@@ -28,6 +28,11 @@ jobs:
         run: cargo test --locked -p adk-sandbox -p adk-security --all-targets
       - name: Public execution feature
         run: cargo test --locked -p adk --no-default-features --features execution --all-targets
+      - name: Seatbelt denial diagnostics
+        if: failure() && runner.os == 'macOS'
+        run: |
+          sudo /usr/bin/log show --last 3m --style compact --predicate 'eventMessage CONTAINS "Sandbox:" OR process == "sandboxd"' | tail -100
+          python3 scripts/seatbelt-diagnostics.py
   unsupported-target:
     runs-on: windows-latest
     steps:

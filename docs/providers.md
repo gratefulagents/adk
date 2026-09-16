@@ -43,8 +43,8 @@ Test paths below are relative to `crates/adk-providers/tests`.
 | Host secrets and cache affinity | Sensitive headers, redacted material/errors, HTTPS/loopback restrictions, redirects/proxies disabled; endpoint/account/auth-scoped cache tests |
 
 Fixture provenance and differential limits are in `fixtures/providers/README.md`.
-The Go-executed Chat SSE fixture is compared at every byte split; remaining
-protocol/error/OAuth vectors are synthetic Rust contract tests, not falsely
+The Go-executed Chat and sparse-terminal Responses SSE fixtures are compared at
+every byte split; remaining protocol/error/OAuth vectors are synthetic Rust contract tests, not falsely
 labeled Go differential tests. A fresh independent review must assess whether
 that evidence closes every acceptance edge case.
 

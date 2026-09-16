@@ -439,6 +439,7 @@ pub struct StreamState {
     response_call_ids: BTreeMap<String, String>,
     response_deltas: BTreeSet<(u64, u64, bool)>,
     response_items: BTreeMap<u64, Value>,
+    response_fragments: BTreeMap<(u64, u64, bool), String>,
     archived_tools: Vec<Value>,
     stopped_blocks: BTreeSet<u64>,
 }
@@ -457,6 +458,7 @@ impl StreamState {
             response_call_ids: BTreeMap::new(),
             response_deltas: BTreeSet::new(),
             response_items: BTreeMap::new(),
+            response_fragments: BTreeMap::new(),
             archived_tools: Vec::new(),
             stopped_blocks: BTreeSet::new(),
         }
@@ -486,6 +488,14 @@ impl StreamState {
         }
         let event: Value =
             serde_json::from_str(data).map_err(|_| protocol_error("invalid SSE JSON"))?;
+        if self.protocol == Protocol::Responses && event["type"] == "error" {
+            return Err(RequestFailure::http(
+                502,
+                &reqwest::header::HeaderMap::new(),
+                SystemTime::now(),
+            )
+            .into_error());
+        }
         if let Some(error) = crate::error::provider_error(&event) {
             return Err(error);
         }
@@ -504,12 +514,32 @@ impl StreamState {
             .unwrap_or(0);
         let delta_key = (index, part, kind.contains("reasoning"));
         match kind {
+            "response.created" | "response.in_progress" => {
+                if let Some(response) = event["response"].as_object() {
+                    for key in ["id", "model", "metadata"] {
+                        if let Some(value) = response.get(key) {
+                            self.body[key] = value.clone();
+                        }
+                    }
+                }
+                Ok(Vec::new())
+            }
             "response.output_text.delta"
+            | "response.refusal.delta"
             | "response.reasoning_summary_text.delta"
             | "response.reasoning_text.delta" => {
                 self.response_deltas.insert(delta_key);
-                let delta = required(&event, "delta")?;
-                Ok(vec![if kind == "response.output_text.delta" {
+                let mut delta = required(&event, "delta")?;
+                if kind == "response.refusal.delta"
+                    && !self.response_fragments.contains_key(&delta_key)
+                {
+                    delta = format!("The model refused to respond: {delta}");
+                }
+                self.response_fragments
+                    .entry(delta_key)
+                    .or_default()
+                    .push_str(&delta);
+                Ok(vec![if !delta_key.2 {
                     ModelEvent::TextDelta { delta }
                 } else {
                     ModelEvent::ReasoningDelta { delta }
@@ -538,36 +568,89 @@ impl StreamState {
                     .cloned()
                     .ok_or_else(|| protocol_error("tool arguments before call item"))?;
                 self.response_deltas.insert(delta_key);
-                Ok(vec![ModelEvent::ToolArgumentsDelta {
-                    call_id,
-                    delta: required(
-                        &event,
-                        if kind.ends_with(".done") {
-                            "arguments"
-                        } else {
-                            "delta"
-                        },
-                    )?,
-                }])
+                let delta = required(
+                    &event,
+                    if kind.ends_with(".done") {
+                        "arguments"
+                    } else {
+                        "delta"
+                    },
+                )?;
+                self.response_fragments
+                    .entry(delta_key)
+                    .or_default()
+                    .push_str(&delta);
+                Ok(vec![ModelEvent::ToolArgumentsDelta { call_id, delta }])
             }
             "response.output_text.done"
+            | "response.refusal.done"
             | "response.reasoning_summary_text.done"
             | "response.reasoning_text.done" => {
                 if !self.response_deltas.insert(delta_key) {
                     return Ok(Vec::new());
                 }
-                let delta = required(&event, "text")?;
+                let mut delta = required(
+                    &event,
+                    if kind == "response.refusal.done" {
+                        "refusal"
+                    } else {
+                        "text"
+                    },
+                )?;
                 if delta.is_empty() {
                     return Ok(Vec::new());
                 }
-                Ok(vec![if kind == "response.output_text.done" {
+                if kind == "response.refusal.done" {
+                    delta = format!("The model refused to respond: {delta}");
+                }
+                self.response_fragments.insert(delta_key, delta.clone());
+                Ok(vec![if !delta_key.2 {
                     ModelEvent::TextDelta { delta }
                 } else {
                     ModelEvent::ReasoningDelta { delta }
                 }])
             }
             "response.completed" | "response.incomplete" => {
-                self.body = event["response"].clone();
+                let terminal = event["response"]
+                    .as_object()
+                    .ok_or_else(|| protocol_error("invalid response terminal event"))?;
+                for (key, value) in terminal {
+                    self.body[key] = value.clone();
+                }
+                for (&(index, _, reasoning), text) in &self.response_fragments {
+                    self.response_items.entry(index).or_insert_with(|| {
+                        if reasoning {
+                            json!({"type":"reasoning","summary":[]})
+                        } else {
+                            json!({"type":"message","role":"assistant","content":[]})
+                        }
+                    });
+                    if self.response_items[&index]["type"] == "function_call"
+                        && self.response_items[&index]["arguments"]
+                            .as_str()
+                            .is_none_or(str::is_empty)
+                    {
+                        self.response_items.get_mut(&index).unwrap()["arguments"] =
+                            text.clone().into();
+                    }
+                }
+                for (&index, item) in &mut self.response_items {
+                    let reasoning = item["type"] == "reasoning";
+                    if !reasoning && item["type"] != "message" {
+                        continue;
+                    }
+                    let field = if reasoning { "summary" } else { "content" };
+                    if item[field].as_array().is_none_or(|parts| {
+                        parts
+                            .iter()
+                            .all(|part| part["text"].as_str().is_none_or(str::is_empty))
+                    }) {
+                        let parts: Vec<_> = self.response_fragments.iter().filter(|((output, _, is_reasoning), _)| *output == index && *is_reasoning == reasoning).map(|(_, text)| json!({"type":if reasoning { "summary_text" } else { "output_text" },"text":text})).collect();
+                        if !parts.is_empty() {
+                            item[field] = parts.into();
+                        }
+                    }
+                }
                 if self
                     .body
                     .get("output")

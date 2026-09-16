@@ -529,7 +529,11 @@ fn compaction(item: &Value, origin: &str) -> RunItem {
                 .unwrap_or_default()
                 .to_owned(),
             content: item["content"].as_str().unwrap_or_default().to_owned(),
-            created_by: origin.to_owned(),
+            created_by: item["created_by"]
+                .as_str()
+                .filter(|value| !value.trim().is_empty())
+                .unwrap_or(origin)
+                .to_owned(),
         },
     }
 }
@@ -541,11 +545,25 @@ fn string(value: &Value, field: &str) -> Result<String, Error> {
         )
     })
 }
-fn call(value: &Value, id: &str, name: &str, arguments: &str) -> Result<RunItem, Error> {
+fn call(
+    value: &Value,
+    id: &str,
+    name: &str,
+    arguments: &str,
+    normalize: bool,
+) -> Result<RunItem, Error> {
     let arguments = match &value[arguments] {
         Value::String(raw) if raw.trim().is_empty() => json!({}),
-        Value::String(raw) => serde_json::from_str(raw)
-            .map_err(|_| Error::new(ErrorCategory::ModelBehavior, "invalid tool arguments JSON"))?,
+        Value::String(raw) => match serde_json::from_str(raw) {
+            Ok(value) => value,
+            Err(_) if normalize => json!({}),
+            Err(_) => {
+                return Err(Error::new(
+                    ErrorCategory::ModelBehavior,
+                    "invalid tool arguments JSON",
+                ));
+            }
+        },
         value if value.is_object() => value.clone(),
         _ => {
             return Err(Error::new(
@@ -577,7 +595,7 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                 return Err(crate::error::response_error(body, false).expect("failed response"));
             }
             let output = body["output"].as_array().map(Vec::as_slice).unwrap_or(&[]);
-            for item in output {
+            for (index, item) in output.iter().enumerate() {
                 match item["type"].as_str() {
                     Some("message") => {
                         let mut parts = Vec::new();
@@ -591,7 +609,10 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                                     })
                                 }
                                 Some("refusal") => parts.push(Content::Text {
-                                    text: string(part, "refusal")?,
+                                    text: format!(
+                                        "The model refused to respond: {}",
+                                        string(part, "refusal")?
+                                    ),
                                 }),
                                 _ => return Err(unsupported()),
                             }
@@ -621,8 +642,42 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                             },
                         });
                     }
-                    Some("function_call") => {
-                        items.push(call(item, "call_id", "name", "arguments")?)
+                    Some(
+                        "function_call"
+                        | "web_search_call"
+                        | "file_search_call"
+                        | "code_interpreter_call"
+                        | "mcp_call"
+                        | "computer_call"
+                        | "image_generation_call"
+                        | "tool_search_call"
+                        | "local_shell_call"
+                        | "shell_call"
+                        | "apply_patch_call"
+                        | "custom_tool_call",
+                    ) => {
+                        let mut tool = item.clone();
+                        let kind = item["type"].as_str().unwrap();
+                        if tool["call_id"]
+                            .as_str()
+                            .is_none_or(|id| id.trim().is_empty())
+                        {
+                            tool["call_id"] = if kind == "function_call" {
+                                format!("call_{index}")
+                            } else {
+                                format!("call_{kind}_{index}")
+                            }
+                            .into();
+                        }
+                        if tool["name"].as_str().is_none_or(str::is_empty)
+                            && kind != "function_call"
+                        {
+                            tool["name"] = kind.into();
+                        }
+                        if tool.get("arguments").is_none() {
+                            tool["arguments"] = json!({});
+                        }
+                        items.push(call(&tool, "call_id", "name", "arguments", true)?);
                     }
                     Some("reasoning") => {
                         let text = item["summary"]
@@ -706,6 +761,17 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                     text: text.to_owned(),
                 });
             }
+            if let Some(content) = msg["content"].as_array() {
+                for part in content {
+                    if part["type"] == "text"
+                        && let Some(text) = part["text"].as_str().filter(|text| !text.is_empty())
+                    {
+                        parts.push(Content::Text {
+                            text: text.to_owned(),
+                        });
+                    }
+                }
+            }
             if let Some(refusal) = msg["refusal"].as_str().filter(|text| !text.is_empty()) {
                 parts.push(Content::Text {
                     text: if parts.is_empty() {
@@ -719,15 +785,26 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                 items.push(message(parts));
             }
             if let Some(calls) = msg["tool_calls"].as_array() {
-                for tool in calls {
+                for (index, tool) in calls.iter().enumerate() {
                     let mut function = tool["function"].clone();
-                    function["id"] = tool["id"].clone();
-                    items.push(call(&function, "id", "name", "arguments")?);
+                    function["id"] = tool["id"]
+                        .as_str()
+                        .filter(|id| !id.is_empty())
+                        .map_or_else(|| format!("call_{index}"), str::to_owned)
+                        .into();
+                    if function.get("arguments").is_none() {
+                        function["arguments"] = json!({});
+                    }
+                    items.push(call(&function, "id", "name", "arguments", true)?);
                 }
             }
-            end_turn = body["end_turn"]
-                .as_bool()
-                .or_else(|| Some(choice["finish_reason"] != "tool_calls"));
+            end_turn = body["end_turn"].as_bool().or_else(|| {
+                Some(
+                    !items
+                        .iter()
+                        .any(|item| matches!(item, RunItem::ToolCall { .. })),
+                )
+            });
         }
         Protocol::Anthropic => {
             for part in body["content"].as_array().ok_or_else(|| {
@@ -753,7 +830,7 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                             ..Default::default()
                         },
                     }),
-                    Some("tool_use") => items.push(call(part, "id", "name", "input")?),
+                    Some("tool_use") => items.push(call(part, "id", "name", "input", false)?),
                     Some("compaction") => items.push(compaction(part, "anthropic")),
                     _ => return Err(unsupported()),
                 }

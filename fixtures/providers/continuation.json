@@ -1104,6 +1104,41 @@
       "summary": "auto"
     }
   },
+  "responses_sparse_sse": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"responses-fixture\",\"model\":\"gpt-5.6\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":0,\"item\":{\"type\":\"reasoning\",\"id\":\"reasoning-fixture\",\"summary\":[]}}\n\ndata: {\"type\":\"response.reasoning_summary_text.delta\",\"output_index\":0,\"delta\":\"why\"}\n\ndata: {\"type\":\"response.output_item.done\",\"output_index\":0,\"item\":{\"type\":\"reasoning\",\"id\":\"reasoning-fixture\",\"encrypted_content\":\"opaque\"}}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":1,\"item\":{\"type\":\"message\",\"role\":\"assistant\",\"content\":[]}}\n\ndata: {\"type\":\"response.content_part.added\",\"output_index\":1,\"part\":{\"type\":\"output_text\",\"text\":\"\"}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":1,\"delta\":\"hé\"}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":1,\"delta\":\"llo\"}\n\ndata: {\"type\":\"response.output_text.done\",\"output_index\":1,\"text\":\"héllo\"}\n\ndata: {\"type\":\"response.output_item.added\",\"output_index\":2,\"item\":{\"type\":\"function_call\",\"id\":\"item-fixture\",\"call_id\":\"call-fixture\",\"name\":\"lookup\",\"arguments\":\"\"}}\n\ndata: {\"type\":\"response.function_call_arguments.done\",\"output_index\":2,\"item_id\":\"item-fixture\",\"arguments\":\"{\\\"q\\\":1}\"}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"status\":\"completed\",\"end_turn\":false,\"output\":[],\"usage\":{\"input_tokens\":100,\"output_tokens\":20,\"input_tokens_details\":{\"cached_tokens\":70,\"cache_write_tokens\":11}}}}\n\n",
+  "responses_sparse_sse_response": {
+    "id": "responses-fixture",
+    "type": "",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "why",
+        "encrypted_content": "opaque",
+        "id": "reasoning-fixture"
+      },
+      {
+        "type": "text",
+        "text": "héllo"
+      },
+      {
+        "type": "tool_use",
+        "id": "call-fixture",
+        "name": "lookup",
+        "input": {
+          "q": 1
+        }
+      }
+    ],
+    "model": "gpt-5.6",
+    "stop_reason": "end_turn",
+    "usage": {
+      "input_tokens": 100,
+      "output_tokens": 20,
+      "cache_read_input_tokens": 70,
+      "cache_creation_input_tokens": 11
+    },
+    "end_turn": false
+  },
   "retry_headers": [
     {
       "capped_seconds": 1,

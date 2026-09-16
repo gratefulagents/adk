@@ -11,8 +11,10 @@ customer data. The original response ID is synthetic and retained.
 opaque strings. The Rust contract test compares Responses replay JSON against
 that output and decodes the Go-generated OpenRouter reasoning envelope. The
 fixture also includes Go-executed Responses/Chat requests, a Chat reasoning/text/
-tool SSE stream and assembled result, 81 OpenAI and 12 Anthropic price vectors,
-and six retry-header vectors. The Rust SSE differential checks every byte split. JSON
+tool SSE stream and assembled result, a Responses stream whose sparse terminal
+omits output (including encrypted reasoning and done-only tool arguments),
+81 OpenAI and 12 Anthropic price vectors, and six retry-header vectors.
+The Rust SSE differentials check every byte split. JSON
 member order is not significant; opaque continuation strings are unchanged.
 Regenerate with `bash scripts/providers/generate.sh /path/to/pinned/sdk`.
 The script checks the source revision and removes its temporary Go test on exit.

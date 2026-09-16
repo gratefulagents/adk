@@ -1038,3 +1038,169 @@ fn empty_responses_message_is_retryable_and_chat_keeps_explicit_false() {
     assert_eq!(response.end_turn, Some(false));
     assert_eq!(response.metadata["fixture"], true);
 }
+
+#[test]
+fn executed_go_sparse_responses_stream_retains_deltas_at_every_boundary() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let source = golden["responses_sparse_sse"].as_str().unwrap().as_bytes();
+    let reference = &golden["responses_sparse_sse_response"];
+    let mut expected = wire::response(reference, Protocol::Anthropic).unwrap();
+    expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    let adk_core::RunItem::Reasoning { reasoning } = &mut expected.items[0] else {
+        panic!()
+    };
+    reasoning.id = reference["content"][0]["id"].as_str().unwrap().into();
+    reasoning.encrypted_content = reference["content"][0]["encrypted_content"]
+        .as_str()
+        .unwrap()
+        .into();
+    for split in 0..=source.len() {
+        let mut decoder = Decoder::default();
+        let mut stream = StreamState::new(Protocol::Responses);
+        let mut completed = Vec::new();
+        for chunk in [&source[..split], &source[split..]] {
+            for event in decoder.feed(chunk).unwrap() {
+                for event in stream.event(&event.data).unwrap() {
+                    if let adk_core::ModelEvent::Complete { response } = event {
+                        completed.push(response);
+                    }
+                }
+            }
+        }
+        decoder.finish().unwrap();
+        assert_eq!(completed, vec![expected.clone()], "split {split}");
+    }
+}
+
+#[test]
+fn explicit_compaction_origin_is_not_relabelled_as_the_current_protocol() {
+    for protocol in [Protocol::Responses, Protocol::Anthropic] {
+        let block = json!({"type":"compaction","id":"c","created_by":"foreign-gateway","encrypted_content":"opaque","content":"retained context"});
+        let body = if protocol == Protocol::Responses {
+            json!({"output":[block]})
+        } else {
+            json!({"content":[block]})
+        };
+        let response = wire::response(&body, protocol).unwrap();
+        assert!(
+            matches!(&response.items[0], adk_core::RunItem::Compaction { compaction } if compaction.created_by == "foreign-gateway")
+        );
+        let mut input = request();
+        input.input = response.items;
+        let replay = wire::request(&input, protocol, false).unwrap();
+        assert!(!replay.to_string().contains("opaque"));
+        assert!(replay.to_string().contains("retained context"));
+    }
+}
+
+#[test]
+fn sparse_refusal_stream_has_one_prefix_and_is_not_empty_output() {
+    for done_only in [false, true] {
+        let mut stream = StreamState::new(Protocol::Responses);
+        let events = if done_only {
+            vec![json!({"type":"response.refusal.done","output_index":0,"refusal":"cannot help"})]
+        } else {
+            vec![
+                json!({"type":"response.refusal.delta","output_index":0,"delta":"cannot "}),
+                json!({"type":"response.refusal.delta","output_index":0,"delta":"help"}),
+                json!({"type":"response.refusal.done","output_index":0,"refusal":"cannot help"}),
+            ]
+        };
+        let mut visible = String::new();
+        for event in events {
+            for event in stream.event(&event.to_string()).unwrap() {
+                if let adk_core::ModelEvent::TextDelta { delta } = event {
+                    visible.push_str(&delta);
+                }
+            }
+        }
+        assert_eq!(visible, "The model refused to respond: cannot help");
+        let events = stream
+            .event(r#"{"type":"response.completed","response":{"status":"completed","output":[]}}"#)
+            .unwrap();
+        let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+            panic!()
+        };
+        assert!(
+            matches!(&response.items[0], adk_core::RunItem::Message { message } if message.content == vec![adk_core::Content::Text { text: visible }])
+        );
+    }
+}
+
+#[test]
+fn responses_in_band_transport_error_is_retryable_and_redacted() {
+    let mut stream = StreamState::new(Protocol::Responses);
+    let error = stream
+        .event(r#"{"type":"error","message":"secret-fixture","code":"unexpected_backend_error"}"#)
+        .unwrap_err();
+    assert!(retry_advice(&error).unwrap().should_retry);
+    assert!(!format!("{error:?}").contains("secret-fixture"));
+}
+
+#[test]
+fn responses_native_tool_outputs_and_missing_call_ids_match_baseline() {
+    for kind in [
+        "function_call",
+        "web_search_call",
+        "file_search_call",
+        "code_interpreter_call",
+        "mcp_call",
+        "computer_call",
+        "image_generation_call",
+        "tool_search_call",
+        "local_shell_call",
+        "shell_call",
+        "apply_patch_call",
+        "custom_tool_call",
+    ] {
+        let mut item = json!({"type":kind});
+        if kind == "function_call" {
+            item["name"] = "lookup".into();
+        }
+        let response = wire::response(&json!({"output":[item]}), Protocol::Responses).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!()
+        };
+        assert_eq!(
+            call.id,
+            if kind == "function_call" {
+                "call_0".to_owned()
+            } else {
+                format!("call_{kind}_0")
+            }
+        );
+        assert_eq!(call.arguments, json!({}));
+        assert_eq!(
+            call.name,
+            if kind == "function_call" {
+                "lookup"
+            } else {
+                kind
+            }
+        );
+    }
+}
+
+#[test]
+fn compatible_chat_multipart_narration_and_truncated_tool_arguments_match_reference() {
+    let body = json!({"choices":[{"message":{"content":[{"type":"text","text":"working"}]},"finish_reason":"tool_calls"}]});
+    let response = wire::response(&body, Protocol::Chat).unwrap();
+    assert_eq!(response.end_turn, Some(true));
+    assert_eq!(response.items.len(), 1);
+    for protocol in [Protocol::Chat, Protocol::Responses] {
+        let body = if protocol == Protocol::Chat {
+            json!({"choices":[{"message":{"tool_calls":[{"function":{"name":"lookup","arguments":"{\"incomplete\":"}}]},"finish_reason":"length"}]})
+        } else {
+            json!({"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"output":[{"type":"function_call","name":"lookup","arguments":"{\"incomplete\":"}]})
+        };
+        let response = wire::response(&body, protocol).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!()
+        };
+        assert_eq!(call.id, "call_0");
+        assert_eq!(call.arguments, json!({}));
+    }
+}

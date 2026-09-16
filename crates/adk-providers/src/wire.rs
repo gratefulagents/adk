@@ -285,12 +285,21 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                 body["response_format"] = json!({"type":"json_schema","json_schema":{"name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema}})
             }
             Protocol::Anthropic => {
-                body["output_config"] = json!({"format":{"type":"json_schema","schema":schema}})
+                body["output_format"] = json!({"type":"json_schema","schema":schema})
             }
         }
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {
+        if key == "thinking_budget" && protocol == Protocol::Anthropic {
+            if !value.is_u64() {
+                return Err(crate::invalid(
+                    "thinking budget must be a nonnegative integer",
+                ));
+            }
+            body[key] = value.clone();
+            continue;
+        }
         if !matches!(
             key.as_str(),
             "temperature"
@@ -313,6 +322,9 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
             return Err(crate::invalid("unsupported provider setting"));
         }
         body[key] = value.clone();
+    }
+    if protocol == Protocol::Anthropic {
+        crate::anthropic::shape(&mut body, request, crate::auth::AuthMode::ApiKey);
     }
     Ok(body)
 }

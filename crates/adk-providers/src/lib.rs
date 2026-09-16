@@ -3,6 +3,7 @@
 //! Requests and streams borrow no global state. Dropping an in-flight operation drops
 //! its HTTP future; no background tasks are spawned. See `docs/providers.md` for
 //! the explicitly tested compatibility boundary.
+pub mod anthropic;
 pub mod auth;
 pub mod client;
 pub mod copilot;

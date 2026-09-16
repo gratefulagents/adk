@@ -37,14 +37,14 @@ PR #19 (`28dcc3a`); this work does not depend on an unmerged runner patch.
 |---|---|---|
 | OpenAI | Responses or Chat / API key | Basic explicit protocol paths implemented; full golden parity pending |
 | OpenAI | Codex Responses / OAuth | Refresh exchange and bearer/account headers exist; host-supplied material parsing and encrypted continuation implemented; full Codex shaping parity pending |
-| Anthropic | Messages / API key | Basic wire path implemented; model-dependent thinking, prompt-cache breakpoints, full metadata and output configuration pending |
-| Anthropic | Messages / OAuth | Refresh exchange exists; material parsing and OAuth headers implemented; full Claude Code shaping/tool conventions and fallback parity pending |
+| Anthropic | Messages / API key | Wire path, generation-dependent thinking budgets/adaptive effort and native output schema implemented; error-driven shape/effort healing and full metadata parity pending |
+| Anthropic | Messages / OAuth | Refresh/material, OAuth headers and Claude Code identity implemented; full session metadata and fallback parity pending |
 | OpenRouter | Chat default or explicit Responses / API key | Generic explicit protocol can target endpoint; typed factory, host-scoped attribution and reasoning-details replay implemented; fallback `models` parity pending |
 | Gemini | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
 | Groq | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
 | xAI | Responses default / API key | Canonical typed factory implemented; model settings and fixtures pending |
 | Local | Chat / optional API key | Explicit loopback HTTP and anonymous scope supported; canonical factory/defaults implemented |
-| Copilot | Model-family Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh/material, family routing, explicit protocol override, token endpoint allow-list and identity headers implemented; Claude thinking/cache shaping and full fixtures pending |
+| Copilot | Model-family Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh/material, family routing, explicit protocol override, token endpoint allow-list and identity headers implemented; generation-aware Claude thinking and cache breakpoints implemented; error healing and full fixtures pending |
 | Named/multi | Above under independent prefixes, route overrides | Explicit registry and typed per-route factory implemented; baseline implicit ProviderSpec inference and delayed unavailable secondary legs pending |
 
 Unsupported audio/files/handoffs fail explicitly. Native `RunItem::Reasoning`

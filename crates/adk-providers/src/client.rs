@@ -99,11 +99,8 @@ impl Provider {
                 .unwrap()
                 .remove("prompt_cache_retention");
         }
-        if scope.mode == AuthMode::CopilotOAuth
-            && self.protocol == Protocol::Anthropic
-            && !request.settings.contains_key("max_tokens")
-        {
-            body["max_tokens"] = 64000.into();
+        if self.protocol == Protocol::Anthropic {
+            crate::anthropic::shape(&mut body, request, scope.mode);
         }
         self.send_body(context, self.protocol.path(), body).await
     }
@@ -136,8 +133,19 @@ impl Provider {
                 body["prompt_cache_key"] =
                     crate::auth::cache_scope(&resolved, &material, key).into();
             }
-            let headers =
+            let mut headers =
                 crate::auth::headers(&resolved, &material, self.protocol == Protocol::Anthropic)?;
+            if self.protocol == Protocol::Anthropic && scope.mode != AuthMode::CopilotOAuth {
+                let betas = crate::anthropic::beta(
+                    body["model"].as_str().unwrap_or_default(),
+                    scope.mode == AuthMode::AnthropicOAuth,
+                );
+                headers.insert(
+                    "anthropic-beta",
+                    reqwest::header::HeaderValue::from_str(&betas)
+                        .map_err(|_| crate::invalid("invalid beta header"))?,
+                );
+            }
             let response = crate::active(
                 context,
                 self.client

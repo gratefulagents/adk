@@ -378,7 +378,14 @@ pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<He
     }
     if anthropic {
         out.insert("anthropic-version", HeaderValue::from_static("2023-06-01"));
+        if scope.mode != AuthMode::CopilotOAuth {
+            out.insert("x-app", HeaderValue::from_static("cli"));
+        }
         if scope.mode == AuthMode::AnthropicOAuth {
+            out.insert(
+                "anthropic-dangerous-direct-browser-access",
+                HeaderValue::from_static("true"),
+            );
             out.insert(
                 "anthropic-beta",
                 HeaderValue::from_static("oauth-2025-04-20"),

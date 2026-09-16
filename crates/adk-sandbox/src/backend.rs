@@ -297,6 +297,8 @@ mod tests {
         assert!(profile.contains("(deny default)"));
         assert!(profile.contains("(allow file-read* (literal \"/\"))"));
         assert!(!profile.contains("(subpath \"/\")"));
+        assert!(profile.contains("(literal \"/private/var/select/sh\")"));
+        assert!(!profile.contains("(subpath \"/private/var\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
         assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
         assert!(!profile.contains("(allow network*)"));

@@ -5,6 +5,10 @@
 ; dyld opens the root directory as an openat base during process startup.
 ; Literal "/" grants directory access, NOT reads beneath it (no subpath rule).
 (allow file-read* (literal "/"))
+; macOS /bin/sh reads this system-owned shell selector before execing bash.
+; Without it the command runs but emits a warning into every captured PTY.
+(allow file-read-metadata (literal "/var"))
+(allow file-read* (literal "/private/var/select/sh"))
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))

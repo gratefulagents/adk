@@ -361,14 +361,22 @@ fn repair(body: &mut Value, protocol: Protocol, error: &str, flipped: &mut bool)
             true
         }
         Some(RequestRepair::ReasoningEffort) if protocol != Protocol::Anthropic => {
-            let next = match body["reasoning"]["effort"].as_str() {
+            let path = if body.get("reasoning_effort").is_some() {
+                "/reasoning_effort"
+            } else {
+                "/reasoning/effort"
+            };
+            let Some(effort) = body.pointer_mut(path) else {
+                return false;
+            };
+            let next = match effort.as_str() {
                 Some("max") => "xhigh",
                 Some("xhigh") => "high",
                 Some("none") => "minimal",
                 Some("minimal") => "low",
                 _ => return false,
             };
-            body["reasoning"]["effort"] = next.into();
+            *effort = next.into();
             true
         }
         _ => false,

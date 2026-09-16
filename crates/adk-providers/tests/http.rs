@@ -748,6 +748,165 @@ async fn copilot_chat_streams_buffered_tool_calls_and_shapes_reasoning() {
 }
 
 #[tokio::test]
+async fn copilot_chat_effort_healing_preserves_payload_and_stops_at_terminal_effort() {
+    use adk_core::{Content, Message, Reasoning, Role, RunItem};
+    use adk_providers::factory::{Kind, RouteSpec};
+    use serde_json::{Value, json};
+
+    for buffered in [true, false] {
+        for efforts in [["max", "xhigh", "high"], ["none", "minimal", "low"]] {
+            for terminal_failure in [false, true] {
+                let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+                listener.set_nonblocking(true).unwrap();
+                let addr = listener.local_addr().unwrap();
+                let server = std::thread::spawn(move || {
+                    let mut requests = Vec::new();
+                    let deadline = std::time::Instant::now() + Duration::from_secs(5);
+                    for index in 0..3 {
+                        let mut socket = loop {
+                            match listener.accept() {
+                                Ok((socket, _)) => break socket,
+                                Err(error) if error.kind() == std::io::ErrorKind::WouldBlock => {
+                                    assert!(std::time::Instant::now() < deadline, "missing retry");
+                                    std::thread::sleep(Duration::from_millis(5));
+                                }
+                                Err(error) => panic!("{error}"),
+                            }
+                        };
+                        let captured = read_request(&mut socket);
+                        assert!(captured.starts_with("POST /chat/completions HTTP/1.1"));
+                        requests.push(
+                            serde_json::from_str::<Value>(
+                                captured.split_once("\r\n\r\n").unwrap().1,
+                            )
+                            .unwrap(),
+                        );
+                        let (status, body) = if index < 2 || terminal_failure {
+                            (
+                                400,
+                                r#"{"error":{"message":"reasoning effort rejected secret-fixture"}}"#,
+                            )
+                        } else {
+                            (
+                                200,
+                                "data: {\"choices\":[{\"delta\":{\"content\":\"ok\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
+                            )
+                        };
+                        write!(socket, "HTTP/1.1 {status} fixture\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+                    }
+                    (requests, listener)
+                });
+                let model = RouteSpec {
+                    kind: Kind::Copilot,
+                    prefix: Some("work".into()),
+                    endpoint: Some(format!("http://{addr}")),
+                    protocol: Some(Protocol::Chat),
+                    mode: AuthMode::CopilotOAuth,
+                    account: None,
+                }
+                .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+                .unwrap();
+                let mut input = request();
+                input.model = "gpt-4o".into();
+                input
+                    .settings
+                    .insert("reasoning_effort".into(), json!(efforts[0]));
+                input
+                    .settings
+                    .insert("reasoning".into(), json!({"effort":"low"}));
+                input.input = vec![
+                    RunItem::Message {
+                        message: Message {
+                            role: Role::User,
+                            content: vec![Content::Text {
+                                text: "original history".into(),
+                            }],
+                        },
+                    },
+                    RunItem::Reasoning {
+                        reasoning: Reasoning {
+                            text: "copilot text".into(),
+                            signature: "opaque".into(),
+                            ..Default::default()
+                        },
+                    },
+                ];
+                input.tools.push(adk_core::ToolDefinition {
+                    name: "WebFetch".into(),
+                    description: "fetch a url".into(),
+                    input_schema: serde_json::from_value(
+                        json!({"type":"object","properties":{"url":{"type":"string"}}}),
+                    )
+                    .unwrap(),
+                    read_only: true,
+                    requires_approval: false,
+                });
+                let ctx = context();
+                let result = if buffered {
+                    model.complete(&ctx, input).await
+                } else {
+                    match model.stream(&ctx, input).await {
+                        Ok(mut stream) => {
+                            let mut response = None;
+                            while let Some(event) = stream.next().await.unwrap() {
+                                if let ModelEvent::Complete { response: complete } = event {
+                                    assert!(response.replace(complete).is_none());
+                                }
+                            }
+                            Ok(response.unwrap())
+                        }
+                        Err(error) => Err(error),
+                    }
+                };
+                let (requests, listener) = server.join().unwrap();
+                if terminal_failure {
+                    let error = result.unwrap_err();
+                    let advice = model.retry_advice(&error).unwrap();
+                    assert_eq!(advice.reason, "400");
+                    assert!(!advice.should_retry);
+                    assert!(!format!("{error:?}").contains("secret-fixture"));
+                } else {
+                    assert_eq!(result.unwrap().end_turn, Some(true));
+                }
+                assert_eq!(
+                    listener.accept().unwrap_err().kind(),
+                    std::io::ErrorKind::WouldBlock
+                );
+                assert_eq!(requests.len(), 3);
+                let mut original = requests[0].clone();
+                original.as_object_mut().unwrap().remove("reasoning_effort");
+                assert_eq!(original["model"], "gpt-4o");
+                assert_eq!(original["stream"], true);
+                assert_eq!(original["stream_options"]["include_usage"], true);
+                assert_eq!(original["tools"][0]["function"]["name"], "WebFetch");
+                let messages = original["messages"].as_array().unwrap();
+                assert!(messages.iter().any(|message| message["role"] == "user"
+                    && message["content"].to_string().contains("original history")));
+                assert!(
+                    messages
+                        .iter()
+                        .any(|message| message["reasoning_text"] == "copilot text"
+                            && message["reasoning_opaque"] == "opaque")
+                );
+                for (mut body, effort) in requests.into_iter().zip(efforts) {
+                    assert_eq!(
+                        body.as_object_mut().unwrap().remove("reasoning_effort"),
+                        Some(json!(effort))
+                    );
+                    assert!(body.get("reasoning").is_none());
+                    for message in body["messages"].as_array().unwrap() {
+                        for field in ["reasoning", "reasoning_content", "reasoning_details"] {
+                            assert!(message.get(field).is_none());
+                        }
+                    }
+                    assert_eq!(body, original);
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
 async fn request_healing_is_bounded_and_preserves_original_payload() {
     for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();

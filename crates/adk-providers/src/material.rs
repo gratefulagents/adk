@@ -24,7 +24,7 @@ fn string(root: &Value, paths: &[&str]) -> Option<String> {
         .find(|s| !s.is_empty())
         .map(str::to_owned)
 }
-fn first_time(root: &Value, paths: &[&str]) -> Option<SystemTime> {
+pub(crate) fn first_time(root: &Value, paths: &[&str]) -> Option<SystemTime> {
     paths
         .iter()
         .filter_map(|p| root.pointer(p))
@@ -58,7 +58,9 @@ pub fn account_from_id_token(token: &str) -> Option<String> {
 pub fn access_token_expiry(token: &str) -> Option<SystemTime> {
     let claims = jwt_claims(token)?;
     let value = claims.get("exp")?;
-    let seconds = value.as_i64().or_else(|| value.as_str()?.parse().ok())?;
+    let seconds = value
+        .as_i64()
+        .or_else(|| value.as_str()?.trim().parse().ok())?;
     if seconds < 0 {
         return SystemTime::UNIX_EPOCH.checked_sub(Duration::from_secs(seconds.unsigned_abs()));
     }
@@ -288,11 +290,21 @@ pub fn serialize(mode: AuthMode, material: &Material, now: SystemTime) -> Result
         _ => return Err(crate::invalid("material codec requires an OAuth mode")),
     };
     if mode == AuthMode::AnthropicOAuth {
-        if let Some(account) = &material.account {
-            body["account_uuid"] = account.clone().into();
+        if let Some(account) = material
+            .account
+            .as_deref()
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+        {
+            body["account_uuid"] = account.into();
         }
-        if let Some(email) = &material.email {
-            body["email"] = email.clone().into();
+        if let Some(email) = material
+            .email
+            .as_deref()
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+        {
+            body["email"] = email.into();
         }
         if let Some(expiry) = material.expires_at {
             body["expired"] = format_time(expiry)?.into();

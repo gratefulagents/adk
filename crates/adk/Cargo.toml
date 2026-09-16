@@ -10,11 +10,14 @@ publish.workspace = true
 default = []
 compat = ["dep:adk-codec"]
 runtime = ["dep:adk-runtime"]
+providers = ["dep:adk-providers"]
+providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 
 [dependencies]
 adk-core.workspace = true
 adk-codec = { workspace = true, optional = true }
 adk-runtime = { workspace = true, optional = true }
+adk-providers = { version = "0.1.0", path = "../adk-providers", optional = true }
 
 [dev-dependencies]
 tokio.workspace = true

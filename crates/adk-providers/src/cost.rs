@@ -5,7 +5,10 @@ use adk_core::Usage;
 /// Unknown OpenAI model prices remain unknown, rather than silently free.
 pub fn openai(model: &str, usage: &Usage) -> Option<f64> {
     let model = model.trim();
-    let model = model.strip_prefix("openai/").unwrap_or(model).trim();
+    let model = model
+        .split_once('/')
+        .filter(|(prefix, bare)| prefix.trim() == "openai" && !bare.trim().is_empty())
+        .map_or(model, |(_, bare)| bare.trim());
     let long = usage.input_tokens > 272_000;
     let (input, read, write, output) = match model {
         "gpt-4" | "gpt-4.1" => (2.0, 0.5, 0.0, 8.0),
@@ -67,8 +70,16 @@ pub fn anthropic(model: &str, usage: &Usage) -> f64 {
     {
         model = prefix.to_owned();
     }
-    if model == "claude-3-5-haiku" {
-        model = "claude-haiku-3-5".into();
+    if let Some((version, family)) = model
+        .strip_prefix("claude-")
+        .and_then(|m| m.rsplit_once('-'))
+        && matches!(family, "haiku" | "sonnet" | "opus")
+        && version.split('-').count() <= 2
+        && version
+            .split('-')
+            .all(|part| !part.is_empty() && part.bytes().all(|b| b.is_ascii_digit()))
+    {
+        model = format!("claude-{family}-{version}");
     }
     let (input, output, read, write) = match model.as_str() {
         "claude-fable-5" | "claude-mythos-5" => (10.0, 50.0, 1.0, 12.5),

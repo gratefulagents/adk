@@ -133,3 +133,128 @@ async fn consumer_drop_closes_http_stream_without_detached_reader() {
     tokio::time::sleep(Duration::from_millis(10)).await;
     server.join().unwrap();
 }
+
+struct DropNotice(Arc<std::sync::atomic::AtomicUsize>);
+impl Drop for DropNotice {
+    fn drop(&mut self) {
+        self.0.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    }
+}
+struct BlockingStore {
+    block_replace: bool,
+    entered: tokio::sync::Notify,
+    dropped: Arc<std::sync::atomic::AtomicUsize>,
+}
+impl CredentialStore for BlockingStore {
+    fn load<'a>(
+        &'a self,
+        ctx: &'a Context,
+        scope: &'a Scope,
+    ) -> BoxFuture<'a, Result<Material, Error>> {
+        Box::pin(async move {
+            if !self.block_replace {
+                let _notice = DropNotice(self.dropped.clone());
+                self.entered.notify_one();
+                std::future::pending::<()>().await;
+            }
+            let mut value = Credentials.load(ctx, scope).await?;
+            value.access_token = Secret::new("");
+            value.refresh_token = Some(Secret::new("fixture-refresh"));
+            Ok(value)
+        })
+    }
+    fn replace<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a Scope,
+        _: u64,
+        _: Material,
+    ) -> BoxFuture<'a, Result<bool, Error>> {
+        Box::pin(async move {
+            assert!(self.block_replace);
+            let _notice = DropNotice(self.dropped.clone());
+            self.entered.notify_one();
+            std::future::pending().await
+        })
+    }
+}
+impl Refresh for BlockingStore {
+    fn refresh<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a Scope,
+        mut value: Material,
+    ) -> BoxFuture<'a, Result<Material, Error>> {
+        Box::pin(async move {
+            value.access_token = Secret::new("refreshed-fixture");
+            Ok(value)
+        })
+    }
+}
+#[tokio::test]
+async fn dropping_auth_load_or_cas_drops_host_future_and_releases_scope_lock() {
+    for block_replace in [false, true] {
+        let dropped = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let store = Arc::new(BlockingStore {
+            block_replace,
+            entered: tokio::sync::Notify::new(),
+            dropped: dropped.clone(),
+        });
+        let scope = Scope::new(
+            "owned-auth",
+            "https://fixture.example.test",
+            None,
+            AuthMode::AnthropicOAuth,
+        )
+        .unwrap();
+        let session = Session::new(scope, store.clone(), store.clone()).unwrap();
+        let ctx = Context {
+            run_id: "auth-owner".into(),
+            cancellation: Arc::new(CancellationToken::new()),
+            deadline: None,
+        };
+        for expected_drops in 1..=2 {
+            let mut operation = Box::pin(session.material(&ctx));
+            tokio::select! {
+                _ = store.entered.notified() => {},
+                _ = &mut operation => panic!("auth operation must remain blocked"),
+            }
+            drop(operation);
+            assert_eq!(
+                dropped.load(std::sync::atomic::Ordering::SeqCst),
+                expected_drops
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn cancellation_interrupts_pending_host_cas_without_detaching_it() {
+    let dropped = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let store = Arc::new(BlockingStore {
+        block_replace: true,
+        entered: tokio::sync::Notify::new(),
+        dropped: dropped.clone(),
+    });
+    let scope = Scope::new(
+        "owned-auth",
+        "https://fixture.example.test",
+        None,
+        AuthMode::AnthropicOAuth,
+    )
+    .unwrap();
+    let session = Session::new(scope, store.clone(), store.clone()).unwrap();
+    let cancel = Arc::new(CancellationToken::new());
+    let ctx = Context {
+        run_id: "auth-owner".into(),
+        cancellation: cancel.clone(),
+        deadline: None,
+    };
+    let cancellation = async {
+        store.entered.notified().await;
+        cancel.cancel();
+    };
+    let (result, ()) = tokio::join!(session.material(&ctx), cancellation);
+    assert_eq!(result.unwrap_err().info.category, ErrorCategory::Cancelled);
+    assert_eq!(dropped.load(std::sync::atomic::Ordering::SeqCst), 1);
+}

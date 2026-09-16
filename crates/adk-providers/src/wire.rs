@@ -13,6 +13,19 @@ pub fn encode_reasoning_details(details: &Value) -> String {
         STANDARD_NO_PAD.encode(details.to_string())
     )
 }
+pub(crate) fn reasoning_details_text(details: &Value) -> String {
+    details
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|detail| {
+            detail["text"]
+                .as_str()
+                .filter(|s| !s.is_empty())
+                .or_else(|| detail["summary"].as_str())
+        })
+        .collect()
+}
 pub fn decode_reasoning_details(signature: &str) -> Option<Value> {
     let bytes = STANDARD_NO_PAD
         .decode(signature.strip_prefix(DETAILS_PREFIX)?)
@@ -41,16 +54,6 @@ fn unsupported() -> Error {
         "content is not representable by this provider protocol",
     )
 }
-fn text(content: &[Content]) -> Result<String, Error> {
-    let mut out = String::new();
-    for part in content {
-        match part {
-            Content::Text { text } => out.push_str(text),
-            _ => return Err(unsupported()),
-        }
-    }
-    Ok(out)
-}
 fn role(role: Role) -> &'static str {
     match role {
         Role::System => "system",
@@ -65,6 +68,23 @@ fn content(parts: &[Content], protocol: Protocol, assistant: bool) -> Result<Vec
         (_, Content::Text { text }) => json!({"type":"text","text":text}),
         (Protocol::Chat, Content::Image { uri, .. }) => json!({"type":"image_url","image_url":{"url":uri}}),
         (Protocol::Responses, Content::Image { uri, .. }) => json!({"type":"input_image","image_url":uri}),
+        (protocol, Content::Attachment { media_type, data, detail }) => {
+            if media_type == "application/pdf" {
+                if protocol != Protocol::Anthropic { return Err(unsupported()); }
+                json!({"type":"document","source":{"type":"base64","media_type":media_type,"data":data}})
+            } else if media_type.starts_with("image/") {
+                let uri = format!("data:{media_type};base64,{data}");
+                match protocol {
+                    Protocol::Anthropic => json!({"type":"image","source":{"type":"base64","media_type":media_type,"data":data}}),
+                    Protocol::Responses => json!({"type":"input_image","image_url":uri,"detail":if detail.is_empty() { "auto" } else { detail }}),
+                    Protocol::Chat => {
+                        let mut image = json!({"type":"image_url","image_url":{"url":uri}});
+                        if !detail.is_empty() { image["image_url"]["detail"] = detail.clone().into(); }
+                        image
+                    }
+                }
+            } else { return Err(unsupported()); }
+        },
         (Protocol::Anthropic, Content::Image { uri, media_type }) => {
             if let Some((prefix, data)) = uri.strip_prefix("data:").and_then(|v| v.split_once(',')) {
                 if !prefix.ends_with(";base64") { return Err(unsupported()); }
@@ -76,6 +96,34 @@ fn content(parts: &[Content], protocol: Protocol, assistant: bool) -> Result<Vec
     })).collect()
 }
 
+fn message_content(parts: &[Content], protocol: Protocol, assistant: bool) -> Result<Value, Error> {
+    if protocol != Protocol::Anthropic
+        && parts
+            .iter()
+            .all(|part| matches!(part, Content::Text { .. }))
+    {
+        let text = parts
+            .iter()
+            .filter_map(|part| match part {
+                Content::Text { text } if !text.trim().is_empty() => {
+                    Some(if protocol == Protocol::Responses {
+                        text.trim()
+                    } else {
+                        text.as_str()
+                    })
+                }
+                _ => None,
+            })
+            .collect::<Vec<_>>()
+            .join("\n");
+        return Ok(if text.is_empty() && assistant {
+            Value::Null
+        } else {
+            text.into()
+        });
+    }
+    Ok(content(parts, protocol, assistant)?.into())
+}
 pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Result<Value, Error> {
     if request.model.trim().is_empty() {
         return Err(crate::invalid("model name is empty"));
@@ -89,9 +137,14 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
             entries.push(json!({"role":"system","content":request.instructions}));
         }
     }
-    for item in &request.input {
+    let mut tool_images = Vec::new();
+    for (input_index, item) in request.input.iter().enumerate() {
+        if !matches!(item, RunItem::ToolResult { .. }) && !tool_images.is_empty() {
+            entries.push(json!({"role":"user","content":content(&tool_images, protocol, false)?}));
+            tool_images.clear();
+        }
         let entry = match item {
-            RunItem::Message { message } => {
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
                 if protocol == Protocol::Anthropic
                     && matches!(message.role, Role::System | Role::Developer)
                 {
@@ -108,13 +161,28 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                             parts.push(part.clone());
                         }
                     }
-                    let mut entry = json!({"role":role(message.role),"content":content(&parts, protocol, message.role == Role::Assistant)?});
+                    let mut entry = json!({"role":role(message.role),"content":message_content(&parts, protocol, message.role == Role::Assistant)?});
                     if !reasoning.is_empty() {
                         entry["reasoning_content"] = reasoning.into();
                     }
                     entry
                 } else {
-                    json!({"role":role(message.role),"content":content(&message.content, protocol, message.role == Role::Assistant)?})
+                    let mut entry = json!({"role":role(message.role),"content":message_content(&message.content, protocol, message.role == Role::Assistant)?});
+                    if protocol == Protocol::Responses && message.role == Role::Assistant {
+                        let phase = match item {
+                            RunItem::PhasedMessage { phase, .. } => phase.as_str(),
+                            _ if matches!(
+                                request.input.get(input_index + 1),
+                                Some(RunItem::ToolCall { .. })
+                            ) =>
+                            {
+                                "commentary"
+                            }
+                            _ => "final_answer",
+                        };
+                        entry["phase"] = phase.into();
+                    }
+                    entry
                 }
             }
             RunItem::ToolCall { call } => match protocol {
@@ -128,21 +196,37 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                     json!({"role":"assistant","content":[{"type":"tool_use","id":call.id,"name":call.name,"input":call.arguments}]})
                 }
             },
-            RunItem::ToolResult { call_id, output } => match protocol {
-                Protocol::Responses => {
-                    json!({"type":"function_call_output","call_id":call_id,"output":text(&output.content)?})
-                }
-                Protocol::Chat => {
-                    json!({"role":"tool","tool_call_id":call_id,"content":text(&output.content)?})
-                }
-                Protocol::Anthropic => {
+            RunItem::ToolResult { call_id, output } => {
+                if protocol == Protocol::Anthropic {
                     json!({"role":"user","content":[{"type":"tool_result","tool_use_id":call_id,"content":content(&output.content, protocol, false)?,"is_error":output.is_error}]})
+                } else {
+                    let mut texts = Vec::new();
+                    for part in &output.content {
+                        match part {
+                            Content::Text { text } => texts.push(text.as_str()),
+                            Content::Image { .. } | Content::Attachment { .. } => {
+                                tool_images.push(part.clone())
+                            }
+                            _ => return Err(unsupported()),
+                        }
+                    }
+                    let text = texts.join("\n");
+                    let text = if text.is_empty() {
+                        "(no output)"
+                    } else {
+                        &text
+                    };
+                    if protocol == Protocol::Responses {
+                        json!({"type":"function_call_output","call_id":call_id,"output":text})
+                    } else {
+                        json!({"role":"tool","tool_call_id":call_id,"content":text})
+                    }
                 }
-            },
+            }
             RunItem::Reasoning { reasoning } => match protocol {
                 Protocol::Responses => {
                     if !reasoning.signature.is_empty() || !reasoning.redacted_data.is_empty() {
-                        return Err(unsupported());
+                        continue;
                     }
                     if reasoning.encrypted_content.trim().is_empty() {
                         continue;
@@ -159,7 +243,7 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                     if !reasoning.encrypted_content.is_empty()
                         || reasoning.signature.starts_with(DETAILS_PREFIX)
                     {
-                        return Err(unsupported());
+                        continue;
                     }
                     if !reasoning.redacted_data.is_empty() {
                         json!({"role":"assistant","content":[{"type":"redacted_thinking","data":reasoning.redacted_data}]})
@@ -191,17 +275,42 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                 }
             },
             RunItem::Compaction { compaction } => {
-                if protocol != Protocol::Responses {
-                    return Err(unsupported());
+                let native = if protocol == Protocol::Anthropic {
+                    "anthropic"
+                } else {
+                    "openai"
+                };
+                let origin = compaction.created_by.trim().to_lowercase();
+                if protocol == Protocol::Chat
+                    || (!origin.is_empty() && origin != native)
+                    || compaction.encrypted_content.trim().is_empty()
+                {
+                    if compaction.content.trim().is_empty() {
+                        continue;
+                    }
+                    let summary = format!(
+                        "[CONTEXT SUMMARY carried over from an earlier context compaction by a different model provider]\n{}",
+                        compaction.content.trim()
+                    );
+                    if protocol == Protocol::Anthropic {
+                        json!({"role":"assistant","content":[{"type":"text","text":summary}]})
+                    } else {
+                        json!({"role":"assistant","content":summary})
+                    }
+                } else if protocol == Protocol::Anthropic {
+                    let summary = if compaction.content.is_empty() {
+                        Value::Null
+                    } else {
+                        compaction.content.clone().into()
+                    };
+                    json!({"role":"assistant","content":[{"type":"compaction","content":summary,"encrypted_content":compaction.encrypted_content}]})
+                } else {
+                    let mut entry = json!({"type":"compaction","encrypted_content":compaction.encrypted_content.trim()});
+                    if !compaction.id.trim().is_empty() {
+                        entry["id"] = compaction.id.clone().into();
+                    }
+                    entry
                 }
-                if compaction.encrypted_content.trim().is_empty() {
-                    continue;
-                }
-                let mut entry = json!({"type":"compaction","encrypted_content":compaction.encrypted_content.trim()});
-                if !compaction.id.trim().is_empty() {
-                    entry["id"] = compaction.id.clone().into();
-                }
-                entry
             }
             RunItem::Handoff { .. } => return Err(unsupported()),
         };
@@ -221,10 +330,27 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                 .is_some_and(|previous| previous["role"] == "assistant")
         {
             let previous = entries.last_mut().unwrap();
+            if let Some(text) = entry["content"].as_str() {
+                if let Some(parts) = previous["content"].as_array_mut() {
+                    parts.push(json!({"type":"text","text":text}));
+                } else if let Some(before) = previous["content"].as_str().filter(|v| !v.is_empty())
+                {
+                    previous["content"] = format!("{before}\n{text}").into();
+                } else {
+                    previous["content"] = text.into();
+                }
+            }
             for key in ["content", "tool_calls"] {
                 if let Some(parts) = entry[key].as_array() {
                     if !previous[key].is_array() {
-                        previous[key] = json!([]);
+                        previous[key] = if key == "content" {
+                            previous[key]
+                                .as_str()
+                                .map(|text| json!([{"type":"text","text":text}]))
+                                .unwrap_or_else(|| json!([]))
+                        } else {
+                            json!([])
+                        };
                     }
                     previous[key]
                         .as_array_mut()
@@ -249,6 +375,9 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         } else {
             entries.push(entry);
         }
+    }
+    if !tool_images.is_empty() {
+        entries.push(json!({"role":"user","content":content(&tool_images, protocol, false)?}));
     }
     let tools: Vec<Value> = request.tools.iter().map(|tool| match protocol {
         Protocol::Responses => json!({"type":"function","name":tool.name,"description":tool.description,"parameters":tool.input_schema}),
@@ -291,7 +420,19 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {
-        if key == "thinking_budget" && protocol == Protocol::Anthropic {
+        if matches!(
+            key.as_str(),
+            "model_fallbacks" | "text_verbosity" | "compaction_threshold"
+        ) {
+            if protocol == Protocol::Anthropic {
+                return Err(crate::invalid(
+                    "setting requires OpenAI-compatible protocol",
+                ));
+            }
+            body[key] = value.clone();
+            continue;
+        }
+        if key == "thinking_budget" {
             if !value.is_u64() {
                 return Err(crate::invalid(
                     "thinking budget must be a nonnegative integer",
@@ -317,6 +458,7 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                 | "tool_choice"
                 | "stop"
                 | "service_tier"
+                | "truncation"
                 | "include"
         ) {
             return Err(crate::invalid("unsupported provider setting"));
@@ -325,6 +467,8 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     if protocol == Protocol::Anthropic {
         crate::anthropic::shape(&mut body, request, crate::auth::AuthMode::ApiKey);
+    } else {
+        crate::openai::shape(&mut body, request, protocol)?;
     }
     Ok(body)
 }
@@ -364,10 +508,28 @@ pub fn usage(value: &Value, protocol: Protocol) -> Usage {
     }
 }
 fn message(content: Vec<Content>) -> RunItem {
-    RunItem::Message {
-        message: Message {
-            role: Role::Assistant,
-            content,
+    phased_message(content, Role::Assistant, None)
+}
+fn phased_message(content: Vec<Content>, role: Role, phase: Option<&str>) -> RunItem {
+    let message = Message { role, content };
+    match phase.filter(|phase| !phase.is_empty()) {
+        Some(phase) => RunItem::PhasedMessage {
+            message,
+            phase: phase.to_owned(),
+        },
+        None => RunItem::Message { message },
+    }
+}
+fn compaction(item: &Value, origin: &str) -> RunItem {
+    RunItem::Compaction {
+        compaction: adk_core::Compaction {
+            id: item["id"].as_str().unwrap_or_default().to_owned(),
+            encrypted_content: item["encrypted_content"]
+                .as_str()
+                .unwrap_or_default()
+                .to_owned(),
+            content: item["content"].as_str().unwrap_or_default().to_owned(),
+            created_by: origin.to_owned(),
         },
     }
 }
@@ -381,6 +543,7 @@ fn string(value: &Value, field: &str) -> Result<String, Error> {
 }
 fn call(value: &Value, id: &str, name: &str, arguments: &str) -> Result<RunItem, Error> {
     let arguments = match &value[arguments] {
+        Value::String(raw) if raw.trim().is_empty() => json!({}),
         Value::String(raw) => serde_json::from_str(raw)
             .map_err(|_| Error::new(ErrorCategory::ModelBehavior, "invalid tool arguments JSON"))?,
         value if value.is_object() => value.clone(),
@@ -400,21 +563,20 @@ fn call(value: &Value, id: &str, name: &str, arguments: &str) -> Result<RunItem,
     })
 }
 pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error> {
+    if let Some(error) = crate::error::provider_error(body) {
+        return Err(error);
+    }
     let mut items = Vec::new();
     let end_turn;
     match protocol {
         Protocol::Responses => {
-            if matches!(body["status"].as_str(), Some("failed" | "cancelled"))
-                || body.get("error").is_some_and(|v| !v.is_null())
-            {
-                return Err(Error::new(
-                    ErrorCategory::Provider,
-                    "provider response failed",
-                ));
+            if matches!(
+                body["status"].as_str(),
+                Some("failed" | "cancelled" | "canceled")
+            ) {
+                return Err(crate::error::response_error(body, false).expect("failed response"));
             }
-            let output = body["output"].as_array().ok_or_else(|| {
-                Error::new(ErrorCategory::Provider, "provider response missing output")
-            })?;
+            let output = body["output"].as_array().map(Vec::as_slice).unwrap_or(&[]);
             for item in output {
                 match item["type"].as_str() {
                     Some("message") => {
@@ -423,16 +585,41 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                             Error::new(ErrorCategory::Provider, "invalid response message")
                         })? {
                             match part["type"].as_str() {
-                                Some("output_text") => parts.push(Content::Text {
-                                    text: string(part, "text")?,
-                                }),
+                                Some("output_text" | "input_text" | "text") => {
+                                    parts.push(Content::Text {
+                                        text: string(part, "text")?,
+                                    })
+                                }
                                 Some("refusal") => parts.push(Content::Text {
                                     text: string(part, "refusal")?,
                                 }),
                                 _ => return Err(unsupported()),
                             }
                         }
-                        items.push(message(parts));
+                        let role = match item["role"].as_str() {
+                            Some("user") => Role::User,
+                            Some("system") => Role::System,
+                            Some("developer") => Role::Developer,
+                            _ => Role::Assistant,
+                        };
+                        parts.retain(|part| matches!(part, Content::Text { text } if !text.trim().is_empty()));
+                        if !parts.is_empty() {
+                            items.push(phased_message(parts, role, item["phase"].as_str()));
+                        }
+                    }
+                    Some("function_call_output") => {
+                        let output = item["output"]
+                            .as_str()
+                            .map(str::to_owned)
+                            .unwrap_or_else(|| item["output"].to_string());
+                        items.push(RunItem::ToolResult {
+                            call_id: string(item, "call_id")?,
+                            output: adk_core::ToolOutput {
+                                content: vec![Content::Text { text: output }],
+                                is_error: false,
+                                should_pause: false,
+                            },
+                        });
                     }
                     Some("function_call") => {
                         items.push(call(item, "call_id", "name", "arguments")?)
@@ -460,21 +647,21 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                             });
                         }
                     }
-                    Some("compaction") => items.push(RunItem::Compaction {
-                        compaction: adk_core::Compaction {
-                            id: item["id"].as_str().unwrap_or_default().to_owned(),
-                            encrypted_content: item["encrypted_content"]
-                                .as_str()
-                                .unwrap_or_default()
-                                .to_owned(),
-                            content: item["content"].as_str().unwrap_or_default().to_owned(),
-                            created_by: item["created_by"].as_str().unwrap_or_default().to_owned(),
-                        },
-                    }),
+                    Some("compaction") => items.push(compaction(item, "openai")),
                     _ => return Err(unsupported()),
                 }
             }
-            end_turn = Some(!items.iter().any(|v| matches!(v, RunItem::ToolCall { .. })));
+            if items.is_empty()
+                && let Some(text) = body["output_text"].as_str().filter(|text| !text.is_empty())
+            {
+                items.push(message(vec![Content::Text {
+                    text: text.to_owned(),
+                }]));
+            }
+            if let Some(error) = crate::error::response_error(body, !items.is_empty()) {
+                return Err(error);
+            }
+            end_turn = body["end_turn"].as_bool();
         }
         Protocol::Chat => {
             let choice = &body["choices"][0];
@@ -486,11 +673,12 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                 ));
             }
             let mut parts = Vec::new();
+            let details_text = reasoning_details_text(&msg["reasoning_details"]);
             let reasoning = ["reasoning", "reasoning_content", "reasoning_text"]
                 .iter()
                 .filter_map(|key| msg[key].as_str())
                 .find(|value| !value.trim().is_empty())
-                .unwrap_or_default();
+                .unwrap_or(&details_text);
             let signature = msg
                 .get("reasoning_details")
                 .filter(|value| !value.is_null())
@@ -518,6 +706,15 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                     text: text.to_owned(),
                 });
             }
+            if let Some(refusal) = msg["refusal"].as_str().filter(|text| !text.is_empty()) {
+                parts.push(Content::Text {
+                    text: if parts.is_empty() {
+                        format!("The model refused to respond: {refusal}")
+                    } else {
+                        refusal.to_owned()
+                    },
+                });
+            }
             if !parts.is_empty() {
                 items.push(message(parts));
             }
@@ -528,7 +725,9 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                     items.push(call(&function, "id", "name", "arguments")?);
                 }
             }
-            end_turn = Some(choice["finish_reason"] != "tool_calls");
+            end_turn = body["end_turn"]
+                .as_bool()
+                .or_else(|| Some(choice["finish_reason"] != "tool_calls"));
         }
         Protocol::Anthropic => {
             for part in body["content"].as_array().ok_or_else(|| {
@@ -555,10 +754,16 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                         },
                     }),
                     Some("tool_use") => items.push(call(part, "id", "name", "input")?),
+                    Some("compaction") => items.push(compaction(part, "anthropic")),
                     _ => return Err(unsupported()),
                 }
             }
-            end_turn = Some(body["stop_reason"] != "tool_use");
+            end_turn = body["end_turn"].as_bool().or_else(|| {
+                Some(!matches!(
+                    body["stop_reason"].as_str(),
+                    Some("tool_use" | "pause_turn")
+                ))
+            });
         }
     }
     Ok(ModelResponse {

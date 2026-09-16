@@ -1,4 +1,4 @@
-//! Owned, pull-based HTTP streams with no detached producer and no implicit retry.
+//! Owned, pull-based HTTP streams with bounded auth/shape recovery and no transient replay.
 use crate::{
     auth::{AuthMode, Session},
     error::RequestFailure,
@@ -12,8 +12,8 @@ use adk_core::{
 use reqwest::Client;
 use serde_json::{Value, json};
 use std::{
-    collections::{BTreeMap, VecDeque},
-    sync::Arc,
+    collections::{BTreeMap, BTreeSet, VecDeque},
+    sync::{Arc, Mutex},
     time::SystemTime,
 };
 
@@ -22,6 +22,7 @@ pub struct Provider {
     protocol: Protocol,
     session: Arc<Session>,
     client: Client,
+    thinking_overrides: Mutex<BTreeMap<String, (String, bool)>>,
 }
 impl Provider {
     pub fn new(
@@ -47,6 +48,7 @@ impl Provider {
             protocol,
             session,
             client,
+            thinking_overrides: Mutex::new(BTreeMap::new()),
         })
     }
     /// Explicit native Responses compaction. No local summary is substituted when
@@ -71,10 +73,15 @@ impl Provider {
         if codex {
             body["tools"] = source.get("tools").cloned().unwrap_or_else(|| json!([]));
             body["parallel_tool_calls"] = (!request.tools.is_empty()).into();
-            for key in ["reasoning", "text"] {
-                if let Some(value) = source.get(key) {
-                    body[key] = value.clone();
+            if let Some(value) = source.get("reasoning") {
+                let mut reasoning = value.clone();
+                if let Some(object) = reasoning.as_object_mut() {
+                    object.remove("summary");
                 }
+                body["reasoning"] = reasoning;
+            }
+            if let Some(verbosity) = source.pointer("/text/verbosity") {
+                body["text"] = json!({"verbosity":verbosity});
             }
         }
         let response = self.send_body(context, "/responses/compact", body).await?;
@@ -93,11 +100,7 @@ impl Provider {
         let mut body = wire::request(request, self.protocol, stream)?;
         let scope = self.session.scope();
         if scope.mode == AuthMode::OpenAiOAuth {
-            body["store"] = false.into();
-            body["stream"] = true.into();
-            body.as_object_mut()
-                .unwrap()
-                .remove("prompt_cache_retention");
+            crate::openai::codex(&mut body);
         }
         if self.protocol == Protocol::Anthropic {
             crate::anthropic::shape(&mut body, request, scope.mode);
@@ -111,8 +114,26 @@ impl Provider {
         body: Value,
     ) -> Result<reqwest::Response, Error> {
         let scope = self.session.scope();
-        for attempt in 0..=1 {
-            let material = self.session.material(context).await?;
+        let mut body = body;
+        let model = body["model"].as_str().unwrap_or_default().to_owned();
+        if self.protocol == Protocol::Anthropic
+            && let Some((kind, cap)) = self.thinking_overrides.lock().unwrap().get(&model).cloned()
+        {
+            if body["thinking"]["type"]
+                .as_str()
+                .is_some_and(|value| value != kind)
+            {
+                repair(&mut body, self.protocol, "thinking.type", &mut false);
+            }
+            if cap {
+                repair(&mut body, self.protocol, "effort", &mut false);
+            }
+        }
+        let mut repaired_anthropic = false;
+        let mut rejected = false;
+        let mut flipped = false;
+        for _ in 0..5 {
+            let material = self.session.material_for_request(context).await?;
             let mut resolved = scope.clone();
             if scope.mode == AuthMode::CopilotOAuth {
                 resolved.endpoint = crate::copilot::request_endpoint(
@@ -128,13 +149,13 @@ impl Provider {
                 }
             }
             let endpoint = format!("{}{path}", resolved.endpoint);
-            let mut body = body.clone();
-            if let Some(key) = body.get("prompt_cache_key").and_then(Value::as_str) {
+            let mut outgoing = body.clone();
+            if let Some(key) = outgoing.get("prompt_cache_key").and_then(Value::as_str) {
                 let key = crate::auth::cache_scope(&resolved, &material, key);
                 if key.is_empty() {
-                    body.as_object_mut().unwrap().remove("prompt_cache_key");
+                    outgoing.as_object_mut().unwrap().remove("prompt_cache_key");
                 } else {
-                    body["prompt_cache_key"] = key.into();
+                    outgoing["prompt_cache_key"] = key.into();
                 }
             }
             let mut headers =
@@ -155,29 +176,55 @@ impl Provider {
                 self.client
                     .post(&endpoint)
                     .headers(headers)
-                    .json(&body)
+                    .json(&outgoing)
                     .send(),
             )
             .await?
             .map_err(|e| RequestFailure::transport(&e).into_error())?;
             if response.status().as_u16() == 401
-                && attempt == 0
+                && !rejected
                 && matches!(
                     scope.mode,
                     AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
                 )
             {
+                rejected = true;
                 drop(response);
                 self.session.reject(context, &material.access_token).await?;
                 continue;
             }
             if !response.status().is_success() {
-                return Err(RequestFailure::http(
-                    response.status().as_u16(),
-                    response.headers(),
-                    SystemTime::now(),
-                )
-                .into_error());
+                let status = response.status().as_u16();
+                let failure = RequestFailure::http(status, response.headers(), SystemTime::now());
+                if status == 400 {
+                    let bytes = read_bytes(context, response).await?;
+                    if !repaired_anthropic
+                        && repair(
+                            &mut body,
+                            self.protocol,
+                            &String::from_utf8_lossy(&bytes),
+                            &mut flipped,
+                        )
+                    {
+                        if self.protocol == Protocol::Anthropic {
+                            repaired_anthropic = true;
+                            let mut overrides = self.thinking_overrides.lock().unwrap();
+                            let previous_cap = overrides.get(&model).is_some_and(|(_, cap)| *cap);
+                            overrides.insert(
+                                model.clone(),
+                                (
+                                    body["thinking"]["type"]
+                                        .as_str()
+                                        .unwrap_or_default()
+                                        .to_owned(),
+                                    previous_cap || !flipped,
+                                ),
+                            );
+                        }
+                        continue;
+                    }
+                }
+                return Err(failure.into_error());
             }
             return Ok(response);
         }
@@ -234,7 +281,11 @@ impl StreamingModel for Provider {
         })
     }
 }
-async fn read_json(context: &Context, mut response: reqwest::Response) -> Result<Value, Error> {
+async fn read_json(context: &Context, response: reqwest::Response) -> Result<Value, Error> {
+    serde_json::from_slice(&read_bytes(context, response).await?)
+        .map_err(|_| protocol_error("invalid provider response JSON"))
+}
+async fn read_bytes(context: &Context, mut response: reqwest::Response) -> Result<Vec<u8>, Error> {
     let mut bytes = Vec::new();
     while let Some(chunk) = crate::active(context, response.chunk())
         .await?
@@ -245,7 +296,77 @@ async fn read_json(context: &Context, mut response: reqwest::Response) -> Result
         }
         bytes.extend_from_slice(&chunk);
     }
-    serde_json::from_slice(&bytes).map_err(|_| protocol_error("invalid provider response JSON"))
+    Ok(bytes)
+}
+fn repair(body: &mut Value, protocol: Protocol, error: &str, flipped: &mut bool) -> bool {
+    use crate::error::RequestRepair;
+    match crate::error::request_repair(400, error) {
+        Some(RequestRepair::ThinkingType) if protocol == Protocol::Anthropic && !*flipped => {
+            let kind = body["thinking"]["type"].as_str().unwrap_or_default();
+            if !matches!(kind, "adaptive" | "enabled") {
+                return false;
+            }
+            if kind == "adaptive" {
+                let budget = match body["output_config"]["effort"].as_str() {
+                    Some("low") => 2048,
+                    Some("high") => 8192,
+                    Some("max" | "xhigh") => 24576,
+                    _ => 4096,
+                }
+                .min(
+                    body["max_tokens"]
+                        .as_u64()
+                        .unwrap_or(16384)
+                        .saturating_sub(1024),
+                );
+                if budget < 1024 {
+                    return false;
+                }
+                body["thinking"] = json!({"type":"enabled","budget_tokens":budget});
+                if let Some(config) = body["output_config"].as_object_mut() {
+                    config.remove("effort");
+                }
+            } else {
+                let budget = body["thinking"]["budget_tokens"].as_u64().unwrap_or(0);
+                body["thinking"] = json!({"type":"adaptive","display":"summarized"});
+                body["output_config"]["effort"] = match budget {
+                    0..=2048 => "low",
+                    2049..=4096 => "medium",
+                    4097..=8192 => "high",
+                    _ => "max",
+                }
+                .into();
+            }
+            *flipped = true;
+            true
+        }
+        Some(RequestRepair::AdaptiveEffort | RequestRepair::ReasoningEffort)
+            if protocol == Protocol::Anthropic =>
+        {
+            if body["thinking"]["type"] != "adaptive"
+                || !matches!(
+                    body["output_config"]["effort"].as_str(),
+                    Some("xhigh" | "max")
+                )
+            {
+                return false;
+            }
+            body["output_config"]["effort"] = "high".into();
+            true
+        }
+        Some(RequestRepair::ReasoningEffort) if protocol != Protocol::Anthropic => {
+            let next = match body["reasoning"]["effort"].as_str() {
+                Some("max") => "xhigh",
+                Some("xhigh") => "high",
+                Some("none") => "minimal",
+                Some("minimal") => "low",
+                _ => return false,
+            };
+            body["reasoning"]["effort"] = next.into();
+            true
+        }
+        _ => false,
+    }
 }
 fn protocol_error(message: &'static str) -> Error {
     Error::new(ErrorCategory::Provider, message)
@@ -316,6 +437,10 @@ pub struct StreamState {
     finish_reason: Option<String>,
     bytes: usize,
     response_call_ids: BTreeMap<String, String>,
+    response_deltas: BTreeSet<(u64, u64, bool)>,
+    response_items: BTreeMap<u64, Value>,
+    archived_tools: Vec<Value>,
+    stopped_blocks: BTreeSet<u64>,
 }
 impl StreamState {
     pub fn new(protocol: Protocol) -> Self {
@@ -330,6 +455,10 @@ impl StreamState {
             finish_reason: None,
             bytes: 0,
             response_call_ids: BTreeMap::new(),
+            response_deltas: BTreeSet::new(),
+            response_items: BTreeMap::new(),
+            archived_tools: Vec::new(),
+            stopped_blocks: BTreeSet::new(),
         }
     }
     pub fn is_complete(&self) -> bool {
@@ -337,6 +466,9 @@ impl StreamState {
     }
     pub fn event(&mut self, data: &str) -> Result<Vec<ModelEvent>, Error> {
         if self.complete {
+            if self.protocol == Protocol::Responses && data == "[DONE]" {
+                return Ok(Vec::new());
+            }
             return Err(protocol_error("data after provider completion"));
         }
         self.bytes = self.bytes.saturating_add(data.len());
@@ -349,53 +481,114 @@ impl StreamState {
             }
             self.body["choices"] = json!([{"message":{"content":self.text,"reasoning_content":self.reasoning,
                 "reasoning_opaque":self.body["reasoning_opaque"],"reasoning_details":self.body["reasoning_details"],
-                "tool_calls":self.tools.values().collect::<Vec<_>>()},"finish_reason":self.finish_reason}]);
+                "tool_calls":self.archived_tools.iter().chain(self.tools.values()).collect::<Vec<_>>()},"finish_reason":self.finish_reason}]);
             return self.finish();
         }
         let event: Value =
             serde_json::from_str(data).map_err(|_| protocol_error("invalid SSE JSON"))?;
-        if event.get("error").is_some_and(|v| !v.is_null()) || event["type"] == "error" {
-            return Err(protocol_error("provider stream error"));
+        if let Some(error) = crate::error::provider_error(&event) {
+            return Err(error);
         }
         match self.protocol {
-            Protocol::Responses => match event["type"].as_str() {
-                Some("response.output_text.delta") => Ok(vec![ModelEvent::TextDelta {
-                    delta: required(&event, "delta")?,
-                }]),
-                Some("response.reasoning_summary_text.delta" | "response.reasoning_text.delta") => {
-                    Ok(vec![ModelEvent::ReasoningDelta {
-                        delta: required(&event, "delta")?,
-                    }])
-                }
-                Some("response.output_item.added") if event["item"]["type"] == "function_call" => {
-                    let item = &event["item"];
-                    self.response_call_ids
-                        .insert(required(item, "id")?, required(item, "call_id")?);
-                    Ok(Vec::new())
-                }
-                Some("response.function_call_arguments.delta") => {
-                    let id = required(&event, "item_id")?;
-                    let call_id = self
-                        .response_call_ids
-                        .get(&id)
-                        .cloned()
-                        .ok_or_else(|| protocol_error("tool arguments before call item"))?;
-                    Ok(vec![ModelEvent::ToolArgumentsDelta {
-                        call_id,
-                        delta: required(&event, "delta")?,
-                    }])
-                }
-                Some("response.completed") => {
-                    self.body = event["response"].clone();
-                    self.finish()
-                }
-                Some("response.failed" | "response.incomplete") => {
-                    Err(protocol_error("provider response did not complete"))
-                }
-                _ => Ok(Vec::new()),
-            },
+            Protocol::Responses => self.responses(event),
             Protocol::Chat => self.chat(event),
             Protocol::Anthropic => self.anthropic(event),
+        }
+    }
+    fn responses(&mut self, event: Value) -> Result<Vec<ModelEvent>, Error> {
+        let index = event["output_index"].as_u64().unwrap_or(0);
+        let kind = event["type"].as_str().unwrap_or_default();
+        let part = event["content_index"]
+            .as_u64()
+            .or_else(|| event["summary_index"].as_u64())
+            .unwrap_or(0);
+        let delta_key = (index, part, kind.contains("reasoning"));
+        match kind {
+            "response.output_text.delta"
+            | "response.reasoning_summary_text.delta"
+            | "response.reasoning_text.delta" => {
+                self.response_deltas.insert(delta_key);
+                let delta = required(&event, "delta")?;
+                Ok(vec![if kind == "response.output_text.delta" {
+                    ModelEvent::TextDelta { delta }
+                } else {
+                    ModelEvent::ReasoningDelta { delta }
+                }])
+            }
+            "response.output_item.added" | "response.output_item.done" => {
+                let item = &event["item"];
+                if !item.is_object() {
+                    return Err(protocol_error("invalid response output item"));
+                }
+                self.response_items.insert(index, item.clone());
+                if item["type"] == "function_call" {
+                    self.response_call_ids
+                        .insert(required(item, "id")?, required(item, "call_id")?);
+                }
+                Ok(Vec::new())
+            }
+            "response.function_call_arguments.delta" | "response.function_call_arguments.done" => {
+                if kind.ends_with(".done") && self.response_deltas.contains(&delta_key) {
+                    return Ok(Vec::new());
+                }
+                let id = required(&event, "item_id")?;
+                let call_id = self
+                    .response_call_ids
+                    .get(&id)
+                    .cloned()
+                    .ok_or_else(|| protocol_error("tool arguments before call item"))?;
+                self.response_deltas.insert(delta_key);
+                Ok(vec![ModelEvent::ToolArgumentsDelta {
+                    call_id,
+                    delta: required(
+                        &event,
+                        if kind.ends_with(".done") {
+                            "arguments"
+                        } else {
+                            "delta"
+                        },
+                    )?,
+                }])
+            }
+            "response.output_text.done"
+            | "response.reasoning_summary_text.done"
+            | "response.reasoning_text.done" => {
+                if !self.response_deltas.insert(delta_key) {
+                    return Ok(Vec::new());
+                }
+                let delta = required(&event, "text")?;
+                if delta.is_empty() {
+                    return Ok(Vec::new());
+                }
+                Ok(vec![if kind == "response.output_text.done" {
+                    ModelEvent::TextDelta { delta }
+                } else {
+                    ModelEvent::ReasoningDelta { delta }
+                }])
+            }
+            "response.completed" | "response.incomplete" => {
+                self.body = event["response"].clone();
+                if self
+                    .body
+                    .get("output")
+                    .and_then(Value::as_array)
+                    .is_none_or(Vec::is_empty)
+                    && !self.response_items.is_empty()
+                {
+                    self.body["output"] = self
+                        .response_items
+                        .values()
+                        .cloned()
+                        .collect::<Vec<_>>()
+                        .into();
+                }
+                self.finish()
+            }
+            "response.failed" | "response.cancelled" => {
+                Err(crate::error::response_error(&event, false)
+                    .unwrap_or_else(|| protocol_error("provider response did not complete")))
+            }
+            _ => Ok(Vec::new()),
         }
     }
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
@@ -411,8 +604,10 @@ impl StreamState {
         Ok(events)
     }
     fn chat(&mut self, event: Value) -> Result<Vec<ModelEvent>, Error> {
-        if let Some(id) = event.get("id") {
-            self.body["id"] = id.clone();
+        for key in ["id", "model", "metadata", "end_turn"] {
+            if let Some(value) = event.get(key) {
+                self.body[key] = value.clone();
+            }
         }
         if event["usage"].is_object() {
             self.body["usage"] = event["usage"].clone();
@@ -426,12 +621,6 @@ impl StreamState {
                 return Err(protocol_error("multiple chat choices are unsupported"));
             }
             let delta = &choice["delta"];
-            if let Some(text) = delta["content"].as_str() {
-                self.text.push_str(text);
-                events.push(ModelEvent::TextDelta {
-                    delta: text.to_owned(),
-                });
-            }
             if let Some(opaque) = delta["reasoning_opaque"].as_str() {
                 self.body["reasoning_opaque"] = opaque.into();
             }
@@ -444,21 +633,45 @@ impl StreamState {
                     .unwrap()
                     .extend(details.iter().cloned());
             }
-            if let Some(text) = ["reasoning", "reasoning_content", "reasoning_text"]
+            let reasoning = ["reasoning", "reasoning_content", "reasoning_text"]
                 .iter()
                 .filter_map(|key| delta[key].as_str())
                 .find(|text| !text.is_empty())
-            {
-                self.reasoning.push_str(text);
-                events.push(ModelEvent::ReasoningDelta {
+                .map(str::to_owned)
+                .unwrap_or_else(|| wire::reasoning_details_text(&delta["reasoning_details"]));
+            if !reasoning.is_empty() {
+                self.reasoning.push_str(&reasoning);
+                events.push(ModelEvent::ReasoningDelta { delta: reasoning });
+            }
+            if let Some(text) = delta["content"].as_str().filter(|text| !text.is_empty()) {
+                self.text.push_str(text);
+                events.push(ModelEvent::TextDelta {
                     delta: text.to_owned(),
                 });
+            }
+            if let Some(refusal) = delta["refusal"].as_str().filter(|text| !text.is_empty()) {
+                let text = if self.text.is_empty() {
+                    format!("The model refused to respond: {refusal}")
+                } else {
+                    refusal.to_owned()
+                };
+                self.text.push_str(&text);
+                events.push(ModelEvent::TextDelta { delta: text });
             }
             if let Some(calls) = delta["tool_calls"].as_array() {
                 for call in calls {
                     let index = call["index"]
                         .as_u64()
                         .ok_or_else(|| protocol_error("tool chunk missing index"))?;
+                    if let Some(id) = call["id"].as_str().filter(|id| !id.is_empty())
+                        && self
+                            .tools
+                            .get(&index)
+                            .and_then(|tool| tool["id"].as_str())
+                            .is_some_and(|previous| !previous.is_empty() && previous != id)
+                    {
+                        self.archived_tools.push(self.tools.remove(&index).unwrap());
+                    }
                     let tool = self.tools.entry(index).or_insert_with(
                         || json!({"id":"","type":"function","function":{"name":"","arguments":""}}),
                     );
@@ -527,6 +740,9 @@ impl StreamState {
                 let index = event["index"]
                     .as_u64()
                     .ok_or_else(|| protocol_error("content block missing index"))?;
+                if self.stopped_blocks.contains(&index) {
+                    return Err(protocol_error("content delta after block stop"));
+                }
                 let block = self
                     .tools
                     .get_mut(&index)
@@ -555,6 +771,26 @@ impl StreamState {
                         )
                         .into()
                     }
+                    Some("compaction_delta") => {
+                        if block["type"] != "compaction" {
+                            return Err(protocol_error("compaction delta has wrong block type"));
+                        }
+                        block["content"] = format!(
+                            "{}{}",
+                            block["content"].as_str().unwrap_or_default(),
+                            delta["content"].as_str().unwrap_or_default()
+                        )
+                        .into();
+                        if let Some(value) = delta["encrypted_content"]
+                            .as_str()
+                            .filter(|value| !value.is_empty())
+                        {
+                            block["encrypted_content"] = value.into();
+                        }
+                    }
+                    Some("compaction_encrypted_content") => {
+                        block["encrypted_content"] = required(delta, "encrypted_content")?.into();
+                    }
                     Some("input_json_delta") => {
                         let args = required(delta, "partial_json")?;
                         self.argument_buffers
@@ -573,6 +809,9 @@ impl StreamState {
                 let index = event["index"]
                     .as_u64()
                     .ok_or_else(|| protocol_error("content block missing index"))?;
+                if !self.tools.contains_key(&index) || !self.stopped_blocks.insert(index) {
+                    return Err(protocol_error("content stop without active block"));
+                }
                 if let Some(args) = self.argument_buffers.remove(&index) {
                     self.tools
                         .get_mut(&index)
@@ -588,6 +827,9 @@ impl StreamState {
                     }
                 }
                 self.body["stop_reason"] = event["delta"]["stop_reason"].clone();
+                if let Some(end_turn) = event["delta"].get("end_turn") {
+                    self.body["end_turn"] = end_turn.clone();
+                }
             }
             Some("message_stop") => {
                 if !self.body["id"].is_string() || !self.body["stop_reason"].is_string() {

@@ -63,7 +63,7 @@ pub fn protocol(model: &str) -> Protocol {
 fn normalize(model: &str) -> &str {
     let model = model.trim();
     match model.split_once('/') {
-        Some((prefix, bare)) if prefix.eq_ignore_ascii_case("copilot") => bare.trim(),
+        Some((prefix, bare)) if prefix.trim().eq_ignore_ascii_case("copilot") => bare.trim(),
         _ => model,
     }
 }

@@ -90,13 +90,39 @@ pub struct NativeHistory {
     pub markers: Vec<ApprovalMarkerBoundary>,
 }
 
-fn text(content: &[Content]) -> Result<String, BridgeError> {
-    match content {
-        [Content::Text { text }] => Ok(text.clone()),
-        _ => Err(BridgeError(
-            "wire text requires exactly one native text block",
-        )),
-    }
+fn encode_content(content: &[Content]) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
+    let (text, attachments) = match content.split_first() {
+        Some((Content::Text { text }, rest)) => (text.clone(), rest),
+        _ => (String::new(), content),
+    };
+    let images = attachments
+        .iter()
+        .map(|content| match content {
+            Content::Attachment {
+                media_type,
+                data,
+                detail,
+            } => Ok(dto::ImageAttachment {
+                media_type: media_type.clone(),
+                data: data.clone(),
+                detail: detail.clone(),
+            }),
+            _ => Err(BridgeError(
+                "wire content requires optional leading text followed by inline attachments",
+            )),
+        })
+        .collect::<Result<_, _>>()?;
+    Ok((text, images))
+}
+
+fn decode_content(text: &str, images: &[dto::ImageAttachment]) -> Vec<Content> {
+    let mut content = vec![Content::Text { text: text.into() }];
+    content.extend(images.iter().map(|image| Content::Attachment {
+        media_type: image.media_type.clone(),
+        data: image.data.clone(),
+        detail: image.detail.clone(),
+    }));
+    content
 }
 
 pub fn encode_item(
@@ -108,7 +134,7 @@ pub fn encode_item(
         ..Default::default()
     };
     match item {
-        RunItem::Message { message } => {
+        RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
             if !matches!(
                 (message.role, agent.is_some()),
                 (Role::User, false) | (Role::Assistant, true)
@@ -117,9 +143,18 @@ pub fn encode_item(
                     "message role requires matching explicit agent provenance",
                 ));
             }
+            let phase = match item {
+                RunItem::PhasedMessage { phase, .. } if phase.is_empty() => {
+                    return Err(BridgeError("empty phase must use an ordinary Message"));
+                }
+                RunItem::PhasedMessage { phase, .. } => phase.clone(),
+                _ => String::new(),
+            };
+            let (text, images) = encode_content(&message.content)?;
             wire.message = Some(dto::MessageOutput {
-                text: text(&message.content)?,
-                ..Default::default()
+                text,
+                phase,
+                images,
             });
         }
         RunItem::ToolCall { call } => {
@@ -135,11 +170,12 @@ pub fn encode_item(
                 return Err(BridgeError("Go ToolOutputData cannot carry should_pause"));
             }
             wire.kind = dto::RunItemType(2);
+            let (content, images) = encode_content(&output.content)?;
             wire.tool_output = Some(dto::ToolOutputData {
                 call_id: call_id.clone(),
-                content: text(&output.content)?,
+                content,
+                images,
                 is_error: output.is_error,
-                ..Default::default()
             });
         }
         RunItem::Reasoning { reasoning } => {
@@ -177,17 +213,21 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                 .message
                 .as_ref()
                 .ok_or(BridgeError("missing Message"))?;
-            RunItem::Message {
-                message: Message {
-                    role: if wire.agent.is_some() {
-                        Role::Assistant
-                    } else {
-                        Role::User
-                    },
-                    content: vec![Content::Text {
-                        text: message.text.clone(),
-                    }],
+            let native = Message {
+                role: if wire.agent.is_some() {
+                    Role::Assistant
+                } else {
+                    Role::User
                 },
+                content: decode_content(&message.text, &message.images),
+            };
+            if message.phase.is_empty() {
+                RunItem::Message { message: native }
+            } else {
+                RunItem::PhasedMessage {
+                    message: native,
+                    phase: message.phase.clone(),
+                }
             }
         }
         1 => {
@@ -214,9 +254,7 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
             RunItem::ToolResult {
                 call_id: output.call_id.clone(),
                 output: ToolOutput {
-                    content: vec![Content::Text {
-                        text: output.content.clone(),
-                    }],
+                    content: decode_content(&output.content, &output.images),
                     is_error: output.is_error,
                     should_pause: false,
                 },

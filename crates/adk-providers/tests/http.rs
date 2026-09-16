@@ -172,7 +172,7 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     let material = StaticStore.load(&ctx, &scope).await.unwrap();
     assert_eq!(
         body,
-        serde_json::json!({"model":"test-model","stream":false,"messages":[{"role":"system","content":"test"}],"prompt_cache_key":cache_scope(&scope, &material, "host-prompt")})
+        serde_json::json!({"model":"test-model","stream":false,"max_tokens":16384,"messages":[{"role":"system","content":"test"}],"prompt_cache_key":cache_scope(&scope, &material, "host-prompt")})
     );
 }
 #[tokio::test]
@@ -352,7 +352,7 @@ async fn copilot_factory_routes_models_and_preserves_wire_identity() {
         let mut captured = Vec::new();
         for body in [
             r#"{"content":[{"type":"text","text":"ok"}],"stop_reason":"end_turn"}"#,
-            r#"{"output":[],"status":"completed"}"#,
+            r#"{"output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}],"status":"completed"}"#,
             r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}]}"#,
         ] {
             let (mut socket, _) = listener.accept().unwrap();
@@ -400,4 +400,215 @@ async fn copilot_factory_routes_models_and_preserves_wire_identity() {
         serde_json::from_str(captured[0].split_once("\r\n\r\n").unwrap().1).unwrap();
     assert_eq!(body["model"], "claude-opus-4.6");
     assert_eq!(body["max_tokens"], 64000);
+}
+
+#[tokio::test]
+async fn request_healing_is_bounded_and_preserves_original_payload() {
+    for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = std::thread::spawn(move || {
+            let mut requests = Vec::new();
+            for index in 0..3 {
+                let (mut socket, _) = listener.accept().unwrap();
+                let captured = read_request(&mut socket);
+                requests.push(
+                    serde_json::from_str::<serde_json::Value>(
+                        captured.split_once("\r\n\r\n").unwrap().1,
+                    )
+                    .unwrap(),
+                );
+                let (status, body) = if index < 2 {
+                    (
+                        400,
+                        if protocol == Protocol::Anthropic {
+                            r#"{"error":{"message":"effort rejected secret-fixture"}}"#
+                        } else {
+                            r#"{"error":{"message":"reasoning effort rejected secret-fixture"}}"#
+                        },
+                    )
+                } else {
+                    (
+                        200,
+                        r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}],"output":[{"type":"message","content":[{"type":"output_text","text":"ok"}]}],"status":"completed"}"#,
+                    )
+                };
+                write!(socket, "HTTP/1.1 {status} fixture\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+                if protocol == Protocol::Anthropic && index == 1 {
+                    break;
+                }
+            }
+            requests
+        });
+        let scope =
+            Scope::new("fixture", &format!("http://{addr}"), None, AuthMode::ApiKey).unwrap();
+        let model = Provider::new(
+            "fixture",
+            protocol,
+            Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+        )
+        .unwrap();
+        let mut input = request();
+        input.model = "claude-opus-4.7".into();
+        input
+            .settings
+            .insert("reasoning_effort".into(), serde_json::json!("max"));
+        let result = model.complete(&context(), input).await;
+        if protocol == Protocol::Anthropic {
+            let error = result.unwrap_err();
+            assert!(!format!("{error:?}").contains("secret-fixture"));
+        } else {
+            result.unwrap();
+        }
+        let requests = server.join().unwrap();
+        let efforts: Vec<_> = requests
+            .iter()
+            .map(|body| {
+                if protocol == Protocol::Anthropic {
+                    body["output_config"]["effort"].as_str().unwrap()
+                } else {
+                    body["reasoning"]["effort"].as_str().unwrap()
+                }
+            })
+            .collect();
+        assert_eq!(
+            efforts,
+            if protocol == Protocol::Anthropic {
+                vec!["max", "high"]
+            } else {
+                vec!["max", "xhigh", "high"]
+            }
+        );
+        for body in &requests {
+            assert_eq!(body["model"], "claude-opus-4.7");
+        }
+    }
+}
+
+#[cfg(feature = "runtime")]
+#[tokio::test]
+async fn runner_consumes_http_phase_and_false_end_turn_before_final_answer() {
+    use adk_core::*;
+    use adk_runtime::*;
+    struct HostFixture;
+    impl Host for HostFixture {
+        fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async { Ok(()) })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { Ok(ApprovalDecision::Defer) })
+        }
+    }
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let mut captured = Vec::new();
+        for (phase, end_turn, text) in [
+            ("commentary", false, "working"),
+            ("final_answer", true, "done"),
+        ] {
+            let (mut socket, _) = listener.accept().unwrap();
+            captured.push(read_request(&mut socket));
+            let body = serde_json::json!({"status":"completed","end_turn":end_turn,"output":[{"type":"message","role":"assistant","phase":phase,"content":[{"type":"output_text","text":text}]}]}).to_string();
+            write!(
+                socket,
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                body.len()
+            )
+            .unwrap();
+        }
+        captured
+    });
+    let scope = Scope::new("fixture", &format!("http://{addr}"), None, AuthMode::ApiKey).unwrap();
+    let model = Arc::new(
+        Provider::new(
+            "fixture",
+            Protocol::Responses,
+            Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+        )
+        .unwrap(),
+    );
+    let runner = Runner::new(
+        AgentConfig::new("fixture", ModelBinding::streaming("gpt-5.6", model)),
+        RunnerConfig::default(),
+    )
+    .unwrap();
+    let result = runner
+        .run(
+            context(),
+            RunRequest {
+                input: vec![],
+                policy: RunPolicy {
+                    max_turns: 2.try_into().unwrap(),
+                    tools: ToolPolicy::default(),
+                    tool_use: ToolUseBehavior::Continue,
+                },
+            },
+            Arc::new(HostFixture),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.responses.len(), 2);
+    let captured = server.join().unwrap();
+    let second: serde_json::Value =
+        serde_json::from_str(captured[1].split_once("\r\n\r\n").unwrap().1).unwrap();
+    assert_eq!(second["input"][0]["phase"], "commentary");
+    assert_eq!(second["input"][0]["content"], "working");
+}
+
+#[tokio::test]
+async fn anthropic_thinking_repair_is_learned_only_for_its_model() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let mut requests = Vec::new();
+        for index in 0..4 {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            requests.push(
+                serde_json::from_str::<serde_json::Value>(
+                    captured.split_once("\r\n\r\n").unwrap().1,
+                )
+                .unwrap(),
+            );
+            let (status, body) = if index == 0 {
+                (
+                    400,
+                    r#"{"error":{"message":"thinking.type.enabled unsupported"}}"#,
+                )
+            } else {
+                (
+                    200,
+                    r#"{"content":[{"type":"text","text":"ok"}],"stop_reason":"end_turn"}"#,
+                )
+            };
+            write!(socket, "HTTP/1.1 {status} fixture\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+        }
+        requests
+    });
+    let scope = Scope::new("fixture", &format!("http://{addr}"), None, AuthMode::ApiKey).unwrap();
+    let model = Provider::new(
+        "fixture",
+        Protocol::Anthropic,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    for name in ["claude-sonnet-4.5", "claude-sonnet-4.5", "claude-haiku-4.5"] {
+        let mut input = request();
+        input.model = name.into();
+        input
+            .settings
+            .insert("reasoning_effort".into(), serde_json::json!("high"));
+        model.complete(&context(), input).await.unwrap();
+    }
+    let requests = server.join().unwrap();
+    let kinds: Vec<_> = requests
+        .iter()
+        .map(|body| body["thinking"]["type"].as_str().unwrap())
+        .collect();
+    assert_eq!(kinds, ["enabled", "adaptive", "adaptive", "enabled"]);
 }

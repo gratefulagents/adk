@@ -8,7 +8,10 @@ use reqwest::{
 use sha2::{Digest, Sha256};
 use std::{
     fmt,
-    sync::Arc,
+    sync::{
+        Arc,
+        atomic::{AtomicBool, Ordering},
+    },
     time::{Duration, SystemTime},
 };
 use tokio::sync::Mutex;
@@ -126,6 +129,7 @@ impl Material {
             self.last_refresh
                 .zip(self.expires_at)
                 .and_then(|(last, expires)| expires.duration_since(last).ok())
+                .filter(|lifetime| !lifetime.is_zero())
                 .map(|lifetime| nominal.min(lifetime / 2))
                 .unwrap_or(nominal)
         };
@@ -136,6 +140,7 @@ impl Material {
 
 /// The host controls persistence, external rotations and atomic revision checks.
 /// Implementations must return only sanitized errors and validate scope on lookup.
+/// Successful replacement must advance the revision; disk persistence is host-owned.
 pub trait CredentialStore: Send + Sync {
     fn load<'a>(
         &'a self,
@@ -151,6 +156,9 @@ pub trait CredentialStore: Send + Sync {
     ) -> BoxFuture<'a, Result<bool, Error>>;
 }
 /// Refresh is injectable for host-owned OAuth integrations and deterministic tests.
+/// The returned future is dropped on request cancellation. Hosts preserving single-use
+/// exchanges across cancellation must supervise and persist them under a host-owned
+/// lifetime, then expose the result through the scoped store.
 pub trait Refresh: Send + Sync {
     fn refresh<'a>(
         &'a self,
@@ -160,13 +168,21 @@ pub trait Refresh: Send + Sync {
     ) -> BoxFuture<'a, Result<Material, Error>>;
 }
 
+#[derive(Default)]
+struct SessionState {
+    rejected: Option<Secret>,
+    copilot_failure: Option<(u64, SystemTime)>,
+}
+
 /// Share one session per credential scope to serialize refresh and external-rotation
 /// reloads. Independent routes must have independent sessions.
 pub struct Session {
     scope: Scope,
     store: Arc<dyn CredentialStore>,
     refresh: Arc<dyn Refresh>,
-    gate: Mutex<Option<Secret>>,
+    gate: Mutex<SessionState>,
+    refresh_disabled: AtomicBool,
+    now: Arc<dyn Fn() -> SystemTime + Send + Sync>,
 }
 impl Session {
     pub fn new(
@@ -179,8 +195,19 @@ impl Session {
             scope,
             store,
             refresh,
-            gate: Mutex::new(None),
+            gate: Mutex::new(SessionState::default()),
+            refresh_disabled: AtomicBool::new(false),
+            now: Arc::new(SystemTime::now),
         })
+    }
+    /// Supply a host clock for refresh scheduling, independently of request deadlines.
+    pub fn with_clock(mut self, now: Arc<dyn Fn() -> SystemTime + Send + Sync>) -> Self {
+        self.now = now;
+        self
+    }
+    /// Disable local exchanges when the host owns refresh or requires reauthentication.
+    pub fn disable_refresh(&self) {
+        self.refresh_disabled.store(true, Ordering::SeqCst);
     }
     pub fn scope(&self) -> &Scope {
         &self.scope
@@ -188,83 +215,153 @@ impl Session {
     /// Invalidate the exact credential rejected on the wire, not whichever token
     /// happens to be current after another request/host has rotated it.
     pub async fn reject(&self, context: &Context, token: &Secret) -> Result<(), Error> {
-        let mut rejected = crate::active(context, self.gate.lock()).await?;
+        let mut state = crate::active(context, self.gate.lock()).await?;
         let current = crate::active(context, self.store.load(context, &self.scope)).await??;
         self.validate(&current)?;
         // A late 401 for an older token must not erase rejection of the current one.
-        if current.access_token.expose() == token.expose() {
-            *rejected = Some(token.clone());
+        if current.access_token.expose().trim() == token.expose().trim() {
+            state.rejected = Some(Secret::new(token.expose().trim()));
         }
         Ok(())
     }
+    /// Direct consumers refresh JWTs five minutes early and opaque tokens after eight days.
     pub async fn material(&self, context: &Context) -> Result<Material, Error> {
-        let mut rejected = crate::active(context, self.gate.lock()).await?;
+        self.material_with_policy(context, true).await
+    }
+    /// Retrying transports try opaque tokens first and refresh only expired JWTs or a 401.
+    pub async fn material_for_request(&self, context: &Context) -> Result<Material, Error> {
+        self.material_with_policy(context, false).await
+    }
+    async fn material_with_policy(
+        &self,
+        context: &Context,
+        proactive: bool,
+    ) -> Result<Material, Error> {
+        let mut state = crate::active(context, self.gate.lock()).await?;
         let mut material = crate::active(context, self.store.load(context, &self.scope)).await??;
         self.validate(&material)?;
-        let rejected_current = rejected
+        let rejected_current = state
+            .rejected
             .as_ref()
-            .is_some_and(|token| token.expose() == material.access_token.expose());
-        let now = SystemTime::now();
-        let needs_refresh = if self.scope.mode == AuthMode::AnthropicOAuth {
-            material.access_token.expose().is_empty()
+            .is_some_and(|token| token.expose() == material.access_token.expose().trim());
+        let now = (self.now)();
+        let needs_refresh = if self.scope.mode == AuthMode::OpenAiOAuth {
+            material.access_token.expose().trim().is_empty()
+                || crate::material::access_token_expiry(material.access_token.expose())
+                    .map(|expiry| {
+                        expiry <= now + Duration::from_secs(if proactive { 300 } else { 0 })
+                    })
+                    .unwrap_or_else(|| proactive && material.needs_refresh(self.scope.mode, now))
+        } else if self.scope.mode == AuthMode::AnthropicOAuth {
+            material.access_token.expose().trim().is_empty()
                 || material
                     .expires_at
                     .is_some_and(|at| at <= now + Duration::from_secs(120))
         } else {
             material.needs_refresh(self.scope.mode, now)
         };
-        let can_refresh = matches!(
-            self.scope.mode,
-            AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
-        ) && material
-            .refresh_token
-            .as_ref()
-            .is_some_and(|token| !token.expose().trim().is_empty());
-        if (needs_refresh || rejected_current) && can_refresh {
-            let revision = material.revision;
-            let original = material.clone();
-            match crate::active(
-                context,
-                self.refresh.refresh(context, &self.scope, material),
+        let can_refresh = !self.refresh_disabled.load(Ordering::SeqCst)
+            && matches!(
+                self.scope.mode,
+                AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
             )
-            .await?
-            {
-                Ok(updated) => {
-                    material = updated;
-                    self.validate(&material)?;
-                    crate::active(
-                        context,
-                        self.store
-                            .replace(context, &self.scope, revision, material.clone()),
-                    )
-                    .await??;
-                    // CAS may lose to an external rotation; never return the losing token.
-                    material =
-                        crate::active(context, self.store.load(context, &self.scope)).await??;
-                    self.validate(&material)?;
+            && material
+                .refresh_token
+                .as_ref()
+                .is_some_and(|token| !token.expose().trim().is_empty());
+        if (needs_refresh || rejected_current) && can_refresh {
+            let fallback = |value: &Material| {
+                matches!(
+                    self.scope.mode,
+                    AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
+                ) && !rejected_current
+                    && !value.access_token.expose().trim().is_empty()
+                    && value.expires_at.is_none_or(|at| at > (self.now)())
+            };
+            let cooling_down = self.scope.mode == AuthMode::CopilotOAuth
+                && state.copilot_failure.is_some_and(|(revision, at)| {
+                    revision == material.revision
+                        && now.duration_since(at).unwrap_or_default() < Duration::from_secs(15)
+                });
+            if cooling_down {
+                if !fallback(&material) {
+                    return Err(Error::new(
+                        ErrorCategory::Provider,
+                        "Copilot token refresh recently failed",
+                    ));
                 }
-                Err(error) => {
-                    if matches!(
-                        error.info.category,
-                        ErrorCategory::Cancelled | ErrorCategory::DeadlineExceeded
-                    ) {
-                        return Err(error);
-                    }
-                    // A single-use token may have been rotated by the host during the
-                    // exchange. Reload before failing or attempting any further exchange.
-                    let fresh =
-                        crate::active(context, self.store.load(context, &self.scope)).await??;
-                    self.validate(&fresh)?;
-                    if fresh.access_token.expose() != original.access_token.expose() {
-                        material = fresh;
-                    } else if self.scope.mode == AuthMode::AnthropicOAuth
-                        && !rejected_current
-                        && !original.access_token.expose().is_empty()
-                        && original.expires_at.is_none_or(|at| at > now)
+            } else {
+                let mut retried = false;
+                loop {
+                    let revision = material.revision;
+                    let original = material.clone();
+                    match crate::active(
+                        context,
+                        self.refresh.refresh(context, &self.scope, material),
+                    )
+                    .await?
                     {
-                        material = original;
-                    } else {
-                        return Err(error);
+                        Ok(updated) => {
+                            self.validate(&updated)?;
+                            crate::active(
+                                context,
+                                self.store.replace(context, &self.scope, revision, updated),
+                            )
+                            .await??;
+                            // CAS may lose to an external rotation; never return the losing token.
+                            material =
+                                crate::active(context, self.store.load(context, &self.scope))
+                                    .await??;
+                            self.validate(&material)?;
+                            state.copilot_failure = None;
+                            break;
+                        }
+                        Err(error) => {
+                            if matches!(
+                                error.info.category,
+                                ErrorCategory::Cancelled | ErrorCategory::DeadlineExceeded
+                            ) {
+                                return Err(error);
+                            }
+                            let fresh =
+                                crate::active(context, self.store.load(context, &self.scope))
+                                    .await??;
+                            self.validate(&fresh)?;
+                            if !fresh.access_token.expose().trim().is_empty()
+                                && fresh.access_token.expose().trim()
+                                    != original.access_token.expose().trim()
+                                && fresh.expires_at.is_none_or(|at| at > (self.now)())
+                            {
+                                material = fresh;
+                                state.copilot_failure = None;
+                            } else if self.scope.mode == AuthMode::OpenAiOAuth
+                                && !retried
+                                && crate::oauth::is_http_refresh_error(&error)
+                                && fresh.refresh_token.as_ref().is_some_and(|token| {
+                                    !token.expose().trim().is_empty()
+                                        && Some(token.expose().trim())
+                                            != original
+                                                .refresh_token
+                                                .as_ref()
+                                                .map(|v| v.expose().trim())
+                                })
+                            {
+                                // Only a newly host-rotated refresh credential permits a second exchange.
+                                material = fresh;
+                                retried = true;
+                                continue;
+                            } else {
+                                if self.scope.mode == AuthMode::CopilotOAuth {
+                                    state.copilot_failure = Some((revision, now));
+                                }
+                                if fallback(&fresh) {
+                                    material = fresh;
+                                } else {
+                                    return Err(error);
+                                }
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -274,11 +371,14 @@ impl Session {
                 "provider rejected credential and refresh is unavailable",
             ));
         }
-        if rejected
-            .as_ref()
-            .is_some_and(|token| token.expose() != material.access_token.expose())
-        {
-            *rejected = None;
+        if let Some(token) = &state.rejected {
+            if token.expose() == material.access_token.expose().trim() {
+                return Err(Error::new(
+                    ErrorCategory::PermissionDenied,
+                    "provider credential remains rejected",
+                ));
+            }
+            state.rejected = None;
         }
         if self.scope.mode != AuthMode::Anonymous
             && material.access_token.expose().trim().is_empty()
@@ -288,6 +388,18 @@ impl Session {
                 "provider credential is unavailable",
             ));
         }
+        if self.scope.mode == AuthMode::OpenAiOAuth
+            && material
+                .account
+                .as_deref()
+                .is_none_or(|value| value.trim().is_empty())
+        {
+            return Err(Error::new(
+                ErrorCategory::PermissionDenied,
+                "OpenAI OAuth account is unavailable",
+            ));
+        }
+        context.check_active()?;
         Ok(material)
     }
     fn validate(&self, material: &Material) -> Result<(), Error> {
@@ -302,6 +414,18 @@ impl Session {
 }
 /// Headers are marked sensitive; do not serialize or log the returned map.
 pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<HeaderMap, Error> {
+    if scope.account.is_some() && scope.account != material.account {
+        return Err(Error::new(
+            ErrorCategory::PermissionDenied,
+            "provider credential account mismatch",
+        ));
+    }
+    if scope.mode != AuthMode::Anonymous && material.access_token.expose().trim().is_empty() {
+        return Err(Error::new(
+            ErrorCategory::PermissionDenied,
+            "provider credential is unavailable",
+        ));
+    }
     let mut out = HeaderMap::new();
     if scope.mode != AuthMode::Anonymous {
         let (key, token) = if anthropic && scope.mode == AuthMode::ApiKey {
@@ -402,6 +526,9 @@ pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<He
 /// prevent concatenation ambiguity. OpenAI OAuth affinity survives token refresh
 /// within one account. Missing stable identity disables explicit cache affinity.
 pub fn cache_scope(scope: &Scope, material: &Material, prompt_key: &str) -> String {
+    if scope.account.is_some() && scope.account != material.account {
+        return String::new();
+    }
     let identity = if scope.mode == AuthMode::OpenAiOAuth {
         material.account.as_deref().unwrap_or("")
     } else {

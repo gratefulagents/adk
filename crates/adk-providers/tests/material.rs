@@ -164,3 +164,61 @@ fn copilot_token_can_select_only_allowlisted_https_hosts() {
         assert_eq!(copilot_endpoint(&format!("proxy-ep={endpoint}")), None);
     }
 }
+
+#[test]
+fn pinned_auth_material_fixtures_preserve_alias_precedence() {
+    let fixtures: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/auth-material.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixtures["baseline"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    for case in fixtures["cases"].as_array().unwrap() {
+        let mode = match case["mode"].as_str().unwrap() {
+            "openai" => AuthMode::OpenAiOAuth,
+            "anthropic" => AuthMode::AnthropicOAuth,
+            "copilot" => AuthMode::CopilotOAuth,
+            _ => unreachable!(),
+        };
+        let value = parse(mode, case["body"].to_string().as_bytes(), None, 42).unwrap();
+        assert_eq!(
+            value.access_token.expose(),
+            case["access"].as_str().unwrap()
+        );
+        assert_eq!(
+            value.refresh_token.as_ref().unwrap().expose(),
+            case["refresh"].as_str().unwrap()
+        );
+        assert_eq!(value.account.as_deref(), case["account"].as_str());
+        assert_eq!(
+            value.expires_at,
+            case["expiry"]
+                .as_u64()
+                .map(|v| SystemTime::UNIX_EPOCH + Duration::from_secs(v))
+        );
+        assert_eq!(value.revision, 42);
+    }
+}
+
+#[test]
+fn zero_anthropic_lifetime_keeps_default_lead_and_serializer_omits_blank_identity() {
+    let now = SystemTime::UNIX_EPOCH + Duration::from_secs(1800000000);
+    let mut value = parse(
+        AuthMode::AnthropicOAuth,
+        br#"{"access_token":"access","refresh_token":"refresh"}"#,
+        None,
+        0,
+    )
+    .unwrap();
+    value.expires_at = Some(now + Duration::from_secs(60));
+    value.last_refresh = value.expires_at;
+    assert!(value.needs_refresh(AuthMode::AnthropicOAuth, now));
+    value.account = Some(" ".into());
+    value.email = Some(" ".into());
+    let serialized = serialize(AuthMode::AnthropicOAuth, &value, now).unwrap();
+    let body: serde_json::Value = serde_json::from_str(serialized.expose()).unwrap();
+    assert!(body.get("account_uuid").is_none());
+    assert!(body.get("email").is_none());
+}

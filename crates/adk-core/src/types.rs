@@ -12,7 +12,7 @@ pub enum Role {
     Assistant,
 }
 
-/// Ordered multimodal content; media are referenced, never fetched by core.
+/// Ordered multimodal content; media are never fetched by core.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Content {
@@ -22,6 +22,13 @@ pub enum Content {
     Image {
         uri: String,
         media_type: String,
+    },
+    /// Go-compatible inline image or PDF attachment. `data` is base64, not a URI;
+    /// an empty `detail` leaves image detail unspecified.
+    Attachment {
+        media_type: String,
+        data: String,
+        detail: String,
     },
     Audio {
         uri: String,
@@ -66,6 +73,12 @@ pub struct ToolOutput {
 pub enum RunItem {
     Message {
         message: Message,
+    },
+    /// A message with an explicit, nonempty provider phase (for example commentary).
+    /// Ordinary `Message` items have no phase; replay must not invent one.
+    PhasedMessage {
+        message: Message,
+        phase: String,
     },
     ToolCall {
         call: ToolCall,

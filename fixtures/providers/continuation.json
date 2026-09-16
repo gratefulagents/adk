@@ -1,4 +1,1068 @@
 {
+  "anthropic_costs": [
+    {
+      "cost": 0.015674999999999998,
+      "model": "claude-fable-5-1",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.015825,
+      "model": "claude-fable-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.015674999999999998,
+      "model": "claude-mythos-5-1",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.015825,
+      "model": "claude-mythos-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0031650000000000003,
+      "model": "claude-sonnet-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.004747500000000001,
+      "model": "claude-sonnet-4-6",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0079125,
+      "model": "claude-opus-4-6",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0237375,
+      "model": "claude-opus-4-1",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0237375,
+      "model": "claude-opus-4",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0015825000000000001,
+      "model": "claude-haiku-4-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.001266,
+      "model": "claude-haiku-3-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.004747500000000001,
+      "model": "unknown-fixture",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    }
+  ],
+  "chat_request": {
+    "model": "gpt-5.6",
+    "messages": [
+      {
+        "role": "system",
+        "content": "Be precise"
+      },
+      {
+        "role": "user",
+        "content": "hello"
+      }
+    ],
+    "max_tokens": 16384,
+    "reasoning": {
+      "effort": "high"
+    }
+  },
+  "chat_sse": "data: {\"id\":\"chat-fixture\",\"choices\":[{\"index\":0,\"delta\":{\"reasoning_content\":\"why \",\"content\":\"hé\",\"tool_calls\":[{\"index\":0,\"id\":\"call-fixture\",\"function\":{\"name\":\"lookup\",\"arguments\":\"{\\\"q\\\":\"}}]}}]}\n\ndata: {\"id\":\"chat-fixture\",\"choices\":[{\"index\":0,\"delta\":{\"content\":\"llo\",\"tool_calls\":[{\"index\":0,\"function\":{\"arguments\":\"1}\"}}]},\"finish_reason\":\"tool_calls\"}],\"usage\":{\"prompt_tokens\":100,\"completion_tokens\":20,\"prompt_tokens_details\":{\"cached_tokens\":70,\"cache_write_tokens\":11}}}\n\ndata: [DONE]\n\n",
+  "chat_sse_response": {
+    "id": "chat-fixture",
+    "type": "",
+    "role": "assistant",
+    "content": [
+      {
+        "type": "thinking",
+        "thinking": "why "
+      },
+      {
+        "type": "text",
+        "text": "héllo"
+      },
+      {
+        "type": "tool_use",
+        "id": "call-fixture",
+        "name": "lookup",
+        "input": {
+          "q": 1
+        }
+      }
+    ],
+    "model": "",
+    "stop_reason": "tool_use",
+    "usage": {
+      "input_tokens": 100,
+      "output_tokens": 20,
+      "cache_read_input_tokens": 70,
+      "cache_creation_input_tokens": 11
+    }
+  },
+  "openai_costs": [
+    {
+      "cost": 0.0025,
+      "known": true,
+      "model": "gpt-4.1",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.30080000000000007,
+      "known": true,
+      "model": "gpt-4.1",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000013000000000000001,
+      "known": true,
+      "model": "gpt-4.1",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0005,
+      "known": true,
+      "model": "gpt-4.1-mini",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.06016,
+      "known": true,
+      "model": "gpt-4.1-mini",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.0000026,
+      "known": true,
+      "model": "gpt-4.1-mini",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.000125,
+      "known": true,
+      "model": "gpt-4.1-nano",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.01504,
+      "known": true,
+      "model": "gpt-4.1-nano",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 6.5e-7,
+      "known": true,
+      "model": "gpt-4.1-nano",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0032500000000000003,
+      "known": true,
+      "model": "gpt-4o",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.501,
+      "known": true,
+      "model": "gpt-4o",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.0000225,
+      "known": true,
+      "model": "gpt-4o",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.000195,
+      "known": true,
+      "model": "gpt-4o-mini",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.03006,
+      "known": true,
+      "model": "gpt-4o-mini",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00000135,
+      "known": true,
+      "model": "gpt-4o-mini",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002025,
+      "known": true,
+      "model": "gpt-5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.151,
+      "known": true,
+      "model": "gpt-5",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001125,
+      "known": true,
+      "model": "gpt-5",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002025,
+      "known": true,
+      "model": "gpt-5-codex",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.151,
+      "known": true,
+      "model": "gpt-5-codex",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001125,
+      "known": true,
+      "model": "gpt-5-codex",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.00040500000000000003,
+      "known": true,
+      "model": "gpt-5-mini",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0302,
+      "known": true,
+      "model": "gpt-5-mini",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00000225,
+      "known": true,
+      "model": "gpt-5-mini",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.000081,
+      "known": true,
+      "model": "gpt-5-nano",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.00604,
+      "known": true,
+      "model": "gpt-5-nano",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 4.5000000000000003e-7,
+      "known": true,
+      "model": "gpt-5-nano",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002025,
+      "known": true,
+      "model": "gpt-5.1",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.151,
+      "known": true,
+      "model": "gpt-5.1",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001125,
+      "known": true,
+      "model": "gpt-5.1",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002025,
+      "known": true,
+      "model": "gpt-5.1-codex",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.151,
+      "known": true,
+      "model": "gpt-5.1-codex",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001125,
+      "known": true,
+      "model": "gpt-5.1-codex",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002025,
+      "known": true,
+      "model": "gpt-5.1-codex-max",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.151,
+      "known": true,
+      "model": "gpt-5.1-codex-max",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001125,
+      "known": true,
+      "model": "gpt-5.1-codex-max",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.00040500000000000003,
+      "known": true,
+      "model": "gpt-5.1-codex-mini",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.0302,
+      "known": true,
+      "model": "gpt-5.1-codex-mini",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00000225,
+      "known": true,
+      "model": "gpt-5.1-codex-mini",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002835,
+      "known": true,
+      "model": "gpt-5.2",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.2114,
+      "known": true,
+      "model": "gpt-5.2",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001575,
+      "known": true,
+      "model": "gpt-5.2",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002835,
+      "known": true,
+      "model": "gpt-5.2-codex",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.2114,
+      "known": true,
+      "model": "gpt-5.2-codex",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001575,
+      "known": true,
+      "model": "gpt-5.2-codex",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.002835,
+      "known": true,
+      "model": "gpt-5.3-codex",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.2114,
+      "known": true,
+      "model": "gpt-5.3-codex",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00001575,
+      "known": true,
+      "model": "gpt-5.3-codex",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0005600000000000001,
+      "known": true,
+      "model": "gpt-5.3-codex-spark",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.12015999999999999,
+      "known": true,
+      "model": "gpt-5.3-codex-spark",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.0000056,
+      "known": true,
+      "model": "gpt-5.3-codex-spark",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.00355,
+      "known": true,
+      "model": "gpt-5.4",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.3015,
+      "known": true,
+      "model": "gpt-5.4",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000017500000000000002,
+      "known": true,
+      "model": "gpt-5.4",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.001065,
+      "known": true,
+      "model": "gpt-5.4-mini",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.09045,
+      "known": true,
+      "model": "gpt-5.4-mini",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.0000052500000000000006,
+      "known": true,
+      "model": "gpt-5.4-mini",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.000289,
+      "known": true,
+      "model": "gpt-5.4-nano",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.024125,
+      "known": true,
+      "model": "gpt-5.4-nano",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00000145,
+      "known": true,
+      "model": "gpt-5.4-nano",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0071,
+      "known": true,
+      "model": "gpt-5.5",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.603,
+      "known": true,
+      "model": "gpt-5.5",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000035000000000000004,
+      "known": true,
+      "model": "gpt-5.5",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.01790625,
+      "known": true,
+      "model": "gpt-5.6-cyber",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 1.66375,
+      "known": true,
+      "model": "gpt-5.6-cyber",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.0000875,
+      "known": true,
+      "model": "gpt-5.6-cyber",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0014325000000000002,
+      "known": true,
+      "model": "gpt-5.6-luna",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.1331,
+      "known": true,
+      "model": "gpt-5.6-luna",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000007,
+      "known": true,
+      "model": "gpt-5.6-luna",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.0053300000000000005,
+      "known": true,
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 1.063,
+      "known": true,
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000024,
+      "known": true,
+      "model": "gpt-5.6-sol",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.00358125,
+      "known": true,
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0.33275,
+      "known": true,
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.000017500000000000002,
+      "known": true,
+      "model": "gpt-5.6-terra",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0.013325,
+      "known": true,
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 2.6574999999999998,
+      "known": true,
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0.00006,
+      "known": true,
+      "model": "gpt-6-astra",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    },
+    {
+      "cost": 0,
+      "known": false,
+      "model": "unknown-fixture",
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200,
+        "cache_creation_input_tokens": 50
+      }
+    },
+    {
+      "cost": 0,
+      "known": false,
+      "model": "unknown-fixture",
+      "usage": {
+        "input_tokens": 300000,
+        "output_tokens": 100,
+        "cache_read_input_tokens": 200000,
+        "cache_creation_input_tokens": 50000
+      }
+    },
+    {
+      "cost": 0,
+      "known": false,
+      "model": "unknown-fixture",
+      "usage": {
+        "input_tokens": 10,
+        "output_tokens": 1,
+        "cache_read_input_tokens": 20,
+        "cache_creation_input_tokens": 20
+      }
+    }
+  ],
   "reasoning_details_json": [
     {
       "type": "reasoning.encrypted",
@@ -18,6 +1082,58 @@
       "encrypted_content": "compact-opaque",
       "id": "c",
       "type": "compaction"
+    }
+  ],
+  "responses_request": {
+    "instructions": "Be precise",
+    "max_output_tokens": 16384,
+    "include": [
+      "reasoning.encrypted_content"
+    ],
+    "prompt_cache_retention": "24h",
+    "truncation": "auto",
+    "input": [
+      {
+        "content": "hello",
+        "role": "user"
+      }
+    ],
+    "model": "gpt-5.6",
+    "reasoning": {
+      "effort": "high",
+      "summary": "auto"
+    }
+  },
+  "retry_headers": [
+    {
+      "capped_seconds": 1,
+      "milliseconds": "1",
+      "seconds": ""
+    },
+    {
+      "capped_seconds": 1,
+      "milliseconds": "1500",
+      "seconds": "9"
+    },
+    {
+      "capped_seconds": 300,
+      "milliseconds": "999999",
+      "seconds": "9"
+    },
+    {
+      "capped_seconds": 12,
+      "milliseconds": "bad",
+      "seconds": "12"
+    },
+    {
+      "capped_seconds": 0,
+      "milliseconds": "",
+      "seconds": "-1"
+    },
+    {
+      "capped_seconds": 300,
+      "milliseconds": "",
+      "seconds": "301"
     }
   ],
   "source_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"

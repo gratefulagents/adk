@@ -222,8 +222,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
     let items: Vec<_> = compacted
         .iter()
         .filter(|item| {
-            !matches!(item, HistoryItem::Native(RunItem::Message { .. }))
-                || !item_text(item).starts_with(CARRY_FORWARD_MARKER)
+            !matches!(
+                item,
+                HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. })
+            ) || !item_text(item).starts_with(CARRY_FORWARD_MARKER)
         })
         .cloned()
         .collect();
@@ -331,9 +333,9 @@ fn content_text(content: &[Content]) -> String {
 }
 fn item_text(item: &HistoryItem) -> String {
     match item {
-        HistoryItem::Native(RunItem::Message { message }) => {
-            content_text(&message.content).trim().into()
-        }
+        HistoryItem::Native(
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+        ) => content_text(&message.content).trim().into(),
         HistoryItem::Native(RunItem::Reasoning { reasoning }) => reasoning.text.trim().into(),
         HistoryItem::Native(RunItem::Compaction { .. }) => "OpenAI compaction item".into(),
         _ => String::new(),
@@ -346,9 +348,9 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
     items
         .iter()
         .map(|item| match item {
-            HistoryItem::Native(RunItem::Message { message }) => {
-                estimate_string_tokens(&content_text(&message.content)) + 8
-            }
+            HistoryItem::Native(
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+            ) => estimate_string_tokens(&content_text(&message.content)) + 8,
             HistoryItem::Native(RunItem::ToolCall { call }) => {
                 estimate_string_tokens(&call.name) + estimate_string_tokens(&arguments(call)) + 16
             }
@@ -590,9 +592,11 @@ fn compact_mixed(
     best.unwrap_or_else(|| unchanged(before, reason))
 }
 fn must_preserve(item: &HistoryItem) -> bool {
-    // Core has no Go agent metadata or opaque-provider item. Preserve non-text context losslessly.
+    // Preserve non-text context losslessly; local summaries cannot reconstruct it.
     match item {
-        HistoryItem::Native(RunItem::Message { message }) => {
+        HistoryItem::Native(
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+        ) => {
             matches!(message.role, Role::System | Role::Developer)
                 || message
                     .content
@@ -611,7 +615,7 @@ fn must_preserve(item: &HistoryItem) -> bool {
     }
 }
 fn is_initial_user(item: &HistoryItem) -> bool {
-    matches!(item, HistoryItem::Native(RunItem::Message { message }) if message.role == Role::User)
+    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
         && {
             let text = item_text(item);
             !text.is_empty()
@@ -658,7 +662,7 @@ fn rebuild(items: &[HistoryItem], protected: &HashSet<usize>, summary: &str) -> 
     let first_protected = (0..items.len()).find(|i| protected.contains(i));
     let defer = first_protected.filter(|p| {
         first_removed.is_some_and(|r| r < *p)
-            && matches!(&items[*p], HistoryItem::Native(RunItem::Message { message }) if message.role == Role::User)
+            && matches!(&items[*p], HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
     });
     let mut out = vec![];
     let mut inserted = false;
@@ -681,9 +685,9 @@ fn extract_mixed_summary(items: &[HistoryItem]) -> String {
         .iter()
         .rev()
         .find_map(|item| match item {
-            HistoryItem::Native(RunItem::Message { message })
-                if message.role == Role::Assistant =>
-            {
+            HistoryItem::Native(
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+            ) if message.role == Role::Assistant => {
                 let text = item_text(item);
                 text.starts_with(SUMMARY_MARKER).then_some(text)
             }
@@ -692,7 +696,7 @@ fn extract_mixed_summary(items: &[HistoryItem]) -> String {
         .unwrap_or_default()
 }
 fn is_summary(item: &HistoryItem) -> bool {
-    matches!(item, HistoryItem::Native(RunItem::Message { message }) if message.role == Role::Assistant)
+    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::Assistant)
         && item_text(item).starts_with(SUMMARY_MARKER)
 }
 fn normalize_summary(text: &str) -> String {
@@ -732,7 +736,7 @@ fn truncate(text: &str, max: usize) -> String {
 fn scope(items: &[HistoryItem]) -> String {
     let users = items
         .iter()
-        .filter(|i| matches!(i, HistoryItem::Native(RunItem::Message { message }) if message.role == Role::User))
+        .filter(|i| matches!(i, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User))
         .count();
     let tools = items
         .iter()
@@ -824,7 +828,7 @@ fn summarize(items: &[HistoryItem], limit: usize) -> String {
         "Recent user requests",
         unique_bullets(items, limit, |item| {
             let text = item_text(item);
-            if matches!(item, HistoryItem::Native(RunItem::Message { message }) if message.role == Role::User)
+            if matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
                 && !text.starts_with("[SYSTEM]")
                 && !text.starts_with("[PHASE TRANSITION")
             {
@@ -926,7 +930,9 @@ fn summarize_terse(items: &[HistoryItem], limit: usize) -> String {
 }
 fn timeline(item: &HistoryItem) -> Option<String> {
     match item {
-        HistoryItem::Native(RunItem::Message { message }) => {
+        HistoryItem::Native(
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+        ) => {
             let text = item_text(item);
             if text.is_empty() {
                 None
@@ -995,7 +1001,9 @@ fn referenced_paths(items: &[HistoryItem], limit: usize) -> Vec<String> {
     let mut seen = HashSet::new();
     for item in items {
         let text = match item {
-            HistoryItem::Native(RunItem::Message { .. }) => item_text(item),
+            HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. }) => {
+                item_text(item)
+            }
             HistoryItem::Native(RunItem::ToolCall { call }) => arguments(call),
             HistoryItem::Native(RunItem::ToolResult { output, .. }) => {
                 content_text(&output.content)

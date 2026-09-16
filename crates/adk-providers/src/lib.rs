@@ -3,6 +3,21 @@
 //! Requests and streams borrow no global state. Dropping an in-flight operation drops
 //! its HTTP future; no background tasks are spawned. See `docs/providers.md` for
 //! the explicitly tested compatibility boundary.
+//!
+//! ```
+//! use adk_providers::{auth::{AuthMode, CredentialStore}, factory::{Kind, RouteSpec},
+//!     oauth::OAuthRefresh, routing::Routes};
+//! use std::sync::Arc;
+//!
+//! fn routes(store: Arc<dyn CredentialStore>) -> Result<Routes, adk_core::Error> {
+//!     let mut routes = Routes::new("work");
+//!     let mut spec = RouteSpec::new(Kind::OpenAi, AuthMode::OpenAiOAuth);
+//!     spec.prefix = Some("work".into());
+//!     routes.register_spec(&spec, store, Arc::new(OAuthRefresh::new()?))?;
+//!     // Resolve work/gpt-5.6 through this store; registration performs no I/O.
+//!     Ok(routes)
+//! }
+//! ```
 pub mod anthropic;
 pub mod auth;
 pub mod client;
@@ -11,7 +26,9 @@ pub mod cost;
 pub mod error;
 pub mod factory;
 pub mod material;
+pub mod metadata;
 pub mod oauth;
+mod openai;
 pub mod routing;
 #[cfg(feature = "runtime")]
 pub mod runtime;

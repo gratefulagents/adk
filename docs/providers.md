@@ -2,70 +2,69 @@
 
 ## Delivery status
 
-**Experimental, incomplete implementation. Issue #5 acceptance is not met.**
-This crate is deliberately not re-exported by the default facade. Do not treat
-its protocol coverage as a complete provider/authentication compatibility matrix.
-No live provider calls or real OAuth refresh exchanges have been verified.
+PR20 remains **draft and not approved**. The mapped provider/auth/route surface
+below is implemented and covered by deterministic tests, but full-scope readiness
+has **not received a fresh independent verdict**. Passing CI or this author's
+local checks is not approval. Live provider calls and real OAuth exchanges are
+**UNVERIFIED**; no credentials were loaded.
 
-Implemented building blocks:
+The facade exposes opt-in `providers` and `providers-runtime` features. Core
+traits, typed history and pull-owned async streams remain independent of HTTP
+clients and secret storage. See the compiled example in `adk_providers` and the
+[client research](migration/provider-research.md).
 
-- Explicit Responses, Chat and Anthropic request/response conversions for text,
-  tools, tool results, image references and structured-output schemas.
-- Pull-based HTTP streams owning their response, with cancellation/deadlines,
-  byte-boundary-safe SSE framing, bounded frames/aggregate data, terminal-marker
-  checks and latched close-after-error. No detached producer or automatic replay
-  of visible output. Retry decisions remain in the runner.
-- Named first-slash routing and preservation of gateway model IDs with slashes;
-  replacing a route replaces its independently constructed model/session.
-- Host-owned credential store and revision-checked replacement, per-session
-  refresh serialization, external-rotation reloads, account checks, sensitive
-  HTTP headers and redacted credential Debug implementations.
-- OpenAI/Anthropic/Copilot refresh HTTP exchange implementations (unverified
-  against live services), host-supplied material codecs, bounded 401 recovery and
-  late-rejection isolation, with no redirect following or transparent retry of
-  potentially single-use refresh tokens.
-- Provider-specific cache usage normalization, baseline price tables, retry
-  header floor/precedence/capping and sanitized transport error categories.
+## Baseline capability and evidence map
 
-## Explicit baseline map and remaining work
+Reference: SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`,
+`pkg/agentsdk/providers`, `internal/openai`, `internal/anthropic`.
+Merged #4 runner interfaces are used directly; no unmerged runner dependency.
+Test paths below are relative to `crates/adk-providers/tests`.
 
-Reference factory: `repos/sdk/pkg/agentsdk/providers/factory.go`; model registry:
-`repos/sdk/internal/agent/multi_provider.go`. Current Rust base includes merged
-PR #19 (`28dcc3a`); this work does not depend on an unmerged runner patch.
-
-| Baseline leg | Baseline wire/auth | Current boundary / work still required |
+| Baseline provider/auth/route | Implementation | Deterministic evidence |
 |---|---|---|
-| OpenAI | Responses or Chat / API key | Basic explicit protocol paths implemented; full golden parity pending |
-| OpenAI | Codex Responses / OAuth | Refresh exchange and bearer/account headers exist; host-supplied material parsing and encrypted continuation implemented; full Codex shaping parity pending |
-| Anthropic | Messages / API key | Wire path, generation-dependent thinking budgets/adaptive effort and native output schema implemented; error-driven shape/effort healing and full metadata parity pending |
-| Anthropic | Messages / OAuth | Refresh/material, OAuth headers and Claude Code identity implemented; full session metadata and fallback parity pending |
-| OpenRouter | Chat default or explicit Responses / API key | Generic explicit protocol can target endpoint; typed factory, host-scoped attribution and reasoning-details replay implemented; fallback `models` parity pending |
-| Gemini | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
-| Groq | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
-| xAI | Responses default / API key | Canonical typed factory implemented; model settings and fixtures pending |
-| Local | Chat / optional API key | Explicit loopback HTTP and anonymous scope supported; canonical factory/defaults implemented |
-| Copilot | Model-family Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh/material, family routing, explicit protocol override, token endpoint allow-list and identity headers implemented; generation-aware Claude thinking and cache breakpoints implemented; error healing and full fixtures pending |
-| Named/multi | Above under independent prefixes, route overrides | Explicit registry and typed per-route factory implemented; baseline implicit ProviderSpec inference and delayed unavailable secondary legs pending |
+| OpenAI Responses and explicit Chat / API key | `factory`, `openai`, `wire`, `client` | `contracts`: Go-executed request goldens, cache accounting, structured output, continuation; `http`: captured wire/stream |
+| OpenAI Codex Responses / OAuth | `auth`, `material`, `oauth`, Codex rewriting; no Chat OAuth | `auth_parity`, `material`, unit request tests; stable account cache keys in `ownership` |
+| Anthropic Messages / API key and OAuth | Generation-dependent thinking, subscription identity/betas, output schema, bounded shape/effort healing and per-model learning | `contracts`, `http::anthropic_thinking_repair_is_learned_only_for_its_model`, `auth_parity` |
+| OpenRouter / API key, default Chat or explicit Responses | Scoped attribution, nested model IDs, reasoning-details replay, ordered/deduplicated Chat fallback `models` | `contracts`, `routes_cost_parity` |
+| Gemini, Groq / API key; xAI / API key, Responses default | Canonical endpoints/protocols through explicit compatible wire adapter | Factory combination table in `contracts`; route/default/alias tests in `routes_cost_parity` |
+| Local / optional API key | Explicit loopback HTTP, anonymous material mode; default Chat | Factory/auth scope tests, loopback HTTP captures |
+| Copilot / GitHub OAuth exchanged for API token, or host-supplied valid API-token material | Claude → Messages, GPT-5/Codex → Responses, otherwise Chat; explicit override, allowed token-derived endpoint hints and identity headers | `http::copilot_factory_routes_models_and_preserves_wire_identity`, factory/Copilot unit tests, `auth_parity` cooldown/expiry vectors |
+| Named/multi-provider routes | Independent `RouteSpec` registrations, replacement overrides, defaults/size aliases, opaque nested IDs, lazy credential lookup | `routes_cost_parity`: complete/stream selection, isolated stores, actual fallback-binding cost |
 
-Unsupported audio/files/handoffs fail explicitly. Native `RunItem::Reasoning`
-and `RunItem::Compaction` retain signed/redacted/encrypted continuation through
-codecs and history. Responses replay retains compaction IDs and uses empty reasoning summaries;
-Anthropic signed/redacted thinking and OpenRouter reasoning details are replayed.
-Cross-protocol encrypted continuation fails rather than silently losing history.
-`Provider::compact` uses the dedicated Responses compaction endpoint; the optional
-`runtime` feature exposes `NativeCompactor` with host-selected pricing. Local
-compaction protects encrypted compaction items. Full differential parity is pending.
+| Cross-cutting capability | Evidence |
+|---|---|
+| Refresh serialization/CAS, rotation, revocation, account isolation, stale rejection, cancellation | 23 `auth_parity` vectors plus `contracts`, `ownership`, material and OAuth request unit tests |
+| SSE framing, transport errors and close/drop ownership | Every UTF-8/CRLF/BOM byte boundary, bounded/truncated framing, real chunked HTTP, cancellation/consumer-drop tests |
+| Reasoning, tools/results, images and PDF | Signed/redacted/encrypted/gateway replay and image tool results in `contracts`; PDF is native Anthropic only, matching baseline conversion; unsupported content fails explicitly |
+| Responses phases and explicit end-turn | `http::runner_consumes_http_phase_and_false_end_turn_before_final_answer`; done-only/multipart/incomplete/error vectors in `contracts` |
+| Native compaction and retained history | Dedicated compact endpoint in `http`; retained user/tool/opaque replay in `contracts`; Anthropic compaction delta replacement; origin-aware codec/runtime tests |
+| Usage, prices and retry | Go-executed 81 OpenAI and 12 Anthropic cost vectors, six header vectors; `retry_parity` status/error/date/reset/cap vectors; additive vs subset cache semantics |
+| Metadata/model selection | Explicit bounded scoped `/models` fetch, one OAuth rejection refresh, normalization/deduplication/picker/compaction thresholds in `routes_cost_parity` |
+| Host secrets and cache affinity | Sensitive headers, redacted material/errors, HTTPS/loopback restrictions, redirects/proxies disabled; endpoint/account/auth-scoped cache tests |
 
-Other outstanding evidence/work: protocol-specific request DTOs beyond the typed
-core input, full stream event/order validation, every error/retry/fallback vector,
-Go-executed request/SSE/cost differential fixtures, model metadata and automatic
-model selection, public facade/example, complete OAuth material/refresh race
-coverage.
-Prompt-cache keys are scoped at send time to endpoint/account/auth material, with
-captured-request tests. OpenAI OAuth affinity survives access-token rotation within
-one account; absent stable identity disables explicit affinity. Runner fallback integration has not been exercised with
-these HTTP adapters. Cost functions are callable by a host estimator but not
-installed automatically in runner configuration.
+Fixture provenance and differential limits are in `fixtures/providers/README.md`.
+The Go-executed Chat SSE fixture is compared at every byte split; remaining
+protocol/error/OAuth vectors are synthetic Rust contract tests, not falsely
+labeled Go differential tests. A fresh independent review must assess whether
+that evidence closes every acceptance edge case.
+
+Transient retry scheduling and model fallback remain runner-owned. Adapter
+retries are limited to OAuth rejection recovery and baseline HTTP-400 shape
+healing before output is exposed. OpenAI effort healing follows bounded
+max→xhigh→high and none→minimal→low ladders. Anthropic heals at most once per
+request and remembers shape/effort caps per provider/model instance. Foreign
+compaction retains its context summary but cannot replay an incompatible
+encrypted blob. Unknown opaque reasoning fails closed. `NativeCompactor` and
+`BaselineCosts` are opt-in runner adapters; unknown cost remains `None` in routing
+and becomes zero only at the runner's documented numeric estimator boundary.
+
+Interactive browser login and OS credential discovery are host-owned, not part
+of the pinned SDK OAuth package's material/refresh boundary. No deployment work or
+additional providers were added. The pinned source contains unused endpoint-family
+fallback predicates, not an active automatic protocol-switch contract. It has
+scoped prompt-cache affinity, not a learned prompt-cache capability registry.
+Neither unused predicates nor a hypothetical registry are counted as missing
+baseline features.
 
 ## Ownership/security contract
 
@@ -112,29 +111,26 @@ real HTTP chunked transfer and clean/failed stream closure. See fixture provenan
 in `fixtures/providers/README.md`. Successful Rust-authored tests do not imply full
 Go parity.
 
-## Recorded local verification (2026-09-16)
+## Verification environment and remaining gates
 
-- Workspace all-feature tests/doctests: **161 passed, 1 pre-existing Go-dependent
-  test ignored**, including **24 provider tests** (1 unit, 16 contract, 5 loopback
-  HTTP/routing, 2 HTTP cancellation/consumer-drop).
-- Strict Clippy for provider sources/all targets: passed using clippy-driver as a
-  Cargo workspace wrapper; strict workspace rustdoc: passed.
-- Direct rustfmt and `git diff --check`: passed. Purity graph: platform-free.
-- Pinned cargo-deny 0.20.2: advisories, bans, licenses and sources passed after the
-  documented exact-version TLS exceptions.
+Local verification uses installed Rust 1.97.1, not pinned 1.88. The sandbox has no
+`/proc/self/exe`; direct compiler/component binaries, explicit runtime library
+paths and system bfd linker are required. Newer Clippy's two pre-existing
+collapsible-style lint families are allowed locally; other warnings are denied.
+Pinned-1.88 CI is a separate gate, not a replacement for independent review.
+Exact check results and head are recorded on PR20.
 
-These runs used installed **Rust 1.97.1**, not the repository's pinned 1.88.
-The sandbox has no `/proc/self/exe`, so rustup, cargo-fmt/cargo-clippy launchers and
-bundled lld fail. Direct compiler/component binaries, explicit runtime library
-paths and the system bfd linker were used; no repository toolchain requirement
-was changed. Pinned-1.88 CI and full issue acceptance remain unverified. The
-research note is explicit about source-only versus executable evidence.
+**Independent review is blocked in this resumed runtime:** the tool surface has
+no reviewer/subagent dispatch or status capability. Persona advice is not an
+independent code review. Platform report `04b0b814-49a5-476f-80b0-974e79986d12`
+records that limitation. A maintainer must dispatch a fresh reviewer against the
+new head; no APPROVE verdict has been manufactured. If review establishes
+readiness, a human may still need to change the draft PR to Ready for review.
 
 ## Controlled live verification protocol
 
 All live rows above are **UNVERIFIED**, not passed. No credentials were loaded or
-external inference requests sent during this work. Complete offline protocol and
-OAuth-material support before exercising the currently incomplete legs.
+external inference requests sent during this work. Complete independent offline review before exercising the live legs.
 
 A host-owned test application should inject an explicitly selected scope/material,
 set a short deadline and a minimal output-token budget, and call one text completion,

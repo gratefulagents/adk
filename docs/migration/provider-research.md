@@ -1,6 +1,7 @@
 # Provider client research (issue #5, 2026-09-16)
 
-This is a bounded dependency decision, not a completed provider parity assessment.
+This records the dependency decision and bounded executable capability evidence.
+It is not a completed provider parity assessment.
 
 ## Version/license/maintenance evidence
 
@@ -24,8 +25,12 @@ and registry feature metadata. It exposes explicit `prompt_cache_key`,
 `prompt_cache_retention`, `reasoning`, `include`, `store`, `stream`, metadata and
 schema-related request fields. The crate exposes a `byot` feature, so it would be
 incorrect to claim it cannot send a custom wire body. Its transport dependency is
-reqwest 0.13, while this spike directly locks 0.12.28. This inspection did **not**
-compile an async-openai capability probe or prove its compaction/SSE/OAuth parity.
+reqwest 0.13, while this spike directly locks 0.12.28. The executable probe in `scripts/providers/client_probe.rs` subsequently compiled
+against 0.42.0 (`response-types`, no transport) and successfully round-tripped
+reasoning and compaction input items, encrypted continuation, effort `max`, summary,
+include, stream/store, instructions and both prompt-cache fields. Run it with
+`bash scripts/providers/probe-client.sh`. It makes no network provider calls and
+does not establish SSE, compaction-endpoint or OAuth behavior.
 
 The missing compatibility obligations are not merely JSON field names: Codex
 request rewriting, host-owned account-scoped material/rotation, Copilot endpoint
@@ -51,11 +56,14 @@ not proof of missing capabilities in competing clients.
   interfaces instead of introducing a second executor/agent framework.
 - **Reject whole ADK-Rust adoption** for this lane: compiler mismatch and foreign
   runner/event semantics. This does not imply the framework is unmaintained.
-- **Defer async-openai adoption**, rather than claiming its wire capabilities are
-  inadequate. Its typed API and BYOT escape hatch merit an executable comparison
-  before finalizing the complete provider crate. The current explicit adapter is
-  experimental and should not be promoted on the strength of this source-only
-  inspection.
+- **Reject adding async-openai as a second transport dependency for this
+  implementation**, not for a missing continuation field: the executable typed
+  probe passes. Adopt the explicit adapter on the existing core model/stream
+  boundary so Anthropic, gateway and OAuth handling share cancellation, bounded
+  parsing, scoped credentials and redirect policy. Adding its separate request
+  models and reqwest 0.13 transport would still require those project-owned
+  adapters; BYOT does not remove that work. Its types-only feature remains a
+  viable future simplification if it eliminates more conversion code than it adds.
 - **Reject silently lossy continuation conversion.** Unknown opaque reasoning or
   compaction crossing incompatible protocols yields Unsupported. Native history
   now retains provider continuation; codec and replay fixtures cover it.
@@ -76,9 +84,11 @@ This is an engineering dependency review, not legal advice or a release attestat
 newer APIs. Exact-version duplicate exceptions document that unavoidable API split;
 all other duplicate bans remain enabled. No registry/git source policy was relaxed.
 
-The final client selection/research acceptance in #5 is consequently still open:
-version/license links and source inspection are present, but the requested full
-missing-capability experiment across client candidates has not been completed.
+The selected architecture is explicit provider adapters over reqwest, with the
+existing framework separation adapted rather than importing another ADK. The
+client probe is deliberately narrower than full compatibility testing: no claim
+is made that async-openai lacks wire capability, or that source/type checks prove
+transport parity. The full adapter fixture/live matrix remains outstanding.
 
 ## Material codec dependencies
 

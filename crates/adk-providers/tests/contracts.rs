@@ -707,3 +707,334 @@ fn oauth_cache_affinity_survives_refresh_but_never_missing_identity() {
     material.account = None;
     assert!(cache_scope(&scope, &material, "prompt").is_empty());
 }
+
+#[test]
+fn request_settings_match_executed_go_chat_and_responses_goldens() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let mut req = request();
+    req.model = "gpt-5.6".into();
+    req.input = vec![adk_core::RunItem::Message {
+        message: adk_core::Message {
+            role: adk_core::Role::User,
+            content: vec![adk_core::Content::Text {
+                text: "hello".into(),
+            }],
+        },
+    }];
+    req.settings
+        .insert("reasoning_effort".into(), json!("high"));
+    for (protocol, key) in [
+        (Protocol::Responses, "responses_request"),
+        (Protocol::Chat, "chat_request"),
+    ] {
+        let mut actual = wire::request(&req, protocol, false).unwrap();
+        // Transport sets stream separately; Rust additionally defaults store=false
+        // to avoid server-side history retention. Compare every other wire field.
+        actual.as_object_mut().unwrap().remove("stream");
+        actual.as_object_mut().unwrap().remove("store");
+        assert_eq!(actual, golden[key]);
+    }
+}
+#[test]
+fn responses_effort_none_budget_and_encrypted_include_are_preserved() {
+    for (model, expected) in [
+        ("gpt-5", "minimal"),
+        ("gpt-5.1", "none"),
+        ("gpt-5.6-codex", "minimal"),
+        ("openai/gpt-6", "none"),
+    ] {
+        let mut req = request();
+        req.model = model.into();
+        req.settings
+            .insert("reasoning_effort".into(), json!("none"));
+        let body = wire::request(&req, Protocol::Responses, true).unwrap();
+        assert_eq!(body["reasoning"]["effort"], expected);
+        assert!(body["reasoning"].get("summary").is_none());
+        assert_eq!(body["include"], json!(["reasoning.encrypted_content"]));
+    }
+    let mut req = request();
+    req.settings.insert("thinking_budget".into(), json!(12288));
+    let body = wire::request(&req, Protocol::Responses, false).unwrap();
+    assert_eq!(
+        body["reasoning"],
+        json!({"effort":"xhigh","summary":"auto"})
+    );
+    assert!(body.get("thinking_budget").is_none());
+}
+
+#[test]
+fn responses_terminal_preserves_phase_explicit_false_and_retry_advice() {
+    let mut stream = StreamState::new(Protocol::Responses);
+    stream.event(&json!({"type":"response.output_item.done","output_index":0,"item":{"type":"message","role":"assistant","phase":"commentary","content":[{"type":"output_text","text":"working"}]}}).to_string()).unwrap();
+    let events = stream.event(&json!({"type":"response.completed","response":{"status":"completed","end_turn":false,"output":[]}}).to_string()).unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!()
+    };
+    assert_eq!(response.end_turn, Some(false));
+    assert!(
+        matches!(&response.items[0], adk_core::RunItem::PhasedMessage { phase, .. } if phase == "commentary")
+    );
+    assert!(stream.event("[DONE]").unwrap().is_empty());
+    let mut failed = StreamState::new(Protocol::Responses);
+    let error = failed.event(r#"{"type":"response.failed","response":{"status":"failed","error":{"code":"server_error","message":"secret-fixture"}}}"#).unwrap_err();
+    assert!(retry_advice(&error).unwrap().should_retry);
+    assert!(!format!("{error:?}").contains("secret-fixture"));
+}
+
+#[test]
+fn responses_done_only_and_incomplete_output_are_usable() {
+    let mut stream = StreamState::new(Protocol::Responses);
+    let event = r#"{"type":"response.output_text.done","output_index":0,"text":"answer"}"#;
+    assert!(
+        matches!(&stream.event(event).unwrap()[0], adk_core::ModelEvent::TextDelta { delta } if delta == "answer")
+    );
+    assert!(stream.event(event).unwrap().is_empty());
+    let body = json!({"status":"incomplete","incomplete_details":{"reason":"max_output_tokens"},"end_turn":false,"output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"answer"}]}]});
+    assert_eq!(
+        wire::response(&body, Protocol::Responses).unwrap().end_turn,
+        Some(false)
+    );
+    let error = wire::response(
+        &json!({"status":"completed","output":[]}),
+        Protocol::Responses,
+    )
+    .unwrap_err();
+    assert!(retry_advice(&error).unwrap().should_retry);
+}
+
+#[test]
+fn anthropic_compaction_deltas_replace_ciphertext_and_reject_stopped_blocks() {
+    let mut stream = StreamState::new(Protocol::Anthropic);
+    for event in [
+        json!({"type":"message_start","message":{"id":"m","usage":{}}}),
+        json!({"type":"content_block_start","index":0,"content_block":{"type":"compaction","content":"a","encrypted_content":"old"}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"b","encrypted_content":"new"}}),
+        json!({"type":"content_block_stop","index":0}),
+    ] {
+        stream.event(&event.to_string()).unwrap();
+    }
+    assert!(stream.event(r#"{"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"late"}}"#).is_err());
+    stream.event(r#"{"type":"message_delta","delta":{"stop_reason":"end_turn"},"usage":{"output_tokens":3}}"#).unwrap();
+    let events = stream.event(r#"{"type":"message_stop"}"#).unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!()
+    };
+    assert!(
+        matches!(&response.items[0], adk_core::RunItem::Compaction { compaction } if compaction.content == "ab" && compaction.encrypted_content == "new" && compaction.created_by == "anthropic")
+    );
+}
+
+#[test]
+fn chat_reasoning_precedes_text_and_reused_tool_indices_keep_both_calls() {
+    let mut stream = StreamState::new(Protocol::Chat);
+    let events = stream.event(&json!({"choices":[{"index":0,"delta":{"content":"answer","reasoning_details":[{"summary":"why"}],"tool_calls":[{"index":0,"id":"first","function":{"name":"one","arguments":"{}"}}]}}]}).to_string()).unwrap();
+    assert!(matches!(&events[0], adk_core::ModelEvent::ReasoningDelta { delta } if delta == "why"));
+    assert!(matches!(&events[1], adk_core::ModelEvent::TextDelta { .. }));
+    stream.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"second","function":{"name":"two","arguments":"{}"}}]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+    let events = stream.event("[DONE]").unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!()
+    };
+    let ids: Vec<_> = response
+        .items
+        .iter()
+        .filter_map(|item| match item {
+            adk_core::RunItem::ToolCall { call } => Some(call.id.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(ids, ["first", "second"]);
+}
+
+#[test]
+fn executed_go_cost_catalog_and_retry_goldens_match() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    for vector in golden["openai_costs"].as_array().unwrap() {
+        let usage = wire::usage(&vector["usage"], Protocol::Anthropic);
+        let cost = adk_providers::cost::openai(vector["model"].as_str().unwrap(), &usage);
+        assert_eq!(
+            cost.is_some(),
+            vector["known"].as_bool().unwrap(),
+            "{}",
+            vector["model"]
+        );
+        if let Some(cost) = cost {
+            assert!(
+                (cost - vector["cost"].as_f64().unwrap()).abs() < 1e-12,
+                "{vector}: {cost}"
+            );
+        }
+    }
+    for vector in golden["anthropic_costs"].as_array().unwrap() {
+        let usage = wire::usage(&vector["usage"], Protocol::Anthropic);
+        let cost = adk_providers::cost::anthropic(vector["model"].as_str().unwrap(), &usage);
+        assert!(
+            (cost - vector["cost"].as_f64().unwrap()).abs() < 1e-12,
+            "{vector}: {cost}"
+        );
+    }
+    for vector in golden["retry_headers"].as_array().unwrap() {
+        let mut headers = HeaderMap::new();
+        headers.insert(
+            "retry-after-ms",
+            vector["milliseconds"].as_str().unwrap().parse().unwrap(),
+        );
+        headers.insert(
+            "retry-after",
+            vector["seconds"].as_str().unwrap().parse().unwrap(),
+        );
+        assert_eq!(
+            retry_after(&headers, SystemTime::UNIX_EPOCH).as_secs(),
+            vector["capped_seconds"].as_u64().unwrap()
+        );
+    }
+}
+
+#[test]
+fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
+    let mut input = request();
+    input.settings.insert(
+        "model_fallbacks".into(),
+        json!(["fixture-model", " next ", "", "next", "vendor/last"]),
+    );
+    input
+        .settings
+        .insert("text_verbosity".into(), json!(" HIGH "));
+    input
+        .settings
+        .insert("compaction_threshold".into(), json!(20000));
+    input.output_schema = Some(json!({"type":"object","properties":{}}).try_into().unwrap());
+    let chat = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert_eq!(
+        chat["models"],
+        json!(["fixture-model", "next", "vendor/last"])
+    );
+    assert!(chat.get("compaction_threshold").is_none());
+    let responses = wire::request(&input, Protocol::Responses, false).unwrap();
+    assert_eq!(responses["text"]["verbosity"], "high");
+    assert_eq!(responses["text"]["format"]["type"], "json_schema");
+    assert_eq!(
+        responses["context_management"],
+        json!([{"type":"compaction","compact_threshold":20000}])
+    );
+    assert!(responses.get("models").is_none());
+}
+
+#[test]
+fn responses_done_only_tracking_is_per_content_part() {
+    let mut stream = StreamState::new(Protocol::Responses);
+    for part in 0..2 {
+        let events = stream.event(&json!({"type":"response.output_text.done","output_index":0,"content_index":part,"text":"part"}).to_string()).unwrap();
+        assert_eq!(events.len(), 1);
+    }
+}
+
+#[test]
+fn executed_go_chat_stream_matches_at_every_chunk_boundary() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let source = golden["chat_sse"].as_str().unwrap().as_bytes();
+    let mut expected = wire::response(&golden["chat_sse_response"], Protocol::Anthropic).unwrap();
+    expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    for split in 0..=source.len() {
+        let mut decoder = Decoder::default();
+        let mut stream = StreamState::new(Protocol::Chat);
+        let mut completed = Vec::new();
+        for chunk in [&source[..split], &source[split..]] {
+            for event in decoder.feed(chunk).unwrap() {
+                for event in stream.event(&event.data).unwrap() {
+                    if let adk_core::ModelEvent::Complete { response } = event {
+                        completed.push(response);
+                    }
+                }
+            }
+        }
+        decoder.finish().unwrap();
+        assert_eq!(completed, vec![expected.clone()], "split {split}");
+    }
+}
+
+#[test]
+fn compacted_history_and_multimodal_tool_results_replay_without_reordering() {
+    use adk_core::*;
+    let mut input = request();
+    input.input = wire::response(
+        &json!({"output":[
+            {"type":"message","role":"user","content":[{"type":"input_text","text":"keep"}]},
+            {"type":"function_call","call_id":"c","name":"lookup","arguments":"{}"},
+            {"type":"function_call_output","call_id":"c","output":"result"},
+            {"type":"compaction","id":"compact","encrypted_content":"opaque"}
+        ]}),
+        Protocol::Responses,
+    )
+    .unwrap()
+    .items;
+    let body = wire::request(&input, Protocol::Responses, false).unwrap();
+    assert_eq!(body["input"][0]["role"], "user");
+    assert_eq!(body["input"][2]["type"], "function_call_output");
+    assert_eq!(body["input"][3]["encrypted_content"], "opaque");
+    input.input = vec![RunItem::ToolResult {
+        call_id: "c".into(),
+        output: ToolOutput {
+            content: vec![
+                Content::Text {
+                    text: "result".into(),
+                },
+                Content::Attachment {
+                    media_type: "image/png".into(),
+                    data: "aW1hZ2U=".into(),
+                    detail: "low".into(),
+                },
+            ],
+            is_error: false,
+            should_pause: false,
+        },
+    }];
+    for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
+        let body = wire::request(&input, protocol, false).unwrap();
+        let entries = if protocol == Protocol::Responses {
+            &body["input"]
+        } else {
+            &body["messages"]
+        };
+        if protocol == Protocol::Anthropic {
+            assert_eq!(
+                entries[0]["content"][0]["content"][1]["source"]["data"],
+                "aW1hZ2U="
+            );
+        } else {
+            let offset = usize::from(protocol == Protocol::Chat);
+            assert_eq!(entries[offset + 1]["role"], "user");
+            assert_eq!(
+                entries[offset + 1]["content"][0]["type"],
+                if protocol == Protocol::Chat {
+                    "image_url"
+                } else {
+                    "input_image"
+                }
+            );
+        }
+    }
+}
+
+#[test]
+fn empty_responses_message_is_retryable_and_chat_keeps_explicit_false() {
+    let error = wire::response(&json!({"status":"completed","output":[{"type":"message","content":[{"type":"output_text","text":"  "}]}]}), Protocol::Responses).unwrap_err();
+    assert!(retry_advice(&error).unwrap().should_retry);
+    let mut stream = StreamState::new(Protocol::Chat);
+    stream.event(r#"{"end_turn":false,"metadata":{"fixture":true},"choices":[{"delta":{"content":"working"},"finish_reason":"stop"}]}"#).unwrap();
+    let events = stream.event("[DONE]").unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!()
+    };
+    assert_eq!(response.end_turn, Some(false));
+    assert_eq!(response.metadata["fixture"], true);
+}

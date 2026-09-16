@@ -14,6 +14,7 @@ impl OAuthRefresh {
         let client = Client::builder()
             .redirect(reqwest::redirect::Policy::none())
             .no_proxy()
+            .timeout(Duration::from_secs(20))
             .build()
             .map_err(|_| {
                 Error::new(ErrorCategory::Provider, "cannot initialize OAuth transport")
@@ -21,6 +22,13 @@ impl OAuthRefresh {
         Ok(Self { client })
     }
     fn request(&self, mode: AuthMode, token: &str) -> Result<reqwest::Request, Error> {
+        let token = token.trim();
+        if token.is_empty() {
+            return Err(Error::new(
+                ErrorCategory::PermissionDenied,
+                "refresh credential unavailable",
+            ));
+        }
         let builder = match mode {
             AuthMode::OpenAiOAuth => self.client.post("https://auth.openai.com/oauth/token")
                 .json(&json!({"grant_type":"refresh_token", "refresh_token":token,
@@ -49,7 +57,7 @@ impl Refresh for OAuthRefresh {
         &'a self,
         context: &'a Context,
         scope: &'a Scope,
-        mut material: Material,
+        material: Material,
     ) -> BoxFuture<'a, Result<Material, Error>> {
         Box::pin(async move {
             let token = material
@@ -67,13 +75,15 @@ impl Refresh for OAuthRefresh {
             let mut response = crate::active(context, self.client.execute(request))
                 .await?
                 .map_err(|e| crate::error::RequestFailure::transport(&e).into_error())?;
-            if !response.status().is_success() {
-                return Err(crate::error::RequestFailure::http(
-                    response.status().as_u16(),
-                    response.headers(),
+            let status = response.status();
+            let headers = response.headers().clone();
+            if status == reqwest::StatusCode::UNAUTHORIZED {
+                return Err(response_error(
+                    status.as_u16(),
+                    &headers,
+                    &[],
                     SystemTime::now(),
-                )
-                .into_error());
+                ));
             }
             let mut bytes = Vec::new();
             while let Some(chunk) = crate::active(context, response.chunk())
@@ -81,6 +91,14 @@ impl Refresh for OAuthRefresh {
                 .map_err(|e| crate::error::RequestFailure::transport(&e).into_error())?
             {
                 if bytes.len().saturating_add(chunk.len()) > 1024 * 1024 {
+                    if !status.is_success() {
+                        return Err(response_error(
+                            status.as_u16(),
+                            &headers,
+                            &bytes,
+                            SystemTime::now(),
+                        ));
+                    }
                     return Err(Error::new(
                         ErrorCategory::Provider,
                         "OAuth response exceeds limit",
@@ -88,73 +106,210 @@ impl Refresh for OAuthRefresh {
                 }
                 bytes.extend_from_slice(&chunk);
             }
-            let body: Value = serde_json::from_slice(&bytes)
-                .map_err(|_| Error::new(ErrorCategory::Provider, "invalid OAuth response"))?;
-            let access_key = if scope.mode == AuthMode::CopilotOAuth {
-                "token"
-            } else {
-                "access_token"
-            };
-            let access = body[access_key]
-                .as_str()
-                .map(str::trim)
-                .filter(|v| !v.is_empty())
-                .ok_or_else(|| {
-                    Error::new(
-                        ErrorCategory::Provider,
-                        "OAuth response missing access token",
-                    )
-                })?;
-            material.access_token = Secret::new(access);
-            if let Some(token) = body["id_token"]
-                .as_str()
-                .map(str::trim)
-                .filter(|v| !v.is_empty())
-            {
-                material.id_token = Some(Secret::new(token));
-                if scope.account.is_none() {
-                    material.account =
-                        crate::material::account_from_id_token(token).or(material.account);
-                }
+            if !status.is_success() {
+                return Err(response_error(
+                    status.as_u16(),
+                    &headers,
+                    &bytes,
+                    SystemTime::now(),
+                ));
             }
-            if let Some(email) = body
-                .pointer("/account/email_address")
-                .and_then(Value::as_str)
-            {
-                material.email = Some(email.to_owned());
-            }
-            if scope.mode != AuthMode::CopilotOAuth
-                && let Some(refresh) = body["refresh_token"]
-                    .as_str()
-                    .map(str::trim)
-                    .filter(|v| !v.is_empty())
-            {
-                material.refresh_token = Some(Secret::new(refresh));
-            }
-            let now = SystemTime::now();
-            material.expires_at = if scope.mode == AuthMode::CopilotOAuth {
-                body["expires_at"]
-                    .as_u64()
-                    .and_then(|v| SystemTime::UNIX_EPOCH.checked_add(Duration::from_secs(v)))
-            } else {
-                body["expires_in"]
-                    .as_u64()
-                    .filter(|v| *v > 0)
-                    .and_then(|v| now.checked_add(Duration::from_secs(v)))
-            };
-            material.last_refresh = Some(now);
-            // Anthropic account response is authoritative; Session validates it.
-            if let Some(account) = body.pointer("/account/uuid").and_then(Value::as_str) {
-                material.account = Some(account.to_owned());
-            }
-            Ok(material)
+            decode_response(scope, material, &bytes, SystemTime::now())
         })
     }
+}
+
+#[derive(Debug, thiserror::Error)]
+#[error("OAuth refresh requires reauthentication (status {status})")]
+struct TerminalRefreshFailure {
+    status: u16,
+}
+
+/// Reports invalidated, consumed or expired refresh material without retaining an error body.
+pub fn is_terminal_refresh_error(error: &Error) -> bool {
+    error.source.as_ref().is_some_and(|source| {
+        source.is::<TerminalRefreshFailure>()
+            || source
+                .downcast_ref::<crate::error::RequestFailure>()
+                .is_some_and(|failure| failure.status == Some(401))
+    })
+}
+
+pub(crate) fn is_http_refresh_error(error: &Error) -> bool {
+    is_terminal_refresh_error(error)
+        || error
+            .source
+            .as_ref()
+            .and_then(|source| source.downcast_ref::<crate::error::RequestFailure>())
+            .is_some_and(|failure| failure.status.is_some())
+}
+
+fn response_error(
+    status: u16,
+    headers: &reqwest::header::HeaderMap,
+    bytes: &[u8],
+    now: SystemTime,
+) -> Error {
+    let terminal = status == 401
+        || [
+            "refresh_token_reused",
+            "refresh_token_expired",
+            "refresh_token_invalidated",
+        ]
+        .iter()
+        .any(|code| {
+            bytes
+                .windows(code.len())
+                .any(|part| part == code.as_bytes())
+        });
+    if terminal {
+        let failure = TerminalRefreshFailure { status };
+        Error::new(ErrorCategory::PermissionDenied, failure.to_string()).with_source(failure)
+    } else {
+        crate::error::RequestFailure::http(status, headers, now).into_error()
+    }
+}
+
+/// Decode a successful exchange without I/O. Hosts using their own OAuth transport
+/// can apply the same bounded material/account rules before a scoped CAS write.
+pub fn decode_response(
+    scope: &Scope,
+    mut material: Material,
+    bytes: &[u8],
+    now: SystemTime,
+) -> Result<Material, Error> {
+    if !matches!(
+        scope.mode,
+        AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
+    ) {
+        return Err(crate::invalid(
+            "credential mode has no OAuth refresh exchange",
+        ));
+    }
+    if bytes.len() > 1024 * 1024 {
+        return Err(Error::new(
+            ErrorCategory::Provider,
+            "OAuth response exceeds limit",
+        ));
+    }
+    let body: Value = serde_json::from_slice(bytes)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid OAuth response"))?;
+    let text = |path| {
+        body.pointer(path)
+            .and_then(Value::as_str)
+            .map(str::trim)
+            .filter(|v| !v.is_empty())
+    };
+    let access_key = if scope.mode == AuthMode::CopilotOAuth {
+        "/token"
+    } else {
+        "/access_token"
+    };
+    let access = text(access_key).ok_or_else(|| {
+        Error::new(
+            ErrorCategory::Provider,
+            "OAuth response missing access token",
+        )
+    })?;
+    material.access_token = Secret::new(access);
+    if scope.mode != AuthMode::CopilotOAuth
+        && let Some(refresh) = text("/refresh_token")
+    {
+        material.refresh_token = Some(Secret::new(refresh));
+    }
+    if scope.mode == AuthMode::OpenAiOAuth {
+        if let Some(token) = text("/id_token") {
+            material.id_token = Some(Secret::new(token));
+        }
+        // An established account (including an explicit override) survives ID-token rotation.
+        if material
+            .account
+            .as_deref()
+            .is_none_or(|value| value.trim().is_empty())
+        {
+            material.account = material
+                .id_token
+                .as_ref()
+                .and_then(|token| crate::material::account_from_id_token(token.expose()));
+        }
+        if material
+            .account
+            .as_deref()
+            .is_none_or(|value| value.trim().is_empty())
+        {
+            return Err(Error::new(
+                ErrorCategory::PermissionDenied,
+                "OpenAI OAuth account is unavailable",
+            ));
+        }
+        material.expires_at = crate::material::access_token_expiry(access);
+    } else if scope.mode == AuthMode::AnthropicOAuth {
+        if let Some(email) = text("/account/email_address") {
+            material.email = Some(email.to_owned());
+        }
+        if let Some(account) = text("/account/uuid") {
+            material.account = Some(account.to_owned());
+        }
+        material.expires_at = body["expires_in"]
+            .as_u64()
+            .filter(|v| *v > 0)
+            .and_then(|v| now.checked_add(Duration::from_secs(v)));
+    } else {
+        material.expires_at =
+            crate::material::first_time(&body, &["/expires_at", "/expiresAt", "/expires"]);
+    }
+    if scope.account.is_some() && scope.account != material.account {
+        return Err(Error::new(
+            ErrorCategory::PermissionDenied,
+            "provider credential account mismatch",
+        ));
+    }
+    material.last_refresh = Some(now);
+    Ok(material)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn terminal_refresh_failures_retain_only_status_and_classification() {
+        for code in [
+            "refresh_token_reused",
+            "refresh_token_expired",
+            "refresh_token_invalidated",
+        ] {
+            let body = json!({"error":code,"access_token":"sensitive-access","refresh_token":"sensitive-refresh"});
+            let error = response_error(
+                400,
+                &reqwest::header::HeaderMap::new(),
+                body.to_string().as_bytes(),
+                SystemTime::UNIX_EPOCH,
+            );
+            assert!(is_terminal_refresh_error(&error));
+            assert!(is_http_refresh_error(&error));
+            let diagnostic = format!("{error:?} {error}");
+            assert!(!diagnostic.contains("sensitive-access"));
+            assert!(!diagnostic.contains("sensitive-refresh"));
+        }
+        assert!(is_terminal_refresh_error(&response_error(
+            401,
+            &reqwest::header::HeaderMap::new(),
+            b"secret",
+            SystemTime::UNIX_EPOCH
+        )));
+        let transient = response_error(
+            503,
+            &reqwest::header::HeaderMap::new(),
+            b"secret",
+            SystemTime::UNIX_EPOCH,
+        );
+        assert!(!is_terminal_refresh_error(&transient));
+        assert!(crate::error::retry_advice(&transient).unwrap().should_retry);
+        assert!(!is_terminal_refresh_error(&Error::new(
+            ErrorCategory::Cancelled,
+            "operation cancelled"
+        )));
+    }
     #[test]
     fn refresh_requests_match_reference_methods_scope_and_content_type() {
         let client = OAuthRefresh::new().unwrap();
@@ -197,5 +352,20 @@ mod tests {
         assert!(copilot.headers()["authorization"].is_sensitive());
         assert!(copilot.body().is_none());
         assert!(client.request(AuthMode::ApiKey, "fixture").is_err());
+        for mode in [
+            AuthMode::OpenAiOAuth,
+            AuthMode::AnthropicOAuth,
+            AuthMode::CopilotOAuth,
+        ] {
+            assert!(client.request(mode, " ").is_err());
+        }
+        let trimmed = client
+            .request(AuthMode::CopilotOAuth, "  fixture-github  ")
+            .unwrap();
+        assert_eq!(trimmed.headers()["authorization"], "token fixture-github");
+        let error = client
+            .request(AuthMode::CopilotOAuth, "fixture-secret\r\nheader:value")
+            .unwrap_err();
+        assert!(!format!("{error:?}").contains("fixture-secret"));
     }
 }

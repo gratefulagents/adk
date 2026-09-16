@@ -351,7 +351,9 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
         assert_eq!(decode_item(&wire).unwrap(), item);
         let mut phased = wire.clone();
         phased.message.as_mut().unwrap().phase = "analysis".into();
-        assert!(decode_item(&phased).is_err());
+        assert!(
+            matches!(decode_item(&phased).unwrap(), RunItem::PhasedMessage { phase, .. } if phase == "analysis")
+        );
         let mut media = wire;
         media
             .message
@@ -359,7 +361,10 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
             .unwrap()
             .images
             .push(dto::ImageAttachment::default());
-        assert!(decode_item(&media).is_err());
+        assert_eq!(
+            encode_item(&decode_item(&media).unwrap(), agent.as_ref()).unwrap(),
+            media
+        );
     }
     for role in [Role::System, Role::Developer, Role::Assistant] {
         assert!(
@@ -376,7 +381,6 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
         );
     }
     for content in [
-        vec![],
         vec![
             Content::Text { text: "a".into() },
             Content::Text { text: "b".into() },
@@ -452,4 +456,208 @@ fn provider_continuation_survives_native_bridge_without_loss() {
         let wire = encode_item(&item, None).unwrap();
         assert_eq!(decode_item(&wire).unwrap(), item);
     }
+}
+
+#[test]
+fn message_phase_is_optional_and_never_inferred_from_assistant_role() {
+    let agent = dto::AgentRef {
+        name: "worker".into(),
+    };
+    let message = Message {
+        role: Role::Assistant,
+        content: vec![Content::Text {
+            text: "working".into(),
+        }],
+    };
+    for phase in [
+        None,
+        Some("commentary"),
+        Some("final_answer"),
+        Some("future_phase"),
+    ] {
+        let item = match phase {
+            Some(phase) => RunItem::PhasedMessage {
+                message: message.clone(),
+                phase: phase.into(),
+            },
+            None => RunItem::Message {
+                message: message.clone(),
+            },
+        };
+        let wire = encode_item(&item, Some(&agent)).unwrap();
+        assert_eq!(wire.message.as_ref().unwrap().phase, phase.unwrap_or(""));
+        assert_eq!(decode_item(&wire).unwrap(), item);
+        let json = serde_json::to_value(&wire).unwrap();
+        assert_eq!(json["Message"]["phase"].as_str(), phase);
+        assert_eq!(
+            decode_item(&serde_json::from_value(json).unwrap()).unwrap(),
+            item
+        );
+        assert_eq!(
+            serde_json::from_value::<RunItem>(serde_json::to_value(&item).unwrap()).unwrap(),
+            item
+        );
+    }
+    assert!(
+        encode_item(
+            &RunItem::PhasedMessage {
+                message,
+                phase: String::new()
+            },
+            Some(&agent)
+        )
+        .is_err()
+    );
+}
+
+#[test]
+fn multimodal_history_preserves_pdf_detail_phase_markers_and_compaction_origin() {
+    let content = vec![
+        Content::Text {
+            text: "see attachment 日本語".into(),
+        },
+        Content::Attachment {
+            media_type: "application/pdf".into(),
+            data: "cGRm".into(),
+            detail: String::new(),
+        },
+        Content::Attachment {
+            media_type: "image/png".into(),
+            data: "cG5n".into(),
+            detail: "high".into(),
+        },
+        Content::Attachment {
+            media_type: "image/jpeg".into(),
+            data: "anBlZw==".into(),
+            detail: "low".into(),
+        },
+        Content::Attachment {
+            media_type: String::new(),
+            data: String::new(),
+            detail: String::new(),
+        },
+    ];
+    let mut items = vec![
+        RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: content.clone(),
+            },
+        },
+        RunItem::PhasedMessage {
+            message: Message {
+                role: Role::Assistant,
+                content: content.clone(),
+            },
+            phase: "commentary".into(),
+        },
+        RunItem::ToolCall {
+            call: call("images"),
+        },
+        RunItem::ToolResult {
+            call_id: "images".into(),
+            output: ToolOutput {
+                content,
+                is_error: false,
+                should_pause: false,
+            },
+        },
+    ];
+    for origin in ["openai", "anthropic", ""] {
+        items.push(RunItem::Compaction {
+            compaction: adk_core::Compaction {
+                id: format!("cmp_{origin}"),
+                content: "summary".into(),
+                encrypted_content: "opaque".into(),
+                created_by: origin.into(),
+            },
+        });
+    }
+    let mut agents = vec![None; items.len()];
+    agents[1] = Some(dto::AgentRef {
+        name: "worker".into(),
+    });
+    let markers = vec![marker("images", ApprovalPhase::Approved, 3)];
+    let wire = encode_history(&items, &agents, &markers).unwrap();
+    let message = wire[0].message.as_ref().unwrap();
+    assert_eq!(message.images[0].media_type, "application/pdf");
+    assert_eq!(message.images[0].data, "cGRm");
+    assert_eq!(message.images[1].detail, "high");
+    assert_eq!(wire[4].tool_output.as_ref().unwrap().images, message.images);
+    let wire_json = serde_json::to_value(&wire).unwrap();
+    let decoded = decode_history(
+        &serde_json::from_value::<Vec<dto::RunItem>>(wire_json.clone()).unwrap(),
+        &[ApprovalPhase::Approved],
+    )
+    .unwrap();
+    assert_eq!(
+        decoded,
+        NativeHistory {
+            items,
+            agents,
+            markers
+        }
+    );
+    assert_eq!(
+        serde_json::to_value(
+            encode_history(&decoded.items, &decoded.agents, &decoded.markers).unwrap()
+        )
+        .unwrap(),
+        wire_json
+    );
+}
+
+#[test]
+fn attachment_only_content_is_canonicalized_but_never_reordered() {
+    let attachment = Content::Attachment {
+        media_type: "image/png".into(),
+        data: "cG5n".into(),
+        detail: "auto".into(),
+    };
+    for content in [vec![], vec![attachment.clone()]] {
+        let item = RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: content.clone(),
+            },
+        };
+        let wire = encode_item(&item, None).unwrap();
+        let mut canonical = vec![Content::Text {
+            text: String::new(),
+        }];
+        canonical.extend(content);
+        assert_eq!(
+            decode_item(&wire).unwrap(),
+            RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: canonical
+                }
+            }
+        );
+    }
+    let item = RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![
+                attachment,
+                Content::Text {
+                    text: "after image".into(),
+                },
+            ],
+        },
+    };
+    assert!(encode_item(&item, None).is_err());
+    let mut wire = encode_item(
+        &RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![],
+            },
+        },
+        None,
+    )
+    .unwrap();
+    wire.tool_output = Some(dto::ToolOutputData::default());
+    assert!(decode_item(&wire).is_err());
 }

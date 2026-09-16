@@ -4,6 +4,10 @@ package openai
 import (
     "encoding/json"
     "os"
+    "net/http"
+    "sort"
+    "io"
+    "strings"
     "path/filepath"
     "testing"
 
@@ -19,13 +23,65 @@ func TestADKContinuationGolden(t *testing.T) {
         },
     }})
     if err != nil { t.Fatal(err) }
+    request := anthropic.CreateMessageRequest{Model: "gpt-5.6", MaxTokens: 16384,
+        System: []anthropic.SystemBlock{{Type: "text", Text: "Be precise"}},
+        Messages: []anthropic.Message{{Role: anthropic.RoleUser, Content: []anthropic.ContentBlock{{Type: "text", Text: "hello"}}}},
+        ReasoningEffort: "high"}
+    responsesRequest, err := toResponseParams(request)
+    if err != nil { t.Fatal(err) }
+    chatRequest, err := toChatRequest(request)
+    if err != nil { t.Fatal(err) }
     details := json.RawMessage(`[{"type":"reasoning.encrypted","data":"opaque","index":0}]`)
     golden := map[string]any{
+        "responses_request": responsesRequest,
+        "chat_request": chatRequest,
         "source_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
         "responses_input": items,
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var prices []map[string]any
+    var models []string
+    for model := range modelPricing { models = append(models, model) }
+    models = append(models, "unknown-fixture")
+    sort.Strings(models)
+    for _, model := range models {
+        for _, usage := range []anthropic.Usage{
+            {InputTokens:1000,OutputTokens:100,CacheReadInputTokens:200,CacheCreationInputTokens:50},
+            {InputTokens:300000,OutputTokens:100,CacheReadInputTokens:200000,CacheCreationInputTokens:50000},
+            {InputTokens:10,OutputTokens:1,CacheReadInputTokens:20,CacheCreationInputTokens:20},
+        } {
+            cost, known := EstimateCost(model, usage)
+            prices = append(prices, map[string]any{"model":model,"usage":usage,"cost":cost,"known":known})
+        }
+    }
+    golden["openai_costs"] = prices
+    var anthropicPrices []map[string]any
+    for _, model := range []string{"claude-fable-5-1", "claude-fable-5", "claude-mythos-5-1", "claude-mythos-5", "claude-sonnet-5", "claude-sonnet-4-6", "claude-opus-4-6", "claude-opus-4-1", "claude-opus-4", "claude-haiku-4-5", "claude-haiku-3-5", "unknown-fixture"} {
+        usage := anthropic.Usage{InputTokens:1000,OutputTokens:100,CacheReadInputTokens:200,CacheCreationInputTokens:50}
+        anthropicPrices = append(anthropicPrices, map[string]any{"model":model,"usage":usage,"cost":anthropic.CalculateCost(model, usage)})
+    }
+    golden["anthropic_costs"] = anthropicPrices
+    var retries []map[string]any
+    for _, pair := range [][2]string{{"1",""},{"1500","9"},{"999999","9"},{"bad","12"},{"","-1"},{"","301"}} {
+        h := http.Header{}
+        h.Set("Retry-After-Ms", pair[0]); h.Set("Retry-After", pair[1])
+        retries = append(retries, map[string]any{"milliseconds":pair[0],"seconds":pair[1],"capped_seconds":capRetryAfterSeconds(parseRetryAfterSeconds(h))})
+    }
+    golden["retry_headers"] = retries
+    chatSSE := "data: " + `{"id":"chat-fixture","choices":[{"index":0,"delta":{"reasoning_content":"why ","content":"hé","tool_calls":[{"index":0,"id":"call-fixture","function":{"name":"lookup","arguments":"{\"q\":"}}]}}]}` + "\n\n" +
+        "data: " + `{"id":"chat-fixture","choices":[{"index":0,"delta":{"content":"llo","tool_calls":[{"index":0,"function":{"arguments":"1}"}}]},"finish_reason":"tool_calls"}],"usage":{"prompt_tokens":100,"completion_tokens":20,"prompt_tokens_details":{"cached_tokens":70,"cache_write_tokens":11}}}` + "\n\ndata: [DONE]\n\n"
+    reader := newChatStreamReader(&http.Response{Body:io.NopCloser(strings.NewReader(chatSSE))})
+    assembler := anthropic.NewStreamAssembler()
+    for {
+        event, err := reader.Next()
+        if err == io.EOF { break }
+        if err != nil { t.Fatal(err) }
+        assembler.Add(event)
+    }
+    if err := reader.Close(); err != nil { t.Fatal(err) }
+    golden["chat_sse"] = chatSSE
+    golden["chat_sse_response"] = assembler.Response()
     data, err := json.MarshalIndent(golden, "", "  ")
     if err != nil { t.Fatal(err) }
     dir := os.Getenv("ADK_PROVIDER_FIXTURE_DIR")

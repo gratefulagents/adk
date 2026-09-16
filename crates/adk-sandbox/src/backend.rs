@@ -295,6 +295,8 @@ mod tests {
         assert!(!args.windows(3).any(|w| w == ["--ro-bind", "/", "/"]));
         let profile = seatbelt_profile(&config, &req).unwrap();
         assert!(profile.contains("(deny default)"));
+        assert!(profile.contains("(allow file-read* (literal \"/\"))"));
+        assert!(!profile.contains("(subpath \"/\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
         assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
         assert!(!profile.contains("(allow network*)"));

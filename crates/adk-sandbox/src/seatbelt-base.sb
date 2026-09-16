@@ -2,6 +2,9 @@
 ; Do not allow sysctl-read globally: kern.procargs2 can expose host environments.
 (version 1)
 (deny default)
+; dyld opens the root directory as an openat base during process startup.
+; Literal "/" grants directory access, NOT reads beneath it (no subpath rule).
+(allow file-read* (literal "/"))
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))

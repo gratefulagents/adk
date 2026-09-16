@@ -311,31 +311,69 @@ pub struct Continuation {
 }
 
 impl Continuation {
-    /// Exactly one pending approval is surfaced at a time. None resumes a
-    /// tool-requested pause; approval pauses require an explicit decision.
+    /// Resume a single pending approval, or a tool-requested pause with None.
+    /// Multiple pending approvals require call-ID decisions via resume_batch.
     pub async fn resume(self, decision: Option<ApprovalDecision>) -> Result<RunOutcome, RunError> {
         self.prepare(decision)?.drive().await
     }
     pub fn stream(self, decision: Option<ApprovalDecision>) -> Result<RunStream, RunError> {
         Ok(RunStream::new(self.prepare(decision)?))
     }
-    fn prepare(mut self, decision: Option<ApprovalDecision>) -> Result<Engine, RunError> {
-        if self.engine.result.pending_approvals.is_empty() != decision.is_none() {
-            let mut error = Error::new(
-                ErrorCategory::InvalidInput,
-                "resume decision must match the pending approval",
-            );
-            if !self.engine.spills.is_empty() {
-                error.source = Some(Box::new(FailedSpills {
-                    source: None,
-                    _spills: self.engine.spills,
-                }));
-            }
-            self.engine.result.status = RunStatus::Incomplete;
-            return Err(RunError::with_partial(error, self.engine.result));
+    pub async fn resume_batch(
+        self,
+        decisions: Vec<(String, ApprovalDecision)>,
+    ) -> Result<RunOutcome, RunError> {
+        self.prepare_batch(decisions)?.drive().await
+    }
+    pub fn stream_batch(
+        self,
+        decisions: Vec<(String, ApprovalDecision)>,
+    ) -> Result<RunStream, RunError> {
+        Ok(RunStream::new(self.prepare_batch(decisions)?))
+    }
+    fn prepare(self, decision: Option<ApprovalDecision>) -> Result<Engine, RunError> {
+        let decisions = match (self.engine.result.pending_approvals.as_slice(), decision) {
+            ([], None) => vec![],
+            ([request], Some(decision)) => vec![(request.call.id.clone(), decision)],
+            _ => return Err(self.invalid_decisions()),
+        };
+        self.prepare_batch(decisions)
+    }
+    fn invalid_decisions(mut self) -> RunError {
+        let mut error = Error::new(
+            ErrorCategory::InvalidInput,
+            "resume decisions must match every pending approval by call ID exactly once",
+        );
+        if !self.engine.spills.is_empty() {
+            error.source = Some(Box::new(FailedSpills {
+                source: None,
+                _spills: self.engine.spills,
+            }));
+        }
+        self.engine.result.status = RunStatus::Incomplete;
+        RunError::with_partial(error, self.engine.result)
+    }
+    fn prepare_batch(
+        mut self,
+        decisions: Vec<(String, ApprovalDecision)>,
+    ) -> Result<Engine, RunError> {
+        let mut seen = HashSet::new();
+        if decisions.len() != self.engine.result.pending_approvals.len()
+            || decisions.iter().any(|(id, _)| {
+                !seen.insert(id.clone())
+                    || !self
+                        .engine
+                        .result
+                        .pending_approvals
+                        .iter()
+                        .any(|request| &request.call.id == id)
+            })
+        {
+            return Err(self.invalid_decisions());
         }
         self.engine.streaming = false;
-        self.engine.approval = decision;
+        self.engine.approvals = decisions.into_iter().collect();
+        self.engine.tools_prepared = false;
         self.engine.result.status = RunStatus::Incomplete;
         Ok(self.engine)
     }
@@ -425,7 +463,9 @@ impl Runner {
             policy: request.policy,
             phase: Phase::Start,
             calls: VecDeque::new(),
-            approval: None,
+            approvals: HashMap::new(),
+            deferred_calls: VecDeque::new(),
+            tools_prepared: false,
             turns: 0,
             fallbacks: HashMap::new(),
             cost: 0.0,
@@ -469,7 +509,9 @@ struct Engine {
     policy: RunPolicy,
     phase: Phase,
     calls: VecDeque<ToolCall>,
-    approval: Option<ApprovalDecision>,
+    approvals: HashMap<String, ApprovalDecision>,
+    deferred_calls: VecDeque<ToolCall>,
+    tools_prepared: bool,
     turns: u32,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
@@ -665,12 +707,23 @@ impl Engine {
                 }
                 Phase::Model => self.model_turn().await?,
                 Phase::Tools => {
+                    if !self.tools_prepared {
+                        self.prepare_tools().await?;
+                        self.tools_prepared = true;
+                    }
                     if self.parallel_batch_ready() {
                         self.tool_batch().await?;
                     } else if let Some(call) = self.calls.front().cloned() {
                         if self.tool(call).await? {
                             return Ok(RunStatus::Paused);
                         }
+                    } else if !self.deferred_calls.is_empty() {
+                        self.calls = std::mem::take(&mut self.deferred_calls);
+                        for request in &self.result.pending_approvals {
+                            self.checkpoint(Boundary::ApprovalPending, Some(&request.call))
+                                .await?;
+                        }
+                        return Ok(RunStatus::Paused);
                     } else if self.policy.tool_use == ToolUseBehavior::StopAfterTool
                         && self.tool_final.is_some()
                     {
@@ -898,6 +951,7 @@ impl Engine {
         if !self.calls.is_empty() {
             self.tool_pause = false;
             self.tool_final = None;
+            self.tools_prepared = false;
             self.phase = Phase::Tools;
         } else if response.end_turn == Some(false) {
             self.phase = Phase::Model;
@@ -1149,6 +1203,63 @@ impl Engine {
             }
         }
     }
+    async fn prepare_tools(&mut self) -> Result<(), Error> {
+        if self.calls.front().is_some_and(|call| {
+            self.agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.definition.name == call.name)
+        }) {
+            return Ok(());
+        }
+        let mut ready = VecDeque::new();
+        self.result.pending_approvals.clear();
+        while let Some(call) = self.calls.pop_front() {
+            let tool = self
+                .agent
+                .tools
+                .iter()
+                .find(|tool| tool.definition().name == call.name);
+            if let Some(tool) = tool {
+                let definition = tool.definition();
+                if self.policy.tools.decision(definition) == ToolDecision::RequireApproval {
+                    if !compile_schema(&definition.input_schema)?.is_valid(&call.arguments) {
+                        return Err(Error::new(
+                            ErrorCategory::ModelBehavior,
+                            format!("invalid arguments for {}", call.name),
+                        ));
+                    }
+                    let request = ApprovalRequest {
+                        call: call.clone(),
+                        reason: "tool policy requires approval".into(),
+                    };
+                    let approval = if let Some(approval) = self.approvals.remove(&call.id) {
+                        approval
+                    } else {
+                        self.emit(RunEvent::ApprovalRequired {
+                            request: request.clone(),
+                        })
+                        .await?;
+                        bounded(
+                            &self.context,
+                            None,
+                            self.host.approve(&self.context, request.clone()),
+                        )
+                        .await?
+                    };
+                    if approval == ApprovalDecision::Defer {
+                        self.result.pending_approvals.push(request);
+                        self.deferred_calls.push_back(call);
+                        continue;
+                    }
+                    self.approvals.insert(call.id.clone(), approval);
+                }
+            }
+            ready.push_back(call);
+        }
+        self.calls = ready;
+        Ok(())
+    }
     fn parallel_batch_ready(&self) -> bool {
         self.calls.len() > 1
             && self.calls.iter().all(|call| {
@@ -1240,7 +1351,7 @@ impl Engine {
                 call: call.clone(),
                 reason: "tool policy requires approval".into(),
             };
-            let approval = if let Some(approval) = self.approval.take() {
+            let approval = if let Some(approval) = self.approvals.remove(&call.id) {
                 approval
             } else {
                 self.emit(RunEvent::ApprovalRequired {
@@ -1256,7 +1367,9 @@ impl Engine {
             };
             match approval {
                 ApprovalDecision::Approve => {
-                    self.result.pending_approvals.clear();
+                    self.result
+                        .pending_approvals
+                        .retain(|request| request.call.id != call.id);
                 }
                 ApprovalDecision::Deny => {
                     return Err(Error::new(
@@ -1344,6 +1457,7 @@ impl Engine {
     }
     async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
         self.calls.pop_front();
+        self.approvals.remove(&call.id);
         let raw = executed.raw;
         self.tool_pause |= raw.should_pause;
         if let Some(error) = executed.hook_error {

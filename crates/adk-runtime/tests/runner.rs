@@ -276,6 +276,7 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
     assert_eq!(paused.result.pending_approvals[0].call.id, "2");
     assert_eq!(one.calls.load(Ordering::SeqCst), 1);
     assert_eq!(two.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(three.calls.load(Ordering::SeqCst), 1);
     let continuation = paused.continuation.take().unwrap();
     drop(paused);
     let done = continuation
@@ -300,7 +301,7 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
             }
         })
         .collect();
-    assert_eq!(ids, ["1", "2", "3"]);
+    assert_eq!(ids, ["1", "3", "2"]);
     assert!(done.result.pending_approvals.is_empty());
 }
 
@@ -1442,4 +1443,119 @@ async fn fallback_state_is_per_agent_identity_not_display_name() {
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("target primary")));
     assert_eq!(target_primary.completes.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids() {
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![
+                call("a", "gated"),
+                call("ready", "ready"),
+                call("b", "gated"),
+            ],
+            None,
+        )),
+        Ok(answer("done")),
+    ]);
+    let gated = TestTool::new("gated", true, false);
+    let ready = TestTool::new("ready", false, false);
+    let mut a = agent(model);
+    a.tools = vec![gated.clone(), ready.clone()];
+    let host = Arc::new(TestHost::default());
+    host.approvals
+        .lock()
+        .unwrap()
+        .extend([ApprovalDecision::Defer, ApprovalDecision::Defer]);
+    let paused = runner(a)
+        .run(context(), request(2), host.clone())
+        .await
+        .unwrap();
+    assert_eq!(ready.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(gated.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(
+        paused
+            .result
+            .pending_approvals
+            .iter()
+            .map(|r| r.call.id.as_str())
+            .collect::<Vec<_>>(),
+        ["a", "b"]
+    );
+    let paused = paused
+        .continuation
+        .unwrap()
+        .stream_batch(vec![
+            ("b".into(), ApprovalDecision::Defer),
+            ("a".into(), ApprovalDecision::Approve),
+        ])
+        .unwrap()
+        .finish()
+        .await
+        .unwrap();
+    assert_eq!(gated.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(paused.result.pending_approvals.len(), 1);
+    assert_eq!(paused.result.pending_approvals[0].call.id, "b");
+    let done = paused
+        .continuation
+        .unwrap()
+        .resume_batch(vec![("b".into(), ApprovalDecision::Approve)])
+        .await
+        .unwrap();
+    assert_eq!(done.result.final_output, Some(json!("done")));
+    assert!(done.result.pending_approvals.is_empty());
+    assert_eq!(ready.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(gated.calls.load(Ordering::SeqCst), 2);
+    let ids: Vec<_> = done
+        .result
+        .history
+        .iter()
+        .filter_map(|item| match item {
+            RunItem::ToolResult { call_id, .. } => Some(call_id.as_str()),
+            _ => None,
+        })
+        .collect();
+    assert_eq!(ids, ["ready", "a", "b"]);
+    assert_eq!(
+        host.events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|e| matches!(e, RunEvent::ApprovalRequired { .. }))
+            .count(),
+        2
+    );
+}
+
+#[tokio::test]
+async fn batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects() {
+    for ids in [vec!["a"], vec!["a", "a"], vec!["a", "unknown"]] {
+        let gated = TestTool::new("gated", true, false);
+        let model = TestModel::with(vec![Ok(response(
+            vec![call("a", "gated"), call("b", "gated")],
+            None,
+        ))]);
+        let mut a = agent(model);
+        a.tools = vec![gated.clone()];
+        let host = Arc::new(TestHost::default());
+        host.approvals
+            .lock()
+            .unwrap()
+            .extend([ApprovalDecision::Defer, ApprovalDecision::Defer]);
+        let paused = runner(a).run(context(), request(2), host).await.unwrap();
+        let error = paused
+            .continuation
+            .unwrap()
+            .resume_batch(
+                ids.into_iter()
+                    .map(|id| (id.into(), ApprovalDecision::Approve))
+                    .collect(),
+            )
+            .await
+            .err()
+            .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+        assert_eq!(error.partial.unwrap().pending_approvals.len(), 2);
+        assert_eq!(gated.calls.load(Ordering::SeqCst), 0);
+    }
 }

@@ -45,7 +45,7 @@ One engine drives both complete and genuinely streaming model capabilities.
 Ordinary preauthorized tool batches run as owned concurrent futures. Read-only
 tools share a Tokio read lock; mutations take its exclusive write lock. Results
 fold in call order, while starts and raw-output hooks may interleave. Approval suspension owns the exact
-unresolved call and remaining queue; resumption consumes the continuation, not a
+unresolved calls and remaining queue; resumption consumes the continuation, not a
 reconstructed `input + new_items` transcript. This prevents completed effects
 being repeated by the continuation API, **not exactly-once execution after a
 process crash**. Durable recovery/idempotency protocols remain separate issues.
@@ -121,7 +121,7 @@ complete.** The following is an enumerated audit, not a parity waiver.
    Go's optional arbitrary `ParseFn`, schema name and strict-mode controls have no
    corresponding configuration in the existing Rust `Option<schemars::Schema>`;
    their mapping remains a public-configuration boundary, not claimed equivalence.
-3. **Ordinary tool concurrency restored, approval scheduling still unresolved.**
+3. **Ordinary tool concurrency and deferred-approval sibling scheduling restored.**
    `runner.go:2288–2365` uses concurrent read-safe tools/exclusive mutations and
    ordered result slots. Rust uses `join_all` plus a Tokio `RwLock`, no spawned
    producer/tasks. Barrier tests prove read fan-out (sequential execution would
@@ -130,16 +130,24 @@ complete.** The following is an enumerated audit, not a parity waiver.
    promised by either baseline; results retain input order. Go's managed-subagent
    parallel-safe marker/semaphore remains in its dedicated integration issue.
 
-   **Unapproved boundary:** Go partitions approvals before executing eligible
-   sibling tools and returns a batch of approval items (`runner.go:2229–2285`).
-   Rust's `Continuation::resume(Option<ApprovalDecision>)` surfaces one deferred
-   call and stops there; batches containing approval/policy failures still use
-   this cursor path. Thus an eligible sibling after a deferred call does not yet
-   run, unlike Go. This is external, not internal-only. Exact parity needs a
-   batch decision/call-ID continuation protocol and an approval-history/event
-   representation agreed with the #2 core contracts; alternatively the maintainer
-   can explicitly approve the single-call protocol. Neither option is presumed
-   approved here; ordinary-batch tests do not establish approval-batch parity.
+   Go partitions approvals before executing eligible sibling tools and returns a
+   batch (`runner.go:2229–2285`). Rust now does this too: all deferred calls are
+   returned in `pending_approvals`, and eligible siblings execute before pause.
+   `Continuation::{resume_batch,stream_batch}` accepts exact call-ID decisions;
+   missing/duplicate/unknown IDs fail before effects. The single-decision methods
+   remain for one pending call or a tool pause. Completed effects are removed from
+   the queue; re-deferral and resume cannot replay them. Approved calls resolve in
+   call order. Two additional actual Go/Rust scenarios verify eligible dispatch,
+   model-facing transcript, usage, and ordered pending IDs in both modes. Rust
+   tests cover repeated pause/resume, reversed decision input, and invalid IDs.
+
+   The existing #2 representation deliberately puts approvals in a side channel
+   (`pending_approvals` / `ApprovalRequired`) rather than a `RunItem` variant.
+   Replay explicitly extracts Go approval markers into the same side channel;
+   it does not claim raw approval-history/event-envelope identity or identical
+   approval-event timing. Core documents native Serde as distinct from Go wire
+   compatibility (`adk-core/src/lib.rs`); a full adapter must preserve the marker
+   when reconstructing the Go wire representation, not silently discard it.
 4. **Other previously declared differences need explicit disposition.** Rust
    retains initial conversation error partials where Go ChatLoop discards them;
    requires a nonzero turn budget instead of Go's nonpositive default-100 sentinel;
@@ -158,8 +166,8 @@ complete.** The following is an enumerated audit, not a parity waiver.
    Go hook/trace payload parity likewise remain unproven, not excluded from #4.
 
 Concrete delivery boundary: fallback/reprobe and default schema outcomes are
-corrected and verified; ordinary tool scheduling is corrected with owned Rust
-futures. Approval-batch/public-configuration compatibility and the explicitly
+corrected and verified; tool scheduling including deferred-approval siblings is corrected with owned
+Rust futures. Public-configuration/wire compatibility and the explicitly
 listed external differences above still need resolution. Do not close #4 or
 approve the full delivery scope on the basis of this correction. The options are
 baseline-compatible core/runtime additions with corresponding replay, or explicit
@@ -179,8 +187,8 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 20 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
-| Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
+| Real Go/Rust replay | `tests/replay.rs`: 22 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |
 | Retry/limits/timeouts | `fallback_precedes_policy_retries_without_spending_extra_turns`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |

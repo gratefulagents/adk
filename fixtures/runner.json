@@ -3264,6 +3264,386 @@
         },
         "streaming": true
       }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "name": "echo",
+            "output": "echo: eligible sibling"
+          }
+        ],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "paused"
+        },
+        "pending": [
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "id": "pending1",
+            "name": "approval",
+            "type": "tool_call"
+          },
+          {
+            "arguments": {
+              "text": "second approval"
+            },
+            "id": "pending2",
+            "name": "approval",
+            "type": "tool_call"
+          }
+        ],
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "approvals": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "approval_batch",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "name": "echo",
+            "output": "echo: eligible sibling"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "paused"
+        },
+        "pending": [
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "id": "pending1",
+            "name": "approval",
+            "type": "tool_call"
+          },
+          {
+            "arguments": {
+              "text": "second approval"
+            },
+            "id": "pending2",
+            "name": "approval",
+            "type": "tool_call"
+          }
+        ],
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "approvals": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "approval_batch_stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "streaming": true
+      }
     }
   ],
   "schema_version": 1,

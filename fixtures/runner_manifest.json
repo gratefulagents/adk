@@ -1,5 +1,5 @@
 {
-  "fixture_sha256": "0523f1db47a21ce67542ad1281709fdef997e7f36b592f0e2f1f9b2c6fc49e6b",
+  "fixture_sha256": "09103e7bce1a5b91fd3e5d626583c75a04c82ab5025e83d2464f27f65241b4b6",
   "generator": {
     "command": [
       "go",
@@ -18,8 +18,8 @@
     "toolchain": "go version go1.26.8 linux/amd64"
   },
   "harness": {
-    "fixtures/runner_inputs.json": "a0fc913d2f929daac535e00ea90fe27818dec454b4ec7041dbd9130b7c4c828b",
-    "scripts/replay/runner_export.go": "c86d578b20acd06f471d7a9bdce02c45a5b61b2a5d88b639758bb44de9466207",
+    "fixtures/runner_inputs.json": "d7dd8cfdceef78c395192119353e37fc9d92ae2f334322b2f7b3befc3ea99cab",
+    "scripts/replay/runner_export.go": "0f23438f115f21e1ba16fbd8c1b80d965b8ef8824a5e35a011069d59ba41763b",
     "scripts/replay/runner_export.py": "ad45e8e30086b5830ea98c12a2b6b6fcdbde95656978fb1cd92570543ad7632b"
   },
   "license": "GPL-3.0-only",

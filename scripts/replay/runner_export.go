@@ -31,6 +31,7 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
+	Approvals bool            `json:"approvals"`
 	Name      string          `json:"name"`
 	Fallbacks []string        `json:"fallbacks"`
 	Schema    json.RawMessage `json:"schema"`
@@ -62,6 +63,8 @@ func normalize(items []sdk.RunItem) []item {
 			out = append(out, item{Type: "message", Text: v.Message.Text})
 		case sdk.RunItemToolCall:
 			out = append(out, item{Type: "tool_call", ID: v.ToolCall.ID, Name: v.ToolCall.Name, Arguments: v.ToolCall.Input})
+		case sdk.RunItemToolApproval:
+			continue
 		case sdk.RunItemToolOutput:
 			out = append(out, item{Type: "tool_result", ID: v.ToolOutput.CallID, Content: v.ToolOutput.Content, IsError: v.ToolOutput.IsError})
 		default:
@@ -128,6 +131,13 @@ func execute(s scenario) object {
 			return "echo: " + args.Text, nil
 		}}
 	agent := &sdk.Agent{Name: "replay-agent", Model: "replay-model", Instructions: "Follow the replay script.", Tools: []sdk.Tool{tool}}
+	if s.Approvals {
+		approval := *tool
+		approval.ToolName = "approval"
+		approval.Approval = true
+		approval.Fn = func(context.Context, json.RawMessage) (string, error) { panic("unapproved effect executed") }
+		agent.Tools = append(agent.Tools, &approval)
+	}
 	agent.FallbackModels = s.Fallbacks
 	if len(s.Schema) > 0 {
 		var schema any
@@ -156,7 +166,9 @@ func execute(s scenario) object {
 				}
 				events = append(events, object{"type": "text_delta", "delta": ev.Delta})
 			case sdk.StreamEventRunItem:
-				events = append(events, object{"type": "item", "item": normalize([]sdk.RunItem{*ev.Item})[0]})
+				for _, v := range normalize([]sdk.RunItem{*ev.Item}) {
+					events = append(events, object{"type": "item", "item": v})
+				}
 			default:
 				panic(fmt.Sprintf("unexpected stream event: %v", ev.Type))
 			}
@@ -177,9 +189,21 @@ func execute(s scenario) object {
 		}
 		status, category = "incomplete", "max_turns"
 	}
-	return object{"requests": m.requests, "dispatch": dispatch, "events": events, "outcome": object{
+	if result.IsInterrupted() {
+		status = "paused"
+	}
+	observation := object{"requests": m.requests, "dispatch": dispatch, "events": events, "outcome": object{
 		"status": status, "error": category, "final_output": result.FinalOutput, "history": normalize(result.FinalHistory), "new_items": normalize(result.NewItems),
 		"response_count": len(result.RawResponses), "last_agent": result.LastAgent.Name, "input_tokens": result.Usage.InputTokens, "output_tokens": result.Usage.OutputTokens}}
+	if s.Approvals {
+		pending := []item{}
+		for _, interruption := range result.AllInterruptions() {
+			approval := interruption
+			pending = append(pending, item{Type: "tool_call", ID: approval.ToolCallID, Name: approval.ToolName, Arguments: approval.ToolInput})
+		}
+		observation["pending"] = pending
+	}
+	return observation
 }
 func main() {
 	var cases []scenario

@@ -33,13 +33,18 @@ Streaming scripts deliver separate text deltas and a complete response; the
 harness drains actual runner events rather than reconstructing deltas from the
 final text. Each max-turn run retains its history, outputs, responses and usage.
 
-Added 12 cases (20 total): sticky fallback with successful primary reprobe;
+Added 12 fallback/schema cases: sticky fallback with successful primary reprobe;
 failed primary reprobe; fallback-chain switch resetting the three-success count;
 and non-JSON/schema-invalid JSON/valid JSON structured output. Each runs normally
 and streamed. The Go provider returns explicit overloaded/retryable advice; Rust
 uses its Provider-error retry predicate. Both execute real selection logic.
 Schema input is serialized to compact, sorted-key JSON before configuring either
 runner so the schema prompt bytes are identical (no output normalization).
+
+Two further scenarios (22 total) interleave two deferred approval calls with an
+eligible sibling. Both real runners must execute that sibling, pause, and return
+both pending call IDs in order. Resume safety/decision validation is separately
+covered by Rust tests; these two Go cases only test the initial suspension.
 
 ## Canonical comparison boundary
 
@@ -58,7 +63,11 @@ runner so the schema prompt bytes are identical (no output normalization).
   its streaming path uses stream; the mocks assert these dispatch choices.
 * Both sides explicitly disable untrusted-output wrapping for the trusted
   in-process echo tool. No normalization strips delimiters after execution.
-* This corpus does not claim parity for policy denial, approvals, cancellation,
+* Go's approval `RunItem`s are projected into an ordered `pending` side channel,
+  matching Rust `pending_approvals`. They are omitted from the model-facing
+  history and committed-item event projection. All non-approval entries retain
+  order and content. Approval event timing/wire marker identity is NOT compared.
+* This corpus does not claim parity for policy denial, approval resume, cancellation,
   general retry/advice policy, handoffs, custom schema parsers, other provider
   failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate

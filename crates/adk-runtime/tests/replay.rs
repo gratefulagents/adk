@@ -183,7 +183,7 @@ impl Host for RecordingHost {
         _: &'a Context,
         _: ApprovalRequest,
     ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
-        Box::pin(async { panic!("read-only echo must not request approval") })
+        Box::pin(async { Ok(ApprovalDecision::Defer) })
     }
 }
 
@@ -208,7 +208,8 @@ fn normalized_events(events: &[RunEvent]) -> Vec<Value> {
                 };
                 out.push(json!({"type":"item","item":normalized(&[item])[0]}));
             }
-            RunEvent::Started { .. }
+            RunEvent::ApprovalRequired { .. }
+            | RunEvent::Started { .. }
             | RunEvent::ToolStarted { .. }
             | RunEvent::Finished { .. }
             | RunEvent::Failed { .. } => {}
@@ -248,6 +249,15 @@ async fn replay(script: &Value) -> Value {
     let mut agent = AgentConfig::new("replay-agent", binding);
     agent.instructions = "Follow the replay script.".into();
     agent.tools.push(tool.clone());
+    if script["approvals"].as_bool() == Some(true) {
+        let mut definition = tool.definition.clone();
+        definition.name = "approval".into();
+        definition.requires_approval = true;
+        agent.tools.push(Arc::new(Echo {
+            definition,
+            dispatch: Mutex::new(vec![]),
+        }));
+    }
     if let Some(names) = script["fallbacks"].as_array() {
         agent.fallbacks = names
             .iter()
@@ -307,7 +317,10 @@ async fn replay(script: &Value) -> Value {
     };
     let (result, error) = match outcome {
         Ok(outcome) => {
-            assert!(outcome.continuation.is_none());
+            assert_eq!(
+                outcome.continuation.is_some(),
+                script["approvals"].as_bool() == Some(true)
+            );
             assert!(outcome.spills.is_empty());
             (outcome.result, Value::Null)
         }
@@ -321,7 +334,10 @@ async fn replay(script: &Value) -> Value {
             )
         }
     };
-    assert!(result.pending_approvals.is_empty());
+    assert_eq!(
+        result.pending_approvals.is_empty(),
+        script["approvals"].as_bool() != Some(true)
+    );
     assert!(
         model.responses.lock().unwrap().is_empty(),
         "runner stopped before consuming the script"
@@ -335,7 +351,7 @@ async fn replay(script: &Value) -> Value {
         }
         other => panic!("missing terminal event: {other:?}"),
     }
-    json!({
+    let mut observation = json!({
         "requests":*model.requests.lock().unwrap(), "dispatch":*tool.dispatch.lock().unwrap(),
         "events":if streaming { normalized_events(&events) } else { vec![] },
         "outcome":{
@@ -344,7 +360,19 @@ async fn replay(script: &Value) -> Value {
             "response_count":result.responses.len(),"last_agent":result.last_agent,
             "input_tokens":result.usage.input_tokens,"output_tokens":result.usage.output_tokens,
         }
-    })
+    });
+    if script["approvals"].as_bool() == Some(true) {
+        observation["pending"] = json!(normalized(
+            &result
+                .pending_approvals
+                .iter()
+                .map(|request| RunItem::ToolCall {
+                    call: request.call.clone()
+                })
+                .collect::<Vec<_>>()
+        ));
+    }
+    observation
 }
 
 fn fixtures() -> Value {
@@ -364,7 +392,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 20);
+    assert_eq!(cases.len(), 22);
     assert_eq!(
         cases
             .iter()

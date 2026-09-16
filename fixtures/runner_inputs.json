@@ -972,5 +972,97 @@
         "n"
       ]
     }
+  },
+  {
+    "name": "approval_batch",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "approvals": true
+  },
+  {
+    "name": "approval_batch_stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "approvals": true
   }
 ]

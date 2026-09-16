@@ -1,0 +1,374 @@
+{
+  "github.com/gratefulagents/gratefulagents/api/platform/v1alpha1": {
+    "capability_acceptance_id": "PLAT-ABI-003",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::agentrun"
+  },
+  "github.com/gratefulagents/gratefulagents/api/triggers/v1alpha1": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::triggers"
+  },
+  "github.com/gratefulagents/gratefulagents/cmd/agent": {
+    "capability_acceptance_id": "PLAT-ABI-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "runtime-owner",
+    "rust_module": "agent_worker"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/agentinfra": {
+    "capability_acceptance_id": "PLAT-ABI-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "runtime-owner",
+    "rust_module": "agent_worker::bootstrap"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/agentplatform": {
+    "capability_acceptance_id": "PLAT-ABI-003",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::agentrun"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/auth": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "retain-go-control-plane; port worker-facing contract only",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::auth"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/computeruse": {
+    "capability_acceptance_id": "PLAT-DESKTOP-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "desktop-owner",
+    "rust_module": "agent_worker::desktop"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/controller/triggers": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "retain-go-control-plane; port worker-facing contract only",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::trigger_run"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/githubapp": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "retain-go-control-plane; port worker-facing contract only",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::github_auth"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/linear": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "retain-go-control-plane; port worker-facing contract only",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::linear"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/mcpattach": {
+    "capability_acceptance_id": "PLAT-TOOLS-002",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "tools-owner",
+    "rust_module": "agent_worker::mcp"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/mcppolicy": {
+    "capability_acceptance_id": "PLAT-TOOLS-002",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "security-owner",
+    "rust_module": "platform_tools::policy"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/orchestration": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::orchestration"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/projectstate": {
+    "capability_acceptance_id": "PLAT-STATE-002",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store::project_state"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/security": {
+    "capability_acceptance_id": "PLAT-TOOLS-004",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "security-owner",
+    "rust_module": "platform_tools::security"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/securitytoolpacks": {
+    "capability_acceptance_id": "PLAT-TOOLS-004",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "security-owner",
+    "rust_module": "platform_tools::security"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/securitytoolrun": {
+    "capability_acceptance_id": "PLAT-TOOLS-004",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "security-owner",
+    "rust_module": "platform_contracts::security_job"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/slack": {
+    "capability_acceptance_id": "PLAT-SLACK-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "connectors-owner",
+    "rust_module": "platform_connector::slack"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/store": {
+    "capability_acceptance_id": "PLAT-PG-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/store/contentblob": {
+    "capability_acceptance_id": "PLAT-S3-002",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store::content"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/store/postgres": {
+    "capability_acceptance_id": "PLAT-PG-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store::postgres"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/store/postgres/sqlc": {
+    "capability_acceptance_id": "PLAT-PG-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store::postgres::queries"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/store/sessionclient": {
+    "capability_acceptance_id": "PLAT-PG-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "persistence-owner",
+    "rust_module": "platform_store::sessions"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/tools": {
+    "capability_acceptance_id": "PLAT-TOOLS-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "tools-owner",
+    "rust_module": "platform_tools"
+  },
+  "github.com/gratefulagents/gratefulagents/internal/usageaccounting": {
+    "capability_acceptance_id": "PLAT-OBS-001",
+    "disposition": "port required worker-facing behavior; package inclusion is not whole-package port scope",
+    "role_owner": "observability-owner",
+    "rust_module": "agent_worker::observability"
+  },
+  "github.com/gratefulagents/gratefulagents/rpc/auth": {
+    "capability_acceptance_id": "PLAT-BOUNDARY-001",
+    "disposition": "retain-go-control-plane; port worker-facing contract only",
+    "role_owner": "platform-owner",
+    "rust_module": "platform_contracts::auth"
+  },
+  "github.com/gratefulagents/sdk/internal/agent": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "github.com/gratefulagents/sdk/internal/agent/policy": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "github.com/gratefulagents/sdk/internal/anthropic": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::anthropic"
+  },
+  "github.com/gratefulagents/sdk/internal/modelactivity": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events::activity"
+  },
+  "github.com/gratefulagents/sdk/internal/modeldelta": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events::delta"
+  },
+  "github.com/gratefulagents/sdk/internal/openai": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::openai"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/durable": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "security-owner",
+    "rust_module": "sdk::guardrails"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/mcp": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "mcp-owner",
+    "rust_module": "sdk::mcp"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/memory": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "storage-owner",
+    "rust_module": "sdk::memory"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/mode": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::mode"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::models_dev"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/otel": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/policy": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "storage-owner",
+    "rust_module": "sdk::project_state"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/providers": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/providers/anthropic": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::anthropic"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/providers/oauth": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::oauth"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::openai"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/runtime": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::runtime"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "security-owner",
+    "rust_module": "sdk::sandbox"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::registry"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/browser": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::browser"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::fs"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/git": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::git"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/internal/pathutil": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "security-owner",
+    "rust_module": "sdk::tools::fs::confinement"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/lsp": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::lsp"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/memory": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::memory"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/projectstate": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::project_state"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/search": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::search"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/shell": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::shell"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/signal": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::signals"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/vision": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::vision"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tools/web": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::web"
+  },
+  "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore": {
+    "capability_acceptance_id": "SDK-source-parity-v1",
+    "disposition": "SDK parity; see SDK per-symbol ledger for finer routing",
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::trace_store"
+  }
+}

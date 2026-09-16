@@ -1,0 +1,866 @@
+{
+  ".": {
+    "role_owner": "release-owner",
+    "rust_module": "sdk::distribution"
+  },
+  ".github/workflows": {
+    "role_owner": "release-owner",
+    "rust_module": "sdk::ci"
+  },
+  "capability:async-shell": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::shell"
+  },
+  "capability:attach-repository": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::git"
+  },
+  "capability:bash": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::shell"
+  },
+  "capability:browser": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::browser"
+  },
+  "capability:github-issue": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::git"
+  },
+  "capability:github-pull-request": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::git"
+  },
+  "capability:interactive-terminal": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::shell"
+  },
+  "capability:lsp": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::lsp"
+  },
+  "capability:memory": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::memory"
+  },
+  "capability:signals": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::signals"
+  },
+  "capability:think": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::signals"
+  },
+  "capability:vision": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::vision"
+  },
+  "capability:web-fetch": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::web"
+  },
+  "capability:workspace-filesystem": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::fs"
+  },
+  "capability:workspace-search": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::search"
+  },
+  "cmd/grateful-agent-run": {
+    "role_owner": "cli-owner",
+    "rust_module": "sdk_cli"
+  },
+  "docs": {
+    "role_owner": "docs-owner",
+    "rust_module": "sdk::documentation"
+  },
+  "eval": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk_evals"
+  },
+  "eval/audit-fixtures": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk_evals::audit_fixtures"
+  },
+  "eval/promptfoo": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk_evals::promptfoo"
+  },
+  "eval/terminal_bench": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk_evals::terminal_bench"
+  },
+  "examples": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples"
+  },
+  "examples/agentsdk_hello": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::agentsdk_hello"
+  },
+  "examples/anthropic_api": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::anthropic_api"
+  },
+  "examples/features": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::features"
+  },
+  "examples/features/agent_runtime": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::agent::examples"
+  },
+  "examples/features/chatloop": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::chat_loop::examples"
+  },
+  "examples/features/context_compaction": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::compaction::examples"
+  },
+  "examples/features/costs": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::usage::examples"
+  },
+  "examples/features/errors_retries": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::retry::examples"
+  },
+  "examples/features/guardrails": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::guardrails::examples"
+  },
+  "examples/features/handoffs_subagents": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::subagents::examples"
+  },
+  "examples/features/internal/liveanthropic": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::test_support::liveanthropic"
+  },
+  "examples/features/internal/liveopenai": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::test_support::liveopenai"
+  },
+  "examples/features/internal/liveopenrouter": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::test_support::liveopenrouter"
+  },
+  "examples/features/internal/liverunner": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::test_support::liverunner"
+  },
+  "examples/features/internal/livetest": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::test_support::livetest"
+  },
+  "examples/features/mcp": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::mcp::examples"
+  },
+  "examples/features/memory": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::memory::examples"
+  },
+  "examples/features/model_abstraction": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::model::examples"
+  },
+  "examples/features/observability": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::telemetry::examples"
+  },
+  "examples/features/policy": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::policy::examples"
+  },
+  "examples/features/providers": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::providers::examples"
+  },
+  "examples/features/sandbox": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::sandbox::examples"
+  },
+  "examples/features/settings_routing": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::routing::examples"
+  },
+  "examples/features/streaming": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::stream::examples"
+  },
+  "examples/features/structured_output": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::output_schema::examples"
+  },
+  "examples/features/tools": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::tools::examples"
+  },
+  "examples/features/tools_registry": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::tools::registry::examples"
+  },
+  "examples/features/tracestore": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::trace_store::examples"
+  },
+  "examples/openai_api": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::openai_api"
+  },
+  "examples/openai_oauth": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::openai_oauth"
+  },
+  "examples/openrouter": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::examples::openrouter"
+  },
+  "internal/agent": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/agent.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/agent_tool.go": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools"
+  },
+  "internal/agent/agents": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::specialists"
+  },
+  "internal/agent/audit_fixes_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/authorization.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "internal/agent/authorization_test.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "internal/agent/compaction_llm.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/compaction_llm_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/compaction_openai_fixes_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/compaction_summary.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/conversation.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "internal/agent/cost.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::usage"
+  },
+  "internal/agent/cost_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::usage"
+  },
+  "internal/agent/durable_checkpoint.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "internal/agent/durable_checkpoint_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "internal/agent/durable_forced_crash_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "internal/agent/durable_review_regression_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "internal/agent/errors.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::error"
+  },
+  "internal/agent/errors_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::error"
+  },
+  "internal/agent/event_stream.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "internal/agent/event_stream_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "internal/agent/final_history_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/guardrail.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::guardrails"
+  },
+  "internal/agent/handoff.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::handoff"
+  },
+  "internal/agent/handoff_enhancements_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::handoff"
+  },
+  "internal/agent/handoff_filters.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::handoff"
+  },
+  "internal/agent/history_compaction.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/history_compaction_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::compaction"
+  },
+  "internal/agent/hooks.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/items.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/llm_snapshot.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/llm_snapshot_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/logger.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/mcp_prompt.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/mcp_prompt_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/mode_routing.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::mode"
+  },
+  "internal/agent/mode_routing_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::mode"
+  },
+  "internal/agent/model.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_fallback.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_fallback_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_identity.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_provider.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_resolution.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_resolution_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/model_settings.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/multi_provider.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/multi_provider_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/otel_processor_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/output_schema.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/platform_hooks.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/policy": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "internal/agent/prompt_cache_key_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/record.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/record_forwarding_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/record_subagent_span_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/retry.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::error"
+  },
+  "internal/agent/run_config.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/run_config_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/run_context.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/run_context_parent_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/run_error_handler.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::error"
+  },
+  "internal/agent/run_result.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner_authorization_test.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "internal/agent/runner_batch2_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner_durable_children_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "internal/agent/runner_fixes_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner_model_timeout_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/runner_panic_cancel_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner_reliability_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/runner_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/security_findings_subagent_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/security_findings_test.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "internal/agent/stream.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "internal/agent/stream_events.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "internal/agent/stream_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "internal/agent/subagent_deadline_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_durable_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_registry.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_registry_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_review_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_run.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/subagent_run_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "internal/agent/thinking_delta.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/thinking_delta_test.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::model"
+  },
+  "internal/agent/tool.go": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools"
+  },
+  "internal/agent/tool_images_test.go": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools"
+  },
+  "internal/agent/tool_output_spill_test.go": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools"
+  },
+  "internal/agent/tracing.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/tracing_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "internal/agent/types_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "internal/agent/usage.go": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::usage"
+  },
+  "internal/anthropic": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::anthropic"
+  },
+  "internal/modelactivity": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events::activity"
+  },
+  "internal/modeldelta": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events::delta"
+  },
+  "internal/openai": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::openai"
+  },
+  "pkg/agentsdk": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/aliases.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/autoloop.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/autoloop_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/boundary_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/chatloop.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/chatloop_multi_approval_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/chatloop_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/composite_hooks.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/conversation.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/conversation_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/doc.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/durable": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "pkg/agentsdk/durable_lease_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "pkg/agentsdk/durable_run.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "pkg/agentsdk/durable_run_test.go": {
+    "role_owner": "durability-owner",
+    "rust_module": "sdk::durable"
+  },
+  "pkg/agentsdk/events": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "pkg/agentsdk/guardrail_rule.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::guardrails"
+  },
+  "pkg/agentsdk/guardrails": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::guardrails"
+  },
+  "pkg/agentsdk/host": {
+    "role_owner": "host-owner",
+    "rust_module": "sdk::host"
+  },
+  "pkg/agentsdk/host/fileconfig": {
+    "role_owner": "host-owner",
+    "rust_module": "sdk::host::file_config"
+  },
+  "pkg/agentsdk/mcp": {
+    "role_owner": "mcp-owner",
+    "rust_module": "sdk::mcp"
+  },
+  "pkg/agentsdk/memory": {
+    "role_owner": "storage-owner",
+    "rust_module": "sdk::memory"
+  },
+  "pkg/agentsdk/mode": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::mode"
+  },
+  "pkg/agentsdk/modelsdev": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::models_dev"
+  },
+  "pkg/agentsdk/otel": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::telemetry"
+  },
+  "pkg/agentsdk/permission_mode_test.go": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "pkg/agentsdk/policy": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::policy"
+  },
+  "pkg/agentsdk/projectstate": {
+    "role_owner": "storage-owner",
+    "rust_module": "sdk::project_state"
+  },
+  "pkg/agentsdk/providers": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers"
+  },
+  "pkg/agentsdk/providers/anthropic": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::anthropic"
+  },
+  "pkg/agentsdk/providers/oauth": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::oauth"
+  },
+  "pkg/agentsdk/providers/openai": {
+    "role_owner": "providers-owner",
+    "rust_module": "sdk::providers::openai"
+  },
+  "pkg/agentsdk/runtime": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::runtime"
+  },
+  "pkg/agentsdk/sandbox": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::sandbox"
+  },
+  "pkg/agentsdk/scheduler.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "pkg/agentsdk/session_event_stream.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "pkg/agentsdk/session_event_stream_test.go": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::events"
+  },
+  "pkg/agentsdk/specialists.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "pkg/agentsdk/specialists_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "pkg/agentsdk/subagent_tools.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "pkg/agentsdk/subagent_tools_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::subagents"
+  },
+  "pkg/agentsdk/tools": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::registry"
+  },
+  "pkg/agentsdk/tools/browser": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::browser"
+  },
+  "pkg/agentsdk/tools/fs": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::fs"
+  },
+  "pkg/agentsdk/tools/git": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::git"
+  },
+  "pkg/agentsdk/tools/internal/pathutil": {
+    "role_owner": "security-owner",
+    "rust_module": "sdk::tools::fs::confinement"
+  },
+  "pkg/agentsdk/tools/lsp": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::lsp"
+  },
+  "pkg/agentsdk/tools/memory": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::memory"
+  },
+  "pkg/agentsdk/tools/projectstate": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::project_state"
+  },
+  "pkg/agentsdk/tools/search": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::search"
+  },
+  "pkg/agentsdk/tools/shell": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::shell"
+  },
+  "pkg/agentsdk/tools/signal": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::signals"
+  },
+  "pkg/agentsdk/tools/skills": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::skills"
+  },
+  "pkg/agentsdk/tools/vision": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::vision"
+  },
+  "pkg/agentsdk/tools/web": {
+    "role_owner": "tools-owner",
+    "rust_module": "sdk::tools::web"
+  },
+  "pkg/agentsdk/tracestore": {
+    "role_owner": "observability-owner",
+    "rust_module": "sdk::trace_store"
+  },
+  "pkg/agentsdk/userinput.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/userinput_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::session"
+  },
+  "pkg/agentsdk/verifier.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "pkg/agentsdk/verifier_test.go": {
+    "role_owner": "runtime-owner",
+    "rust_module": "sdk::agent"
+  },
+  "scripts": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk_evals::automation"
+  },
+  "test/integration/openai_oauth": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::integration_tests::openai_oauth"
+  },
+  "test/integration/openai_vision": {
+    "role_owner": "verification-owner",
+    "rust_module": "sdk::integration_tests::openai_vision"
+  }
+}

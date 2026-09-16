@@ -1,0 +1,442 @@
+{
+  "cases": [
+    {
+      "expected": [
+        {
+          "reasoning": {
+            "encrypted_content": "encrypted_1",
+            "id": "rs_1",
+            "signature": "sig_1",
+            "text": "provider-visible thinking",
+            "thinking": "provider-visible thinking"
+          },
+          "reasoning_text": "provider-visible thinking",
+          "thinking_text": "provider-visible thinking",
+          "type": "reasoning"
+        },
+        {
+          "tool_call": {
+            "id": "call_1",
+            "input": {
+              "path": "README.md"
+            },
+            "name": "Read"
+          },
+          "type": "tool_call"
+        },
+        {
+          "message_phase": "commentary",
+          "message_text": "final answer",
+          "type": "message"
+        }
+      ],
+      "input": [
+        {
+          "Agent": null,
+          "Compaction": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Message": null,
+          "Reasoning": {
+            "encrypted_content": "encrypted_1",
+            "id": "rs_1",
+            "signature": "sig_1",
+            "text": "provider-visible thinking"
+          },
+          "ToolApproval": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "Type": 5
+        },
+        {
+          "Agent": null,
+          "Compaction": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Message": null,
+          "Reasoning": null,
+          "ToolApproval": null,
+          "ToolCall": {
+            "id": "call_1",
+            "input": {
+              "path": "README.md"
+            },
+            "name": "Read"
+          },
+          "ToolOutput": null,
+          "Type": 1
+        },
+        {
+          "Agent": null,
+          "Compaction": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Message": {
+            "phase": "commentary",
+            "text": "final answer"
+          },
+          "Reasoning": null,
+          "ToolApproval": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "Type": 0
+        }
+      ],
+      "name": "model-items",
+      "operation": "snapshot_items"
+    },
+    {
+      "expected": {
+        "end_turn": false,
+        "items": [
+          {
+            "reasoning": {
+              "encrypted_content": "encrypted_1",
+              "id": "rs_1",
+              "signature": "sig_1",
+              "text": "provider-visible thinking",
+              "thinking": "provider-visible thinking"
+            },
+            "reasoning_text": "provider-visible thinking",
+            "thinking_text": "provider-visible thinking",
+            "type": "reasoning"
+          },
+          {
+            "tool_call": {
+              "id": "call_1",
+              "input": {
+                "path": "README.md"
+              },
+              "name": "Read"
+            },
+            "type": "tool_call"
+          },
+          {
+            "message_phase": "commentary",
+            "message_text": "final answer",
+            "type": "message"
+          }
+        ],
+        "raw": {
+          "id": "resp_1",
+          "output": [
+            "raw content"
+          ]
+        },
+        "raw_available": true,
+        "reasoning": [
+          {
+            "encrypted_content": "encrypted_1",
+            "id": "rs_1",
+            "signature": "sig_1",
+            "text": "provider-visible thinking",
+            "thinking": "provider-visible thinking"
+          }
+        ],
+        "reasoning_texts": [
+          "provider-visible thinking"
+        ],
+        "texts": [
+          "final answer"
+        ],
+        "thinking_texts": [
+          "provider-visible thinking"
+        ],
+        "tool_calls": [
+          {
+            "id": "call_1",
+            "input": {
+              "path": "README.md"
+            },
+            "name": "Read"
+          }
+        ],
+        "usage": {
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "requests": 0
+        }
+      },
+      "input": {
+        "ContextTokens": 0,
+        "CostKnown": false,
+        "CostUSD": 0,
+        "EndTurn": false,
+        "Items": [
+          {
+            "Agent": null,
+            "Compaction": null,
+            "HandoffCall": null,
+            "HandoffOutput": null,
+            "Message": null,
+            "Reasoning": {
+              "encrypted_content": "encrypted_1",
+              "id": "rs_1",
+              "signature": "sig_1",
+              "text": "provider-visible thinking"
+            },
+            "ToolApproval": null,
+            "ToolCall": null,
+            "ToolOutput": null,
+            "Type": 5
+          },
+          {
+            "Agent": null,
+            "Compaction": null,
+            "HandoffCall": null,
+            "HandoffOutput": null,
+            "Message": null,
+            "Reasoning": null,
+            "ToolApproval": null,
+            "ToolCall": {
+              "id": "call_1",
+              "input": {
+                "path": "README.md"
+              },
+              "name": "Read"
+            },
+            "ToolOutput": null,
+            "Type": 1
+          },
+          {
+            "Agent": null,
+            "Compaction": null,
+            "HandoffCall": null,
+            "HandoffOutput": null,
+            "Message": {
+              "phase": "commentary",
+              "text": "final answer"
+            },
+            "Reasoning": null,
+            "ToolApproval": null,
+            "ToolCall": null,
+            "ToolOutput": null,
+            "Type": 0
+          }
+        ],
+        "Raw": {
+          "id": "resp_1",
+          "output": [
+            "raw content"
+          ]
+        },
+        "Usage": {
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "requests": 0
+        }
+      },
+      "name": "model-response-explicit-false",
+      "operation": "response_snapshot"
+    },
+    {
+      "expected": {
+        "items": [
+          {
+            "message_text": "done",
+            "type": "message"
+          }
+        ],
+        "raw_available": false,
+        "texts": [
+          "done"
+        ],
+        "usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      },
+      "input": {
+        "ContextTokens": 0,
+        "CostKnown": false,
+        "CostUSD": 0,
+        "EndTurn": null,
+        "Items": [
+          {
+            "Agent": null,
+            "Compaction": null,
+            "HandoffCall": null,
+            "HandoffOutput": null,
+            "Message": {
+              "text": "done"
+            },
+            "Reasoning": null,
+            "ToolApproval": null,
+            "ToolCall": null,
+            "ToolOutput": null,
+            "Type": 0
+          }
+        ],
+        "Raw": null,
+        "Usage": {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      },
+      "name": "model-response-omitted-end-turn",
+      "operation": "response_snapshot"
+    },
+    {
+      "expected": {
+        "AgentName": "researcher",
+        "CallID": "child_1",
+        "DurationMS": 0,
+        "InputRaw": "{\"command\":\"false\"}",
+        "IsError": false,
+        "Output": "",
+        "ParentCallID": "parent_1",
+        "Phase": "start",
+        "Tool": "Bash"
+      },
+      "input": {
+        "agent_name": "researcher",
+        "input_raw": "{\"command\":\"false\"}",
+        "parent_call_id": "parent_1",
+        "tool": "Bash",
+        "tool_use_id": "child_1",
+        "type": "tool_start"
+      },
+      "name": "child-tool-0",
+      "operation": "child_event"
+    },
+    {
+      "expected": {
+        "AgentName": "researcher",
+        "CallID": "child_1",
+        "DurationMS": 42,
+        "InputRaw": "",
+        "IsError": true,
+        "Output": "exit 2\nbad",
+        "ParentCallID": "parent_1",
+        "Phase": "end",
+        "Tool": "Bash"
+      },
+      "input": {
+        "agent_name": "researcher",
+        "is_error": true,
+        "output": "exit 2\nbad",
+        "parent_call_id": "parent_1",
+        "tool": "Bash",
+        "tool_duration_ms": 42,
+        "tool_use_id": "child_1",
+        "type": "tool_end"
+      },
+      "name": "child-tool-1",
+      "operation": "child_event"
+    },
+    {
+      "expected": [
+        "task_2"
+      ],
+      "input": [
+        {
+          "actor": "tester",
+          "event_id": "event_1",
+          "payload": {
+            "created_at": "2000-01-01T00:00:00.000000001Z",
+            "project_id": "test-project",
+            "schema_version": 1,
+            "state_dir": "/fixture/state",
+            "updated_at": "2000-01-01T00:00:00.000000002Z",
+            "workdir": "/fixture/repo"
+          },
+          "project_id": "test-project",
+          "seq": 1,
+          "time": "2000-01-01T00:00:00.000000002Z",
+          "type": "project.initialized"
+        },
+        {
+          "actor": "tester",
+          "event_id": "event_2",
+          "payload": {
+            "created_at": "2000-01-01T00:00:00.000000003Z",
+            "id": "task_1",
+            "priority": 1,
+            "status": "open",
+            "title": "Set up schema",
+            "type": "task",
+            "updated_at": "2000-01-01T00:00:00.000000003Z"
+          },
+          "project_id": "test-project",
+          "seq": 2,
+          "time": "2000-01-01T00:00:00.000000003Z",
+          "type": "task.created"
+        },
+        {
+          "actor": "tester",
+          "event_id": "event_3",
+          "payload": {
+            "created_at": "2000-01-01T00:00:00.000000004Z",
+            "depends_on": [
+              "task_1"
+            ],
+            "id": "task_2",
+            "priority": 2,
+            "status": "open",
+            "title": "Use schema",
+            "type": "task",
+            "updated_at": "2000-01-01T00:00:00.000000004Z"
+          },
+          "project_id": "test-project",
+          "seq": 3,
+          "time": "2000-01-01T00:00:00.000000004Z",
+          "type": "task.created"
+        },
+        {
+          "actor": "tester",
+          "event_id": "event_4",
+          "payload": {
+            "actor": "tester",
+            "at": "2000-01-01T00:00:00.000000005Z",
+            "id": "task_1"
+          },
+          "project_id": "test-project",
+          "seq": 4,
+          "time": "2000-01-01T00:00:00.000000005Z",
+          "type": "task.claimed"
+        },
+        {
+          "actor": "tester",
+          "event_id": "event_5",
+          "payload": {
+            "at": "2000-01-01T00:00:00.000000006Z",
+            "id": "task_1",
+            "reason": "done",
+            "task": {
+              "assignee": "tester",
+              "blocks": [
+                "task_2"
+              ],
+              "closed_at": "2000-01-01T00:00:00.000000006Z",
+              "comments": [
+                {
+                  "actor": "tester",
+                  "body": "Closed: done",
+                  "created_at": "2000-01-01T00:00:00.000000006Z",
+                  "id": "comment_1"
+                }
+              ],
+              "created_at": "2000-01-01T00:00:00.000000003Z",
+              "id": "task_1",
+              "priority": 1,
+              "status": "closed",
+              "title": "Set up schema",
+              "type": "task",
+              "updated_at": "2000-01-01T00:00:00.000000006Z"
+            }
+          },
+          "project_id": "test-project",
+          "seq": 5,
+          "time": "2000-01-01T00:00:00.000000006Z",
+          "type": "task.closed"
+        }
+      ],
+      "name": "state-ready-after-close-and-reopen",
+      "operation": "state_ready"
+    }
+  ],
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+}

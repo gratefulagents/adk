@@ -1,0 +1,44 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-p=2",
+    "-count=1",
+    "-timeout=180s",
+    "-json",
+    "-run",
+    "Test(NewSessionEventStream|ContentEventLine|BuildConversation|BuildWorkingState|BuildAssistantTurn|SelectNextUser|CollectImmediate|ChatLoop|QuickAction|ExtractAskUser|ExtractPresentPlan|DetectUserInput|BuildAutoTurn)",
+    "./pkg/agentsdk"
+  ],
+  "cwd": "repos/sdk",
+  "environment": {
+    "PATH": "/opt/gratefulagents/bin:/workspace/scratch/go/bin:/usr/local/java/bin:/usr/lib/llvm-22/bin:/usr/local/cargo/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gratefulagents/fallback/bin",
+    "GOPATH": "/workspace/scratch/go",
+    "GOMODCACHE": "/workspace/scratch/go/pkg/mod",
+    "GOCACHE": "/workspace/scratch/go-build",
+    "TMPDIR": "/tmp",
+    "HOME": "/workspace/repo/scripts/replay/.home",
+    "GOROOT": "/usr/local/go",
+    "GOTOOLCHAIN": "local",
+    "GOTELEMETRY": "off",
+    "GRATEFUL_LIVE_TESTS": "skip",
+    "GOMAXPROCS": "2",
+    "CGO_ENABLED": "0"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 1.166,
+  "test_events": {
+    "pass": 20,
+    "fail": 0,
+    "skip": 0
+  },
+  "packages": [
+    {
+      "Package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "Action": "pass",
+      "Elapsed": 1.003
+    }
+  ],
+  "revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+}

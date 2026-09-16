@@ -1,0 +1,57 @@
+{
+  "artifact_sha256": {
+    "inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98",
+    "sources.json": "575dadda068f610e1a8776a3f79cca4642cfffb486992269784818f8f3091b20"
+  },
+  "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "counts": {
+    "apis": 5859,
+    "artifacts": 62,
+    "capabilities": 81,
+    "cli_flags": 49,
+    "configuration": 253,
+    "defaults": 118,
+    "environment": 133,
+    "evals_and_automation": 23,
+    "examples": 57,
+    "files": 460,
+    "os_constraints": 31,
+    "os_runtime_checks": 30,
+    "packages": 74,
+    "registrations": 128,
+    "subtests": 261,
+    "tests": 1182,
+    "tool_parameters": 191,
+    "tools": 62,
+    "verification_groups": 88
+  },
+  "distinct_literal_tool_names": 53,
+  "generator_sha256": "bb25b74c1653bbf9f38b2db1bd7be6a00cf779cff4cf48685245c565d521c075",
+  "linked_exported_variables": 101,
+  "parse_failures": 0,
+  "parsed_go_files": 398,
+  "public_exported_declaration_counts": {
+    "const": 191,
+    "field": 1157,
+    "function": 292,
+    "interface-method": 95,
+    "method": 644,
+    "type": 475,
+    "var": 111
+  },
+  "resolved_type_aliases": 205,
+  "routes_sha256": "f65b208ef3b22873418ddec3156e5b16f118dd5049fc5f8b3cffe4e8036b6310",
+  "schema_version": 1,
+  "sdk_version": "v0.0.115",
+  "source_verification": "git pin and tag, clean checkout, all tracked files parsed or archived; not SDK test execution",
+  "tool_types_without_literal_schema": [
+    "internal/agent.FunctionTool",
+    "internal/agent.policyToolWrapper",
+    "pkg/agentsdk/tools/shell.BashStartTool",
+    "pkg/agentsdk/tools/shell.BashTool",
+    "pkg/agentsdk/tools/shell.ReadOnlyBashTool",
+    "pkg/agentsdk/tools/shell.WorkspaceWriteBashTool"
+  ],
+  "tracked_files": 460,
+  "unmapped_records": 0
+}

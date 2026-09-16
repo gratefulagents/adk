@@ -1,0 +1,59 @@
+sdk-core 0 {'pass': 401, 'fail': 0, 'skip': 0}
+sdk-session 0 {'pass': 20, 'fail': 0, 'skip': 0}
+platform-state 0 {'pass': 21, 'fail': 0, 'skip': 0}
+platform-transcript 0 {'pass': 3, 'fail': 0, 'skip': 0}
+exported sdk: 6 cases
+exported platform: 1 cases
+exported sdk: 6 cases
+exported platform: 1 cases
+PASS: independent Go exports and provenance manifests are byte-identical
+test_changed_call_reference_is_not_equivalent (test_replay.ReplayTests.test_changed_call_reference_is_not_equivalent) ... ok
+test_duplicate_object_keys_are_rejected (test_replay.ReplayTests.test_duplicate_object_keys_are_rejected) ... ok
+test_false_is_not_omission (test_replay.ReplayTests.test_false_is_not_omission) ... ok
+test_false_is_not_zero (test_replay.ReplayTests.test_false_is_not_zero) ... ok
+test_go_reference_outputs_match_python_replay (test_replay.ReplayTests.test_go_reference_outputs_match_python_replay) ... ok
+test_nonexistent_dependency_is_rejected (test_replay.ReplayTests.test_nonexistent_dependency_is_rejected) ... ok
+test_nonfinite_number_is_rejected (test_replay.ReplayTests.test_nonfinite_number_is_rejected) ... ok
+test_normalization_is_idempotent (test_replay.ReplayTests.test_normalization_is_idempotent) ... ok
+test_normalization_retains_dependency_relationship (test_replay.ReplayTests.test_normalization_retains_dependency_relationship) ... ok
+test_null_is_not_empty_array (test_replay.ReplayTests.test_null_is_not_empty_array) ... ok
+test_object_key_order_is_ignored (test_replay.ReplayTests.test_object_key_order_is_ignored) ... ok
+test_reordered_items_are_not_equivalent (test_replay.ReplayTests.test_reordered_items_are_not_equivalent) ... ok
+test_state_sequence_reordering_is_rejected (test_replay.ReplayTests.test_state_sequence_reordering_is_rejected) ... ok
+test_unknown_operation_is_rejected (test_replay.ReplayTests.test_unknown_operation_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.002s
+
+OK
+PASS: 7 cases; exact ordered values and identity relationships retained
+PASS: 7 cases; exact ordered values and identity relationships retained
+PASS: CLI rejects mutated parent-call relationship, exit 1
+PASS: licenses byte-identical
+PASS: both repository worktrees unchanged
+
+Parent review follow-up: fixed RFC3339Nano chronology (trimmed fractional zeros); added exact-nanosecond, equal-instant and invalid-format regressions.
+test_changed_call_reference_is_not_equivalent (test_replay.ReplayTests.test_changed_call_reference_is_not_equivalent) ... ok
+test_duplicate_object_keys_are_rejected (test_replay.ReplayTests.test_duplicate_object_keys_are_rejected) ... ok
+test_false_is_not_omission (test_replay.ReplayTests.test_false_is_not_omission) ... ok
+test_false_is_not_zero (test_replay.ReplayTests.test_false_is_not_zero) ... ok
+test_go_reference_outputs_match_python_replay (test_replay.ReplayTests.test_go_reference_outputs_match_python_replay) ... ok
+test_nonexistent_dependency_is_rejected (test_replay.ReplayTests.test_nonexistent_dependency_is_rejected) ... ok
+test_nonfinite_number_is_rejected (test_replay.ReplayTests.test_nonfinite_number_is_rejected) ... ok
+test_normalization_is_idempotent (test_replay.ReplayTests.test_normalization_is_idempotent) ... ok
+test_normalization_orders_trimmed_nanoseconds_chronologically (test_replay.ReplayTests.test_normalization_orders_trimmed_nanoseconds_chronologically) ... ok
+test_normalization_preserves_equal_instants_with_different_precision (test_replay.ReplayTests.test_normalization_preserves_equal_instants_with_different_precision) ... ok
+test_normalization_rejects_unsupported_timestamp_format (test_replay.ReplayTests.test_normalization_rejects_unsupported_timestamp_format) ... ok
+test_normalization_retains_dependency_relationship (test_replay.ReplayTests.test_normalization_retains_dependency_relationship) ... ok
+test_null_is_not_empty_array (test_replay.ReplayTests.test_null_is_not_empty_array) ... ok
+test_object_key_order_is_ignored (test_replay.ReplayTests.test_object_key_order_is_ignored) ... ok
+test_reordered_items_are_not_equivalent (test_replay.ReplayTests.test_reordered_items_are_not_equivalent) ... ok
+test_state_sequence_reordering_is_rejected (test_replay.ReplayTests.test_state_sequence_reordering_is_rejected) ... ok
+test_unknown_operation_is_rejected (test_replay.ReplayTests.test_unknown_operation_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.004s
+
+OK
+PASS: fresh offline Go export after normalization fix matches both fixture files and manifest byte-for-byte.
+PASS: parent independently recounted compressed Go logs: 445 pass events, 0 failures/skips.

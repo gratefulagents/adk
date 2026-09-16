@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "contract_id": "source-parity-v1",
+  "meaning": "Each acceptance_id names a future source-parity obligation, not an existing executable test or a passing result.",
+  "baseline_implementation_status": "not_implemented",
+  "baseline_verification_status": "not_run",
+  "required_completion_evidence": [
+    "Rust implementation commit and symbol or artifact path in the assigned module",
+    "Executable Rust regression identifier or explicitly justified documentation/artifact review",
+    "Passing command output linked to the acceptance ID, including platform and relevant configuration",
+    "Review of the referenced complete SDK source, not only its signature or literal schema",
+    "Explicit approved divergence for any intentionally changed behavior"
+  ],
+  "category_obligations": {
+    "apis": "Preserve the referenced public contract or internal behavior needed by public consumers: field/tag/serialization semantics, signature intent, alias/member relationships, defaults, errors, cancellation, concurrency and ownership. Rust syntax need not mirror Go.",
+    "packages": "Account for the package's files, exported API and host/internal boundaries in the proposed module and regress its candidate Go tests.",
+    "tools": "Match tool name, description, complete input schema, runtime default/clamp behavior, results/errors, approval, timeout, permission and enablement semantics for applicable configurations. Dynamic adapters require host/MCP fixtures.",
+    "tool_parameters": "Preserve property type, enum, requiredness, bounds and nested schema; distinguish JSON defaults, documented defaults and actual runtime defaults. Trace back to the parent tool.",
+    "capabilities": "Exercise feature selection, disabled paths, host-only requirements and interactions with permissions. Follow verification_group_id to concrete candidate Go regressions; establish symbol-specific Rust assertions.",
+    "registrations": "Verify the registration call or literal in its enclosing branch, with default, opted-in, disabled and permission-specific cases. A static occurrence is not an unconditional registration.",
+    "cli_flags": "Match parsing, help, default initializer and environment precedence, validation, output/exit behavior and post-parse normalization. Distinguish Go standard flag behavior from explicit SDK registrations.",
+    "environment": "Match key/expression, fallback, precedence and invalid/absent-value behavior without persisting credentials. Test production sites separately from test-only reads.",
+    "configuration": "Translate the complete configuration/constructor/registry function and its referenced types and helpers; test resolved effective configuration rather than guessing from field names.",
+    "defaults": "Preserve the literal and surrounding override/normalization logic; evaluate environment-dependent or computed defaults in fixtures.",
+    "tests": "Port or explicitly replace the referenced Go entry point, including live/skip gates, failure assertions and platform guards. This inventory did not run it.",
+    "subtests": "Port the enclosing table/callback and data-dependent cases; one static Run call is not one runtime test case.",
+    "examples": "Provide runnable idiomatic Rust usage for the file's demonstrated capabilities, retaining credential/live-test prerequisites where applicable.",
+    "evals_and_automation": "Preserve eval tasks/assertions, audit fixtures, scoring, adapters, workflow gates and script behavior, or record a reviewed replacement. No eval has been executed by this baseline.",
+    "os_constraints": "Exercise each supported build constraint or document an intentional unsupported platform with equivalent safe failure behavior.",
+    "os_runtime_checks": "Verify both sides of runtime platform conditionals on applicable OSes, especially confinement, PTY/process lifecycle and fallback behavior.",
+    "artifacts": "Review and migrate the complete non-Go file contract, configuration/fixture contents, dependencies, legal notices or documentation as appropriate. File-level coverage does not imply semantic normalization.",
+    "files": "Retain traceability from the exact source hash to migrated behavior or an explicit reviewed non-code/artifact disposition.",
+    "verification_groups": "Review all listed concrete Go regression references, fill explicit coverage gaps and attach executable Rust tests. Module association is not measured symbol coverage."
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-mod=readonly",
+    "-p=2",
+    "-count=1",
+    "-timeout=120s",
+    "./pkg/agentsdk/events",
+    "./pkg/agentsdk/projectstate",
+    "./pkg/agentsdk/policy",
+    "./pkg/agentsdk/mode"
+  ],
+  "cwd": "repos/sdk",
+  "environment": {
+    "HOME": "/tmp/home",
+    "TMPDIR": "/tmp",
+    "GOMODCACHE": "/workspace/scratch/go/pkg/mod",
+    "GOCACHE": "/workspace/scratch/go-build",
+    "PATH": "/opt/gratefulagents/bin:/workspace/scratch/go/bin:/usr/local/java/bin:/usr/lib/llvm-22/bin:/usr/local/cargo/bin:/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/gratefulagents/fallback/bin",
+    "GOPATH": "/workspace/scratch/go",
+    "GOROOT": "/usr/local/go",
+    "GOTOOLCHAIN": "local",
+    "GOTELEMETRY": "off",
+    "GRATEFUL_LIVE_TESTS": "skip",
+    "GOMAXPROCS": "2"
+  },
+  "exit_code": 0,
+  "elapsed_seconds": 20.158
+}

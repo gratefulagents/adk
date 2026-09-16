@@ -1,0 +1,173 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "floor_message_id": 3,
+        "items": [
+          {
+            "message": {
+              "text": "user asks"
+            },
+            "type": "message"
+          },
+          {
+            "agent": "main",
+            "reasoning": {
+              "encrypted_content": "enc",
+              "id": "r1",
+              "signature": "sig",
+              "text": "thinking"
+            },
+            "type": "reasoning"
+          },
+          {
+            "agent": "main",
+            "tool_call": {
+              "id": "call-1",
+              "input": {
+                "path": "a.go"
+              },
+              "name": "read_file"
+            },
+            "type": "tool_call"
+          },
+          {
+            "tool_output": {
+              "call_id": "call-1",
+              "content": "file contents"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent": "main",
+            "handoff_call": {
+              "from_agent": "main",
+              "to_agent": "executor"
+            },
+            "type": "handoff_call"
+          },
+          {
+            "handoff_output": {
+              "from_agent": "main",
+              "to_agent": "executor"
+            },
+            "type": "handoff_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "call-2",
+              "input": {},
+              "tool_name": "bash"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent": "main",
+            "compaction": {
+              "content": "summary of dropped history",
+              "created_by": "compactor",
+              "id": "c1"
+            },
+            "type": "compaction"
+          },
+          {
+            "agent": "main",
+            "message": {
+              "text": "assistant replies"
+            },
+            "type": "message"
+          }
+        ],
+        "seen_message_id": 17,
+        "self_assistant_message_id": 18,
+        "version": 1
+      },
+      "input": {
+        "floor_message_id": 3,
+        "items": [
+          {
+            "message_text": "user asks",
+            "type": "message"
+          },
+          {
+            "agent_name": "main",
+            "reasoning": {
+              "encrypted_content": "enc",
+              "id": "r1",
+              "signature": "sig",
+              "text": "thinking",
+              "thinking": "thinking"
+            },
+            "reasoning_text": "thinking",
+            "thinking_text": "thinking",
+            "type": "reasoning"
+          },
+          {
+            "agent_name": "main",
+            "tool_call": {
+              "id": "call-1",
+              "input": {
+                "path": "a.go"
+              },
+              "name": "read_file"
+            },
+            "type": "tool_call"
+          },
+          {
+            "tool_output": {
+              "call_id": "call-1",
+              "content": "file contents"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "main",
+            "handoff_call": {
+              "from_agent": "main",
+              "to_agent": "executor"
+            },
+            "type": "handoff_call"
+          },
+          {
+            "handoff_output": {
+              "from_agent": "main",
+              "to_agent": "executor"
+            },
+            "type": "handoff_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "call-2",
+              "input": {},
+              "tool_name": "bash"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "main",
+            "compaction": {
+              "content": "summary of dropped history",
+              "created_by": "compactor",
+              "id": "c1"
+            },
+            "type": "compaction"
+          },
+          {
+            "agent_name": "main",
+            "message_text": "assistant replies",
+            "type": "message"
+          }
+        ],
+        "seen_message_id": 17,
+        "self_assistant_message_id": 18,
+        "version": 1
+      },
+      "name": "platform-all-item-types-roundtrip",
+      "operation": "persist_transcript"
+    }
+  ],
+  "platform_revision": "08e65c970830f05042c251bcbb46ec6a9e3719b9",
+  "schema_version": 1
+}

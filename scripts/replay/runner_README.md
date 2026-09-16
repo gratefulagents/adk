@@ -56,7 +56,11 @@ wrapped model history are compared without delimiter normalization. Four default
 budget cases map Go zero/negative sentinels to the public Rust policy default.
 Two actual ChatLoop/Conversation cases cover success and turn-limit partials:
 Go's nil result slot is recovered from MaxTurnsExceeded.PartialResult itself.
-The corpus now contains **42 cases**.
+Two additional normal-path cases compare actual Go ChatLoop approval handling
+with Rust continuation for one and two approved calls. An eligible sibling must
+execute exactly once. Shared dispatch recording includes approved tools, and all
+hooks, requests, history and final usage are compared across the entire resume.
+The corpus now contains **44 cases**.
 
 ## Canonical comparison boundary
 
@@ -91,7 +95,7 @@ The corpus now contains **42 cases**.
   matching Rust `pending_approvals`. They are omitted from the model-facing
   history and committed-item event projection. All non-approval entries retain
   order and content. Approval event timing/wire marker identity is NOT compared.
-* This corpus does not claim parity for policy denial, approval resume, cancellation,
+* This corpus does not claim parity for policy denial, denied/re-deferred/streamed approval resume, cancellation,
   general retry/advice policy, handoffs, arbitrary custom parser implementations, other provider
   failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate

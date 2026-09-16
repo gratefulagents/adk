@@ -153,7 +153,7 @@ impl StreamingModel for ScriptModel {
 
 struct Echo {
     definition: ToolDefinition,
-    dispatch: Mutex<Vec<Value>>,
+    dispatch: Arc<Mutex<Vec<Value>>>,
 }
 impl Tool for Echo {
     fn definition(&self) -> &ToolDefinition {
@@ -300,7 +300,7 @@ async fn replay(script: &Value) -> Value {
             name:"echo".into(),description:"Echo text".into(),
             input_schema:serde_json::from_value(json!({"type":"object","properties":{"text":{"type":"string"}},"required":["text"]})).unwrap(),
             read_only:true, requires_approval:false,
-        }, dispatch:Mutex::new(vec![]),
+        }, dispatch:Arc::new(Mutex::new(vec![])),
     });
     let binding = if streaming {
         ModelBinding::streaming("replay-model", model.clone())
@@ -316,7 +316,7 @@ async fn replay(script: &Value) -> Value {
         definition.requires_approval = true;
         agent.tools.push(Arc::new(Echo {
             definition,
-            dispatch: Mutex::new(vec![]),
+            dispatch: tool.dispatch.clone(),
         }));
     }
     if let Some(names) = script["fallbacks"].as_array() {
@@ -404,11 +404,24 @@ async fn replay(script: &Value) -> Value {
     } else {
         runner.run(context, request, host.clone()).await
     };
+    let resumed = script["resume"].as_bool() == Some(true);
+    let outcome = if resumed {
+        let paused = outcome.unwrap();
+        let decisions = paused
+            .result
+            .pending_approvals
+            .iter()
+            .map(|request| (request.call.id.clone(), ApprovalDecision::Approve))
+            .collect();
+        paused.continuation.unwrap().resume_batch(decisions).await
+    } else {
+        outcome
+    };
     let (result, error) = match outcome {
         Ok(outcome) => {
             assert_eq!(
                 outcome.continuation.is_some(),
-                script["approvals"].as_bool() == Some(true)
+                script["approvals"].as_bool() == Some(true) && !resumed
             );
             assert!(outcome.spills.is_empty());
             (outcome.result, Value::Null)
@@ -425,7 +438,7 @@ async fn replay(script: &Value) -> Value {
     };
     assert_eq!(
         result.pending_approvals.is_empty(),
-        script["approvals"].as_bool() != Some(true)
+        script["approvals"].as_bool() != Some(true) || resumed
     );
     assert!(
         model.responses.lock().unwrap().is_empty(),
@@ -482,7 +495,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 42);
+    assert_eq!(cases.len(), 44);
     assert_eq!(
         cases
             .iter()

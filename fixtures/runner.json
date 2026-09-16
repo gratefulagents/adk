@@ -9273,6 +9273,630 @@
         "streaming": true,
         "untrusted": true
       }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "name": "echo",
+            "output": "echo: eligible sibling"
+          },
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "name": "approval",
+            "output": "echo: first approval"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "id": "eligible",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "eligible",
+            "is_error": false,
+            "output": "echo: eligible sibling",
+            "type": "tool_end"
+          },
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "id": "pending1",
+            "name": "approval",
+            "type": "tool_start"
+          },
+          {
+            "id": "pending1",
+            "is_error": false,
+            "output": "echo: first approval",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: first approval",
+              "id": "pending1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 8,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: first approval",
+              "id": "pending1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 4,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "pending": [],
+        "requests": [
+          {
+            "input": [],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          },
+          {
+            "input": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: eligible sibling",
+                "id": "eligible",
+                "type": "tool_result"
+              },
+              {
+                "content": "echo: first approval",
+                "id": "pending1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "approvals": true,
+        "chat_loop": true,
+        "input": [],
+        "max_turns": 3,
+        "name": "approval_resume_1",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "resume": true,
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "name": "echo",
+            "output": "echo: eligible sibling"
+          },
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "name": "approval",
+            "output": "echo: first approval"
+          },
+          {
+            "arguments": {
+              "text": "second approval"
+            },
+            "name": "approval",
+            "output": "echo: second approval"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "id": "eligible",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "eligible",
+            "is_error": false,
+            "output": "echo: eligible sibling",
+            "type": "tool_end"
+          },
+          {
+            "arguments": {
+              "text": "first approval"
+            },
+            "id": "pending1",
+            "name": "approval",
+            "type": "tool_start"
+          },
+          {
+            "id": "pending1",
+            "is_error": false,
+            "output": "echo: first approval",
+            "type": "tool_end"
+          },
+          {
+            "arguments": {
+              "text": "second approval"
+            },
+            "id": "pending2",
+            "name": "approval",
+            "type": "tool_start"
+          },
+          {
+            "id": "pending2",
+            "is_error": false,
+            "output": "echo: second approval",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: first approval",
+              "id": "pending1",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: second approval",
+              "id": "pending2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 8,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "first approval"
+              },
+              "id": "pending1",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "eligible sibling"
+              },
+              "id": "eligible",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "second approval"
+              },
+              "id": "pending2",
+              "name": "approval",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: eligible sibling",
+              "id": "eligible",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: first approval",
+              "id": "pending1",
+              "type": "tool_result"
+            },
+            {
+              "content": "echo: second approval",
+              "id": "pending2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 4,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "pending": [],
+        "requests": [
+          {
+            "input": [],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          },
+          {
+            "input": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: eligible sibling",
+                "id": "eligible",
+                "type": "tool_result"
+              },
+              {
+                "content": "echo: first approval",
+                "id": "pending1",
+                "type": "tool_result"
+              },
+              {
+                "content": "echo: second approval",
+                "id": "pending2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "approval"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "approvals": true,
+        "chat_loop": true,
+        "input": [],
+        "max_turns": 3,
+        "name": "approval_resume_2",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "resume": true,
+        "streaming": false
+      }
     }
   ],
   "schema_version": 1,

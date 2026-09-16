@@ -32,6 +32,7 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
+	Resume       bool            `json:"resume"`
 	ChatLoop     bool            `json:"chat_loop"`
 	Untrusted    bool            `json:"untrusted"`
 	OutputCap    int             `json:"output_cap"`
@@ -153,6 +154,12 @@ func (h *recordingHooks) OnAgentEnd(_ *sdk.RunContext, a *sdk.Agent, output any)
 	h.append(object{"type": "agent_end", "agent": a.Name, "output": output})
 }
 
+type approvalGate struct{}
+
+func (approvalGate) ApproveTool(context.Context, sdk.ToolApprovalRequest) (bool, string, error) {
+	return true, "", nil
+}
+
 func execute(s scenario) object {
 	m := &model{script: s.Responses, requests: []object{}}
 	dispatch := []object{}
@@ -172,7 +179,20 @@ func execute(s scenario) object {
 		approval := *tool
 		approval.ToolName = "approval"
 		approval.Approval = true
-		approval.Fn = func(context.Context, json.RawMessage) (string, error) { panic("unapproved effect executed") }
+		approval.Fn = func(_ context.Context, input json.RawMessage) (string, error) {
+			if !s.Resume {
+				panic("unapproved effect executed")
+			}
+			var args struct {
+				Text string `json:"text"`
+			}
+			if err := json.Unmarshal(input, &args); err != nil {
+				panic(err)
+			}
+			output := "echo: " + args.Text
+			dispatch = append(dispatch, object{"name": "approval", "arguments": input, "output": output})
+			return output, nil
+		}
 		agent.Tools = append(agent.Tools, &approval)
 	}
 	agent.FallbackModels = s.Fallbacks
@@ -236,7 +256,11 @@ func execute(s scenario) object {
 		if len(s.Input) != 0 {
 			panic("chat loop fixture must start with empty history")
 		}
-		result, err = sdk.NewChatLoop(sdk.ChatLoopOptions{Runner: runner, Agent: agent, RunConfig: cfg}).Run(context.Background())
+		opts := sdk.ChatLoopOptions{Runner: runner, Agent: agent, RunConfig: cfg}
+		if s.Resume {
+			opts.ApprovalGate = approvalGate{}
+		}
+		result, err = sdk.NewChatLoop(opts).Run(context.Background())
 	} else {
 		result, err = runner.Run(context.Background(), agent, convert(s.Input), cfg)
 	}

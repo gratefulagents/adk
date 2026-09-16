@@ -74,7 +74,7 @@ Fixture comparisons preserve absent/null/false/empty differences, array order,
 UTF-8 and numeric representations. See codec tests for bounded edge coverage;
 passing seven reference cases does not establish full Go SDK or platform parity.
 The additional [runner replay](scripts/replay/runner_README.md) executes the real
-Go and Rust engines over 42 deterministic normal/streaming scenarios,
+Go and Rust engines over 44 deterministic normal/streaming scenarios,
 comparing dispatch, semantic event order, history and final/partial outcomes:
 
 ```sh

@@ -8,6 +8,12 @@ See `LICENSE`, `crates/adk-platform/LICENSE`, and `fixtures/NOTICE.md` for licen
 texts, original provenance and notices. The offline harness links the platform
 codec and is therefore explicitly on the platform side of the boundary.
 
+Execution-policy and secret/shell regression provenance is recorded in
+[`crates/adk-security/NOTICE.md`](crates/adk-security/NOTICE.md). The optional
+sandbox invokes host-installed Bubblewrap or Seatbelt; it does not redistribute
+those OS/backend binaries. Research comparisons do not relicense or copy the
+external agent implementations cited in the design document.
+
 Third-party dependencies retain their respective licenses; `deny.toml` checks the
 resolved all-feature dependency graph against an explicit SPDX allowlist. This
 is an engineering gate, not legal advice or permission to ignore license duties.

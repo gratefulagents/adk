@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/adk-providers", "crates/adk-core", "crates/adk-codec", "crates/adk-runtime", "crates/adk", "crates/adk-platform", "bins/adk-agent", "bins/adk-harness"]
+members = ["crates/adk-security", "crates/adk-sandbox", "crates/adk-providers", "crates/adk-core", "crates/adk-codec", "crates/adk-runtime", "crates/adk", "crates/adk-platform", "bins/adk-agent", "bins/adk-harness"]
 default-members = ["crates/adk", "crates/adk-core", "crates/adk-codec"]
 
 [workspace.package]

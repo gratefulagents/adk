@@ -12,12 +12,15 @@ compat = ["dep:adk-codec"]
 runtime = ["dep:adk-runtime"]
 providers = ["dep:adk-providers"]
 providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
+execution = ["dep:adk-security", "dep:adk-sandbox"]
 
 [dependencies]
 adk-core.workspace = true
 adk-codec = { workspace = true, optional = true }
 adk-runtime = { workspace = true, optional = true }
 adk-providers = { version = "0.1.0", path = "../adk-providers", optional = true }
+adk-security = { version = "0.1.0", path = "../adk-security", optional = true }
+adk-sandbox = { version = "0.1.0", path = "../adk-sandbox", optional = true }
 
 [dev-dependencies]
 tokio.workspace = true

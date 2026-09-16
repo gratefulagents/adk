@@ -26,15 +26,16 @@ use std::{
     time::{Duration, Instant},
 };
 
+use adk_codec::approval::ApprovalMarkerBoundary;
 use adk_core::*;
 use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_for_request,
-    estimate_history_tokens, estimate_request_overhead_tokens, finalize_local_history,
-    output_reserve_tokens,
+    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_approvals,
+    estimate_history_tokens, estimate_history_tokens_with_approvals,
+    estimate_request_overhead_tokens, finalize_local_history_with_approvals, output_reserve_tokens,
 };
 use crate::output::{OutputPolicy, SpillFile};
 
@@ -156,8 +157,16 @@ pub trait CostEstimator: Send + Sync {
 
 #[derive(Debug, Clone)]
 pub enum Observation {
+    TextDelta {
+        delta: String,
+    },
+    CommittedItems {
+        items: Vec<RunItem>,
+        agents: Vec<Option<adk_codec::dto::AgentRef>>,
+        markers: Vec<ApprovalMarkerBoundary>,
+    },
     ApprovalMarker {
-        agent: String,
+        agent: Option<String>,
         call: ToolCall,
         decision: ApprovalDecision,
         reason: Option<String>,
@@ -167,6 +176,11 @@ pub enum Observation {
     HistoryReplaced {
         before: Vec<RunItem>,
         after: Vec<RunItem>,
+    },
+    ApprovalHistoryReplaced {
+        before: Vec<RunItem>,
+        after: Vec<RunItem>,
+        markers: Vec<ApprovalMarkerBoundary>,
     },
     AgentStarted {
         agent: String,
@@ -300,6 +314,14 @@ pub trait TurnContext: Send + Sync {
     ) -> BoxFuture<'a, Result<Vec<RunItem>, Error>>;
 }
 
+/// None accepts the answer; Some(feedback) asks the same engine to continue.
+pub trait StopGate: Send + Sync {
+    fn check<'a>(
+        &'a self,
+        context: &'a Context,
+        output: &'a Value,
+    ) -> BoxFuture<'a, Result<Option<String>, Error>>;
+}
 pub struct RunnerConfig {
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
@@ -318,6 +340,10 @@ pub struct RunnerConfig {
     pub return_tool_output: bool,
     /// Optional native guardrail; Go leaves argument decoding/validation to each tool.
     pub validate_tool_arguments: bool,
+    pub approve_mutating_tools: bool,
+    pub consecutive_tool_error_limit: Option<usize>,
+    pub stop_gate: Option<Arc<dyn StopGate>>,
+    pub stop_gate_max_blocks: usize,
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
@@ -343,6 +369,10 @@ impl Default for RunnerConfig {
             prompt_cache_namespace: None,
             return_tool_output: false,
             validate_tool_arguments: false,
+            approve_mutating_tools: false,
+            consecutive_tool_error_limit: Some(3),
+            stop_gate: None,
+            stop_gate_max_blocks: 8,
             turn_context: None,
             transient_context: vec![],
             hooks: None,
@@ -395,6 +425,7 @@ impl Continuation {
     ) -> Result<RunOutcome, RunError> {
         self.engine.result.status = RunStatus::Incomplete;
         self.engine.tools_prepared = true;
+        self.engine.streaming = false;
         self.engine.sender.take();
         while let Some(call) = self.engine.calls.front().cloned() {
             let Some(request) = self
@@ -439,6 +470,10 @@ impl Continuation {
             }
         }
         self.engine.turns = 0;
+        self.engine.policy.max_turns = self.engine.base_turn_limit;
+        self.engine.stop_gate_blocks = 0;
+        self.engine.consecutive_tool_errors = 0;
+        self.engine.tool_error_escalated = false;
         self.engine.fallbacks.clear();
         self.engine.calibration = EstimateCalibration::default();
         self.engine.tool_final = None;
@@ -542,6 +577,9 @@ impl Runner {
         validate_agent(&agent, &mut HashSet::new())?;
         config.output.work_dir = Some(config.work_dir.clone());
         config.local_compaction = config.local_compaction.normalized();
+        if config.stop_gate_max_blocks == 0 {
+            config.stop_gate_max_blocks = 8;
+        }
         if let Some(max) = config.limits.max_cost {
             if !max.is_finite() || max < 0.0 || config.cost_estimator.is_none() {
                 return Err(Error::new(
@@ -580,6 +618,7 @@ impl Runner {
             config: self.config.clone(),
             context,
             host,
+            base_turn_limit: request.policy.max_turns,
             policy: request.policy,
             phase: Phase::Start,
             calls: VecDeque::new(),
@@ -587,8 +626,15 @@ impl Runner {
             denial_reasons: HashMap::new(),
             deferred_calls: VecDeque::new(),
             pending_marker_events: Vec::new(),
+            approval_journal: crate::compat::ApprovalJournal::default(),
             tools_prepared: false,
+            tool_turn_start: None,
+            consecutive_tool_errors: 0,
+            tool_error_escalated: false,
+            stop_gate_blocks: 0,
             turns: 0,
+            committed_cursor: 0,
+            committed_markers: 0,
             calibration: EstimateCalibration::default(),
             fallbacks: HashMap::new(),
             cost: 0.0,
@@ -630,14 +676,22 @@ struct Engine {
     context: Context,
     host: Arc<dyn Host>,
     policy: RunPolicy,
+    base_turn_limit: std::num::NonZeroU32,
     phase: Phase,
     calls: VecDeque<ToolCall>,
     approvals: HashMap<String, ApprovalDecision>,
     denial_reasons: HashMap<String, String>,
     deferred_calls: VecDeque<ToolCall>,
     pending_marker_events: Vec<Observation>,
+    approval_journal: crate::compat::ApprovalJournal,
     tools_prepared: bool,
+    tool_turn_start: Option<usize>,
+    consecutive_tool_errors: usize,
+    tool_error_escalated: bool,
+    stop_gate_blocks: usize,
     turns: u32,
+    committed_cursor: usize,
+    committed_markers: usize,
     calibration: EstimateCalibration,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
@@ -767,6 +821,15 @@ fn text(content: &[Content]) -> String {
 
 impl Engine {
     async fn emit(&self, event: RunEvent) -> Result<(), Error> {
+        if let RunEvent::Model {
+            event: ModelEvent::TextDelta { delta },
+        } = &event
+        {
+            self.observe(Observation::TextDelta {
+                delta: delta.clone(),
+            })
+            .await?;
+        }
         bounded(
             &self.context,
             None,
@@ -785,7 +848,13 @@ impl Engine {
         Ok(())
     }
     async fn observe(&self, observation: Observation) -> Result<(), Error> {
-        let hooks = if matches!(observation, Observation::AgentEnded { .. }) {
+        self.approval_journal
+            .observe(&self.context, observation.clone())
+            .await?;
+        let hooks = if matches!(
+            observation,
+            Observation::AgentEnded { .. } | Observation::Handoff { .. }
+        ) {
             [&self.agent.hooks, &self.config.hooks]
         } else {
             [&self.config.hooks, &self.agent.hooks]
@@ -819,9 +888,64 @@ impl Engine {
         self.result.history.push(item.clone());
         self.result.new_items.push(item);
     }
+    async fn publish_committed(&mut self) -> Result<(), Error> {
+        let entries = self.approval_journal.entries();
+        if self.committed_cursor == self.result.new_items.len()
+            && self.committed_markers == entries.len()
+        {
+            return Ok(());
+        }
+        let items = self.result.new_items[self.committed_cursor..].to_vec();
+        let agents = items
+            .iter()
+            .map(|item| {
+                let no_agent = match item {
+                    RunItem::Message { message } => message.role == Role::User,
+                    RunItem::ToolResult { call_id, .. } => entries.iter().any(|entry| {
+                        entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
+                            && entry.marker.agent.is_none()
+                            && entry.marker.data.call_id == *call_id
+                    }),
+                    _ => false,
+                };
+                (!no_agent).then(|| adk_codec::dto::AgentRef {
+                    name: self.agent.name.clone(),
+                })
+            })
+            .collect();
+        let mut markers = entries[self.committed_markers..]
+            .iter()
+            .map(|entry| {
+                let before_item = entry
+                    .new_items_before
+                    .checked_sub(self.committed_cursor)
+                    .ok_or_else(|| {
+                        Error::new(
+                            ErrorCategory::Internal,
+                            "late approval marker behind committed cursor",
+                        )
+                    })?;
+                Ok(ApprovalMarkerBoundary {
+                    before_item,
+                    marker: entry.marker.clone(),
+                })
+            })
+            .collect::<Result<Vec<_>, Error>>()?;
+        markers.sort_by_key(|marker| marker.before_item);
+        self.observe(Observation::CommittedItems {
+            items,
+            agents,
+            markers,
+        })
+        .await?;
+        self.committed_cursor = self.result.new_items.len();
+        self.committed_markers = entries.len();
+        Ok(())
+    }
     async fn drive(mut self) -> Result<RunOutcome, RunError> {
         let execution = async {
             let status = self.advance().await?;
+            self.publish_committed().await?;
             self.result.status = status;
             self.checkpoint(
                 if status == RunStatus::Paused {
@@ -904,6 +1028,7 @@ impl Engine {
                         for event in std::mem::take(&mut self.pending_marker_events) {
                             self.observe(event).await?;
                         }
+                        self.settle_tool_turn();
                         for request in &self.result.pending_approvals {
                             self.checkpoint(Boundary::ApprovalPending, Some(&request.call))
                                 .await?;
@@ -912,12 +1037,14 @@ impl Engine {
                     } else if self.policy.tool_use == ToolUseBehavior::StopAfterTool
                         && self.tool_final.is_some()
                     {
+                        self.settle_tool_turn();
                         if self.config.return_tool_output {
                             let output = self.tool_final.take().unwrap();
                             self.result.final_output = Some(self.validate_output(output).await?);
                         }
                         self.phase = Phase::Finish;
                     } else {
+                        self.settle_tool_turn();
                         self.phase = Phase::Model;
                         if std::mem::take(&mut self.tool_pause) {
                             return Ok(RunStatus::Paused);
@@ -1037,24 +1164,47 @@ impl Engine {
         })
         .await
     }
-    async fn compact_local(&mut self, request: &mut ModelRequest) -> Result<(), Error> {
-        let policy = self.calibration.apply(self.config.local_compaction);
+    async fn compact_local(
+        &mut self,
+        request: &mut ModelRequest,
+        forced: bool,
+    ) -> Result<bool, Error> {
+        let mut policy = self.config.local_compaction;
+        if policy == LocalCompactionPolicy::default() {
+            policy = LocalCompactionPolicy::for_model(&request.model);
+        }
+        let mut policy = self.calibration.apply(policy);
+        let markers = self
+            .approval_journal
+            .history_markers()
+            .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
         let transient = &request.input[self.result.history.len()..];
         let overhead =
             estimate_request_overhead_tokens(request) + estimate_history_tokens(transient);
-        let before = estimate_history_tokens(&self.result.history) + overhead;
+        let history_estimate =
+            estimate_history_tokens_with_approvals(&self.result.history, &markers);
+        if forced {
+            policy.trigger_tokens = 1;
+            policy.target_tokens = policy.target_tokens.min((history_estimate / 2).max(1));
+        }
+        let before = history_estimate + overhead;
         if !policy.enabled || before <= policy.trigger_tokens {
-            return Ok(());
+            return Ok(false);
         }
         self.observe(Observation::CompactionStarted {
             context_tokens: before,
             target_tokens: policy.target_tokens,
         })
         .await?;
-        let outcome = compact_for_request(
+        let outcome = compact_with_approvals(
             &self.result.history,
+            &markers,
             policy,
-            overhead.min(i64::MAX as u64) as i64,
+            if forced {
+                0
+            } else {
+                overhead.min(i64::MAX as u64) as i64
+            },
         );
         if !outcome.changed {
             if !matches!(outcome.reason, "disabled" | "below-threshold") {
@@ -1066,18 +1216,24 @@ impl Engine {
                 })
                 .await?;
             }
-            return Ok(());
+            return Ok(false);
         }
-        let history = finalize_local_history(&outcome.history, &self.result.history);
+        let (history, markers) = finalize_local_history_with_approvals(
+            &outcome.history,
+            &outcome.markers,
+            &self.result.history,
+            &markers,
+        );
         validate_history_pairs(&history)?;
         let before_items = self.result.history.len();
-        let context_tokens = estimate_history_tokens(&history) + overhead;
+        let context_tokens = estimate_history_tokens_with_approvals(&history, &markers) + overhead;
         let mut input = history.clone();
         input.extend_from_slice(transient);
         request.input = input;
-        self.observe(Observation::HistoryReplaced {
+        self.observe(Observation::ApprovalHistoryReplaced {
             before: self.result.history.clone(),
             after: history.clone(),
+            markers,
         })
         .await?;
         self.result.history = history;
@@ -1087,9 +1243,44 @@ impl Engine {
             after_items: self.result.history.len(),
             context_tokens,
         })
-        .await
+        .await?;
+        Ok(true)
+    }
+    fn settle_tool_turn(&mut self) {
+        let Some(start) = self.tool_turn_start.take() else {
+            return;
+        };
+        let Some(limit) = self
+            .config
+            .consecutive_tool_error_limit
+            .filter(|limit| *limit > 0)
+        else {
+            return;
+        };
+        let errors: Vec<_> = self.result.new_items[start..]
+            .iter()
+            .filter_map(|item| match item {
+                RunItem::ToolResult { output, .. } => Some(output.is_error),
+                _ => None,
+            })
+            .collect();
+        if errors.is_empty() {
+            return;
+        }
+        if errors.iter().all(|error| *error) {
+            self.consecutive_tool_errors = self.consecutive_tool_errors.saturating_add(1);
+        } else {
+            self.consecutive_tool_errors = 0;
+            self.tool_error_escalated = false;
+        }
+        if self.consecutive_tool_errors >= limit && !self.tool_error_escalated {
+            self.tool_error_escalated = true;
+            self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
+        }
     }
     async fn model_turn(&mut self) -> Result<(), Error> {
+        self.settle_tool_turn();
+        self.publish_committed().await?;
         if self.turns >= self.policy.max_turns.get() {
             return Err(Error::new(
                 ErrorCategory::MaxTurns,
@@ -1159,7 +1350,14 @@ impl Engine {
             );
         }
         let mut request = ModelRequest {
-            model: self.agent.model.name().into(),
+            model: self
+                .fallbacks
+                .get(&(Arc::as_ptr(&self.agent) as usize))
+                .map_or_else(
+                    || self.agent.model.name(),
+                    |(index, _)| self.agent.fallbacks[index - 1].name(),
+                )
+                .into(),
             instructions,
             input,
             tools,
@@ -1168,7 +1366,7 @@ impl Engine {
             output_schema_strict: self.agent.output_schema_strict,
             settings,
         };
-        self.compact_local(&mut request).await?;
+        self.compact_local(&mut request, false).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
         let (response, model, streamed) = self.model_response(request).await?;
         self.observe(Observation::ModelAccepted {
@@ -1177,6 +1375,7 @@ impl Engine {
         })
         .await?;
         self.record_response(response.clone(), &model)?;
+        self.publish_committed().await?;
         if !streamed {
             self.emit(RunEvent::Model {
                 event: ModelEvent::Complete {
@@ -1220,11 +1419,14 @@ impl Engine {
             self.calls.push_front(handoff);
         }
         if !self.calls.is_empty() {
+            self.stop_gate_blocks = 0;
+            self.tool_turn_start = Some(self.result.new_items.len());
             self.tool_pause = false;
             self.tool_final = None;
             self.tools_prepared = false;
             self.phase = Phase::Tools;
         } else if response.end_turn == Some(false) {
+            self.stop_gate_blocks = 0;
             self.phase = Phase::Model;
         } else {
             let output = response
@@ -1238,6 +1440,33 @@ impl Engine {
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
+            if let Some(gate) = &self.config.stop_gate {
+                let has_tools = self
+                    .agent
+                    .tools
+                    .iter()
+                    .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
+                    || !self.agent.handoffs.is_empty();
+                if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
+                    if let Some(mut feedback) =
+                        bounded(&self.context, None, gate.check(&self.context, &output)).await?
+                    {
+                        self.stop_gate_blocks += 1;
+                        if feedback.trim().is_empty() {
+                            feedback =
+                                "the finalization check failed; continue working until it passes"
+                                    .into();
+                        }
+                        self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                        if self.turns >= self.policy.max_turns.get() {
+                            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                        }
+                        self.phase = Phase::Model;
+                        return Ok(());
+                    }
+                    self.stop_gate_blocks = 0;
+                }
+            }
             self.result.final_output = Some(output.clone());
             self.observe(Observation::AgentEnded {
                 agent: self.agent.name.clone(),
@@ -1320,7 +1549,7 @@ impl Engine {
     }
     async fn model_response(
         &mut self,
-        request: ModelRequest,
+        mut request: ModelRequest,
     ) -> Result<(ModelResponse, String, bool), Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
@@ -1347,13 +1576,20 @@ impl Engine {
                     attempt,
                 })
                 .await?;
-                let mut request = request.clone();
-                request.model = binding.name().into();
-                let estimated_prompt = estimate_history_tokens(&request.input)
-                    + estimate_request_overhead_tokens(&request)
-                    - output_reserve_tokens(&request)
-                    - REQUEST_SAFETY_BUFFER;
-                match self.model_attempt(binding, request).await {
+                if request.model != binding.name() {
+                    request.model = binding.name().into();
+                    self.compact_local(&mut request, false).await?;
+                }
+                let markers = self
+                    .approval_journal
+                    .history_markers()
+                    .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+                let estimated_prompt =
+                    estimate_history_tokens_with_approvals(&request.input, &markers)
+                        + estimate_request_overhead_tokens(&request)
+                        - output_reserve_tokens(&request)
+                        - REQUEST_SAFETY_BUFFER;
+                match self.model_attempt(binding, request.clone()).await {
                     Ok(response) => {
                         self.calibration.observe_estimate(
                             response
@@ -1385,6 +1621,13 @@ impl Engine {
                             || (error.info.category == ErrorCategory::DeadlineExceeded && !idle)
                         {
                             return Err(error);
+                        }
+                        let message = error.info.message.to_lowercase();
+                        if (message.contains("context_length_exceeded")
+                            || message.contains("exceeds the context window"))
+                            && self.compact_local(&mut request, true).await?
+                        {
+                            continue;
                         }
                         attempt += 1;
                         let advice = match binding {
@@ -1580,6 +1823,22 @@ impl Engine {
             }
         }
     }
+    fn tool_decision(&self, definition: &ToolDefinition) -> ToolDecision {
+        let decision = self.policy.tools.decision(definition);
+        if decision == ToolDecision::Allow
+            && self.config.approve_mutating_tools
+            && !definition.read_only
+            && self
+                .agent
+                .tools
+                .iter()
+                .any(|tool| tool.definition().name == definition.name && !tool.is_control_flow())
+        {
+            ToolDecision::RequireApproval
+        } else {
+            decision
+        }
+    }
     async fn prepare_tools(&mut self) -> Result<(), Error> {
         if self.calls.front().is_some_and(|call| {
             self.agent
@@ -1599,7 +1858,7 @@ impl Engine {
                 .find(|tool| tool.definition().name == call.name);
             if let Some(tool) = tool {
                 let definition = tool.definition();
-                if self.policy.tools.decision(definition) == ToolDecision::RequireApproval {
+                if self.tool_decision(definition) == ToolDecision::RequireApproval {
                     if self.config.validate_tool_arguments
                         && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
                     {
@@ -1629,7 +1888,7 @@ impl Engine {
                     if approval == ApprovalDecision::Defer {
                         self.pending_marker_events
                             .push(Observation::ApprovalMarker {
-                                agent: self.agent.name.clone(),
+                                agent: Some(self.agent.name.clone()),
                                 call: call.clone(),
                                 decision: approval,
                                 reason: None,
@@ -1654,7 +1913,7 @@ impl Engine {
                 self.agent.tools.iter().any(|tool| {
                     let definition = tool.definition();
                     definition.name == call.name
-                        && self.policy.tools.decision(definition) == ToolDecision::Allow
+                        && self.tool_decision(definition) == ToolDecision::Allow
                         && (!self.config.validate_tool_arguments
                             || compile_schema(&definition.input_schema)
                                 .is_ok_and(|schema| schema.is_valid(&call.arguments)))
@@ -1737,7 +1996,7 @@ impl Engine {
             return Ok(false);
         }
         let definition = definition.unwrap();
-        let decision = self.policy.tools.decision(definition);
+        let decision = self.tool_decision(definition);
         if self.config.validate_tool_arguments
             && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
         {
@@ -1766,7 +2025,7 @@ impl Engine {
                 .await?
             };
             self.observe(Observation::ApprovalMarker {
-                agent: self.agent.name.clone(),
+                agent: None,
                 call: call.clone(),
                 decision: approval,
                 reason: self.denial_reasons.get(&call.id).cloned(),
@@ -1816,24 +2075,34 @@ impl Engine {
         }
         self.checkpoint(Boundary::ToolPrepared, Some(&call)).await?;
         if let Some(handoff) = handoff {
-            self.calls.pop_front();
-            while let Some(skipped) = self.calls.pop_front() {
-                self.append(RunItem::ToolResult {
-                    call_id: skipped.id,
-                    output: ToolOutput {
-                        content: vec![Content::Text {
-                            text: "Not executed because the response handed off to another agent."
-                                .into(),
-                        }],
+            let pending: HashSet<_> = self.calls.drain(..).map(|call| call.id).collect();
+            let ordered: Vec<_> = self
+                .result
+                .responses
+                .last()
+                .unwrap()
+                .items
+                .iter()
+                .filter_map(|item| match item {
+                    RunItem::ToolCall { call } if pending.contains(&call.id) => Some(call.clone()),
+                    _ => None,
+                })
+                .collect();
+            for pending in ordered {
+                if pending.id == call.id {
+                    self.append(RunItem::Handoff {
+                        call_id: pending.id,
+                        agent: handoff.target.name.clone(),
+                    });
+                } else {
+                    self.append(RunItem::ToolResult { call_id: pending.id, output: ToolOutput {
+                        content: vec![Content::Text { text: format!("not executed: the conversation was handed off to {} in this turn", handoff.target.name) }],
                         is_error: true,
                         should_pause: false,
-                    },
-                });
+                    } });
+                }
             }
-            self.append(RunItem::Handoff {
-                call_id: call.id,
-                agent: handoff.target.name.clone(),
-            });
+            self.publish_committed().await?;
             let from = self.agent.name.clone();
             self.agent = handoff.target.clone();
             self.result.last_agent = Some(self.agent.name.clone());
@@ -1860,7 +2129,8 @@ impl Engine {
         self.emit(RunEvent::ToolStarted { call: call.clone() })
             .await?;
         let mut operation = self.context.clone();
-        if let Some(timeout) = self.policy.tools.timeout {
+        let timeout = self.policy.tools.timeout.or_else(|| tool.timeout());
+        if let Some(timeout) = timeout {
             if let Some(deadline) = Instant::now().checked_add(timeout) {
                 operation.deadline = Some(operation.deadline.map_or(deadline, |d| d.min(deadline)));
             }
@@ -1876,7 +2146,7 @@ impl Engine {
         };
         let raw = match bounded(
             &context.operation,
-            self.policy.tools.timeout,
+            timeout,
             tool.execute(&context, call.clone()),
         )
         .await
@@ -1885,7 +2155,7 @@ impl Engine {
             Err(error) => {
                 // A local tool budget is model-visible; a dead parent still terminates the run.
                 self.context.check_active()?;
-                let message = if let Some(timeout) = self.policy.tools.timeout.filter(|_| {
+                let message = if let Some(timeout) = timeout.filter(|_| {
                     context
                         .operation
                         .deadline

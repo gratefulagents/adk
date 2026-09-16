@@ -113,6 +113,15 @@ pub trait ModelStream: Send {
 /// infrastructure, cancellation and authorization failures use `Err`.
 pub trait Tool: Send + Sync {
     fn definition(&self) -> &ToolDefinition;
+    /// Host-authored lifecycle/control capability, never inferred from a tool name.
+    /// Exempts mutation-only approval policy, not authorization or tool-owned approval.
+    fn is_control_flow(&self) -> bool {
+        false
+    }
+    /// Optional tool default; explicit host policy takes precedence.
+    fn timeout(&self) -> Option<Duration> {
+        None
+    }
     fn execute<'a>(
         &'a self,
         context: &'a ToolContext,

@@ -19,11 +19,11 @@
     "GRATEFUL_LIVE_TESTS": "skip"
   },
   "fixtures": {
-    "compaction.json": "d7507babd9715eaf38e50516099fcfbe663f1c687a9c12adc5dd02d7314281c1",
+    "compaction.json": "209c9f9cb9904a4c06d82d4827fb5ffabd7c60784800b28d63f8d97f88d2bcb9",
     "compaction_inputs.json": "8971283252deac7393a0339ecd5423acf2eb6141b8b23ea72360bcdad8c78a42"
   },
   "harness": {
-    "scripts/replay/compaction_export.go": "aedaf8885e5a9cd1487dcd471424a8e695c819847d9afc8522ee383adaf0536e",
+    "scripts/replay/compaction_export.go": "53e8f78d2e6e9c89c4d536cb9a39adc42095859260cb91176565eea5b10fa794",
     "scripts/replay/compaction_export.py": "1d2e980a07f102108265b9b6e3a993e3e5590f69ae85224fda3c48bd568a0454"
   },
   "license": "GPL-3.0-only",

@@ -36,6 +36,38 @@ impl Default for LocalCompactionPolicy {
     }
 }
 impl LocalCompactionPolicy {
+    pub fn for_model(model: &str) -> Self {
+        let model = model
+            .trim()
+            .split_once('/')
+            .map_or(model.trim(), |(_, name)| name)
+            .trim()
+            .to_lowercase();
+        let (trigger_tokens, target_tokens) = if ["spark", "nano", "mini", "lite", "flash"]
+            .iter()
+            .any(|part| model.contains(part))
+        {
+            (110_000, 60_000)
+        } else if model.starts_with("gpt-6") {
+            (244_800, 136_000)
+        } else if model.starts_with("gpt-5.6") {
+            (334_800, 186_000)
+        } else if ["gpt-5.5", "gpt-5.4", "gpt-5.3-codex", "gpt-5.2", "gpt-5.1"]
+            .iter()
+            .any(|prefix| model.starts_with(prefix))
+        {
+            (360_000, 200_000)
+        } else if model.contains("fable") {
+            (900_000, 500_000)
+        } else {
+            (180_000, 100_000)
+        };
+        Self {
+            trigger_tokens,
+            target_tokens,
+            ..Self::default()
+        }
+    }
     pub fn normalized(mut self) -> Self {
         if self.trigger_tokens == 0 {
             self.trigger_tokens = 180_000;

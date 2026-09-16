@@ -364,30 +364,19 @@ fn scalar_config_maps_sentinels_without_broadening_authorization() {
 }
 
 #[test]
-fn unsupported_approval_and_invalid_config_do_not_partially_apply() {
+fn invalid_config_does_not_partially_apply() {
     let mut config = RunnerConfig::default();
     let mut policy = RunPolicy::default();
-    for wire in [
-        RunConfigSentinels {
-            max_turns: 9,
-            tool_policy: Some(ToolPolicySentinels {
-                approval_required: true,
-                default_timeout: 7,
-            }),
-            ..Default::default()
-        },
-        RunConfigSentinels {
-            max_turns: i64::MAX,
-            ..Default::default()
-        },
-    ] {
-        assert!(apply_go_config(&wire, &mut config, &mut policy).is_err());
-        assert_eq!(policy, RunPolicy::default());
-        assert_eq!(
-            config.output.max_bytes,
-            RunnerConfig::default().output.max_bytes
-        );
-    }
+    let wire = RunConfigSentinels {
+        max_turns: i64::MAX,
+        ..Default::default()
+    };
+    assert!(apply_go_config(&wire, &mut config, &mut policy).is_err());
+    assert_eq!(policy, RunPolicy::default());
+    assert_eq!(
+        config.output.max_bytes,
+        RunnerConfig::default().output.max_bytes
+    );
 }
 
 async fn marker(
@@ -402,7 +391,7 @@ async fn marker(
         .observe(
             &context(),
             Observation::ApprovalMarker {
-                agent: "agent".into(),
+                agent: Some("agent".into()),
                 call: call(id),
                 decision,
                 new_items_before: n,

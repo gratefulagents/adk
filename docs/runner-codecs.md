@@ -44,7 +44,7 @@ operations use it as a hard deadline. The codec does not install timers.
 **Do not map Go ApprovalRequired to native ApprovalPolicy::All.** Go applies it
 only to mutating, non-control-flow tools. Likewise, DefaultTimeout is an override
 of eligible tools' own timeouts, not a blanket replacement of every native
-ToolPolicy. These decisions belong in the runner adapter. Other callbacks,
+ToolPolicy. The runner adapter now enforces mutation-only approval through registered tool identity, preserving tool-owned approval and all access/name denials. Host timeout overrides the tool's own optional timeout. Other callbacks,
 compaction/handoff settings, and authorization fields are outside this projection.
 
 ## Approval and history integration
@@ -125,3 +125,23 @@ in a temporary standalone Go program, and compares 21 config cases plus ordered
 denied marker/output pairs against Rust. This intentionally does not claim to
 exercise the full Go runtime or provider dependencies. The temporary program is
 removed after execution. Minimal containers may need `GOROOT` set explicitly.
+
+## Runtime event and gate adapters
+
+`GoEventAdapter` translates awaited `TextDelta`/`CommittedItems` observations to
+Go stream snapshots without a second engine or detached producer. Settled tool
+batches preserve pending markers interleaved with eligible outputs in call order.
+This is a stream projection, not a resumable checkpoint: `should_pause` remains
+on the native outcome/continuation while the wire output carries its text/error
+payload. Native handoffs project to `Handing off to <target>` tool outputs, with
+source-agent provenance; skipped sibling outputs remain in original call order.
+
+`apply_go_config` also installs consecutive-tool-error and stop-gate block limits.
+Managed-subagent limits are returned explicitly for the dedicated host integration.
+`StopGate` is bounded by parent cancellation/deadline. Its consecutive block cap
+resets after tool execution or `end_turn=false`, and a blocked final answer at the
+turn boundary gets the same one-turn extension as the Go runner.
+
+Model-specific threshold lookup and 104 local compaction cases are executed
+against the pinned SDK. Full approval histories/new items and streamed snapshot
+order are now compared in real-engine replay; see the replay README.

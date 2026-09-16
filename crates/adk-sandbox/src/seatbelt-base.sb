@@ -13,6 +13,9 @@
 (allow process-fork)
 (allow signal (target same-sandbox))
 (allow process-info* (target same-sandbox))
+; These legacy sysctls expose same-UID argv/environment; deny explicitly,
+; including PID suffixes, rather than relying on default-deny or process-info.
+(deny sysctl-read (sysctl-name-prefix "kern.procargs"))
 (allow sysctl-read
   (sysctl-name "hw.activecpu")
   (sysctl-name "hw.byteorder")

@@ -302,6 +302,7 @@ mod tests {
         assert!(profile.contains("(sysctl-name \"hw.pagesize_compat\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
         assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
+        assert!(profile.contains("(deny sysctl-read (sysctl-name-prefix \"kern.procargs\"))"));
         assert!(!profile.contains("(allow network*)"));
         assert!(!profile.contains("(allow file-write*"));
     }

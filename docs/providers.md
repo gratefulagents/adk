@@ -60,9 +60,10 @@ Other outstanding evidence/work: protocol-specific request DTOs beyond the typed
 core input, full stream event/order validation, every error/retry/fallback vector,
 Go-executed request/SSE/cost differential fixtures, model metadata and automatic
 model selection, public facade/example, complete OAuth material/refresh race
-coverage, endpoint/auth-scoped prompt-cache capability state.
+coverage.
 Prompt-cache keys are scoped at send time to endpoint/account/auth material, with
-captured-request tests; there is no learned cache capability registry yet. Runner fallback integration has not been exercised with
+captured-request tests. OpenAI OAuth affinity survives access-token rotation within
+one account; absent stable identity disables explicit affinity. Runner fallback integration has not been exercised with
 these HTTP adapters. Cost functions are callable by a host estimator but not
 installed automatically in runner configuration.
 

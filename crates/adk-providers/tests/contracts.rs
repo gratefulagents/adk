@@ -158,7 +158,7 @@ fn diagnostics_and_header_debug_are_secret_safe() {
 }
 #[test]
 fn cache_namespace_is_endpoint_route_mode_account_token_scoped() {
-    let original = scope(AuthMode::OpenAiOAuth);
+    let original = scope(AuthMode::ApiKey);
     let material = material();
     let initial = cache_scope(&original, &material, "prompt");
     for change in 0..5 {
@@ -167,7 +167,7 @@ fn cache_namespace_is_endpoint_route_mode_account_token_scoped() {
         match change {
             0 => scope.endpoint.push_str("/other"),
             1 => scope.route.push('b'),
-            2 => scope.mode = AuthMode::ApiKey,
+            2 => scope.mode = AuthMode::OpenAiOAuth,
             3 => material.account = Some("account-b".into()),
             _ => material.access_token = Secret::new("rotated"),
         }
@@ -695,4 +695,15 @@ async fn refresh_cas_loser_never_returns_its_unpersisted_credential() {
         "external-winner"
     );
     assert_eq!(store.writes.load(Ordering::SeqCst), 0);
+}
+
+#[test]
+fn oauth_cache_affinity_survives_refresh_but_never_missing_identity() {
+    let scope = scope(AuthMode::OpenAiOAuth);
+    let mut material = material();
+    let initial = cache_scope(&scope, &material, "prompt");
+    material.access_token = Secret::new("rotated-access");
+    assert_eq!(cache_scope(&scope, &material, " prompt "), initial);
+    material.account = None;
+    assert!(cache_scope(&scope, &material, "prompt").is_empty());
 }

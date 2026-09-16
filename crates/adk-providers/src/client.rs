@@ -130,8 +130,12 @@ impl Provider {
             let endpoint = format!("{}{path}", resolved.endpoint);
             let mut body = body.clone();
             if let Some(key) = body.get("prompt_cache_key").and_then(Value::as_str) {
-                body["prompt_cache_key"] =
-                    crate::auth::cache_scope(&resolved, &material, key).into();
+                let key = crate::auth::cache_scope(&resolved, &material, key);
+                if key.is_empty() {
+                    body.as_object_mut().unwrap().remove("prompt_cache_key");
+                } else {
+                    body["prompt_cache_key"] = key.into();
+                }
             }
             let mut headers =
                 crate::auth::headers(&resolved, &material, self.protocol == Protocol::Anthropic)?;

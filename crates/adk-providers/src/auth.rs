@@ -399,15 +399,26 @@ pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<He
     Ok(out)
 }
 /// Internal cache namespace, not a public credential fingerprint. Length prefixes
-/// prevent concatenation ambiguity; refresh and endpoint changes invalidate it.
+/// prevent concatenation ambiguity. OpenAI OAuth affinity survives token refresh
+/// within one account. Missing stable identity disables explicit cache affinity.
 pub fn cache_scope(scope: &Scope, material: &Material, prompt_key: &str) -> String {
+    let identity = if scope.mode == AuthMode::OpenAiOAuth {
+        material.account.as_deref().unwrap_or("")
+    } else {
+        material.access_token.expose()
+    }
+    .trim();
+    let prompt_key = prompt_key.trim();
+    if scope.mode == AuthMode::Anonymous || identity.is_empty() || prompt_key.is_empty() {
+        return String::new();
+    }
     let mut hash = Sha256::new();
     for value in [
         &scope.route,
         &scope.endpoint,
         &format!("{:?}", scope.mode),
         material.account.as_deref().unwrap_or(""),
-        material.access_token.expose(),
+        identity,
         prompt_key,
     ] {
         hash.update((value.len() as u64).to_be_bytes());

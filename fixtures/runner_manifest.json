@@ -1,5 +1,5 @@
 {
-  "fixture_sha256": "fe6124dba996d77018b9ea6d5160bf53693cb26625333fa25fbcb8555a9ff05b",
+  "fixture_sha256": "95977af271203ce5a20264b73807e99a1cbdb750bd135a1690f745f6897e6896",
   "generator": {
     "command": [
       "go",
@@ -18,9 +18,9 @@
     "toolchain": "go version go1.26.8 linux/amd64"
   },
   "harness": {
-    "fixtures/runner_inputs.json": "792f158532664cab333a73155142501a4cc81f57fa18fbd40bf73c8ad5ec6e39",
-    "scripts/replay/runner_export.go": "eae4ceedddbc31a0e05be572bca9753d635c1c245cd7e2c51a072c685cd9c111",
-    "scripts/replay/runner_export.py": "fa5be590f3ba2e4f82bc82a77990c7c75d2e5e155b7a253cae3c8642ccf564b6"
+    "fixtures/runner_inputs.json": "b40422ecff0c4aaf126722e350755884d4b3d19b1d219060fd0b735608450d7d",
+    "scripts/replay/runner_export.go": "57c1f351cc37a99f0bd917ba31ed5503ba30167bde4832358b52c699f07680c2",
+    "scripts/replay/runner_export.py": "6ed44dacf0715a4074fc0926d5503ead3a37b734dadf17016f40063d4cc00acc"
   },
   "license": "GPL-3.0-only",
   "license_copy": "licenses/SDK-GPL-3.0.txt",
@@ -111,6 +111,11 @@
       "path": "internal/agent/hooks.go",
       "sha256": "54aa598d8c5452a05262ca1b1b28b9105a645891a586ef49344371b0183b6797",
       "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/hooks.go"
+    },
+    {
+      "path": "pkg/agentsdk/chatloop.go",
+      "sha256": "f009cd5f6c077cdfb809ca447eea2e01b574919bd3040190e4187938d6850e91",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/chatloop.go"
     }
   ]
 }

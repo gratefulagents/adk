@@ -50,6 +50,14 @@ Four custom-parser scenarios bring the total to 26: parser rejection preserves
 raw JSON; parser success transforms the value. Both modes use a named, non-strict
 schema and compare the resulting model instructions as well as final output.
 
+Ten output scenarios cover trust wrapping, embedded opening markers, already
+wrapped text, UTF-8 caps and caps too small for the wrapper. Raw items/events and
+wrapped model history are compared without delimiter normalization. Four default
+budget cases map Go zero/negative sentinels to the public Rust policy default.
+Two actual ChatLoop/Conversation cases cover success and turn-limit partials:
+Go's nil result slot is recovered from MaxTurnsExceeded.PartialResult itself.
+The corpus now contains **42 cases**.
+
 ## Canonical comparison boundary
 
 * Exact model name, instructions, ordered model-input history, advertised tool
@@ -68,14 +76,17 @@ schema and compare the resulting model instructions as well as final output.
   Go emits committed run items; Rust model-complete items and tool-finished
   payloads describe the corresponding semantic events. Runtime-specific
   lifecycle/telemetry envelopes are not wire-compatible and are not compared.
+* Empty tool-result content and false error flags are omitted to match Go's
+  omitempty JSON representation; nonempty text is compared verbatim.
 * Text-only message items omit role because Go `RunItem.Message` has no role.
   Rust inputs use User and scripted responses use Assistant. Call IDs are not
   renamed, arrays are not sorted, Unicode/text is unchanged, null final output
   on partial failure is retained, and JSON arguments are compared structurally.
 * Go uses StreamResponse even inside Run. Rust's regular path uses complete and
   its streaming path uses stream; the mocks assert these dispatch choices.
-* Both sides explicitly disable untrusted-output wrapping for the trusted
-  in-process echo tool. No normalization strips delimiters after execution.
+* Both engines use the script's trust and cap settings. Original trusted echo
+  cases disable wrapping; output cases enable it. No normalization strips
+  delimiters or truncation markers after execution.
 * Go's approval `RunItem`s are projected into an ordered `pending` side channel,
   matching Rust `pending_approvals`. They are omitted from the model-facing
   history and committed-item event projection. All non-approval entries retain

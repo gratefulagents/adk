@@ -18,7 +18,7 @@ SOURCES = ['LICENSE', 'go.mod', 'go.sum', 'internal/agent/runner.go',
            'internal/agent/tool.go', 'internal/agent/usage.go',
            'internal/agent/model_fallback.go', 'internal/agent/output_schema.go',
            'internal/agent/retry.go', 'internal/agent/model_settings.go',
-           'internal/agent/hooks.go']
+           'internal/agent/hooks.go', 'pkg/agentsdk/chatloop.go']
 
 
 def digest(path):

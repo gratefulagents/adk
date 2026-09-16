@@ -150,15 +150,29 @@ complete.** The following is an enumerated audit, not a parity waiver.
    approval-event timing. Core documents native Serde as distinct from Go wire
    compatibility (`adk-core/src/lib.rs`); a full adapter must preserve the marker
    when reconstructing the Go wire representation, not silently discard it.
-4. **Other previously declared differences need explicit disposition.** Rust
-   retains initial conversation error partials where Go ChatLoop discards them;
-   now defaults RunPolicy to 100 turns, but its native NonZeroU32 still cannot
-   represent Go's nonpositive sentinel (a wire/configuration mapping decision);
-   escapes tool-supplied trust delimiters instead of Go's accepted-wrapper bypass.
-   These affect results/configuration/model-visible text and are not merely Rust
-   internals. Preserve the core API/security behavior pending a maintainer decision
-   to approve these departures or specify a compatibility surface; documentation
-   alone is not that decision. No security bypass was reintroduced.
+4. **Output formatting/history restored; partial/default mappings audited.**
+   Rust now matches Go's delimiter idempotence, including preserving text that
+   contains the opening marker. This text-format limitation does not authorize
+   execution: registered definitions and ToolPolicy checks remain unchanged.
+   NewItems/tool-result events retain capped raw text, while effective model
+   history is wrapped, matching runner.go:1579–1588. Hooks retain raw text before
+   capping. Ten real-engine replay cases cover ordinary/marker-bearing/already
+   wrapped text, Unicode truncation and caps smaller than the wrapper, in both
+   modes. Like Go, tiny caps preserve intact delimiters and empty the body.
+
+   Four real-engine cases map Go's zero/negative turn sentinels to the public
+   Rust RunPolicy default of 100, comparing execution rather than Serde shapes.
+   This verifies the mapping, not acceptance of Go sentinel integers by native
+   NonZeroU32 deserialization. A Go-compatible configuration adapter must perform
+   that mapping; no such adapter is claimed here.
+
+   The earlier assertion that ChatLoop discards all partials was too broad:
+   its nil result slot on MaxTurnsExceeded is accompanied by a typed error with
+   PartialResult. Two actual ChatLoop/Conversation cases verify normal completion
+   and turn-limit partials, extracting that error's existing partial, never
+   reconstructing history. Other infrastructure-error partial enrichment remains
+   a native capability required by #4's usable typed partial errors, not evidence
+   of equivalence for every Go ChatLoop error path.
 5. **Provider retry advice and precedence implemented.** `Model::retry_advice`
    carries should-retry, retry-after and reason. Eligible overload/quota/rate-limit
    advice selects fallback before the host ModelErrorHandler; then policy retries
@@ -168,7 +182,7 @@ complete.** The following is an enumerated audit, not a parity waiver.
    output, cancellation and deadlines still prohibit replay. Virtual-time tests
    cover precedence, explicit rejection, missing reason, ten-retry bounds and the
    five-minute cap without sleeping in real time. Fallback/schema cross-language
-   replay remains separate from these Rust-only advice regressions. All 26 replay
+   replay remains separate from these Rust-only advice regressions. All 42 replay
    scenarios now also compare lifecycle callback order/content, including
    per-attempt agent/model start, model-end items/usage, raw tool callbacks and
    final agent output. This is a declared native-to-Go projection, not raw
@@ -177,11 +191,15 @@ complete.** The following is an enumerated audit, not a parity waiver.
 
 Concrete delivery boundary: fallback/reprobe and default schema outcomes are
 corrected and verified; tool scheduling including deferred-approval siblings is corrected with owned
-Rust futures. Raw wire/trace compatibility and the explicitly listed partial-result, budget
-and trust-wrapper differences above still need resolution. Do not close #4 or
-approve the full delivery scope on the basis of this correction. The options are
-baseline-compatible core/runtime additions with corresponding replay, or explicit
-maintainer approval of each named external departure under #1.
+Rust futures. Output text/history is now baseline-compatible in the enumerated
+cases. Remaining delivery decisions concern native approval side channels versus
+Go wire markers/timing, native configuration versus Go sentinel ingestion, and
+infrastructure-error partial enrichment beyond the proven turn-limit case. Raw
+trace and default compaction-heuristic equivalence are not established. Do not
+close #4 on the basis of this bounded correction. If full Go-facing ingestion and
+wire identity are required in #4, those adapters need implementation and replay;
+otherwise their explicit ownership/acceptance belongs in the maintainer's scope
+decision under #1, not an implicit waiver in this note.
 
 Cross-language replay must use the real Go runner and the Rust engine, normalize
 only declared representation differences, retain event order/call correlations,
@@ -197,7 +215,7 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 26 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 42 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |

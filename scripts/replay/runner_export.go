@@ -32,6 +32,9 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
+	ChatLoop     bool            `json:"chat_loop"`
+	Untrusted    bool            `json:"untrusted"`
+	OutputCap    int             `json:"output_cap"`
 	SchemaName   string          `json:"schema_name"`
 	SchemaStrict *bool           `json:"schema_strict"`
 	CustomParser bool            `json:"custom_parser"`
@@ -204,9 +207,9 @@ func execute(s scenario) object {
 			}
 		}
 	}
-	trusted := false
+	trusted := s.Untrusted
 	hooks := &recordingHooks{events: []object{}}
-	cfg := sdk.RunConfig{Hooks: hooks, MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
+	cfg := sdk.RunConfig{Hooks: hooks, MaxToolOutputBytes: s.OutputCap, MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
 	runner := sdk.NewRunnerWithProvider(m)
 	var result *sdk.RunResult
 	var err error
@@ -229,6 +232,11 @@ func execute(s scenario) object {
 			}
 		}
 		result, err = stream.FinalResult(), stream.Err()
+	} else if s.ChatLoop {
+		if len(s.Input) != 0 {
+			panic("chat loop fixture must start with empty history")
+		}
+		result, err = sdk.NewChatLoop(sdk.ChatLoopOptions{Runner: runner, Agent: agent, RunConfig: cfg}).Run(context.Background())
 	} else {
 		result, err = runner.Run(context.Background(), agent, convert(s.Input), cfg)
 	}
@@ -238,6 +246,9 @@ func execute(s scenario) object {
 		var max *sdk.MaxTurnsExceeded
 		if !errors.As(err, &max) {
 			panic(err)
+		}
+		if s.ChatLoop && result == nil {
+			result = max.PartialResult
 		}
 		if result == nil || max.PartialResult != result {
 			panic("missing partial result")

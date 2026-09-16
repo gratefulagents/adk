@@ -25,7 +25,9 @@ fn normalized(items: &[RunItem]) -> Vec<Value> {
         RunItem::ToolCall { call } => json!({"type":"tool_call", "id":call.id, "name":call.name, "arguments":call.arguments}),
         RunItem::ToolResult { call_id, output } => {
             assert!(!output.should_pause);
-            let mut value = json!({"type":"tool_result", "id":call_id, "content":text(&output.content)});
+            let mut value = json!({"type":"tool_result", "id":call_id});
+            let content = text(&output.content);
+            if !content.is_empty() { value["content"] = json!(content); }
             if output.is_error { value["is_error"] = json!(true); }
             value
         }
@@ -347,7 +349,12 @@ async fn replay(script: &Value) -> Value {
         RunnerConfig {
             hooks: Some(hooks.clone()),
             output: OutputPolicy {
-                untrusted: false,
+                untrusted: script["untrusted"].as_bool().unwrap_or(false),
+                max_bytes: match script["output_cap"].as_i64().unwrap_or(0) {
+                    n if n < 0 => None,
+                    0 => Some(adk_runtime::output::DEFAULT_MAX_OUTPUT_BYTES),
+                    n => Some(n as usize),
+                },
                 ..OutputPolicy::default()
             },
             model_idle_timeout: None,
@@ -364,8 +371,10 @@ async fn replay(script: &Value) -> Value {
     let request = RunRequest {
         input: input_items(&script["input"], Role::User),
         policy: RunPolicy {
-            max_turns: NonZeroU32::new(script["max_turns"].as_u64().unwrap().try_into().unwrap())
-                .unwrap(),
+            max_turns: match script["max_turns"].as_i64().unwrap() {
+                n if n <= 0 => RunPolicy::default().max_turns,
+                n => NonZeroU32::new(n.try_into().unwrap()).unwrap(),
+            },
             tools: ToolPolicy::default(),
             tool_use: ToolUseBehavior::Continue,
         },
@@ -382,6 +391,16 @@ async fn replay(script: &Value) -> Value {
             "pull and host event channels diverged"
         );
         stream.finish().await
+    } else if script["chat_loop"].as_bool() == Some(true) {
+        adk_runtime::Conversation::default()
+            .run(
+                &runner,
+                context,
+                request.input,
+                request.policy,
+                host.clone(),
+            )
+            .await
     } else {
         runner.run(context, request, host.clone()).await
     };
@@ -463,7 +482,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 26);
+    assert_eq!(cases.len(), 42);
     assert_eq!(
         cases
             .iter()

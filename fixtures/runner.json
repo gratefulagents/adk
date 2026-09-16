@@ -5426,6 +5426,3853 @@
         "schema_strict": false,
         "streaming": true
       }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "name": "echo",
+            "output": "echo: ordinary untrusted output"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: ordinary untrusted output",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: ordinary untrusted output\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: ordinary untrusted output",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: ordinary untrusted output\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_plain_False",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            },
+            "name": "echo",
+            "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_marker_False",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            },
+            "name": "echo",
+            "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_wrapped_False",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "name": "echo",
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_utf8_cap_False",
+        "output_cap": 128,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "name": "echo",
+            "output": "echo: ordinary untrusted output"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: ordinary untrusted output",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: ordinary untrusted output",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: ordinary untrusted output\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: ordinary untrusted output",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: ordinary untrusted output\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_plain_True",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            },
+            "name": "echo",
+            "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_marker_True",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            },
+            "name": "echo",
+            "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_wrapped_True",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "name": "echo",
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\necho: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_utf8_cap_True",
+        "output_cap": 128,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 0,
+        "name": "default_turn_budget_0_False",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": -1,
+        "name": "default_turn_budget_-1_False",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 0,
+        "name": "default_turn_budget_0_True",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": -1,
+        "name": "default_turn_budget_-1_True",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "chat_loop": true,
+        "input": [],
+        "max_turns": 1,
+        "name": "chat_loop_partial_False",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          }
+        ],
+        "outcome": {
+          "error": "max_turns",
+          "final_output": null,
+          "history": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "incomplete"
+        },
+        "requests": [
+          {
+            "input": [],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "chat_loop": true,
+        "input": [],
+        "max_turns": 1,
+        "name": "chat_loop_partial_True",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": false,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "name": "echo",
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\n\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\n\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_tiny_cap_False",
+        "output_cap": 1,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "name": "echo",
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\n\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\n\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "output_tiny_cap_True",
+        "output_cap": 1,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "untrusted": true
+      }
     }
   ],
   "schema_version": 1,

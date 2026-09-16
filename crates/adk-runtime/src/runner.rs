@@ -1594,17 +1594,21 @@ impl Engine {
             self.spills.push(Arc::new(spill));
         }
         if self.tool_final.is_none() {
-            self.tool_final = Some(text(&processed.output.content));
+            self.tool_final = Some(text(&processed.item_output.content));
         }
-        self.append(RunItem::ToolResult {
+        self.result.history.push(RunItem::ToolResult {
             call_id: call.id.clone(),
-            output: processed.output.clone(),
+            output: processed.output,
+        });
+        self.result.new_items.push(RunItem::ToolResult {
+            call_id: call.id.clone(),
+            output: processed.item_output.clone(),
         });
         self.checkpoint(Boundary::ToolCompleted, Some(&call))
             .await?;
         self.emit(RunEvent::ToolFinished {
             call_id: call.id,
-            output: processed.output,
+            output: processed.item_output,
         })
         .await?;
         Ok(())

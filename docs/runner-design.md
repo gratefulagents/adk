@@ -118,9 +118,11 @@ complete.** The following is an enumerated audit, not a parity waiver.
    as `OutputValidationFailed` observations instead of aborting by default.
    A host may deliberately fail its hook (an explicit host policy, not default).
    Replay compares non-JSON, schema-invalid JSON, and valid JSON in both modes.
-   Go's optional arbitrary `ParseFn`, schema name and strict-mode controls have no
-   corresponding configuration in the existing Rust `Option<schemars::Schema>`;
-   their mapping remains a public-configuration boundary, not claimed equivalence.
+   Custom `OutputParser`, schema name and strict-mode configuration are now
+   exposed explicitly. Parser failures preserve raw text, parser successes may
+   return transformed values, matching Go ParseFn. Four extra Go/Rust cases
+   verify custom rejection/transformation and named non-strict schema prompts.
+   Name/strict settings also reach the provider-neutral ModelRequest.
 3. **Ordinary tool concurrency and deferred-approval sibling scheduling restored.**
    `runner.go:2288–2365` uses concurrent read-safe tools/exclusive mutations and
    ordered result slots. Rust uses `join_all` plus a Tokio `RwLock`, no spawned
@@ -150,25 +152,29 @@ complete.** The following is an enumerated audit, not a parity waiver.
    when reconstructing the Go wire representation, not silently discard it.
 4. **Other previously declared differences need explicit disposition.** Rust
    retains initial conversation error partials where Go ChatLoop discards them;
-   requires a nonzero turn budget instead of Go's nonpositive default-100 sentinel;
+   now defaults RunPolicy to 100 turns, but its native NonZeroU32 still cannot
+   represent Go's nonpositive sentinel (a wire/configuration mapping decision);
    escapes tool-supplied trust delimiters instead of Go's accepted-wrapper bypass.
    These affect results/configuration/model-visible text and are not merely Rust
    internals. Preserve the core API/security behavior pending a maintainer decision
    to approve these departures or specify a compatibility surface; documentation
    alone is not that decision. No security bypass was reintroduced.
-5. **Provider-policy parity is still bounded.** Core `Model` errors carry no Go
-   `ModelRetryAdvice` (retry-after, reason, retryability), `ErrorHandler`, or
-   `ParseFn` analogue. Rust's configured retry predicate is the selection boundary;
-   full advice precedence/eligible-error and five-minute delay-cap mapping needs
-   that adapter/configuration contract. The replay scripts use an explicit Go
-   overloaded/retryable error and corresponding Rust Provider error; they do not
-   prove all provider-error classes equivalent. Compaction defaults and full
-   Go hook/trace payload parity likewise remain unproven, not excluded from #4.
+5. **Provider retry advice and precedence implemented.** `Model::retry_advice`
+   carries should-retry, retry-after and reason. Eligible overload/quota/rate-limit
+   advice selects fallback before the host ModelErrorHandler; then policy retries
+   are considered unless advice explicitly rejects them; advised retries are
+   bounded at ten failures per turn. Delays honor retry-after and are capped at
+   five minutes, with nonzero backoff for advice without a delay. Visible stream
+   output, cancellation and deadlines still prohibit replay. Virtual-time tests
+   cover precedence, explicit rejection, missing reason, ten-retry bounds and the
+   five-minute cap without sleeping in real time. Fallback/schema cross-language
+   replay remains separate from these Rust-only advice regressions; full raw
+   hook/trace payload and default compaction-heuristic equivalence is not claimed.
 
 Concrete delivery boundary: fallback/reprobe and default schema outcomes are
 corrected and verified; tool scheduling including deferred-approval siblings is corrected with owned
-Rust futures. Public-configuration/wire compatibility and the explicitly
-listed external differences above still need resolution. Do not close #4 or
+Rust futures. Raw wire/trace compatibility and the explicitly listed partial-result, budget
+and trust-wrapper differences above still need resolution. Do not close #4 or
 approve the full delivery scope on the basis of this correction. The options are
 baseline-compatible core/runtime additions with corresponding replay, or explicit
 maintainer approval of each named external departure under #1.
@@ -187,10 +193,11 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 22 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 26 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |
+| Provider advice | `provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes`, `provider_advised_retries_are_bounded_without_spending_model_turns`, `fallback_precedes_error_handler_which_precedes_advice_retry` |
 | Retry/limits/timeouts | `fallback_precedes_policy_retries_without_spending_extra_turns`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
 | Compaction/cache/context | `compaction_replaces_history_and_hints_cache_prefix_are_request_only` |
 | Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |

@@ -150,6 +150,13 @@ impl TestModel {
     }
 }
 impl Model for TestModel {
+    fn retry_advice(&self, error: &Error) -> Option<ModelRetryAdvice> {
+        (error.info.message == "overloaded").then(|| ModelRetryAdvice {
+            should_retry: true,
+            retry_after: Duration::ZERO,
+            reason: "overloaded".into(),
+        })
+    }
     fn provider(&self) -> &str {
         "test"
     }
@@ -380,6 +387,8 @@ async fn stream_emits_complete_and_failure_and_never_retries_visible_output() {
     ]);
     let mut config = RunnerConfig::default();
     config.retry.max_retries = 2;
+    let handler = Arc::new(AbortModelError(AtomicUsize::new(0)));
+    config.error_handler = Some(handler.clone());
     let r = Runner::new(agent(model.clone()), config).unwrap();
     let mut stream = r.stream(context(), request(2), Arc::new(TestHost::default()));
     let mut failed = false;
@@ -397,6 +406,7 @@ async fn stream_emits_complete_and_failure_and_never_retries_visible_output() {
             .contains(&message(Role::Assistant, "partial"))
     );
     assert_eq!(model.starts.load(Ordering::SeqCst), 1);
+    assert_eq!(handler.0.load(Ordering::SeqCst), 0);
     let model = TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
         response: answer("ok"),
     })]);
@@ -457,12 +467,12 @@ async fn cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream() {
 
 #[tokio::test]
 async fn fallback_precedes_policy_retries_without_spending_extra_turns() {
-    let primary = TestModel::with(vec![Err(provider_error())]);
+    let primary = TestModel::with(vec![Err(Error::new(ErrorCategory::Provider, "overloaded"))]);
     let fallback = TestModel::with(vec![Err(provider_error()), Ok(answer("fallback"))]);
     let mut a = agent(primary.clone());
     a.fallbacks = vec![ModelBinding::complete("backup", fallback.clone())];
     let mut config = RunnerConfig::default();
-    config.retry.max_retries = 1;
+    config.retry.max_retries = 2;
     config.retry.initial_delay = Duration::ZERO;
     let result = Runner::new(a, config)
         .unwrap()
@@ -1238,7 +1248,10 @@ async fn conversation_keeps_failed_spill_history_alive_after_error_is_dropped() 
 
 #[tokio::test]
 async fn sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes() {
-    let primary = TestModel::with(vec![Err(provider_error()), Ok(answer("primary recovered"))]);
+    let primary = TestModel::with(vec![
+        Err(Error::new(ErrorCategory::Provider, "overloaded")),
+        Ok(answer("primary recovered")),
+    ]);
     let backup = TestModel::with(vec![
         Ok(response(vec![call("1", "approved")], None)),
         Ok(response(vec![], Some(false))),
@@ -1426,7 +1439,7 @@ async fn dropping_stream_drops_all_inflight_batch_tools() {
 
 #[tokio::test]
 async fn fallback_state_is_per_agent_identity_not_display_name() {
-    let primary = TestModel::with(vec![Err(provider_error())]);
+    let primary = TestModel::with(vec![Err(Error::new(ErrorCategory::Provider, "overloaded"))]);
     let backup = TestModel::with(vec![Ok(response(vec![call("1", "transfer")], None))]);
     let target_primary = TestModel::with(vec![Ok(answer("target primary"))]);
     let target = agent(target_primary.clone());
@@ -1557,5 +1570,154 @@ async fn batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_befor
         assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
         assert_eq!(error.partial.unwrap().pending_approvals.len(), 2);
         assert_eq!(gated.calls.load(Ordering::SeqCst), 0);
+    }
+}
+
+struct AdvisedModel {
+    model: Arc<TestModel>,
+    advice: Option<ModelRetryAdvice>,
+}
+impl Model for AdvisedModel {
+    fn provider(&self) -> &str {
+        "test"
+    }
+    fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+        self.advice.clone()
+    }
+    fn complete<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.model.complete(context, request)
+    }
+}
+
+#[tokio::test(start_paused = true)]
+async fn provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes() {
+    for (should_retry, reason, advised, policy_retries, expected_calls, expected_delay) in [
+        (true, "rate_limit", 3600, 1, 2, 300),
+        (false, "invalid_key", 0, 10, 1, 0),
+        (false, "", 0, 1, 2, 0),
+        (true, "rate_limit", 0, 0, 2, 1),
+    ] {
+        let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
+        let advised_model = Arc::new(AdvisedModel {
+            model: model.clone(),
+            advice: Some(ModelRetryAdvice {
+                should_retry,
+                retry_after: Duration::from_secs(advised),
+                reason: reason.into(),
+            }),
+        });
+        let a = AgentConfig::new("test", ModelBinding::complete("primary", advised_model));
+        let mut config = RunnerConfig::default();
+        config.retry.max_retries = policy_retries;
+        config.retry.initial_delay = Duration::ZERO;
+        let start = tokio::time::Instant::now();
+        let result = Runner::new(a, config)
+            .unwrap()
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await;
+        assert_eq!(model.completes.load(Ordering::SeqCst), expected_calls);
+        assert_eq!(start.elapsed(), Duration::from_secs(expected_delay));
+        assert_eq!(result.is_ok(), expected_calls == 2);
+    }
+}
+
+#[tokio::test(start_paused = true)]
+async fn provider_advised_retries_are_bounded_without_spending_model_turns() {
+    let model = TestModel::with((0..11).map(|_| Err(provider_error())).collect());
+    let advised = Arc::new(AdvisedModel {
+        model: model.clone(),
+        advice: Some(ModelRetryAdvice {
+            should_retry: true,
+            retry_after: Duration::from_millis(1),
+            reason: "transient".into(),
+        }),
+    });
+    let fallback = TestModel::with(vec![Ok(answer("must not select fallback for this reason"))]);
+    let mut a = AgentConfig::new("test", ModelBinding::complete("primary", advised));
+    a.fallbacks = vec![ModelBinding::complete("backup", fallback.clone())];
+    let error = runner(a)
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Provider);
+    assert!(error.partial.unwrap().responses.is_empty());
+    assert_eq!(model.completes.load(Ordering::SeqCst), 11);
+    assert_eq!(fallback.completes.load(Ordering::SeqCst), 0);
+}
+
+struct AbortModelError(AtomicUsize);
+impl ModelErrorHandler for AbortModelError {
+    fn handle(&self, _: &str, _: u32, _: &Error) -> ModelErrorAction {
+        self.0.fetch_add(1, Ordering::SeqCst);
+        ModelErrorAction::Abort
+    }
+}
+#[tokio::test]
+async fn fallback_precedes_error_handler_which_precedes_advice_retry() {
+    for has_fallback in [false, true] {
+        let model = TestModel::with(vec![Err(provider_error())]);
+        let advised = Arc::new(AdvisedModel {
+            model: model.clone(),
+            advice: Some(ModelRetryAdvice {
+                should_retry: true,
+                retry_after: Duration::ZERO,
+                reason: "quota".into(),
+            }),
+        });
+        let mut a = AgentConfig::new("test", ModelBinding::complete("primary", advised));
+        if has_fallback {
+            a.fallbacks = vec![ModelBinding::complete(
+                "backup",
+                TestModel::with(vec![Ok(answer("backup"))]),
+            )];
+        }
+        let handler = Arc::new(AbortModelError(AtomicUsize::new(0)));
+        let config = RunnerConfig {
+            error_handler: Some(handler.clone()),
+            ..RunnerConfig::default()
+        };
+        let result = Runner::new(a, config)
+            .unwrap()
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await;
+        assert_eq!(result.is_ok(), has_fallback);
+        assert_eq!(handler.0.load(Ordering::SeqCst), usize::from(!has_fallback));
+        assert_eq!(model.completes.load(Ordering::SeqCst), 1);
+    }
+}
+
+struct RetryModelError(bool);
+impl ModelErrorHandler for RetryModelError {
+    fn handle(&self, agent: &str, turn: u32, _: &Error) -> ModelErrorAction {
+        assert_eq!(agent, "test");
+        assert_eq!(turn, 0);
+        if self.0 {
+            ModelErrorAction::Continue
+        } else {
+            ModelErrorAction::Retry
+        }
+    }
+}
+#[tokio::test]
+async fn error_handler_retry_and_continue_reenter_the_same_model_turn() {
+    for continue_action in [false, true] {
+        let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
+        let config = RunnerConfig {
+            error_handler: Some(Arc::new(RetryModelError(continue_action))),
+            ..RunnerConfig::default()
+        };
+        let result = Runner::new(agent(model.clone()), config)
+            .unwrap()
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.final_output, Some(json!("done")));
+        assert_eq!(result.result.responses.len(), 1);
+        assert_eq!(model.completes.load(Ordering::SeqCst), 2);
     }
 }

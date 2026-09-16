@@ -102,6 +102,13 @@ impl ScriptModel {
 }
 
 impl Model for ScriptModel {
+    fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+        Some(ModelRetryAdvice {
+            should_retry: true,
+            retry_after: std::time::Duration::ZERO,
+            reason: "overloaded".into(),
+        })
+    }
     fn provider(&self) -> &str {
         "replay"
     }
@@ -219,6 +226,19 @@ fn normalized_events(events: &[RunEvent]) -> Vec<Value> {
     out
 }
 
+struct CustomParser;
+impl adk_runtime::OutputParser for CustomParser {
+    fn parse(&self, raw: &str) -> Result<Value, Error> {
+        let value: Value = serde_json::from_str(raw)
+            .map_err(|e| Error::new(ErrorCategory::ModelBehavior, e.to_string()))?;
+        let n = value["n"].as_i64().unwrap();
+        if n < 0 {
+            return Err(Error::new(ErrorCategory::ModelBehavior, "negative n"));
+        }
+        Ok(json!({"accepted":n}))
+    }
+}
+
 async fn replay(script: &Value) -> Value {
     use adk_runtime::{AgentConfig, ModelBinding, Runner, RunnerConfig, output::OutputPolicy};
     let streaming = script["streaming"].as_bool().unwrap();
@@ -272,6 +292,15 @@ async fn replay(script: &Value) -> Value {
     }
     if !script["schema"].is_null() {
         agent.output_schema = Some(script["schema"].clone().try_into().unwrap());
+        if let Some(name) = script["schema_name"].as_str() {
+            agent.output_schema_name = name.into();
+        }
+        if let Some(strict) = script["schema_strict"].as_bool() {
+            agent.output_schema_strict = strict;
+        }
+        if script["custom_parser"].as_bool() == Some(true) {
+            agent.output_parser = Some(Arc::new(CustomParser));
+        }
     }
     let runner = Runner::new(
         agent,
@@ -392,7 +421,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 22);
+    assert_eq!(cases.len(), 26);
     assert_eq!(
         cases
             .iter()

@@ -1,5 +1,5 @@
 {
-  "fixture_sha256": "09103e7bce1a5b91fd3e5d626583c75a04c82ab5025e83d2464f27f65241b4b6",
+  "fixture_sha256": "6af5244ab6b4f5c8f62117c32a3e07056b8923c8eed6d381b39765c3ed5b35b4",
   "generator": {
     "command": [
       "go",
@@ -18,9 +18,9 @@
     "toolchain": "go version go1.26.8 linux/amd64"
   },
   "harness": {
-    "fixtures/runner_inputs.json": "d7dd8cfdceef78c395192119353e37fc9d92ae2f334322b2f7b3befc3ea99cab",
-    "scripts/replay/runner_export.go": "0f23438f115f21e1ba16fbd8c1b80d965b8ef8824a5e35a011069d59ba41763b",
-    "scripts/replay/runner_export.py": "ad45e8e30086b5830ea98c12a2b6b6fcdbde95656978fb1cd92570543ad7632b"
+    "fixtures/runner_inputs.json": "792f158532664cab333a73155142501a4cc81f57fa18fbd40bf73c8ad5ec6e39",
+    "scripts/replay/runner_export.go": "914a7c0a474fb04b82c7a4b75c3bc4e058032115dcd96cc4965d307aba6efc4f",
+    "scripts/replay/runner_export.py": "0fa7b487852f57536e710386d46f01166f6ed86dfb0284ac50f7dd0815c8cfe1"
   },
   "license": "GPL-3.0-only",
   "license_copy": "licenses/SDK-GPL-3.0.txt",
@@ -96,6 +96,16 @@
       "path": "internal/agent/output_schema.go",
       "sha256": "c980f3b8e006eb63fc0eaf155f4cc9c1067bab81c73342bdeb4f7b7affa8948f",
       "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/output_schema.go"
+    },
+    {
+      "path": "internal/agent/retry.go",
+      "sha256": "2ef2fce9c7de9308938155fbadb5a236cde8eb02952f7f48ff28d5f8b6801e0c",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/retry.go"
+    },
+    {
+      "path": "internal/agent/model_settings.go",
+      "sha256": "caf251dd13636c99f6f69ded435be146f1ed4c4c4ffa3dea786f60859736df36",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/model_settings.go"
     }
   ]
 }

@@ -99,6 +99,8 @@ pub struct ModelRequest {
     pub input: Vec<RunItem>,
     pub tools: Vec<ToolDefinition>,
     pub output_schema: Option<schemars::Schema>,
+    pub output_schema_name: String,
+    pub output_schema_strict: bool,
     pub settings: serde_json::Map<String, Value>,
 }
 

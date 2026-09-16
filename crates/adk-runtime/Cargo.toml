@@ -16,3 +16,6 @@ serde_json.workspace = true
 schemars.workspace = true
 sha2 = "0.10"
 jsonschema = { version = "0.33", default-features = false }
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }

@@ -70,6 +70,10 @@ pub struct Handoff {
     pub target: Arc<AgentConfig>,
 }
 
+pub trait OutputParser: Send + Sync {
+    fn parse(&self, raw: &str) -> Result<Value, Error>;
+}
+
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
@@ -78,6 +82,9 @@ pub struct AgentConfig {
     pub tools: Vec<Arc<dyn Tool>>,
     pub handoffs: Vec<Handoff>,
     pub output_schema: Option<schemars::Schema>,
+    pub output_schema_name: String,
+    pub output_schema_strict: bool,
+    pub output_parser: Option<Arc<dyn OutputParser>>,
     pub settings: Map<String, Value>,
 }
 
@@ -91,13 +98,26 @@ impl AgentConfig {
             tools: vec![],
             handoffs: vec![],
             output_schema: None,
+            output_schema_name: "final_output".into(),
+            output_schema_strict: true,
+            output_parser: None,
             settings: Map::new(),
         }
     }
 }
 
-/// Retries apply only to model errors accepted by this predicate, before any
-/// streaming event has been exposed. Tools and host callbacks are never retried.
+pub enum ModelErrorAction {
+    Retry,
+    Continue,
+    Abort,
+}
+
+pub trait ModelErrorHandler: Send + Sync {
+    fn handle(&self, agent: &str, turn: u32, error: &Error) -> ModelErrorAction;
+}
+
+/// Policy retries supplement provider advice before any visible model event.
+/// Tools and host callbacks are never retried.
 pub struct RetryPolicy {
     pub max_retries: u32,
     pub initial_delay: Duration,
@@ -109,7 +129,7 @@ impl Default for RetryPolicy {
     fn default() -> Self {
         Self {
             max_retries: 0,
-            initial_delay: Duration::from_millis(200),
+            initial_delay: Duration::from_secs(1),
             max_delay: Duration::from_secs(30),
             retryable: |e| e.info.category == ErrorCategory::Provider,
         }
@@ -250,6 +270,7 @@ pub struct RunnerConfig {
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
+    pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
     pub limits: Limits,
     pub cost_estimator: Option<Arc<dyn CostEstimator>>,
     /// None disables the model inactivity timeout. Host backpressure is excluded.
@@ -275,6 +296,7 @@ impl Default for RunnerConfig {
             work_dir: PathBuf::from("."),
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
+            error_handler: None,
             limits: Limits::default(),
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
@@ -877,7 +899,18 @@ impl Engine {
             if !instructions.trim().is_empty() {
                 instructions.push_str("\n\n---\n\n");
             }
-            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+            let name = self.agent.output_schema_name.trim();
+            let name = if name.is_empty() {
+                "final_output"
+            } else {
+                name
+            };
+            let strict = if self.agent.output_schema_strict {
+                "\nStrict mode: do not include prose, markdown fences, or fields outside the schema."
+            } else {
+                ""
+            };
+            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
         }
         let mut settings = self.agent.settings.clone();
         if let Some(key) = &self.config.prompt_cache_key {
@@ -901,6 +934,8 @@ impl Engine {
             input,
             tools,
             output_schema: self.agent.output_schema.clone(),
+            output_schema_name: self.agent.output_schema_name.clone(),
+            output_schema_strict: self.agent.output_schema_strict,
             settings,
         };
         self.checkpoint(Boundary::ModelPrepared, None).await?;
@@ -973,6 +1008,18 @@ impl Engine {
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
         if let Some(schema) = &self.agent.output_schema {
+            if let Some(parser) = &self.agent.output_parser {
+                return match parser.parse(&output) {
+                    Ok(value) => Ok(value),
+                    Err(error) => {
+                        self.observe(Observation::OutputValidationFailed {
+                            message: error.to_string(),
+                        })
+                        .await?;
+                        Ok(Value::String(output))
+                    }
+                };
+            }
             match serde_json::from_str::<Value>(&output) {
                 Ok(value) => {
                     if !compile_schema(schema)?.is_valid(&value) {
@@ -1038,8 +1085,8 @@ impl Engine {
             .collect();
         let agent_key = Arc::as_ptr(&self.agent) as usize;
         let start = self.fallbacks.get(&agent_key).map_or(0, |state| state.0);
+        let mut attempt = 0;
         for (index, binding) in candidates.iter().enumerate().skip(start) {
-            let mut attempt = 0;
             loop {
                 self.observe(Observation::ModelAttempt {
                     agent: self.agent.name.clone(),
@@ -1065,7 +1112,6 @@ impl Engine {
                     }
                     Err((error, committed)) => {
                         if committed
-                            || !(self.config.retry.retryable)(&error)
                             || matches!(
                                 error.info.category,
                                 ErrorCategory::Cancelled | ErrorCategory::DeadlineExceeded
@@ -1073,7 +1119,35 @@ impl Engine {
                         {
                             return Err(error);
                         }
-                        if let Some(next) = candidates.get(index + 1) {
+                        attempt += 1;
+                        let advice = match binding {
+                            ModelBinding::Complete { model, .. } => model.retry_advice(&error),
+                            ModelBinding::Streaming { model, .. } => model.retry_advice(&error),
+                        };
+                        if let Some(next) = candidates.get(index + 1).filter(|_| {
+                            error.info.category != ErrorCategory::ModelBehavior
+                                && advice.as_ref().is_some_and(|advice| {
+                                    let reason = advice.reason.trim().to_ascii_lowercase();
+                                    advice.should_retry
+                                        && (matches!(
+                                            reason.as_str(),
+                                            "429" | "402" | "503" | "529"
+                                        ) || [
+                                            "rate_limit",
+                                            "too_many_requests",
+                                            "too many requests",
+                                            "overloaded",
+                                            "quota",
+                                            "billing",
+                                            "subscription",
+                                            "credit",
+                                            "limit_exceeded",
+                                            "exhausted",
+                                        ]
+                                        .iter()
+                                        .any(|part| reason.contains(part)))
+                                })
+                        }) {
                             self.fallbacks.insert(agent_key, (index + 1, 0));
                             self.observe(Observation::Fallback {
                                 from: binding.name().into(),
@@ -1081,27 +1155,62 @@ impl Engine {
                             })
                             .await?;
                             break;
-                        } else if attempt < self.config.retry.max_retries {
-                            let delay = self
-                                .config
-                                .retry
-                                .initial_delay
-                                .saturating_mul(2u32.saturating_pow(attempt))
-                                .min(self.config.retry.max_delay);
-                            self.observe(Observation::Retry {
-                                model: binding.name().into(),
-                                delay,
-                            })
-                            .await?;
-                            bounded(&self.context, None, async {
-                                tokio::time::sleep(delay).await;
-                                Ok(())
-                            })
-                            .await?;
-                            attempt += 1;
-                        } else {
+                        }
+                        if let Some(handler) = &self.config.error_handler {
+                            match handler.handle(&self.agent.name, self.turns - 1, &error) {
+                                ModelErrorAction::Retry | ModelErrorAction::Continue => continue,
+                                ModelErrorAction::Abort => return Err(error),
+                            }
+                        }
+                        let policy_retry = attempt <= self.config.retry.max_retries
+                            && (self.config.retry.retryable)(&error)
+                            && !advice.as_ref().is_some_and(|advice| {
+                                !advice.should_retry && !advice.reason.trim().is_empty()
+                            });
+                        let advised_retry =
+                            advice.as_ref().is_some_and(|advice| advice.should_retry)
+                                && attempt <= 10;
+                        if !policy_retry && !advised_retry {
                             return Err(error);
                         }
+                        let policy_delay = if attempt == 1 {
+                            self.config.retry.initial_delay
+                        } else {
+                            self.config
+                                .retry
+                                .initial_delay
+                                .saturating_mul(2u32.saturating_pow(attempt - 1))
+                                .min(if self.config.retry.max_delay.is_zero() {
+                                    Duration::from_secs(30)
+                                } else {
+                                    self.config.retry.max_delay
+                                })
+                        };
+                        let advised_delay = advice
+                            .as_ref()
+                            .map_or(Duration::ZERO, |advice| advice.retry_after);
+                        let delay = if policy_retry {
+                            policy_delay.max(advised_delay)
+                        } else if !advised_delay.is_zero() {
+                            advised_delay
+                        } else if !self.config.retry.initial_delay.is_zero() {
+                            policy_delay
+                        } else {
+                            Duration::from_secs(1)
+                                .saturating_mul(2u32.saturating_pow(attempt - 1))
+                                .min(Duration::from_secs(30))
+                        }
+                        .min(Duration::from_secs(300));
+                        self.observe(Observation::Retry {
+                            model: binding.name().into(),
+                            delay,
+                        })
+                        .await?;
+                        bounded(&self.context, None, async {
+                            tokio::time::sleep(delay).await;
+                            Ok(())
+                        })
+                        .await?;
                     }
                 }
             }

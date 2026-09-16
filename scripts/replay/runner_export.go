@@ -31,14 +31,17 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
-	Approvals bool            `json:"approvals"`
-	Name      string          `json:"name"`
-	Fallbacks []string        `json:"fallbacks"`
-	Schema    json.RawMessage `json:"schema"`
-	Streaming bool            `json:"streaming"`
-	MaxTurns  int             `json:"max_turns"`
-	Input     []item          `json:"input"`
-	Responses []response      `json:"responses"`
+	SchemaName   string          `json:"schema_name"`
+	SchemaStrict *bool           `json:"schema_strict"`
+	CustomParser bool            `json:"custom_parser"`
+	Approvals    bool            `json:"approvals"`
+	Name         string          `json:"name"`
+	Fallbacks    []string        `json:"fallbacks"`
+	Schema       json.RawMessage `json:"schema"`
+	Streaming    bool            `json:"streaming"`
+	MaxTurns     int             `json:"max_turns"`
+	Input        []item          `json:"input"`
+	Responses    []response      `json:"responses"`
 }
 
 func convert(items []item) []sdk.RunItem {
@@ -149,6 +152,26 @@ func execute(s scenario) object {
 			panic(err)
 		}
 		agent.OutputType = sdk.NewOutputSchema("final_output", canonical)
+		if s.SchemaName != "" {
+			agent.OutputType.Name = s.SchemaName
+		}
+		if s.SchemaStrict != nil {
+			agent.OutputType.Strict = *s.SchemaStrict
+		}
+		if s.CustomParser {
+			agent.OutputType.ParseFn = func(raw string) (any, error) {
+				var value struct {
+					N int `json:"n"`
+				}
+				if err := json.Unmarshal([]byte(raw), &value); err != nil {
+					return nil, err
+				}
+				if value.N < 0 {
+					return nil, errors.New("negative n")
+				}
+				return object{"accepted": value.N}, nil
+			}
+		}
 	}
 	trusted := false
 	cfg := sdk.RunConfig{MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}

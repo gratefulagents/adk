@@ -1064,5 +1064,165 @@
       }
     ],
     "approvals": true
+  },
+  {
+    "name": "custom_schema_-1_False",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_1_False",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_-1_True",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_1_True",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
   }
 ]

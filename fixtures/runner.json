@@ -3644,6 +3644,370 @@
         ],
         "streaming": true
       }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": "{\"n\":-1}",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "{\"n\":-1}",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "{\"n\":-1}",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: reviewed_result\nJSON schema:\n{\"properties\":{\"n\":{\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"n\"],\"type\":\"object\"}\n</structured_output>",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "custom_parser": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "custom_schema_-1_False",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "schema": {
+          "properties": {
+            "n": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "n"
+          ],
+          "type": "object"
+        },
+        "schema_name": "reviewed_result",
+        "schema_strict": false,
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": {
+            "accepted": 1
+          },
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "{\"n\":1}",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "{\"n\":1}",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: reviewed_result\nJSON schema:\n{\"properties\":{\"n\":{\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"n\"],\"type\":\"object\"}\n</structured_output>",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "custom_parser": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "custom_schema_1_False",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "schema": {
+          "properties": {
+            "n": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "n"
+          ],
+          "type": "object"
+        },
+        "schema_name": "reviewed_result",
+        "schema_strict": false,
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [
+          {
+            "item": {
+              "text": "{\"n\":-1}",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "{\"n\":-1}",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "{\"n\":-1}",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "{\"n\":-1}",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: reviewed_result\nJSON schema:\n{\"properties\":{\"n\":{\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"n\"],\"type\":\"object\"}\n</structured_output>",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "custom_parser": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "custom_schema_-1_True",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "schema": {
+          "properties": {
+            "n": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "n"
+          ],
+          "type": "object"
+        },
+        "schema_name": "reviewed_result",
+        "schema_strict": false,
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [
+          {
+            "item": {
+              "text": "{\"n\":1}",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": {
+            "accepted": 1
+          },
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "{\"n\":1}",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "{\"n\":1}",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: reviewed_result\nJSON schema:\n{\"properties\":{\"n\":{\"minimum\":0,\"type\":\"integer\"}},\"required\":[\"n\"],\"type\":\"object\"}\n</structured_output>",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "custom_parser": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "custom_schema_1_True",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "schema": {
+          "properties": {
+            "n": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "n"
+          ],
+          "type": "object"
+        },
+        "schema_name": "reviewed_result",
+        "schema_strict": false,
+        "streaming": true
+      }
     }
   ],
   "schema_version": 1,

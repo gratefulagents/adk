@@ -1,4 +1,10 @@
-use std::{future::Future, path::PathBuf, pin::Pin, sync::Arc, time::Instant};
+use std::{
+    future::Future,
+    path::PathBuf,
+    pin::Pin,
+    sync::Arc,
+    time::{Duration, Instant},
+};
 
 use crate::{
     ApprovalRequest, Error, ErrorCategory, ModelEvent, ModelRequest, ModelResponse, RunError,
@@ -65,9 +71,20 @@ pub trait Agent: Send + Sync {
     ) -> BoxFuture<'a, Result<RunResult, RunError>>;
 }
 
+/// Provider retry guidance; the runner owns precedence, bounds and cancellation.
+#[derive(Debug, Clone)]
+pub struct ModelRetryAdvice {
+    pub should_retry: bool,
+    pub retry_after: Duration,
+    pub reason: String,
+}
+
 /// Provider-neutral completion boundary. Streaming is a separate capability;
 /// implementations must not simulate it by silently buffering a complete call.
 pub trait Model: Send + Sync {
+    fn retry_advice(&self, _error: &Error) -> Option<ModelRetryAdvice> {
+        None
+    }
     fn provider(&self) -> &str;
     fn complete<'a>(
         &'a self,

@@ -41,10 +41,14 @@ uses its Provider-error retry predicate. Both execute real selection logic.
 Schema input is serialized to compact, sorted-key JSON before configuring either
 runner so the schema prompt bytes are identical (no output normalization).
 
-Two further scenarios (22 total) interleave two deferred approval calls with an
+Two further approval scenarios interleave two deferred approval calls with an
 eligible sibling. Both real runners must execute that sibling, pause, and return
 both pending call IDs in order. Resume safety/decision validation is separately
 covered by Rust tests; these two Go cases only test the initial suspension.
+
+Four custom-parser scenarios bring the total to 26: parser rejection preserves
+raw JSON; parser success transforms the value. Both modes use a named, non-strict
+schema and compare the resulting model instructions as well as final output.
 
 ## Canonical comparison boundary
 
@@ -68,7 +72,7 @@ covered by Rust tests; these two Go cases only test the initial suspension.
   history and committed-item event projection. All non-approval entries retain
   order and content. Approval event timing/wire marker identity is NOT compared.
 * This corpus does not claim parity for policy denial, approval resume, cancellation,
-  general retry/advice policy, handoffs, custom schema parsers, other provider
+  general retry/advice policy, handoffs, arbitrary custom parser implementations, other provider
   failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate
   engine tests cover selected Rust behavior; this is not a parity claim for

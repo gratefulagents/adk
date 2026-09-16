@@ -16,7 +16,8 @@ SOURCES = ['LICENSE', 'go.mod', 'go.sum', 'internal/agent/runner.go',
            'internal/agent/agent.go', 'internal/agent/run_config.go',
            'internal/agent/run_result.go', 'internal/agent/stream_events.go',
            'internal/agent/tool.go', 'internal/agent/usage.go',
-           'internal/agent/model_fallback.go', 'internal/agent/output_schema.go']
+           'internal/agent/model_fallback.go', 'internal/agent/output_schema.go',
+           'internal/agent/retry.go', 'internal/agent/model_settings.go']
 
 
 def digest(path):

@@ -3,5 +3,7 @@
 # Disposable Python and replay work products.
 __pycache__/
 *.pyc
+/target/
+/candidate.json
 /scripts/replay/.work/
 /scripts/replay/.home/

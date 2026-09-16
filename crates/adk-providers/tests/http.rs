@@ -342,3 +342,62 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
         serde_json::json!({"model":"test-model","input":[],"instructions":"test"})
     );
 }
+
+#[tokio::test]
+async fn copilot_factory_routes_models_and_preserves_wire_identity() {
+    use adk_providers::factory::{Kind, RouteSpec};
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let mut captured = Vec::new();
+        for body in [
+            r#"{"content":[{"type":"text","text":"ok"}],"stop_reason":"end_turn"}"#,
+            r#"{"output":[],"status":"completed"}"#,
+            r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}]}"#,
+        ] {
+            let (mut socket, _) = listener.accept().unwrap();
+            captured.push(read_request(&mut socket));
+            write!(
+                socket,
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+                body.len(),
+                body
+            )
+            .unwrap();
+        }
+        captured
+    });
+    let spec = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: Some("work".into()),
+        endpoint: Some(format!("http://{addr}/v1")),
+        protocol: None,
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    };
+    let model = spec
+        .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+        .unwrap();
+    for name in ["copilot/claude-opus-4.6", "gpt-5.4", "gpt-4o"] {
+        let mut input = request();
+        input.model = name.into();
+        model.complete(&context(), input).await.unwrap();
+    }
+    let captured = server.join().unwrap();
+    for (i, path) in ["/v1/messages", "/v1/responses", "/v1/chat/completions"]
+        .iter()
+        .enumerate()
+    {
+        assert!(captured[i].starts_with(&format!("POST {path} HTTP/1.1")));
+        assert!(
+            captured[i]
+                .to_lowercase()
+                .contains("copilot-integration-id: vscode-chat")
+        );
+        assert!(!captured[i].to_lowercase().contains("x-api-key:"));
+    }
+    let body: serde_json::Value =
+        serde_json::from_str(captured[0].split_once("\r\n\r\n").unwrap().1).unwrap();
+    assert_eq!(body["model"], "claude-opus-4.6");
+    assert_eq!(body["max_tokens"], 64000);
+}

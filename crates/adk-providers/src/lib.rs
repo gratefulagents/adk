@@ -5,6 +5,7 @@
 //! the explicitly tested compatibility boundary.
 pub mod auth;
 pub mod client;
+pub mod copilot;
 pub mod cost;
 pub mod error;
 pub mod factory;

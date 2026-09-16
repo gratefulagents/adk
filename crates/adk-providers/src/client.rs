@@ -99,6 +99,12 @@ impl Provider {
                 .unwrap()
                 .remove("prompt_cache_retention");
         }
+        if scope.mode == AuthMode::CopilotOAuth
+            && self.protocol == Protocol::Anthropic
+            && !request.settings.contains_key("max_tokens")
+        {
+            body["max_tokens"] = 64000.into();
+        }
         self.send_body(context, self.protocol.path(), body).await
     }
     async fn send_body(
@@ -108,15 +114,30 @@ impl Provider {
         body: Value,
     ) -> Result<reqwest::Response, Error> {
         let scope = self.session.scope();
-        let endpoint = format!("{}{path}", scope.endpoint);
         for attempt in 0..=1 {
             let material = self.session.material(context).await?;
+            let mut resolved = scope.clone();
+            if scope.mode == AuthMode::CopilotOAuth {
+                resolved.endpoint = crate::copilot::request_endpoint(
+                    &scope.endpoint,
+                    material.access_token.expose(),
+                );
+                if self.protocol == Protocol::Anthropic {
+                    resolved.endpoint = resolved
+                        .endpoint
+                        .trim_end_matches("/chat/completions")
+                        .trim_end_matches("/v1")
+                        .to_owned();
+                }
+            }
+            let endpoint = format!("{}{path}", resolved.endpoint);
             let mut body = body.clone();
             if let Some(key) = body.get("prompt_cache_key").and_then(Value::as_str) {
-                body["prompt_cache_key"] = crate::auth::cache_scope(scope, &material, key).into();
+                body["prompt_cache_key"] =
+                    crate::auth::cache_scope(&resolved, &material, key).into();
             }
             let headers =
-                crate::auth::headers(scope, &material, self.protocol == Protocol::Anthropic)?;
+                crate::auth::headers(&resolved, &material, self.protocol == Protocol::Anthropic)?;
             let response = crate::active(
                 context,
                 self.client

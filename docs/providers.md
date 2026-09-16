@@ -44,7 +44,7 @@ PR #19 (`28dcc3a`); this work does not depend on an unmerged runner patch.
 | Groq | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
 | xAI | Responses default / API key | Canonical typed factory implemented; model settings and fixtures pending |
 | Local | Chat / optional API key | Explicit loopback HTTP and anonymous scope supported; canonical factory/defaults implemented |
-| Copilot | Metadata-selected Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh exchange exists; material parsing implemented; model discovery/selection, token-derived endpoint restrictions pending; Copilot identity headers implemented |
+| Copilot | Model-family Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh/material, family routing, explicit protocol override, token endpoint allow-list and identity headers implemented; Claude thinking/cache shaping and full fixtures pending |
 | Named/multi | Above under independent prefixes, route overrides | Explicit registry and typed per-route factory implemented; baseline implicit ProviderSpec inference and delayed unavailable secondary legs pending |
 
 Unsupported audio/files/handoffs fail explicitly. Native `RunItem::Reasoning`
@@ -73,6 +73,15 @@ shares one `Session` per actual credential scope. Multiple unrelated sessions
 for one rotating refresh token are **not** a distributed refresh lock. Storage
 implementations must enforce their own cross-process single-flight semantics.
 Store and refresh trait errors must be sanitized by the host.
+
+Copilot uses the pinned factory's fallback heuristic (Claude → Messages,
+GPT-5/Codex → Responses, others → Chat), not an implicit `/models` network lookup.
+An explicit `RouteSpec.protocol` overrides that heuristic, including the baseline
+force-Chat rollback behavior without reading an environment flag. Token `proxy-ep`
+hints can select only the individual/business/enterprise GitHub Copilot API hosts
+and only when the configured endpoint is a canonical default. Custom endpoints
+are never overridden. Cache keys include the actual selected endpoint. Material
+lookup/persistence remains under the host's original logical credential scope.
 
 All HTTP clients disallow redirects and automatic environment proxy discovery.
 Endpoints require HTTPS except explicitly configured loopback HTTP; URL userinfo,

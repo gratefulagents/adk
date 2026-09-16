@@ -91,7 +91,7 @@ impl RouteSpec {
         &self,
         store: Arc<dyn CredentialStore>,
         refresh: Arc<dyn Refresh>,
-    ) -> Result<Provider, Error> {
+    ) -> Result<Arc<dyn adk_core::StreamingModel>, Error> {
         let scope = self.scope()?;
         let protocol = self.protocol.unwrap_or(self.kind.protocol());
         if (self.kind == Kind::Anthropic && protocol != Protocol::Anthropic)
@@ -101,10 +101,11 @@ impl RouteSpec {
             return Err(crate::invalid("protocol does not match provider kind"));
         }
         let name = scope.route.clone();
-        Provider::new(
-            name,
-            protocol,
-            Arc::new(Session::new(scope, store, refresh)?),
-        )
+        let session = Arc::new(Session::new(scope, store, refresh)?);
+        if self.kind == Kind::Copilot && self.protocol.is_none() {
+            Ok(Arc::new(crate::copilot::Copilot::new(name, session)?))
+        } else {
+            Ok(Arc::new(Provider::new(name, protocol, session)?))
+        }
     }
 }

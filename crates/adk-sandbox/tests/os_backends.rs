@@ -101,7 +101,10 @@ async fn os_enforcement_required_in_ci() {
         b"original"
     );
 
-    let result = executor.run(&ctx, shell("printf allowed > new; mkdir newdir; printf index > .git/index; if (printf bad > .git/config) 2>/dev/null; then exit 21; fi; if (printf bad > .mcp.json) 2>/dev/null; then exit 22; fi; if (printf bad > .git/hooks/evil) 2>/dev/null; then exit 23; fi; if mv .git movedgit 2>/dev/null; then exit 24; fi; if (printf bad > escape) 2>/dev/null; then exit 25; fi; if ln .git/config alias 2>/dev/null; then if (printf bad > alias) 2>/dev/null; then exit 26; fi; fi; printf writable", AccessMode::WorkspaceWrite)).await.unwrap();
+    // The absolute symlink may resolve to a new file in Linux's private /tmp.
+    // The invariant is that the HOST target stays unchanged (checked below),
+    // not that every write to a same-spelled private path fails.
+    let result = executor.run(&ctx, shell("printf allowed > new; mkdir newdir; printf index > .git/index; if (printf bad > .git/config) 2>/dev/null; then exit 21; fi; if (printf bad > .mcp.json) 2>/dev/null; then exit 22; fi; if (printf bad > .git/hooks/evil) 2>/dev/null; then exit 23; fi; if mv .git movedgit 2>/dev/null; then exit 24; fi; (printf bad > escape) 2>/dev/null || :; if ln .git/config alias 2>/dev/null; then if (printf bad > alias) 2>/dev/null; then exit 26; fi; fi; printf writable", AccessMode::WorkspaceWrite)).await.unwrap();
     assert!(result.status.success(), "{result:?}");
     assert_eq!(result.stdout, b"writable");
     assert_eq!(fs::read(workspace.join("new")).unwrap(), b"allowed");
@@ -138,6 +141,24 @@ async fn os_enforcement_required_in_ci() {
     assert!(result.status.success(), "network deny test: {result:?}");
     assert!(String::from_utf8_lossy(&result.stdout).contains("network-denied"));
 
+    #[cfg(target_os = "macos")]
+    {
+        fs::write(workspace.join("host-pid"), std::process::id().to_string()).unwrap();
+        let mut request = Request::new(workspace.join("network-helper"));
+        request.args = vec![
+            "--ignored".into(),
+            "--exact".into(),
+            "host_environment_helper".into(),
+        ];
+        request.timeout = Some(Duration::from_secs(5));
+        let result = executor.run(&ctx, request).await.unwrap();
+        assert!(
+            result.status.success(),
+            "host environment denial: {result:?}"
+        );
+        assert!(String::from_utf8_lossy(&result.stdout).contains("host-environment-denied"));
+    }
+
     #[cfg(target_os = "linux")]
     {
         let mut req = shell(
@@ -167,4 +188,31 @@ fn network_helper() {
     let address = fs::read_to_string("address").unwrap().parse().unwrap();
     assert!(std::net::TcpStream::connect_timeout(&address, Duration::from_millis(300)).is_err());
     println!("network-denied");
+}
+
+#[cfg(target_os = "macos")]
+#[test]
+#[ignore = "invoked inside Seatbelt by os_enforcement_required_in_ci"]
+fn host_environment_helper() {
+    let pid: i32 = fs::read_to_string("host-pid").unwrap().parse().unwrap();
+    let mut mib = [libc::CTL_KERN, libc::KERN_PROCARGS2, pid];
+    let mut bytes = vec![0u8; 64 * 1024];
+    let mut size = bytes.len();
+    // Query only this test's trusted parent, never print its environment.
+    let result = unsafe {
+        libc::sysctl(
+            mib.as_mut_ptr(),
+            3,
+            bytes.as_mut_ptr().cast(),
+            &mut size,
+            std::ptr::null_mut(),
+            0,
+        )
+    };
+    assert_eq!(result, -1, "host process environment must be inaccessible");
+    assert!(matches!(
+        std::io::Error::last_os_error().raw_os_error(),
+        Some(libc::EPERM | libc::EACCES)
+    ));
+    println!("host-environment-denied");
 }

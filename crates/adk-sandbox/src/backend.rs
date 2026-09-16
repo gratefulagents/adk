@@ -258,9 +258,7 @@ fn seatbelt_profile(config: &Config, request: &Request) -> Result<String, Error>
     if config.workspace.to_str().is_none() {
         return Err(Error::Invalid("non-UTF8 workspace".into()));
     }
-    let mut profile = String::from(
-        "(version 1)\n(deny default)\n(allow process-exec)\n(allow process-fork)\n(allow signal (target same-sandbox))\n(allow process-info* (target same-sandbox))\n(allow sysctl-read)\n",
-    );
+    let mut profile = String::from(include_str!("seatbelt-base.sb"));
     profile.push_str("(allow file-read* (subpath \"/usr\") (subpath \"/bin\") (subpath \"/sbin\") (subpath \"/System/Library\") (subpath \"/Library/Apple\") (subpath \"/private/var/db/dyld\") (literal \"/dev/null\") (literal \"/dev/urandom\") (literal \"/dev/random\"))\n");
     profile.push_str("(allow file-read* file-write* (subpath (param \"PRIVATE\")))\n(allow file-write-data (literal \"/dev/null\"))\n");
     profile.push_str("(allow file-read* (require-all (subpath (param \"WORKSPACE\"))");
@@ -297,6 +295,8 @@ mod tests {
         assert!(!args.windows(3).any(|w| w == ["--ro-bind", "/", "/"]));
         let profile = seatbelt_profile(&config, &req).unwrap();
         assert!(profile.contains("(deny default)"));
+        assert!(!profile.contains("(allow sysctl-read)"));
+        assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
         assert!(!profile.contains("(allow network*)"));
         assert!(!profile.contains("(allow file-write*"));
     }

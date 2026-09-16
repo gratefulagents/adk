@@ -29,6 +29,8 @@ The executor never creates these in the host workspace. Missing/wrong-type entri
 
 `Auto` selects fixed `/usr/bin/sandbox-exec`. A default-deny Seatbelt profile allows only runtime reads, workspace reads, private temporary storage, process creation and same-sandbox signals/process info. Network is denied unless explicitly allowed. Parameters, not profile-string interpolation, carry paths. Known credential entries and protected metadata are excluded from grants; the workspace root and `.git` parent cannot be renamed. Unlike Linux, the profile protects absent names without mountpoint prerequisites.
 
+The fixed runtime profile in `src/seatbelt-base.sb` derives from the pinned SDK's `pkg/agentsdk/sandbox/executor_seatbelt.go` (GPL-3.0-only). Sysctl reads are allowlisted: broad sysctl access could disclose other host process environments. Only the runtime's `kern.grade_cputype` sysctl write and private-terminal ioctl are granted.
+
 Every real execution first runs a bounded, lifecycle-managed functional read/write probe: a command must read an allowed fixture, fail writing a forbidden path, and return the expected marker; the host also checks the forbidden path was not created. A failed probe prevents the requested command from starting. Seatbelt is deprecated and must be required/tested on the exact host OS release; Linux tests do not verify it.
 
 ### Explicit local and unsupported platforms
@@ -57,4 +59,4 @@ ADK_REQUIRE_SANDBOX=1 cargo test -p adk-sandbox --test os_backends -- --nocaptur
 cargo clippy -p adk-sandbox --all-targets -- -D warnings
 ```
 
-The default OS test prints an explicit `SKIP` diagnostic on backend unavailability. Setting **any** value of `ADK_REQUIRE_SANDBOX` turns that into a failure. Native Linux/macOS CI must set it; argument/profile generation tests alone are not evidence of containment. The single ignored `network_helper` test is a fixture executed *inside* the sandbox by the enforcement suite, not a skipped security assertion. Windows has a separate fail-closed test.
+The default OS test prints an explicit `SKIP` diagnostic on backend unavailability. Setting **any** value of `ADK_REQUIRE_SANDBOX` turns that into a failure. Native Linux/macOS CI must set it; argument/profile generation tests alone are not evidence of containment. The ignored `network_helper` and macOS `host_environment_helper` tests are fixtures executed *inside* the sandbox by the enforcement suite, not skipped security assertions. Windows has a separate fail-closed test.

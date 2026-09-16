@@ -150,9 +150,15 @@ async fn supervise(
             || denied.exists()
             || std::fs::read(private.0.join("home/readable"))? != b"probe"
         {
-            return Err(Error::Unavailable(
-                "Seatbelt functional read/write enforcement probe failed".into(),
-            ));
+            // This is output of a fixed host-owned probe, never the requested
+            // workload. Keep diagnostics bounded so native CI can distinguish
+            // profile/compiler failures from a failed enforcement assertion.
+            return Err(Error::Unavailable(format!(
+                "Seatbelt functional read/write enforcement probe failed (status {}, completion {:?}, stderr: {})",
+                result.status,
+                result.completion,
+                String::from_utf8_lossy(&result.stderr[..result.stderr.len().min(2048)])
+            )));
         }
     }
     let mut built = backend::build(&config, &request)?;

@@ -209,6 +209,9 @@ mod tests {
         }
         let env = environment(&BTreeMap::new(), Path::new("/tmp/private")).unwrap();
         assert_eq!(env["PATH"], "/usr/bin:/bin");
-        assert_eq!(env["HOME"], "/tmp/private/home");
+        assert_eq!(
+            env["HOME"],
+            Path::new("/tmp/private").join("home").to_string_lossy()
+        );
     }
 }

@@ -149,6 +149,7 @@ async fn os_enforcement_required_in_ci() {
             "--ignored".into(),
             "--exact".into(),
             "host_environment_helper".into(),
+            "--nocapture".into(),
         ];
         request.timeout = Some(Duration::from_secs(5));
         let result = executor.run(&ctx, request).await.unwrap();

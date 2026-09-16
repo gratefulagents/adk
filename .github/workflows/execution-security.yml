@@ -33,12 +33,6 @@ jobs:
         run: |
           sudo /usr/bin/log show --last 3m --style compact --predicate 'eventMessage CONTAINS "Sandbox:" OR process == "sandboxd"' | tail -100
           python3 scripts/seatbelt-diagnostics.py
-          cc scripts/stack-probe.c -o "$RUNNER_TEMP/stack-probe"
-          "$RUNNER_TEMP/stack-probe"
-          cp crates/adk-sandbox/src/seatbelt-base.sb "$RUNNER_TEMP/stack-probe.sb"
-          # Diagnostic process only; no production policy change.
-          echo '(allow file-read*)' >> "$RUNNER_TEMP/stack-probe.sb"
-          /usr/bin/sandbox-exec -f "$RUNNER_TEMP/stack-probe.sb" /usr/bin/env -i "$RUNNER_TEMP/stack-probe"
   unsupported-target:
     runs-on: windows-latest
     steps:

@@ -127,3 +127,21 @@ process from escaping its group. Kernel compromise, resource exhaustion, network
 egress destinations, all host secrets, and runtime destruction before async
 cleanup are not solved merely by owning Rust handles. These limitations must
 remain visible in public API documentation and CI evidence.
+
+### Native macOS runtime compatibility
+
+Native macOS 14 arm64 CI exposed a Rust 1.88 startup failure before `main`:
+`failed to allocate a guard page: Invalid argument`. A bounded C probe confirmed
+that `getpagesize()` returned `-1` inside the profile versus `16384` outside,
+with identical stack limits. Apple's numeric `CTL_HW/HW_PAGESIZE` API resolves
+to **`hw.pagesize_compat`**, not the separately named `hw.pagesize` already in
+the allowlist. The profile now permits that exact read; it does not grant global
+sysctl access. References:
+
+- [Apple XNU 10063.121.3 page-size sysctl definitions](https://github.com/apple-oss-distributions/xnu/blob/xnu-10063.121.3/bsd/kern/kern_mib.c)
+- [Apple libc numeric page-size query](https://github.com/apple-oss-distributions/Libc/blob/Libc-1592.100.35/gen/FreeBSD/getpagesize.c)
+- [Rust 1.88 guard alignment and mapping](https://github.com/rust-lang/rust/blob/1.88.0/library/std/src/sys/pal/unix/stack_overflow.rs)
+
+CI runs the Rust helper under the real profile and separately verifies that
+`kern.procargs2` cannot read the trusted parent's environment. Startup probes
+must execute representative runtimes, not only `/bin/sh`.

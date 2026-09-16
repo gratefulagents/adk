@@ -66,7 +66,7 @@ struct ScriptModel {
 }
 
 impl ScriptModel {
-    fn respond(&self, request: ModelRequest) -> (ModelResponse, Vec<String>) {
+    fn respond(&self, request: ModelRequest) -> Result<(ModelResponse, Vec<String>), Error> {
         self.requests.lock().unwrap().push(json!({
             "model":request.model, "instructions":request.instructions,
             "input":normalized(&request.input), "tools":request.tools.iter().map(|t| &t.name).collect::<Vec<_>>()
@@ -77,6 +77,9 @@ impl ScriptModel {
             .unwrap()
             .pop_front()
             .expect("model script exhausted");
+        if let Some(error) = script["error"].as_str() {
+            return Err(Error::new(ErrorCategory::Provider, error));
+        }
         let response = ModelResponse {
             items: input_items(&script["items"], Role::Assistant),
             usage: Usage {
@@ -94,7 +97,7 @@ impl ScriptModel {
             .iter()
             .map(|v| v.as_str().unwrap().into())
             .collect();
-        (response, deltas)
+        Ok((response, deltas))
     }
 }
 
@@ -109,7 +112,7 @@ impl Model for ScriptModel {
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             assert!(!self.streaming, "streaming path silently used completion");
-            Ok(self.respond(request).0)
+            Ok(self.respond(request)?.0)
         })
     }
 }
@@ -128,7 +131,7 @@ impl StreamingModel for ScriptModel {
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         Box::pin(async move {
             assert!(self.streaming);
-            let (response, deltas) = self.respond(request);
+            let (response, deltas) = self.respond(request)?;
             let mut events: VecDeque<_> = deltas
                 .into_iter()
                 .map(|delta| ModelEvent::TextDelta { delta })
@@ -245,6 +248,21 @@ async fn replay(script: &Value) -> Value {
     let mut agent = AgentConfig::new("replay-agent", binding);
     agent.instructions = "Follow the replay script.".into();
     agent.tools.push(tool.clone());
+    if let Some(names) = script["fallbacks"].as_array() {
+        agent.fallbacks = names
+            .iter()
+            .map(|name| {
+                if streaming {
+                    ModelBinding::streaming(name.as_str().unwrap(), model.clone())
+                } else {
+                    ModelBinding::complete(name.as_str().unwrap(), model.clone())
+                }
+            })
+            .collect();
+    }
+    if !script["schema"].is_null() {
+        agent.output_schema = Some(script["schema"].clone().try_into().unwrap());
+    }
     let runner = Runner::new(
         agent,
         RunnerConfig {
@@ -346,7 +364,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 8);
+    assert_eq!(cases.len(), 20);
     assert_eq!(
         cases
             .iter()

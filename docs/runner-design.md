@@ -16,8 +16,9 @@ Inspected versioned sources, not unversioned example snippets:
   Its sans-I/O `AgentRun` and effectful `AgentRunner` share normal/streamed
   execution. Adopt a single explicit state machine and advertisement/dispatch
   consistency, not the Go goroutine topology. Reject blindly copying its turn
-  accounting (zero means no calls; retries consume turns), concurrent hook
-  interleaving, or synthetic structured-output tool defaults. Those change
+  accounting (zero means no calls; retries consume turns) or synthetic
+  structured-output tool defaults. Tool scheduling follows the Go read/write
+  exclusion contract, rather than adopting another framework’s defaults. Those change
   observable contracts. The tagged runner is in `rig-agent`, not the historical
   `rig-core/src/agent` location.
 * **Swiftide v0.32.1**, [release, 2025-11-15](https://github.com/bosun-ai/swiftide/releases/tag/v0.32.1),
@@ -41,7 +42,9 @@ code; access policy is not an OS sandbox.
 ## Ownership and behavior
 
 One engine drives both complete and genuinely streaming model capabilities.
-Tool effects are sequential and ordered. Approval suspension owns the exact
+Ordinary preauthorized tool batches run as owned concurrent futures. Read-only
+tools share a Tokio read lock; mutations take its exclusive write lock. Results
+fold in call order, while starts and raw-output hooks may interleave. Approval suspension owns the exact
 unresolved call and remaining queue; resumption consumes the continuation, not a
 reconstructed `input + new_items` transcript. This prevents completed effects
 being repeated by the continuation API, **not exactly-once execution after a
@@ -52,9 +55,10 @@ must race pending I/O; checking a flag only before dispatch is insufficient.
 Provider idle timeouts reset per received event rather than acting as total
 stream deadlines. Limits stop at reported usage boundaries, not mid-generation;
 provider compaction reports usage and cost too, and is charged before another
-model call. A cost-limited run requires a cost estimator. Retries re-enter the
-primary model each turn rather than maintaining Go's sticky fallback/reprobe
-counter. No tool effect is automatically retried, and cancellation cannot undo an
+model call. A cost-limited run requires a cost estimator. Fallback selection and success counts are per agent identity, live inside the
+continuation, and reset to primary after three successful fallback calls. A new
+fallback resets its count; a failed primary reprobe can select fallback again.
+Configured fallback is selected before policy retries, matching Go's precedence. No tool effect is automatically retried, and cancellation cannot undo an
 already-completed external effect. Raw tool hooks observe
 output before model-facing wrapping/capping; a trusted observer must handle that
 sensitive data accordingly. Owned spill files outlive the model's use of them and
@@ -94,19 +98,72 @@ Relevant references: [runner](https://github.com/gratefulagents/sdk/blob/1dc92b7
 | Streaming | Ordered deltas/terminal events, bounded producer advance, dropped consumer releases owned work |
 | Handoff | Target dispatch and last agent, tool queue ordering, turn accounting |
 
-Go defaults nonpositive max turns to 100; native core instead requires an explicit
-nonzero turn budget. Do not invent a Go-style sentinel in the Rust policy. Go's
-ChatLoop initial error branch discards the runner partial result; retaining usable
-partial results is an intentional Rust improvement. The Go no-gate denial branch
-also has history/interruption-state ambiguities; owned continuations avoid copying
-that control flow. Go provider retry advice, default compaction heuristics and
-fallback reprobe timing are not automatically supplied by neutral core traits.
-Rust rejects schema-invalid final output with a typed error and retained response,
-rather than Go's warning-and-raw-string fallback. Tool-provided trust delimiters
-are escaped instead of being accepted as evidence that output is already wrapped.
-These are deliberate fail-closed behavior changes. Native tool execution is
-sequential; unlike Go's concurrent batch dispatch, effect completion and hook
-ordering are deterministic. This is not a timing/concurrency parity claim.
+### Delivery-scope audit (PR18 correction)
+
+Documentation does not approve external differences. **Issue #4 is not scope
+complete.** The following is an enumerated audit, not a parity waiver.
+
+1. **Sticky fallback/reprobe restored.** Pinned `runner.go:517–522, 715–717,
+   1114–1115, 1224–1230` stores fallback per agent, counts successful calls and
+   clears it at three. Rust retains the same state through approval continuation,
+   selects subsequent fallback on failure, resets the count on switching, and
+   reprobes primary. Replay includes recovery, failed reprobe and chain switching,
+   in regular and streaming modes. Rust tests also cover continuation retention,
+   distinct agents with the same display name, and fallback-before-retry priority.
+2. **Default structured-output outcomes restored.** `runner.go:2137–2146` warns
+   and keeps raw text when `OutputType.Validate` fails. Crucially,
+   `output_schema.go:Validate` defaults to JSON parsing, not JSON Schema validation:
+   schema-invalid but parseable JSON is returned parsed. Rust now matches both
+   outcomes, including schema prompt instructions, and exposes validation problems
+   as `OutputValidationFailed` observations instead of aborting by default.
+   A host may deliberately fail its hook (an explicit host policy, not default).
+   Replay compares non-JSON, schema-invalid JSON, and valid JSON in both modes.
+   Go's optional arbitrary `ParseFn`, schema name and strict-mode controls have no
+   corresponding configuration in the existing Rust `Option<schemars::Schema>`;
+   their mapping remains a public-configuration boundary, not claimed equivalence.
+3. **Ordinary tool concurrency restored, approval scheduling still unresolved.**
+   `runner.go:2288–2365` uses concurrent read-safe tools/exclusive mutations and
+   ordered result slots. Rust uses `join_all` plus a Tokio `RwLock`, no spawned
+   producer/tasks. Barrier tests prove read fan-out (sequential execution would
+   deadlock), exclusive mutations, ordered result folding, and consumer-drop
+   cleanup in both execution modes. No exact concurrent start/hook order is
+   promised by either baseline; results retain input order. Go's managed-subagent
+   parallel-safe marker/semaphore remains in its dedicated integration issue.
+
+   **Unapproved boundary:** Go partitions approvals before executing eligible
+   sibling tools and returns a batch of approval items (`runner.go:2229–2285`).
+   Rust's `Continuation::resume(Option<ApprovalDecision>)` surfaces one deferred
+   call and stops there; batches containing approval/policy failures still use
+   this cursor path. Thus an eligible sibling after a deferred call does not yet
+   run, unlike Go. This is external, not internal-only. Exact parity needs a
+   batch decision/call-ID continuation protocol and an approval-history/event
+   representation agreed with the #2 core contracts; alternatively the maintainer
+   can explicitly approve the single-call protocol. Neither option is presumed
+   approved here; ordinary-batch tests do not establish approval-batch parity.
+4. **Other previously declared differences need explicit disposition.** Rust
+   retains initial conversation error partials where Go ChatLoop discards them;
+   requires a nonzero turn budget instead of Go's nonpositive default-100 sentinel;
+   escapes tool-supplied trust delimiters instead of Go's accepted-wrapper bypass.
+   These affect results/configuration/model-visible text and are not merely Rust
+   internals. Preserve the core API/security behavior pending a maintainer decision
+   to approve these departures or specify a compatibility surface; documentation
+   alone is not that decision. No security bypass was reintroduced.
+5. **Provider-policy parity is still bounded.** Core `Model` errors carry no Go
+   `ModelRetryAdvice` (retry-after, reason, retryability), `ErrorHandler`, or
+   `ParseFn` analogue. Rust's configured retry predicate is the selection boundary;
+   full advice precedence/eligible-error and five-minute delay-cap mapping needs
+   that adapter/configuration contract. The replay scripts use an explicit Go
+   overloaded/retryable error and corresponding Rust Provider error; they do not
+   prove all provider-error classes equivalent. Compaction defaults and full
+   Go hook/trace payload parity likewise remain unproven, not excluded from #4.
+
+Concrete delivery boundary: fallback/reprobe and default schema outcomes are
+corrected and verified; ordinary tool scheduling is corrected with owned Rust
+futures. Approval-batch/public-configuration compatibility and the explicitly
+listed external differences above still need resolution. Do not close #4 or
+approve the full delivery scope on the basis of this correction. The options are
+baseline-compatible core/runtime additions with corresponding replay, or explicit
+maintainer approval of each named external departure under #1.
 
 Cross-language replay must use the real Go runner and the Rust engine, normalize
 only declared representation differences, retain event order/call correlations,
@@ -122,12 +179,13 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: eight real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 20 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
+| Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |
-| Retry/limits/timeouts | `retries_then_fallback_without_spending_extra_turns`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
+| Retry/limits/timeouts | `fallback_precedes_policy_retries_without_spending_extra_turns`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
 | Compaction/cache/context | `compaction_replaces_history_and_hints_cache_prefix_are_request_only` |
-| Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_is_schema_validated_not_just_json_parsed`, `handoff_preempts_siblings_and_pairs_all_calls` |
+| Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |
 | Hooks/spill lifetimes | `raw_hooks_precede_processing_and_spills_live_across_pause_and_error`, `durable_failure_before_effect_fails_closed_after_effect_preserves_result`, 12 `output.rs` unit tests |
 | Independent review regressions | `tests/review_regressions.rs`: failed resume adoption; trailing partial text after reasoning/completed messages; no duplicated committed deltas; last nonempty final answer validated in both execution modes |
 

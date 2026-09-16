@@ -455,9 +455,9 @@ async fn cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream() {
 }
 
 #[tokio::test]
-async fn retries_then_fallback_without_spending_extra_turns() {
-    let primary = TestModel::with(vec![Err(provider_error()), Err(provider_error())]);
-    let fallback = TestModel::with(vec![Ok(answer("fallback"))]);
+async fn fallback_precedes_policy_retries_without_spending_extra_turns() {
+    let primary = TestModel::with(vec![Err(provider_error())]);
+    let fallback = TestModel::with(vec![Err(provider_error()), Ok(answer("fallback"))]);
     let mut a = agent(primary.clone());
     a.fallbacks = vec![ModelBinding::complete("backup", fallback.clone())];
     let mut config = RunnerConfig::default();
@@ -469,7 +469,8 @@ async fn retries_then_fallback_without_spending_extra_turns() {
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("fallback")));
-    assert_eq!(primary.completes.load(Ordering::SeqCst), 2);
+    assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
+    assert_eq!(fallback.completes.load(Ordering::SeqCst), 2);
     assert_eq!(fallback.requests.lock().unwrap()[0].model, "backup");
     assert_eq!(result.result.responses.len(), 1);
 }
@@ -680,23 +681,37 @@ fn duplicate_names_and_invalid_schema_are_rejected() {
 }
 
 #[tokio::test]
-async fn structured_output_is_schema_validated_not_just_json_parsed() {
+async fn structured_output_validation_preserves_baseline_result() {
     for output in ["not json", "{\"n\":-1}", "{\"n\":1}"] {
         let mut a = agent(TestModel::with(vec![Ok(answer(output))]));
         a.output_schema = Some(
             schemars::json_schema!({"type":"object", "required":["n"], "properties":{"n":{"type":"integer", "minimum":0}}, "additionalProperties":false}),
         );
-        let result = runner(a)
-            .run(context(), request(1), Arc::new(TestHost::default()))
-            .await;
-        if output == "{\"n\":1}" {
-            assert_eq!(result.unwrap().result.final_output, Some(json!({"n":1})));
-        } else {
-            assert_eq!(
-                result.err().unwrap().error.info.category,
-                ErrorCategory::ModelBehavior
-            );
-        }
+        let hooks = Arc::new(Observations::default());
+        let result = Runner::new(
+            a,
+            RunnerConfig {
+                hooks: Some(hooks.clone()),
+                ..RunnerConfig::default()
+            },
+        )
+        .unwrap()
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await;
+        assert_eq!(
+            result.unwrap().result.final_output,
+            Some(serde_json::from_str(output).unwrap_or_else(|_| json!(output)))
+        );
+        assert_eq!(
+            hooks
+                .seen
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|event| matches!(event, Observation::OutputValidationFailed { .. }))
+                .count(),
+            usize::from(output != "{\"n\":1}")
+        );
     }
 }
 
@@ -1218,4 +1233,213 @@ async fn conversation_keeps_failed_spill_history_alive_after_error_is_dropped() 
     assert!(path.exists());
     drop(conversation);
     assert!(!path.exists());
+}
+
+#[tokio::test]
+async fn sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes() {
+    let primary = TestModel::with(vec![Err(provider_error()), Ok(answer("primary recovered"))]);
+    let backup = TestModel::with(vec![
+        Ok(response(vec![call("1", "approved")], None)),
+        Ok(response(vec![], Some(false))),
+        Ok(response(vec![], Some(false))),
+    ]);
+    let tool = TestTool::new("approved", true, false);
+    let mut a = agent(primary.clone());
+    a.fallbacks = vec![ModelBinding::complete("backup", backup.clone())];
+    a.tools = vec![tool.clone()];
+    let host = Arc::new(TestHost::default());
+    host.approvals
+        .lock()
+        .unwrap()
+        .push_back(ApprovalDecision::Defer);
+    let paused = runner(a).run(context(), request(4), host).await.unwrap();
+    assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
+    let done = paused
+        .continuation
+        .unwrap()
+        .resume(Some(ApprovalDecision::Approve))
+        .await
+        .unwrap();
+    assert_eq!(done.result.final_output, Some(json!("primary recovered")));
+    assert_eq!(primary.completes.load(Ordering::SeqCst), 2);
+    assert_eq!(backup.completes.load(Ordering::SeqCst), 3);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+}
+
+struct BatchTool {
+    definition: ToolDefinition,
+    barrier: Option<Arc<tokio::sync::Barrier>>,
+    active: Arc<AtomicUsize>,
+    peak: Arc<AtomicUsize>,
+    drops: Arc<AtomicUsize>,
+    pending: bool,
+}
+impl Tool for BatchTool {
+    fn definition(&self) -> &ToolDefinition {
+        &self.definition
+    }
+    fn execute<'a>(
+        &'a self,
+        _: &'a ToolContext,
+        _: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            struct Guard<'a>(&'a AtomicUsize, &'a AtomicUsize);
+            impl Drop for Guard<'_> {
+                fn drop(&mut self) {
+                    self.0.fetch_sub(1, Ordering::SeqCst);
+                    self.1.fetch_add(1, Ordering::SeqCst);
+                }
+            }
+            let n = self.active.fetch_add(1, Ordering::SeqCst) + 1;
+            let _guard = Guard(&self.active, &self.drops);
+            self.peak.fetch_max(n, Ordering::SeqCst);
+            if let Some(barrier) = &self.barrier {
+                barrier.wait().await;
+            }
+            if self.pending {
+                std::future::pending::<()>().await;
+            }
+            tokio::task::yield_now().await;
+            Ok(ToolOutput {
+                content: vec![Content::Text {
+                    text: self.definition.name.clone(),
+                }],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+
+#[tokio::test]
+async fn tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order() {
+    for read_only in [true, false] {
+        for streaming in [false, true] {
+            let active = Arc::new(AtomicUsize::new(0));
+            let peak = Arc::new(AtomicUsize::new(0));
+            let drops = Arc::new(AtomicUsize::new(0));
+            let barrier = read_only.then(|| Arc::new(tokio::sync::Barrier::new(2)));
+            let calls = response(vec![call("1", "one"), call("2", "two")], None);
+            let model = if streaming {
+                TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
+                    response: calls,
+                })])
+            } else {
+                TestModel::with(vec![Ok(calls)])
+            };
+            let mut a = agent(model);
+            a.tools = ["one", "two"]
+                .into_iter()
+                .map(|name| {
+                    Arc::new(BatchTool {
+                        definition: ToolDefinition {
+                            name: name.into(),
+                            description: String::new(),
+                            input_schema: schemars::json_schema!({"type":"object"}),
+                            read_only,
+                            requires_approval: false,
+                        },
+                        barrier: barrier.clone(),
+                        active: active.clone(),
+                        peak: peak.clone(),
+                        drops: drops.clone(),
+                        pending: false,
+                    }) as Arc<dyn Tool>
+                })
+                .collect();
+            let mut req = request(1);
+            req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+            req.policy.tools.access = AccessMode::FullAccess;
+            let runner = runner(a);
+            let execution = async {
+                if streaming {
+                    runner
+                        .stream(context(), req, Arc::new(TestHost::default()))
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(), req, Arc::new(TestHost::default()))
+                        .await
+                }
+            };
+            let done = tokio::time::timeout(Duration::from_secs(1), execution)
+                .await
+                .expect("sequential reads deadlocked at barrier")
+                .unwrap();
+            assert_eq!(peak.load(Ordering::SeqCst), if read_only { 2 } else { 1 });
+            assert_eq!(drops.load(Ordering::SeqCst), 2);
+            assert_eq!(active.load(Ordering::SeqCst), 0);
+            let ids: Vec<_> = done
+                .result
+                .history
+                .iter()
+                .filter_map(|item| match item {
+                    RunItem::ToolResult { call_id, .. } => Some(call_id.as_str()),
+                    _ => None,
+                })
+                .collect();
+            assert_eq!(ids, ["1", "2"]);
+        }
+    }
+}
+
+#[tokio::test]
+async fn dropping_stream_drops_all_inflight_batch_tools() {
+    let active = Arc::new(AtomicUsize::new(0));
+    let drops = Arc::new(AtomicUsize::new(0));
+    let model = TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
+        response: response(vec![call("1", "one"), call("2", "two")], None),
+    })]);
+    let mut a = agent(model);
+    a.tools = ["one", "two"]
+        .into_iter()
+        .map(|name| {
+            Arc::new(BatchTool {
+                definition: ToolDefinition {
+                    name: name.into(),
+                    description: String::new(),
+                    input_schema: schemars::json_schema!({"type":"object"}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                barrier: None,
+                active: active.clone(),
+                peak: Arc::new(AtomicUsize::new(0)),
+                drops: drops.clone(),
+                pending: true,
+            }) as Arc<dyn Tool>
+        })
+        .collect();
+    let mut stream = runner(a).stream(context(), request(2), Arc::new(TestHost::default()));
+    while tokio::time::timeout(Duration::from_millis(10), stream.next())
+        .await
+        .is_ok()
+    {}
+    assert_eq!(active.load(Ordering::SeqCst), 2);
+    drop(stream);
+    assert_eq!(active.load(Ordering::SeqCst), 0);
+    assert_eq!(drops.load(Ordering::SeqCst), 2);
+}
+
+#[tokio::test]
+async fn fallback_state_is_per_agent_identity_not_display_name() {
+    let primary = TestModel::with(vec![Err(provider_error())]);
+    let backup = TestModel::with(vec![Ok(response(vec![call("1", "transfer")], None))]);
+    let target_primary = TestModel::with(vec![Ok(answer("target primary"))]);
+    let target = agent(target_primary.clone());
+    let mut source = agent(primary);
+    assert_eq!(source.name, target.name);
+    source.fallbacks = vec![ModelBinding::complete("backup", backup)];
+    source.handoffs = vec![Handoff {
+        definition: TestTool::new("transfer", false, false).definition.clone(),
+        target: Arc::new(target),
+    }];
+    let result = runner(source)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("target primary")));
+    assert_eq!(target_primary.completes.load(Ordering::SeqCst), 1);
 }

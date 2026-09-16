@@ -306,5 +306,671 @@
         ]
       }
     ]
+  },
+  {
+    "name": "sticky_reprobe",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary recovered"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "failed_reprobe",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback again"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_chain_reset",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "schema_11",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "not JSON"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_12",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_13",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "sticky_reprobe_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary recovered"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "failed_reprobe_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback again"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_chain_reset_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "schema_17",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "not JSON"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_18",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_19",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
   }
 ]

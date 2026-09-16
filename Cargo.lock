@@ -64,6 +64,7 @@ name = "adk-runtime"
 version = "0.1.0"
 dependencies = [
  "adk-core",
+ "futures-util",
  "jsonschema",
  "schemars",
  "serde_json",

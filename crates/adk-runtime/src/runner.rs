@@ -1,13 +1,14 @@
 //! Owned execution state. Snapshots are observations, not replayable checkpoints.
 //! Dropping a run future or pull stream drops all in-flight provider/tool futures.
 //! Providers and tools must honor the core no-detached-work contract; cancellation
-//! cannot undo effects already performed. Tool calls execute sequentially. A first
+//! cannot undo effects already performed. Read-only tools share batch execution;
+//! mutations are exclusive. Approval/handoff boundaries are resolved first. A first
 //! handoff preempts sibling calls, which receive explicit not-executed results.
 //!
 //! Normal runs use `Model::complete`; pull streams use `StreamingModel::stream`
 //! when supplied, or only completion events for an explicit complete-only binding.
-//! Model retries/fallbacks stop at the first visible provider event. Each turn
-//! tries the primary model anew; there is no sticky fallback or timed reprobe.
+//! Model retries/fallbacks stop at the first visible provider event. Fallbacks
+//! stay active per agent until three successful calls trigger a primary reprobe.
 //! Token/cost limits use reported consumption and can only stop after a response
 //! crosses the limit; provider-side hard generation caps belong in model settings.
 //! Compactors must report any successful provider usage/cost, not assume zero.
@@ -18,7 +19,7 @@
 //! delivery; `RunError` remains authoritative and retains partial history/spills.
 
 use std::{
-    collections::{HashSet, VecDeque},
+    collections::{HashMap, HashSet, VecDeque},
     future::Future,
     path::PathBuf,
     sync::Arc,
@@ -160,6 +161,9 @@ pub enum Observation {
         before_items: usize,
         after_items: usize,
         context_tokens: u64,
+    },
+    OutputValidationFailed {
+        message: String,
     },
     Usage {
         usage: Usage,
@@ -423,6 +427,7 @@ impl Runner {
             calls: VecDeque::new(),
             approval: None,
             turns: 0,
+            fallbacks: HashMap::new(),
             cost: 0.0,
             tool_pause: false,
             tool_final: None,
@@ -451,6 +456,11 @@ enum Phase {
     Finish,
 }
 
+struct ExecutedTool {
+    raw: ToolOutput,
+    hook_error: Option<Error>,
+}
+
 struct Engine {
     agent: Arc<AgentConfig>,
     config: Arc<RunnerConfig>,
@@ -461,6 +471,7 @@ struct Engine {
     calls: VecDeque<ToolCall>,
     approval: Option<ApprovalDecision>,
     turns: u32,
+    fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
     tool_pause: bool,
     tool_final: Option<String>,
@@ -654,7 +665,9 @@ impl Engine {
                 }
                 Phase::Model => self.model_turn().await?,
                 Phase::Tools => {
-                    if let Some(call) = self.calls.front().cloned() {
+                    if self.parallel_batch_ready() {
+                        self.tool_batch().await?;
+                    } else if let Some(call) = self.calls.front().cloned() {
                         if self.tool(call).await? {
                             return Ok(RunStatus::Paused);
                         }
@@ -663,7 +676,7 @@ impl Engine {
                     {
                         if self.config.return_tool_output {
                             let output = self.tool_final.take().unwrap();
-                            self.result.final_output = Some(self.validate_output(output)?);
+                            self.result.final_output = Some(self.validate_output(output).await?);
                         }
                         self.phase = Phase::Finish;
                     } else {
@@ -720,7 +733,14 @@ impl Engine {
         let before_items = self.result.history.len();
         let request = CompactionRequest {
             agent: self.agent.name.clone(),
-            model: self.agent.model.name().into(),
+            model: self
+                .fallbacks
+                .get(&(Arc::as_ptr(&self.agent) as usize))
+                .map_or_else(
+                    || self.agent.model.name(),
+                    |(index, _)| self.agent.fallbacks[index - 1].name(),
+                )
+                .into(),
             history: self.result.history.clone(),
             context_tokens: tokens,
             target_tokens: config.target_tokens,
@@ -795,11 +815,17 @@ impl Engine {
             .filter(|d| self.policy.tools.decision(d) != ToolDecision::Deny)
             .cloned()
             .collect();
-        let instructions = if self.config.cache_prefix.is_empty() {
+        let mut instructions = if self.config.cache_prefix.is_empty() {
             self.agent.instructions.clone()
         } else {
             format!("{}\n{}", self.config.cache_prefix, self.agent.instructions)
         };
+        if let Some(schema) = &self.agent.output_schema {
+            if !instructions.trim().is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+        }
         let mut settings = self.agent.settings.clone();
         if let Some(key) = &self.config.prompt_cache_key {
             let namespace = self
@@ -886,26 +912,31 @@ impl Engine {
                 })
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
-            self.result.final_output = Some(self.validate_output(output)?);
+            self.result.final_output = Some(self.validate_output(output).await?);
             self.phase = Phase::Finish;
         }
         Ok(())
     }
-    fn validate_output(&self, output: String) -> Result<Value, Error> {
+    async fn validate_output(&self, output: String) -> Result<Value, Error> {
         if let Some(schema) = &self.agent.output_schema {
-            let value: Value = serde_json::from_str(&output).map_err(|e| {
-                Error::new(
-                    ErrorCategory::ModelBehavior,
-                    format!("output is not JSON: {e}"),
-                )
-            })?;
-            if !compile_schema(schema)?.is_valid(&value) {
-                return Err(Error::new(
-                    ErrorCategory::ModelBehavior,
-                    "output does not match its JSON schema",
-                ));
+            match serde_json::from_str::<Value>(&output) {
+                Ok(value) => {
+                    if !compile_schema(schema)?.is_valid(&value) {
+                        self.observe(Observation::OutputValidationFailed {
+                            message: "output does not match its JSON schema".into(),
+                        })
+                        .await?;
+                    }
+                    Ok(value)
+                }
+                Err(error) => {
+                    self.observe(Observation::OutputValidationFailed {
+                        message: format!("output is not JSON: {error}"),
+                    })
+                    .await?;
+                    Ok(Value::String(output))
+                }
             }
-            Ok(value)
         } else {
             Ok(Value::String(output))
         }
@@ -951,7 +982,9 @@ impl Engine {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
-        for (index, binding) in candidates.iter().enumerate() {
+        let agent_key = Arc::as_ptr(&self.agent) as usize;
+        let start = self.fallbacks.get(&agent_key).map_or(0, |state| state.0);
+        for (index, binding) in candidates.iter().enumerate().skip(start) {
             let mut attempt = 0;
             loop {
                 self.observe(Observation::ModelAttempt {
@@ -964,6 +997,12 @@ impl Engine {
                 request.model = binding.name().into();
                 match self.model_attempt(binding, request).await {
                     Ok(response) => {
+                        if let Some((_, successes)) = self.fallbacks.get_mut(&agent_key) {
+                            *successes += 1;
+                            if *successes == 3 {
+                                self.fallbacks.remove(&agent_key);
+                            }
+                        }
                         return Ok((
                             response,
                             binding.name().into(),
@@ -980,7 +1019,15 @@ impl Engine {
                         {
                             return Err(error);
                         }
-                        if attempt < self.config.retry.max_retries {
+                        if let Some(next) = candidates.get(index + 1) {
+                            self.fallbacks.insert(agent_key, (index + 1, 0));
+                            self.observe(Observation::Fallback {
+                                from: binding.name().into(),
+                                to: next.name().into(),
+                            })
+                            .await?;
+                            break;
+                        } else if attempt < self.config.retry.max_retries {
                             let delay = self
                                 .config
                                 .retry
@@ -998,13 +1045,6 @@ impl Engine {
                             })
                             .await?;
                             attempt += 1;
-                        } else if let Some(next) = candidates.get(index + 1) {
-                            self.observe(Observation::Fallback {
-                                from: binding.name().into(),
-                                to: next.name().into(),
-                            })
-                            .await?;
-                            break;
                         } else {
                             return Err(error);
                         }
@@ -1109,6 +1149,60 @@ impl Engine {
             }
         }
     }
+    fn parallel_batch_ready(&self) -> bool {
+        self.calls.len() > 1
+            && self.calls.iter().all(|call| {
+                self.agent.tools.iter().any(|tool| {
+                    let definition = tool.definition();
+                    definition.name == call.name
+                        && self.policy.tools.decision(definition) == ToolDecision::Allow
+                        && compile_schema(&definition.input_schema)
+                            .is_ok_and(|schema| schema.is_valid(&call.arguments))
+                })
+            })
+    }
+    async fn tool_batch(&mut self) -> Result<(), Error> {
+        let calls: Vec<_> = self.calls.iter().cloned().collect();
+        for call in &calls {
+            self.checkpoint(Boundary::ToolPrepared, Some(call)).await?;
+        }
+        let mutation_lock = tokio::sync::RwLock::new(());
+        let outputs = futures_util::future::join_all(calls.iter().map(|call| async {
+            let tool = self
+                .agent
+                .tools
+                .iter()
+                .find(|tool| tool.definition().name == call.name)
+                .unwrap();
+            if tool.definition().read_only {
+                let _guard = mutation_lock.read().await;
+                self.execute_tool(tool.as_ref(), call).await
+            } else {
+                let _guard = mutation_lock.write().await;
+                self.execute_tool(tool.as_ref(), call).await
+            }
+        }))
+        .await;
+        let mut failure = None;
+        for (call, output) in calls.into_iter().zip(outputs) {
+            let result = match output {
+                Ok(raw) => self.finish_tool(call, raw).await,
+                Err(error) => {
+                    self.calls.pop_front();
+                    Err(error)
+                }
+            };
+            if let Err(error) = result {
+                if failure.is_none() {
+                    failure = Some(error);
+                }
+            }
+        }
+        match failure {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
+    }
     async fn tool(&mut self, call: ToolCall) -> Result<bool, Error> {
         let agent = self.agent.clone();
         let tool = agent
@@ -1211,6 +1305,11 @@ impl Engine {
             return Ok(false);
         }
         let tool = tool.expect("tool or handoff resolved");
+        let raw = self.execute_tool(tool.as_ref(), &call).await?;
+        self.finish_tool(call, raw).await?;
+        Ok(false)
+    }
+    async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
         self.emit(RunEvent::ToolStarted { call: call.clone() })
             .await?;
         let mut operation = self.context.clone();
@@ -1234,15 +1333,20 @@ impl Engine {
             tool.execute(&context, call.clone()),
         )
         .await?;
-        self.calls.pop_front();
-        self.tool_pause |= raw.should_pause;
-        if let Err(error) = self
+        let hook_error = self
             .observe(Observation::RawToolOutput {
                 call: call.clone(),
                 output: raw.clone(),
             })
             .await
-        {
+            .err();
+        Ok(ExecutedTool { raw, hook_error })
+    }
+    async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
+        self.calls.pop_front();
+        let raw = executed.raw;
+        self.tool_pause |= raw.should_pause;
+        if let Some(error) = executed.hook_error {
             self.append(RunItem::ToolResult {
                 call_id: call.id,
                 output: withheld_output(),
@@ -1280,7 +1384,7 @@ impl Engine {
             output: processed.output,
         })
         .await?;
-        Ok(false)
+        Ok(())
     }
 }
 

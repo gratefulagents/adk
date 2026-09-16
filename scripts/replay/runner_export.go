@@ -23,6 +23,7 @@ type item struct {
 	IsError   bool            `json:"is_error,omitempty"`
 }
 type response struct {
+	Error        string   `json:"error,omitempty"`
 	Items        []item   `json:"items"`
 	EndTurn      *bool    `json:"end_turn"`
 	InputTokens  int64    `json:"input_tokens"`
@@ -30,11 +31,13 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
-	Name      string     `json:"name"`
-	Streaming bool       `json:"streaming"`
-	MaxTurns  int        `json:"max_turns"`
-	Input     []item     `json:"input"`
-	Responses []response `json:"responses"`
+	Name      string          `json:"name"`
+	Fallbacks []string        `json:"fallbacks"`
+	Schema    json.RawMessage `json:"schema"`
+	Streaming bool            `json:"streaming"`
+	MaxTurns  int             `json:"max_turns"`
+	Input     []item          `json:"input"`
+	Responses []response      `json:"responses"`
 }
 
 func convert(items []item) []sdk.RunItem {
@@ -87,6 +90,9 @@ func (m *model) StreamResponse(_ context.Context, req sdk.ModelRequest) (*sdk.Mo
 		return nil, errors.New("script exhausted")
 	}
 	s := m.script[index]
+	if s.Error != "" {
+		return nil, errors.New(s.Error)
+	}
 	r := &sdk.ModelResponse{Items: convert(s.Items), EndTurn: s.EndTurn, Usage: sdk.Usage{InputTokens: s.InputTokens, OutputTokens: s.OutputTokens}}
 	events := make(chan sdk.ModelStreamEvent, len(s.Deltas)+1)
 	for _, delta := range s.Deltas {
@@ -99,9 +105,13 @@ func (m *model) StreamResponse(_ context.Context, req sdk.ModelRequest) (*sdk.Mo
 	close(done)
 	return sdk.NewModelStream(events, done), nil
 }
-func (*model) GetRetryAdvice(error) *sdk.ModelRetryAdvice { return nil }
-func (*model) CalculateCost(sdk.Usage) float64            { return 0 }
-func (*model) Provider() string                           { return "replay" }
+func (*model) GetRetryAdvice(error) *sdk.ModelRetryAdvice {
+	return &sdk.ModelRetryAdvice{ShouldRetry: true, Reason: "overloaded"}
+}
+func (m *model) GetModel(string) (sdk.Model, error) { return m, nil }
+func (*model) Close() error                         { return nil }
+func (*model) CalculateCost(sdk.Usage) float64      { return 0 }
+func (*model) Provider() string                     { return "replay" }
 
 func execute(s scenario) object {
 	m := &model{script: s.Responses, requests: []object{}}
@@ -118,9 +128,21 @@ func execute(s scenario) object {
 			return "echo: " + args.Text, nil
 		}}
 	agent := &sdk.Agent{Name: "replay-agent", Model: "replay-model", Instructions: "Follow the replay script.", Tools: []sdk.Tool{tool}}
+	agent.FallbackModels = s.Fallbacks
+	if len(s.Schema) > 0 {
+		var schema any
+		if err := json.Unmarshal(s.Schema, &schema); err != nil {
+			panic(err)
+		}
+		canonical, err := json.Marshal(schema)
+		if err != nil {
+			panic(err)
+		}
+		agent.OutputType = sdk.NewOutputSchema("final_output", canonical)
+	}
 	trusted := false
 	cfg := sdk.RunConfig{MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
-	runner := sdk.NewRunnerWithModel(m)
+	runner := sdk.NewRunnerWithProvider(m)
 	var result *sdk.RunResult
 	var err error
 	events := []object{}

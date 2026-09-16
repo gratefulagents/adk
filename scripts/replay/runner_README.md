@@ -33,6 +33,14 @@ Streaming scripts deliver separate text deltas and a complete response; the
 harness drains actual runner events rather than reconstructing deltas from the
 final text. Each max-turn run retains its history, outputs, responses and usage.
 
+Added 12 cases (20 total): sticky fallback with successful primary reprobe;
+failed primary reprobe; fallback-chain switch resetting the three-success count;
+and non-JSON/schema-invalid JSON/valid JSON structured output. Each runs normally
+and streamed. The Go provider returns explicit overloaded/retryable advice; Rust
+uses its Provider-error retry predicate. Both execute real selection logic.
+Schema input is serialized to compact, sorted-key JSON before configuring either
+runner so the schema prompt bytes are identical (no output normalization).
+
 ## Canonical comparison boundary
 
 * Exact model name, instructions, ordered model-input history, advertised tool
@@ -51,9 +59,12 @@ final text. Each max-turn run retains its history, outputs, responses and usage.
 * Both sides explicitly disable untrusted-output wrapping for the trusted
   in-process echo tool. No normalization strips delimiters after execution.
 * This corpus does not claim parity for policy denial, approvals, cancellation,
-  retries, handoffs, schemas, provider failures, multimedia, timing/backpressure,
+  general retry/advice policy, handoffs, custom schema parsers, other provider
+  failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate
-  engine tests own those contracts. Scripted streaming is not a provider test.
+  engine tests cover selected Rust behavior; this is not a parity claim for
+  those excluded cases. Unresolved external differences are enumerated in
+  `docs/runner-design.md` and require resolution before #4 is scope complete. Scripted streaming is not a provider test.
 
 ## Licensing and provenance
 

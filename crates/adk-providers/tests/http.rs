@@ -304,8 +304,12 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
                 0.25
             }
         }
+        let provider = Arc::new(provider);
+        let mut routes = adk_providers::routing::Routes::new("fixture");
+        routes.register("fixture", provider.clone()).unwrap();
         let compactor = adk_providers::runtime::NativeCompactor {
-            provider: Arc::new(provider),
+            routes: Arc::new(routes),
+            provider,
             template: request(),
             costs: Arc::new(Price),
         };
@@ -344,6 +348,201 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
 }
 
 #[tokio::test]
+#[cfg(feature = "runtime")]
+async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
+    use adk_providers::{factory::Kind, routing::Routes, runtime::NativeCompactor};
+    use adk_runtime::{CompactionRequest, Compactor, CostEstimator};
+    use serde_json::json;
+    use std::sync::Mutex;
+
+    let cases = [
+        ("work/gpt-5.4", "gpt-5.4"),
+        ("work/small", "gpt-5.6-luna"),
+        ("work/medium", "gpt-5.6-terra"),
+        ("work/large", "gpt-5.6-sol"),
+        ("small", "gpt-5.6-luna"),
+        ("work/vendor/model", "vendor/model"),
+    ];
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        for (_, expected) in cases {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            assert!(captured.starts_with("POST /v1/responses/compact HTTP/1.1"));
+            let body: serde_json::Value =
+                serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+            assert_eq!(body["model"], expected);
+            assert_eq!(
+                body["input"],
+                json!([{"role":"user","content":"runner history"}])
+            );
+            let body = r#"{"output":[{"type":"compaction","id":"c","encrypted_content":"opaque"}],"usage":{"input_tokens":12,"output_tokens":2}}"#;
+            write!(
+                socket,
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                body.len()
+            )
+            .unwrap();
+        }
+    });
+    let scope = Scope::new("work", &format!("http://{addr}/v1"), None, AuthMode::ApiKey).unwrap();
+    let provider = Arc::new(
+        Provider::new(
+            "work",
+            Protocol::Responses,
+            Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+        )
+        .unwrap(),
+    );
+    let mut routes = Routes::new("work");
+    routes
+        .register_kind("work", Kind::OpenAi, provider.clone())
+        .unwrap();
+    #[derive(Default)]
+    struct Price(Mutex<Vec<String>>);
+    impl CostEstimator for Price {
+        fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
+            assert_eq!(usage.input_tokens, 12);
+            assert_eq!(usage.output_tokens, 2);
+            self.0.lock().unwrap().push(model.into());
+            0.25
+        }
+    }
+    let costs = Arc::new(Price::default());
+    let compactor = NativeCompactor {
+        routes: Arc::new(routes),
+        provider,
+        template: request(),
+        costs: costs.clone(),
+    };
+    for (binding, _) in cases {
+        let result = compactor
+            .compact(
+                &context(),
+                CompactionRequest {
+                    agent: "fixture".into(),
+                    model: binding.into(),
+                    history: vec![adk_core::RunItem::Message {
+                        message: adk_core::Message {
+                            role: adk_core::Role::User,
+                            content: vec![adk_core::Content::Text {
+                                text: "runner history".into(),
+                            }],
+                        },
+                    }],
+                    context_tokens: 20,
+                    target_tokens: 5,
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(result.cost, 0.25);
+        assert!(
+            matches!(&result.history[0], adk_core::RunItem::Compaction { compaction } if compaction.encrypted_content == "opaque")
+        );
+    }
+    server.join().unwrap();
+    assert_eq!(
+        *costs.0.lock().unwrap(),
+        cases.map(|(binding, _)| binding.to_owned())
+    );
+}
+
+#[tokio::test]
+#[cfg(feature = "runtime")]
+async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
+    use adk_providers::{factory::Kind, routing::Routes, runtime::NativeCompactor};
+    use adk_runtime::{CompactionRequest, Compactor, CostEstimator};
+
+    struct NoCost;
+    impl CostEstimator for NoCost {
+        fn cost(&self, _: &str, _: &adk_core::Usage) -> f64 {
+            panic!("rejected compaction must not be charged")
+        }
+    }
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    listener.set_nonblocking(true).unwrap();
+    let addr = listener.local_addr().unwrap();
+    let scope = Scope::new("work", &format!("http://{addr}/v1"), None, AuthMode::ApiKey).unwrap();
+    let session =
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap());
+    let provider = Arc::new(Provider::new("work", Protocol::Responses, session.clone()).unwrap());
+    let other = Arc::new(Provider::new("work", Protocol::Responses, session.clone()).unwrap());
+    let chat = Arc::new(Provider::new("chat", Protocol::Chat, session.clone()).unwrap());
+    let anthropic = Arc::new(Provider::new("anthropic", Protocol::Anthropic, session).unwrap());
+    let mut routes = Routes::new("work");
+    routes
+        .register_kind("work", Kind::OpenAi, provider.clone())
+        .unwrap();
+    routes
+        .register_kind("fallback", Kind::OpenAi, other)
+        .unwrap();
+    routes
+        .register_kind("chat", Kind::OpenRouter, chat.clone())
+        .unwrap();
+    routes
+        .register_kind("anthropic", Kind::Anthropic, anthropic)
+        .unwrap();
+    let routes = Arc::new(routes);
+    let mut compactor = NativeCompactor {
+        routes,
+        provider,
+        template: request(),
+        costs: Arc::new(NoCost),
+    };
+    for binding in [
+        "fallback/small",
+        "anthropic/small",
+        "chat/small",
+        "missing/small",
+    ] {
+        let error = compactor
+            .compact(
+                &context(),
+                CompactionRequest {
+                    agent: "fixture".into(),
+                    model: binding.into(),
+                    history: vec![],
+                    context_tokens: 20,
+                    target_tokens: 5,
+                },
+            )
+            .await
+            .err()
+            .expect("incompatible fallback must fail");
+        assert_eq!(
+            error.info.category,
+            if binding.starts_with("missing/") {
+                adk_core::ErrorCategory::InvalidInput
+            } else {
+                adk_core::ErrorCategory::Unsupported
+            }
+        );
+    }
+    compactor.provider = chat;
+    let error = compactor
+        .compact(
+            &context(),
+            CompactionRequest {
+                agent: "fixture".into(),
+                model: "chat/small".into(),
+                history: vec![],
+                context_tokens: 20,
+                target_tokens: 5,
+            },
+        )
+        .await
+        .err()
+        .expect("Chat cannot compact even on the matching route");
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Unsupported);
+    assert_eq!(
+        listener.accept().unwrap_err().kind(),
+        std::io::ErrorKind::WouldBlock
+    );
+}
+
+#[tokio::test]
 async fn copilot_factory_routes_models_and_preserves_wire_identity() {
     use adk_providers::factory::{Kind, RouteSpec};
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
@@ -353,7 +552,7 @@ async fn copilot_factory_routes_models_and_preserves_wire_identity() {
         for body in [
             r#"{"content":[{"type":"text","text":"ok"}],"stop_reason":"end_turn"}"#,
             r#"{"output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}],"status":"completed"}"#,
-            r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}]}"#,
+            "data: {\"choices\":[{\"delta\":{\"content\":\"ok\"},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
         ] {
             let (mut socket, _) = listener.accept().unwrap();
             captured.push(read_request(&mut socket));
@@ -389,6 +588,9 @@ async fn copilot_factory_routes_models_and_preserves_wire_identity() {
         .enumerate()
     {
         assert!(captured[i].starts_with(&format!("POST {path} HTTP/1.1")));
+        let body: serde_json::Value =
+            serde_json::from_str(captured[i].split_once("\r\n\r\n").unwrap().1).unwrap();
+        assert_eq!(body["stream"], i == 2);
         assert!(
             captured[i]
                 .to_lowercase()
@@ -400,6 +602,149 @@ async fn copilot_factory_routes_models_and_preserves_wire_identity() {
         serde_json::from_str(captured[0].split_once("\r\n\r\n").unwrap().1).unwrap();
     assert_eq!(body["model"], "claude-opus-4.6");
     assert_eq!(body["max_tokens"], 64000);
+}
+
+#[tokio::test]
+async fn copilot_chat_streams_buffered_tool_calls_and_shapes_reasoning() {
+    use adk_core::{Reasoning, RunItem};
+    use adk_providers::{
+        factory::{Kind, RouteSpec},
+        wire::encode_reasoning_details,
+    };
+    use serde_json::json;
+
+    for buffered in [true, false] {
+        for effort in [Some(" high "), None, Some("  ")] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let addr = listener.local_addr().unwrap();
+            let server = std::thread::spawn(move || {
+                let (mut socket, _) = listener.accept().unwrap();
+                let captured = read_request(&mut socket);
+                let chunks = [
+                    json!({"id":"chat-1","choices":[{"delta":{"reasoning_text":"Let me "}}]}),
+                    json!({"choices":[{"delta":{"reasoning_text":"think","reasoning_opaque":"signature","content":"Checking."}}]}),
+                    json!({"choices":[{"delta":{"tool_calls":[{"index":0,"id":"call-1","function":{"name":"Web","arguments":"{\"url\":"}}]}}]}),
+                    json!({"choices":[{"delta":{"tool_calls":[{"index":0,"function":{"name":"Fetch","arguments":"\"https://example.com\"}"}}]},"finish_reason":"tool_calls"}]}),
+                    json!({"choices":[],"usage":{"prompt_tokens":12,"completion_tokens":5,"prompt_tokens_details":{"cached_tokens":4}}}),
+                ];
+                let mut body: String = chunks
+                    .iter()
+                    .map(|chunk| format!("data: {chunk}\n\n"))
+                    .collect();
+                body.push_str("data: [DONE]\n\n");
+                write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+                captured
+            });
+            let spec = RouteSpec {
+                kind: Kind::Copilot,
+                prefix: Some("work".into()),
+                endpoint: Some(format!("http://{addr}")),
+                protocol: Some(Protocol::Chat),
+                mode: AuthMode::CopilotOAuth,
+                account: None,
+            };
+            let model = spec
+                .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+                .unwrap();
+            let mut input = request();
+            input.model = "claude-opus-4.8".into();
+            input.settings.insert("thinking_budget".into(), json!(2048));
+            if let Some(effort) = effort {
+                input
+                    .settings
+                    .insert("reasoning_effort".into(), json!(effort));
+                input
+                    .settings
+                    .insert("reasoning".into(), json!({"effort":"low"}));
+            }
+            input.input = vec![
+                RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "plaintext".into(),
+                        ..Default::default()
+                    },
+                },
+                RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        signature: encode_reasoning_details(&json!([{"text":"structured"}])),
+                        ..Default::default()
+                    },
+                },
+                RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "copilot text".into(),
+                        signature: "opaque".into(),
+                        ..Default::default()
+                    },
+                },
+            ];
+            input.tools.push(adk_core::ToolDefinition {
+                name: "WebFetch".into(),
+                description: "fetch a url".into(),
+                input_schema: serde_json::from_value(
+                    json!({"type":"object","properties":{"url":{"type":"string"}}}),
+                )
+                .unwrap(),
+                read_only: true,
+                requires_approval: false,
+            });
+            let ctx = context();
+            let response = if buffered {
+                model.complete(&ctx, input).await.unwrap()
+            } else {
+                let mut stream = model.stream(&ctx, input).await.unwrap();
+                let mut response = None;
+                while let Some(event) = stream.next().await.unwrap() {
+                    if let ModelEvent::Complete { response: complete } = event {
+                        response = Some(complete);
+                    }
+                }
+                response.unwrap()
+            };
+            assert_eq!(response.end_turn, Some(false));
+            assert_eq!(response.response_id.as_deref(), Some("chat-1"));
+            assert_eq!(response.usage.input_tokens, 12);
+            assert_eq!(response.usage.output_tokens, 5);
+            assert_eq!(response.usage.cache_read_tokens, 4);
+            assert_eq!(response.usage.context_tokens, Some(12));
+            assert!(response.items.iter().any(|item| matches!(item, RunItem::ToolCall { call }
+                if call.id == "call-1" && call.name == "WebFetch" && call.arguments == json!({"url":"https://example.com"}))));
+            assert!(
+                response
+                    .items
+                    .iter()
+                    .any(|item| matches!(item, RunItem::Reasoning { reasoning }
+                if reasoning.text == "Let me think" && reasoning.signature == "signature"))
+            );
+            let captured = server.join().unwrap();
+            assert!(captured.starts_with("POST /chat/completions HTTP/1.1"));
+            let body: serde_json::Value =
+                serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+            assert_eq!(body["stream"], true);
+            assert_eq!(body["stream_options"]["include_usage"], true);
+            assert_eq!(
+                body.get("reasoning_effort"),
+                effort
+                    .filter(|e| !e.trim().is_empty())
+                    .map(|e| json!(e.trim()))
+                    .as_ref()
+            );
+            assert!(body.get("reasoning").is_none());
+            assert!(body.get("thinking_budget").is_none());
+            let messages = body["messages"].as_array().unwrap();
+            for message in messages {
+                for field in ["reasoning", "reasoning_content", "reasoning_details"] {
+                    assert!(message.get(field).is_none(), "{body}");
+                }
+            }
+            assert!(
+                messages
+                    .iter()
+                    .any(|message| message["reasoning_text"] == "copilot text"
+                        && message["reasoning_opaque"] == "opaque")
+            );
+        }
+    }
 }
 
 #[tokio::test]

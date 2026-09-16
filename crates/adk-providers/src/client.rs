@@ -102,6 +102,9 @@ impl Provider {
         if scope.mode == AuthMode::OpenAiOAuth {
             crate::openai::codex(&mut body);
         }
+        if scope.mode == AuthMode::CopilotOAuth && self.protocol == Protocol::Chat {
+            crate::copilot::shape_chat(&mut body, request);
+        }
         if self.protocol == Protocol::Anthropic {
             crate::anthropic::shape(&mut body, request, scope.mode);
         }
@@ -247,7 +250,10 @@ impl Model for Provider {
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
-            if self.session.scope().mode == AuthMode::OpenAiOAuth {
+            if self.session.scope().mode == AuthMode::OpenAiOAuth
+                || (self.session.scope().mode == AuthMode::CopilotOAuth
+                    && self.protocol == Protocol::Chat)
+            {
                 let mut stream = self.stream(context, request).await?;
                 let mut complete = None;
                 while let Some(event) = stream.next().await? {

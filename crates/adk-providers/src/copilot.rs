@@ -6,6 +6,24 @@ use adk_core::{
 };
 use std::sync::Arc;
 
+pub(crate) fn shape_chat(body: &mut serde_json::Value, request: &ModelRequest) {
+    body.as_object_mut().unwrap().remove("reasoning");
+    if let Some(effort) = request
+        .settings
+        .get("reasoning_effort")
+        .and_then(serde_json::Value::as_str)
+        .map(str::trim)
+        .filter(|effort| !effort.is_empty())
+    {
+        body["reasoning_effort"] = effort.into();
+    }
+    for message in body["messages"].as_array_mut().unwrap() {
+        for field in ["reasoning", "reasoning_content", "reasoning_details"] {
+            message.as_object_mut().unwrap().remove(field);
+        }
+    }
+}
+
 /// Only the three API hosts recognized by the reference can be derived from a
 /// token. Paths, ports, userinfo, query strings, fragments and lookalikes fail.
 pub fn endpoint_hint(token: &str) -> Option<String> {
@@ -126,6 +144,35 @@ impl StreamingModel for Copilot {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn chat_history_keeps_only_copilot_reasoning_fields() {
+        let request = ModelRequest {
+            model: "claude-opus-4.8".into(),
+            instructions: String::new(),
+            input: vec![],
+            tools: vec![],
+            output_schema: None,
+            output_schema_name: String::new(),
+            output_schema_strict: true,
+            settings: Default::default(),
+        };
+        let mut body = serde_json::json!({
+            "reasoning":{"max_tokens":2048},
+            "messages":[{"role":"assistant","content":"text",
+                "reasoning":"plaintext","reasoning_content":"plaintext",
+                "reasoning_details":[{"text":"structured"}],
+                "reasoning_text":"copilot text","reasoning_opaque":"opaque"}]
+        });
+        shape_chat(&mut body, &request);
+        assert_eq!(
+            body,
+            serde_json::json!({"messages":[{
+                "role":"assistant","content":"text",
+                "reasoning_text":"copilot text","reasoning_opaque":"opaque"
+            }]})
+        );
+    }
+
     #[test]
     fn endpoint_hints_are_exact_hosts_and_never_override_custom_endpoints() {
         for tier in ["individual", "business", "enterprise"] {

@@ -1,6 +1,6 @@
 //! Opt-in runner integration. The host selects pricing and compaction policy.
 use crate::client::Provider;
-use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest};
+use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest, StreamingModel};
 use adk_runtime::{CompactedHistory, CompactionRequest, Compactor, CostEstimator};
 use std::sync::Arc;
 
@@ -16,6 +16,9 @@ impl CostEstimator for BaselineCosts {
 }
 
 pub struct NativeCompactor {
+    /// The same registry used by the runner's model bindings.
+    pub routes: Arc<crate::routing::Routes>,
+    /// Must be registered in `routes` as this same Arc, not a separate instance.
     pub provider: Arc<Provider>,
     /// Instructions, tools and settings used for compaction. Model and input
     /// are supplied by the runner, not taken from this template.
@@ -29,12 +32,19 @@ impl Compactor for NativeCompactor {
         request: CompactionRequest,
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
         Box::pin(async move {
+            let (provider, model) = self.routes.resolve(&request.model)?;
+            let expected: Arc<dyn StreamingModel> = self.provider.clone();
+            if !Arc::ptr_eq(&provider, &expected) {
+                return Err(Error::new(
+                    ErrorCategory::Unsupported,
+                    "selected route does not match native compaction provider",
+                ));
+            }
             let mut input = self.template.clone();
-            input.model = request.model;
+            input.model = model;
             input.input = request.history;
-            let model = input.model.clone();
             let response = self.provider.compact(context, input).await?;
-            let cost = self.costs.cost(&model, &response.usage);
+            let cost = self.costs.cost(&request.model, &response.usage);
             if !cost.is_finite() || cost < 0.0 {
                 return Err(Error::new(
                     ErrorCategory::InvalidInput,

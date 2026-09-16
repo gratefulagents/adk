@@ -2,11 +2,11 @@
 
 ## Delivery status
 
-PR20 remains **draft and not approved**. The mapped provider/auth/route surface
-below is implemented and covered by deterministic tests, but full-scope readiness
-has **not received a fresh independent verdict**. Passing CI or this author's
-local checks is not approval. Live provider calls and real OAuth exchanges are
-**UNVERIFIED**; no credentials were loaded.
+PR20 remains **draft**. The mapped provider/auth/route surface below is implemented
+and covered by deterministic tests. Exact-head independent review and check
+results are recorded on PR20; passing CI or the author's local checks alone is
+not approval. Live provider calls and real OAuth exchanges are **UNVERIFIED**;
+no credentials were loaded.
 
 The facade exposes opt-in `providers` and `providers-runtime` features. Core
 traits, typed history and pull-owned async streams remain independent of HTTP
@@ -57,6 +57,12 @@ compaction retains its context summary but cannot replay an incompatible
 encrypted blob. Unknown opaque reasoning fails closed. `NativeCompactor` and
 `BaselineCosts` are opt-in runner adapters; unknown cost remains `None` in routing
 and becomes zero only at the runner's documented numeric estimator boundary.
+`NativeCompactor` takes the runner's `Routes` registry and resolves named routes
+and size aliases before sending a provider-local model ID. Register its shared
+`Arc<Provider>` with `Routes::register_kind` (or `register` for literal IDs).
+Only bindings selecting that exact provider instance can compact; a fallback to
+another instance is rejected before HTTP rather than crossing credential scopes.
+Cost estimation still receives the original selected binding, not the wire ID.
 
 Interactive browser login and OS credential discovery are host-owned, not part
 of the pinned SDK OAuth package's material/refresh boundary. No deployment work or
@@ -82,6 +88,10 @@ hints can select only the individual/business/enterprise GitHub Copilot API host
 and only when the configured endpoint is a canonical default. Custom endpoints
 are never overridden. Cache keys include the actual selected endpoint. Material
 lookup/persistence remains under the host's original logical credential scope.
+Copilot Chat uses flat `reasoning_effort`, drops OpenRouter nested reasoning
+controls/history, and retains `reasoning_text`/`reasoning_opaque` continuation.
+Even buffered `complete` callers use SSE internally so Copilot tool calls are
+assembled rather than lost; other Chat providers retain buffered JSON requests.
 
 All HTTP clients disallow redirects and automatic environment proxy discovery.
 Endpoints require HTTPS except explicitly configured loopback HTTP; URL userinfo,
@@ -120,12 +130,13 @@ collapsible-style lint families are allowed locally; other warnings are denied.
 Pinned-1.88 CI is a separate gate, not a replacement for independent review.
 Exact check results and head are recorded on PR20.
 
-**Independent review is blocked in this resumed runtime:** the tool surface has
-no reviewer/subagent dispatch or status capability. Persona advice is not an
-independent code review. Platform report `04b0b814-49a5-476f-80b0-974e79986d12`
-records that limitation. A maintainer must dispatch a fresh reviewer against the
-new head; no APPROVE verdict has been manufactured. If review establishes
-readiness, a human may still need to change the draft PR to Ready for review.
+Independent review must assess the exact implementation head, not infer parity
+from green checks. The first full review requested corrections to Copilot Chat
+shaping, buffered tool-call preservation and native-compaction route resolution;
+focused loopback regressions now cover those paths. Reviewer dispatch is available
+again after the earlier runtime limitation. Current-head review results are
+recorded on PR20. A human may still need to change the draft PR to Ready for review;
+that UI transition is separate from implementation and review readiness.
 
 ## Controlled live verification protocol
 

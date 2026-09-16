@@ -64,7 +64,9 @@ Two denied-resume cases also compare Go ChatLoop and Rust: one or two calls
 receive error tool results without executing, then the model continues. The Go
 approval tool panics if accidentally invoked under denial. These cases preserve
 exact denial text and confirm the eligible sibling is not repeated.
-The corpus now contains **46 cases**.
+Two ordinary tool-failure cases verify paired error outputs and continued execution.
+Two low-budget fallback cases prove that the initial failed attempt consumes a turn.
+The corpus now contains **50 cases**.
 
 ## Canonical comparison boundary
 
@@ -74,9 +76,9 @@ The corpus now contains **46 cases**.
 * Lifecycle hook projection compares agent/model start, model completion with
   items/usage, tool start/raw output, and successful agent end with final output.
   The pinned Go implementation fires OnAgentStart on every model attempt, despite
-  its interface comment saying once per run. Rust ModelAttempt therefore maps to
+  its interface comment saying once per run. Rust AgentStarted and ModelAttempt map to
   that callback followed by OnLLMStart; Rust Started is a separate run-start event.
-  Model Complete / ToolStarted / RawToolOutput / completed Finished map to the
+  ModelAccepted / ToolStarted / RawToolOutput / AgentEnded map to the
   corresponding callbacks. Order is preserved, including failed model attempts;
   no sorting or expected-golden reconstruction is used. This proves the projected
   lifecycle for these scripts, not raw OTel payloads or concurrent callback order.

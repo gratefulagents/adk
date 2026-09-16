@@ -9,6 +9,7 @@ description = "Standalone ADK execution engine, streaming, approvals and owned T
 
 [dependencies]
 adk-core.workspace = true
+adk-codec.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
 futures-util = { version = "0.3", default-features = false, features = ["std"] }

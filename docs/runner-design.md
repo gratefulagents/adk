@@ -192,24 +192,41 @@ complete.** The following is an enumerated audit, not a parity waiver.
    output, cancellation and deadlines still prohibit replay. Virtual-time tests
    cover precedence, explicit rejection, missing reason, ten-retry bounds and the
    five-minute cap without sleeping in real time. Fallback/schema cross-language
-   replay remains separate from these Rust-only advice regressions. All 46 replay
+   replay remains separate from these Rust-only advice regressions. All 50 replay
    scenarios now also compare lifecycle callback order/content, including
    per-attempt agent/model start, model-end items/usage, raw tool callbacks and
    final agent output. This is a declared native-to-Go projection, not raw
-   hook/trace payload equivalence. Default compaction-heuristic equivalence is
-   still not claimed.
+   hook/trace payload equivalence. Local compaction evidence is tracked separately below.
 
-Concrete delivery boundary: fallback/reprobe and default schema outcomes are
-corrected and verified; tool scheduling including deferred-approval siblings is corrected with owned
-Rust futures. Output text/history is now baseline-compatible in the enumerated
-cases. Remaining delivery decisions concern native approval side channels versus
-Go wire markers/timing, native configuration versus Go sentinel ingestion, and
-infrastructure-error partial enrichment beyond the proven turn-limit case. Raw
-trace and default compaction-heuristic equivalence are not established. Do not
-close #4 on the basis of this bounded correction. If full Go-facing ingestion and
-wire identity are required in #4, those adapters need implementation and replay;
-otherwise their explicit ownership/acceptance belongs in the maintainer's scope
-decision under #1, not an implicit waiver in this note.
+## Compatibility integration update
+
+The maintainer clarified that these are implementation obligations, not requests
+for a scope waiver. Configuration sentinels and approval wire markers now have
+explicit codecs in `adk-codec`; `adk-runtime::compat` provides scalar config
+application, an approval journal, serial Go gate/resume handling, and infallible
+lifecycle callbacks isolated from native fail-closed security hooks. See
+[codec contracts](runner-codecs.md) and [error/callback contracts](runner-error-contracts.md).
+
+Failed model attempts now consume turns, including fallback and host retries.
+Local inactivity before visible output is retryable; parent deadlines are not.
+Ordinary tool errors/timeouts become paired error outputs, while parent
+cancellation remains fatal. Argument-schema validation is opt-in rather than an
+unconditional pre-dispatch rejection. Cache hashing uses the baseline NUL-separated
+namespace/key format. Default local compaction is implemented and differentially
+checked against extracted pinned Go functions; see [compaction evidence](local-compaction.md).
+
+These corrections do not authorize closing #4. Remaining evidence boundaries are
+explicit: runner replay still projects approval markers rather than comparing
+raw wire events; the separate codec tests verify marker representation and
+ordering. Approval-aware compaction has a pure planner but the automatic runner
+currently plans native history, with journal rebasing afterward. Forced provider
+context-overflow recovery and model-specific threshold selection are not wired
+into the automatic runner. Native diagnostic partials are deliberately richer
+than Go result slots as enumerated in E01–E12, not a claim of wire identity.
+OTel exporter composition belongs to #11, provider-native compaction to #5, and
+platform sessions to #12. None of these ownership boundaries removes the #4
+interfaces or justifies approving unverified external differences. Fresh review
+must examine the integrated head; earlier reviews and CI do not approve it.
 
 Cross-language replay must use the real Go runner and the Rust engine, normalize
 only declared representation differences, retain event order/call correlations,
@@ -225,15 +242,18 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 46 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 50 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |
-| Provider advice | `provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes`, `provider_advised_retries_are_bounded_without_spending_model_turns`, `fallback_precedes_error_handler_which_precedes_advice_retry` |
-| Retry/limits/timeouts | `fallback_precedes_policy_retries_without_spending_extra_turns`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
+| Provider advice | `provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes`, `provider_advised_retries_are_bounded_within_the_model_turn_budget`, `fallback_precedes_error_handler_which_precedes_advice_retry` |
+| Retry/limits/timeouts | `fallback_precedes_policy_retries_and_each_attempt_spends_a_turn`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
 | Compaction/cache/context | `compaction_replaces_history_and_hints_cache_prefix_are_request_only` |
 | Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |
 | Hooks/spill lifetimes | `raw_hooks_precede_processing_and_spills_live_across_pause_and_error`, `durable_failure_before_effect_fails_closed_after_effect_preserves_result`, 12 `output.rs` unit tests |
+| Sentinel/wire adapters | `adk-codec/tests/runner_codecs.rs` and explicitly executed `go_runner_differential.rs`: 21 Go config vectors and denial marker ordering; runtime `tests/compat.rs`: 12 integration tests |
+| Error and callback contracts | `tests/error_contracts.rs`: 10 tests implementing the E01–E12 map in `docs/runner-error-contracts.md` |
+| Default local compaction | `tests/local_compaction.rs`: 9 tests, including 104 extracted-Go planner/finalizer cases, cache stability, custom-backend fallback, calibration and cancellation |
 | Independent review regressions | `tests/review_regressions.rs`: failed resume adoption; trailing partial text after reasoning/completed messages; no duplicated committed deltas; last nonempty final answer validated in both execution modes |
 
 Tests are under `crates/adk-runtime/`. The replay corpus deliberately covers a

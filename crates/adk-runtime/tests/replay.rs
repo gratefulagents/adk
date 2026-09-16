@@ -152,6 +152,7 @@ impl StreamingModel for ScriptModel {
 }
 
 struct Echo {
+    fail: bool,
     definition: ToolDefinition,
     dispatch: Arc<Mutex<Vec<Value>>>,
 }
@@ -165,6 +166,10 @@ impl Tool for Echo {
         call: ToolCall,
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
+            if self.fail {
+                self.dispatch.lock().unwrap().push(json!({"name":self.definition.name,"arguments":call.arguments,"error":"scripted tool failure"}));
+                return Err(Error::new(ErrorCategory::Tool, "scripted tool failure"));
+            }
             let output = format!("echo: {}", call.arguments["text"].as_str().unwrap());
             self.dispatch.lock().unwrap().push(
                 json!({"name":self.definition.name,"arguments":call.arguments,"output":output}),
@@ -295,7 +300,7 @@ async fn replay(script: &Value) -> Value {
         requests: Mutex::new(vec![]),
         streaming,
     });
-    let tool = Arc::new(Echo {
+    let tool = Arc::new(Echo { fail:script["tool_error"].as_bool().unwrap_or(false),
         definition:ToolDefinition {
             name:"echo".into(),description:"Echo text".into(),
             input_schema:serde_json::from_value(json!({"type":"object","properties":{"text":{"type":"string"}},"required":["text"]})).unwrap(),
@@ -315,6 +320,7 @@ async fn replay(script: &Value) -> Value {
         definition.name = "approval".into();
         definition.requires_approval = true;
         agent.tools.push(Arc::new(Echo {
+            fail: false,
             definition,
             dispatch: tool.dispatch.clone(),
         }));
@@ -504,7 +510,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 46);
+    assert_eq!(cases.len(), 50);
     assert_eq!(
         cases
             .iter()

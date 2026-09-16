@@ -1,0 +1,91 @@
+{
+  "command": [
+    "go",
+    "test",
+    "-overlay=<temporary overlay>",
+    "-mod=readonly",
+    "-p=2",
+    "-count=1",
+    "-timeout=120s",
+    "-run",
+    "^TestExportCompactionReference$",
+    "./internal/agent"
+  ],
+  "environment": {
+    "CGO_ENABLED": "0",
+    "GOMAXPROCS": "2",
+    "GOTELEMETRY": "off",
+    "GOTOOLCHAIN": "local",
+    "GRATEFUL_LIVE_TESTS": "skip"
+  },
+  "fixtures": {
+    "compaction.json": "d7507babd9715eaf38e50516099fcfbe663f1c687a9c12adc5dd02d7314281c1",
+    "compaction_inputs.json": "8971283252deac7393a0339ecd5423acf2eb6141b8b23ea72360bcdad8c78a42"
+  },
+  "harness": {
+    "scripts/replay/compaction_export.go": "aedaf8885e5a9cd1487dcd471424a8e695c819847d9afc8522ee383adaf0536e",
+    "scripts/replay/compaction_export.py": "1d2e980a07f102108265b9b6e3a993e3e5590f69ae85224fda3c48bd568a0454"
+  },
+  "license": "GPL-3.0-only",
+  "license_copy": "licenses/SDK-GPL-3.0.txt",
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "sources": [
+    {
+      "path": "LICENSE",
+      "sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/LICENSE"
+    },
+    {
+      "path": "go.mod",
+      "sha256": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/go.mod"
+    },
+    {
+      "path": "go.sum",
+      "sha256": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/go.sum"
+    },
+    {
+      "path": "internal/agent/history_compaction.go",
+      "sha256": "768d579b677788eccc1d01887904cff7c3b772258dd26cdfd65b69d898679563",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/history_compaction.go"
+    },
+    {
+      "path": "internal/agent/history_compaction_test.go",
+      "sha256": "ecbda42ac183ef41d5a429efa5c0c5e0907b412f7125b86f4e8cbe5ec8a1630b",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/history_compaction_test.go"
+    },
+    {
+      "path": "internal/agent/run_config.go",
+      "sha256": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go"
+    },
+    {
+      "path": "internal/agent/runner.go",
+      "sha256": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/runner.go"
+    },
+    {
+      "path": "internal/agent/items.go",
+      "sha256": "fc3506f8767831ea124df1c0d1c9a72c4fdc6c248860a1660eaa3bb569ae287b",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/items.go"
+    },
+    {
+      "path": "internal/agent/stream.go",
+      "sha256": "e965af45e4650dfdff38df948e38cc06dbfbea5aa86a8f1bd7fe51751be2be09",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/stream.go"
+    },
+    {
+      "path": "internal/agent/compaction_llm.go",
+      "sha256": "4fd196fffcacb06cd9ed3c07a72d432cdb2d27127e67fe5da7837c7297092556",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/compaction_llm.go"
+    },
+    {
+      "path": "internal/agent/prompt_cache_key_test.go",
+      "sha256": "31c5db512059a75cfb0857fc6cfbf8a2e24c185b0ef0ee11423803d40591c4dd",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/prompt_cache_key_test.go"
+    }
+  ],
+  "toolchain": "go version go1.26.8 linux/amd64"
+}

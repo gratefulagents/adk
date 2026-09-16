@@ -31,6 +31,11 @@ use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
+use crate::compaction::{
+    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_for_request,
+    estimate_history_tokens, estimate_request_overhead_tokens, finalize_local_history,
+    output_reserve_tokens,
+};
 use crate::output::{OutputPolicy, SpillFile};
 
 #[derive(Clone)]
@@ -86,6 +91,7 @@ pub struct AgentConfig {
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn OutputParser>>,
     pub settings: Map<String, Value>,
+    pub hooks: Option<Arc<dyn RunHooks>>,
 }
 
 impl AgentConfig {
@@ -102,6 +108,7 @@ impl AgentConfig {
             output_schema_strict: true,
             output_parser: None,
             settings: Map::new(),
+            hooks: None,
         }
     }
 }
@@ -149,6 +156,33 @@ pub trait CostEstimator: Send + Sync {
 
 #[derive(Debug, Clone)]
 pub enum Observation {
+    ApprovalMarker {
+        agent: String,
+        call: ToolCall,
+        decision: ApprovalDecision,
+        reason: Option<String>,
+        new_items_before: usize,
+        history_before: usize,
+    },
+    HistoryReplaced {
+        before: Vec<RunItem>,
+        after: Vec<RunItem>,
+    },
+    AgentStarted {
+        agent: String,
+    },
+    ModelAccepted {
+        agent: String,
+        response: ModelResponse,
+    },
+    ToolStarted {
+        agent: String,
+        call: ToolCall,
+    },
+    AgentEnded {
+        agent: String,
+        output: Value,
+    },
     ModelAttempt {
         agent: String,
         model: String,
@@ -282,12 +316,16 @@ pub struct RunnerConfig {
     pub prompt_cache_namespace: Option<String>,
     /// StopAfterTool executes the whole batch; by default it returns no output.
     pub return_tool_output: bool,
+    /// Optional native guardrail; Go leaves argument decoding/validation to each tool.
+    pub validate_tool_arguments: bool,
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
     pub hooks: Option<Arc<dyn RunHooks>>,
     pub durable: Option<Arc<dyn DurableHook>>,
     pub compaction: Option<CompactionConfig>,
+    /// Baseline local fallback; independent of the optional provider/custom compactor.
+    pub local_compaction: LocalCompactionPolicy,
 }
 
 impl Default for RunnerConfig {
@@ -304,11 +342,13 @@ impl Default for RunnerConfig {
             prompt_cache_key: None,
             prompt_cache_namespace: None,
             return_tool_output: false,
+            validate_tool_arguments: false,
             turn_context: None,
             transient_context: vec![],
             hooks: None,
             durable: None,
             compaction: None,
+            local_compaction: LocalCompactionPolicy::default(),
         }
     }
 }
@@ -346,6 +386,63 @@ impl Continuation {
         decisions: Vec<(String, ApprovalDecision)>,
     ) -> Result<RunOutcome, RunError> {
         self.prepare_batch(decisions)?.drive().await
+    }
+    /// Go ChatLoop boundary: resolve and execute each pending call before asking
+    /// the next gate, then start a fresh invocation budget without replaying effects.
+    pub async fn resume_go_gate(
+        mut self,
+        gate: &dyn crate::compat::GoApprovalGate,
+    ) -> Result<RunOutcome, RunError> {
+        self.engine.result.status = RunStatus::Incomplete;
+        self.engine.tools_prepared = true;
+        self.engine.sender.take();
+        while let Some(call) = self.engine.calls.front().cloned() {
+            let Some(request) = self
+                .engine
+                .result
+                .pending_approvals
+                .iter()
+                .find(|r| r.call.id == call.id)
+                .cloned()
+            else {
+                return Err(self
+                    .engine
+                    .fail(Error::new(
+                        ErrorCategory::InvalidInput,
+                        "Go gate resume requires pending approval calls",
+                    ))
+                    .await);
+            };
+            let decision = match bounded(
+                &self.engine.context,
+                None,
+                gate.approve(&self.engine.context, &request),
+            )
+            .await
+            {
+                Ok(decision) => decision,
+                Err(error) => return Err(self.engine.fail(error).await),
+            };
+            let approval = if decision.approved {
+                ApprovalDecision::Approve
+            } else {
+                ApprovalDecision::Deny
+            };
+            if !decision.approved && !decision.reason.trim().is_empty() {
+                self.engine
+                    .denial_reasons
+                    .insert(call.id.clone(), decision.reason.trim().into());
+            }
+            self.engine.approvals.insert(call.id.clone(), approval);
+            if let Err(error) = self.engine.tool(call).await {
+                return Err(self.engine.fail(error).await);
+            }
+        }
+        self.engine.turns = 0;
+        self.engine.fallbacks.clear();
+        self.engine.calibration = EstimateCalibration::default();
+        self.engine.tool_final = None;
+        self.engine.drive().await
     }
     pub fn stream_batch(
         self,
@@ -444,6 +541,7 @@ impl Runner {
     pub fn new(agent: AgentConfig, mut config: RunnerConfig) -> Result<Self, Error> {
         validate_agent(&agent, &mut HashSet::new())?;
         config.output.work_dir = Some(config.work_dir.clone());
+        config.local_compaction = config.local_compaction.normalized();
         if let Some(max) = config.limits.max_cost {
             if !max.is_finite() || max < 0.0 || config.cost_estimator.is_none() {
                 return Err(Error::new(
@@ -486,9 +584,12 @@ impl Runner {
             phase: Phase::Start,
             calls: VecDeque::new(),
             approvals: HashMap::new(),
+            denial_reasons: HashMap::new(),
             deferred_calls: VecDeque::new(),
+            pending_marker_events: Vec::new(),
             tools_prepared: false,
             turns: 0,
+            calibration: EstimateCalibration::default(),
             fallbacks: HashMap::new(),
             cost: 0.0,
             tool_pause: false,
@@ -532,9 +633,12 @@ struct Engine {
     phase: Phase,
     calls: VecDeque<ToolCall>,
     approvals: HashMap<String, ApprovalDecision>,
+    denial_reasons: HashMap<String, String>,
     deferred_calls: VecDeque<ToolCall>,
+    pending_marker_events: Vec<Observation>,
     tools_prepared: bool,
     turns: u32,
+    calibration: EstimateCalibration,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
     tool_pause: bool,
@@ -582,6 +686,15 @@ fn compile_schema(schema: &schemars::Schema) -> Result<jsonschema::Validator, Er
     })
 }
 
+#[derive(Debug)]
+struct OperationTimeout;
+impl std::fmt::Display for OperationTimeout {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("local operation timeout")
+    }
+}
+impl std::error::Error for OperationTimeout {}
+
 async fn bounded<T>(
     context: &Context,
     timeout: Option<Duration>,
@@ -593,9 +706,49 @@ async fn bounded<T>(
         biased;
         _ = context.cancellation.cancelled() => Err(Error::new(ErrorCategory::Cancelled, "operation cancelled")),
         _ = async { match deadline { Some(d) => tokio::time::sleep_until(d.into()).await, None => std::future::pending().await } } => Err(Error::new(ErrorCategory::DeadlineExceeded, "deadline exceeded")),
-        _ = async { match timeout { Some(d) => tokio::time::sleep(d).await, None => std::future::pending().await } } => Err(Error::new(ErrorCategory::DeadlineExceeded, "operation inactivity/timeout limit exceeded")),
+        _ = async { match timeout { Some(d) => tokio::time::sleep(d).await, None => std::future::pending().await } } => Err(Error::new(ErrorCategory::DeadlineExceeded, "operation inactivity/timeout limit exceeded").with_source(OperationTimeout)),
         result = future => result,
     }
+}
+
+fn go_duration(duration: Duration) -> String {
+    let ns = duration.as_nanos();
+    if ns == 0 {
+        return "0s".into();
+    }
+    if ns < 1_000_000_000 {
+        let (scale, digits, unit) = if ns < 1_000 {
+            (1, 0, "ns")
+        } else if ns < 1_000_000 {
+            (1_000, 3, "µs")
+        } else {
+            (1_000_000, 6, "ms")
+        };
+        let fraction = format!("{:0width$}", ns % scale, width = digits);
+        let fraction = fraction.trim_end_matches('0');
+        return if fraction.is_empty() {
+            format!("{}{unit}", ns / scale)
+        } else {
+            format!("{}.{fraction}{unit}", ns / scale)
+        };
+    }
+    let seconds = duration.as_secs();
+    let mut result = String::new();
+    if seconds >= 3600 {
+        result.push_str(&format!("{}h", seconds / 3600));
+    }
+    if seconds >= 60 {
+        result.push_str(&format!("{}m", seconds / 60 % 60));
+    }
+    result.push_str(&(seconds % 60).to_string());
+    let fraction = format!("{:09}", duration.subsec_nanos());
+    let fraction = fraction.trim_end_matches('0');
+    if !fraction.is_empty() {
+        result.push('.');
+        result.push_str(fraction);
+    }
+    result.push('s');
+    result
 }
 
 fn text(content: &[Content]) -> String {
@@ -632,11 +785,16 @@ impl Engine {
         Ok(())
     }
     async fn observe(&self, observation: Observation) -> Result<(), Error> {
-        if let Some(hooks) = &self.config.hooks {
+        let hooks = if matches!(observation, Observation::AgentEnded { .. }) {
+            [&self.agent.hooks, &self.config.hooks]
+        } else {
+            [&self.config.hooks, &self.agent.hooks]
+        };
+        for hooks in hooks.into_iter().flatten() {
             bounded(
                 &self.context,
                 None,
-                hooks.observe(&self.context, observation),
+                hooks.observe(&self.context, observation.clone()),
             )
             .await?;
         }
@@ -695,25 +853,27 @@ impl Engine {
                 spills: self.spills,
                 continuation: None,
             }),
-            Err(mut error) => {
-                self.result.status = RunStatus::Incomplete;
-                self.result.final_output = None;
-                // Preserve the original failure even when the failed-event sink fails.
-                let _ = self
-                    .emit(RunEvent::Failed {
-                        error: error.info.clone(),
-                    })
-                    .await;
-                if !self.spills.is_empty() {
-                    error.source = Some(Box::new(FailedSpills {
-                        source: error.source.take(),
-                        _spills: self.spills,
-                    }));
-                }
-                Err(RunError::with_partial(error, self.result))
-            }
+            Err(error) => Err(self.fail(error).await),
         }
     }
+    async fn fail(mut self, mut error: Error) -> RunError {
+        self.result.status = RunStatus::Incomplete;
+        self.result.final_output = None;
+        // Preserve the original failure even when the failed-event sink fails.
+        let _ = self
+            .emit(RunEvent::Failed {
+                error: error.info.clone(),
+            })
+            .await;
+        if !self.spills.is_empty() {
+            error.source = Some(Box::new(FailedSpills {
+                source: error.source.take(),
+                _spills: self.spills,
+            }));
+        }
+        RunError::with_partial(error, self.result)
+    }
+
     async fn advance(&mut self) -> Result<RunStatus, Error> {
         loop {
             self.context.check_active()?;
@@ -741,6 +901,9 @@ impl Engine {
                         }
                     } else if !self.deferred_calls.is_empty() {
                         self.calls = std::mem::take(&mut self.deferred_calls);
+                        for event in std::mem::take(&mut self.pending_marker_events) {
+                            self.observe(event).await?;
+                        }
                         for request in &self.result.pending_approvals {
                             self.checkpoint(Boundary::ApprovalPending, Some(&request.call))
                                 .await?;
@@ -834,11 +997,22 @@ impl Engine {
         {
             Ok(compacted) => compacted,
             Err(error) => {
-                let _ = self
-                    .observe(Observation::CompactionFailed {
-                        error: error.info.clone(),
-                    })
-                    .await;
+                self.context.check_active()?;
+                self.observe(Observation::CompactionFailed {
+                    error: error.info.clone(),
+                })
+                .await?;
+                if matches!(
+                    error.info.category,
+                    ErrorCategory::Provider | ErrorCategory::Unsupported
+                ) || error
+                    .source
+                    .as_deref()
+                    .is_some_and(|source| source.is::<OperationTimeout>())
+                {
+                    // Request preparation still runs the baseline local planner after this failure.
+                    return Ok(());
+                }
                 return Err(error);
             }
         };
@@ -849,12 +1023,69 @@ impl Engine {
         })
         .await?;
         validate_history_pairs(&compacted.history)?;
+        self.observe(Observation::HistoryReplaced {
+            before: self.result.history.clone(),
+            after: compacted.history.clone(),
+        })
+        .await?;
         self.result.history = compacted.history;
         self.result.usage.context_tokens = Some(compacted.context_tokens);
         self.observe(Observation::Compacted {
             before_items,
             after_items: self.result.history.len(),
             context_tokens: compacted.context_tokens,
+        })
+        .await
+    }
+    async fn compact_local(&mut self, request: &mut ModelRequest) -> Result<(), Error> {
+        let policy = self.calibration.apply(self.config.local_compaction);
+        let transient = &request.input[self.result.history.len()..];
+        let overhead =
+            estimate_request_overhead_tokens(request) + estimate_history_tokens(transient);
+        let before = estimate_history_tokens(&self.result.history) + overhead;
+        if !policy.enabled || before <= policy.trigger_tokens {
+            return Ok(());
+        }
+        self.observe(Observation::CompactionStarted {
+            context_tokens: before,
+            target_tokens: policy.target_tokens,
+        })
+        .await?;
+        let outcome = compact_for_request(
+            &self.result.history,
+            policy,
+            overhead.min(i64::MAX as u64) as i64,
+        );
+        if !outcome.changed {
+            if !matches!(outcome.reason, "disabled" | "below-threshold") {
+                self.observe(Observation::CompactionFailed {
+                    error: ErrorInfo {
+                        category: ErrorCategory::ModelBehavior,
+                        message: outcome.reason.into(),
+                    },
+                })
+                .await?;
+            }
+            return Ok(());
+        }
+        let history = finalize_local_history(&outcome.history, &self.result.history);
+        validate_history_pairs(&history)?;
+        let before_items = self.result.history.len();
+        let context_tokens = estimate_history_tokens(&history) + overhead;
+        let mut input = history.clone();
+        input.extend_from_slice(transient);
+        request.input = input;
+        self.observe(Observation::HistoryReplaced {
+            before: self.result.history.clone(),
+            after: history.clone(),
+        })
+        .await?;
+        self.result.history = history;
+        self.result.usage.context_tokens = Some(context_tokens);
+        self.observe(Observation::Compacted {
+            before_items,
+            after_items: self.result.history.len(),
+            context_tokens,
         })
         .await
     }
@@ -868,7 +1099,6 @@ impl Engine {
         self.check_budget()?;
         self.compact().await?;
         self.check_budget()?;
-        self.turns += 1;
         let mut input = self.result.history.clone();
         input.extend(self.config.transient_context.clone());
         if let Some(hints) = &self.config.turn_context {
@@ -876,7 +1106,7 @@ impl Engine {
                 bounded(
                     &self.context,
                     None,
-                    hints.context(&self.context, &self.result, self.turns),
+                    hints.context(&self.context, &self.result, self.turns + 1),
                 )
                 .await?,
             );
@@ -920,15 +1150,15 @@ impl Engine {
                 .as_deref()
                 .unwrap_or(&self.context.run_id);
             let mut hash = Sha256::new();
-            hash.update((namespace.len() as u64).to_le_bytes());
             hash.update(namespace);
+            hash.update([0]);
             hash.update(key);
             settings.insert(
                 "prompt_cache_key".into(),
                 Value::String(format!("{:x}", hash.finalize())),
             );
         }
-        let request = ModelRequest {
+        let mut request = ModelRequest {
             model: self.agent.model.name().into(),
             instructions,
             input,
@@ -938,8 +1168,14 @@ impl Engine {
             output_schema_strict: self.agent.output_schema_strict,
             settings,
         };
+        self.compact_local(&mut request).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
         let (response, model, streamed) = self.model_response(request).await?;
+        self.observe(Observation::ModelAccepted {
+            agent: self.agent.name.clone(),
+            response: response.clone(),
+        })
+        .await?;
         self.record_response(response.clone(), &model)?;
         if !streamed {
             self.emit(RunEvent::Model {
@@ -1001,7 +1237,13 @@ impl Engine {
                 })
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
-            self.result.final_output = Some(self.validate_output(output).await?);
+            let output = self.validate_output(output).await?;
+            self.result.final_output = Some(output.clone());
+            self.observe(Observation::AgentEnded {
+                agent: self.agent.name.clone(),
+                output,
+            })
+            .await?;
             self.phase = Phase::Finish;
         }
         Ok(())
@@ -1088,6 +1330,17 @@ impl Engine {
         let mut attempt = 0;
         for (index, binding) in candidates.iter().enumerate().skip(start) {
             loop {
+                if self.turns >= self.policy.max_turns.get() {
+                    return Err(Error::new(
+                        ErrorCategory::MaxTurns,
+                        "maximum model turns exceeded",
+                    ));
+                }
+                self.turns += 1;
+                self.observe(Observation::AgentStarted {
+                    agent: self.agent.name.clone(),
+                })
+                .await?;
                 self.observe(Observation::ModelAttempt {
                     agent: self.agent.name.clone(),
                     model: binding.name().into(),
@@ -1096,8 +1349,19 @@ impl Engine {
                 .await?;
                 let mut request = request.clone();
                 request.model = binding.name().into();
+                let estimated_prompt = estimate_history_tokens(&request.input)
+                    + estimate_request_overhead_tokens(&request)
+                    - output_reserve_tokens(&request)
+                    - REQUEST_SAFETY_BUFFER;
                 match self.model_attempt(binding, request).await {
                     Ok(response) => {
+                        self.calibration.observe_estimate(
+                            response
+                                .usage
+                                .context_tokens
+                                .unwrap_or(response.usage.input_tokens),
+                            estimated_prompt,
+                        );
                         if let Some((_, successes)) = self.fallbacks.get_mut(&agent_key) {
                             *successes += 1;
                             if *successes == 3 {
@@ -1111,11 +1375,14 @@ impl Engine {
                         ));
                     }
                     Err((error, committed)) => {
+                        self.context.check_active()?;
+                        let idle = error
+                            .source
+                            .as_deref()
+                            .is_some_and(|source| source.is::<OperationTimeout>());
                         if committed
-                            || matches!(
-                                error.info.category,
-                                ErrorCategory::Cancelled | ErrorCategory::DeadlineExceeded
-                            )
+                            || error.info.category == ErrorCategory::Cancelled
+                            || (error.info.category == ErrorCategory::DeadlineExceeded && !idle)
                         {
                             return Err(error);
                         }
@@ -1126,27 +1393,28 @@ impl Engine {
                         };
                         if let Some(next) = candidates.get(index + 1).filter(|_| {
                             error.info.category != ErrorCategory::ModelBehavior
-                                && advice.as_ref().is_some_and(|advice| {
-                                    let reason = advice.reason.trim().to_ascii_lowercase();
-                                    advice.should_retry
-                                        && (matches!(
-                                            reason.as_str(),
-                                            "429" | "402" | "503" | "529"
-                                        ) || [
-                                            "rate_limit",
-                                            "too_many_requests",
-                                            "too many requests",
-                                            "overloaded",
-                                            "quota",
-                                            "billing",
-                                            "subscription",
-                                            "credit",
-                                            "limit_exceeded",
-                                            "exhausted",
-                                        ]
-                                        .iter()
-                                        .any(|part| reason.contains(part)))
-                                })
+                                && (idle
+                                    || advice.as_ref().is_some_and(|advice| {
+                                        let reason = advice.reason.trim().to_ascii_lowercase();
+                                        advice.should_retry
+                                            && (matches!(
+                                                reason.as_str(),
+                                                "429" | "402" | "503" | "529"
+                                            ) || [
+                                                "rate_limit",
+                                                "too_many_requests",
+                                                "too many requests",
+                                                "overloaded",
+                                                "quota",
+                                                "billing",
+                                                "subscription",
+                                                "credit",
+                                                "limit_exceeded",
+                                                "exhausted",
+                                            ]
+                                            .iter()
+                                            .any(|part| reason.contains(part)))
+                                    }))
                         }) {
                             self.fallbacks.insert(agent_key, (index + 1, 0));
                             self.observe(Observation::Fallback {
@@ -1163,7 +1431,7 @@ impl Engine {
                             }
                         }
                         let policy_retry = attempt <= self.config.retry.max_retries
-                            && (self.config.retry.retryable)(&error)
+                            && (idle || (self.config.retry.retryable)(&error))
                             && !advice.as_ref().is_some_and(|advice| {
                                 !advice.should_retry && !advice.reason.trim().is_empty()
                             });
@@ -1332,7 +1600,9 @@ impl Engine {
             if let Some(tool) = tool {
                 let definition = tool.definition();
                 if self.policy.tools.decision(definition) == ToolDecision::RequireApproval {
-                    if !compile_schema(&definition.input_schema)?.is_valid(&call.arguments) {
+                    if self.config.validate_tool_arguments
+                        && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
+                    {
                         return Err(Error::new(
                             ErrorCategory::ModelBehavior,
                             format!("invalid arguments for {}", call.name),
@@ -1357,6 +1627,15 @@ impl Engine {
                         .await?
                     };
                     if approval == ApprovalDecision::Defer {
+                        self.pending_marker_events
+                            .push(Observation::ApprovalMarker {
+                                agent: self.agent.name.clone(),
+                                call: call.clone(),
+                                decision: approval,
+                                reason: None,
+                                new_items_before: self.result.new_items.len() + ready.len(),
+                                history_before: self.result.history.len() + ready.len(),
+                            });
                         self.result.pending_approvals.push(request);
                         self.deferred_calls.push_back(call);
                         continue;
@@ -1376,8 +1655,9 @@ impl Engine {
                     let definition = tool.definition();
                     definition.name == call.name
                         && self.policy.tools.decision(definition) == ToolDecision::Allow
-                        && compile_schema(&definition.input_schema)
-                            .is_ok_and(|schema| schema.is_valid(&call.arguments))
+                        && (!self.config.validate_tool_arguments
+                            || compile_schema(&definition.input_schema)
+                                .is_ok_and(|schema| schema.is_valid(&call.arguments)))
                 })
             })
     }
@@ -1435,21 +1715,32 @@ impl Engine {
             .find(|h| h.definition.name == call.name);
         let definition = tool
             .map(|t| t.definition())
-            .or_else(|| handoff.map(|h| &h.definition))
-            .ok_or_else(|| {
-                Error::new(
-                    ErrorCategory::ModelBehavior,
-                    format!("unknown tool: {}", call.name),
-                )
-            })?;
-        let decision = self.policy.tools.decision(definition);
-        if decision == ToolDecision::Deny {
-            return Err(Error::new(
-                ErrorCategory::PermissionDenied,
-                format!("tool denied: {}", call.name),
-            ));
+            .or_else(|| handoff.map(|h| &h.definition));
+        if definition
+            .is_none_or(|definition| self.policy.tools.decision(definition) == ToolDecision::Deny)
+        {
+            let output = ToolOutput {
+                content: vec![Content::Text {
+                    text: format!("unknown tool: {}", call.name),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            self.finish_tool(
+                call,
+                ExecutedTool {
+                    raw: output,
+                    hook_error: None,
+                },
+            )
+            .await?;
+            return Ok(false);
         }
-        if !compile_schema(&definition.input_schema)?.is_valid(&call.arguments) {
+        let definition = definition.unwrap();
+        let decision = self.policy.tools.decision(definition);
+        if self.config.validate_tool_arguments
+            && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
+        {
             return Err(Error::new(
                 ErrorCategory::ModelBehavior,
                 format!("invalid arguments for {}", call.name),
@@ -1474,6 +1765,15 @@ impl Engine {
                 )
                 .await?
             };
+            self.observe(Observation::ApprovalMarker {
+                agent: self.agent.name.clone(),
+                call: call.clone(),
+                decision: approval,
+                reason: self.denial_reasons.get(&call.id).cloned(),
+                new_items_before: self.result.new_items.len(),
+                history_before: self.result.history.len(),
+            })
+            .await?;
             match approval {
                 ApprovalDecision::Approve => {
                     self.result
@@ -1487,7 +1787,10 @@ impl Engine {
                     self.calls.pop_front();
                     let output = ToolOutput {
                         content: vec![Content::Text {
-                            text: "tool call denied by host approval gate".into(),
+                            text: self
+                                .denial_reasons
+                                .remove(&call.id)
+                                .unwrap_or_else(|| "tool call denied by host approval gate".into()),
                         }],
                         is_error: true,
                         should_pause: false,
@@ -1549,6 +1852,11 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
+        self.observe(Observation::ToolStarted {
+            agent: self.agent.name.clone(),
+            call: call.clone(),
+        })
+        .await?;
         self.emit(RunEvent::ToolStarted { call: call.clone() })
             .await?;
         let mut operation = self.context.clone();
@@ -1566,12 +1874,38 @@ impl Engine {
                 self.context.run_id, self.turns, call.id
             )),
         };
-        let raw = bounded(
+        let raw = match bounded(
             &context.operation,
             self.policy.tools.timeout,
             tool.execute(&context, call.clone()),
         )
-        .await?;
+        .await
+        {
+            Ok(output) => output,
+            Err(error) => {
+                // A local tool budget is model-visible; a dead parent still terminates the run.
+                self.context.check_active()?;
+                let message = if let Some(timeout) = self.policy.tools.timeout.filter(|_| {
+                    context
+                        .operation
+                        .deadline
+                        .is_some_and(|d| Instant::now() >= d)
+                }) {
+                    format!(
+                        "tool {:?} timed out after {}",
+                        call.name,
+                        go_duration(timeout)
+                    )
+                } else {
+                    error.info.message
+                };
+                ToolOutput {
+                    content: vec![Content::Text { text: message }],
+                    is_error: true,
+                    should_pause: false,
+                }
+            }
+        };
         let hook_error = self
             .observe(Observation::RawToolOutput {
                 call: call.clone(),

@@ -10469,6 +10469,714 @@
         "resume": true,
         "streaming": false
       }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          }
+        ],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\nscripted tool failure\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "call-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\nscripted tool failure\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "tool_failure_False",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "tool_error": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "scripted tool failure",
+              "id": "call-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "ordinary untrusted output"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "BEGIN UNTRUSTED TOOL OUTPUT\nscripted tool failure\nEND UNTRUSTED TOOL OUTPUT",
+              "id": "call-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "ordinary untrusted output"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "call-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\nscripted tool failure\nEND UNTRUSTED TOOL OUTPUT",
+                "id": "call-1",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "tool_failure_True",
+        "output_cap": 0,
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "ordinary untrusted output"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "tool_error": true,
+        "untrusted": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          }
+        ],
+        "outcome": {
+          "error": "max_turns",
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "fallback 1",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "fallback 1",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "incomplete"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "backup",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "fallbacks": [
+          "backup",
+          "backup2"
+        ],
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "fallback_attempt_budget",
+        "responses": [
+          {
+            "error": "overloaded"
+          },
+          {
+            "deltas": [],
+            "end_turn": false,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [
+          {
+            "item": {
+              "text": "fallback 1",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          }
+        ],
+        "outcome": {
+          "error": "max_turns",
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "fallback 1",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 1,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "fallback 1",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 1,
+          "response_count": 1,
+          "status": "incomplete"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "backup",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "fallbacks": [
+          "backup",
+          "backup2"
+        ],
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "fallback_attempt_budget_stream",
+        "responses": [
+          {
+            "error": "overloaded"
+          },
+          {
+            "deltas": [],
+            "end_turn": false,
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1
+          }
+        ],
+        "streaming": true
+      }
     }
   ],
   "schema_version": 1,

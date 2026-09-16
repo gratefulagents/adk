@@ -32,6 +32,7 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
+	ToolError    bool            `json:"tool_error"`
 	Deny         bool            `json:"deny"`
 	Resume       bool            `json:"resume"`
 	ChatLoop     bool            `json:"chat_loop"`
@@ -171,6 +172,10 @@ func execute(s scenario) object {
 			}
 			if err := json.Unmarshal(input, &args); err != nil {
 				panic(err)
+			}
+			if s.ToolError {
+				dispatch = append(dispatch, object{"name": "echo", "arguments": input, "error": "scripted tool failure"})
+				return "", errors.New("scripted tool failure")
 			}
 			dispatch = append(dispatch, object{"name": "echo", "arguments": input, "output": "echo: " + args.Text})
 			return "echo: " + args.Text, nil

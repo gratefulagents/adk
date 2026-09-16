@@ -466,7 +466,7 @@ async fn cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream() {
 }
 
 #[tokio::test]
-async fn fallback_precedes_policy_retries_without_spending_extra_turns() {
+async fn fallback_precedes_policy_retries_and_each_attempt_spends_a_turn() {
     let primary = TestModel::with(vec![Err(Error::new(ErrorCategory::Provider, "overloaded"))]);
     let fallback = TestModel::with(vec![Err(provider_error()), Ok(answer("fallback"))]);
     let mut a = agent(primary.clone());
@@ -476,7 +476,7 @@ async fn fallback_precedes_policy_retries_without_spending_extra_turns() {
     config.retry.initial_delay = Duration::ZERO;
     let result = Runner::new(a, config)
         .unwrap()
-        .run(context(), request(1), Arc::new(TestHost::default()))
+        .run(context(), request(3), Arc::new(TestHost::default()))
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("fallback")));
@@ -528,20 +528,23 @@ async fn cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work() {
     assert_eq!(model.drops.load(Ordering::SeqCst), 1);
     let mut tool = TestTool::new("wait", false, false);
     Arc::get_mut(&mut tool).unwrap().pending = true;
-    let mut a = agent(TestModel::with(vec![Ok(response(
-        vec![call("1", "wait")],
-        None,
-    ))]));
+    let mut a = agent(TestModel::with(vec![
+        Ok(response(vec![call("1", "wait")], None)),
+        Ok(answer("Recovered from tool timeout.")),
+    ]));
     a.tools = vec![tool];
     let mut req = request(2);
     req.policy.tools.timeout = Some(Duration::from_millis(5));
-    let error = runner(a)
+    let result = runner(a)
         .run(context(), req, Arc::new(TestHost::default()))
         .await
-        .err()
-        .unwrap();
-    assert_eq!(error.error.info.category, ErrorCategory::DeadlineExceeded);
-    assert_eq!(error.partial.unwrap().responses.len(), 1);
+        .unwrap()
+        .result;
+    assert_eq!(result.responses.len(), 2);
+    assert!(
+        matches!(&result.new_items[1], RunItem::ToolResult { output, .. }
+        if output.is_error && output.content == vec![Content::Text { text: "tool \"wait\" timed out after 5ms".into() }])
+    );
 }
 
 struct UnitCost;
@@ -607,7 +610,7 @@ async fn authorization_and_argument_validation_precede_effects() {
             }
         }
         let mut responses = vec![Ok(response(vec![c], None))];
-        if mode == 1 {
+        if mode != 2 {
             responses.push(Ok(answer("Denied without execution.")));
         }
         let model = if streaming {
@@ -632,14 +635,21 @@ async fn authorization_and_argument_validation_precede_effects() {
             .lock()
             .unwrap()
             .push_back(ApprovalDecision::Deny);
-        let runner = runner(a);
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                validate_tool_arguments: true,
+                ..RunnerConfig::default()
+            },
+        )
+        .unwrap();
         let outcome = if streaming {
             runner.stream(context(), request(2), host).finish().await
         } else {
             runner.run(context(), request(2), host).await
         };
         assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
-        if mode == 1 {
+        if mode != 2 {
             let result = outcome.unwrap().result;
             assert_eq!(
                 result.final_output,
@@ -1300,7 +1310,7 @@ async fn sticky_fallback_survives_approval_resume_and_reprobes_after_three_succe
         .lock()
         .unwrap()
         .push_back(ApprovalDecision::Defer);
-    let paused = runner(a).run(context(), request(4), host).await.unwrap();
+    let paused = runner(a).run(context(), request(5), host).await.unwrap();
     assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
     let done = paused
         .continuation
@@ -1485,7 +1495,7 @@ async fn fallback_state_is_per_agent_identity_not_display_name() {
         target: Arc::new(target),
     }];
     let result = runner(source)
-        .run(context(), request(2), Arc::new(TestHost::default()))
+        .run(context(), request(3), Arc::new(TestHost::default()))
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("target primary")));
@@ -1651,7 +1661,7 @@ async fn provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes(
         let start = tokio::time::Instant::now();
         let result = Runner::new(a, config)
             .unwrap()
-            .run(context(), request(1), Arc::new(TestHost::default()))
+            .run(context(), request(2), Arc::new(TestHost::default()))
             .await;
         assert_eq!(model.completes.load(Ordering::SeqCst), expected_calls);
         assert_eq!(start.elapsed(), Duration::from_secs(expected_delay));
@@ -1660,7 +1670,7 @@ async fn provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes(
 }
 
 #[tokio::test(start_paused = true)]
-async fn provider_advised_retries_are_bounded_without_spending_model_turns() {
+async fn provider_advised_retries_are_bounded_within_the_model_turn_budget() {
     let model = TestModel::with((0..11).map(|_| Err(provider_error())).collect());
     let advised = Arc::new(AdvisedModel {
         model: model.clone(),
@@ -1674,7 +1684,7 @@ async fn provider_advised_retries_are_bounded_without_spending_model_turns() {
     let mut a = AgentConfig::new("test", ModelBinding::complete("primary", advised));
     a.fallbacks = vec![ModelBinding::complete("backup", fallback.clone())];
     let error = runner(a)
-        .run(context(), request(1), Arc::new(TestHost::default()))
+        .run(context(), request(12), Arc::new(TestHost::default()))
         .await
         .err()
         .unwrap();
@@ -1717,7 +1727,7 @@ async fn fallback_precedes_error_handler_which_precedes_advice_retry() {
         };
         let result = Runner::new(a, config)
             .unwrap()
-            .run(context(), request(1), Arc::new(TestHost::default()))
+            .run(context(), request(2), Arc::new(TestHost::default()))
             .await;
         assert_eq!(result.is_ok(), has_fallback);
         assert_eq!(handler.0.load(Ordering::SeqCst), usize::from(!has_fallback));
@@ -1738,7 +1748,7 @@ impl ModelErrorHandler for RetryModelError {
     }
 }
 #[tokio::test]
-async fn error_handler_retry_and_continue_reenter_the_same_model_turn() {
+async fn error_handler_retry_and_continue_spend_attempt_turns() {
     for continue_action in [false, true] {
         let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
         let config = RunnerConfig {
@@ -1747,7 +1757,7 @@ async fn error_handler_retry_and_continue_reenter_the_same_model_turn() {
         };
         let result = Runner::new(agent(model.clone()), config)
             .unwrap()
-            .run(context(), request(1), Arc::new(TestHost::default()))
+            .run(context(), request(2), Arc::new(TestHost::default()))
             .await
             .unwrap();
         assert_eq!(result.result.final_output, Some(json!("done")));

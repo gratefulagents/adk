@@ -2130,5 +2130,157 @@
     "chat_loop": true,
     "resume": true,
     "deny": true
+  },
+  {
+    "name": "tool_failure_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0,
+    "tool_error": true
+  },
+  {
+    "name": "tool_failure_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0,
+    "tool_error": true
+  },
+  {
+    "name": "fallback_attempt_budget",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_attempt_budget_stream",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
   }
 ]

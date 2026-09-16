@@ -5,6 +5,8 @@
 //! Abortion only takes effect when a task yields. Non-yielding work can prevent
 //! shutdown; blocking processes/threads need their own owner and termination API.
 
+pub mod compaction;
+pub mod compat;
 pub mod output;
 pub mod runner;
 pub use runner::*;

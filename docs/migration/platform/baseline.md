@@ -520,4 +520,3 @@ Remaining acceptance gaps are substantive rather than missing handoff artifacts:
 Database tests require `TEST_DATABASE_URL`, run migrations, and delete shared test tables. They must use a disposable database; skipped database tests are not parity evidence: `P/internal/store/postgres/store_test.go:19–43`.
 
 Normalization must preserve message/pass/claim relationships, event ordering, transcript watermarks, manifest repository ordering and generation derivation. Random IDs, timestamps and encryption nonces may be replaced consistently, but ciphertext byte equality is not an appropriate replay assertion.
-

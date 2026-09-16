@@ -80,3 +80,13 @@ pub struct RunPolicy {
     pub tools: ToolPolicy,
     pub tool_use: ToolUseBehavior,
 }
+
+impl Default for RunPolicy {
+    fn default() -> Self {
+        Self {
+            max_turns: NonZeroU32::new(100).unwrap(),
+            tools: ToolPolicy::default(),
+            tool_use: ToolUseBehavior::Continue,
+        }
+    }
+}

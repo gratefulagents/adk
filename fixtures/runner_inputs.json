@@ -1,0 +1,2286 @@
+[
+  {
+    "name": "normal",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "tool-loop",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "max-turn",
+    "streaming": false,
+    "max_turns": 1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-budget",
+            "name": "echo",
+            "arguments": {
+              "text": "retained"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "explicit-continue",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Working."
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Finished."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "normal-stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Do",
+          "ne."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "tool-loop-stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Tw",
+          "o echoes complete."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "max-turn-stream",
+    "streaming": true,
+    "max_turns": 1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-budget",
+            "name": "echo",
+            "arguments": {
+              "text": "retained"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "explicit-continue-stream",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Working."
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Wo",
+          "rking."
+        ]
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Finished."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Fi",
+          "nished."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sticky_reprobe",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary recovered"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "failed_reprobe",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback again"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_chain_reset",
+    "streaming": false,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "schema_11",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "not JSON"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_12",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_13",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "sticky_reprobe_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary recovered"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "failed_reprobe_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback again"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_chain_reset_stream",
+    "streaming": true,
+    "max_turns": 20,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 2"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "backup2 3"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "primary"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "schema_17",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "not JSON"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_18",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "schema_19",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    }
+  },
+  {
+    "name": "approval_batch",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "approvals": true
+  },
+  {
+    "name": "approval_batch_stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "approvals": true
+  },
+  {
+    "name": "custom_schema_-1_False",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_1_False",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_-1_True",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":-1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "custom_schema_1_True",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "{\"n\":1}"
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "n": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "n"
+      ]
+    },
+    "schema_name": "reviewed_result",
+    "schema_strict": false,
+    "custom_parser": true
+  },
+  {
+    "name": "output_plain_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_marker_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_wrapped_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_utf8_cap_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 128
+  },
+  {
+    "name": "output_plain_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_marker_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_wrapped_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0
+  },
+  {
+    "name": "output_utf8_cap_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 128
+  },
+  {
+    "name": "default_turn_budget_0_False",
+    "streaming": false,
+    "max_turns": 0,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "default_turn_budget_-1_False",
+    "streaming": false,
+    "max_turns": -1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "default_turn_budget_0_True",
+    "streaming": true,
+    "max_turns": 0,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "default_turn_budget_-1_True",
+    "streaming": true,
+    "max_turns": -1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "chat_loop_partial_False",
+    "streaming": false,
+    "max_turns": 1,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "chat_loop": true
+  },
+  {
+    "name": "chat_loop_partial_True",
+    "streaming": false,
+    "max_turns": 1,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "chat_loop": true
+  },
+  {
+    "name": "output_tiny_cap_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 1
+  },
+  {
+    "name": "output_tiny_cap_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 1
+  },
+  {
+    "name": "approval_resume_1",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true
+  },
+  {
+    "name": "approval_resume_2",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true
+  },
+  {
+    "name": "approval_deny_resume_1",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true,
+    "deny": true
+  },
+  {
+    "name": "approval_deny_resume_2",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true,
+    "deny": true
+  },
+  {
+    "name": "tool_failure_False",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0,
+    "tool_error": true
+  },
+  {
+    "name": "tool_failure_True",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "ordinary untrusted output"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "untrusted": true,
+    "output_cap": 0,
+    "tool_error": true
+  },
+  {
+    "name": "fallback_attempt_budget",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  },
+  {
+    "name": "fallback_attempt_budget_stream",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "error": "overloaded"
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "fallback 1"
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      }
+    ],
+    "fallbacks": [
+      "backup",
+      "backup2"
+    ]
+  }
+]

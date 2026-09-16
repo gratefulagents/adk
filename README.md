@@ -1,16 +1,18 @@
 # ADK
 
-Rust-native agent development foundation, with reusable contracts separated from
-platform integration. **This is not a production agent runner.** Providers, tool
-execution, sandbox backends, MCP transport, durable storage and deployment remain
-future work; no placeholder implementation is advertised as a capability.
+Rust-native agent development kit, with a standalone execution engine and reusable
+contracts separated from platform integration. The opt-in `runtime` feature runs
+host-supplied models and tools, including streamed execution and approval
+continuations. Provider adapters, sandbox backends, MCP transport, durable storage
+and deployment remain separate work; this is not a production platform worker.
 
 ## Workspace
 
 - `adk-core`: native agent/model/tool/host interfaces, messages, runs, events,
   policies and errors with partial results.
 - `adk-codec`: explicit Go compatibility codecs, separate from native types.
-- `adk-runtime`: optional Tokio cancellation and owned-task resource management.
+- `adk-runtime`: optional Rust state-machine runner, tool-output safety, streaming,
+  approval continuation, and Tokio cancellation/owned-task resource management.
 - `adk`: public facade; no platform dependency, even with every feature enabled.
 - `adk-platform`: one-way integration boundary and platform fixture codec.
 - `adk-agent`: foundation inspection binary (`--version` only), **not a worker**.
@@ -47,16 +49,19 @@ cargo deny --locked check
 |---|---|---|
 | Minimal | `cargo test --locked -p adk --no-default-features --all-targets` | Native contracts only |
 | Default | `cargo test --locked --all-targets` | Default workspace members: facade, core, SDK codecs |
-| Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add Tokio ownership, no runner |
+| Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add standalone runner and Tokio ownership |
 | All | `cargo test --locked --workspace --all-features --all-targets` | Include codecs, runtime, platform boundary and binaries |
 
 The facade's default feature set is empty. `compat` adds SDK codecs; `runtime`
-adds the task owner. Neither adds Kubernetes/platform code. Purity checks walk
+adds the execution engine and task owner. Neither adds Kubernetes/platform code.
+See [runner design and behavior](docs/runner-design.md) for lifecycle contracts,
+Go compatibility mapping, research and explicit integration boundaries. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect
 platform/Kubernetes dependencies.
 
 ```sh
 cargo run --locked -p adk --example standalone --no-default-features
+cargo run --locked -p adk --features runtime --example runner
 cargo run --locked -p adk-agent -- --version
 cargo run --locked -p adk-harness -- --fixtures > candidate.json
 python3 scripts/replay/replay.py --candidate candidate.json
@@ -68,6 +73,18 @@ stdin. It computes results from inputs; it never reads fixture `expected` fields
 Fixture comparisons preserve absent/null/false/empty differences, array order,
 UTF-8 and numeric representations. See codec tests for bounded edge coverage;
 passing seven reference cases does not establish full Go SDK or platform parity.
+The additional [runner replay](scripts/replay/runner_README.md) executes the real
+Go and Rust engines over 46 deterministic normal/streaming scenarios,
+comparing dispatch, semantic event order, history and final/partial outcomes:
+
+```sh
+cargo test --locked -p adk-runtime --test replay
+python3 scripts/replay/runner_export.py --check
+```
+
+Regenerating the Go reference requires the pinned SDK checkout and a warm Go
+module cache (or explicit `--allow-downloads`). Rust replay tests are offline once
+Cargo dependencies have been fetched.
 
 Dependency/advisory checks require network access and deliberately track the
 current RustSec database. Compiler and dependency changes require a reviewed PR,

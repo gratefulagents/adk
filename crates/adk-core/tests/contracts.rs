@@ -185,3 +185,11 @@ fn schemas_expose_tagged_events_and_nonzero_turn_limit() {
     let invalid = json!({"max_turns": 0, "tools": ToolPolicy::default(), "tool_use": "continue"});
     assert!(serde_json::from_value::<RunPolicy>(invalid).is_err());
 }
+
+#[test]
+fn default_run_policy_preserves_baseline_hundred_turn_budget() {
+    let policy = RunPolicy::default();
+    assert_eq!(policy.max_turns.get(), 100);
+    assert_eq!(policy.tools, ToolPolicy::default());
+    assert_eq!(policy.tool_use, ToolUseBehavior::Continue);
+}

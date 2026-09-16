@@ -1,4 +1,6 @@
 //! Bounded, typed codecs for the pinned Go SDK migration baseline.
+pub mod approval;
+pub mod config;
 pub mod dto;
 mod state;
 pub mod timestamp;

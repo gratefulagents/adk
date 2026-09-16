@@ -31,7 +31,7 @@ fn normalized(items: &[RunItem]) -> Vec<Value> {
             if output.is_error { value["is_error"] = json!(true); }
             value
         }
-        _ => panic!("unexpected handoff"),
+        RunItem::Handoff { call_id, agent } => json!({"type":"tool_result","id":call_id,"content":format!("Handing off to {agent}")}),
     }).collect()
 }
 
@@ -186,14 +186,43 @@ impl Tool for Echo {
 #[derive(Default)]
 struct RecordingHost(Mutex<Vec<RunEvent>>, Arc<RecordingHooks>);
 #[derive(Default)]
-struct RecordingHooks(Mutex<Vec<Value>>);
+struct RecordingHooks(
+    Mutex<Vec<Value>>,
+    adk_runtime::compat::ApprovalJournal,
+    Arc<Mutex<Vec<Value>>>,
+);
+struct WireSink(Arc<Mutex<Vec<Value>>>);
+impl adk_runtime::compat::GoEventSink for WireSink {
+    fn emit<'a>(
+        &'a self,
+        _: &'a Context,
+        event: adk_runtime::compat::GoStreamEvent,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            let value = match event {
+                adk_runtime::compat::GoStreamEvent::TextDelta(delta) => {
+                    json!({"type":"text_delta","delta":delta})
+                }
+                adk_runtime::compat::GoStreamEvent::Item(item) => {
+                    json!({"type":"item","item":item})
+                }
+            };
+            self.0.lock().unwrap().push(value);
+            Ok(())
+        })
+    }
+}
 impl adk_runtime::RunHooks for RecordingHooks {
     fn observe<'a>(
         &'a self,
-        _: &'a Context,
+        context: &'a Context,
         event: adk_runtime::Observation,
     ) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
+            self.1.observe(context, event.clone()).await?;
+            adk_runtime::compat::GoEventAdapter(Arc::new(WireSink(self.2.clone())))
+                .observe(context, event.clone())
+                .await?;
             match event {
                 adk_runtime::Observation::ModelAttempt { agent, .. } => {
                     let mut hooks = self.0.lock().unwrap();
@@ -240,38 +269,16 @@ impl Host for RecordingHost {
     }
 }
 
-fn normalized_events(events: &[RunEvent]) -> Vec<Value> {
-    let mut out = vec![];
-    for event in events {
-        match event {
-            RunEvent::Model {
-                event: ModelEvent::TextDelta { delta },
-            } => out.push(json!({"type":"text_delta","delta":delta})),
-            RunEvent::Model {
-                event: ModelEvent::Complete { response },
-            } => {
-                for item in normalized(&response.items) {
-                    out.push(json!({"type":"item","item":item}));
-                }
-            }
-            RunEvent::ToolFinished { call_id, output } => {
-                let item = RunItem::ToolResult {
-                    call_id: call_id.clone(),
-                    output: output.clone(),
-                };
-                out.push(json!({"type":"item","item":normalized(&[item])[0]}));
-            }
-            RunEvent::ApprovalRequired { .. }
-            | RunEvent::Started { .. }
-            | RunEvent::ToolStarted { .. }
-            | RunEvent::Finished { .. }
-            | RunEvent::Failed { .. } => {}
-            other => panic!("unmapped event: {other:?}"),
-        }
+struct CompletionGate;
+impl adk_runtime::runner::StopGate for CompletionGate {
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a Value,
+    ) -> BoxFuture<'a, Result<Option<String>, Error>> {
+        Box::pin(async { Ok(Some("finish verification".into())) })
     }
-    out
 }
-
 struct CustomParser;
 impl adk_runtime::OutputParser for CustomParser {
     fn parse(&self, raw: &str) -> Result<Value, Error> {
@@ -315,6 +322,25 @@ async fn replay(script: &Value) -> Value {
     let mut agent = AgentConfig::new("replay-agent", binding);
     agent.instructions = "Follow the replay script.".into();
     agent.tools.push(tool.clone());
+    if script["handoff"].as_bool() == Some(true) {
+        let binding = if streaming {
+            ModelBinding::streaming("target-model", model.clone())
+        } else {
+            ModelBinding::complete("target-model", model.clone())
+        };
+        let mut target = AgentConfig::new("target", binding);
+        target.instructions = "Follow the replay script.".into();
+        agent.handoffs = vec![adk_runtime::Handoff {
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "Transfer".into(),
+                input_schema: schemars::json_schema!({"type":"object","properties":{}}),
+                read_only: true,
+                requires_approval: false,
+            },
+            target: Arc::new(target),
+        }];
+    }
     if script["approvals"].as_bool() == Some(true) {
         let mut definition = tool.definition.clone();
         definition.name = "approval".into();
@@ -354,6 +380,11 @@ async fn replay(script: &Value) -> Value {
         agent,
         RunnerConfig {
             hooks: Some(hooks.clone()),
+            stop_gate: script["stop_gate_blocks"]
+                .as_u64()
+                .filter(|n| *n > 0)
+                .map(|_| Arc::new(CompletionGate) as Arc<dyn adk_runtime::runner::StopGate>),
+            stop_gate_max_blocks: script["stop_gate_blocks"].as_u64().unwrap_or(8) as usize,
             output: OutputPolicy {
                 untrusted: script["untrusted"].as_bool().unwrap_or(false),
                 max_bytes: match script["output_cap"].as_i64().unwrap_or(0) {
@@ -411,24 +442,28 @@ async fn replay(script: &Value) -> Value {
         runner.run(context, request, host.clone()).await
     };
     let resumed = script["resume"].as_bool() == Some(true);
-    let outcome = if resumed {
-        let paused = outcome.unwrap();
-        let decisions = paused
-            .result
-            .pending_approvals
-            .iter()
-            .map(|request| {
-                (
-                    request.call.id.clone(),
-                    if script["deny"].as_bool() == Some(true) {
-                        ApprovalDecision::Deny
-                    } else {
-                        ApprovalDecision::Approve
-                    },
-                )
+    struct Gate(bool);
+    impl adk_runtime::compat::GoApprovalGate for Gate {
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a ApprovalRequest,
+        ) -> BoxFuture<'a, Result<adk_runtime::compat::GoApprovalDecision, Error>> {
+            Box::pin(async move {
+                Ok(adk_runtime::compat::GoApprovalDecision {
+                    approved: !self.0,
+                    reason: String::new(),
+                })
             })
-            .collect();
-        paused.continuation.unwrap().resume_batch(decisions).await
+        }
+    }
+    let outcome = if resumed {
+        outcome
+            .unwrap()
+            .continuation
+            .unwrap()
+            .resume_go_gate(&Gate(script["deny"].as_bool() == Some(true)))
+            .await
     } else {
         outcome
     };
@@ -469,9 +504,9 @@ async fn replay(script: &Value) -> Value {
         other => panic!("missing terminal event: {other:?}"),
     }
     let mut observation = json!({
+        "wire_events":if streaming { hooks.2.lock().unwrap().clone() } else { vec![] },
         "hooks":*hooks.0.lock().unwrap(),
         "requests":*model.requests.lock().unwrap(), "dispatch":*tool.dispatch.lock().unwrap(),
-        "events":if streaming { normalized_events(&events) } else { vec![] },
         "outcome":{
             "error":error,"status":result.status,"final_output":result.final_output,
             "history":normalized(&result.history),"new_items":normalized(&result.new_items),
@@ -480,6 +515,35 @@ async fn replay(script: &Value) -> Value {
         }
     });
     if script["approvals"].as_bool() == Some(true) {
+        let agents = |items: &[RunItem]| {
+            items
+                .iter()
+                .map(|item| match item {
+                    RunItem::Message { message } if message.role == Role::User => None,
+                    RunItem::ToolResult { call_id, .. }
+                        if hooks.1.entries().iter().any(|entry| {
+                            entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
+                                && entry.marker.data.call_id == *call_id
+                        }) =>
+                    {
+                        None
+                    }
+                    _ => Some(adk_codec::dto::AgentRef {
+                        name: "replay-agent".into(),
+                    }),
+                })
+                .collect::<Vec<_>>()
+        };
+        let history = hooks
+            .1
+            .encode_history(&result.history, &agents(&result.history))
+            .unwrap();
+        let new_items = hooks
+            .1
+            .encode_new_items(&result.new_items, &agents(&result.new_items))
+            .unwrap();
+        observation["wire_history"] = json!(adk_codec::snapshot_items(&history.items));
+        observation["wire_new_items"] = json!(adk_codec::snapshot_items(&new_items.items));
         observation["pending"] = json!(normalized(
             &result
                 .pending_approvals
@@ -510,7 +574,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 50);
+    assert_eq!(cases.len(), 56);
     assert_eq!(
         cases
             .iter()
@@ -551,6 +615,6 @@ async fn replay_observations_depend_on_execution_not_goldens() {
     let mut changed = case["input"].clone();
     changed["responses"][0]["deltas"][0] = json!("changed delta");
     let observed = replay(&changed).await;
-    assert_ne!(observed["events"], case["expected"]["events"]);
+    assert_ne!(observed["wire_events"], case["expected"]["wire_events"]);
     assert_eq!(observed["outcome"], case["expected"]["outcome"]);
 }

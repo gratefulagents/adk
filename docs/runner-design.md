@@ -149,17 +149,15 @@ complete.** The following is an enumerated audit, not a parity waiver.
    normal execution path. Two additional denied-resume cases revealed and fixed
    a real mismatch: denial now pairs the call with Go ChatLoop’s error output
    and continues the model instead of aborting with ApprovalDenied. No denied
-   tool executes. Permission-policy denial remains fatal. Direct denial is
+   tool executes. Permission-policy denial never executes the tool. Direct denial is
    regression-tested in both modes; re-deferral and streamed resume remain
    Rust-only evidence.
 
-   The existing #2 representation deliberately puts approvals in a side channel
-   (`pending_approvals` / `ApprovalRequired`) rather than a `RunItem` variant.
-   Replay explicitly extracts Go approval markers into the same side channel;
-   it does not claim raw approval-history/event-envelope identity or identical
-   approval-event timing. Core documents native Serde as distinct from Go wire
-   compatibility (`adk-core/src/lib.rs`); a full adapter must preserve the marker
-   when reconstructing the Go wire representation, not silently discard it.
+   Core keeps native approval side channels. The explicit journal/codecs now
+   preserve pending/resolved markers and provenance in Go history snapshots.
+   Replay compares full wire histories/new items for approval cases and raw
+   streamed snapshot order, including markers, through `GoEventAdapter`.
+   The bridge awaits its sink, buffers only a settled tool batch, and owns no tasks.
 4. **Output formatting/history restored; partial/default mappings audited.**
    Rust now matches Go's delimiter idempotence, including preserving text that
    contains the opening marker. This text-format limitation does not authorize
@@ -174,7 +172,7 @@ complete.** The following is an enumerated audit, not a parity waiver.
    Rust RunPolicy default of 100, comparing execution rather than Serde shapes.
    This verifies the mapping, not acceptance of Go sentinel integers by native
    NonZeroU32 deserialization. A Go-compatible configuration adapter must perform
-   that mapping; no such adapter is claimed here.
+   that mapping; `adk_codec::config` and `compat::apply_go_config` now implement it.
 
    The earlier assertion that ChatLoop discards all partials was too broad:
    its nil result slot on MaxTurnsExceeded is accompanied by a typed error with
@@ -192,7 +190,7 @@ complete.** The following is an enumerated audit, not a parity waiver.
    output, cancellation and deadlines still prohibit replay. Virtual-time tests
    cover precedence, explicit rejection, missing reason, ten-retry bounds and the
    five-minute cap without sleeping in real time. Fallback/schema cross-language
-   replay remains separate from these Rust-only advice regressions. All 50 replay
+   replay remains separate from these Rust-only advice regressions. All 56 replay
    scenarios now also compare lifecycle callback order/content, including
    per-attempt agent/model start, model-end items/usage, raw tool callbacks and
    final agent output. This is a declared native-to-Go projection, not raw
@@ -215,18 +213,27 @@ unconditional pre-dispatch rejection. Cache hashing uses the baseline NUL-separa
 namespace/key format. Default local compaction is implemented and differentially
 checked against extracted pinned Go functions; see [compaction evidence](local-compaction.md).
 
-These corrections do not authorize closing #4. Remaining evidence boundaries are
-explicit: runner replay still projects approval markers rather than comparing
-raw wire events; the separate codec tests verify marker representation and
-ordering. Approval-aware compaction has a pure planner but the automatic runner
-currently plans native history, with journal rebasing afterward. Forced provider
-context-overflow recovery and model-specific threshold selection are not wired
-into the automatic runner. Native diagnostic partials are deliberately richer
-than Go result slots as enumerated in E01–E12, not a claim of wire identity.
-OTel exporter composition belongs to #11, provider-native compaction to #5, and
-platform sessions to #12. None of these ownership boundaries removes the #4
-interfaces or justifies approving unverified external differences. Fresh review
-must examine the integrated head; earlier reviews and CI do not approve it.
+The corrective continuation after merged PR18 integrates the remaining adapters:
+- Automatic local planning/finalization includes approval markers in estimates,
+  summary selection and journal replacement without rewriting emitted new items.
+- Canonical context-overflow errors trigger local recovery only when history
+  shrinks; retries consume turns. Default thresholds resolve against the active
+  model before calibration; configured nondefault thresholds remain explicit.
+- Mutation-only approval preserves tool-owned requirements, control-flow exemptions
+  and authorization denial. Per-tool timeout defaults remain overridable by host policy.
+- Default consecutive all-error tool turns inject the baseline three-strike note;
+  stop gates use a consecutive-block cap and reset on tool/nonfinal progress.
+- Stream projection retains native pause continuations and maps handoffs to the
+  baseline paired output payloads in original call order with source provenance.
+- Custom-compactor marker rebasing uses call-correlated anchors, not globally
+  unique ordinary message text.
+
+Native diagnostic partials remain richer than Go return slots as enumerated in
+E01–E12; they are not serialized Go snapshots. OTel exporter composition belongs
+to #11, provider-native compaction to #5, and platform sessions to #12. Those
+boundaries retain the #4 interfaces and do not waive observable runner behavior.
+Fresh independent review and CI must cover the follow-up head; neither the PR18
+merge nor earlier green checks constitute delivery acceptance.
 
 Cross-language replay must use the real Go runner and the Rust engine, normalize
 only declared representation differences, retain event order/call correlations,
@@ -242,7 +249,7 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 50 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 56 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |
@@ -251,9 +258,10 @@ and streamed final results.
 | Compaction/cache/context | `compaction_replaces_history_and_hints_cache_prefix_are_request_only` |
 | Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |
 | Hooks/spill lifetimes | `raw_hooks_precede_processing_and_spills_live_across_pause_and_error`, `durable_failure_before_effect_fails_closed_after_effect_preserves_result`, 12 `output.rs` unit tests |
-| Sentinel/wire adapters | `adk-codec/tests/runner_codecs.rs` and explicitly executed `go_runner_differential.rs`: 21 Go config vectors and denial marker ordering; runtime `tests/compat.rs`: 12 integration tests |
+| Sentinel/wire adapters | `adk-codec/tests/runner_codecs.rs` and explicitly executed `go_runner_differential.rs`: 21 Go config vectors and denial marker ordering; runtime `tests/compat.rs`: 13 integration tests |
 | Error and callback contracts | `tests/error_contracts.rs`: 10 tests implementing the E01–E12 map in `docs/runner-error-contracts.md` |
-| Default local compaction | `tests/local_compaction.rs`: 9 tests, including 104 extracted-Go planner/finalizer cases, cache stability, custom-backend fallback, calibration and cancellation |
+| Default local compaction | `tests/local_compaction.rs`: 10 tests, including 104 extracted-Go planner/finalizer cases, cache stability, custom-backend fallback, calibration and cancellation |
+| Corrective integration | `tests/followup.rs`: forced recovery budgets/cache/transients, model thresholds, mutation-only policy, timeout precedence, marker-aware automatic/custom compaction, wire sink backpressure/drop, pause/handoff projection, stop-gate reset, denied-handoff gate eligibility, and handoff-preserved error streaks |
 | Independent review regressions | `tests/review_regressions.rs`: failed resume adoption; trailing partial text after reasoning/completed messages; no duplicated committed deltas; last nonempty final answer validated in both execution modes |
 
 Tests are under `crates/adk-runtime/`. The replay corpus deliberately covers a

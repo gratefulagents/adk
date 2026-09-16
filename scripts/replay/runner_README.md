@@ -66,7 +66,10 @@ approval tool panics if accidentally invoked under denial. These cases preserve
 exact denial text and confirm the eligible sibling is not repeated.
 Two ordinary tool-failure cases verify paired error outputs and continued execution.
 Two low-budget fallback cases prove that the initial failed attempt consumes a turn.
-The corpus now contains **50 cases**.
+Four three-strike/stop-gate cases compare error escalation, consecutive block caps,
+and turn-boundary extension. Two handoff cases compare source/target dispatch,
+original-order skipped siblings, paired handoff outputs and source provenance.
+The corpus now contains **56 cases**.
 
 ## Canonical comparison boundary
 
@@ -97,17 +100,20 @@ The corpus now contains **50 cases**.
 * Both engines use the script's trust and cap settings. Original trusted echo
   cases disable wrapping; output cases enable it. No normalization strips
   delimiters or truncation markers after execution.
-* Go's approval `RunItem`s are projected into an ordered `pending` side channel,
-  matching Rust `pending_approvals`. They are omitted from the model-facing
-  history and committed-item event projection. All non-approval entries retain
-  order and content. Approval event timing/wire marker identity is NOT compared.
+* Approval cases compare **full Go snapshot history and new items**, not only
+  pending side channels. Pending marker provenance and resolved marker absence of
+  agent identity are retained; denied outputs have no invented agent identity.
+* All streamed cases compare **raw snapshot event order** via the awaited
+  `GoEventAdapter`, including approval markers. This replaces the earlier
+  marker-stripping committed-item projection. Sink backpressure and consumer-drop
+  are independently tested. Native event enum envelopes remain Rust-native.
 * This corpus does not claim parity for policy denial, re-deferred/streamed approval resume, cancellation,
-  general retry/advice policy, handoffs, arbitrary custom parser implementations, other provider
+  general retry/advice policy, arbitrary custom parser implementations, other provider
   failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate
   engine tests cover selected Rust behavior; this is not a parity claim for
-  those excluded cases. Unresolved external differences are enumerated in
-  `docs/runner-design.md` and require resolution before #4 is scope complete. Scripted streaming is not a provider test.
+  those excluded cases. Representation boundaries and the acceptance evidence map are enumerated in
+  `docs/runner-design.md`; they are not waivers. Scripted streaming is not a provider test.
 
 ## Licensing and provenance
 

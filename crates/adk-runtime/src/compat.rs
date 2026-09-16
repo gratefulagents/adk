@@ -76,20 +76,19 @@ impl RunHooks for GoCallbackAdapter {
 
 /// Applies representable scalar settings atomically, retaining native authorization.
 /// Subagent, consecutive-error and stop-gate limits in the returned value remain
-/// the caller's responsibility. Go's mutation-only approval policy is unsupported.
+/// the caller's responsibility. Mutation-only approval never relaxes authorization.
 pub fn apply_go_config(
     sentinels: &RunConfigSentinels,
     config: &mut RunnerConfig,
     policy: &mut RunPolicy,
 ) -> Result<EffectiveRunConfig, ConfigError> {
     let effective = sentinels.resolve()?;
-    if effective
+    config.approve_mutating_tools = effective
         .tool_policy
         .as_ref()
-        .is_some_and(|p| p.approval_required)
-    {
-        return Err(ConfigError("ToolPolicy.ApprovalRequired"));
-    }
+        .is_some_and(|p| p.approval_required);
+    config.consecutive_tool_error_limit = effective.consecutive_tool_error_limit;
+    config.stop_gate_max_blocks = effective.stop_gate_max_blocks;
     policy.max_turns = effective.max_turns;
     config.output.max_bytes = effective.max_tool_output_bytes;
     config.output.untrusted = effective.untrusted_tool_outputs;
@@ -136,6 +135,28 @@ pub struct ApprovalJournal {
 }
 
 impl ApprovalJournal {
+    pub fn history_markers(&self) -> Result<Vec<ApprovalMarkerBoundary>, BridgeError> {
+        let state = self.state.lock().unwrap();
+        if state.history_invalidated {
+            return Err(BridgeError(
+                "approval history anchors invalidated by history replacement",
+            ));
+        }
+        let mut markers: Vec<_> = state
+            .entries
+            .iter()
+            .filter_map(|entry| {
+                entry
+                    .history_before
+                    .map(|before_item| ApprovalMarkerBoundary {
+                        before_item,
+                        marker: entry.marker.clone(),
+                    })
+            })
+            .collect();
+        markers.sort_by_key(|entry| entry.before_item);
+        Ok(markers)
+    }
     pub fn entries(&self) -> Vec<ApprovalJournalEntry> {
         self.state.lock().unwrap().entries.clone()
     }
@@ -207,6 +228,27 @@ impl RunHooks for ApprovalJournal {
         Box::pin(async move {
             let mut state = self.state.lock().unwrap();
             match observation {
+                Observation::ApprovalHistoryReplaced { markers, .. } => {
+                    let mut used = std::collections::HashSet::new();
+                    for entry in &mut state.entries {
+                        entry.history_before = None;
+                    }
+                    for marker in markers {
+                        let entry = state.entries.iter_mut().enumerate().find(|(index, entry)| {
+                            !used.contains(index) && entry.marker == marker.marker
+                        });
+                        if let Some((index, entry)) = entry {
+                            used.insert(index);
+                            entry.history_before = Some(marker.before_item);
+                        } else {
+                            state.history_invalidated = true;
+                            return Err(Error::new(
+                                ErrorCategory::Internal,
+                                "compaction invented an approval marker",
+                            ));
+                        }
+                    }
+                }
                 Observation::ApprovalMarker {
                     agent,
                     call,
@@ -224,7 +266,7 @@ impl RunHooks for ApprovalJournal {
                         marker: ApprovalMarker::from_call(
                             &call,
                             phase,
-                            Some(dto::AgentRef { name: agent }),
+                            agent.map(|name| dto::AgentRef { name }),
                         ),
                         new_items_before,
                         history_before: Some(history_before),
@@ -268,6 +310,11 @@ fn rebase_entry(
     }
     let mut correspondence = Vec::new();
     for (old_index, item) in before.iter().enumerate() {
+        // Approval-local, call-ID-correlated anchors; repeated/reordered prose
+        // is normal in a conversation and is not evidence of ambiguity.
+        if matches!(item, RunItem::Message { .. }) {
+            continue;
+        }
         let mut matches = after
             .iter()
             .enumerate()
@@ -392,4 +439,81 @@ pub async fn run_go_chat(
         resumes += 1;
     }
     Ok(outcome)
+}
+
+/// Go stream payload bridge. Tool items are published at the settled batch boundary,
+/// so pending markers remain interleaved in call order rather than scheduling order.
+#[derive(Debug, Clone, PartialEq)]
+pub enum GoStreamEvent {
+    TextDelta(String),
+    Item(Box<dto::RunItemSnapshot>),
+}
+pub trait GoEventSink: Send + Sync {
+    fn emit<'a>(
+        &'a self,
+        context: &'a Context,
+        event: GoStreamEvent,
+    ) -> BoxFuture<'a, Result<(), Error>>;
+}
+pub struct GoEventAdapter(pub Arc<dyn GoEventSink>);
+impl RunHooks for GoEventAdapter {
+    fn observe<'a>(
+        &'a self,
+        context: &'a Context,
+        observation: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            match observation {
+                Observation::TextDelta { delta } => {
+                    self.0
+                        .emit(context, GoStreamEvent::TextDelta(delta))
+                        .await?
+                }
+                Observation::CommittedItems {
+                    items,
+                    agents,
+                    markers,
+                } => {
+                    // Stream projection is deliberately not a checkpoint codec:
+                    // pause state stays on the owned native outcome, while Go's
+                    // event carries its ordinary output payload. A native handoff
+                    // projects to the paired tool output emitted by the Go runner.
+                    let items: Vec<_> = items
+                        .into_iter()
+                        .map(|item| match item {
+                            RunItem::ToolResult {
+                                call_id,
+                                mut output,
+                            } => {
+                                output.should_pause = false;
+                                RunItem::ToolResult { call_id, output }
+                            }
+                            RunItem::Handoff { call_id, agent } => RunItem::ToolResult {
+                                call_id,
+                                output: ToolOutput {
+                                    content: vec![Content::Text {
+                                        text: format!("Handing off to {agent}"),
+                                    }],
+                                    is_error: false,
+                                    should_pause: false,
+                                },
+                            },
+                            other => other,
+                        })
+                        .collect();
+                    let wire =
+                        approval::encode_history(&items, &agents, &markers).map_err(|error| {
+                            Error::new(ErrorCategory::Unsupported, error.to_string())
+                        })?;
+                    for item in adk_codec::snapshot_items(&wire) {
+                        self.0
+                            .emit(context, GoStreamEvent::Item(Box::new(item)))
+                            .await?;
+                    }
+                }
+                _ => {}
+            }
+            Ok(())
+        })
+    }
 }

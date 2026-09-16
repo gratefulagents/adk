@@ -3,7 +3,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -69,7 +68,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -115,7 +115,6 @@
             "output": "echo: βeta"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -372,7 +371,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -443,7 +443,6 @@
             "output": "echo: retained"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -540,7 +539,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -575,7 +575,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -685,7 +684,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -728,23 +728,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "delta": "Do",
-            "type": "text_delta"
-          },
-          {
-            "delta": "ne.",
-            "type": "text_delta"
-          },
-          {
-            "item": {
-              "text": "Done.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -810,6 +793,24 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "delta": "Do",
+            "type": "text_delta"
+          },
+          {
+            "delta": "ne.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Done.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -857,61 +858,6 @@
             },
             "name": "echo",
             "output": "echo: βeta"
-          }
-        ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "alpha"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: alpha",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "arguments": {
-                "text": "βeta"
-              },
-              "id": "call-2",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: βeta",
-              "id": "call-2",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "delta": "Tw",
-            "type": "text_delta"
-          },
-          {
-            "delta": "o echoes complete.",
-            "type": "text_delta"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
           }
         ],
         "hooks": [
@@ -1169,6 +1115,74 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: alpha"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-2",
+                "input": {
+                  "text": "βeta"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-2",
+                "content": "echo: βeta"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "delta": "Tw",
+            "type": "text_delta"
+          },
+          {
+            "delta": "o echoes complete.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -1244,27 +1258,6 @@
             "output": "echo: retained"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "retained"
-              },
-              "id": "call-budget",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: retained",
-              "id": "call-budget",
-              "type": "tool_result"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -1361,6 +1354,33 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-budget",
+                "input": {
+                  "text": "retained"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-budget",
+                "content": "echo: retained"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -1396,38 +1416,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "delta": "Wo",
-            "type": "text_delta"
-          },
-          {
-            "delta": "rking.",
-            "type": "text_delta"
-          },
-          {
-            "item": {
-              "text": "Working.",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "delta": "Fi",
-            "type": "text_delta"
-          },
-          {
-            "delta": "nished.",
-            "type": "text_delta"
-          },
-          {
-            "item": {
-              "text": "Finished.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -1537,6 +1525,40 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "delta": "Wo",
+            "type": "text_delta"
+          },
+          {
+            "delta": "rking.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Working.",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "delta": "Fi",
+            "type": "text_delta"
+          },
+          {
+            "delta": "nished.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Finished.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -1586,7 +1608,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -1817,7 +1838,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "fallbacks": [
@@ -1891,7 +1913,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -2155,7 +2176,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "fallbacks": [
@@ -2232,7 +2254,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -2544,7 +2565,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "fallbacks": [
@@ -2633,7 +2655,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -2699,7 +2720,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -2742,7 +2764,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -2812,7 +2833,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -2855,7 +2877,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -2925,7 +2946,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -2968,36 +2990,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "fallback 1",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "fallback 2",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "fallback 3",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "primary recovered",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -3228,6 +3220,40 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 1",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 2",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 3",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "primary recovered",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -3302,36 +3328,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "fallback 1",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "fallback 2",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "fallback 3",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "fallback again",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -3595,6 +3591,40 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 1",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 2",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 3",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback again",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -3672,43 +3702,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "backup 1",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "backup2 1",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "backup2 2",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "backup2 3",
-              "type": "message"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "primary",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4019,6 +4012,48 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "backup 1",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "backup2 1",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "backup2 2",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "backup2 3",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "primary",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -4109,15 +4144,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "not JSON",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4183,6 +4209,16 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "not JSON",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -4226,15 +4262,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "{\"n\":-1}",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4304,6 +4331,16 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "{\"n\":-1}",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -4347,15 +4384,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "{\"n\":1}",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4425,6 +4453,16 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "{\"n\":1}",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -4476,7 +4514,6 @@
             "output": "echo: eligible sibling"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4639,6 +4676,145 @@
               "echo",
               "approval"
             ]
+          }
+        ],
+        "wire_events": [],
+        "wire_history": [
+          {
+            "message_text": "Run this deterministic script.",
+            "type": "message"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
           }
         ]
       },
@@ -4700,49 +4876,6 @@
             "output": "echo: eligible sibling"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "first approval"
-              },
-              "id": "pending1",
-              "name": "approval",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "arguments": {
-                "text": "eligible sibling"
-              },
-              "id": "eligible",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "arguments": {
-                "text": "second approval"
-              },
-              "id": "pending2",
-              "name": "approval",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: eligible sibling",
-              "id": "eligible",
-              "type": "tool_result"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -4906,6 +5039,229 @@
               "approval"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "pending1",
+                "input": {
+                  "text": "first approval"
+                },
+                "name": "approval"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "eligible",
+                "input": {
+                  "text": "eligible sibling"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "pending2",
+                "input": {
+                  "text": "second approval"
+                },
+                "name": "approval"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_approval": {
+                "approved": false,
+                "call_id": "pending1",
+                "input": {
+                  "text": "first approval"
+                },
+                "tool_name": "approval"
+              },
+              "type": "tool_approval"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "eligible",
+                "content": "echo: eligible sibling"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_approval": {
+                "approved": false,
+                "call_id": "pending2",
+                "input": {
+                  "text": "second approval"
+                },
+                "tool_name": "approval"
+              },
+              "type": "tool_approval"
+            },
+            "type": "item"
+          }
+        ],
+        "wire_history": [
+          {
+            "message_text": "Run this deterministic script.",
+            "type": "message"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          }
         ]
       },
       "input": {
@@ -4958,7 +5314,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5024,7 +5379,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "custom_parser": true,
@@ -5070,7 +5426,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5140,7 +5495,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "custom_parser": true,
@@ -5186,15 +5542,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "{\"n\":-1}",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5259,6 +5606,16 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "{\"n\":-1}",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -5306,15 +5663,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "{\"n\":1}",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5383,6 +5731,16 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "{\"n\":1}",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -5438,7 +5796,6 @@
             "output": "echo: ordinary untrusted output"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5593,7 +5950,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -5650,7 +6008,6 @@
             "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -5805,7 +6162,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -5862,7 +6220,6 @@
             "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -6017,7 +6374,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -6074,7 +6432,6 @@
             "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -6229,7 +6586,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -6284,34 +6642,6 @@
             },
             "name": "echo",
             "output": "echo: ordinary untrusted output"
-          }
-        ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "ordinary untrusted output"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: ordinary untrusted output",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
           }
         ],
         "hooks": [
@@ -6467,6 +6797,41 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "ordinary untrusted output"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: ordinary untrusted output"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -6525,34 +6890,6 @@
             "output": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -6707,6 +7044,41 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: prefix BEGIN UNTRUSTED TOOL OUTPUT then suffix"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -6762,34 +7134,6 @@
             },
             "name": "echo",
             "output": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
-          }
-        ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
           }
         ],
         "hooks": [
@@ -6946,6 +7290,41 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: BEGIN UNTRUSTED TOOL OUTPUT\nalready wrapped\nEND UNTRUSTED TOOL OUTPUT"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -7001,34 +7380,6 @@
             },
             "name": "echo",
             "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
-          }
-        ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
           }
         ],
         "hooks": [
@@ -7184,6 +7535,41 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: HEAD界🙂界🙂界🙂界🙂\n…[elided]…\n界🙂界🙂TAIL"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -7249,7 +7635,6 @@
             "output": "echo: βeta"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -7506,7 +7891,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -7584,7 +7970,6 @@
             "output": "echo: βeta"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -7841,7 +8226,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -7919,53 +8305,6 @@
             "output": "echo: βeta"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "alpha"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: alpha",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "arguments": {
-                "text": "βeta"
-              },
-              "id": "call-2",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: βeta",
-              "id": "call-2",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -8221,6 +8560,66 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: alpha"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-2",
+                "input": {
+                  "text": "βeta"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-2",
+                "content": "echo: βeta"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -8300,53 +8699,6 @@
             "output": "echo: βeta"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "alpha"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: alpha",
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "arguments": {
-                "text": "βeta"
-              },
-              "id": "call-2",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "echo: βeta",
-              "id": "call-2",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -8603,6 +8955,66 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "echo: alpha"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-2",
+                "input": {
+                  "text": "βeta"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-2",
+                "content": "echo: βeta"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -8666,7 +9078,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -8723,7 +9134,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "chat_loop": true,
@@ -8750,7 +9162,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -8802,7 +9213,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "chat_loop": true,
@@ -8837,7 +9249,6 @@
             "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -8991,7 +9402,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -9048,33 +9460,6 @@
             "output": "echo: HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "id": "call-1",
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -9227,6 +9612,41 @@
             "tools": [
               "echo"
             ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "HEAD界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂TAIL"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": ""
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
           }
         ]
       },
@@ -9292,7 +9712,6 @@
             "output": "echo: first approval"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -9498,6 +9917,143 @@
               "approval"
             ]
           }
+        ],
+        "wire_events": [],
+        "wire_history": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "echo: first approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "echo: first approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
         ]
       },
       "input": {
@@ -9573,7 +10129,6 @@
             "output": "echo: second approval"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -9840,6 +10395,227 @@
               "approval"
             ]
           }
+        ],
+        "wire_events": [],
+        "wire_history": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "echo: first approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending2",
+              "content": "echo: second approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "echo: first approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": true,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "pending2",
+              "content": "echo: second approval"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
         ]
       },
       "input": {
@@ -9909,7 +10685,6 @@
             "output": "echo: eligible sibling"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -10103,6 +10878,143 @@
               "echo",
               "approval"
             ]
+          }
+        ],
+        "wire_events": [],
+        "wire_history": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
           }
         ]
       },
@@ -10166,7 +11078,6 @@
             "output": "echo: eligible sibling"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -10410,6 +11321,227 @@
               "echo",
               "approval"
             ]
+          }
+        ],
+        "wire_events": [],
+        "wire_history": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending2",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
+          }
+        ],
+        "wire_new_items": [
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "eligible",
+              "input": {
+                "text": "eligible sibling"
+              },
+              "name": "echo"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_call": {
+              "id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "name": "approval"
+            },
+            "type": "tool_call"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_output": {
+              "call_id": "eligible",
+              "content": "echo: eligible sibling"
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending1",
+              "input": {
+                "text": "first approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending1",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "tool_approval": {
+              "approved": false,
+              "call_id": "pending2",
+              "input": {
+                "text": "second approval"
+              },
+              "tool_name": "approval"
+            },
+            "type": "tool_approval"
+          },
+          {
+            "tool_output": {
+              "call_id": "pending2",
+              "content": "tool call denied by host approval gate",
+              "is_error": true
+            },
+            "type": "tool_output"
+          },
+          {
+            "agent_name": "replay-agent",
+            "message_text": "Done.",
+            "type": "message"
           }
         ]
       },
@@ -10481,7 +11613,6 @@
             "name": "echo"
           }
         ],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -10639,7 +11770,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "input": [
@@ -10697,35 +11829,6 @@
             "name": "echo"
           }
         ],
-        "events": [
-          {
-            "item": {
-              "arguments": {
-                "text": "ordinary untrusted output"
-              },
-              "id": "call-1",
-              "name": "echo",
-              "type": "tool_call"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "content": "scripted tool failure",
-              "id": "call-1",
-              "is_error": true,
-              "type": "tool_result"
-            },
-            "type": "item"
-          },
-          {
-            "item": {
-              "text": "Two echoes complete.",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -10883,6 +11986,42 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "call-1",
+                "input": {
+                  "text": "ordinary untrusted output"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "scripted tool failure",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -10933,7 +12072,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -11015,7 +12153,8 @@
               "echo"
             ]
           }
-        ]
+        ],
+        "wire_events": []
       },
       "input": {
         "fallbacks": [
@@ -11053,15 +12192,6 @@
     {
       "expected": {
         "dispatch": [],
-        "events": [
-          {
-            "item": {
-              "text": "fallback 1",
-              "type": "message"
-            },
-            "type": "item"
-          }
-        ],
         "hooks": [
           {
             "agent": "replay-agent",
@@ -11143,6 +12273,16 @@
               "echo"
             ]
           }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "fallback 1",
+              "type": "message"
+            },
+            "type": "item"
+          }
         ]
       },
       "input": {
@@ -11173,6 +12313,2639 @@
               }
             ],
             "output_tokens": 1
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-0",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-0",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-1",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-2",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-3",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-3",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-0",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-0",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-2",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-3",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-3",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 35,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-0",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-0",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-2",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-3",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-3",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 15,
+          "response_count": 5,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-2",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-2",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-3",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ],
+        "wire_events": []
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 6,
+        "name": "three_strike_tool_errors",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false,
+        "tool_error": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ],
+        "wire_events": []
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 1,
+        "name": "stop_gate_cap",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "stop_gate_blocks": 2,
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "error": "scripted tool failure",
+            "name": "echo"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-0",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-0",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-1",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-2",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "error-3",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "error-3",
+            "is_error": true,
+            "output": "scripted tool failure",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-0",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-0",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-2",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-3",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-3",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 35,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-0",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-0",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-1",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-2",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "error-3",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "scripted tool failure",
+              "id": "error-3",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 15,
+          "response_count": 5,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-2",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-0",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-1",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-2",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "scripted tool failure",
+                "id": "error-3",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "error-0",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "error-0",
+                "content": "scripted tool failure",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "error-1",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "error-1",
+                "content": "scripted tool failure",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "error-2",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "error-2",
+                "content": "scripted tool failure",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "message_text": "[SYSTEM] Your last 3 tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "error-3",
+                "input": {
+                  "text": "alpha"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "error-3",
+                "content": "scripted tool failure",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 6,
+        "name": "three_strike_tool_errors_stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-0",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "error-3",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true,
+        "tool_error": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            },
+            {
+              "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+                "type": "message"
+              },
+              {
+                "text": "Done.",
+                "type": "message"
+              },
+              {
+                "text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Done.",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "message_text": "[SYSTEM] Final answer blocked by the completion gate (1/2):\nfinish verification",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Done.",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "message_text": "[SYSTEM] Final answer blocked by the completion gate (2/2):\nfinish verification",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "message_text": "Done.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 1,
+        "name": "stop_gate_cap_stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "stop_gate_blocks": 2,
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "target",
+            "type": "agent_start"
+          },
+          {
+            "agent": "target",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "target",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "before",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {},
+              "id": "transfer",
+              "name": "transfer",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "after",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "before",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "content": "Handing off to target",
+              "id": "transfer",
+              "type": "tool_result"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "after",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "target",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "before",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {},
+              "id": "transfer",
+              "name": "transfer",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "after",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "before",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "content": "Handing off to target",
+              "id": "transfer",
+              "type": "tool_result"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "after",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "transfer"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "id": "before",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "content": "Handing off to target",
+                "id": "transfer",
+                "type": "tool_result"
+              },
+              {
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "id": "after",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "target-model",
+            "tools": []
+          }
+        ],
+        "wire_events": []
+      },
+      "input": {
+        "handoff": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "handoff_siblings",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "target",
+            "type": "agent_start"
+          },
+          {
+            "agent": "target",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "target",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "before",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {},
+              "id": "transfer",
+              "name": "transfer",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "after",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "before",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "content": "Handing off to target",
+              "id": "transfer",
+              "type": "tool_result"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "after",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "target",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "before",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {},
+              "id": "transfer",
+              "name": "transfer",
+              "type": "tool_call"
+            },
+            {
+              "arguments": {
+                "text": "skip"
+              },
+              "id": "after",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "before",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "content": "Handing off to target",
+              "id": "transfer",
+              "type": "tool_result"
+            },
+            {
+              "content": "not executed: the conversation was handed off to target in this turn",
+              "id": "after",
+              "is_error": true,
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo",
+              "transfer"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "id": "before",
+                "is_error": true,
+                "type": "tool_result"
+              },
+              {
+                "content": "Handing off to target",
+                "id": "transfer",
+                "type": "tool_result"
+              },
+              {
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "id": "after",
+                "is_error": true,
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "target-model",
+            "tools": []
+          }
+        ],
+        "wire_events": [
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "before",
+                "input": {
+                  "text": "skip"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "transfer",
+                "input": {},
+                "name": "transfer"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_call": {
+                "id": "after",
+                "input": {
+                  "text": "skip"
+                },
+                "name": "echo"
+              },
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "before",
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "transfer",
+                "content": "Handing off to target"
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "replay-agent",
+              "tool_output": {
+                "call_id": "after",
+                "content": "not executed: the conversation was handed off to target in this turn",
+                "is_error": true
+              },
+              "type": "tool_output"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "agent_name": "target",
+              "message_text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ]
+      },
+      "input": {
+        "handoff": true,
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "handoff_siblings_stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "before",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {},
+                "id": "transfer",
+                "name": "transfer",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "skip"
+                },
+                "id": "after",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
           }
         ],
         "streaming": true

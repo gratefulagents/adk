@@ -75,7 +75,7 @@ usage. Transient request-only context must not become persisted summary content.
 
 ## Integration API
 
-Expose `pub mod compaction;` in `lib.rs` (the coordinating change owns wiring).
+The public `compaction` module is wired into the runner.
 
 - `LocalCompactionPolicy::default()` — enabled local defaults. `normalized()`
   implements zero normalization. Rust fields are unsigned, so negative Go
@@ -159,9 +159,7 @@ Go model-specific thresholds (`run_config.go:199–254`) are an optional resolve
 not inherent in `DefaultCompactionConfig`: small/fast variants (spark/nano/mini/
 lite/flash) 110,000/60,000; GPT-6 244,800/136,000; GPT-5.6 334,800/186,000;
 GPT-5.5/5.4/5.3-codex/5.2-codex/5.2/5.1 360,000/200,000;
-Fable 900,000/500,000; other models 180,000/100,000. The runner should apply
-host-resolved thresholds for the active model before calibration when it has
-such a resolver. This module does not add provider metadata resolution.
+Fable 900,000/500,000; other models 180,000/100,000. The runner resolves these defaults for the active model before calibration and preserves explicitly customized policies. `LocalCompactionPolicy::for_model` is checked against 14 executed-Go model-name vectors. Provider metadata resolution remains in the provider adapter.
 
 ## Representation boundaries
 
@@ -214,3 +212,12 @@ calibration, native opaque-content protection, and the Go cache hash vector.
 The cache test establishes the hash and local nonmutation contract; actual
 runner event/usage/cache sequencing is integration behavior, not a claim made
 by a planner-only test.
+
+## Automatic integration evidence
+
+`tests/followup.rs` verifies automatic marker-aware selection and exact journal
+replacement (including summarized-away markers), unchanged append-only new items,
+forced overflow recovery in both execution modes, one-turn retry limits, no-op
+and disabled recovery, transient/cache preservation, and active-model defaults
+before any reported usage. Custom compaction with repeated ordinary messages
+retains approval-local anchors without treating prose duplication as corruption.

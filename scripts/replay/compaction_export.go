@@ -206,6 +206,12 @@ func TestExportCompactionReference(t *testing.T) {
 		stringsOut = append(stringsOut, map[string]any{"text": text, "tokens": estimateStringTokens(text)})
 	}
 	output := map[string]any{"cases": results, "default_policy": DefaultCompactionConfig(), "overhead": overhead, "strings": stringsOut, "cache_wire_key": promptCacheWireKey("namespace", "logical")}
+	models := map[string]any{}
+	for _, model := range []string{"unknown", "openai/gpt-6", " gpt-5.6 ", "gpt-5.3-codex-spark", "gpt-5.5", "gpt-5.4", "gpt-5.3-codex", "gpt-5.2-codex", "gpt-5.2", "gpt-5.1", "claude-fable", "sonnet-4", "vendor/flash", "provider/gpt-6-mini"} {
+		trigger, target := CompactionDefaultsForModel(model)
+		models[model] = []int{trigger, target}
+	}
+	output["model_thresholds"] = models
 	data, err = json.Marshal(output)
 	if err != nil {
 		t.Fatal(err)

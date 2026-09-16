@@ -32,23 +32,25 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
-	ToolError    bool            `json:"tool_error"`
-	Deny         bool            `json:"deny"`
-	Resume       bool            `json:"resume"`
-	ChatLoop     bool            `json:"chat_loop"`
-	Untrusted    bool            `json:"untrusted"`
-	OutputCap    int             `json:"output_cap"`
-	SchemaName   string          `json:"schema_name"`
-	SchemaStrict *bool           `json:"schema_strict"`
-	CustomParser bool            `json:"custom_parser"`
-	Approvals    bool            `json:"approvals"`
-	Name         string          `json:"name"`
-	Fallbacks    []string        `json:"fallbacks"`
-	Schema       json.RawMessage `json:"schema"`
-	Streaming    bool            `json:"streaming"`
-	MaxTurns     int             `json:"max_turns"`
-	Input        []item          `json:"input"`
-	Responses    []response      `json:"responses"`
+	Handoff        bool            `json:"handoff"`
+	StopGateBlocks int             `json:"stop_gate_blocks"`
+	ToolError      bool            `json:"tool_error"`
+	Deny           bool            `json:"deny"`
+	Resume         bool            `json:"resume"`
+	ChatLoop       bool            `json:"chat_loop"`
+	Untrusted      bool            `json:"untrusted"`
+	OutputCap      int             `json:"output_cap"`
+	SchemaName     string          `json:"schema_name"`
+	SchemaStrict   *bool           `json:"schema_strict"`
+	CustomParser   bool            `json:"custom_parser"`
+	Approvals      bool            `json:"approvals"`
+	Name           string          `json:"name"`
+	Fallbacks      []string        `json:"fallbacks"`
+	Schema         json.RawMessage `json:"schema"`
+	Streaming      bool            `json:"streaming"`
+	MaxTurns       int             `json:"max_turns"`
+	Input          []item          `json:"input"`
+	Responses      []response      `json:"responses"`
 }
 
 func convert(items []item) []sdk.RunItem {
@@ -181,6 +183,10 @@ func execute(s scenario) object {
 			return "echo: " + args.Text, nil
 		}}
 	agent := &sdk.Agent{Name: "replay-agent", Model: "replay-model", Instructions: "Follow the replay script.", Tools: []sdk.Tool{tool}}
+	if s.Handoff {
+		target := &sdk.Agent{Name: "target", Model: "target-model", Instructions: "Follow the replay script."}
+		agent.Handoffs = []*sdk.Handoff{{Agent: target, ToolName: "transfer", Description: "Transfer"}}
+	}
 	if s.Approvals {
 		approval := *tool
 		approval.ToolName = "approval"
@@ -236,10 +242,14 @@ func execute(s scenario) object {
 	trusted := s.Untrusted
 	hooks := &recordingHooks{events: []object{}}
 	cfg := sdk.RunConfig{Hooks: hooks, MaxToolOutputBytes: s.OutputCap, MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
+	if s.StopGateBlocks > 0 {
+		cfg.StopGateMaxBlocks = s.StopGateBlocks
+		cfg.StopGate = func(context.Context, string) (bool, string) { return false, "finish verification" }
+	}
 	runner := sdk.NewRunnerWithProvider(m)
 	var result *sdk.RunResult
 	var err error
-	events := []object{}
+	wireEvents := []object{}
 	if s.Streaming {
 		stream := runner.RunStreamed(context.Background(), agent, convert(s.Input), cfg)
 		for ev := range stream.Events {
@@ -248,11 +258,12 @@ func execute(s scenario) object {
 				if ev.Name != "model.delta" {
 					panic("unexpected raw event: " + ev.Name)
 				}
-				events = append(events, object{"type": "text_delta", "delta": ev.Delta})
+				wireEvents = append(wireEvents, object{"type": "text_delta", "delta": ev.Delta})
 			case sdk.StreamEventRunItem:
-				for _, v := range normalize([]sdk.RunItem{*ev.Item}) {
-					events = append(events, object{"type": "item", "item": v})
+				for _, item := range sdk.SnapshotRunItems([]sdk.RunItem{*ev.Item}) {
+					wireEvents = append(wireEvents, object{"type": "item", "item": item})
 				}
+
 			default:
 				panic(fmt.Sprintf("unexpected stream event: %v", ev.Type))
 			}
@@ -288,10 +299,12 @@ func execute(s scenario) object {
 	if result.IsInterrupted() {
 		status = "paused"
 	}
-	observation := object{"hooks": hooks.events, "requests": m.requests, "dispatch": dispatch, "events": events, "outcome": object{
+	observation := object{"wire_events": wireEvents, "hooks": hooks.events, "requests": m.requests, "dispatch": dispatch, "outcome": object{
 		"status": status, "error": category, "final_output": result.FinalOutput, "history": normalize(result.FinalHistory), "new_items": normalize(result.NewItems),
 		"response_count": len(result.RawResponses), "last_agent": result.LastAgent.Name, "input_tokens": result.Usage.InputTokens, "output_tokens": result.Usage.OutputTokens}}
 	if s.Approvals {
+		observation["wire_history"] = sdk.SnapshotRunItems(result.FinalHistory)
+		observation["wire_new_items"] = sdk.SnapshotRunItems(result.NewItems)
 		pending := []item{}
 		for _, interruption := range result.AllInterruptions() {
 			approval := interruption

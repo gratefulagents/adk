@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gratefulagents:migration:sdk-inventory:1",
+  "title": "SDK source inventory v1",
+  "type": "object",
+  "required": ["schema_version", "sdk_version", "commit", "upstream", "source_license", "counts", "records"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "sdk_version": {"const": "v0.0.115"},
+    "commit": {"const": "1dc92b73900fac74dc357a938e4b5eee6392b418"},
+    "upstream": {"type": "string"},
+    "source_license": {"type": "string"},
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+    "records": {
+      "type": "object",
+      "additionalProperties": {"type": "array", "items": {"$ref": "#/$defs/record"}}
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": ["id", "acceptance_id", "rust_module", "role_owner", "implementation_status", "verification_status", "acceptance_contract", "verification_group_id"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "acceptance_id": {"type": "string", "pattern": "^SDK-[0-9A-F]{16}$"},
+        "rust_module": {"type": "string", "pattern": "^sdk(_cli|_evals)?(::[a-z_][a-z0-9_]*)*$"},
+        "role_owner": {"type": "string", "pattern": "^[a-z-]+-owner$"},
+        "implementation_status": {"const": "not_implemented"},
+        "verification_status": {"const": "not_run"},
+        "acceptance_contract": {"const": "source-parity-v1"},
+        "verification_group_id": {"type": "string", "pattern": "^verification_groups:"},
+        "source": {"type": "string"},
+        "line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "start_byte": {"type": "integer", "minimum": 0},
+        "end_byte": {"type": "integer", "minimum": 0}
+      },
+      "additionalProperties": true
+    }
+  }
+}

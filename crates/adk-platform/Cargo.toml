@@ -1,0 +1,15 @@
+[package]
+name = "adk-platform"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "AGPL-3.0-only"
+publish.workspace = true
+
+[dependencies]
+adk-core.workspace = true
+adk-codec.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+thiserror.workspace = true

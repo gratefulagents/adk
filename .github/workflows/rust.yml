@@ -1,0 +1,53 @@
+name: Rust foundation
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        features: [minimal, default, runtime, all]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned compiler and components
+        run: rustup show active-toolchain
+      - name: Feature matrix
+        shell: bash
+        run: |
+          case '${{ matrix.features }}' in
+            minimal) cargo test --locked -p adk --no-default-features --all-targets ;;
+            default) cargo test --locked --all-targets ;;
+            runtime) cargo test --locked -p adk --no-default-features --features runtime --all-targets ;;
+            all) cargo test --locked --workspace --all-features --all-targets ;;
+          esac
+      - name: Standalone example
+        run: cargo run --locked -p adk --example standalone --no-default-features
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show active-toolchain
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --locked --workspace --all-features --all-targets -- -D warnings
+      - run: cargo doc --locked --workspace --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - run: cargo test --locked --workspace --all-features --doc
+      - run: python3 scripts/check-purity.py
+      - run: python3 -m unittest discover -s scripts -p 'test_purity.py' -v
+      - run: python3 -m unittest discover -s scripts/replay -p 'test_*.py' -v
+      - name: Compare Rust against pinned Go outputs
+        run: |
+          cargo run --locked -p adk-harness -- --fixtures > candidate.json
+          python3 scripts/replay/replay.py --candidate candidate.json
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show active-toolchain
+      - name: Install pinned dependency checker
+        run: cargo install cargo-deny --version 0.20.2 --locked
+      - run: cargo deny --locked check

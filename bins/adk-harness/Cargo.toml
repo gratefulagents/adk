@@ -1,0 +1,11 @@
+[package]
+name = "adk-harness"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license = "AGPL-3.0-only"
+publish.workspace = true
+
+[dependencies]
+adk-platform.workspace = true
+serde_json.workspace = true

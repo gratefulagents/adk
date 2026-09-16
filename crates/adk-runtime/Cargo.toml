@@ -1,0 +1,13 @@
+[package]
+name = "adk-runtime"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Opt-in Tokio cancellation and explicitly owned tasks for ADK"
+
+[dependencies]
+adk-core.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true

@@ -210,7 +210,13 @@ fn host_environment_helper() {
             0,
         )
     };
-    assert_eq!(result, -1, "host process environment must be inaccessible");
+    let has_path = bytes[..size.min(bytes.len())]
+        .windows(b"\0PATH=".len())
+        .any(|window| window == b"\0PATH=");
+    assert_eq!(
+        result, -1,
+        "host process environment must be inaccessible (returned {size} bytes; contains PATH key: {has_path})"
+    );
     assert!(matches!(
         std::io::Error::last_os_error().raw_os_error(),
         Some(libc::EPERM | libc::EACCES)

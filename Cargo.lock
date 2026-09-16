@@ -10,6 +10,8 @@ dependencies = [
  "adk-core",
  "adk-providers",
  "adk-runtime",
+ "adk-sandbox",
+ "adk-security",
  "tokio",
 ]
 
@@ -91,6 +93,28 @@ dependencies = [
  "sha2",
  "tokio",
  "tokio-util",
+]
+
+[[package]]
+name = "adk-sandbox"
+version = "0.1.0"
+dependencies = [
+ "adk-core",
+ "libc",
+ "thiserror",
+ "tokio",
+ "tokio-util",
+]
+
+[[package]]
+name = "adk-security"
+version = "0.1.0"
+dependencies = [
+ "adk-core",
+ "regex",
+ "schemars",
+ "serde_json",
+ "tokio",
 ]
 
 [[package]]
@@ -292,6 +316,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e079f19b08ca6239f47f8ba8509c11cf3ea30095831f7fed61441475edd8c449"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "errno"
+version = "0.3.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
+dependencies = [
+ "libc",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -1316,6 +1350,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
+name = "signal-hook-registry"
+version = "1.4.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b"
+dependencies = [
+ "errno",
+ "libc",
+]
+
+[[package]]
 name = "slab"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1468,6 +1512,7 @@ dependencies = [
  "libc",
  "mio",
  "pin-project-lite",
+ "signal-hook-registry",
  "socket2",
  "tokio-macros",
  "windows-sys 0.61.2",

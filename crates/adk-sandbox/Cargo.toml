@@ -1,0 +1,20 @@
+[package]
+name = "adk-sandbox"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "GPL-3.0-only"
+publish = false
+description = "Opt-in trusted-host OS sandbox and subprocess lifecycle boundary"
+
+[dependencies]
+adk-core = { version = "0.1.0", path = "../adk-core" }
+thiserror = "2"
+tokio = { version = "1", features = ["rt", "macros", "sync", "time", "process", "io-util", "net"] }
+tokio-util = { version = "0.7", features = ["rt"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[dev-dependencies]
+tokio = { version = "1", features = ["rt-multi-thread"] }

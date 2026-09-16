@@ -3,8 +3,9 @@
 Rust-native agent development kit, with a standalone execution engine and reusable
 contracts separated from platform integration. The opt-in `runtime` feature runs
 host-supplied models and tools, including streamed execution and approval
-continuations. Provider adapters, sandbox backends, MCP transport, durable storage
-and deployment remain separate work; this is not a production platform worker.
+continuations. The opt-in `execution` feature adds sandbox backends, subprocess
+ownership, and policy/guardrails. MCP transport, durable storage and deployment
+remain separate work; this is not a production platform worker.
 
 ## Workspace
 
@@ -13,6 +14,9 @@ and deployment remain separate work; this is not a production platform worker.
 - `adk-codec`: explicit Go compatibility codecs, separate from native types.
 - `adk-runtime`: optional Rust state-machine runner, tool-output safety, streaming,
   approval continuation, and Tokio cancellation/owned-task resource management.
+- `adk-security`: composed permissions, command and secret guardrails, exact-call approval.
+- `adk-sandbox`: Linux Bubblewrap/macOS Seatbelt and explicit full-access local
+  execution, with owned process groups and PTY lifecycle.
 - `adk`: public facade; no platform dependency, even with every feature enabled.
 - `adk-platform`: one-way integration boundary and platform fixture codec.
 - `adk-agent`: foundation inspection binary (`--version` only), **not a worker**.
@@ -50,10 +54,13 @@ cargo deny --locked check
 | Minimal | `cargo test --locked -p adk --no-default-features --all-targets` | Native contracts only |
 | Default | `cargo test --locked --all-targets` | Default workspace members: facade, core, SDK codecs |
 | Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add standalone runner and Tokio ownership |
-| All | `cargo test --locked --workspace --all-features --all-targets` | Include codecs, runtime, platform boundary and binaries |
+| Execution | `cargo test --locked -p adk --no-default-features --features execution --all-targets` | Add opt-in sandbox, process ownership and security |
+| All | `cargo test --locked --workspace --all-features --all-targets` | Include codecs, runtime, execution, platform boundary and binaries |
 
 The facade's default feature set is empty. `compat` adds SDK codecs; `runtime`
-adds the execution engine and task owner. Neither adds Kubernetes/platform code.
+adds the execution engine and task owner. `execution` adds sandbox and security
+APIs; see [execution security](docs/execution-security.md) for trusted-host usage,
+OS support, enforced CI tests and limitations. None adds Kubernetes/platform code.
 See [runner design and behavior](docs/runner-design.md) for lifecycle contracts,
 Go compatibility mapping, research and explicit integration boundaries. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect

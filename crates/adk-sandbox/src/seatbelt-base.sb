@@ -1,0 +1,58 @@
+; Runtime subset derived from SDK executor_seatbelt.go (GPL-3.0-only).
+; Do not allow sysctl-read globally: kern.procargs2 can expose host environments.
+(version 1)
+(deny default)
+; dyld opens the root directory as an openat base during process startup.
+; Literal "/" grants directory access, NOT reads beneath it (no subpath rule).
+(allow file-read* (literal "/"))
+; macOS /bin/sh reads this system-owned shell selector before execing bash.
+; Without it the command runs but emits a warning into every captured PTY.
+(allow file-read-metadata (literal "/var"))
+(allow file-read* (literal "/private/var/select/sh"))
+(allow process-exec)
+(allow process-fork)
+(allow signal (target same-sandbox))
+; Host process metadata is not required to execute commands.
+(deny process-info*)
+; These legacy sysctls expose same-UID argv/environment; deny explicitly,
+; including PID suffixes, rather than relying on default-deny or process-info.
+(deny sysctl-read (sysctl-name-prefix "kern.procargs"))
+(allow sysctl-read
+  (sysctl-name "hw.activecpu")
+  (sysctl-name "hw.byteorder")
+  (sysctl-name "hw.cacheconfig")
+  (sysctl-name "hw.cachelinesize_compat")
+  (sysctl-name "hw.cpufamily")
+  (sysctl-name "hw.cputype")
+  (sysctl-name "hw.logicalcpu")
+  (sysctl-name "hw.logicalcpu_max")
+  (sysctl-name "hw.machine")
+  (sysctl-name "hw.memsize")
+  (sysctl-name "hw.model")
+  (sysctl-name "hw.ncpu")
+  (sysctl-name "hw.nperflevels")
+  (sysctl-name-prefix "hw.optional.arm.")
+  (sysctl-name-prefix "hw.optional.armv8_")
+  (sysctl-name "hw.pagesize")
+  ; getpagesize()/sysconf use numeric HW_PAGESIZE, named pagesize_compat in XNU.
+  ; Rust needs this to align its main-thread guard mapping before main().
+  (sysctl-name "hw.pagesize_compat")
+  (sysctl-name "hw.physicalcpu")
+  (sysctl-name "hw.physicalcpu_max")
+  (sysctl-name "machdep.cpu.brand_string")
+  (sysctl-name "kern.argmax")
+  (sysctl-name "kern.hostname")
+  (sysctl-name "kern.maxfilesperproc")
+  (sysctl-name "kern.maxproc")
+  (sysctl-name "kern.osproductversion")
+  (sysctl-name "kern.osrelease")
+  (sysctl-name "kern.ostype")
+  (sysctl-name "kern.osversion")
+  (sysctl-name "kern.version")
+  (sysctl-name "vm.loadavg")
+  (sysctl-name-prefix "hw.perflevel")
+  (sysctl-name-prefix "kern.proc.pgrp.")
+  (sysctl-name-prefix "kern.proc.pid."))
+(allow sysctl-write (sysctl-name "kern.grade_cputype"))
+; The PTY is created by the host, never borrowed from the host's terminal.
+(allow file-ioctl (regex #"^/dev/ttys[0-9]+$"))

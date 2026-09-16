@@ -3,7 +3,7 @@
 import json
 import subprocess
 
-REUSABLE = {"adk", "adk-core", "adk-codec", "adk-runtime"}
+REUSABLE = {"adk", "adk-core", "adk-codec", "adk-runtime", "adk-security", "adk-sandbox"}
 FORBIDDEN = {"adk-platform", "adk-agent", "adk-harness", "kube", "kube-client", "kube-core", "kube-runtime", "k8s-openapi"}
 
 

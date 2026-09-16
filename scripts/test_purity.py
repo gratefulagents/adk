@@ -24,5 +24,13 @@ class PurityTests(unittest.TestCase):
     def test_transitive_kubernetes_rejected(self):
         self.assertTrue(purity.violations(self.metadata("k8s-openapi")))
 
+    def test_execution_crates_are_checked_independently(self):
+        for name in ("adk-security", "adk-sandbox"):
+            with self.subTest(name=name):
+                metadata = self.metadata("adk-platform")
+                metadata["packages"][0]["name"] = name
+                self.assertEqual(purity.violations(metadata),
+                                 [name + " -> helper -> adk-platform"])
+
     def test_pure_allowed(self):
         self.assertEqual(purity.violations(self.metadata("serde")), [])

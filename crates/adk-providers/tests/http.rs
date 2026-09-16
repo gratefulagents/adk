@@ -15,6 +15,8 @@ impl CredentialStore for StaticStore {
             Ok(Material {
                 access_token: Secret::new("fixture-token"),
                 refresh_token: None,
+                id_token: None,
+                email: None,
                 account: None,
                 expires_at: None,
                 last_refresh: None,
@@ -143,7 +145,12 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
         request
     });
     let provider = provider(&format!("http://{addr}/v1"));
-    let response = provider.complete(&context(), request()).await.unwrap();
+    let mut input = request();
+    input
+        .settings
+        .insert("prompt_cache_key".into(), serde_json::json!("host-prompt"));
+    let ctx = context();
+    let response = provider.complete(&ctx, input).await.unwrap();
     assert_eq!(response.usage.context_tokens, Some(12));
     assert_eq!(response.usage.cache_read_tokens, 4);
     let request = server.join().unwrap();
@@ -155,9 +162,17 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     );
     let body: serde_json::Value =
         serde_json::from_str(request.split_once("\r\n\r\n").unwrap().1).unwrap();
+    let scope = Scope::new(
+        "fixture",
+        &format!("http://{addr}/v1"),
+        None,
+        AuthMode::ApiKey,
+    )
+    .unwrap();
+    let material = StaticStore.load(&ctx, &scope).await.unwrap();
     assert_eq!(
         body,
-        serde_json::json!({"model":"test-model","stream":false,"messages":[{"role":"system","content":"test"}]})
+        serde_json::json!({"model":"test-model","stream":false,"messages":[{"role":"system","content":"test"}],"prompt_cache_key":cache_scope(&scope, &material, "host-prompt")})
     );
 }
 #[tokio::test]
@@ -243,4 +258,87 @@ async fn premature_eof_errors_once_then_closes_owned_stream() {
     assert!(stream.next().await.is_err());
     assert_eq!(stream.next().await.unwrap(), None);
     server.join().unwrap();
+}
+
+#[tokio::test]
+async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let addr = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        let captured = read_request(&mut socket);
+        let body = r#"{"output":[{"type":"compaction","id":"c","encrypted_content":"opaque"}],"usage":{"input_tokens":12,"output_tokens":2}}"#;
+        write!(
+            socket,
+            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+            body.len(),
+            body
+        )
+        .unwrap();
+        captured
+    });
+    let scope = Scope::new(
+        "fixture",
+        &format!("http://{addr}/v1"),
+        None,
+        AuthMode::ApiKey,
+    )
+    .unwrap();
+    let provider = Provider::new(
+        "fixture",
+        Protocol::Responses,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    #[cfg(not(feature = "runtime"))]
+    let (items, usage) = {
+        let result = provider.compact(&context(), request()).await.unwrap();
+        (result.items, result.usage)
+    };
+    #[cfg(feature = "runtime")]
+    let (items, usage) = {
+        use adk_runtime::Compactor;
+        struct Price;
+        impl adk_runtime::CostEstimator for Price {
+            fn cost(&self, _: &str, _: &adk_core::Usage) -> f64 {
+                0.25
+            }
+        }
+        let compactor = adk_providers::runtime::NativeCompactor {
+            provider: Arc::new(provider),
+            template: request(),
+            costs: Arc::new(Price),
+        };
+        let result = compactor
+            .compact(
+                &context(),
+                adk_runtime::CompactionRequest {
+                    agent: "fixture".into(),
+                    model: "test-model".into(),
+                    history: vec![],
+                    context_tokens: 20,
+                    target_tokens: 5,
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(result.cost, 0.25);
+        assert_eq!(
+            result.context_tokens,
+            adk_runtime::compaction::estimate_history_tokens(&result.history)
+        );
+        (result.history, result.usage)
+    };
+    assert!(
+        matches!(&items[0], adk_core::RunItem::Compaction { compaction } if compaction.encrypted_content == "opaque")
+    );
+    assert_eq!(usage.input_tokens, 12);
+    let captured = server.join().unwrap();
+    assert!(captured.starts_with("POST /v1/responses/compact HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+    assert_eq!(
+        body,
+        serde_json::json!({"model":"test-model","input":[],"instructions":"test"})
+    );
 }

@@ -1,0 +1,34 @@
+// GPL-3.0-only. Synthetic parity probe against pinned gratefulagents/sdk.
+package openai
+
+import (
+    "encoding/json"
+    "os"
+    "path/filepath"
+    "testing"
+
+    "github.com/gratefulagents/sdk/internal/anthropic"
+)
+
+func TestADKContinuationGolden(t *testing.T) {
+    items, err := toResponseInputItems([]anthropic.Message{{
+        Role: anthropic.RoleAssistant,
+        Content: []anthropic.ContentBlock{
+            {Type: "thinking", ID: "r", Thinking: "summary", EncryptedContent: "reasoning-opaque"},
+            anthropic.NewCompactionBlock("c", "compact-opaque", "openai"),
+        },
+    }})
+    if err != nil { t.Fatal(err) }
+    details := json.RawMessage(`[{"type":"reasoning.encrypted","data":"opaque","index":0}]`)
+    golden := map[string]any{
+        "source_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+        "responses_input": items,
+        "reasoning_details_json": details,
+        "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
+    }
+    data, err := json.MarshalIndent(golden, "", "  ")
+    if err != nil { t.Fatal(err) }
+    dir := os.Getenv("ADK_PROVIDER_FIXTURE_DIR")
+    if dir == "" { t.Fatal("explicit fixture directory required") }
+    if err := os.WriteFile(filepath.Join(dir, "continuation.json"), append(data, '\n'), 0644); err != nil { t.Fatal(err) }
+}

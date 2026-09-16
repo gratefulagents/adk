@@ -142,6 +142,25 @@ pub fn encode_item(
                 ..Default::default()
             });
         }
+        RunItem::Reasoning { reasoning } => {
+            wire.kind = dto::RunItemType(5);
+            wire.reasoning = Some(dto::ReasoningData {
+                id: reasoning.id.clone(),
+                text: reasoning.text.clone(),
+                signature: reasoning.signature.clone(),
+                redacted_data: reasoning.redacted_data.clone(),
+                encrypted_content: reasoning.encrypted_content.clone(),
+            });
+        }
+        RunItem::Compaction { compaction } => {
+            wire.kind = dto::RunItemType(7);
+            wire.compaction = Some(dto::CompactionData {
+                id: compaction.id.clone(),
+                content: compaction.content.clone(),
+                encrypted_content: compaction.encrypted_content.clone(),
+                created_by: compaction.created_by.clone(),
+            });
+        }
         RunItem::Handoff { .. } => {
             return Err(BridgeError(
                 "native and Go handoffs have different payloads",
@@ -200,6 +219,35 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                     }],
                     is_error: output.is_error,
                     should_pause: false,
+                },
+            }
+        }
+        5 => {
+            let data = wire
+                .reasoning
+                .as_ref()
+                .ok_or(BridgeError("missing Reasoning"))?;
+            RunItem::Reasoning {
+                reasoning: adk_core::Reasoning {
+                    id: data.id.clone(),
+                    text: data.text.clone(),
+                    signature: data.signature.clone(),
+                    redacted_data: data.redacted_data.clone(),
+                    encrypted_content: data.encrypted_content.clone(),
+                },
+            }
+        }
+        7 => {
+            let data = wire
+                .compaction
+                .as_ref()
+                .ok_or(BridgeError("missing Compaction"))?;
+            RunItem::Compaction {
+                compaction: adk_core::Compaction {
+                    id: data.id.clone(),
+                    content: data.content.clone(),
+                    encrypted_content: data.encrypted_content.clone(),
+                    created_by: data.created_by.clone(),
                 },
             }
         }

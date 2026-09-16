@@ -29,6 +29,8 @@ fn material() -> Material {
     Material {
         access_token: Secret::new("fixture-access"),
         refresh_token: Some(Secret::new("fixture-refresh")),
+        id_token: None,
+        email: None,
         account: Some("account-a".into()),
         expires_at: Some(SystemTime::UNIX_EPOCH),
         last_refresh: Some(SystemTime::UNIX_EPOCH),
@@ -378,10 +380,24 @@ fn anthropic_stream_merges_usage_and_preserves_signature() {
     assert!(format!("{:?}", response.items).contains("signed"));
 }
 #[test]
-fn opaque_native_compaction_is_explicitly_unsupported_not_lost() {
-    let error = wire::response(&json!({"status":"completed","output":[{"type":"compaction","encrypted_content":"opaque"}]}),Protocol::Responses).unwrap_err();
-    assert_eq!(error.info.category, ErrorCategory::Unsupported);
-    assert!(!format!("{error:?}").contains("opaque"));
+fn opaque_compaction_and_reasoning_survive_exact_codex_replay_shape() {
+    let response = wire::response(&json!({"status":"completed","output":[
+        {"type":"reasoning","id":"r","summary":[{"type":"summary_text","text":"summary"}],"encrypted_content":"reasoning-opaque"},
+        {"type":"compaction","id":"c","encrypted_content":"compact-opaque"}]}),Protocol::Responses).unwrap();
+    let mut input = request();
+    input.input = response.items;
+    let body = wire::request(&input, Protocol::Responses, false).unwrap();
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    assert_eq!(body["input"], golden["responses_input"]);
+    assert_eq!(
+        wire::decode_reasoning_details(golden["reasoning_details_signature"].as_str().unwrap())
+            .unwrap(),
+        golden["reasoning_details_json"]
+    );
+    assert!(wire::request(&input, Protocol::Chat, false).is_err());
 }
 
 #[test]
@@ -432,4 +448,251 @@ fn responses_tool_delta_uses_call_id_not_output_item_id() {
             delta: "{}".into()
         }]
     );
+}
+
+struct FailedRefresh;
+impl Refresh for FailedRefresh {
+    fn refresh<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a Scope,
+        _: Material,
+    ) -> BoxFuture<'a, Result<Material, Error>> {
+        Box::pin(async {
+            Err(Error::new(
+                ErrorCategory::Provider,
+                "fixture refresh failure",
+            ))
+        })
+    }
+}
+#[tokio::test]
+async fn anthropic_refresh_grace_never_reuses_a_rejected_token() {
+    let mut value = material();
+    value.expires_at = Some(SystemTime::now() + Duration::from_secs(60));
+    let store = Arc::new(Store {
+        value: Mutex::new(value),
+        writes: AtomicUsize::new(0),
+    });
+    let session = Session::new(
+        scope(AuthMode::AnthropicOAuth),
+        store.clone(),
+        Arc::new(FailedRefresh),
+    )
+    .unwrap();
+    let ctx = context();
+    let original = session.material(&ctx).await.unwrap();
+    session.reject(&ctx, &original.access_token).await.unwrap();
+    session
+        .reject(&ctx, &Secret::new("older-rejected-token"))
+        .await
+        .unwrap();
+    assert!(session.material(&ctx).await.is_err());
+    {
+        let mut current = store.value.lock().await;
+        current.access_token = Secret::new("host-rotation");
+        current.expires_at = None;
+    }
+    assert_eq!(
+        session.material(&ctx).await.unwrap().access_token.expose(),
+        "host-rotation"
+    );
+}
+#[tokio::test]
+async fn stale_unauthorized_does_not_refresh_new_host_credential() {
+    let mut value = material();
+    value.expires_at = None;
+    value.access_token = Secret::new("host-rotation");
+    let store = Arc::new(Store {
+        value: Mutex::new(value),
+        writes: AtomicUsize::new(0),
+    });
+    let refresh = Arc::new(Refresher(AtomicUsize::new(0)));
+    let session = Session::new(scope(AuthMode::AnthropicOAuth), store, refresh.clone()).unwrap();
+    let ctx = context();
+    session
+        .reject(&ctx, &Secret::new("old-token"))
+        .await
+        .unwrap();
+    assert_eq!(
+        session.material(&ctx).await.unwrap().access_token.expose(),
+        "host-rotation"
+    );
+    assert_eq!(refresh.0.load(Ordering::SeqCst), 0);
+}
+#[test]
+fn signed_redacted_and_gateway_reasoning_roundtrip_in_order() {
+    let mut req = request();
+    let body = json!({"content":[{"type":"thinking","thinking":"thought","signature":"signed"},
+        {"type":"redacted_thinking","data":"redacted"},{"type":"text","text":"answer"}],"stop_reason":"end_turn"});
+    req.input = wire::response(&body, Protocol::Anthropic).unwrap().items;
+    let replay = wire::request(&req, Protocol::Anthropic, false).unwrap();
+    assert_eq!(replay["messages"][0]["content"], body["content"]);
+    let details = json!([{"type":"reasoning.encrypted","data":"opaque","index":0}]);
+    let body = json!({"choices":[{"message":{"reasoning_details":details,"content":"answer"},"finish_reason":"stop"}]});
+    req.input = wire::response(&body, Protocol::Chat).unwrap().items;
+    assert_eq!(
+        wire::request(&req, Protocol::Chat, false).unwrap()["messages"][1]["reasoning_details"],
+        details
+    );
+}
+
+#[test]
+fn canonical_factory_scopes_every_baseline_leg_without_credential_inheritance() {
+    use adk_providers::factory::{Kind, RouteSpec};
+    for (kind, mode, endpoint, protocol) in [
+        (
+            Kind::OpenAi,
+            AuthMode::ApiKey,
+            "https://api.openai.com/v1",
+            Protocol::Responses,
+        ),
+        (
+            Kind::OpenAi,
+            AuthMode::OpenAiOAuth,
+            "https://chatgpt.com/backend-api/codex",
+            Protocol::Responses,
+        ),
+        (
+            Kind::Anthropic,
+            AuthMode::ApiKey,
+            "https://api.anthropic.com",
+            Protocol::Anthropic,
+        ),
+        (
+            Kind::Anthropic,
+            AuthMode::AnthropicOAuth,
+            "https://api.anthropic.com",
+            Protocol::Anthropic,
+        ),
+        (
+            Kind::OpenRouter,
+            AuthMode::ApiKey,
+            "https://openrouter.ai/api/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Gemini,
+            AuthMode::ApiKey,
+            "https://generativelanguage.googleapis.com/v1beta/openai",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Groq,
+            AuthMode::ApiKey,
+            "https://api.groq.com/openai/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Xai,
+            AuthMode::ApiKey,
+            "https://api.x.ai/v1",
+            Protocol::Responses,
+        ),
+        (
+            Kind::Local,
+            AuthMode::Anonymous,
+            "http://localhost:11434/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Local,
+            AuthMode::ApiKey,
+            "http://localhost:11434/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Copilot,
+            AuthMode::CopilotOAuth,
+            "https://api.individual.githubcopilot.com",
+            Protocol::Chat,
+        ),
+    ] {
+        let mut spec = RouteSpec {
+            kind,
+            prefix: None,
+            endpoint: None,
+            protocol: None,
+            mode,
+            account: None,
+        };
+        assert_eq!(spec.scope().unwrap().endpoint, endpoint);
+        assert_eq!(kind.protocol(), protocol);
+        let canonical = spec.scope().unwrap();
+        spec.prefix = Some("independent".into());
+        assert_ne!(spec.scope().unwrap(), canonical);
+        let store = Arc::new(Store {
+            value: Mutex::new(material()),
+            writes: AtomicUsize::new(0),
+        });
+        spec.build(store, Arc::new(FailedRefresh)).unwrap();
+    }
+}
+#[test]
+fn attribution_and_subscription_headers_do_not_leak_to_unrelated_hosts() {
+    let value = material();
+    for (url, expected) in [
+        ("https://openrouter.ai/api/v1", true),
+        ("https://eu.openrouter.ai/api/v1", true),
+        ("https://openrouter.ai.evil.test/v1", false),
+        ("https://example.test/v1", false),
+    ] {
+        let scope = Scope::new("named", url, None, AuthMode::ApiKey).unwrap();
+        assert_eq!(
+            headers(&scope, &value, false)
+                .unwrap()
+                .contains_key("http-referer"),
+            expected
+        );
+    }
+    let h = headers(&scope(AuthMode::CopilotOAuth), &value, true).unwrap();
+    assert_eq!(h["copilot-integration-id"], "vscode-chat");
+    assert_eq!(h["anthropic-beta"], "interleaved-thinking-2025-05-14");
+    assert!(!h.contains_key("x-api-key"));
+    let h = headers(&scope(AuthMode::AnthropicOAuth), &value, true).unwrap();
+    assert_eq!(h["anthropic-beta"], "oauth-2025-04-20");
+    assert_eq!(h["user-agent"], "claude-cli/2.1.158 (external, cli)");
+}
+
+struct RacingRefresh(Arc<Store>);
+impl Refresh for RacingRefresh {
+    fn refresh<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a Scope,
+        mut value: Material,
+    ) -> BoxFuture<'a, Result<Material, Error>> {
+        Box::pin(async move {
+            let mut external = self.0.value.lock().await;
+            external.access_token = Secret::new("external-winner");
+            external.expires_at = None;
+            external.revision += 1;
+            value.access_token = Secret::new("discarded-refresh");
+            value.expires_at = None;
+            Ok(value)
+        })
+    }
+}
+#[tokio::test]
+async fn refresh_cas_loser_never_returns_its_unpersisted_credential() {
+    let store = Arc::new(Store {
+        value: Mutex::new(material()),
+        writes: AtomicUsize::new(0),
+    });
+    let session = Session::new(
+        scope(AuthMode::AnthropicOAuth),
+        store.clone(),
+        Arc::new(RacingRefresh(store.clone())),
+    )
+    .unwrap();
+    assert_eq!(
+        session
+            .material(&context())
+            .await
+            .unwrap()
+            .access_token
+            .expose(),
+        "external-winner"
+    );
+    assert_eq!(store.writes.load(Ordering::SeqCst), 0);
 }

@@ -14,6 +14,8 @@ impl CredentialStore for Credentials {
             Ok(Material {
                 access_token: Secret::new("fixture"),
                 refresh_token: None,
+                id_token: None,
+                email: None,
                 account: None,
                 expires_at: None,
                 last_refresh: None,

@@ -106,6 +106,23 @@ impl Refresh for OAuthRefresh {
                     )
                 })?;
             material.access_token = Secret::new(access);
+            if let Some(token) = body["id_token"]
+                .as_str()
+                .map(str::trim)
+                .filter(|v| !v.is_empty())
+            {
+                material.id_token = Some(Secret::new(token));
+                if scope.account.is_none() {
+                    material.account =
+                        crate::material::account_from_id_token(token).or(material.account);
+                }
+            }
+            if let Some(email) = body
+                .pointer("/account/email_address")
+                .and_then(Value::as_str)
+            {
+                material.email = Some(email.to_owned());
+            }
             if scope.mode != AuthMode::CopilotOAuth
                 && let Some(refresh) = body["refresh_token"]
                     .as_str()

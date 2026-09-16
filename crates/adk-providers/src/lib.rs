@@ -7,8 +7,12 @@ pub mod auth;
 pub mod client;
 pub mod cost;
 pub mod error;
+pub mod factory;
+pub mod material;
 pub mod oauth;
 pub mod routing;
+#[cfg(feature = "runtime")]
+pub mod runtime;
 pub mod sse;
 pub mod wire;
 

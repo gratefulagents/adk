@@ -21,7 +21,8 @@ Implemented building blocks:
   refresh serialization, external-rotation reloads, account checks, sensitive
   HTTP headers and redacted credential Debug implementations.
 - OpenAI/Anthropic/Copilot refresh HTTP exchange implementations (unverified
-  against live services), with no redirect following or transparent retry of
+  against live services), host-supplied material codecs, bounded 401 recovery and
+  late-rejection isolation, with no redirect following or transparent retry of
   potentially single-use refresh tokens.
 - Provider-specific cache usage normalization, baseline price tables, retry
   header floor/precedence/capping and sanitized transport error categories.
@@ -35,31 +36,33 @@ PR #19 (`28dcc3a`); this work does not depend on an unmerged runner patch.
 | Baseline leg | Baseline wire/auth | Current boundary / work still required |
 |---|---|---|
 | OpenAI | Responses or Chat / API key | Basic explicit protocol paths implemented; full golden parity pending |
-| OpenAI | Codex Responses / OAuth | Refresh exchange and bearer/account headers exist; material parser, complete Codex shaping and lossless encrypted continuation pending |
+| OpenAI | Codex Responses / OAuth | Refresh exchange and bearer/account headers exist; host-supplied material parsing and encrypted continuation implemented; full Codex shaping parity pending |
 | Anthropic | Messages / API key | Basic wire path implemented; model-dependent thinking, prompt-cache breakpoints, full metadata and output configuration pending |
-| Anthropic | Messages / OAuth | Refresh exchange exists; material parsing, Claude Code shaping/header/tool conventions and fallback parity pending |
-| OpenRouter | Chat default or explicit Responses / API key | Generic explicit protocol can target endpoint; automatic factory, attribution headers, fallback `models` and reasoning-details parity pending |
-| Gemini | Chat / API key | Generic explicit protocol only; canonical factory and fixtures pending |
-| Groq | Chat / API key | Generic explicit protocol only; canonical factory and fixtures pending |
-| xAI | Responses default / API key | Generic explicit protocol only; factory, model settings and fixtures pending |
-| Local | Chat / optional API key | Explicit loopback HTTP and anonymous scope supported; canonical factory/defaults pending |
-| Copilot | Metadata-selected Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh exchange exists; material parsing, model discovery/selection, token-derived endpoint restrictions and Copilot headers pending |
-| Named/multi | Above under independent prefixes, route overrides | Explicit registry implemented; baseline ProviderSpec inheritance/inference and delayed unavailable secondary legs pending |
+| Anthropic | Messages / OAuth | Refresh exchange exists; material parsing and OAuth headers implemented; full Claude Code shaping/tool conventions and fallback parity pending |
+| OpenRouter | Chat default or explicit Responses / API key | Generic explicit protocol can target endpoint; typed factory, host-scoped attribution and reasoning-details replay implemented; fallback `models` parity pending |
+| Gemini | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
+| Groq | Chat / API key | Canonical typed factory implemented; full provider fixtures pending |
+| xAI | Responses default / API key | Canonical typed factory implemented; model settings and fixtures pending |
+| Local | Chat / optional API key | Explicit loopback HTTP and anonymous scope supported; canonical factory/defaults implemented |
+| Copilot | Metadata-selected Messages → Responses → Chat / GitHub OAuth exchanged for API token | Refresh exchange exists; material parsing implemented; model discovery/selection, token-derived endpoint restrictions pending; Copilot identity headers implemented |
+| Named/multi | Above under independent prefixes, route overrides | Explicit registry and typed per-route factory implemented; baseline implicit ProviderSpec inference and delayed unavailable secondary legs pending |
 
-Unsupported audio/files/handoffs and opaque Responses reasoning/compaction fail
-explicitly rather than being silently dropped. Core `RunItem` currently has no
-lossless provider continuation variant. Native compaction needs that contract,
-its codec/history integration, and a provider compactor implementing the runner's
-existing `Compactor` boundary. This is unresolved implementation work, **not an
-approved scope reduction**. Anthropic redacted thinking is likewise unsupported.
+Unsupported audio/files/handoffs fail explicitly. Native `RunItem::Reasoning`
+and `RunItem::Compaction` retain signed/redacted/encrypted continuation through
+codecs and history. Responses replay retains compaction IDs and uses empty reasoning summaries;
+Anthropic signed/redacted thinking and OpenRouter reasoning details are replayed.
+Cross-protocol encrypted continuation fails rather than silently losing history.
+`Provider::compact` uses the dedicated Responses compaction endpoint; the optional
+`runtime` feature exposes `NativeCompactor` with host-selected pricing. Local
+compaction protects encrypted compaction items. Full differential parity is pending.
 
 Other outstanding evidence/work: protocol-specific request DTOs beyond the typed
 core input, full stream event/order validation, every error/retry/fallback vector,
 Go-executed request/SSE/cost differential fixtures, model metadata and automatic
 model selection, public facade/example, complete OAuth material/refresh race
-coverage, endpoint/auth-scoped prompt-cache capability state and native compaction.
-The cache-scope hash helper is tested independently; there is no learned cache
-capability registry yet. Runner fallback integration has not been exercised with
+coverage, endpoint/auth-scoped prompt-cache capability state.
+Prompt-cache keys are scoped at send time to endpoint/account/auth material, with
+captured-request tests; there is no learned cache capability registry yet. Runner fallback integration has not been exercised with
 these HTTP adapters. Cost functions are callable by a host estimator but not
 installed automatically in runner configuration.
 

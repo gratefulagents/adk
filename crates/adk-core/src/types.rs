@@ -64,10 +64,47 @@ pub struct ToolOutput {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum RunItem {
-    Message { message: Message },
-    ToolCall { call: ToolCall },
-    ToolResult { call_id: String, output: ToolOutput },
-    Handoff { call_id: String, agent: String },
+    Message {
+        message: Message,
+    },
+    ToolCall {
+        call: ToolCall,
+    },
+    ToolResult {
+        call_id: String,
+        output: ToolOutput,
+    },
+    Handoff {
+        call_id: String,
+        agent: String,
+    },
+    /// Provider continuation state is ordered history, not visible assistant output.
+    Reasoning {
+        reasoning: Reasoning,
+    },
+    Compaction {
+        compaction: Compaction,
+    },
+}
+
+/// Lossless reasoning continuation. Opaque fields are forwarded only by adapters
+/// supporting their encoding; they must not be substituted with display text.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct Reasoning {
+    pub id: String,
+    pub text: String,
+    pub signature: String,
+    pub redacted_data: String,
+    pub encrypted_content: String,
+}
+
+/// A provider-issued compacted context window, distinct from a local text summary.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct Compaction {
+    pub id: String,
+    pub content: String,
+    pub encrypted_content: String,
+    pub created_by: String,
 }
 
 /// Provider token counters. Cache counters may be subsets of input tokens;

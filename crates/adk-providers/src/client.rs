@@ -49,6 +49,41 @@ impl Provider {
             client,
         })
     }
+    /// Explicit native Responses compaction. No local summary is substituted when
+    /// the selected protocol or endpoint does not support this operation.
+    pub async fn compact(
+        &self,
+        context: &Context,
+        request: ModelRequest,
+    ) -> Result<ModelResponse, Error> {
+        if self.protocol != Protocol::Responses {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "native compaction requires Responses protocol",
+            ));
+        }
+        let source = wire::request(&request, self.protocol, false)?;
+        let codex = self.session.scope().mode == AuthMode::OpenAiOAuth;
+        let mut body = json!({"model":source["model"],"input":source["input"]});
+        if !codex || !request.instructions.is_empty() {
+            body["instructions"] = source["instructions"].clone();
+        }
+        if codex {
+            body["tools"] = source.get("tools").cloned().unwrap_or_else(|| json!([]));
+            body["parallel_tool_calls"] = (!request.tools.is_empty()).into();
+            for key in ["reasoning", "text"] {
+                if let Some(value) = source.get(key) {
+                    body[key] = value.clone();
+                }
+            }
+        }
+        let response = self.send_body(context, "/responses/compact", body).await?;
+        let result = wire::response(&read_json(context, response).await?, self.protocol)?;
+        if !result.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if !compaction.encrypted_content.trim().is_empty())) {
+            return Err(protocol_error("native compaction response has no encrypted continuation"));
+        }
+        Ok(result)
+    }
     async fn send(
         &self,
         context: &Context,
@@ -56,9 +91,7 @@ impl Provider {
         stream: bool,
     ) -> Result<reqwest::Response, Error> {
         let mut body = wire::request(request, self.protocol, stream)?;
-        let material = self.session.material(context).await?;
         let scope = self.session.scope();
-        let headers = crate::auth::headers(scope, &material, self.protocol == Protocol::Anthropic)?;
         if scope.mode == AuthMode::OpenAiOAuth {
             body["store"] = false.into();
             body["stream"] = true.into();
@@ -66,26 +99,59 @@ impl Provider {
                 .unwrap()
                 .remove("prompt_cache_retention");
         }
-        let endpoint = format!("{}{}", scope.endpoint, self.protocol.path());
-        let response = crate::active(
-            context,
-            self.client
-                .post(endpoint)
-                .headers(headers)
-                .json(&body)
-                .send(),
-        )
-        .await?
-        .map_err(|e| RequestFailure::transport(&e).into_error())?;
-        if !response.status().is_success() {
-            return Err(RequestFailure::http(
-                response.status().as_u16(),
-                response.headers(),
-                SystemTime::now(),
+        self.send_body(context, self.protocol.path(), body).await
+    }
+    async fn send_body(
+        &self,
+        context: &Context,
+        path: &str,
+        body: Value,
+    ) -> Result<reqwest::Response, Error> {
+        let scope = self.session.scope();
+        let endpoint = format!("{}{path}", scope.endpoint);
+        for attempt in 0..=1 {
+            let material = self.session.material(context).await?;
+            let mut body = body.clone();
+            if let Some(key) = body.get("prompt_cache_key").and_then(Value::as_str) {
+                body["prompt_cache_key"] = crate::auth::cache_scope(scope, &material, key).into();
+            }
+            let headers =
+                crate::auth::headers(scope, &material, self.protocol == Protocol::Anthropic)?;
+            let response = crate::active(
+                context,
+                self.client
+                    .post(&endpoint)
+                    .headers(headers)
+                    .json(&body)
+                    .send(),
             )
-            .into_error());
+            .await?
+            .map_err(|e| RequestFailure::transport(&e).into_error())?;
+            if response.status().as_u16() == 401
+                && attempt == 0
+                && matches!(
+                    scope.mode,
+                    AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
+                )
+            {
+                drop(response);
+                self.session.reject(context, &material.access_token).await?;
+                continue;
+            }
+            if !response.status().is_success() {
+                return Err(RequestFailure::http(
+                    response.status().as_u16(),
+                    response.headers(),
+                    SystemTime::now(),
+                )
+                .into_error());
+            }
+            return Ok(response);
         }
-        Ok(response)
+        Err(Error::new(
+            ErrorCategory::PermissionDenied,
+            "provider authentication retry exhausted",
+        ))
     }
 }
 impl Model for Provider {
@@ -111,20 +177,8 @@ impl Model for Provider {
                 }
                 return complete.ok_or_else(|| protocol_error("stream ended without completion"));
             }
-            let mut response = self.send(context, &request, false).await?;
-            let mut bytes = Vec::new();
-            while let Some(chunk) = crate::active(context, response.chunk())
-                .await?
-                .map_err(|e| RequestFailure::transport(&e).into_error())?
-            {
-                if bytes.len().saturating_add(chunk.len()) > 16 * 1024 * 1024 {
-                    return Err(protocol_error("provider response exceeds limit"));
-                }
-                bytes.extend_from_slice(&chunk);
-            }
-            let body = serde_json::from_slice(&bytes)
-                .map_err(|_| protocol_error("invalid provider response JSON"))?;
-            wire::response(&body, self.protocol)
+            let response = self.send(context, &request, false).await?;
+            wire::response(&read_json(context, response).await?, self.protocol)
         })
     }
 }
@@ -146,6 +200,19 @@ impl StreamingModel for Provider {
             }) as Box<dyn ModelStream>)
         })
     }
+}
+async fn read_json(context: &Context, mut response: reqwest::Response) -> Result<Value, Error> {
+    let mut bytes = Vec::new();
+    while let Some(chunk) = crate::active(context, response.chunk())
+        .await?
+        .map_err(|e| RequestFailure::transport(&e).into_error())?
+    {
+        if bytes.len().saturating_add(chunk.len()) > 16 * 1024 * 1024 {
+            return Err(protocol_error("provider response exceeds limit"));
+        }
+        bytes.extend_from_slice(&chunk);
+    }
+    serde_json::from_slice(&bytes).map_err(|_| protocol_error("invalid provider response JSON"))
 }
 fn protocol_error(message: &'static str) -> Error {
     Error::new(ErrorCategory::Provider, message)
@@ -247,7 +314,9 @@ impl StreamState {
             if self.protocol != Protocol::Chat || self.finish_reason.is_none() {
                 return Err(protocol_error("premature stream terminal marker"));
             }
-            self.body["choices"] = json!([{"message":{"content":self.text,"reasoning_content":self.reasoning,"tool_calls":self.tools.values().collect::<Vec<_>>()},"finish_reason":self.finish_reason}]);
+            self.body["choices"] = json!([{"message":{"content":self.text,"reasoning_content":self.reasoning,
+                "reasoning_opaque":self.body["reasoning_opaque"],"reasoning_details":self.body["reasoning_details"],
+                "tool_calls":self.tools.values().collect::<Vec<_>>()},"finish_reason":self.finish_reason}]);
             return self.finish();
         }
         let event: Value =
@@ -330,9 +399,22 @@ impl StreamState {
                     delta: text.to_owned(),
                 });
             }
-            if let Some(text) = delta["reasoning_content"]
-                .as_str()
-                .or_else(|| delta["reasoning"].as_str())
+            if let Some(opaque) = delta["reasoning_opaque"].as_str() {
+                self.body["reasoning_opaque"] = opaque.into();
+            }
+            if let Some(details) = delta["reasoning_details"].as_array() {
+                if !self.body["reasoning_details"].is_array() {
+                    self.body["reasoning_details"] = json!([]);
+                }
+                self.body["reasoning_details"]
+                    .as_array_mut()
+                    .unwrap()
+                    .extend(details.iter().cloned());
+            }
+            if let Some(text) = ["reasoning", "reasoning_content", "reasoning_text"]
+                .iter()
+                .filter_map(|key| delta[key].as_str())
+                .find(|text| !text.is_empty())
             {
                 self.reasoning.push_str(text);
                 events.push(ModelEvent::ReasoningDelta {

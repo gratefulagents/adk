@@ -87,6 +87,8 @@ impl Scope {
 pub struct Material {
     pub access_token: Secret,
     pub refresh_token: Option<Secret>,
+    pub id_token: Option<Secret>,
+    pub email: Option<String>,
     pub account: Option<String>,
     pub expires_at: Option<SystemTime>,
     pub last_refresh: Option<SystemTime>,
@@ -109,6 +111,9 @@ impl Material {
             return true;
         }
         if mode == AuthMode::OpenAiOAuth {
+            if let Some(expiry) = crate::material::access_token_expiry(self.access_token.expose()) {
+                return expiry <= now;
+            }
             return self
                 .last_refresh
                 .and_then(|at| now.duration_since(at).ok())
@@ -161,7 +166,7 @@ pub struct Session {
     scope: Scope,
     store: Arc<dyn CredentialStore>,
     refresh: Arc<dyn Refresh>,
-    gate: Mutex<()>,
+    gate: Mutex<Option<Secret>>,
 }
 impl Session {
     pub fn new(
@@ -174,35 +179,106 @@ impl Session {
             scope,
             store,
             refresh,
-            gate: Mutex::new(()),
+            gate: Mutex::new(None),
         })
     }
     pub fn scope(&self) -> &Scope {
         &self.scope
     }
+    /// Invalidate the exact credential rejected on the wire, not whichever token
+    /// happens to be current after another request/host has rotated it.
+    pub async fn reject(&self, context: &Context, token: &Secret) -> Result<(), Error> {
+        let mut rejected = crate::active(context, self.gate.lock()).await?;
+        let current = crate::active(context, self.store.load(context, &self.scope)).await??;
+        self.validate(&current)?;
+        // A late 401 for an older token must not erase rejection of the current one.
+        if current.access_token.expose() == token.expose() {
+            *rejected = Some(token.clone());
+        }
+        Ok(())
+    }
     pub async fn material(&self, context: &Context) -> Result<Material, Error> {
-        let _guard = crate::active(context, self.gate.lock()).await?;
+        let mut rejected = crate::active(context, self.gate.lock()).await?;
         let mut material = crate::active(context, self.store.load(context, &self.scope)).await??;
         self.validate(&material)?;
-        if material.needs_refresh(self.scope.mode, SystemTime::now()) {
+        let rejected_current = rejected
+            .as_ref()
+            .is_some_and(|token| token.expose() == material.access_token.expose());
+        let now = SystemTime::now();
+        let needs_refresh = if self.scope.mode == AuthMode::AnthropicOAuth {
+            material.access_token.expose().is_empty()
+                || material
+                    .expires_at
+                    .is_some_and(|at| at <= now + Duration::from_secs(120))
+        } else {
+            material.needs_refresh(self.scope.mode, now)
+        };
+        let can_refresh = matches!(
+            self.scope.mode,
+            AuthMode::OpenAiOAuth | AuthMode::AnthropicOAuth | AuthMode::CopilotOAuth
+        ) && material
+            .refresh_token
+            .as_ref()
+            .is_some_and(|token| !token.expose().trim().is_empty());
+        if (needs_refresh || rejected_current) && can_refresh {
             let revision = material.revision;
-            material = crate::active(
+            let original = material.clone();
+            match crate::active(
                 context,
                 self.refresh.refresh(context, &self.scope, material),
             )
-            .await??;
-            self.validate(&material)?;
-            if !crate::active(
-                context,
-                self.store
-                    .replace(context, &self.scope, revision, material.clone()),
-            )
-            .await??
+            .await?
             {
-                // A host rotation won: never overwrite it or return the losing token.
-                material = crate::active(context, self.store.load(context, &self.scope)).await??;
-                self.validate(&material)?;
+                Ok(updated) => {
+                    material = updated;
+                    self.validate(&material)?;
+                    crate::active(
+                        context,
+                        self.store
+                            .replace(context, &self.scope, revision, material.clone()),
+                    )
+                    .await??;
+                    // CAS may lose to an external rotation; never return the losing token.
+                    material =
+                        crate::active(context, self.store.load(context, &self.scope)).await??;
+                    self.validate(&material)?;
+                }
+                Err(error) => {
+                    if matches!(
+                        error.info.category,
+                        ErrorCategory::Cancelled | ErrorCategory::DeadlineExceeded
+                    ) {
+                        return Err(error);
+                    }
+                    // A single-use token may have been rotated by the host during the
+                    // exchange. Reload before failing or attempting any further exchange.
+                    let fresh =
+                        crate::active(context, self.store.load(context, &self.scope)).await??;
+                    self.validate(&fresh)?;
+                    if fresh.access_token.expose() != original.access_token.expose() {
+                        material = fresh;
+                    } else if self.scope.mode == AuthMode::AnthropicOAuth
+                        && !rejected_current
+                        && !original.access_token.expose().is_empty()
+                        && original.expires_at.is_none_or(|at| at > now)
+                    {
+                        material = original;
+                    } else {
+                        return Err(error);
+                    }
+                }
             }
+        } else if rejected_current {
+            return Err(Error::new(
+                ErrorCategory::PermissionDenied,
+                "provider rejected credential and refresh is unavailable",
+            ));
+        }
+        if rejected
+            .as_ref()
+            .is_some_and(|token| token.expose() != material.access_token.expose())
+        {
+            *rejected = None;
         }
         if self.scope.mode != AuthMode::Anonymous
             && material.access_token.expose().trim().is_empty()
@@ -244,16 +320,74 @@ pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<He
         value.set_sensitive(true);
         out.insert(key, value);
     }
-    if scope.mode == AuthMode::OpenAiOAuth
-        && let Some(account) = &material.account
-    {
+    if scope.mode == AuthMode::OpenAiOAuth {
+        let account = material
+            .account
+            .as_ref()
+            .filter(|value| !value.trim().is_empty())
+            .ok_or_else(|| {
+                Error::new(
+                    ErrorCategory::PermissionDenied,
+                    "OpenAI OAuth account is unavailable",
+                )
+            })?;
+        out.insert(
+            "openai-beta",
+            HeaderValue::from_static("responses=experimental"),
+        );
         let mut value = HeaderValue::from_str(account)
             .map_err(|_| crate::invalid("account is not a valid HTTP header"))?;
         value.set_sensitive(true);
         out.insert("chatgpt-account-id", value);
     }
+    if scope.mode == AuthMode::CopilotOAuth {
+        for (key, value) in [
+            ("copilot-integration-id", "vscode-chat"),
+            ("editor-version", "vscode/1.107.0"),
+            ("editor-plugin-version", "copilot-chat/0.35.0"),
+            ("user-agent", "GitHubCopilotChat/0.35.0"),
+            ("openai-intent", "conversation-edits"),
+            ("x-github-api-version", "2026-06-01"),
+            ("x-initiator", "user"),
+        ] {
+            out.insert(key, HeaderValue::from_static(value));
+        }
+        if anthropic {
+            out.insert(
+                "anthropic-beta",
+                HeaderValue::from_static("interleaved-thinking-2025-05-14"),
+            );
+        }
+    }
+    let openrouter = Url::parse(&scope.endpoint)
+        .ok()
+        .and_then(|url| url.host_str().map(str::to_owned))
+        .is_some_and(|host| host == "openrouter.ai" || host.ends_with(".openrouter.ai"));
+    if openrouter
+        && scope.mode == AuthMode::ApiKey
+        && !material.access_token.expose().trim().is_empty()
+    {
+        out.insert(
+            "http-referer",
+            HeaderValue::from_static("https://github.com/gratefulagents/sdk"),
+        );
+        out.insert(
+            "x-openrouter-title",
+            HeaderValue::from_static("gratefulagents/sdk"),
+        );
+    }
     if anthropic {
         out.insert("anthropic-version", HeaderValue::from_static("2023-06-01"));
+        if scope.mode == AuthMode::AnthropicOAuth {
+            out.insert(
+                "anthropic-beta",
+                HeaderValue::from_static("oauth-2025-04-20"),
+            );
+            out.insert(
+                "user-agent",
+                HeaderValue::from_static("claude-cli/2.1.158 (external, cli)"),
+            );
+        }
     }
     Ok(out)
 }

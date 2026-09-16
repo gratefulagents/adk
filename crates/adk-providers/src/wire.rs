@@ -3,7 +3,22 @@ use adk_core::{
     Content, Error, ErrorCategory, Message, ModelRequest, ModelResponse, Role, RunItem, ToolCall,
     Usage,
 };
+use base64::{Engine, engine::general_purpose::STANDARD_NO_PAD};
 use serde_json::{Value, json};
+const DETAILS_PREFIX: &str = "openrouter-reasoning-details:";
+
+pub fn encode_reasoning_details(details: &Value) -> String {
+    format!(
+        "{DETAILS_PREFIX}{}",
+        STANDARD_NO_PAD.encode(details.to_string())
+    )
+}
+pub fn decode_reasoning_details(signature: &str) -> Option<Value> {
+    let bytes = STANDARD_NO_PAD
+        .decode(signature.strip_prefix(DETAILS_PREFIX)?)
+        .ok()?;
+    serde_json::from_slice(&bytes).ok()
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Protocol {
@@ -124,6 +139,70 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                     json!({"role":"user","content":[{"type":"tool_result","tool_use_id":call_id,"content":content(&output.content, protocol, false)?,"is_error":output.is_error}]})
                 }
             },
+            RunItem::Reasoning { reasoning } => match protocol {
+                Protocol::Responses => {
+                    if !reasoning.signature.is_empty() || !reasoning.redacted_data.is_empty() {
+                        return Err(unsupported());
+                    }
+                    if reasoning.encrypted_content.trim().is_empty() {
+                        continue;
+                    }
+                    let id = if reasoning.id.trim().is_empty() {
+                        format!("reasoning_{}", entries.len())
+                    } else {
+                        reasoning.id.clone()
+                    };
+                    // Codex requires summary:[] and rejects status on replay.
+                    json!({"type":"reasoning","id":id,"summary":[],"encrypted_content":reasoning.encrypted_content})
+                }
+                Protocol::Anthropic => {
+                    if !reasoning.encrypted_content.is_empty()
+                        || reasoning.signature.starts_with(DETAILS_PREFIX)
+                    {
+                        return Err(unsupported());
+                    }
+                    if !reasoning.redacted_data.is_empty() {
+                        json!({"role":"assistant","content":[{"type":"redacted_thinking","data":reasoning.redacted_data}]})
+                    } else if !reasoning.signature.is_empty() {
+                        json!({"role":"assistant","content":[{"type":"thinking","thinking":reasoning.text,"signature":reasoning.signature}]})
+                    } else {
+                        continue;
+                    }
+                }
+                Protocol::Chat => {
+                    if !reasoning.encrypted_content.is_empty()
+                        || !reasoning.redacted_data.is_empty()
+                    {
+                        return Err(unsupported());
+                    }
+                    if reasoning.text.is_empty() && reasoning.signature.is_empty() {
+                        continue;
+                    }
+                    let mut entry = json!({"role":"assistant","content":null});
+                    if let Some(details) = decode_reasoning_details(&reasoning.signature) {
+                        entry["reasoning_details"] = details;
+                    } else if !reasoning.signature.is_empty() {
+                        entry["reasoning_text"] = reasoning.text.clone().into();
+                        entry["reasoning_opaque"] = reasoning.signature.clone().into();
+                    } else {
+                        entry["reasoning"] = reasoning.text.clone().into();
+                    }
+                    entry
+                }
+            },
+            RunItem::Compaction { compaction } => {
+                if protocol != Protocol::Responses {
+                    return Err(unsupported());
+                }
+                if compaction.encrypted_content.trim().is_empty() {
+                    continue;
+                }
+                let mut entry = json!({"type":"compaction","encrypted_content":compaction.encrypted_content.trim()});
+                if !compaction.id.trim().is_empty() {
+                    entry["id"] = compaction.id.clone().into();
+                }
+                entry
+            }
             RunItem::Handoff { .. } => return Err(unsupported()),
         };
         if protocol == Protocol::Anthropic
@@ -135,6 +214,38 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                 .as_array_mut()
                 .unwrap()
                 .extend(entry["content"].as_array().unwrap().clone());
+        } else if protocol == Protocol::Chat
+            && entry["role"] == "assistant"
+            && entries
+                .last()
+                .is_some_and(|previous| previous["role"] == "assistant")
+        {
+            let previous = entries.last_mut().unwrap();
+            for key in ["content", "tool_calls"] {
+                if let Some(parts) = entry[key].as_array() {
+                    if !previous[key].is_array() {
+                        previous[key] = json!([]);
+                    }
+                    previous[key]
+                        .as_array_mut()
+                        .unwrap()
+                        .extend(parts.iter().cloned());
+                }
+            }
+            if let Some(details) = entry.get("reasoning_details") {
+                previous["reasoning_details"] = details.clone();
+            }
+            for key in [
+                "reasoning_content",
+                "reasoning",
+                "reasoning_text",
+                "reasoning_opaque",
+            ] {
+                if let Some(value) = entry[key].as_str() {
+                    previous[key] =
+                        format!("{}{}", previous[key].as_str().unwrap_or_default(), value).into();
+                }
+            }
         } else {
             entries.push(entry);
         }
@@ -314,8 +425,40 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                     Some("function_call") => {
                         items.push(call(item, "call_id", "name", "arguments")?)
                     }
-                    // Opaque reasoning/compaction requires a lossless continuation type;
-                    // never quietly drop it or send it back as visible text.
+                    Some("reasoning") => {
+                        let text = item["summary"]
+                            .as_array()
+                            .into_iter()
+                            .flatten()
+                            .filter_map(|part| part["text"].as_str())
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        let encrypted_content = item["encrypted_content"]
+                            .as_str()
+                            .unwrap_or_default()
+                            .to_owned();
+                        if !text.is_empty() || !encrypted_content.is_empty() {
+                            items.push(RunItem::Reasoning {
+                                reasoning: adk_core::Reasoning {
+                                    id: item["id"].as_str().unwrap_or_default().to_owned(),
+                                    text,
+                                    encrypted_content,
+                                    ..Default::default()
+                                },
+                            });
+                        }
+                    }
+                    Some("compaction") => items.push(RunItem::Compaction {
+                        compaction: adk_core::Compaction {
+                            id: item["id"].as_str().unwrap_or_default().to_owned(),
+                            encrypted_content: item["encrypted_content"]
+                                .as_str()
+                                .unwrap_or_default()
+                                .to_owned(),
+                            content: item["content"].as_str().unwrap_or_default().to_owned(),
+                            created_by: item["created_by"].as_str().unwrap_or_default().to_owned(),
+                        },
+                    }),
                     _ => return Err(unsupported()),
                 }
             }
@@ -331,16 +474,34 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                 ));
             }
             let mut parts = Vec::new();
-            if let Some(reasoning) = msg["reasoning_content"]
-                .as_str()
-                .or_else(|| msg["reasoning"].as_str())
-            {
-                parts.push(Content::Reasoning {
-                    text: reasoning.to_owned(),
-                    signature: None,
+            let reasoning = ["reasoning", "reasoning_content", "reasoning_text"]
+                .iter()
+                .filter_map(|key| msg[key].as_str())
+                .find(|value| !value.trim().is_empty())
+                .unwrap_or_default();
+            let signature = msg
+                .get("reasoning_details")
+                .filter(|value| !value.is_null())
+                .map(encode_reasoning_details)
+                .unwrap_or_else(|| {
+                    msg["reasoning_opaque"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_owned()
+                });
+            if !reasoning.is_empty() || !signature.is_empty() {
+                items.push(RunItem::Reasoning {
+                    reasoning: adk_core::Reasoning {
+                        text: reasoning.to_owned(),
+                        signature,
+                        ..Default::default()
+                    },
                 });
             }
-            if let Some(text) = msg["content"].as_str() {
+            if let Some(text) = msg["content"]
+                .as_str()
+                .filter(|text| !text.trim().is_empty())
+            {
                 parts.push(Content::Text {
                     text: text.to_owned(),
                 });
@@ -368,10 +529,19 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
                     Some("text") => items.push(message(vec![Content::Text {
                         text: string(part, "text")?,
                     }])),
-                    Some("thinking") => items.push(message(vec![Content::Reasoning {
-                        text: string(part, "thinking")?,
-                        signature: part["signature"].as_str().map(str::to_owned),
-                    }])),
+                    Some("thinking") => items.push(RunItem::Reasoning {
+                        reasoning: adk_core::Reasoning {
+                            text: string(part, "thinking")?,
+                            signature: part["signature"].as_str().unwrap_or_default().to_owned(),
+                            ..Default::default()
+                        },
+                    }),
+                    Some("redacted_thinking") => items.push(RunItem::Reasoning {
+                        reasoning: adk_core::Reasoning {
+                            redacted_data: string(part, "data")?,
+                            ..Default::default()
+                        },
+                    }),
                     Some("tool_use") => items.push(call(part, "id", "name", "input")?),
                     _ => return Err(unsupported()),
                 }

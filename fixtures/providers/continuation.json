@@ -1,0 +1,24 @@
+{
+  "reasoning_details_json": [
+    {
+      "type": "reasoning.encrypted",
+      "data": "opaque",
+      "index": 0
+    }
+  ],
+  "reasoning_details_signature": "openrouter-reasoning-details:W3sidHlwZSI6InJlYXNvbmluZy5lbmNyeXB0ZWQiLCJkYXRhIjoib3BhcXVlIiwiaW5kZXgiOjB9XQ",
+  "responses_input": [
+    {
+      "id": "r",
+      "summary": [],
+      "encrypted_content": "reasoning-opaque",
+      "type": "reasoning"
+    },
+    {
+      "encrypted_content": "compact-opaque",
+      "id": "c",
+      "type": "compaction"
+    }
+  ],
+  "source_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+}

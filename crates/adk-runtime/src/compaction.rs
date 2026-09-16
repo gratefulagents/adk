@@ -334,6 +334,8 @@ fn item_text(item: &HistoryItem) -> String {
         HistoryItem::Native(RunItem::Message { message }) => {
             content_text(&message.content).trim().into()
         }
+        HistoryItem::Native(RunItem::Reasoning { reasoning }) => reasoning.text.trim().into(),
+        HistoryItem::Native(RunItem::Compaction { .. }) => "OpenAI compaction item".into(),
         _ => String::new(),
     }
 }
@@ -355,6 +357,12 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
             }
             HistoryItem::Native(RunItem::Handoff { agent, .. }) => {
                 estimate_string_tokens(agent) + 8
+            }
+            HistoryItem::Native(RunItem::Reasoning { reasoning }) => {
+                estimate_string_tokens(&reasoning.text) + 8
+            }
+            HistoryItem::Native(RunItem::Compaction { compaction }) => {
+                estimate_string_tokens(&compaction.encrypted_content).min(20_000) + 8
             }
             HistoryItem::Approval(marker) => {
                 let input = match &marker.data.input {
@@ -596,6 +604,9 @@ fn must_preserve(item: &HistoryItem) -> bool {
             .iter()
             .any(|c| !matches!(c, Content::Text { .. })),
         HistoryItem::Native(RunItem::Handoff { .. }) => true,
+        HistoryItem::Native(RunItem::Compaction { compaction }) => {
+            !compaction.encrypted_content.trim().is_empty()
+        }
         _ => false,
     }
 }
@@ -969,6 +980,13 @@ fn timeline(item: &HistoryItem) -> Option<String> {
             "  - assistant: tool_approval {}",
             marker.data.tool_name
         )),
+        HistoryItem::Native(RunItem::Reasoning { reasoning }) => {
+            (!reasoning.text.trim().is_empty())
+                .then(|| format!("  - assistant: {}", truncate(&reasoning.text, 160)))
+        }
+        HistoryItem::Native(RunItem::Compaction { .. }) => {
+            Some("  - assistant: OpenAI compaction item".into())
+        }
         HistoryItem::Native(RunItem::Handoff { .. }) => None,
     }
 }

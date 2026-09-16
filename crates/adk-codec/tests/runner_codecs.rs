@@ -427,3 +427,29 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
     call_wire.tool_call.as_mut().unwrap().input = dto::RawJson::Missing;
     assert!(decode_item(&call_wire).is_err());
 }
+
+#[test]
+fn provider_continuation_survives_native_bridge_without_loss() {
+    for item in [
+        RunItem::Reasoning {
+            reasoning: adk_core::Reasoning {
+                id: "r".into(),
+                text: "summary".into(),
+                signature: "signature".into(),
+                redacted_data: "redacted".into(),
+                encrypted_content: "encrypted".into(),
+            },
+        },
+        RunItem::Compaction {
+            compaction: adk_core::Compaction {
+                id: "c".into(),
+                content: "summary".into(),
+                encrypted_content: "encrypted".into(),
+                created_by: "fixture".into(),
+            },
+        },
+    ] {
+        let wire = encode_item(&item, None).unwrap();
+        assert_eq!(decode_item(&wire).unwrap(), item);
+    }
+}

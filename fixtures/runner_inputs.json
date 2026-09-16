@@ -2026,5 +2026,109 @@
     "approvals": true,
     "chat_loop": true,
     "resume": true
+  },
+  {
+    "name": "approval_deny_resume_1",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true,
+    "deny": true
+  },
+  {
+    "name": "approval_deny_resume_2",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "pending1",
+            "name": "approval",
+            "arguments": {
+              "text": "first approval"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "eligible",
+            "name": "echo",
+            "arguments": {
+              "text": "eligible sibling"
+            }
+          },
+          {
+            "type": "tool_call",
+            "id": "pending2",
+            "name": "approval",
+            "arguments": {
+              "text": "second approval"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 1,
+        "output_tokens": 1,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ],
+    "approvals": true,
+    "chat_loop": true,
+    "resume": true,
+    "deny": true
   }
 ]

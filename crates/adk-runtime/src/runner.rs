@@ -1481,10 +1481,27 @@ impl Engine {
                         .retain(|request| request.call.id != call.id);
                 }
                 ApprovalDecision::Deny => {
-                    return Err(Error::new(
-                        ErrorCategory::ApprovalDenied,
-                        format!("approval denied: {}", call.name),
-                    ));
+                    self.result
+                        .pending_approvals
+                        .retain(|request| request.call.id != call.id);
+                    self.calls.pop_front();
+                    let output = ToolOutput {
+                        content: vec![Content::Text {
+                            text: "tool call denied by host approval gate".into(),
+                        }],
+                        is_error: true,
+                        should_pause: false,
+                    };
+                    self.append(RunItem::ToolResult {
+                        call_id: call.id.clone(),
+                        output: output.clone(),
+                    });
+                    self.emit(RunEvent::ToolFinished {
+                        call_id: call.id,
+                        output,
+                    })
+                    .await?;
+                    return Ok(false);
                 }
                 ApprovalDecision::Defer => {
                     self.result.pending_approvals = vec![request];

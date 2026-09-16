@@ -411,7 +411,16 @@ async fn replay(script: &Value) -> Value {
             .result
             .pending_approvals
             .iter()
-            .map(|request| (request.call.id.clone(), ApprovalDecision::Approve))
+            .map(|request| {
+                (
+                    request.call.id.clone(),
+                    if script["deny"].as_bool() == Some(true) {
+                        ApprovalDecision::Deny
+                    } else {
+                        ApprovalDecision::Approve
+                    },
+                )
+            })
             .collect();
         paused.continuation.unwrap().resume_batch(decisions).await
     } else {
@@ -495,7 +504,7 @@ async fn actual_rust_runner_matches_actual_go_runner() {
     let inputs: Value =
         serde_json::from_str(include_str!("../../../fixtures/runner_inputs.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 44);
+    assert_eq!(cases.len(), 46);
     assert_eq!(
         cases
             .iter()

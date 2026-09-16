@@ -60,7 +60,11 @@ Two additional normal-path cases compare actual Go ChatLoop approval handling
 with Rust continuation for one and two approved calls. An eligible sibling must
 execute exactly once. Shared dispatch recording includes approved tools, and all
 hooks, requests, history and final usage are compared across the entire resume.
-The corpus now contains **44 cases**.
+Two denied-resume cases also compare Go ChatLoop and Rust: one or two calls
+receive error tool results without executing, then the model continues. The Go
+approval tool panics if accidentally invoked under denial. These cases preserve
+exact denial text and confirm the eligible sibling is not repeated.
+The corpus now contains **46 cases**.
 
 ## Canonical comparison boundary
 
@@ -95,7 +99,7 @@ The corpus now contains **44 cases**.
   matching Rust `pending_approvals`. They are omitted from the model-facing
   history and committed-item event projection. All non-approval entries retain
   order and content. Approval event timing/wire marker identity is NOT compared.
-* This corpus does not claim parity for policy denial, denied/re-deferred/streamed approval resume, cancellation,
+* This corpus does not claim parity for policy denial, re-deferred/streamed approval resume, cancellation,
   general retry/advice policy, handoffs, arbitrary custom parser implementations, other provider
   failures, multimedia, timing/backpressure,
   concurrent tool scheduling, raw telemetry or partial stream errors. Separate

@@ -32,6 +32,7 @@ type response struct {
 	Deltas       []string `json:"deltas"`
 }
 type scenario struct {
+	Deny         bool            `json:"deny"`
 	Resume       bool            `json:"resume"`
 	ChatLoop     bool            `json:"chat_loop"`
 	Untrusted    bool            `json:"untrusted"`
@@ -154,10 +155,10 @@ func (h *recordingHooks) OnAgentEnd(_ *sdk.RunContext, a *sdk.Agent, output any)
 	h.append(object{"type": "agent_end", "agent": a.Name, "output": output})
 }
 
-type approvalGate struct{}
+type approvalGate struct{ deny bool }
 
-func (approvalGate) ApproveTool(context.Context, sdk.ToolApprovalRequest) (bool, string, error) {
-	return true, "", nil
+func (g approvalGate) ApproveTool(context.Context, sdk.ToolApprovalRequest) (bool, string, error) {
+	return !g.deny, "", nil
 }
 
 func execute(s scenario) object {
@@ -180,7 +181,7 @@ func execute(s scenario) object {
 		approval.ToolName = "approval"
 		approval.Approval = true
 		approval.Fn = func(_ context.Context, input json.RawMessage) (string, error) {
-			if !s.Resume {
+			if !s.Resume || s.Deny {
 				panic("unapproved effect executed")
 			}
 			var args struct {
@@ -258,7 +259,7 @@ func execute(s scenario) object {
 		}
 		opts := sdk.ChatLoopOptions{Runner: runner, Agent: agent, RunConfig: cfg}
 		if s.Resume {
-			opts.ApprovalGate = approvalGate{}
+			opts.ApprovalGate = approvalGate{deny: s.Deny}
 		}
 		result, err = sdk.NewChatLoop(opts).Run(context.Background())
 	} else {

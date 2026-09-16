@@ -593,7 +593,9 @@ async fn turn_token_and_cost_limits_keep_partial_usage() {
 
 #[tokio::test]
 async fn authorization_and_argument_validation_precede_effects() {
-    for mode in 0..3 {
+    for (mode, streaming) in
+        (0..3).flat_map(|mode| [false, true].map(|streaming| (mode, streaming)))
+    {
         let mut tool = TestTool::new("write", mode == 1, false);
         if mode == 0 {
             Arc::get_mut(&mut tool).unwrap().definition.read_only = false;
@@ -604,7 +606,25 @@ async fn authorization_and_argument_validation_precede_effects() {
                 call.arguments = json!({"extra":true});
             }
         }
-        let model = TestModel::with(vec![Ok(response(vec![c], None))]);
+        let mut responses = vec![Ok(response(vec![c], None))];
+        if mode == 1 {
+            responses.push(Ok(answer("Denied without execution.")));
+        }
+        let model = if streaming {
+            let model = Arc::new(TestModel::default());
+            model
+                .streams
+                .lock()
+                .unwrap()
+                .extend(responses.into_iter().map(|response| {
+                    vec![StreamStep::Event(ModelEvent::Complete {
+                        response: response.unwrap(),
+                    })]
+                }));
+            model
+        } else {
+            TestModel::with(responses)
+        };
         let mut a = agent(model.clone());
         a.tools = vec![tool.clone()];
         let host = Arc::new(TestHost::default());
@@ -612,20 +632,34 @@ async fn authorization_and_argument_validation_precede_effects() {
             .lock()
             .unwrap()
             .push_back(ApprovalDecision::Deny);
-        let error = runner(a)
-            .run(context(), request(2), host)
-            .await
-            .err()
-            .unwrap();
+        let runner = runner(a);
+        let outcome = if streaming {
+            runner.stream(context(), request(2), host).finish().await
+        } else {
+            runner.run(context(), request(2), host).await
+        };
         assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
-        assert_eq!(
-            error.error.info.category,
-            [
-                ErrorCategory::PermissionDenied,
-                ErrorCategory::ApprovalDenied,
-                ErrorCategory::ModelBehavior
-            ][mode]
-        );
+        if mode == 1 {
+            let result = outcome.unwrap().result;
+            assert_eq!(
+                result.final_output,
+                Some(json!("Denied without execution."))
+            );
+            assert!(result.pending_approvals.is_empty());
+            assert!(
+                matches!(&result.new_items[1], RunItem::ToolResult { output, .. } if output.is_error)
+            );
+            assert_eq!(model.requests.lock().unwrap().len(), 2);
+        } else {
+            assert_eq!(
+                outcome.err().unwrap().error.info.category,
+                if mode == 0 {
+                    ErrorCategory::PermissionDenied
+                } else {
+                    ErrorCategory::ModelBehavior
+                }
+            );
+        }
         assert_eq!(
             model.requests.lock().unwrap()[0].tools.len(),
             usize::from(mode != 0)

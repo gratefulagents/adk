@@ -146,8 +146,12 @@ complete.** The following is an enumerated audit, not a parity waiver.
    pending calls after an eligible sibling has completed. They compare exact
    dispatch, hooks, requests, history and final/usage outcomes through resume;
    repeating that sibling would fail the comparison. These resume cases use the
-   normal execution path; denial/re-deferral and streamed resume remain Rust-only
-   evidence.
+   normal execution path. Two additional denied-resume cases revealed and fixed
+   a real mismatch: denial now pairs the call with Go ChatLoop’s error output
+   and continues the model instead of aborting with ApprovalDenied. No denied
+   tool executes. Permission-policy denial remains fatal. Direct denial is
+   regression-tested in both modes; re-deferral and streamed resume remain
+   Rust-only evidence.
 
    The existing #2 representation deliberately puts approvals in a side channel
    (`pending_approvals` / `ApprovalRequired`) rather than a `RunItem` variant.
@@ -188,7 +192,7 @@ complete.** The following is an enumerated audit, not a parity waiver.
    output, cancellation and deadlines still prohibit replay. Virtual-time tests
    cover precedence, explicit rejection, missing reason, ten-retry bounds and the
    five-minute cap without sleeping in real time. Fallback/schema cross-language
-   replay remains separate from these Rust-only advice regressions. All 44 replay
+   replay remains separate from these Rust-only advice regressions. All 46 replay
    scenarios now also compare lifecycle callback order/content, including
    per-attempt agent/model start, model-end items/usage, raw tool callbacks and
    final agent output. This is a declared native-to-Go projection, not raw
@@ -221,7 +225,7 @@ and streamed final results.
 
 | Acceptance family | Executable evidence |
 |---|---|
-| Real Go/Rust replay | `tests/replay.rs`: 44 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
+| Real Go/Rust replay | `tests/replay.rs`: 46 real-engine scenarios plus argument/ID/delta mutation checks; [normalization and provenance](../scripts/replay/runner_README.md) |
 | Approval/stop/pause | `tests/runner.rs`: `approval_resume_keeps_cursor_and_completed_effects`, `batch_approvals_run_eligible_siblings_and_resume_only_unresolved_call_ids`, `batch_approval_decisions_reject_missing_duplicate_and_unknown_ids_before_effects`, `tool_pause_resumes_next_turn_and_stop_executes_batch` |
 | Concurrent tool batches | `tool_batches_fan_out_reads_exclude_mutations_and_fold_in_call_order`, `dropping_stream_drops_all_inflight_batch_tools` (Rust regressions, not Go scheduler replay) |
 | Stream backpressure/drop | `stream_is_lazy_bounded_and_drop_drops_provider`, `cancelled_next_future_is_safe_and_owner_drop_cleans_pending_stream`, `invalid_stream_protocol_is_not_success` |

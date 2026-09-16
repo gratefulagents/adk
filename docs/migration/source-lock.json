@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "baseline_id": "adk-go-v0.0.115-1",
+  "sdk": {
+    "repository": "https://github.com/gratefulagents/sdk",
+    "path": "repos/sdk",
+    "revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "tag": "v0.0.115",
+    "tag_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "go_mod_sha256": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+    "go_sum_sha256": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+    "license_file": "licenses/sdk-LICENSE"
+  },
+  "platform": {
+    "repository": "https://github.com/gratefulagents/gratefulagents",
+    "path": "repos/gratefulagents",
+    "revision": "08e65c970830f05042c251bcbb46ec6a9e3719b9",
+    "required_sdk": "v0.0.115",
+    "epic_requested_revision": "67fcfff804930a6679976aea97124cc7aa04e500",
+    "checkout_delta": [{"revision": "08e65c970830f05042c251bcbb46ec6a9e3719b9", "changed_paths": [".github/workflows/app-release.yml"], "classification": "Android app CI only; no worker or SDK contract change"}],
+    "go_mod_sha256": "9809f3fd30fd35ed4c23a227364d57e8bb5b2981f2767296b3cff193c4e0c5c7",
+    "go_sum_sha256": "c8bb17949b2c40242464fa2132395777988cdfb94ccef6a63a2e7c46a99e5e5b",
+    "license_file": "licenses/platform-LICENSE"
+  },
+  "later_sdk_commits": [],
+  "version_resolution": "Local SDK tag v0.0.115 resolves to the checkout revision. Platform go.mod requires this tag with no replace directive. No post-tag checkout fixes exist at this baseline. Remote tag immutability is not assumed; revision and content hashes are authoritative."
+}

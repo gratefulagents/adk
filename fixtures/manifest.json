@@ -1,0 +1,81 @@
+{
+  "fixtures": {
+    "platform.json": "61912555d563a917368cde5e4cc97c7e15703f319cf10d9fb294ae15910265ae",
+    "sdk.json": "79878b47622a5da7ced8d5e706447ab60d91ba3156b81cfd6be8a81a33a6b49a"
+  },
+  "repositories": {
+    "gratefulagents": {
+      "license_copy": "licenses/PLATFORM-AGPL-3.0.txt",
+      "revision": "08e65c970830f05042c251bcbb46ec6a9e3719b9",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "sha256": "0d96a4ff68ad6d4b6f1f30f713b18d5184912ba8dd389f86aa7710db079abcb0",
+          "url": "https://github.com/gratefulagents/gratefulagents/blob/08e65c970830f05042c251bcbb46ec6a9e3719b9/LICENSE"
+        },
+        {
+          "path": "cmd/agent/transcript_snapshot.go",
+          "sha256": "ad96de5e2d145968c0b7ddfa2a0a622a2a81c8f82600132596af1de90ee29b3e",
+          "url": "https://github.com/gratefulagents/gratefulagents/blob/08e65c970830f05042c251bcbb46ec6a9e3719b9/cmd/agent/transcript_snapshot.go"
+        },
+        {
+          "path": "cmd/agent/transcript_snapshot_test.go",
+          "sha256": "95808eb6827036b724a2937bbcce656a611d1c3b50c86ecffbe51f119d3b4a1a",
+          "url": "https://github.com/gratefulagents/gratefulagents/blob/08e65c970830f05042c251bcbb46ec6a9e3719b9/cmd/agent/transcript_snapshot_test.go"
+        }
+      ]
+    },
+    "sdk": {
+      "license_copy": "licenses/SDK-GPL-3.0.txt",
+      "revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+      "sources": [
+        {
+          "path": "LICENSE",
+          "sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/LICENSE"
+        },
+        {
+          "path": "internal/agent/llm_snapshot.go",
+          "sha256": "cb64d64f237d12a49555e1435e5d0533873877276c11dd2600a1a27b1c0daa1f",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/llm_snapshot.go"
+        },
+        {
+          "path": "internal/agent/llm_snapshot_test.go",
+          "sha256": "f8acb1dea587ba4c7ce91b47c702b17b47f431856a5f548836474e15315ceec3",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/llm_snapshot_test.go"
+        },
+        {
+          "path": "internal/agent/items.go",
+          "sha256": "fc3506f8767831ea124df1c0d1c9a72c4fdc6c248860a1660eaa3bb569ae287b",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/items.go"
+        },
+        {
+          "path": "internal/agent/model.go",
+          "sha256": "2bb06a0b3ceb1329a2a703b37a12adce7e9b7d17bf53057f99c9a1b9861712f1",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/model.go"
+        },
+        {
+          "path": "pkg/agentsdk/session_event_stream.go",
+          "sha256": "0da3c09dc207fc3fcd9619764e3c5ac9ff9a32a218aee9fe0606212beb45e5c0",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/session_event_stream.go"
+        },
+        {
+          "path": "pkg/agentsdk/session_event_stream_test.go",
+          "sha256": "f99222442c0c91aa3d1f03097afaadb9f30082fb82a47eab6022efa9dc8ba7ee",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/session_event_stream_test.go"
+        },
+        {
+          "path": "pkg/agentsdk/projectstate/engine.go",
+          "sha256": "a33162d6812b35d4a01b160d416664f3073664b84eade8db5c4c7d22a0e48ec0",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/projectstate/engine.go"
+        },
+        {
+          "path": "pkg/agentsdk/projectstate/filesystem_test.go",
+          "sha256": "314e45098b24386b37464ac0ef645d292930fd10efd9b7a525479f0b8ce82831",
+          "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/projectstate/filesystem_test.go"
+        }
+      ]
+    }
+  },
+  "schema_version": 1
+}

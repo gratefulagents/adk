@@ -1,0 +1,53 @@
+Python syntax and owned source/document whitespace: PASS
+
+$ gofmt -l scripts/platform/environment_inventory.go scripts/platform/environment_inventory_test.go
+exit=0
+
+$ go test -v scripts/platform/environment_inventory.go scripts/platform/environment_inventory_test.go
+failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory
+=== RUN   TestEnvironmentExpressionCoverage
+=== RUN   TestEnvironmentExpressionCoverage/os.Getenv(providerAPIKeyEnvName(provider))
+=== RUN   TestEnvironmentExpressionCoverage/os.LookupEnv(sandbox.SandboxModeEnv)
+=== RUN   TestEnvironmentExpressionCoverage/os.Environ()
+=== RUN   TestEnvironmentExpressionCoverage/os.Setenv(name,_value)
+=== RUN   TestEnvironmentExpressionCoverage/os.Unsetenv("TOKEN")
+=== RUN   TestEnvironmentExpressionCoverage/agentinfra.MustEnv("MODEL")
+=== RUN   TestEnvironmentExpressionCoverage/readSetting("WORKSPACE_DIR")
+=== RUN   TestEnvironmentExpressionCoverage/corev1.EnvVar{Name:_name,_ValueFrom:_secret}
+=== RUN   TestEnvironmentExpressionCoverage/corev1.EnvVar{Name:_sandbox.SandboxModeEnv,_Value:_"required"}
+=== RUN   TestEnvironmentExpressionCoverage/strings.TrimSpace(value)
+--- PASS: TestEnvironmentExpressionCoverage (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/os.Getenv(providerAPIKeyEnvName(provider)) (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/os.LookupEnv(sandbox.SandboxModeEnv) (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/os.Environ() (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/os.Setenv(name,_value) (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/os.Unsetenv("TOKEN") (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/agentinfra.MustEnv("MODEL") (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/readSetting("WORKSPACE_DIR") (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/corev1.EnvVar{Name:_name,_ValueFrom:_secret} (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/corev1.EnvVar{Name:_sandbox.SandboxModeEnv,_Value:_"required"} (0.00s)
+    --- PASS: TestEnvironmentExpressionCoverage/strings.TrimSpace(value) (0.00s)
+=== RUN   TestInferredKubernetesEnvironmentAndDynamicDefinition
+--- PASS: TestInferredKubernetesEnvironmentAndDynamicDefinition (0.00s)
+PASS
+ok  	command-line-arguments	0.001s
+exit=0
+
+$ go vet scripts/platform/environment_inventory.go scripts/platform/environment_inventory_test.go
+exit=0
+
+$ python3 scripts/platform/verify.py
+PASS: closure 62 packages / 470 production / 373 tests; no test-only package additions
+PASS: every closure file import list agrees with Go AST
+PASS: production path SHA-256 b42f09f901303e913d871b439ea457d83e6907daf77482e742120c481b6fbcca
+PASS: 278 exact platform source archives, 50 internal/tools files, 46 worker registration expressions
+PASS: environment/metadata witnesses, package assignments, source hashes, byte-identical regeneration
+Environment inventory counts: {"contexts": 606, "expression_records": 1979, "go_files_scanned": 1178, "literal_key_candidates": 293, "metadata_expressions": 1249, "non_go_candidates": 6564, "registration_expressions": 606}
+exit=0
+
+$ git diff --check -- docs/migration/platform scripts/platform
+exit=0
+
+repos/gratefulagents: clean; no tracked/untracked changes
+
+repos/sdk: clean; no tracked/untracked changes

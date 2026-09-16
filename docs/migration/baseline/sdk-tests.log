@@ -1,0 +1,13 @@
+failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory
+go: downloading github.com/google/uuid v1.6.0
+go: downloading modernc.org/sqlite v1.51.0
+go: downloading modernc.org/libc v1.72.3
+go: downloading golang.org/x/sys v0.43.0
+go: downloading github.com/dustin/go-humanize v1.0.1
+go: downloading modernc.org/mathutil v1.7.1
+go: downloading modernc.org/memory v1.11.0
+go: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec
+ok  	github.com/gratefulagents/sdk/pkg/agentsdk/events	0.002s
+ok  	github.com/gratefulagents/sdk/pkg/agentsdk/projectstate	0.011s
+ok  	github.com/gratefulagents/sdk/pkg/agentsdk/policy	0.002s
+?   	github.com/gratefulagents/sdk/pkg/agentsdk/mode	[no test files]

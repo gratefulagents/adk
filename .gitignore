@@ -1,0 +1,7 @@
+# Attached peer repositories are inputs, not ADK deliverables.
+/repos/
+# Disposable Python and replay work products.
+__pycache__/
+*.pyc
+/scripts/replay/.work/
+/scripts/replay/.home/

@@ -30,6 +30,9 @@
   (sysctl-name-prefix "hw.optional.arm.")
   (sysctl-name-prefix "hw.optional.armv8_")
   (sysctl-name "hw.pagesize")
+  ; getpagesize()/sysconf use numeric HW_PAGESIZE, named pagesize_compat in XNU.
+  ; Rust needs this to align its main-thread guard mapping before main().
+  (sysctl-name "hw.pagesize_compat")
   (sysctl-name "hw.physicalcpu")
   (sysctl-name "hw.physicalcpu_max")
   (sysctl-name "machdep.cpu.brand_string")

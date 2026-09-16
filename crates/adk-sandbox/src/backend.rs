@@ -299,6 +299,7 @@ mod tests {
         assert!(!profile.contains("(subpath \"/\")"));
         assert!(profile.contains("(literal \"/private/var/select/sh\")"));
         assert!(!profile.contains("(subpath \"/private/var\")"));
+        assert!(profile.contains("(sysctl-name \"hw.pagesize_compat\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
         assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
         assert!(!profile.contains("(allow network*)"));

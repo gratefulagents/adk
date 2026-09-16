@@ -1446,7 +1446,9 @@ impl Engine {
                     .tools
                     .iter()
                     .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
-                    || !self.agent.handoffs.is_empty();
+                    || self.agent.handoffs.iter().any(|handoff| {
+                        self.tool_decision(&handoff.definition) != ToolDecision::Deny
+                    });
                 if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
                     if let Some(mut feedback) =
                         bounded(&self.context, None, gate.check(&self.context, &output)).await?
@@ -2075,6 +2077,9 @@ impl Engine {
         }
         self.checkpoint(Boundary::ToolPrepared, Some(&call)).await?;
         if let Some(handoff) = handoff {
+            // Handoff outputs include deliberately skipped siblings; they are
+            // not a failed tool turn and must neither advance nor reset its streak.
+            self.tool_turn_start = None;
             let pending: HashSet<_> = self.calls.drain(..).map(|call| call.id).collect();
             let ordered: Vec<_> = self
                 .result

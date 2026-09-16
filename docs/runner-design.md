@@ -261,7 +261,7 @@ and streamed final results.
 | Sentinel/wire adapters | `adk-codec/tests/runner_codecs.rs` and explicitly executed `go_runner_differential.rs`: 21 Go config vectors and denial marker ordering; runtime `tests/compat.rs`: 13 integration tests |
 | Error and callback contracts | `tests/error_contracts.rs`: 10 tests implementing the E01–E12 map in `docs/runner-error-contracts.md` |
 | Default local compaction | `tests/local_compaction.rs`: 10 tests, including 104 extracted-Go planner/finalizer cases, cache stability, custom-backend fallback, calibration and cancellation |
-| Corrective integration | `tests/followup.rs`: forced recovery budgets/cache/transients, model thresholds, mutation-only policy, timeout precedence, marker-aware automatic/custom compaction, wire sink backpressure/drop, pause/handoff projection and stop-gate reset |
+| Corrective integration | `tests/followup.rs`: forced recovery budgets/cache/transients, model thresholds, mutation-only policy, timeout precedence, marker-aware automatic/custom compaction, wire sink backpressure/drop, pause/handoff projection, stop-gate reset, denied-handoff gate eligibility, and handoff-preserved error streaks |
 | Independent review regressions | `tests/review_regressions.rs`: failed resume adoption; trailing partial text after reasoning/completed messages; no duplicated committed deltas; last nonempty final answer validated in both execution modes |
 
 Tests are under `crates/adk-runtime/`. The replay corpus deliberately covers a

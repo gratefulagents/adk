@@ -853,3 +853,83 @@ async fn custom_compaction_rebases_approval_anchors_despite_repeated_ordinary_me
         [4, 4]
     );
 }
+
+#[tokio::test]
+async fn handoff_skipped_siblings_preserve_but_do_not_advance_tool_error_streak() {
+    let target_model = Script::new(vec![
+        Ok(response(vec![call("missing3")], false)),
+        Ok(answer()),
+    ]);
+    let target = Arc::new(AgentConfig::new(
+        "target",
+        ModelBinding::complete("target", target_model.clone()),
+    ));
+    let source_model = Script::new(vec![
+        Ok(response(vec![call("missing1")], false)),
+        Ok(response(vec![call("missing2")], false)),
+        Ok(response(vec![call("skip"), call("transfer")], false)),
+    ]);
+    let mut source = AgentConfig::new("source", ModelBinding::complete("source", source_model));
+    let skipped = TestTool::new("skip", true, false, false, false);
+    source.tools = vec![skipped.clone()];
+    source.handoffs = vec![Handoff {
+        definition: TestTool::new("transfer", true, true, false, false)
+            .definition
+            .clone(),
+        target,
+    }];
+    let runner = Runner::new(source, RunnerConfig::default()).unwrap();
+    let outcome = runner
+        .run(context(), request(vec![], 5), Arc::new(Quiet))
+        .await
+        .unwrap();
+    let escalation = |items: &[RunItem]| {
+        items.iter().filter(|item| matches!(item, RunItem::Message { message } if message.content.iter().any(|content| matches!(content, Content::Text { text } if text.starts_with("[SYSTEM] Your last 3 tool turns all failed."))))).count()
+    };
+    let sent = target_model.requests.lock().unwrap();
+    assert_eq!(
+        escalation(&sent[0].input),
+        0,
+        "successful handoff advanced the error streak"
+    );
+    assert_eq!(
+        escalation(&sent[1].input),
+        1,
+        "successful handoff reset the existing error streak"
+    );
+    assert_eq!(escalation(&outcome.result.new_items), 1);
+    assert_eq!(skipped.calls.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
+    let model = Script::new(vec![Ok(answer())]);
+    let target_model = Script::new(vec![]);
+    let target = Arc::new(AgentConfig::new(
+        "target",
+        ModelBinding::complete("target", target_model.clone()),
+    ));
+    let mut agent = AgentConfig::new("source", ModelBinding::complete("source", model.clone()));
+    agent.handoffs = vec![Handoff {
+        definition: TestTool::new("transfer", true, true, false, false)
+            .definition
+            .clone(),
+        target,
+    }];
+    let gate = Arc::new(RejectTwice(AtomicUsize::new(0)));
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            stop_gate: Some(gate.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request(vec![], 1);
+    req.policy.tools.denied_tools.insert("transfer".into());
+    let outcome = runner.run(context(), req, Arc::new(Quiet)).await.unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    assert_eq!(gate.0.load(Ordering::SeqCst), 0);
+    assert!(model.requests.lock().unwrap()[0].tools.is_empty());
+    assert!(target_model.requests.lock().unwrap().is_empty());
+}

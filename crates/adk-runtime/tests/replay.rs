@@ -177,10 +177,49 @@ impl Tool for Echo {
 }
 
 #[derive(Default)]
-struct RecordingHost(Mutex<Vec<RunEvent>>);
+struct RecordingHost(Mutex<Vec<RunEvent>>, Arc<RecordingHooks>);
+#[derive(Default)]
+struct RecordingHooks(Mutex<Vec<Value>>);
+impl adk_runtime::RunHooks for RecordingHooks {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: adk_runtime::Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            match event {
+                adk_runtime::Observation::ModelAttempt { agent, .. } => {
+                    let mut hooks = self.0.lock().unwrap();
+                    hooks.push(json!({"type":"agent_start","agent":agent}));
+                    hooks.push(json!({"type":"model_start","agent":agent}));
+                }
+                adk_runtime::Observation::RawToolOutput { call, output } => self.0.lock().unwrap().push(json!({"type":"tool_end","id":call.id,"output":text(&output.content),"is_error":output.is_error})),
+                _ => {}
+            }
+            Ok(())
+        })
+    }
+}
 impl Host for RecordingHost {
     fn emit<'a>(&'a self, _: &'a Context, event: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
+            let hook = match &event {
+                RunEvent::Model {
+                    event: ModelEvent::Complete { response },
+                } => Some(
+                    json!({"type":"model_end","items":normalized(&response.items),"input_tokens":response.usage.input_tokens,"output_tokens":response.usage.output_tokens}),
+                ),
+                RunEvent::ToolStarted { call } => Some(
+                    json!({"type":"tool_start","id":call.id,"name":call.name,"arguments":call.arguments}),
+                ),
+                RunEvent::Finished { result } if result.status == RunStatus::Completed => Some(
+                    json!({"type":"agent_end","agent":result.last_agent,"output":result.final_output}),
+                ),
+                _ => None,
+            };
+            if let Some(hook) = hook {
+                self.1.0.lock().unwrap().push(hook);
+            }
             self.0.lock().unwrap().push(event);
             Ok(())
         })
@@ -302,9 +341,11 @@ async fn replay(script: &Value) -> Value {
             agent.output_parser = Some(Arc::new(CustomParser));
         }
     }
+    let hooks = Arc::new(RecordingHooks::default());
     let runner = Runner::new(
         agent,
         RunnerConfig {
+            hooks: Some(hooks.clone()),
             output: OutputPolicy {
                 untrusted: false,
                 ..OutputPolicy::default()
@@ -314,7 +355,7 @@ async fn replay(script: &Value) -> Value {
         },
     )
     .unwrap();
-    let host = Arc::new(RecordingHost::default());
+    let host = Arc::new(RecordingHost(Mutex::new(vec![]), hooks.clone()));
     let context = Context {
         run_id: script["name"].as_str().unwrap().into(),
         cancellation: Arc::new(CancellationToken::new()),
@@ -381,6 +422,7 @@ async fn replay(script: &Value) -> Value {
         other => panic!("missing terminal event: {other:?}"),
     }
     let mut observation = json!({
+        "hooks":*hooks.0.lock().unwrap(),
         "requests":*model.requests.lock().unwrap(), "dispatch":*tool.dispatch.lock().unwrap(),
         "events":if streaming { normalized_events(&events) } else { vec![] },
         "outcome":{
@@ -450,7 +492,7 @@ async fn replay_observations_depend_on_execution_not_goldens() {
     changed["responses"][0]["items"][0]["arguments"]["text"] = json!("mutated argument");
     changed["responses"][0]["items"][0]["id"] = json!("mutated-call-id");
     let observed = replay(&changed).await;
-    for field in ["requests", "dispatch", "outcome"] {
+    for field in ["requests", "dispatch", "outcome", "hooks"] {
         assert_ne!(
             observed[field], case["expected"][field],
             "mutation was hidden: {field}"

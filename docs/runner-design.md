@@ -168,8 +168,12 @@ complete.** The following is an enumerated audit, not a parity waiver.
    output, cancellation and deadlines still prohibit replay. Virtual-time tests
    cover precedence, explicit rejection, missing reason, ten-retry bounds and the
    five-minute cap without sleeping in real time. Fallback/schema cross-language
-   replay remains separate from these Rust-only advice regressions; full raw
-   hook/trace payload and default compaction-heuristic equivalence is not claimed.
+   replay remains separate from these Rust-only advice regressions. All 26 replay
+   scenarios now also compare lifecycle callback order/content, including
+   per-attempt agent/model start, model-end items/usage, raw tool callbacks and
+   final agent output. This is a declared native-to-Go projection, not raw
+   hook/trace payload equivalence. Default compaction-heuristic equivalence is
+   still not claimed.
 
 Concrete delivery boundary: fallback/reprobe and default schema outcomes are
 corrected and verified; tool scheduling including deferred-approval siblings is corrected with owned

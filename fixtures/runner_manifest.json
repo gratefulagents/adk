@@ -1,5 +1,5 @@
 {
-  "fixture_sha256": "6af5244ab6b4f5c8f62117c32a3e07056b8923c8eed6d381b39765c3ed5b35b4",
+  "fixture_sha256": "fe6124dba996d77018b9ea6d5160bf53693cb26625333fa25fbcb8555a9ff05b",
   "generator": {
     "command": [
       "go",
@@ -19,8 +19,8 @@
   },
   "harness": {
     "fixtures/runner_inputs.json": "792f158532664cab333a73155142501a4cc81f57fa18fbd40bf73c8ad5ec6e39",
-    "scripts/replay/runner_export.go": "914a7c0a474fb04b82c7a4b75c3bc4e058032115dcd96cc4965d307aba6efc4f",
-    "scripts/replay/runner_export.py": "0fa7b487852f57536e710386d46f01166f6ed86dfb0284ac50f7dd0815c8cfe1"
+    "scripts/replay/runner_export.go": "eae4ceedddbc31a0e05be572bca9753d635c1c245cd7e2c51a072c685cd9c111",
+    "scripts/replay/runner_export.py": "fa5be590f3ba2e4f82bc82a77990c7c75d2e5e155b7a253cae3c8642ccf564b6"
   },
   "license": "GPL-3.0-only",
   "license_copy": "licenses/SDK-GPL-3.0.txt",
@@ -106,6 +106,11 @@
       "path": "internal/agent/model_settings.go",
       "sha256": "caf251dd13636c99f6f69ded435be146f1ed4c4c4ffa3dea786f60859736df36",
       "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/model_settings.go"
+    },
+    {
+      "path": "internal/agent/hooks.go",
+      "sha256": "54aa598d8c5452a05262ca1b1b28b9105a645891a586ef49344371b0183b6797",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/hooks.go"
     }
   ]
 }

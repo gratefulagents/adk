@@ -55,6 +55,15 @@ schema and compare the resulting model instructions as well as final output.
 * Exact model name, instructions, ordered model-input history, advertised tool
   names, executed tool name/arguments/output, final/new history, response count,
   last agent, input/output token totals, final output and outcome category.
+* Lifecycle hook projection compares agent/model start, model completion with
+  items/usage, tool start/raw output, and successful agent end with final output.
+  The pinned Go implementation fires OnAgentStart on every model attempt, despite
+  its interface comment saying once per run. Rust ModelAttempt therefore maps to
+  that callback followed by OnLLMStart; Rust Started is a separate run-start event.
+  Model Complete / ToolStarted / RawToolOutput / completed Finished map to the
+  corresponding callbacks. Order is preserved, including failed model attempts;
+  no sorting or expected-golden reconstruction is used. This proves the projected
+  lifecycle for these scripts, not raw OTel payloads or concurrent callback order.
 * Streamed event projection compares text deltas and committed items in order.
   Go emits committed run items; Rust model-complete items and tool-finished
   payloads describe the corresponding semantic events. Runtime-specific

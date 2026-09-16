@@ -4,6 +4,32 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "Done.",
@@ -90,6 +116,106 @@
           }
         ],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "Two echoes complete.",
@@ -318,6 +444,45 @@
           }
         ],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "retained"
+                },
+                "id": "call-budget",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "retained"
+            },
+            "id": "call-budget",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-budget",
+            "is_error": false,
+            "output": "echo: retained",
+            "type": "tool_end"
+          }
+        ],
         "outcome": {
           "error": "max_turns",
           "final_output": null,
@@ -411,6 +576,51 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Finished.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Finished.",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "Finished.",
@@ -533,6 +743,32 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Done.",
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -676,6 +912,106 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "id": "call-1",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-1",
+            "is_error": false,
+            "output": "echo: alpha",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "id": "call-2",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-2",
+            "is_error": false,
+            "output": "echo: βeta",
+            "type": "tool_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Two echoes complete.",
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -929,6 +1265,45 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "retained"
+                },
+                "id": "call-budget",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "retained"
+            },
+            "id": "call-budget",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "call-budget",
+            "is_error": false,
+            "output": "echo: retained",
+            "type": "tool_end"
+          }
+        ],
         "outcome": {
           "error": "max_turns",
           "final_output": null,
@@ -1053,6 +1428,51 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Finished.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "Finished.",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "Finished.",
@@ -1167,6 +1587,97 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "primary recovered",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "primary recovered",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "primary recovered",
@@ -1381,6 +1892,105 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback again",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "fallback again",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "fallback again",
@@ -1623,6 +2233,124 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "primary",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "primary",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "primary",
@@ -1906,6 +2634,32 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "not JSON",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "not JSON",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "not JSON",
@@ -1989,6 +2743,34 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "n": -1
+            },
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": {
@@ -2074,6 +2856,34 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "n": 1
+            },
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": {
@@ -2186,6 +2996,97 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "primary recovered",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "primary recovered",
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -2429,6 +3330,105 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "fallback again",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "fallback again",
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -2707,6 +3707,124 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 1",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 2",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "backup2 3",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "primary",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "primary",
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -3000,6 +4118,32 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "not JSON",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "not JSON",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "not JSON",
@@ -3089,6 +4233,34 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "n": -1
+            },
+            "type": "agent_end"
           }
         ],
         "outcome": {
@@ -3184,6 +4356,34 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "n": 1
+            },
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": {
@@ -3277,6 +4477,61 @@
           }
         ],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "id": "eligible",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "eligible",
+            "is_error": false,
+            "output": "echo: eligible sibling",
+            "type": "tool_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": null,
@@ -3488,6 +4743,61 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "arguments": {
+                  "text": "first approval"
+                },
+                "id": "pending1",
+                "name": "approval",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "eligible sibling"
+                },
+                "id": "eligible",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "arguments": {
+                  "text": "second approval"
+                },
+                "id": "pending2",
+                "name": "approval",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "arguments": {
+              "text": "eligible sibling"
+            },
+            "id": "eligible",
+            "name": "echo",
+            "type": "tool_start"
+          },
+          {
+            "id": "eligible",
+            "is_error": false,
+            "output": "echo: eligible sibling",
+            "type": "tool_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": null,
@@ -3649,6 +4959,32 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "{\"n\":-1}",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "{\"n\":-1}",
@@ -3735,6 +5071,34 @@
       "expected": {
         "dispatch": [],
         "events": [],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "accepted": 1
+            },
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": {
@@ -3831,6 +5195,32 @@
             "type": "item"
           }
         ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":-1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": "{\"n\":-1}",
+            "type": "agent_end"
+          }
+        ],
         "outcome": {
           "error": null,
           "final_output": "{\"n\":-1}",
@@ -3923,6 +5313,34 @@
               "type": "message"
             },
             "type": "item"
+          }
+        ],
+        "hooks": [
+          {
+            "agent": "replay-agent",
+            "type": "agent_start"
+          },
+          {
+            "agent": "replay-agent",
+            "type": "model_start"
+          },
+          {
+            "input_tokens": 1,
+            "items": [
+              {
+                "text": "{\"n\":1}",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 1,
+            "type": "model_end"
+          },
+          {
+            "agent": "replay-agent",
+            "output": {
+              "accepted": 1
+            },
+            "type": "agent_end"
           }
         ],
         "outcome": {

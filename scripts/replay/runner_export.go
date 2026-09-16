@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sync"
 
 	sdk "github.com/gratefulagents/sdk/pkg/agentsdk"
 )
@@ -119,6 +120,36 @@ func (*model) Close() error                         { return nil }
 func (*model) CalculateCost(sdk.Usage) float64      { return 0 }
 func (*model) Provider() string                     { return "replay" }
 
+type recordingHooks struct {
+	sdk.NoOpRunHooks
+	mu     sync.Mutex
+	events []object
+}
+
+func (h *recordingHooks) append(event object) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	h.events = append(h.events, event)
+}
+func (h *recordingHooks) OnAgentStart(_ *sdk.RunContext, a *sdk.Agent) {
+	h.append(object{"type": "agent_start", "agent": a.Name})
+}
+func (h *recordingHooks) OnLLMStart(_ *sdk.RunContext, a *sdk.Agent) {
+	h.append(object{"type": "model_start", "agent": a.Name})
+}
+func (h *recordingHooks) OnLLMEnd(_ *sdk.RunContext, _ *sdk.Agent, r *sdk.ModelResponse) {
+	h.append(object{"type": "model_end", "items": normalize(r.Items), "input_tokens": r.Usage.InputTokens, "output_tokens": r.Usage.OutputTokens})
+}
+func (h *recordingHooks) OnToolStart(_ *sdk.RunContext, _ *sdk.Agent, _ sdk.Tool, c sdk.ToolCallData) {
+	h.append(object{"type": "tool_start", "id": c.ID, "name": c.Name, "arguments": c.Input})
+}
+func (h *recordingHooks) OnToolEnd(_ *sdk.RunContext, _ *sdk.Agent, _ sdk.Tool, c sdk.ToolCallData, r sdk.ToolResult) {
+	h.append(object{"type": "tool_end", "id": c.ID, "output": r.Content, "is_error": r.IsError})
+}
+func (h *recordingHooks) OnAgentEnd(_ *sdk.RunContext, a *sdk.Agent, output any) {
+	h.append(object{"type": "agent_end", "agent": a.Name, "output": output})
+}
+
 func execute(s scenario) object {
 	m := &model{script: s.Responses, requests: []object{}}
 	dispatch := []object{}
@@ -174,7 +205,8 @@ func execute(s scenario) object {
 		}
 	}
 	trusted := false
-	cfg := sdk.RunConfig{MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
+	hooks := &recordingHooks{events: []object{}}
+	cfg := sdk.RunConfig{Hooks: hooks, MaxTurns: s.MaxTurns, TracingDisabled: true, UntrustedToolOutputs: &trusted, ToolAccessLevel: sdk.ToolAccessLevelReadOnly, ModelCallTimeout: -1}
 	runner := sdk.NewRunnerWithProvider(m)
 	var result *sdk.RunResult
 	var err error
@@ -215,7 +247,7 @@ func execute(s scenario) object {
 	if result.IsInterrupted() {
 		status = "paused"
 	}
-	observation := object{"requests": m.requests, "dispatch": dispatch, "events": events, "outcome": object{
+	observation := object{"hooks": hooks.events, "requests": m.requests, "dispatch": dispatch, "events": events, "outcome": object{
 		"status": status, "error": category, "final_output": result.FinalOutput, "history": normalize(result.FinalHistory), "new_items": normalize(result.NewItems),
 		"response_count": len(result.RawResponses), "last_agent": result.LastAgent.Name, "input_tokens": result.Usage.InputTokens, "output_tokens": result.Usage.OutputTokens}}
 	if s.Approvals {

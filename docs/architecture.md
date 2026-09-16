@@ -1,6 +1,10 @@
 # ADR 0001: Rust-native foundation, explicit compatibility boundary
 
 Status: accepted for the issue #2 foundation; not approval of a production runner.
+The table below records the original foundation scope. Issue #4 adds the optional
+standalone engine, output protection, in-process approval continuation and replay;
+see [runner design](runner-design.md) for the current runtime implementation and
+its deliberately separate provider/durability/platform boundaries.
 
 ## Boundaries and dependency direction
 

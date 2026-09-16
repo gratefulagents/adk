@@ -1,0 +1,91 @@
+{
+  "fixture_sha256": "523ded44c1a7e445830f71c3fdb762e00e01b8130a04fea51e6540e7e4f09c5a",
+  "generator": {
+    "command": [
+      "go",
+      "run",
+      "-mod=readonly",
+      "../../scripts/replay/runner_export.go"
+    ],
+    "cwd": "repos/sdk",
+    "environment": {
+      "CGO_ENABLED": "0",
+      "GOMAXPROCS": "2",
+      "GOTELEMETRY": "off",
+      "GOTOOLCHAIN": "local",
+      "GRATEFUL_LIVE_TESTS": "skip"
+    },
+    "toolchain": "go version go1.26.8 linux/amd64"
+  },
+  "harness": {
+    "fixtures/runner_inputs.json": "2bbd503b2685ea7866e46999b6f3256fa64343a75935834da1460ae40ba7db86",
+    "scripts/replay/runner_export.go": "71ef14983e0c88bcf54caa7f036163f612566567a9dd1e2f45c5d8fadbbb2de7",
+    "scripts/replay/runner_export.py": "3b56a8b1469436cec937a6e774a6e7fd0cc891ff95e17a4973ea623ccd902656"
+  },
+  "license": "GPL-3.0-only",
+  "license_copy": "licenses/SDK-GPL-3.0.txt",
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "sources": [
+    {
+      "path": "LICENSE",
+      "sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/LICENSE"
+    },
+    {
+      "path": "go.mod",
+      "sha256": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/go.mod"
+    },
+    {
+      "path": "go.sum",
+      "sha256": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/go.sum"
+    },
+    {
+      "path": "internal/agent/runner.go",
+      "sha256": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/runner.go"
+    },
+    {
+      "path": "internal/agent/model.go",
+      "sha256": "2bb06a0b3ceb1329a2a703b37a12adce7e9b7d17bf53057f99c9a1b9861712f1",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/model.go"
+    },
+    {
+      "path": "internal/agent/items.go",
+      "sha256": "fc3506f8767831ea124df1c0d1c9a72c4fdc6c248860a1660eaa3bb569ae287b",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/items.go"
+    },
+    {
+      "path": "internal/agent/agent.go",
+      "sha256": "4249ea49210c173858beda562079e6c198b482c2043b1fbc4df795b10dcb6d07",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/agent.go"
+    },
+    {
+      "path": "internal/agent/run_config.go",
+      "sha256": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go"
+    },
+    {
+      "path": "internal/agent/run_result.go",
+      "sha256": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_result.go"
+    },
+    {
+      "path": "internal/agent/stream_events.go",
+      "sha256": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/stream_events.go"
+    },
+    {
+      "path": "internal/agent/tool.go",
+      "sha256": "158236e8b91b82a869e61a92ad9d08eebfe5c32910372cbe4246eabe2cc3f4d6",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/tool.go"
+    },
+    {
+      "path": "internal/agent/usage.go",
+      "sha256": "619655758f961e8bd5bd004cea7127bcc0ed916013cdaf785959f7edb1839d37",
+      "url": "https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/usage.go"
+    }
+  ]
+}

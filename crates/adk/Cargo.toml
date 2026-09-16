@@ -15,3 +15,10 @@ runtime = ["dep:adk-runtime"]
 adk-core.workspace = true
 adk-codec = { workspace = true, optional = true }
 adk-runtime = { workspace = true, optional = true }
+
+[dev-dependencies]
+tokio.workspace = true
+
+[[example]]
+name = "runner"
+required-features = ["runtime"]

@@ -1,9 +1,13 @@
-//! Optional Tokio lifecycle primitives, not an agent executor.
+//! Opt-in execution engine and explicitly owned Tokio lifecycle primitives.
 //!
 //! [`TaskGroup`] never detaches tasks: drop cancels and requests abortion;
 //! [`TaskGroup::shutdown`] additionally joins every task before returning.
 //! Abortion only takes effect when a task yields. Non-yielding work can prevent
 //! shutdown; blocking processes/threads need their own owner and termination API.
+
+pub mod output;
+pub mod runner;
+pub use runner::*;
 
 use std::future::Future;
 

@@ -1,0 +1,1169 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "normal",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "tool-loop",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "retained"
+            },
+            "name": "echo",
+            "output": "echo: retained"
+          }
+        ],
+        "events": [],
+        "outcome": {
+          "error": "max_turns",
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "retained"
+              },
+              "id": "call-budget",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: retained",
+              "id": "call-budget",
+              "type": "tool_result"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "retained"
+              },
+              "id": "call-budget",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: retained",
+              "id": "call-budget",
+              "type": "tool_result"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "incomplete"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 1,
+        "name": "max-turn",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "retained"
+                },
+                "id": "call-budget",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [],
+        "outcome": {
+          "error": null,
+          "final_output": "Finished.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Working.",
+              "type": "message"
+            },
+            {
+              "text": "Finished.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Working.",
+              "type": "message"
+            },
+            {
+              "text": "Finished.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "explicit-continue",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": false,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Finished.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": false
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [
+          {
+            "delta": "Do",
+            "type": "text_delta"
+          },
+          {
+            "delta": "ne.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "text": "Done.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Done.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Done.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "normal-stream",
+        "responses": [
+          {
+            "deltas": [
+              "Do",
+              "ne."
+            ],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Done.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "alpha"
+            },
+            "name": "echo",
+            "output": "echo: alpha"
+          },
+          {
+            "arguments": {
+              "text": "βeta"
+            },
+            "name": "echo",
+            "output": "echo: βeta"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            "type": "item"
+          },
+          {
+            "delta": "Tw",
+            "type": "text_delta"
+          },
+          {
+            "delta": "o echoes complete.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "text": "Two echoes complete.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Two echoes complete.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 21,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "alpha"
+              },
+              "id": "call-1",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: alpha",
+              "id": "call-1",
+              "type": "tool_result"
+            },
+            {
+              "arguments": {
+                "text": "βeta"
+              },
+              "id": "call-2",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: βeta",
+              "id": "call-2",
+              "type": "tool_result"
+            },
+            {
+              "text": "Two echoes complete.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 9,
+          "response_count": 3,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: alpha",
+                "id": "call-1",
+                "type": "tool_result"
+              },
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              },
+              {
+                "content": "echo: βeta",
+                "id": "call-2",
+                "type": "tool_result"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 3,
+        "name": "tool-loop-stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "alpha"
+                },
+                "id": "call-1",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "βeta"
+                },
+                "id": "call-2",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [
+              "Tw",
+              "o echoes complete."
+            ],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Two echoes complete.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [
+          {
+            "arguments": {
+              "text": "retained"
+            },
+            "name": "echo",
+            "output": "echo: retained"
+          }
+        ],
+        "events": [
+          {
+            "item": {
+              "arguments": {
+                "text": "retained"
+              },
+              "id": "call-budget",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            "type": "item"
+          },
+          {
+            "item": {
+              "content": "echo: retained",
+              "id": "call-budget",
+              "type": "tool_result"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": "max_turns",
+          "final_output": null,
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "arguments": {
+                "text": "retained"
+              },
+              "id": "call-budget",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: retained",
+              "id": "call-budget",
+              "type": "tool_result"
+            }
+          ],
+          "input_tokens": 7,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "arguments": {
+                "text": "retained"
+              },
+              "id": "call-budget",
+              "name": "echo",
+              "type": "tool_call"
+            },
+            {
+              "content": "echo: retained",
+              "id": "call-budget",
+              "type": "tool_result"
+            }
+          ],
+          "output_tokens": 3,
+          "response_count": 1,
+          "status": "incomplete"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 1,
+        "name": "max-turn-stream",
+        "responses": [
+          {
+            "deltas": [],
+            "end_turn": null,
+            "input_tokens": 7,
+            "items": [
+              {
+                "arguments": {
+                  "text": "retained"
+                },
+                "id": "call-budget",
+                "name": "echo",
+                "type": "tool_call"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    },
+    {
+      "expected": {
+        "dispatch": [],
+        "events": [
+          {
+            "delta": "Wo",
+            "type": "text_delta"
+          },
+          {
+            "delta": "rking.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "text": "Working.",
+              "type": "message"
+            },
+            "type": "item"
+          },
+          {
+            "delta": "Fi",
+            "type": "text_delta"
+          },
+          {
+            "delta": "nished.",
+            "type": "text_delta"
+          },
+          {
+            "item": {
+              "text": "Finished.",
+              "type": "message"
+            },
+            "type": "item"
+          }
+        ],
+        "outcome": {
+          "error": null,
+          "final_output": "Finished.",
+          "history": [
+            {
+              "text": "Run this deterministic script.",
+              "type": "message"
+            },
+            {
+              "text": "Working.",
+              "type": "message"
+            },
+            {
+              "text": "Finished.",
+              "type": "message"
+            }
+          ],
+          "input_tokens": 14,
+          "last_agent": "replay-agent",
+          "new_items": [
+            {
+              "text": "Working.",
+              "type": "message"
+            },
+            {
+              "text": "Finished.",
+              "type": "message"
+            }
+          ],
+          "output_tokens": 6,
+          "response_count": 2,
+          "status": "completed"
+        },
+        "requests": [
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          },
+          {
+            "input": [
+              {
+                "text": "Run this deterministic script.",
+                "type": "message"
+              },
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "instructions": "Follow the replay script.",
+            "model": "replay-model",
+            "tools": [
+              "echo"
+            ]
+          }
+        ]
+      },
+      "input": {
+        "input": [
+          {
+            "text": "Run this deterministic script.",
+            "type": "message"
+          }
+        ],
+        "max_turns": 2,
+        "name": "explicit-continue-stream",
+        "responses": [
+          {
+            "deltas": [
+              "Wo",
+              "rking."
+            ],
+            "end_turn": false,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Working.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          },
+          {
+            "deltas": [
+              "Fi",
+              "nished."
+            ],
+            "end_turn": true,
+            "input_tokens": 7,
+            "items": [
+              {
+                "text": "Finished.",
+                "type": "message"
+              }
+            ],
+            "output_tokens": 3
+          }
+        ],
+        "streaming": true
+      }
+    }
+  ],
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+}

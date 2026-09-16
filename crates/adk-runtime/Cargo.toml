@@ -5,9 +5,13 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 publish.workspace = true
-description = "Opt-in Tokio cancellation and explicitly owned tasks for ADK"
+description = "Standalone ADK execution engine, streaming, approvals and owned Tokio lifecycles"
 
 [dependencies]
 adk-core.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
+serde_json.workspace = true
+schemars.workspace = true
+sha2 = "0.10"
+jsonschema = { version = "0.33", default-features = false }

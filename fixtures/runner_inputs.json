@@ -1,0 +1,310 @@
+[
+  {
+    "name": "normal",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "tool-loop",
+    "streaming": false,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "max-turn",
+    "streaming": false,
+    "max_turns": 1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-budget",
+            "name": "echo",
+            "arguments": {
+              "text": "retained"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "explicit-continue",
+    "streaming": false,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Working."
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Finished."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "normal-stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Done."
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Do",
+          "ne."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "tool-loop-stream",
+    "streaming": true,
+    "max_turns": 3,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-1",
+            "name": "echo",
+            "arguments": {
+              "text": "alpha"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-2",
+            "name": "echo",
+            "arguments": {
+              "text": "βeta"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Two echoes complete."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Tw",
+          "o echoes complete."
+        ]
+      }
+    ]
+  },
+  {
+    "name": "max-turn-stream",
+    "streaming": true,
+    "max_turns": 1,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "tool_call",
+            "id": "call-budget",
+            "name": "echo",
+            "arguments": {
+              "text": "retained"
+            }
+          }
+        ],
+        "end_turn": null,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": []
+      }
+    ]
+  },
+  {
+    "name": "explicit-continue-stream",
+    "streaming": true,
+    "max_turns": 2,
+    "input": [
+      {
+        "type": "message",
+        "text": "Run this deterministic script."
+      }
+    ],
+    "responses": [
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Working."
+          }
+        ],
+        "end_turn": false,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Wo",
+          "rking."
+        ]
+      },
+      {
+        "items": [
+          {
+            "type": "message",
+            "text": "Finished."
+          }
+        ],
+        "end_turn": true,
+        "input_tokens": 7,
+        "output_tokens": 3,
+        "deltas": [
+          "Fi",
+          "nished."
+        ]
+      }
+    ]
+  }
+]

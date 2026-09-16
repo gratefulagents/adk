@@ -45,3 +45,11 @@ Go baseline `TestPersistedItemsFromRunStripsImages` covers that separately.
 Regeneration source lives in `scripts/replay/`, including the small synthetic
 extensions described above. Normalization policy and known coverage limitations
 are in its README and `docs/migration/baseline/README.md`.
+
+## Runner execution replay (issue #4)
+
+`runner*.json` adds synthetic model/tool-loop scenarios executed by the real Go
+runner at the same SDK pin and compared with the Rust runtime. These are
+SDK-derived GPL-3.0-only fixtures, not platform derivatives. Exact exporter/input
+hashes and source links are in `runner_manifest.json`; execution and normalization
+scope are documented in [runner replay](../scripts/replay/runner_README.md).

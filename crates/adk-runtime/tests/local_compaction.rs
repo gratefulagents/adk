@@ -719,3 +719,145 @@ async fn parent_cancellation_during_custom_compaction_is_fatal_not_local_fallbac
             .any(|o| matches!(o, runner::Observation::Compacted { .. }))
     );
 }
+
+#[test]
+fn compaction_preserves_phased_multimodal_items_tool_pairs_and_provider_origins() {
+    let case = inputs()
+        .into_iter()
+        .find(|c| c["name"] == "minimal_summary")
+        .unwrap();
+    let mut items = history(&case);
+    let attachments = vec![
+        Content::Text {
+            text: "inspect".into(),
+        },
+        Content::Attachment {
+            media_type: "application/pdf".into(),
+            data: "cGRm".into(),
+            detail: String::new(),
+        },
+        Content::Attachment {
+            media_type: "image/png".into(),
+            data: "cG5n".into(),
+            detail: "high".into(),
+        },
+    ];
+    let mut protected = vec![
+        RunItem::PhasedMessage {
+            message: Message {
+                role: Role::Assistant,
+                content: attachments.clone(),
+            },
+            phase: "commentary".into(),
+        },
+        RunItem::ToolCall {
+            call: ToolCall {
+                id: "images".into(),
+                name: "inspect".into(),
+                arguments: json!({}),
+            },
+        },
+        RunItem::ToolResult {
+            call_id: "images".into(),
+            output: ToolOutput {
+                content: attachments,
+                is_error: false,
+                should_pause: false,
+            },
+        },
+    ];
+    for origin in ["openai", "anthropic", ""] {
+        protected.push(RunItem::Compaction {
+            compaction: Compaction {
+                id: format!("cmp_{origin}"),
+                content: "summary".into(),
+                encrypted_content: "opaque".into(),
+                created_by: origin.into(),
+            },
+        });
+    }
+    items.splice(1..1, protected.clone());
+    let recent = RunItem::PhasedMessage {
+        message: Message {
+            role: Role::Assistant,
+            content: vec![Content::Text {
+                text: "recent answer".into(),
+            }],
+        },
+        phase: "final_answer".into(),
+    };
+    items.push(recent.clone());
+    let before = items.clone();
+    let actual = compact_for_request(&items, policy(&case), 0);
+    assert!(actual.changed);
+    assert_eq!(items, before);
+    assert_eq!(actual, compact_for_request(&items, policy(&case), 0));
+    let finalized = finalize_local_history(&actual.history, &items);
+    for item in protected.iter().chain(std::iter::once(&recent)) {
+        assert!(finalized.contains(item), "lost {item:?}");
+    }
+    let agents: Vec<_> = finalized
+        .iter()
+        .map(|item| match item {
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. }
+                if message.role == Role::Assistant =>
+            {
+                Some(AgentRef {
+                    name: "worker".into(),
+                })
+            }
+            _ => None,
+        })
+        .collect();
+    let wire = adk_codec::approval::encode_history(&finalized, &agents, &[]).unwrap();
+    assert_eq!(
+        adk_codec::approval::decode_history(&wire, &[])
+            .unwrap()
+            .items,
+        finalized
+    );
+}
+
+#[test]
+fn phased_text_has_the_same_local_compaction_semantics_as_plain_text() {
+    let case = inputs()
+        .into_iter()
+        .find(|c| c["name"] == "minimal_summary")
+        .unwrap();
+    let plain = history(&case);
+    let phased: Vec<_> = plain
+        .iter()
+        .cloned()
+        .map(|item| match item {
+            RunItem::Message { message } if message.role == Role::Assistant => {
+                RunItem::PhasedMessage {
+                    message,
+                    phase: "commentary".into(),
+                }
+            }
+            other => other,
+        })
+        .collect();
+    assert_eq!(
+        estimate_history_tokens(&plain),
+        estimate_history_tokens(&phased)
+    );
+    let expected = compact_for_request(&plain, policy(&case), 0);
+    let actual = compact_for_request(&phased, policy(&case), 0);
+    assert!(actual.changed);
+    assert_eq!(actual.before_tokens, expected.before_tokens);
+    assert_eq!(actual.after_tokens, expected.after_tokens);
+    assert_eq!(
+        extract_summary(&actual.history),
+        extract_summary(&expected.history)
+    );
+    let unphased: Vec<_> = actual
+        .history
+        .into_iter()
+        .map(|item| match item {
+            RunItem::PhasedMessage { message, .. } => RunItem::Message { message },
+            other => other,
+        })
+        .collect();
+    assert_eq!(unphased, expected.history);
+}

@@ -12,7 +12,7 @@ pub enum Role {
     Assistant,
 }
 
-/// Ordered multimodal content; media are referenced, never fetched by core.
+/// Ordered multimodal content; media are never fetched by core.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum Content {
@@ -22,6 +22,13 @@ pub enum Content {
     Image {
         uri: String,
         media_type: String,
+    },
+    /// Go-compatible inline image or PDF attachment. `data` is base64, not a URI;
+    /// an empty `detail` leaves image detail unspecified.
+    Attachment {
+        media_type: String,
+        data: String,
+        detail: String,
     },
     Audio {
         uri: String,
@@ -64,10 +71,53 @@ pub struct ToolOutput {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum RunItem {
-    Message { message: Message },
-    ToolCall { call: ToolCall },
-    ToolResult { call_id: String, output: ToolOutput },
-    Handoff { call_id: String, agent: String },
+    Message {
+        message: Message,
+    },
+    /// A message with an explicit, nonempty provider phase (for example commentary).
+    /// Ordinary `Message` items have no phase; replay must not invent one.
+    PhasedMessage {
+        message: Message,
+        phase: String,
+    },
+    ToolCall {
+        call: ToolCall,
+    },
+    ToolResult {
+        call_id: String,
+        output: ToolOutput,
+    },
+    Handoff {
+        call_id: String,
+        agent: String,
+    },
+    /// Provider continuation state is ordered history, not visible assistant output.
+    Reasoning {
+        reasoning: Reasoning,
+    },
+    Compaction {
+        compaction: Compaction,
+    },
+}
+
+/// Lossless reasoning continuation. Opaque fields are forwarded only by adapters
+/// supporting their encoding; they must not be substituted with display text.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct Reasoning {
+    pub id: String,
+    pub text: String,
+    pub signature: String,
+    pub redacted_data: String,
+    pub encrypted_content: String,
+}
+
+/// A provider-issued compacted context window, distinct from a local text summary.
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct Compaction {
+    pub id: String,
+    pub content: String,
+    pub encrypted_content: String,
+    pub created_by: String,
 }
 
 /// Provider token counters. Cache counters may be subsets of input tokens;

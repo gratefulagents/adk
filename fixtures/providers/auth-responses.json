@@ -1,0 +1,14 @@
+{
+  "baseline": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {"name":"anthropic rotates credentials and trims account", "mode":"anthropic", "body":{"access_token":" new-access ","refresh_token":" new-refresh ","expires_in":3600,"account":{"uuid":" account ","email_address":" new@example.test "}}, "access":"new-access", "refresh":"new-refresh", "account":"account", "email":"new@example.test", "expiry":1800003600},
+    {"name":"anthropic blank optional values retain identity and clear old expiry", "mode":"anthropic", "body":{"access_token":"new-access","refresh_token":" ","account":{"uuid":" ","email_address":" "}}, "access":"new-access", "refresh":"fixture-refresh", "account":"account", "email":"fixture@example.test", "expiry":null},
+    {"name":"copilot numeric string milliseconds and alternate expiry", "mode":"copilot", "body":{"token":" new-access ","expires_at":"invalid","expiresAt":"1800003600000","refresh_token":"must-not-replace-github-token","account":{"uuid":"must-not-replace-account"}}, "access":"new-access", "refresh":"fixture-refresh", "account":"account", "email":"fixture@example.test", "expiry":1800003600},
+    {"name":"copilot RFC3339 expiry alias", "mode":"copilot", "body":{"token":"new-access","expires":"2027-01-15T09:00:00Z"}, "access":"new-access", "refresh":"fixture-refresh", "account":"account", "email":"fixture@example.test", "expiry":1800003600},
+    {"name":"copilot missing expiry clears stale expiry", "mode":"copilot", "body":{"token":"new-access"}, "access":"new-access", "refresh":"fixture-refresh", "account":"account", "email":"fixture@example.test", "expiry":null},
+    {"name":"openai ignores unrelated account object", "mode":"openai", "body":{"access_token":" new-access ","refresh_token":"new-refresh","account":{"uuid":"wrong-account","email_address":"wrong@example.test"}}, "access":"new-access", "refresh":"new-refresh", "account":"account", "email":"fixture@example.test", "expiry":null},
+    {"name":"empty response token is rejected without secret echo", "mode":"anthropic", "body":{"access_token":" ","refresh_token":"sensitive-fixture"}, "error":true},
+    {"name":"wrong account is rejected without secret echo", "mode":"anthropic", "body":{"access_token":"sensitive-fixture","account":{"uuid":"wrong-account"}}, "error":true},
+    {"name":"wrong response token field is not accepted", "mode":"copilot", "body":{"access_token":"sensitive-fixture"}, "error":true}
+  ]
+}

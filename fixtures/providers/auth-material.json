@@ -1,0 +1,10 @@
+{
+  "baseline":"1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases":[
+    {"mode":"anthropic","body":{"claudeAiOauth":{"accessToken":" nested-access ","refreshToken":" nested-refresh ","expiresAt":"invalid","tokenAccount":{"uuid":"nested-account","emailAddress":"nested@example.test"}},"access_token":"flat-access","refresh_token":"flat-refresh","account_uuid":" flat-account ","email":" flat@example.test ","expired":1800000000000},"access":"nested-access","refresh":"nested-refresh","account":"flat-account","expiry":1800000000},
+    {"mode":"anthropic","body":{"tokens":{"access_token":" token-access ","refresh_token":" token-refresh "},"account":{"uuid":" account ","email_address":"fixture@example.test"},"expiresAt":"1800000000"},"access":"token-access","refresh":"token-refresh","account":"account","expiry":1800000000},
+    {"mode":"copilot","body":{"oauth_token":" root-refresh ","github.com":{"oauth_token":"host-refresh"},"tokens":{"token":" token-access ","expires_at":"1800000000000"},"copilot":{"token":"nested-access","oauth_token":"nested-refresh"}},"access":"token-access","refresh":"root-refresh","account":null,"expiry":1800000000},
+    {"mode":"copilot","body":{"github.com":{},"github.com:other":{"oauth_token":"other-refresh"},"copilot":{"oauth_token":"fallback-refresh"}},"access":"","refresh":"fallback-refresh","account":null,"expiry":null},
+    {"mode":"openai","body":{"tokens":{"refresh_token":" refresh-only "}},"access":"","refresh":"refresh-only","account":null,"expiry":null}
+  ]
+}

@@ -32,6 +32,7 @@ fn normalized(items: &[RunItem]) -> Vec<Value> {
             value
         }
         RunItem::Handoff { call_id, agent } => json!({"type":"tool_result","id":call_id,"content":format!("Handing off to {agent}")}),
+        RunItem::Reasoning { .. } | RunItem::Compaction { .. } | RunItem::PhasedMessage { .. } => panic!("provider continuations require provider-wire replay fixtures"),
     }).collect()
 }
 

@@ -900,7 +900,9 @@ impl Engine {
             .iter()
             .map(|item| {
                 let no_agent = match item {
-                    RunItem::Message { message } => message.role == Role::User,
+                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                        message.role == Role::User
+                    }
                     RunItem::ToolResult { call_id, .. } => entries.iter().any(|entry| {
                         entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
                             && entry.marker.agent.is_none()
@@ -1400,7 +1402,9 @@ impl Engine {
                     }
                     self.calls.push_back(call.clone());
                 }
-                RunItem::Message { message } if message.role == Role::Assistant => {}
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. }
+                    if message.role == Role::Assistant => {}
+                RunItem::Reasoning { .. } | RunItem::Compaction { .. } => {}
                 _ => {
                     return Err(Error::new(
                         ErrorCategory::ModelBehavior,
@@ -1434,7 +1438,9 @@ impl Engine {
                 .iter()
                 .rev()
                 .filter_map(|i| match i {
-                    RunItem::Message { message } => Some(text(&message.content)),
+                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                        Some(text(&message.content))
+                    }
                     _ => None,
                 })
                 .find(|t| !t.is_empty())
@@ -1775,7 +1781,9 @@ impl Engine {
                                     complete = Some(response.clone())
                                 }
                                 ModelEvent::ItemDone { item } => {
-                                    if let RunItem::Message { message } = item {
+                                    if let RunItem::Message { message }
+                                    | RunItem::PhasedMessage { message, .. } = item
+                                    {
                                         let finished_text = text(&message.content);
                                         if !finished_text.is_empty() && finished_text == delta_text
                                         {

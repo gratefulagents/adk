@@ -14,6 +14,7 @@ dependencies = [
  "adk-runtime",
  "adk-sandbox",
  "adk-security",
+ "adk-tools",
  "tokio",
 ]
 
@@ -157,6 +158,21 @@ dependencies = [
  "schemars",
  "serde_json",
  "tokio",
+]
+
+[[package]]
+name = "adk-tools"
+version = "0.1.0"
+dependencies = [
+ "adk-core",
+ "adk-project-state",
+ "adk-runtime",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

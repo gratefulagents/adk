@@ -1,0 +1,2100 @@
+[
+  {
+    "name": "AnalyzeImage",
+    "family": "vision",
+    "feature": "Vision",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "AnalyzeImage",
+      "description": "Loads an image from a local file path or URL directly into your visual context. Inspect the image yourself to answer the prompt; no separate text analysis is generated.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "image_path": {
+            "type": "string",
+            "description": "Workspace-relative image path or absolute path returned by the Browser screenshot action"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL of the image to analyze"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "What to analyze or describe (e.g., 'describe the UI layout', 'find visual bugs', 'extract text')"
+          },
+          "detail_level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "high"
+            ],
+            "description": "Analysis detail level (default: high)"
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/vision.Tool",
+    "acceptance_id": "SDK-17BB44A3499484F4"
+  },
+  {
+    "name": "ApplyPatch",
+    "family": "workspace-filesystem",
+    "feature": "ApplyPatch",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "ApplyPatch",
+      "description": "Applies a unified diff or an OpenAI patch envelope within the workspace. The complete patch is validated before files change; set dry_run to validate and preview without changing files.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "patch": {
+            "type": "string",
+            "description": "Unified diff text, or an OpenAI envelope using *** Begin Patch, *** Update/Add/Delete File, direct change chunks or range-less @@/@@ locator hunks, optional *** Move to, *** End of File, and *** End Patch. Both support file creation, modification, deletion, and rename. Unified diffs also support executable-bit changes."
+          },
+          "dry_run": {
+            "type": "boolean",
+            "description": "Validate the complete patch and return its operations without changing files.",
+            "default": false
+          }
+        },
+        "required": [
+          "patch"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.ApplyPatchTool",
+    "acceptance_id": "SDK-79B6001F15A15064"
+  },
+  {
+    "name": "AskUserQuestion",
+    "family": "signals",
+    "feature": "Signals.AskUserQuestion",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "AskUserQuestion",
+      "description": "Ask the user a question and wait for their response.\n\nWhen asking the user a question, prefer providing choices when possible. This helps\nthe user respond quickly with a single click. Only use freeform (no choices) when the\nanswer truly cannot be predicted.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "The question to ask the user"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Optional list of choices for the user to pick from. Prefer providing choices when possible."
+          },
+          "allow_freeform": {
+            "type": "boolean",
+            "description": "Whether to allow freeform text input in addition to choices. Defaults to true.",
+            "default": true
+          }
+        },
+        "required": [
+          "question"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.AskUserQuestionTool",
+    "acceptance_id": "SDK-D874A36F5AFC1361"
+  },
+  {
+    "name": "Bash",
+    "family": "bash",
+    "feature": "Bash",
+    "mode": "full_access",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": null,
+    "source_type": "pkg/agentsdk/tools/shell.BashTool",
+    "acceptance_id": "SDK-691C860CE2F8DEEC"
+  },
+  {
+    "name": "Bash",
+    "family": "bash",
+    "feature": "Bash",
+    "mode": "read_only",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": null,
+    "source_type": "pkg/agentsdk/tools/shell.ReadOnlyBashTool",
+    "acceptance_id": "SDK-160A0E01D972A7FC"
+  },
+  {
+    "name": "Bash",
+    "family": "bash",
+    "feature": "Bash",
+    "mode": "workspace_write",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": null,
+    "source_type": "pkg/agentsdk/tools/shell.WorkspaceWriteBashTool",
+    "acceptance_id": "SDK-83DB094FA832EE86"
+  },
+  {
+    "name": "BashKill",
+    "family": "async-shell",
+    "feature": "AsyncShell",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "BashKill",
+      "description": "Terminates a background bash job started by BashStart.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Job id returned by BashStart"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/shell.BashKillTool",
+    "acceptance_id": "SDK-17F8C6CC5ECE54C9"
+  },
+  {
+    "name": "BashPoll",
+    "family": "async-shell",
+    "feature": "AsyncShell",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "BashPoll",
+      "description": "Polls a background bash job started by BashStart. By default returns only output produced since the previous poll (incremental), plus status. Optionally waits before returning so long jobs do not require tight polling.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Job id returned by BashStart"
+          },
+          "wait_ms": {
+            "type": "number",
+            "description": "Optional milliseconds to wait for the job to finish before returning, max 120000"
+          },
+          "incremental": {
+            "type": "boolean",
+            "description": "Return only output since the previous poll (default true). Set false to get the full bounded output again."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/shell.BashPollTool",
+    "acceptance_id": "SDK-8AD0572EC9F31BC3"
+  },
+  {
+    "name": "BashStart",
+    "family": "async-shell",
+    "feature": "AsyncShell",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": null,
+    "source_type": "pkg/agentsdk/tools/shell.BashStartTool",
+    "acceptance_id": "SDK-F14A4F2142A1FD0E"
+  },
+  {
+    "name": "Browser",
+    "family": "browser",
+    "feature": "Browser",
+    "mode": "read_only",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Browser",
+      "description": "Headless browser automation for read-only navigation and page text extraction. Screenshot capture requires workspace-write access.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "navigate",
+              "get_text"
+            ],
+            "description": "Browser action: navigate (load URL and return title), get_text (extract page text)"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to navigate to"
+          },
+          "width": {
+            "type": "integer",
+            "description": "Viewport width in pixels (default: 1280)"
+          },
+          "height": {
+            "type": "integer",
+            "description": "Viewport height in pixels (default: 720)"
+          }
+        },
+        "required": [
+          "action",
+          "url"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/browser.Tool",
+    "acceptance_id": "SDK-2D576EBF6B4B58A8"
+  },
+  {
+    "name": "Browser",
+    "family": "browser",
+    "feature": "Browser",
+    "mode": "write",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Browser",
+      "description": "Headless browser automation. Supports screenshot capture and navigation via headless Chromium. For full interactive automation (click, type, evaluate), configure the Playwright MCP server.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "screenshot",
+              "navigate",
+              "get_text"
+            ],
+            "description": "Browser action: screenshot (capture page), navigate (load URL and return title), get_text (extract page text)"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL to navigate to"
+          },
+          "output_path": {
+            "type": "string",
+            "description": "Workspace-relative file path for screenshot output. Omit to use the ephemeral screenshot directory."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Viewport width in pixels (default: 1280)"
+          },
+          "height": {
+            "type": "integer",
+            "description": "Viewport height in pixels (default: 720)"
+          }
+        },
+        "required": [
+          "action",
+          "url"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/browser.Tool",
+    "acceptance_id": "SDK-2D576EBF6B4B58A8"
+  },
+  {
+    "name": "Delete",
+    "family": "workspace-filesystem",
+    "feature": "Delete",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Delete",
+      "description": "Deletes one regular file or empty directory within the workspace. Delete contained paths explicitly before deleting a non-empty directory.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Workspace-relative path of the regular file or empty directory to delete"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.DeleteTool",
+    "acceptance_id": "SDK-A57C84B35F996C6D"
+  },
+  {
+    "name": "Edit",
+    "family": "workspace-filesystem",
+    "feature": "Edit",
+    "mode": "full_access",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Edit",
+      "description": "Performs exact string replacement in a file. The old_string must match exactly one location (including whitespace and indentation); include enough surrounding lines to make it unique, or set replace_all for intentional multi-site renames. Use Write to create new files; use this for modifying existing ones.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Absolute path to the file to edit"
+          },
+          "old_string": {
+            "type": "string",
+            "description": "Exact text to find and replace"
+          },
+          "new_string": {
+            "type": "string",
+            "description": "Text to replace old_string with"
+          },
+          "replace_all": {
+            "type": "boolean",
+            "description": "Replace all occurrences (default false)",
+            "default": false
+          }
+        },
+        "required": [
+          "file_path",
+          "old_string",
+          "new_string"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.FileEditTool",
+    "acceptance_id": "SDK-B60692B96C278803"
+  },
+  {
+    "name": "Edit",
+    "family": "workspace-filesystem",
+    "feature": "Edit",
+    "mode": "workspace_write",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Edit",
+      "description": "Performs exact string replacement in a file. The old_string must match exactly one location (including whitespace and indentation); include enough surrounding lines to make it unique, or set replace_all for intentional multi-site renames. Use Write to create new files; use this for modifying existing ones.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Absolute path to the file to edit"
+          },
+          "old_string": {
+            "type": "string",
+            "description": "Exact text to find and replace"
+          },
+          "new_string": {
+            "type": "string",
+            "description": "Text to replace old_string with"
+          },
+          "replace_all": {
+            "type": "boolean",
+            "description": "Replace all occurrences (default false)",
+            "default": false
+          }
+        },
+        "required": [
+          "file_path",
+          "old_string",
+          "new_string"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.WorkspaceEditTool",
+    "acceptance_id": "SDK-7BCC990ABF2D638F"
+  },
+  {
+    "name": "LSP",
+    "family": "lsp",
+    "feature": "LSP",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "LSP",
+      "description": "Performs read-only LSP operations (definition, references, hover, document/workspace symbols, implementation, type definition, diagnostics) using a configured language server.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "type": "string",
+            "enum": [
+              "goToDefinition",
+              "definition",
+              "findReferences",
+              "references",
+              "hover",
+              "documentSymbol",
+              "workspaceSymbol",
+              "implementation",
+              "typeDefinition",
+              "diagnostics"
+            ],
+            "description": "The read-only LSP operation to perform"
+          },
+          "filePath": {
+            "type": "string",
+            "description": "Workspace-relative or absolute path to the source file"
+          },
+          "languageId": {
+            "type": "string",
+            "description": "Language identifier used to select the configured server"
+          },
+          "line": {
+            "type": "number",
+            "description": "1-based source line for position-based operations"
+          },
+          "character": {
+            "type": "number",
+            "description": "1-based UTF-16 code-unit position for position-based operations"
+          },
+          "query": {
+            "type": "string",
+            "description": "Search query for workspaceSymbol"
+          }
+        },
+        "required": [
+          "operation"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/lsp.Tool",
+    "acceptance_id": "SDK-E67D2F3BC6DBD618"
+  },
+  {
+    "name": "Memory",
+    "family": "memory",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Memory",
+      "description": "Store and retrieve persistent semantic memories across agent runs. Actions: store (save a memory), search (find similar memories), list (browse memories), delete (remove a memory).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "store",
+              "search",
+              "list",
+              "delete"
+            ],
+            "description": "The action to perform"
+          },
+          "content": {
+            "type": "string",
+            "description": "Memory content to store, or search query text"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags for categorization or filtering"
+          },
+          "id": {
+            "type": "string",
+            "description": "Memory ID (required for delete)"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max results to return (default 10 for search, 50 for list)"
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/memory.Tool",
+    "acceptance_id": "SDK-70B8CBD77B84DF5A"
+  },
+  {
+    "name": "Move",
+    "family": "workspace-filesystem",
+    "feature": "Move",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Move",
+      "description": "Moves or renames one regular file or directory to a new path within the workspace. The destination must not exist and its parent directory must exist.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "source_path": {
+            "type": "string",
+            "description": "Workspace-relative path of the regular file or directory to move"
+          },
+          "destination_path": {
+            "type": "string",
+            "description": "New workspace-relative path. It must not exist and its parent directory must exist."
+          }
+        },
+        "required": [
+          "source_path",
+          "destination_path"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.MoveTool",
+    "acceptance_id": "SDK-5FAEEA695A943709"
+  },
+  {
+    "name": "Terminal",
+    "family": "interactive-terminal",
+    "feature": "InteractiveTerminal",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": true,
+    "definition": {
+      "name": "Terminal",
+      "description": "Interact with a persistent terminal (PTY) session. Use for interactive programs (vim, gdb, REPLs, ssh, installers with prompts) and long-running foreground processes; use Bash for ordinary one-shot commands. Keystrokes are sent verbatim: end shell commands with \\n to execute them. Send special keys (C-c, C-d, Escape, Enter, arrow keys) as standalone calls with only that token in keystrokes. Prefer short waits and repeated reads over one long wait.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "op": {
+            "type": "string",
+            "enum": [
+              "start",
+              "send",
+              "read",
+              "kill",
+              "list"
+            ],
+            "description": "start: open a new session (returns session_id). send: write keystrokes, wait wait_ms, return new output. read: return output produced since the last read. kill: terminate the session. list: list sessions."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Session id returned by start. Required for send/read/kill."
+          },
+          "keystrokes": {
+            "type": "string",
+            "description": "Raw keystrokes for send. End commands with \\n to execute. Special keys (C-c, C-d, C-z, Escape, Enter, Tab, Up/Down/Left/Right) must be the entire string."
+          },
+          "wait_ms": {
+            "type": "number",
+            "description": "How long to wait after sending before capturing output (default 1000, max 60000). Use small values for instant commands and poll with read for slow ones."
+          }
+        },
+        "required": [
+          "op"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/shell.TerminalTool",
+    "acceptance_id": "SDK-ABDDC8BEC077585B"
+  },
+  {
+    "name": "WebFetch",
+    "family": "web-fetch",
+    "feature": "WebFetch",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "WebFetch",
+      "description": "Fetches a URL and returns its content as readable text. HTML pages are converted to a simplified readable format. Supports pagination through large content via start_index.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "URL to fetch and convert to readable text"
+          },
+          "max_length": {
+            "type": "integer",
+            "description": "Maximum characters to return (default: 50000)"
+          },
+          "start_index": {
+            "type": "integer",
+            "description": "Start index for pagination through content (default: 0)"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/web.FetchTool",
+    "acceptance_id": "SDK-F0E77628F01BCC62"
+  },
+  {
+    "name": "Write",
+    "family": "workspace-filesystem",
+    "feature": "Write",
+    "mode": "full_access",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Write",
+      "description": "Creates or overwrites a file with the given content. Creates parent directories if needed. Overwrite replaces the entire file — use Edit for targeted changes to existing files so unrelated content is preserved.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Absolute path to the file to write"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the file"
+          }
+        },
+        "required": [
+          "file_path",
+          "content"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.FileWriteTool",
+    "acceptance_id": "SDK-4D8B4D3ACAA1DC8D"
+  },
+  {
+    "name": "Write",
+    "family": "workspace-filesystem",
+    "feature": "Write",
+    "mode": "workspace_write",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "Write",
+      "description": "Creates or overwrites a file with the given content. Creates parent directories if needed. Overwrite replaces the entire file — use Edit for targeted changes to existing files so unrelated content is preserved.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "file_path": {
+            "type": "string",
+            "description": "Absolute path to the file to write"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content to write to the file"
+          }
+        },
+        "required": [
+          "file_path",
+          "content"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/fs.WorkspaceWriteFileTool",
+    "acceptance_id": "SDK-F75075C0486EF163"
+  },
+  {
+    "name": "attach_repository",
+    "family": "attach-repository",
+    "feature": "AttachRepository",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "attach_repository",
+      "description": "Clone a credential-free GitHub repository over HTTPS into this SDK workspace's repository list. Accepts owner/repo, github.com/owner/repo, or https://github.com/owner/repo forms. Repositories are cloned under repos/<alias> by default.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "repository": {
+            "type": "string",
+            "description": "Credential-free GitHub repository. Accepts owner/repo, github.com/owner/repo, or https://github.com/owner/repo[.git]."
+          },
+          "repo": {
+            "type": "string",
+            "description": "Alias for repository."
+          },
+          "base_branch": {
+            "type": "string",
+            "description": "Branch to clone from. If empty, uses the tool default or the repository default branch."
+          },
+          "branch_name": {
+            "type": "string",
+            "description": "Branch name to create/check out after cloning. If empty, uses the tool default or keeps the cloned branch."
+          },
+          "alias": {
+            "type": "string",
+            "description": "Directory name under the workspace repository list. Defaults to the repository name."
+          }
+        }
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/git.AttachRepositoryTool",
+    "acceptance_id": "SDK-6C32B49F268AAE98"
+  },
+  {
+    "name": "create_github_issue",
+    "family": "github-issue",
+    "feature": "GitHubIssue",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "create_github_issue",
+      "description": "Create a GitHub issue in the current repository. Use this to file bug reports, feature requests, improvement recommendations, or analysis findings. Returns the issue URL.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Issue title. Required."
+          },
+          "body": {
+            "type": "string",
+            "description": "Issue body in markdown. Should contain detailed description, analysis, and any recommendations."
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Labels to apply to the issue (e.g. [\"meta-harness\", \"enhancement\"])."
+          },
+          "assignees": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GitHub usernames to assign to the issue."
+          },
+          "repo_path": {
+            "type": "string",
+            "description": "Workspace-relative path to the git repository, for example repos/<alias>. Defaults to the workspace root for callers that still use a single root repository."
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/git.CreateIssueTool",
+    "acceptance_id": "SDK-0EFEAC6B5A380E6D"
+  },
+  {
+    "name": "create_pull_request",
+    "family": "github-pull-request",
+    "feature": "GitHubPullRequest",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": true,
+    "definition": {
+      "name": "create_pull_request",
+      "description": "Create a GitHub pull request from the current branch. Commits any unstaged changes, pushes the branch, and opens a PR. Returns the PR URL.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "PR title. If empty, inferred from commits."
+          },
+          "body": {
+            "type": "string",
+            "description": "PR body/description in markdown. If empty, auto-filled from commits."
+          },
+          "base_branch": {
+            "type": "string",
+            "description": "Target branch to merge into (e.g. main). If empty, uses repo default."
+          },
+          "repo_path": {
+            "type": "string",
+            "description": "Workspace-relative path to the git repository, for example repos/<alias>. Defaults to the workspace root for callers that still use a single root repository."
+          },
+          "draft": {
+            "type": "boolean",
+            "description": "Create as draft PR. Defaults to false."
+          }
+        }
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/git.CreatePullRequestTool",
+    "acceptance_id": "SDK-C99C32DF2849BD46"
+  },
+  {
+    "name": "finish",
+    "family": "signals",
+    "feature": "Signals.Finish",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": true,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "finish",
+      "description": "Signal that you have completed all work for this run.\n\nCall this tool when you are done with the task. Include a brief summary of what was accomplished.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "Brief summary of what was accomplished"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.FinishTool",
+    "acceptance_id": "SDK-6B4AAFFB80527B80"
+  },
+  {
+    "name": "get_plan",
+    "family": "signals",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": true,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "get_plan",
+      "description": "Read the current implementation plan from the durable plan artifact.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.GetPlanTool",
+    "acceptance_id": "SDK-FEF5EA9B685D643C"
+  },
+  {
+    "name": "glob",
+    "family": "workspace-search",
+    "feature": "Glob",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "glob",
+      "description": "Find files matching a glob pattern (for example, **/*.go). Returns deterministically sorted, pageable results; use output_format=json for structured completion metadata.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "Optional subdirectory to search (default: working directory)"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max results per page (default 200)"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Continuation cursor returned by a previous identical search"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Additional include globs; all paths must match at least one"
+          },
+          "exclude": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Exclude globs"
+          },
+          "respect_gitignore": {
+            "type": "boolean",
+            "description": "Honor workspace .gitignore files (default false for compatibility)"
+          },
+          "skip_default_dirs": {
+            "type": "boolean",
+            "description": "Skip .git, node_modules, vendor, .venv, and target (default true)"
+          },
+          "output_format": {
+            "type": "string",
+            "enum": [
+              "text",
+              "json"
+            ],
+            "description": "text preserves legacy output; json returns matches/truncated/next_cursor"
+          }
+        },
+        "required": [
+          "pattern"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/search.GlobTool",
+    "acceptance_id": "SDK-0C24CB75DA6C0A40"
+  },
+  {
+    "name": "grep",
+    "family": "workspace-search",
+    "feature": "Grep",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "grep",
+      "description": "Search file contents with a Go regular expression. Supports pageable structured results, context lines, files/count modes, include/exclude globs, and configurable ignore behavior.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "pattern": {
+            "type": "string",
+            "description": "Go-syntax regular expression"
+          },
+          "path": {
+            "type": "string",
+            "description": "Subdirectory to search (default: working directory)"
+          },
+          "glob": {
+            "type": "string",
+            "description": "Legacy single filename include glob"
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Include globs"
+          },
+          "exclude": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Exclude globs"
+          },
+          "ignore_case": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max results per page (default 200)"
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Continuation cursor returned by a previous identical search"
+          },
+          "before_context": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "after_context": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "matches",
+              "files",
+              "count"
+            ],
+            "description": "Result mode (default matches)"
+          },
+          "respect_gitignore": {
+            "type": "boolean",
+            "description": "Honor workspace .gitignore files (default false for compatibility)"
+          },
+          "skip_default_dirs": {
+            "type": "boolean",
+            "description": "Skip .git, node_modules, vendor, .venv, and target (default true)"
+          },
+          "output_format": {
+            "type": "string",
+            "enum": [
+              "text",
+              "json"
+            ],
+            "description": "text preserves legacy output; json returns matches/truncated/next_cursor"
+          }
+        },
+        "required": [
+          "pattern"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/search.GrepTool",
+    "acceptance_id": "SDK-2B30AEDDA4332EB2"
+  },
+  {
+    "name": "list_files",
+    "family": "workspace-search",
+    "feature": "ListFiles",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "list_files",
+      "description": "List files and directories under a path relative to the working directory. Use glob to find files by name pattern instead of walking directories manually.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path (default: working directory)"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Max entries (default 100)"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/search.ListFilesTool",
+    "acceptance_id": "SDK-D10A5C4059044356"
+  },
+  {
+    "name": "memory_delete",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_delete",
+      "description": "Delete one durable typed project memory by id.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryDeleteTool",
+    "acceptance_id": "SDK-8C3773B421C2F4CA"
+  },
+  {
+    "name": "memory_list",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_list",
+      "description": "List durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryListTool",
+    "acceptance_id": "SDK-17222A7FFFD89C38"
+  },
+  {
+    "name": "memory_recall",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_recall",
+      "description": "Search durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryRecallTool",
+    "acceptance_id": "SDK-C61BE94B9DEC66C8"
+  },
+  {
+    "name": "memory_remember",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_remember",
+      "description": "Store a durable typed project memory in the filesystem event log.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryRememberTool",
+    "acceptance_id": "SDK-0BD7F0BF171F2A2A"
+  },
+  {
+    "name": "memory_stats",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_stats",
+      "description": "Summarize durable typed project memory counts by kind, scope, and tag.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryStatsTool",
+    "acceptance_id": "SDK-ABDB3E88C434B085"
+  },
+  {
+    "name": "memory_update",
+    "family": "project-state",
+    "feature": "ProjectState.MemoryTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "memory_update",
+      "description": "Update an existing durable typed project memory by id. Omitted fields keep their current values.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_run": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.memoryUpdateTool",
+    "acceptance_id": "SDK-7F8655354326F642"
+  },
+  {
+    "name": "present_plan",
+    "family": "signals",
+    "feature": "Signals.PresentPlan",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "present_plan",
+      "description": "Present the finalized plan to the user for approval with action buttons.\n\nCall this when a plan is ready for user review and approval. The user will see the\nsummary along with clickable action buttons.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "summary": {
+            "type": "string",
+            "description": "A brief summary of the plan for display to the user"
+          },
+          "actions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Unique action identifier"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Button label shown to the user"
+                },
+                "style": {
+                  "type": "string",
+                  "enum": [
+                    "primary",
+                    "secondary",
+                    "destructive"
+                  ],
+                  "description": "Button style"
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ]
+            },
+            "description": "List of action buttons to show the user"
+          },
+          "recommended": {
+            "type": "string",
+            "description": "ID of the recommended action"
+          }
+        },
+        "required": [
+          "summary",
+          "actions"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.PresentPlanTool",
+    "acceptance_id": "SDK-CCD3D490A6683252"
+  },
+  {
+    "name": "prime_context",
+    "family": "project-state",
+    "feature": "ProjectState.PrimeTool",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "prime_context",
+      "description": "Build compact durable project context from tasks and memories for session start or compaction recovery.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "active_task_id": {
+            "type": "string"
+          },
+          "ready_limit": {
+            "type": "integer"
+          },
+          "memory_limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.primeContextTool",
+    "acceptance_id": "SDK-1004D0ADA66D844E"
+  },
+  {
+    "name": "read_file",
+    "family": "workspace-search",
+    "feature": "ReadFile",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": true,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "read_file",
+      "description": "Read a UTF-8 text file relative to the working directory. Supports line-range slicing via start_line/end_line — prefer ranged reads for large files instead of re-reading the whole file. Use grep to locate content first, then read the relevant range.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "start_line": {
+            "type": "integer",
+            "description": "1-indexed start line"
+          },
+          "end_line": {
+            "type": "integer",
+            "description": "1-indexed end line (inclusive); 0 = end of file"
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/search.ReadFileTool",
+    "acceptance_id": "SDK-C61932852E64FC3F"
+  },
+  {
+    "name": "save_plan",
+    "family": "signals",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": true,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "save_plan",
+      "description": "Save the implementation plan to a durable plan artifact.\n\nThis plan survives phase and step changes. Always call save_plan at the end of\nplanning instead of only putting the plan in conversation text.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "description": "The full plan content in markdown format"
+          },
+          "summary": {
+            "type": "string",
+            "description": "A 1-2 sentence summary of the plan"
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.SavePlanTool",
+    "acceptance_id": "SDK-DE8F5F2D422810DF"
+  },
+  {
+    "name": "skill_install",
+    "family": "skills",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "skill_install",
+      "description": "Install a skill from the catalog into the workspace. This writes the MCP server config to .mcp.json. MCP configs are loaded at session start, so the new server's tools become available after the agent restarts (they are NOT available in the current session).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Skill name to install (e.g. search-duckduckgo, browser-playwright)"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/skills.InstallTool",
+    "acceptance_id": "SDK-546E0ECA4178EA53"
+  },
+  {
+    "name": "skill_list_installed",
+    "family": "skills",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "skill_list_installed",
+      "description": "List skills currently installed in the workspace's .mcp.json.",
+      "input_schema": {
+        "type": "object",
+        "properties": {}
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/skills.ListInstalledTool",
+    "acceptance_id": "SDK-5D16FA5A8D779362"
+  },
+  {
+    "name": "skill_search",
+    "family": "skills",
+    "feature": "ExtraTools",
+    "mode": "any",
+    "classification": "host-only",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "skill_search",
+      "description": "Search the skill catalog for MCP tools that can be installed. Use this to discover available integrations (search, browser, GitHub, Slack, etc).",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query (matches name, description, tags)"
+          },
+          "category": {
+            "type": "string",
+            "description": "Filter by category (e.g. search, browser, developer-tools, communication, data)"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/skills.SearchTool",
+    "acceptance_id": "SDK-553DA52E54F124A6"
+  },
+  {
+    "name": "task_claim",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_claim",
+      "description": "Atomically claim a durable project task for the current agent.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskClaimTool",
+    "acceptance_id": "SDK-0EB62E076BC2D2DF"
+  },
+  {
+    "name": "task_close",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_close",
+      "description": "Close a durable project task with an optional reason.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskCloseTool",
+    "acceptance_id": "SDK-318EF9DB7893CA5F"
+  },
+  {
+    "name": "task_comment",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_comment",
+      "description": "Add a durable comment to a project task.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "body"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskCommentTool",
+    "acceptance_id": "SDK-E3CE0854D8074001"
+  },
+  {
+    "name": "task_create",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_create",
+      "description": "Create a durable project task in the filesystem event log. Use for work that should survive sessions and context compaction.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "task",
+              "bug",
+              "feature",
+              "chore",
+              "epic"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskCreateTool",
+    "acceptance_id": "SDK-582F0EF4A008D073"
+  },
+  {
+    "name": "task_link",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_link",
+      "description": "Add or remove a dependency between durable project tasks.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "depends_on"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskLinkTool",
+    "acceptance_id": "SDK-A0A0FDEB2F2E6F84"
+  },
+  {
+    "name": "task_ready",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_ready",
+      "description": "List ready durable project tasks: open tasks with no open blockers.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_assigned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskReadyTool",
+    "acceptance_id": "SDK-30B437930AFFF8DF"
+  },
+  {
+    "name": "task_show",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_show",
+      "description": "Show one durable project task with comments and dependencies.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskShowTool",
+    "acceptance_id": "SDK-B44B57530D8755F3"
+  },
+  {
+    "name": "task_update",
+    "family": "project-state",
+    "feature": "ProjectState.TaskTools",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": false,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "task_update",
+      "description": "Update durable project task fields.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/projectstate.taskUpdateTool",
+    "acceptance_id": "SDK-ACE8D4C9F18D4BFB"
+  },
+  {
+    "name": "think",
+    "family": "think",
+    "feature": "Think",
+    "mode": "any",
+    "classification": "runtime-built-in",
+    "legacy": false,
+    "read_only": true,
+    "control_flow": false,
+    "writes_git_remote": false,
+    "definition": {
+      "name": "think",
+      "description": "Use the tool to think about something. It will not obtain new information or change anything; it only logs the thought. Use it when complex reasoning is needed between actions: analyzing tool output before acting on it, checking the task's requirements or constraints before an important or irreversible step, planning the next sequence of actions, or verifying that prior results actually satisfy the goal.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "thought": {
+            "type": "string",
+            "description": "Your reasoning: what you learned, what it implies, what to do next and why."
+          }
+        },
+        "required": [
+          "thought"
+        ]
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "source_type": "pkg/agentsdk/tools/signal.ThinkTool",
+    "acceptance_id": "SDK-6F4F5D601F3C3484"
+  }
+]

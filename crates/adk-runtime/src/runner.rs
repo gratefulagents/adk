@@ -14,9 +14,16 @@
 //! Compactors must report any successful provider usage/cost, not assume zero.
 //!
 //! Approval continuations are in-process, single-use owners, not serializable
-//! checkpoints. DurableHook is fail-closed boundary observation, not crash replay.
+//! checkpoints. `run_durable` provides separate, serialized crash recovery.
+//! DurableHook alone remains fail-closed boundary observation.
 //! Failed events are best effort when the host, deadline or cancellation prevents
 //! delivery; `RunError` remains authoritative and retains partial history/spills.
+
+#[path = "durable.rs"]
+pub mod durable;
+pub use durable::{
+    CheckpointStore, DurableRun, GoRecovery, RunnerCheckpoint, StoredCheckpointStore,
+};
 
 use std::{
     collections::{HashMap, HashSet, VecDeque},
@@ -285,8 +292,10 @@ pub enum Boundary {
     Started,
     ModelPrepared,
     ModelCompleted,
+    ModelDispatched,
     ToolPrepared,
     ToolCompleted,
+    ToolDispatched,
     ApprovalPending,
     Handoff,
     Paused,
@@ -614,6 +623,7 @@ impl Runner {
     }
     fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
         Engine {
+            durable_state: None,
             agent: self.initial.clone(),
             config: self.config.clone(),
             context,
@@ -657,7 +667,7 @@ impl Runner {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 enum Phase {
     Start,
     Model,
@@ -671,6 +681,7 @@ struct ExecutedTool {
 }
 
 struct Engine {
+    durable_state: Option<durable::DurableState>,
     agent: Arc<AgentConfig>,
     config: Arc<RunnerConfig>,
     context: Context,
@@ -870,10 +881,19 @@ impl Engine {
         Ok(())
     }
     async fn checkpoint(
-        &self,
+        &mut self,
         boundary: Boundary,
         pending: Option<&ToolCall>,
     ) -> Result<(), Error> {
+        if self.durable_state.is_none()
+            && matches!(
+                boundary,
+                Boundary::ModelDispatched | Boundary::ToolDispatched
+            )
+        {
+            return Ok(());
+        }
+        self.persist_boundary(boundary, pending).await?;
         if let Some(hook) = &self.config.durable {
             bounded(
                 &self.context,
@@ -1031,7 +1051,7 @@ impl Engine {
                             self.observe(event).await?;
                         }
                         self.settle_tool_turn();
-                        for request in &self.result.pending_approvals {
+                        for request in self.result.pending_approvals.clone() {
                             self.checkpoint(Boundary::ApprovalPending, Some(&request.call))
                                 .await?;
                         }
@@ -1386,7 +1406,10 @@ impl Engine {
             })
             .await?;
         }
-        self.checkpoint(Boundary::ModelCompleted, None).await?;
+
+        if self.durable_state.is_none() {
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
+        }
         self.observe(Observation::Usage {
             usage: self.result.usage.clone(),
             cost: self.cost,
@@ -1470,6 +1493,9 @@ impl Engine {
                             self.policy.max_turns = self.policy.max_turns.saturating_add(1);
                         }
                         self.phase = Phase::Model;
+                        if self.durable_state.is_some() {
+                            self.checkpoint(Boundary::ModelCompleted, None).await?;
+                        }
                         return Ok(());
                     }
                     self.stop_gate_blocks = 0;
@@ -1482,6 +1508,9 @@ impl Engine {
             })
             .await?;
             self.phase = Phase::Finish;
+        }
+        if self.durable_state.is_some() {
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
         }
         Ok(())
     }
@@ -1597,6 +1626,7 @@ impl Engine {
                         + estimate_request_overhead_tokens(&request)
                         - output_reserve_tokens(&request)
                         - REQUEST_SAFETY_BUFFER;
+                self.checkpoint(Boundary::ModelDispatched, None).await?;
                 match self.model_attempt(binding, request.clone()).await {
                     Ok(response) => {
                         self.calibration.observe_estimate(
@@ -1619,6 +1649,9 @@ impl Engine {
                         ));
                     }
                     Err((error, committed)) => {
+                        if self.durable_state.is_some() {
+                            return Err(error);
+                        }
                         self.context.check_active()?;
                         let idle = error
                             .source
@@ -1850,6 +1883,9 @@ impl Engine {
         }
     }
     async fn prepare_tools(&mut self) -> Result<(), Error> {
+        if self.durable_state.is_some() {
+            return Ok(());
+        }
         if self.calls.front().is_some_and(|call| {
             self.agent
                 .handoffs
@@ -1918,7 +1954,8 @@ impl Engine {
         Ok(())
     }
     fn parallel_batch_ready(&self) -> bool {
-        self.calls.len() > 1
+        self.durable_state.is_none()
+            && self.calls.len() > 1
             && self.calls.iter().all(|call| {
                 self.agent.tools.iter().any(|tool| {
                     let definition = tool.definition();
@@ -2020,6 +2057,10 @@ impl Engine {
                 call: call.clone(),
                 reason: "tool policy requires approval".into(),
             };
+            if self.durable_state.is_some() {
+                self.checkpoint(Boundary::ApprovalPending, Some(&call))
+                    .await?;
+            }
             let approval = if let Some(approval) = self.approvals.remove(&call.id) {
                 approval
             } else {
@@ -2124,11 +2165,13 @@ impl Engine {
                 to: self.agent.name.clone(),
             })
             .await?;
-            self.checkpoint(Boundary::Handoff, None).await?;
             self.phase = Phase::Model;
+            self.checkpoint(Boundary::Handoff, None).await?;
             return Ok(false);
         }
         let tool = tool.expect("tool or handoff resolved");
+        self.checkpoint(Boundary::ToolDispatched, Some(&call))
+            .await?;
         let raw = self.execute_tool(tool.as_ref(), &call).await?;
         self.finish_tool(call, raw).await?;
         Ok(false)
@@ -2152,10 +2195,15 @@ impl Engine {
             operation,
             work_dir: self.config.work_dir.clone(),
             policy: self.policy.tools.clone(),
-            idempotency_key: Some(format!(
-                "{}:{}:{}",
-                self.context.run_id, self.turns, call.id
-            )),
+            idempotency_key: Some(
+                self.durable_state
+                    .as_ref()
+                    .and_then(|state| state.effect.as_ref())
+                    .map_or_else(
+                        || format!("{}:{}:{}", self.context.run_id, self.turns, call.id),
+                        |effect| effect.idempotency_key.clone(),
+                    ),
+            ),
         };
         let raw = match bounded(
             &context.operation,
@@ -2166,6 +2214,9 @@ impl Engine {
         {
             Ok(output) => output,
             Err(error) => {
+                if self.durable_state.is_some() {
+                    return Err(error);
+                }
                 // A local tool budget is model-visible; a dead parent still terminates the run.
                 self.context.check_active()?;
                 let message = if let Some(timeout) = timeout.filter(|_| {
@@ -2210,11 +2261,10 @@ impl Engine {
             });
             return Err(error);
         }
-        let processed = match self
-            .config
-            .output
-            .process(raw, self.policy.tools.access != AccessMode::ReadOnly)
-        {
+        let processed = match self.config.output.process(
+            raw,
+            self.durable_state.is_none() && self.policy.tools.access != AccessMode::ReadOnly,
+        ) {
             Ok(processed) => processed,
             Err(error) => {
                 self.append(RunItem::ToolResult {

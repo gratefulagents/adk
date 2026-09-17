@@ -1,0 +1,96 @@
+{
+  "schema_version": 2,
+  "tenant_id": "tenant_go",
+  "run_id": "run_go",
+  "revision": 1,
+  "event_sequence": 1,
+  "status": "running",
+  "classification": "sensitive",
+  "state": {
+    "checkpoint": "tool_prepared",
+    "large": 18446744073709551615,
+    "text": "\u003chello\u003e\u0026世界"
+  },
+  "attempts": [
+    {
+      "id": "att_go",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "steps": [
+    {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "prepared",
+      "data": {
+        "nested": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "tool_calls": [
+    {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "approvals": [
+    {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+      "resolved_at": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "child_runs": [
+    {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  ],
+  "effects": [
+    {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  ],
+  "cancellation": {
+    "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+    "requested_by": "operator",
+    "reason": "stop",
+    "acknowledged_at": "0001-01-01T00:00:00Z"
+  },
+  "cumulative_budget": {
+    "input_tokens": 9007199254740993,
+    "output_tokens": 12,
+    "tool_calls": 2,
+    "cost_micros": 42,
+    "wall_time_ms": 99
+  },
+  "created_at": "2026-01-02T02:04:05.123456789Z",
+  "updated_at": "2026-01-02T02:04:05.123456789Z",
+  "retain_until": "2026-01-02T04:04:05.123456789+01:00"
+}

@@ -1,0 +1,227 @@
+[
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "idempotent",
+      "state": "prepared",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "idempotent",
+      "state": "dispatched",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "idempotent",
+      "state": "succeeded",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "idempotent",
+      "state": "failed",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "idempotent",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "deduplicated",
+      "state": "prepared",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "deduplicated",
+      "state": "dispatched",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "deduplicated",
+      "state": "succeeded",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "deduplicated",
+      "state": "failed",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "deduplicated",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "state": "prepared",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "state": "dispatched",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "reconcile",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "state": "succeeded",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "state": "failed",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "none",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  },
+  {
+    "effect": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00"
+    },
+    "decision": {
+      "action": "operator_resolution",
+      "automatic": false,
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e"
+    }
+  }
+]

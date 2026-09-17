@@ -16,6 +16,8 @@ exceptions = [
   { name = "untrusted", version = "=0.9.0", allow = ["ISC"] },
   { name = "subtle", version = "=2.6.1", allow = ["BSD-3-Clause"] },
   { name = "webpki-roots", version = "=1.0.9", allow = ["CDLA-Permissive-2.0"] },
+  # SQLite hashlink dependency; retained Zlib notice reviewed in durable research.
+  { name = "foldhash", version = "=0.1.5", allow = ["Zlib"] },
 ]
 
 [bans]
@@ -25,6 +27,20 @@ wildcards = "deny"
 skip = [
   { name = "getrandom", version = "=0.2.17" },
   { name = "windows-sys", version = "=0.52.0" },
+  # Existing ahash/jsonschema RNG and proc-macro ecosystem use distinct majors.
+  { name = "getrandom", version = "=0.3.4" },
+  { name = "r-efi", version = "=5.3.0" },
+  { name = "syn", version = "=2.0.119" },
+  # rust-postgres uses current RustCrypto; existing SDK SHA1/SHA2 uses 0.10.
+  { name = "block-buffer", version = "=0.10.4" },
+  { name = "cpufeatures", version = "=0.2.17" },
+  { name = "crypto-common", version = "=0.1.7" },
+  { name = "digest", version = "=0.10.7" },
+  { name = "sha2", version = "=0.10.9" },
+  # PostgreSQL and SQLite require different fallible-iterator APIs.
+  { name = "fallible-iterator", version = "=0.2.0" },
+  # whoami (Postgres) and mio/ring use different WASI generations.
+  { name = "wasi", version = "=0.11.1+wasi-snapshot-preview1" },
 ]
 
 [sources]

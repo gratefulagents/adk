@@ -1,0 +1,11 @@
+{
+  "license": "GPL-3.0-only",
+  "normalization": "IDs, timestamps, and temporary directory paths only; Go API output and replay determine expected behavior",
+  "packages": [
+    "pkg/agentsdk/projectstate",
+    "pkg/agentsdk/memory"
+  ],
+  "revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "schema_version": 1,
+  "source": "github.com/gratefulagents/sdk"
+}

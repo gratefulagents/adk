@@ -25,6 +25,29 @@ jobs:
           esac
       - name: Standalone example
         run: cargo run --locked -p adk --example standalone --no-default-features
+  durable-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: adk
+          POSTGRES_PASSWORD: adk-test-only
+          POSTGRES_DB: adk_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U adk -d adk_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup show active-toolchain
+      - name: Verify real transactional store semantics
+        run: cargo test --locked -p adk-durable --all-features --all-targets
+        env:
+          ADK_TEST_POSTGRES_URL: postgres://adk:adk-test-only@localhost:5432/adk_test
   quality:
     runs-on: ubuntu-latest
     steps:

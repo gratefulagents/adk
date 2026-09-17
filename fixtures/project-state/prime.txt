@@ -1,0 +1,12 @@
+## Durable Project State
+Project: fixture-project
+Workspace: /fixture/work
+
+### Ready Work
+- task_000000000002 [P1 open] Dependent
+
+### Pinned Memories
+- Rust uses ownership and borrowing (pinned; rust,design)
+
+### Recent Memories
+- Run cargo test before shipping (procedural; rust,tests)

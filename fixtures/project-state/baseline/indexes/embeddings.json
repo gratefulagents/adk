@@ -1,0 +1,25 @@
+{
+  "model": "fixture-model",
+  "schema_version": 1,
+  "updated_at": "2025-01-01T00:00:17.123456789Z",
+  "vectors": {
+    "mem_000000000001": {
+      "dims": 2,
+      "hash": "6eee0206982d26be2a23b3f43029686bc968783c059730b70a8d7124df5b9cd0",
+      "model": "fixture-model",
+      "vector": [
+        1,
+        0
+      ]
+    },
+    "mem_000000000002": {
+      "dims": 2,
+      "hash": "7df013dac412081cfba6f7ab29e15c55598ad582bdd41f169155f3d885421af8",
+      "model": "fixture-model",
+      "vector": [
+        0,
+        1
+      ]
+    }
+  }
+}

@@ -6,14 +6,14 @@ use adk_core::{ApprovalRequest, Content, Message, Role, RunItem, ToolCall, ToolO
 #[error("unsupported approval/history conversion: {0}")]
 pub struct BridgeError(pub &'static str);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub enum ApprovalPhase {
     Pending,
     Approved,
     Denied,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ApprovalMarker {
     pub data: dto::ToolApprovalData,
     pub phase: ApprovalPhase,

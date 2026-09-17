@@ -1,0 +1,23 @@
+{
+  "cap": {
+    "calls": 3,
+    "feedback": [
+      "[SYSTEM] Final answer blocked by the completion gate (1/2):\nthe finalization check failed; continue working until it passes",
+      "[SYSTEM] Final answer blocked by the completion gate (2/2):\nthe finalization check failed; continue working until it passes"
+    ],
+    "final_output": "candidate",
+    "gate_calls": 2,
+    "max_turns": 1
+  },
+  "tool_reset": {
+    "calls": 5,
+    "feedback": [
+      "[SYSTEM] Final answer blocked by the completion gate (1/2):\nthe finalization check failed; continue working until it passes",
+      "[SYSTEM] Final answer blocked by the completion gate (1/2):\nthe finalization check failed; continue working until it passes",
+      "[SYSTEM] Final answer blocked by the completion gate (2/2):\nthe finalization check failed; continue working until it passes"
+    ],
+    "final_output": "candidate",
+    "gate_calls": 3,
+    "max_turns": 8
+  }
+}

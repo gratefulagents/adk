@@ -37,6 +37,9 @@ impl GoCallbackAdapter {
 }
 
 impl RunHooks for GoCallbackAdapter {
+    fn durable_observer(&self) -> bool {
+        true
+    }
     fn observe<'a>(
         &'a self,
         context: &'a Context,
@@ -103,7 +106,7 @@ pub fn apply_go_config(
     Ok(effective)
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ApprovalJournalEntry {
     pub marker: ApprovalMarker,
     pub new_items_before: usize,
@@ -135,6 +138,27 @@ pub struct ApprovalJournal {
 }
 
 impl ApprovalJournal {
+    pub(crate) fn restore(
+        entries: Vec<ApprovalJournalEntry>,
+        history_len: usize,
+        new_items_len: usize,
+    ) -> Result<Self, BridgeError> {
+        for entry in &entries {
+            entry.marker.validate()?;
+            if entry.history_before.is_some_and(|n| n > history_len)
+                || entry.new_items_before > new_items_len
+            {
+                return Err(BridgeError("approval journal anchor out of range"));
+            }
+        }
+        Ok(Self {
+            state: Mutex::new(JournalState {
+                entries,
+                history_invalidated: false,
+            }),
+        })
+    }
+
     pub fn history_markers(&self) -> Result<Vec<ApprovalMarkerBoundary>, BridgeError> {
         let state = self.state.lock().unwrap();
         if state.history_invalidated {

@@ -14,9 +14,17 @@
 //! Compactors must report any successful provider usage/cost, not assume zero.
 //!
 //! Approval continuations are in-process, single-use owners, not serializable
-//! checkpoints. DurableHook is fail-closed boundary observation, not crash replay.
+//! checkpoints. `run_durable` provides separate, serialized crash recovery.
+//! DurableHook alone remains fail-closed boundary observation.
 //! Failed events are best effort when the host, deadline or cancellation prevents
 //! delivery; `RunError` remains authoritative and retains partial history/spills.
+
+#[path = "durable.rs"]
+pub mod durable;
+pub use durable::{
+    CheckpointStore, ChildCheckpointOwner, DurableRun, GoRecovery, RunnerCheckpoint,
+    StoredCheckpointStore,
+};
 
 use std::{
     collections::{HashMap, HashSet, VecDeque},
@@ -242,6 +250,11 @@ pub enum Observation {
 /// Awaited and fail-closed. RawToolOutput precedes truncation/trust wrapping;
 /// hooks must not forward sensitive raw data to untrusted telemetry sinks.
 pub trait RunHooks: Send + Sync {
+    /// Opt in only for observational callbacks that tolerate missing/repeated delivery.
+    /// This does not provide effect idempotency or recovery for callback side effects.
+    fn durable_observer(&self) -> bool {
+        false
+    }
     fn observe<'a>(
         &'a self,
         context: &'a Context,
@@ -285,8 +298,10 @@ pub enum Boundary {
     Started,
     ModelPrepared,
     ModelCompleted,
+    ModelDispatched,
     ToolPrepared,
     ToolCompleted,
+    ToolDispatched,
     ApprovalPending,
     Handoff,
     Paused,
@@ -316,6 +331,12 @@ pub trait TurnContext: Send + Sync {
 
 /// None accepts the answer; Some(feedback) asks the same engine to continue.
 pub trait StopGate: Send + Sync {
+    /// Stable identity/version of a deterministic, replay-safe gate and its configuration.
+    /// Opting in forbids external effects and dependence on unpersisted mutable state.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+
     fn check<'a>(
         &'a self,
         context: &'a Context,
@@ -469,13 +490,15 @@ impl Continuation {
                 return Err(self.engine.fail(error).await);
             }
         }
-        self.engine.turns = 0;
-        self.engine.policy.max_turns = self.engine.base_turn_limit;
-        self.engine.stop_gate_blocks = 0;
-        self.engine.consecutive_tool_errors = 0;
-        self.engine.tool_error_escalated = false;
-        self.engine.fallbacks.clear();
-        self.engine.calibration = EstimateCalibration::default();
+        if self.engine.durable_state.is_none() {
+            self.engine.turns = 0;
+            self.engine.policy.max_turns = self.engine.base_turn_limit;
+            self.engine.stop_gate_blocks = 0;
+            self.engine.consecutive_tool_errors = 0;
+            self.engine.tool_error_escalated = false;
+            self.engine.fallbacks.clear();
+            self.engine.calibration = EstimateCalibration::default();
+        }
         self.engine.tool_final = None;
         self.engine.drive().await
     }
@@ -614,6 +637,7 @@ impl Runner {
     }
     fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
         Engine {
+            durable_state: None,
             agent: self.initial.clone(),
             config: self.config.clone(),
             context,
@@ -657,11 +681,12 @@ impl Runner {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
 enum Phase {
     Start,
     Model,
     Tools,
+    Finalize,
     Finish,
 }
 
@@ -671,6 +696,7 @@ struct ExecutedTool {
 }
 
 struct Engine {
+    durable_state: Option<durable::DurableState>,
     agent: Arc<AgentConfig>,
     config: Arc<RunnerConfig>,
     context: Context,
@@ -870,10 +896,19 @@ impl Engine {
         Ok(())
     }
     async fn checkpoint(
-        &self,
+        &mut self,
         boundary: Boundary,
         pending: Option<&ToolCall>,
     ) -> Result<(), Error> {
+        if self.durable_state.is_none()
+            && matches!(
+                boundary,
+                Boundary::ModelDispatched | Boundary::ToolDispatched
+            )
+        {
+            return Ok(());
+        }
+        self.persist_boundary(boundary, pending).await?;
         if let Some(hook) = &self.config.durable {
             bounded(
                 &self.context,
@@ -1031,7 +1066,7 @@ impl Engine {
                             self.observe(event).await?;
                         }
                         self.settle_tool_turn();
-                        for request in &self.result.pending_approvals {
+                        for request in self.result.pending_approvals.clone() {
                             self.checkpoint(Boundary::ApprovalPending, Some(&request.call))
                                 .await?;
                         }
@@ -1052,6 +1087,16 @@ impl Engine {
                             return Ok(RunStatus::Paused);
                         }
                     }
+                }
+                Phase::Finalize => {
+                    let output = self.result.final_output.take().ok_or_else(|| {
+                        Error::new(
+                            ErrorCategory::InvalidInput,
+                            "missing durable final candidate",
+                        )
+                    })?;
+                    self.finish_candidate(output).await?;
+                    self.checkpoint(Boundary::ModelCompleted, None).await?;
                 }
                 Phase::Finish => return Ok(RunStatus::Completed),
             }
@@ -1386,7 +1431,10 @@ impl Engine {
             })
             .await?;
         }
-        self.checkpoint(Boundary::ModelCompleted, None).await?;
+
+        if self.durable_state.is_none() {
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
+        }
         self.observe(Observation::Usage {
             usage: self.result.usage.clone(),
             cost: self.cost,
@@ -1446,43 +1494,55 @@ impl Engine {
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
-            if let Some(gate) = &self.config.stop_gate {
-                let has_tools = self
-                    .agent
+            if self.durable_state.is_some() && self.config.stop_gate.is_some() {
+                self.result.final_output = Some(output);
+                self.phase = Phase::Finalize;
+            } else {
+                self.finish_candidate(output).await?;
+            }
+        }
+        if self.durable_state.is_some() {
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
+        }
+        Ok(())
+    }
+    async fn finish_candidate(&mut self, output: Value) -> Result<(), Error> {
+        if let Some(gate) = &self.config.stop_gate {
+            let has_tools =
+                self.agent
                     .tools
                     .iter()
                     .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
                     || self.agent.handoffs.iter().any(|handoff| {
                         self.tool_decision(&handoff.definition) != ToolDecision::Deny
                     });
-                if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
-                    if let Some(mut feedback) =
-                        bounded(&self.context, None, gate.check(&self.context, &output)).await?
-                    {
-                        self.stop_gate_blocks += 1;
-                        if feedback.trim().is_empty() {
-                            feedback =
-                                "the finalization check failed; continue working until it passes"
-                                    .into();
-                        }
-                        self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
-                        if self.turns >= self.policy.max_turns.get() {
-                            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
-                        }
-                        self.phase = Phase::Model;
-                        return Ok(());
+            if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
+                if let Some(mut feedback) =
+                    bounded(&self.context, None, gate.check(&self.context, &output)).await?
+                {
+                    self.stop_gate_blocks += 1;
+                    if feedback.trim().is_empty() {
+                        feedback =
+                            "the finalization check failed; continue working until it passes"
+                                .into();
                     }
-                    self.stop_gate_blocks = 0;
+                    self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                    if self.turns >= self.policy.max_turns.get() {
+                        self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                    }
+                    self.phase = Phase::Model;
+                    return Ok(());
                 }
+                self.stop_gate_blocks = 0;
             }
-            self.result.final_output = Some(output.clone());
-            self.observe(Observation::AgentEnded {
-                agent: self.agent.name.clone(),
-                output,
-            })
-            .await?;
-            self.phase = Phase::Finish;
         }
+        self.result.final_output = Some(output.clone());
+        self.observe(Observation::AgentEnded {
+            agent: self.agent.name.clone(),
+            output,
+        })
+        .await?;
+        self.phase = Phase::Finish;
         Ok(())
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
@@ -1597,6 +1657,7 @@ impl Engine {
                         + estimate_request_overhead_tokens(&request)
                         - output_reserve_tokens(&request)
                         - REQUEST_SAFETY_BUFFER;
+                self.checkpoint(Boundary::ModelDispatched, None).await?;
                 match self.model_attempt(binding, request.clone()).await {
                     Ok(response) => {
                         self.calibration.observe_estimate(
@@ -1619,6 +1680,9 @@ impl Engine {
                         ));
                     }
                     Err((error, committed)) => {
+                        if self.durable_state.is_some() {
+                            return Err(error);
+                        }
                         self.context.check_active()?;
                         let idle = error
                             .source
@@ -1850,6 +1914,9 @@ impl Engine {
         }
     }
     async fn prepare_tools(&mut self) -> Result<(), Error> {
+        if self.durable_state.is_some() {
+            return Ok(());
+        }
         if self.calls.front().is_some_and(|call| {
             self.agent
                 .handoffs
@@ -1918,7 +1985,8 @@ impl Engine {
         Ok(())
     }
     fn parallel_batch_ready(&self) -> bool {
-        self.calls.len() > 1
+        self.durable_state.is_none()
+            && self.calls.len() > 1
             && self.calls.iter().all(|call| {
                 self.agent.tools.iter().any(|tool| {
                     let definition = tool.definition();
@@ -2020,6 +2088,10 @@ impl Engine {
                 call: call.clone(),
                 reason: "tool policy requires approval".into(),
             };
+            if self.durable_state.is_some() {
+                self.checkpoint(Boundary::ApprovalPending, Some(&call))
+                    .await?;
+            }
             let approval = if let Some(approval) = self.approvals.remove(&call.id) {
                 approval
             } else {
@@ -2124,11 +2196,13 @@ impl Engine {
                 to: self.agent.name.clone(),
             })
             .await?;
-            self.checkpoint(Boundary::Handoff, None).await?;
             self.phase = Phase::Model;
+            self.checkpoint(Boundary::Handoff, None).await?;
             return Ok(false);
         }
         let tool = tool.expect("tool or handoff resolved");
+        self.checkpoint(Boundary::ToolDispatched, Some(&call))
+            .await?;
         let raw = self.execute_tool(tool.as_ref(), &call).await?;
         self.finish_tool(call, raw).await?;
         Ok(false)
@@ -2152,10 +2226,15 @@ impl Engine {
             operation,
             work_dir: self.config.work_dir.clone(),
             policy: self.policy.tools.clone(),
-            idempotency_key: Some(format!(
-                "{}:{}:{}",
-                self.context.run_id, self.turns, call.id
-            )),
+            idempotency_key: Some(
+                self.durable_state
+                    .as_ref()
+                    .and_then(|state| state.effect.as_ref())
+                    .map_or_else(
+                        || format!("{}:{}:{}", self.context.run_id, self.turns, call.id),
+                        |effect| effect.idempotency_key.clone(),
+                    ),
+            ),
         };
         let raw = match bounded(
             &context.operation,
@@ -2166,6 +2245,9 @@ impl Engine {
         {
             Ok(output) => output,
             Err(error) => {
+                if self.durable_state.is_some() {
+                    return Err(error);
+                }
                 // A local tool budget is model-visible; a dead parent still terminates the run.
                 self.context.check_active()?;
                 let message = if let Some(timeout) = timeout.filter(|_| {
@@ -2210,11 +2292,10 @@ impl Engine {
             });
             return Err(error);
         }
-        let processed = match self
-            .config
-            .output
-            .process(raw, self.policy.tools.access != AccessMode::ReadOnly)
-        {
+        let processed = match self.config.output.process(
+            raw,
+            self.durable_state.is_none() && self.policy.tools.access != AccessMode::ReadOnly,
+        ) {
             Ok(processed) => processed,
             Err(error) => {
                 self.append(RunItem::ToolResult {

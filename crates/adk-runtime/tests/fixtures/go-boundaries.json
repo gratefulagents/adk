@@ -1,0 +1,759 @@
+{
+  "approval": [
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 1,
+      "boundary": "run_started",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 2,
+      "boundary": "model_prepared",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 3,
+      "boundary": "model_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 4,
+      "boundary": "tool_prepared",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 5,
+      "boundary": "tool_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_approval",
+          "agent_name": "agent",
+          "tool_approval": {
+            "tool_name": "effect",
+            "input": {},
+            "call_id": "call-1",
+            "approved": false
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 6,
+      "boundary": "approval_pending",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_approval",
+          "agent_name": "agent",
+          "tool_approval": {
+            "tool_name": "effect",
+            "input": {},
+            "call_id": "call-1",
+            "approved": false
+          }
+        }
+      ],
+      "interruptions": [
+        {
+          "tool_name": "effect",
+          "tool_input": {},
+          "tool_call_id": "call-1"
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    }
+  ],
+  "handoff": [
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 1,
+      "boundary": "run_started",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 2,
+      "boundary": "model_prepared",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 3,
+      "boundary": "model_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "transfer_to_target",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 4,
+      "boundary": "handoff_completed",
+      "agent_name": "target",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "transfer_to_target",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "Handing off to target"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 5,
+      "boundary": "model_prepared",
+      "agent_name": "target",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "transfer_to_target",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "Handing off to target"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 6,
+      "boundary": "model_completed",
+      "agent_name": "target",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "transfer_to_target",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "Handing off to target"
+          }
+        },
+        {
+          "type": "message",
+          "agent_name": "target",
+          "message_text": "done"
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 7,
+      "boundary": "run_completed",
+      "agent_name": "target",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "transfer_to_target",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "Handing off to target"
+          }
+        },
+        {
+          "type": "message",
+          "agent_name": "target",
+          "message_text": "done"
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    }
+  ],
+  "pause": [
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 1,
+      "boundary": "run_started",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 2,
+      "boundary": "model_prepared",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 3,
+      "boundary": "model_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "AskUserQuestion",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 4,
+      "boundary": "tool_prepared",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "AskUserQuestion",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 5,
+      "boundary": "tool_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "AskUserQuestion",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 6,
+      "boundary": "paused",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "AskUserQuestion",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    }
+  ],
+  "tool": [
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 1,
+      "boundary": "run_started",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 2,
+      "boundary": "model_prepared",
+      "agent_name": "agent",
+      "history": null,
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 3,
+      "boundary": "model_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 4,
+      "boundary": "tool_prepared",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 5,
+      "boundary": "tool_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 6,
+      "boundary": "model_prepared",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 7,
+      "boundary": "model_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent_name": "agent",
+          "message_text": "done"
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    },
+    {
+      "schema_version": 1,
+      "run_id": "run-1",
+      "attempt_id": "go-attempt",
+      "step_id": "step_go",
+      "sequence": 8,
+      "boundary": "run_completed",
+      "agent_name": "agent",
+      "history": [
+        {
+          "type": "tool_call",
+          "agent_name": "agent",
+          "tool_call": {
+            "id": "call-1",
+            "name": "effect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent_name": "agent",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ndone\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent_name": "agent",
+          "message_text": "done"
+        }
+      ],
+      "usage": {
+        "requests": 0,
+        "input_tokens": 0,
+        "output_tokens": 0
+      },
+      "created_at": "2026-01-02T03:04:05Z"
+    }
+  ]
+}

@@ -9,6 +9,9 @@ description = "Standalone ADK execution engine, streaming, approvals and owned T
 
 [dependencies]
 adk-core.workspace = true
+adk-durable = { version = "0.1.0", path = "../adk-durable", default-features = false }
+serde.workspace = true
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde"] }
 adk-codec.workspace = true
 tokio.workspace = true
 tokio-util.workspace = true
@@ -19,4 +22,5 @@ sha2 = "0.10"
 jsonschema = { version = "0.33", default-features = false }
 
 [dev-dependencies]
+tempfile = "3"
 tokio = { workspace = true, features = ["test-util"] }

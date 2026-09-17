@@ -1,0 +1,12 @@
+{
+  "id": "event_go",
+  "tenant_id": "tenant_go",
+  "run_id": "run_go",
+  "sequence": 1,
+  "at": "2026-01-02T03:04:05.123456789+01:00",
+  "type": "tool.prepared",
+  "classification": "sensitive",
+  "payload": {
+    "n": 9007199254740993
+  }
+}

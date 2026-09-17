@@ -1,0 +1,1588 @@
+{
+  "definitions": [
+    {
+      "description": "Create a durable project task in the filesystem event log. Use for work that should survive sessions and context compaction.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "task",
+              "bug",
+              "feature",
+              "chore",
+              "epic"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "name": "task_create",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "List ready durable project tasks: open tasks with no open blockers.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_assigned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "name": "task_ready",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Show one durable project task with comments and dependencies.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_show",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Update durable project task fields.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_update",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Atomically claim a durable project task for the current agent.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_claim",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Close a durable project task with an optional reason.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_close",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Add a durable comment to a project task.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "body"
+        ]
+      },
+      "name": "task_comment",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Add or remove a dependency between durable project tasks.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "depends_on"
+        ]
+      },
+      "name": "task_link",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Store a durable typed project memory in the filesystem event log.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "name": "memory_remember",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Search durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "name": "memory_recall",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "List durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "name": "memory_list",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Update an existing durable typed project memory by id. Omitted fields keep their current values.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_run": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "memory_update",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Delete one durable typed project memory by id.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "memory_delete",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Summarize durable typed project memory counts by kind, scope, and tag.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "name": "memory_stats",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Build compact durable project context from tasks and memories for session start or compaction recovery.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "active_task_id": {
+            "type": "string"
+          },
+          "ready_limit": {
+            "type": "integer"
+          },
+          "memory_limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "name": "prime_context",
+      "read_only": true,
+      "requires_approval": false
+    }
+  ],
+  "steps": [
+    {
+      "name": "task_create",
+      "input": {
+        "title": "blocker"
+      },
+      "format": "json",
+      "save": "$a",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "open",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "priority": 0,
+        "title": "dependent"
+      },
+      "format": "json",
+      "save": "$b",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$b",
+        "priority": 0,
+        "status": "open",
+        "title": "dependent",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "format": "json",
+      "output": {
+        "action": "add",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {},
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$b"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "priority": 2,
+          "status": "open",
+          "title": "blocker",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_claim",
+      "input": {
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_comment",
+      "input": {
+        "body": "note",
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "actor": "agent",
+        "body": "note",
+        "created_at": "\u003ctime\u003e",
+        "id": "\u003ccomment\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "$a",
+        "labels": [
+          "label"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "labels": [
+          "label"
+        ],
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "$a",
+        "labels": []
+      },
+      "format": "json",
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_close",
+      "input": {
+        "id": "$a",
+        "reason": "done"
+      },
+      "format": "json",
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "closed_at": "\u003ctime\u003e",
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          },
+          {
+            "body": "Closed: done",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "closed",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {},
+      "format": "json",
+      "output": [
+        {
+          "created_at": "\u003ctime\u003e",
+          "depends_on": [
+            "$a"
+          ],
+          "id": "$b",
+          "priority": 0,
+          "status": "open",
+          "title": "dependent",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "action": "remove",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "format": "json",
+      "output": {
+        "action": "remove",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_show",
+      "input": {
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "assignee": "agent",
+        "closed_at": "\u003ctime\u003e",
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          },
+          {
+            "body": "Closed: done",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "closed",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "durable engineering preference",
+        "kind": "semantic",
+        "scope": "user",
+        "tags": [
+          "style"
+        ]
+      },
+      "format": "json",
+      "save": "$m",
+      "output": {
+        "content": "durable engineering preference",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "semantic",
+        "scope": "user",
+        "tags": [
+          "style"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "content": "compact engineering preference",
+        "id": "$m",
+        "tags": []
+      },
+      "format": "json",
+      "output": {
+        "content": "compact engineering preference",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "semantic",
+        "scope": "user",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "semantic"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "compact engineering preference",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "semantic",
+          "scope": "user",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "query": "engineering"
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "compact engineering preference",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "semantic",
+          "scope": "user",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {},
+      "format": "json",
+      "output": {
+        "by_kind": {
+          "semantic": 1
+        },
+        "by_scope": {
+          "user": 1
+        },
+        "by_tag": {},
+        "total": 1
+      },
+      "is_error": false
+    },
+    {
+      "name": "prime_context",
+      "input": {
+        "active_task_id": "$b",
+        "memory_limit": null,
+        "ready_limit": null
+      },
+      "format": "text",
+      "output": "## Durable Project State\nProject: tool-contract\n\n### Active Task\n- $b [P0 open] dependent\n\n### Ready Work\n- $b [P0 open] dependent\n\n### Recent Memories\n- compact engineering preference (semantic)",
+      "is_error": false
+    },
+    {
+      "name": "memory_delete",
+      "input": {
+        "id": "$m"
+      },
+      "format": "json",
+      "output": {
+        "id": "$m",
+        "status": "deleted"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {},
+      "format": "json",
+      "output": {
+        "by_kind": {},
+        "by_scope": {},
+        "by_tag": {},
+        "total": 0
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": null,
+        "depends_on": null,
+        "description": null,
+        "labels": null,
+        "priority": null,
+        "title": "nullable",
+        "type": null
+      },
+      "format": "json",
+      "save": "$c",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$c",
+        "priority": 2,
+        "status": "open",
+        "title": "nullable",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "assignee": null,
+        "include_assigned": null,
+        "labels": null,
+        "limit": null
+      },
+      "format": "json",
+      "output": [
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "priority": 0,
+          "status": "open",
+          "title": "dependent",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$c",
+          "priority": 2,
+          "status": "open",
+          "title": "nullable",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "description": null,
+        "id": "$c",
+        "labels": null,
+        "priority": null,
+        "title": null
+      },
+      "format": "json",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$c",
+        "priority": 2,
+        "status": "open",
+        "title": "nullable",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "nullable memory",
+        "file_paths": null,
+        "kind": null,
+        "scope": null,
+        "source_run": null,
+        "tags": null,
+        "task_ids": null
+      },
+      "format": "json",
+      "save": "$n",
+      "output": {
+        "content": "nullable memory",
+        "created_at": "\u003ctime\u003e",
+        "id": "$n",
+        "kind": "semantic",
+        "scope": "project",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "content": null,
+        "id": "$n",
+        "kind": null,
+        "scope": null,
+        "tags": null
+      },
+      "format": "json",
+      "output": {
+        "content": "nullable memory",
+        "created_at": "\u003ctime\u003e",
+        "id": "$n",
+        "kind": "semantic",
+        "scope": "project",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": null,
+        "limit": null,
+        "tags": null
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "nullable memory",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "semantic",
+          "scope": "project",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "kinds": null,
+        "limit": null,
+        "query": "nullable",
+        "tags": null
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "nullable memory",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "semantic",
+          "scope": "project",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": "$n",
+        "tags": [
+          null,
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "content": "nullable memory",
+        "created_at": "\u003ctime\u003e",
+        "id": "$n",
+        "kind": "semantic",
+        "scope": "project",
+        "tags": [
+          "keep"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "$c",
+        "labels": [
+          null,
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$c",
+        "labels": [
+          "keep"
+        ],
+        "priority": 2,
+        "status": "open",
+        "title": "nullable",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": null,
+      "format": "json",
+      "output": {
+        "by_kind": {
+          "semantic": 1
+        },
+        "by_scope": {
+          "project": 1
+        },
+        "by_tag": {
+          "keep": 1
+        },
+        "total": 1
+      },
+      "is_error": false
+    },
+    {
+      "name": "prime_context",
+      "input": null,
+      "format": "text",
+      "output": "## Durable Project State\nProject: tool-contract\n\n### Ready Work\n- $b [P0 open] dependent\n- $c [P2 open] nullable\n\n### Recent Memories\n- nullable memory (semantic; keep)",
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": null,
+      "format": "text",
+      "output": "title is required",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "title": ""
+      },
+      "format": "text",
+      "output": "title is required",
+      "is_error": true
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": ""
+      },
+      "format": "text",
+      "output": "memory content is required",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "content": "absent",
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "memory \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": null
+      },
+      "format": "text",
+      "output": "memory id is required",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "title": 42
+      },
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go struct field .title of type string",
+      "is_error": true
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "limit": "oops"
+      },
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go struct field .limit of type int",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { Title string \"json:\\\"title\\\"\"; Description string \"json:\\\"description\\\"\"; Type string \"json:\\\"type\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; DependsOn []string \"json:\\\"depends_on\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { Title string \"json:\\\"title\\\"\"; Description string \"json:\\\"description\\\"\"; Type string \"json:\\\"type\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; DependsOn []string \"json:\\\"depends_on\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { Title string \"json:\\\"title\\\"\"; Description string \"json:\\\"description\\\"\"; Type string \"json:\\\"type\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; DependsOn []string \"json:\\\"depends_on\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_create",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { Title string \"json:\\\"title\\\"\"; Description string \"json:\\\"description\\\"\"; Type string \"json:\\\"type\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; DependsOn []string \"json:\\\"depends_on\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_ready",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { Limit int \"json:\\\"limit\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\"; IncludeAssigned bool \"json:\\\"include_assigned\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_ready",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { Limit int \"json:\\\"limit\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\"; IncludeAssigned bool \"json:\\\"include_assigned\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_ready",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { Limit int \"json:\\\"limit\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\"; IncludeAssigned bool \"json:\\\"include_assigned\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_ready",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { Limit int \"json:\\\"limit\\\"\"; Assignee string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\"; IncludeAssigned bool \"json:\\\"include_assigned\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_show",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_show",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_show",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_show",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_update",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; Title *string \"json:\\\"title\\\"\"; Description *string \"json:\\\"description\\\"\"; Type *string \"json:\\\"type\\\"\"; Status *string \"json:\\\"status\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee *string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_update",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; Title *string \"json:\\\"title\\\"\"; Description *string \"json:\\\"description\\\"\"; Type *string \"json:\\\"type\\\"\"; Status *string \"json:\\\"status\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee *string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_update",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; Title *string \"json:\\\"title\\\"\"; Description *string \"json:\\\"description\\\"\"; Type *string \"json:\\\"type\\\"\"; Status *string \"json:\\\"status\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee *string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_update",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; Title *string \"json:\\\"title\\\"\"; Description *string \"json:\\\"description\\\"\"; Type *string \"json:\\\"type\\\"\"; Status *string \"json:\\\"status\\\"\"; Priority *int \"json:\\\"priority\\\"\"; Assignee *string \"json:\\\"assignee\\\"\"; Labels []string \"json:\\\"labels\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_claim",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_claim",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_claim",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_claim",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_close",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; Reason string \"json:\\\"reason\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_close",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; Reason string \"json:\\\"reason\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_close",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; Reason string \"json:\\\"reason\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_close",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; Reason string \"json:\\\"reason\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_comment",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; Body string \"json:\\\"body\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_comment",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; Body string \"json:\\\"body\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_comment",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; Body string \"json:\\\"body\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_comment",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; Body string \"json:\\\"body\\\"\"; Actor string \"json:\\\"actor\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; DependsOn string \"json:\\\"depends_on\\\"\"; Action string \"json:\\\"action\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; DependsOn string \"json:\\\"depends_on\\\"\"; Action string \"json:\\\"action\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; DependsOn string \"json:\\\"depends_on\\\"\"; Action string \"json:\\\"action\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; DependsOn string \"json:\\\"depends_on\\\"\"; Action string \"json:\\\"action\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_remember",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type projectstate.UpsertMemoryInput",
+      "is_error": true
+    },
+    {
+      "name": "memory_remember",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type projectstate.UpsertMemoryInput",
+      "is_error": true
+    },
+    {
+      "name": "memory_remember",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type projectstate.UpsertMemoryInput",
+      "is_error": true
+    },
+    {
+      "name": "memory_remember",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type projectstate.UpsertMemoryInput",
+      "is_error": true
+    },
+    {
+      "name": "memory_recall",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_recall",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_recall",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_recall",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_list",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_list",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_list",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_list",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\"; Content *string \"json:\\\"content\\\"\"; Kind *string \"json:\\\"kind\\\"\"; Scope *string \"json:\\\"scope\\\"\"; Tags []string \"json:\\\"tags\\\"\"; TaskIDs []string \"json:\\\"task_ids\\\"\"; FilePaths []string \"json:\\\"file_paths\\\"\"; SourceRun *string \"json:\\\"source_run\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\"; Content *string \"json:\\\"content\\\"\"; Kind *string \"json:\\\"kind\\\"\"; Scope *string \"json:\\\"scope\\\"\"; Tags []string \"json:\\\"tags\\\"\"; TaskIDs []string \"json:\\\"task_ids\\\"\"; FilePaths []string \"json:\\\"file_paths\\\"\"; SourceRun *string \"json:\\\"source_run\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\"; Content *string \"json:\\\"content\\\"\"; Kind *string \"json:\\\"kind\\\"\"; Scope *string \"json:\\\"scope\\\"\"; Tags []string \"json:\\\"tags\\\"\"; TaskIDs []string \"json:\\\"task_ids\\\"\"; FilePaths []string \"json:\\\"file_paths\\\"\"; SourceRun *string \"json:\\\"source_run\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_update",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\"; Content *string \"json:\\\"content\\\"\"; Kind *string \"json:\\\"kind\\\"\"; Scope *string \"json:\\\"scope\\\"\"; Tags []string \"json:\\\"tags\\\"\"; TaskIDs []string \"json:\\\"task_ids\\\"\"; FilePaths []string \"json:\\\"file_paths\\\"\"; SourceRun *string \"json:\\\"source_run\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_delete",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_delete",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_delete",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_delete",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type struct { ID string \"json:\\\"id\\\"\" }",
+      "is_error": true
+    },
+    {
+      "name": "memory_stats",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_stats",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_stats",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "memory_stats",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type projectstate.MemoryFilter",
+      "is_error": true
+    },
+    {
+      "name": "prime_context",
+      "input": [],
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal array into Go value of type projectstate.PrimeOptions",
+      "is_error": true
+    },
+    {
+      "name": "prime_context",
+      "input": "oops",
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal string into Go value of type projectstate.PrimeOptions",
+      "is_error": true
+    },
+    {
+      "name": "prime_context",
+      "input": 42,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal number into Go value of type projectstate.PrimeOptions",
+      "is_error": true
+    },
+    {
+      "name": "prime_context",
+      "input": false,
+      "format": "text",
+      "output": "Invalid input: json: cannot unmarshal bool into Go value of type projectstate.PrimeOptions",
+      "is_error": true
+    }
+  ]
+}

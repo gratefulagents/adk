@@ -4,7 +4,8 @@ Rust-native agent development kit, with a standalone execution engine and reusab
 contracts separated from platform integration. The opt-in `runtime` feature runs
 host-supplied models and tools, including streamed execution and approval
 continuations. The opt-in `execution` feature adds sandbox backends, subprocess
-ownership, and policy/guardrails. MCP transport, durable storage and deployment
+ownership, and policy/guardrails. Opt-in `durable` and `project-state` features
+provide compatible persistence and project memory. MCP transport and deployment
 remain separate work; this is not a production platform worker.
 
 ## Workspace
@@ -14,6 +15,10 @@ remain separate work; this is not a production platform worker.
 - `adk-codec`: explicit Go compatibility codecs, separate from native types.
 - `adk-runtime`: optional Rust state-machine runner, tool-output safety, streaming,
   approval continuation, and Tokio cancellation/owned-task resource management.
+- `adk-durable`: versioned Go-compatible documents, fenced filesystem/Postgres
+  stores, snapshot CAS, immutable events and conservative effect recovery.
+- `adk-project-state`: event-sourced project tasks and memories, filesystem/SQLite
+  stores and separate embedding-assisted recall.
 - `adk-security`: composed permissions, command and secret guardrails, exact-call approval.
 - `adk-sandbox`: Linux Bubblewrap/macOS Seatbelt and explicit full-access local
   execution, with owned process groups and PTY lifecycle.
@@ -61,6 +66,8 @@ The facade's default feature set is empty. `compat` adds SDK codecs; `runtime`
 adds the execution engine and task owner. `execution` adds sandbox and security
 APIs; see [execution security](docs/execution-security.md) for trusted-host usage,
 OS support, enforced CI tests and limitations. None adds Kubernetes/platform code.
+See [durable runs and project state](docs/durable-runs.md) for fenced store
+ownership, compatible Go checkpoints, recovery limits and memory APIs.
 See [runner design and behavior](docs/runner-design.md) for lifecycle contracts,
 Go compatibility mapping, research and explicit integration boundaries. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect

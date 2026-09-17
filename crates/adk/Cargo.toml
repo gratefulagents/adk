@@ -13,6 +13,8 @@ runtime = ["dep:adk-runtime"]
 providers = ["dep:adk-providers"]
 providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 execution = ["dep:adk-security", "dep:adk-sandbox"]
+durable = ["dep:adk-durable"]
+project-state = ["dep:adk-project-state"]
 
 [dependencies]
 adk-core.workspace = true
@@ -21,6 +23,9 @@ adk-runtime = { workspace = true, optional = true }
 adk-providers = { version = "0.1.0", path = "../adk-providers", optional = true }
 adk-security = { version = "0.1.0", path = "../adk-security", optional = true }
 adk-sandbox = { version = "0.1.0", path = "../adk-sandbox", optional = true }
+
+adk-durable = { version = "0.1.0", path = "../adk-durable", optional = true }
+adk-project-state = { version = "0.1.0", path = "../adk-project-state", optional = true }
 
 [dev-dependencies]
 tokio.workspace = true

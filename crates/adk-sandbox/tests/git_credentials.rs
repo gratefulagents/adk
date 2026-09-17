@@ -80,11 +80,15 @@ fn request(script: &str, access: AccessMode) -> Request {
 }
 
 fn sandbox_config(root: &Path) -> Config {
-    let mut config = Config::new(root);
+    let config = Config::new(root);
     #[cfg(target_os = "macos")]
-    config
-        .runtime_roots
-        .push(adk_sandbox::macos_developer_toolchain_root().unwrap());
+    let config = {
+        let mut config = config;
+        config
+            .runtime_roots
+            .push(adk_sandbox::macos_developer_toolchain_root().unwrap());
+        config
+    };
     config
 }
 

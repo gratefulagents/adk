@@ -168,6 +168,7 @@ dependencies = [
  "adk-project-state",
  "adk-runtime",
  "base64",
+ "memchr",
  "regex",
  "regex-syntax",
  "rustix",

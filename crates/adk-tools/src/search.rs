@@ -63,7 +63,7 @@ fn output(text: String, is_error: bool) -> ToolOutput {
     }
 }
 
-fn go_string(bytes: &[u8]) -> String {
+pub(crate) fn go_string(bytes: &[u8]) -> String {
     let mut rest = bytes;
     let mut result = String::new();
     while !rest.is_empty() {

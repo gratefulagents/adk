@@ -28,6 +28,20 @@ Go regex differences, size limits, hard links and symlinks. Cases marked
 `crates/adk-tools/tests/search.rs` additionally covers concurrent symlink swaps,
 query-bound cursor rejection and cancellation.
 
+`lifecycle.json` and `verify-lifecycle.go` compare Write/Edit/Move/Delete results
+and resulting filesystem trees (including permissions) against the pinned SDK:
+
+```sh
+cargo build -p adk-tools --example lifecycle_replay
+cd repos/sdk
+go run ../../fixtures/tools/verify-lifecycle.go ../../target/debug/examples/lifecycle_replay
+```
+
+These 77 cases exercise both write-access variants, exact matching, merged and
+truncated Edit diffs, directory lifecycle, hard links, symlinks, and failure
+restoration. Temporary workspace roots are normalized in result strings;
+`error_only` cases compare error status and filesystem effects, not OS diagnostics.
+
 This is an explicit subset of tool behavior, not the full security corpus.
 Rust malformed-input diagnostics are not yet byte-for-byte Go diagnostics.
 Plan artifact and namespace-memory tests use injected recording/in-memory stores;

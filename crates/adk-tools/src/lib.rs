@@ -10,12 +10,20 @@ use std::{
     sync::{Arc, OnceLock},
 };
 
+#[cfg(target_os = "linux")]
+mod edit;
+#[cfg(target_os = "linux")]
+mod edit_diff;
+#[cfg(target_os = "linux")]
+mod lifecycle;
 pub mod memory;
 pub mod plan;
 mod search;
 mod search_pattern;
 pub mod signal;
 mod workspace;
+#[cfg(target_os = "linux")]
+mod write;
 
 fn json_text(value: &impl serde::Serialize) -> Result<String, serde_json::Error> {
     Ok(serde_json::to_string(value)?
@@ -197,6 +205,11 @@ impl Registry {
                 .remove(&capability.name)
                 .or_else(|| signal::builtin(capability))
                 .or_else(|| search::builtin(capability));
+            #[cfg(target_os = "linux")]
+            let implementation = implementation
+                .or_else(|| lifecycle::builtin(capability))
+                .or_else(|| write::builtin(capability))
+                .or_else(|| edit::builtin(capability));
             let Some(tool) = implementation else {
                 if capability.classification != "host-only" {
                     missing.push(capability.name.clone());

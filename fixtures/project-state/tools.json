@@ -1,0 +1,844 @@
+{
+  "definitions": [
+    {
+      "description": "Create a durable project task in the filesystem event log. Use for work that should survive sessions and context compaction.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "task",
+              "bug",
+              "feature",
+              "chore",
+              "epic"
+            ]
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "name": "task_create",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "List ready durable project tasks: open tasks with no open blockers.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer"
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "include_assigned": {
+            "type": "boolean"
+          }
+        }
+      },
+      "name": "task_ready",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Show one durable project task with comments and dependencies.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_show",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Update durable project task fields.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4
+          },
+          "assignee": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_update",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Atomically claim a durable project task for the current agent.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_claim",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Close a durable project task with an optional reason.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "task_close",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Add a durable comment to a project task.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "body"
+        ]
+      },
+      "name": "task_comment",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Add or remove a dependency between durable project tasks.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "depends_on": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "add",
+              "remove"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "depends_on"
+        ]
+      },
+      "name": "task_link",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Store a durable typed project memory in the filesystem event log.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "name": "memory_remember",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Search durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "name": "memory_recall",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "List durable typed project memories.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "name": "memory_list",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Update an existing durable typed project memory by id. Omitted fields keep their current values.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "pinned",
+              "semantic",
+              "episodic",
+              "procedural"
+            ]
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "project",
+              "user",
+              "task",
+              "file"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "task_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "file_paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_run": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "memory_update",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Delete one durable typed project memory by id.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "name": "memory_delete",
+      "read_only": false,
+      "requires_approval": false
+    },
+    {
+      "description": "Summarize durable typed project memory counts by kind, scope, and tag.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "kinds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "name": "memory_stats",
+      "read_only": true,
+      "requires_approval": false
+    },
+    {
+      "description": "Build compact durable project context from tasks and memories for session start or compaction recovery.",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "active_task_id": {
+            "type": "string"
+          },
+          "ready_limit": {
+            "type": "integer"
+          },
+          "memory_limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "name": "prime_context",
+      "read_only": true,
+      "requires_approval": false
+    }
+  ],
+  "steps": [
+    {
+      "name": "task_create",
+      "input": {
+        "title": "blocker"
+      },
+      "save": "$a",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "open",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "priority": 0,
+        "title": "dependent"
+      },
+      "save": "$b",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$b",
+        "priority": 0,
+        "status": "open",
+        "title": "dependent",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "output": {
+        "action": "add",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {},
+      "output": [
+        {
+          "blocks": [
+            "$b"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "priority": 2,
+          "status": "open",
+          "title": "blocker",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_claim",
+      "input": {
+        "id": "$a"
+      },
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_comment",
+      "input": {
+        "body": "note",
+        "id": "$a"
+      },
+      "output": {
+        "actor": "agent",
+        "body": "note",
+        "created_at": "\u003ctime\u003e",
+        "id": "\u003ccomment\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "$a",
+        "labels": [
+          "label"
+        ]
+      },
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "labels": [
+          "label"
+        ],
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "$a",
+        "labels": []
+      },
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "in_progress",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_close",
+      "input": {
+        "id": "$a",
+        "reason": "done"
+      },
+      "output": {
+        "assignee": "agent",
+        "blocks": [
+          "$b"
+        ],
+        "closed_at": "\u003ctime\u003e",
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          },
+          {
+            "body": "Closed: done",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "closed",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {},
+      "output": [
+        {
+          "created_at": "\u003ctime\u003e",
+          "depends_on": [
+            "$a"
+          ],
+          "id": "$b",
+          "priority": 0,
+          "status": "open",
+          "title": "dependent",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "action": "remove",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "output": {
+        "action": "remove",
+        "depends_on": "$a",
+        "id": "$b"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_show",
+      "input": {
+        "id": "$a"
+      },
+      "output": {
+        "assignee": "agent",
+        "closed_at": "\u003ctime\u003e",
+        "comments": [
+          {
+            "actor": "agent",
+            "body": "note",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          },
+          {
+            "body": "Closed: done",
+            "created_at": "\u003ctime\u003e",
+            "id": "\u003ccomment\u003e"
+          }
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "priority": 2,
+        "status": "closed",
+        "title": "blocker",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "durable engineering preference",
+        "kind": "semantic",
+        "scope": "user",
+        "tags": [
+          "style"
+        ]
+      },
+      "save": "$m",
+      "output": {
+        "content": "durable engineering preference",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "semantic",
+        "scope": "user",
+        "tags": [
+          "style"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "content": "compact engineering preference",
+        "id": "$m",
+        "tags": []
+      },
+      "output": {
+        "content": "compact engineering preference",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "semantic",
+        "scope": "user",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "semantic"
+        ]
+      },
+      "output": [
+        {
+          "content": "compact engineering preference",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "semantic",
+          "scope": "user",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "query": "engineering"
+      },
+      "output": [
+        {
+          "content": "compact engineering preference",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "semantic",
+          "scope": "user",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {},
+      "output": {
+        "by_kind": {
+          "semantic": 1
+        },
+        "by_scope": {
+          "user": 1
+        },
+        "by_tag": {},
+        "total": 1
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_delete",
+      "input": {
+        "id": "$m"
+      },
+      "output": {
+        "id": "$m",
+        "status": "deleted"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {},
+      "output": {
+        "by_kind": {},
+        "by_scope": {},
+        "by_tag": {},
+        "total": 0
+      },
+      "is_error": false
+    }
+  ]
+}

@@ -35,3 +35,8 @@ Regeneration and bidirectional verification commands are documented in
 [`../../docs/project-state.md`](../../docs/project-state.md). Rust conformance tests
 read these fixtures without modifying them. The test scenarios are purpose-built;
 no claim is made that they represent the complete upstream Go test suite.
+
+- `tools.go` / `tools.json`: actual baseline `pkg/agentsdk/tools/projectstate`
+  definitions and task/memory operation results, with only generated IDs and
+  timestamps normalized. `crates/adk-project-state/src/tool-definitions.json`
+  is derived from these same pinned Go tool definitions, under GPL-3.0-only.

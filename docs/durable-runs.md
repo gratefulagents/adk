@@ -64,14 +64,13 @@ uniquely named disposable test schemas.
 Go's runner does not reject every unknown boundary name. Nonterminal Rust runner
 envelopes therefore use the Go-rejected `model_completed` marker, retaining the
 actual boundary in the Rust extension. They remain inspectable by Go without
-silently authorizing unsafe replay. Explicit migration supports Go `run_started`
-and `run_completed` with host-verified missing policy/budget metadata; ambiguous
-Go prepared checkpoints are not evidence that dispatch never occurred.
+silently authorizing unsafe replay. Explicit migration supports safe Go start/completed-tool/handoff/pause/child-change/terminal boundaries with host-verified missing policy/budget metadata and complete history. Ambiguous Go prepared checkpoints are not evidence that dispatch never occurred.
 
-Unsupported execution/recovery modes fail explicitly: durable streaming, custom
-hooks/compaction/turn context/stop gates/parsers, automatic restoration of approval
-journals, paused/child checkpoints, and other Go continuation boundaries. Existing
-in-process APIs remain available. Filesystem durable-run privacy is Unix-only and
+Durable streaming, Go observational callbacks, native approval journals/paused
+continuations and host-owned child checkpoint restoration are supported. See the
+[exact pinned-baseline supported/rejected matrix](durable-recovery-matrix.md) for
+all boundaries, conditions, tests, and remaining function-valued native extensions
+without a crash-replay protocol. Filesystem durable-run privacy is Unix-only and
 assumes trusted private ancestors and a local filesystem with locking/rename/fsync
 semantics; use PostgreSQL elsewhere. Project-state lock compatibility is not a
 claim of safe simultaneous stale-lock recovery by unmodified Go and Rust workers.
@@ -98,6 +97,7 @@ verification requires the pinned SDK checkout and a Go module cache/network.
 See [durable fixture provenance](../fixtures/durable/README.md) and
 [project-state provenance](../fixtures/project-state/manifest.json).
 
-The #7 built-in tool registry is not present in this checkout. Store, engine,
-recall and session-interface tests here provide its state dependency, but **#7's
-model-facing state-tool tests remain unverified** until that implementation lands.
+The 15 baseline state-backed tool adapters are implemented and tested on both
+filesystem and SQLite stores, including differential comparison with actual
+Go-generated tool definitions and outputs. #7's unrelated/full registry remains
+a downstream consumer, not a blocker for these contracts.

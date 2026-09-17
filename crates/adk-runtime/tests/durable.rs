@@ -438,7 +438,7 @@ async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() 
         "model_prepared",
         "tool_prepared",
         "model_completed",
-        "paused",
+        "approval_pending",
     ] {
         let mut unsafe_cp = cp.clone();
         unsafe_cp.boundary = boundary.into();
@@ -716,4 +716,588 @@ async fn destructive_redaction_never_acknowledges_executable_state() {
         assert_eq!(error.error.info.category, ErrorCategory::Host);
     }
     assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn go_safe_boundaries_and_terminal_children_resume_without_replaying_history() {
+    for boundary in [
+        "tool_completed",
+        "handoff_completed",
+        "paused",
+        "child_changed",
+    ] {
+        let mut cp =
+            RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+        cp.boundary = boundary.into();
+        cp.children = Some(
+            json!({"records":[{"task":{"id":"c1","status":"completed"}},{"task":{"id":"c2","status":"failed"}},{"task":{"id":"c3","status":"cancelled"}}]}),
+        );
+        let (runner, model, tool) = setup(vec![message(Role::Assistant, "done")], false, false);
+        let migrated = runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .unwrap();
+        let result = run(&runner, Arc::new(Store::default()), Some(migrated))
+            .await
+            .unwrap();
+        assert_eq!(result.result.status, RunStatus::Completed);
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        assert!(tool.keys.lock().unwrap().is_empty());
+        cp.children = Some(json!({"records":[{"task":{"id":"c4","status":"running"}}]}));
+        let migrated = runner.migrate_go_checkpoint(cp, verified()).unwrap();
+        assert!(
+            run(&runner, Arc::new(Store::default()), Some(migrated))
+                .await
+                .is_err()
+        );
+    }
+}
+
+#[tokio::test]
+async fn durable_stream_is_lazy_and_persists_completion() {
+    let (runner, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let store = Arc::new(Store::default());
+    let stream = runner.stream_durable(
+        context(),
+        request(false),
+        Arc::new(HostImpl),
+        DurableRun::new(store.clone()),
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    assert!(store.checkpoints.lock().unwrap().is_empty());
+    let result = stream.finish().await.unwrap();
+    assert_eq!(result.result.status, RunStatus::Completed);
+    assert_eq!(store.latest().execution_boundary(), "run_completed");
+}
+
+struct DeferredHost(AtomicUsize);
+impl Host for DeferredHost {
+    fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async { Ok(()) })
+    }
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ApprovalRequest,
+    ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+        Box::pin(async move {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(ApprovalDecision::Defer)
+        })
+    }
+}
+#[tokio::test]
+async fn approval_pause_survives_restart_and_completed_approved_effect_is_not_replayed() {
+    let (runner, model, tool) = setup(vec![call("one")], false, false);
+    let store = Arc::new(Store::default());
+    let host = Arc::new(DeferredHost(AtomicUsize::new(0)));
+    let mut req = request(false);
+    req.policy.tools.approval = ApprovalPolicy::All;
+    let result = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            host.clone(),
+            durable(store.clone(), None),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.status, RunStatus::Paused);
+    drop(result);
+    let checkpoint = store.latest();
+    req.input.clear();
+    let restored = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            host.clone(),
+            durable(store.clone(), Some(checkpoint)),
+        )
+        .await
+        .unwrap();
+    assert_eq!(host.0.load(Ordering::SeqCst), 1);
+    assert!(tool.keys.lock().unwrap().is_empty());
+    let completed = restored
+        .continuation
+        .unwrap()
+        .resume(Some(ApprovalDecision::Approve))
+        .await
+        .unwrap();
+    assert_eq!(completed.result.status, RunStatus::Completed);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+    let checkpoint = store.at("tool_completed");
+    model
+        .responses
+        .lock()
+        .unwrap()
+        .push_back(response(vec![message(Role::Assistant, "after recovery")]));
+    runner
+        .run_durable(
+            context(),
+            req,
+            host.clone(),
+            durable(Arc::new(Store::default()), Some(checkpoint)),
+        )
+        .await
+        .unwrap();
+    assert_eq!(host.0.load(Ordering::SeqCst), 1);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+}
+
+#[derive(Default)]
+struct Children(Mutex<Option<serde_json::Value>>);
+impl ChildCheckpointOwner for Children {
+    fn restore<'a>(
+        &'a self,
+        _: &'a Context,
+        checkpoint: serde_json::Value,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            *self.0.lock().unwrap() = Some(checkpoint);
+            Ok(())
+        })
+    }
+    fn checkpoint<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<serde_json::Value, Error>> {
+        Box::pin(async move {
+            Ok(self
+                .0
+                .lock()
+                .unwrap()
+                .clone()
+                .unwrap_or(json!({"records":[]})))
+        })
+    }
+}
+#[tokio::test]
+async fn child_owner_restores_active_records_as_reconciling_and_retains_delivery_state() {
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    cp.children = Some(
+        json!({"records":[{"task":{"id":"child","status":"running","waiting_on":["a"]},"result_delivered":true,"security_baseline":{"tool_access_level":"read_only"},"queued_messages":[{"type": "message", "message_text":"queued"}]}]}),
+    );
+    let migrated = runner.migrate_go_checkpoint(cp, verified()).unwrap();
+    let children = Arc::new(Children::default());
+    let store = Arc::new(Store::default());
+    let mut d = durable(store.clone(), Some(migrated));
+    d.children = Some(children.clone());
+    runner
+        .run_durable(context(), request(true), Arc::new(HostImpl), d)
+        .await
+        .unwrap();
+    let saved = store.latest().children.unwrap();
+    assert_eq!(saved["records"][0]["task"]["status"], "reconciling");
+    assert_eq!(saved["records"][0]["result_delivered"], true);
+    assert_eq!(
+        saved["records"][0]["queued_messages"][0]["message_text"],
+        "queued"
+    );
+    assert_eq!(saved, children.0.lock().unwrap().clone().unwrap());
+}
+
+#[tokio::test]
+async fn go_observational_callbacks_are_allowed_in_durable_execution() {
+    struct Callbacks(AtomicUsize);
+    impl compat::GoLifecycleCallbacks for Callbacks {
+        fn on_model_start(&self, _: &Context, _: &str, _: &str, _: u32) {
+            self.0.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    let callbacks = Arc::new(Callbacks(AtomicUsize::new(0)));
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            hooks: Some(Arc::new(compat::GoCallbackAdapter::new(callbacks.clone()))),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    run(&runner, Arc::new(Store::default()), None)
+        .await
+        .unwrap();
+    assert_eq!(callbacks.0.load(Ordering::SeqCst), 1);
+}
+
+struct ScriptStream(VecDeque<ModelEvent>);
+impl ModelStream for ScriptStream {
+    fn next(&mut self) -> BoxFuture<'_, Result<Option<ModelEvent>, Error>> {
+        Box::pin(async move { Ok(self.0.pop_front()) })
+    }
+}
+impl StreamingModel for ModelImpl {
+    fn stream<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            let response = self.responses.lock().unwrap().pop_front().unwrap();
+            Ok(Box::new(ScriptStream(VecDeque::from([
+                ModelEvent::TextDelta {
+                    delta: "partial".into(),
+                },
+                ModelEvent::Complete { response },
+            ]))) as Box<dyn ModelStream>)
+        })
+    }
+}
+#[tokio::test]
+async fn dropping_genuine_durable_stream_never_replays_uncertain_model_dispatch() {
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let runner = Runner::new(
+        AgentConfig::new("agent", ModelBinding::streaming("model", model.clone())),
+        RunnerConfig::default(),
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    let mut stream = runner.stream_durable(
+        context(),
+        request(false),
+        Arc::new(HostImpl),
+        DurableRun::new(store.clone()),
+    );
+    while let Some(event) = stream.next().await {
+        if matches!(
+            event,
+            RunEvent::Model {
+                event: ModelEvent::TextDelta { .. }
+            }
+        ) {
+            break;
+        }
+    }
+    assert_eq!(store.latest().execution_boundary(), "model_dispatched");
+    drop(stream);
+    let error = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+        .await
+        .err()
+        .unwrap();
+    assert!(error.error.info.message.contains("operator_resolution"));
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    let store = Arc::new(Store::default());
+    runner
+        .stream_durable(
+            context(),
+            request(false),
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone()),
+        )
+        .finish()
+        .await
+        .unwrap();
+    assert_eq!(store.latest().execution_boundary(), "run_completed");
+}
+
+#[tokio::test]
+async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects() {
+    let cases: std::collections::BTreeMap<String, Vec<RunnerCheckpoint>> =
+        serde_json::from_str(include_str!("fixtures/go-boundaries.json")).unwrap();
+    for (mode, checkpoints) in cases {
+        for cp in checkpoints {
+            let (_, model, tool) = setup(vec![message(Role::Assistant, "resumed")], false, false);
+            let mut agent =
+                AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+            agent.tools.push(tool.clone());
+            agent.handoffs.push(Handoff {
+                definition: ToolDefinition {
+                    name: "transfer_to_target".into(),
+                    description: "".into(),
+                    input_schema: schemars::json_schema!({"type":"object"}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                target: Arc::new(AgentConfig::new(
+                    "target",
+                    ModelBinding::complete("model", model.clone()),
+                )),
+            });
+            let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+            let supported = matches!(
+                cp.boundary.as_str(),
+                "run_started" | "tool_completed" | "handoff_completed" | "paused" | "run_completed"
+            ) && !(mode == "approval" && cp.boundary == "tool_completed");
+            let mut recovery = verified();
+            recovery.turns = 4;
+            if cp.boundary == "run_completed" {
+                recovery.final_output = Some(json!("done"));
+            }
+            let migrated = runner.migrate_go_checkpoint(cp.clone(), recovery);
+            assert_eq!(
+                migrated.is_ok(),
+                supported,
+                "{mode}: {}: {migrated:?}",
+                cp.boundary
+            );
+            if let Ok(cp) = migrated {
+                let terminal = cp.execution_boundary() == "run_completed";
+                let result = run(&runner, Arc::new(Store::default()), Some(cp))
+                    .await
+                    .unwrap();
+                assert_eq!(result.result.status, RunStatus::Completed);
+                assert!(tool.keys.lock().unwrap().is_empty());
+                assert_eq!(model.calls.load(Ordering::SeqCst), usize::from(!terminal));
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
+    let (_, model, _) = setup(
+        vec![RunItem::ToolCall {
+            call: ToolCall {
+                id: "handoff-1".into(),
+                name: "transfer".into(),
+                arguments: json!({}),
+            },
+        }],
+        false,
+        false,
+    );
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.handoffs.push(Handoff {
+        definition: ToolDefinition {
+            name: "transfer".into(),
+            description: "".into(),
+            input_schema: schemars::json_schema!({"type":"object"}),
+            read_only: true,
+            requires_approval: false,
+        },
+        target: Arc::new(AgentConfig::new(
+            "target",
+            ModelBinding::complete("model", model.clone()),
+        )),
+    });
+    let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let cp = store.latest();
+    assert_eq!(cp.agent_name, "target");
+    assert_eq!(
+        cp.history
+            .last()
+            .unwrap()
+            .tool_output
+            .as_ref()
+            .unwrap()
+            .call_id,
+        "handoff-1"
+    );
+    let result = run(&runner, Arc::new(Store::default()), Some(cp))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}
+
+#[tokio::test]
+async fn go_approval_gate_cannot_reset_durable_turn_budget() {
+    struct Gate;
+    impl compat::GoApprovalGate for Gate {
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a ApprovalRequest,
+        ) -> BoxFuture<'a, Result<compat::GoApprovalDecision, Error>> {
+            Box::pin(async {
+                Ok(compat::GoApprovalDecision {
+                    approved: true,
+                    reason: String::new(),
+                })
+            })
+        }
+    }
+    let (runner, model, tool) = setup(vec![call("one")], false, false);
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    req.policy.tools.approval = ApprovalPolicy::All;
+    let store = Arc::new(Store::default());
+    let paused = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(DeferredHost(AtomicUsize::new(0))),
+            DurableRun::new(store.clone()),
+        )
+        .await
+        .unwrap();
+    let error = paused
+        .continuation
+        .unwrap()
+        .resume_go_gate(&Gate)
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+    assert_eq!(store.latest().runtime.unwrap().turns(), 1);
+}
+
+#[tokio::test]
+async fn prepared_approved_call_restores_exact_grant_without_another_callback() {
+    let (runner, _, tool) = setup(vec![call("one")], false, false);
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("tool_prepared".into(), true));
+    let mut req = request(false);
+    req.policy.tools.approval = ApprovalPolicy::All;
+    assert!(
+        runner
+            .run_durable(
+                context(),
+                req.clone(),
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone())
+            )
+            .await
+            .is_err()
+    );
+    assert!(tool.keys.lock().unwrap().is_empty());
+    let host = Arc::new(DeferredHost(AtomicUsize::new(0)));
+    req.input.clear();
+    let result = runner
+        .run_durable(
+            context(),
+            req,
+            host.clone(),
+            durable(Arc::new(Store::default()), Some(store.latest())),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.status, RunStatus::Completed);
+    assert_eq!(host.0.load(Ordering::SeqCst), 0);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn actual_go_reader_accepts_rust_approval_history_and_refuses_nonterminal_replay() {
+    if std::env::var_os("ADK_TEST_GO").is_none() {
+        return;
+    }
+    let (runner, _, _) = setup(vec![call("one")], false, false);
+    let store = Arc::new(Store::default());
+    let mut req = request(false);
+    req.policy.tools.approval = ApprovalPolicy::All;
+    runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone()),
+        )
+        .await
+        .unwrap();
+    assert!(
+        store
+            .latest()
+            .history
+            .iter()
+            .any(|item| item.tool_approval.is_some())
+    );
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("checkpoints.json");
+    std::fs::write(
+        &path,
+        serde_json::to_vec(&*store.checkpoints.lock().unwrap()).unwrap(),
+    )
+    .unwrap();
+    let output = std::process::Command::new("go")
+        .current_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../repos/sdk"))
+        .args(["run", "../../crates/adk-runtime/tests/fixtures/verify.go"])
+        .arg(path)
+        .env("GOTOOLCHAIN", "local")
+        .env("GOTELEMETRY", "off")
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{} {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    println!("{}", String::from_utf8_lossy(&output.stdout));
+}
+
+#[tokio::test]
+async fn child_restore_snapshot_and_unknown_status_fail_before_parent_dispatch() {
+    struct FailedChildren;
+    impl ChildCheckpointOwner for FailedChildren {
+        fn restore<'a>(
+            &'a self,
+            _: &'a Context,
+            _: serde_json::Value,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::Host, "restore failed")) })
+        }
+        fn checkpoint<'a>(
+            &'a self,
+            _: &'a Context,
+        ) -> BoxFuture<'a, Result<serde_json::Value, Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::Host, "snapshot failed")) })
+        }
+    }
+    let (runner, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut d = DurableRun::new(Arc::new(Store::default()));
+    d.children = Some(Arc::new(FailedChildren));
+    assert!(
+        runner
+            .run_durable(context(), request(false), Arc::new(HostImpl), d)
+            .await
+            .is_err()
+    );
+    let mut cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    cp.children = Some(json!({"records":[{"task":{"id":"c","status":"running"}}]}));
+    let migrated = runner
+        .migrate_go_checkpoint(cp.clone(), verified())
+        .unwrap();
+    let mut d = durable(Arc::new(Store::default()), Some(migrated));
+    d.children = Some(Arc::new(FailedChildren));
+    assert!(
+        runner
+            .run_durable(context(), request(true), Arc::new(HostImpl), d)
+            .await
+            .is_err()
+    );
+    cp.children.as_mut().unwrap()["records"][0]["task"]["status"] = json!("future_status");
+    assert!(runner.migrate_go_checkpoint(cp, verified()).is_err());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn native_tool_pause_restarts_after_completed_tool_without_dispatching_it_again() {
+    struct PausingTool(Arc<ToolImpl>);
+    impl Tool for PausingTool {
+        fn definition(&self) -> &ToolDefinition {
+            self.0.definition()
+        }
+        fn execute<'a>(
+            &'a self,
+            context: &'a ToolContext,
+            call: ToolCall,
+        ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+            Box::pin(async move {
+                let mut output = self.0.execute(context, call).await?;
+                output.should_pause = true;
+                Ok(output)
+            })
+        }
+    }
+    let (_, model, tool) = setup(vec![call("one")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(Arc::new(PausingTool(tool.clone())));
+    let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    let outcome = run(&runner, store.clone(), None).await.unwrap();
+    assert_eq!(outcome.result.status, RunStatus::Paused);
+    drop(outcome);
+    let cp = store.latest();
+    assert_eq!(cp.execution_boundary(), "paused");
+    let outcome = run(&runner, Arc::new(Store::default()), Some(cp))
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.status, RunStatus::Completed);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
 }

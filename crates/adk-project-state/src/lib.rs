@@ -5,6 +5,7 @@ mod engine;
 pub mod memory;
 pub mod recall;
 mod storage;
+pub mod tools;
 mod types;
 
 pub use contracts::*;

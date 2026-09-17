@@ -8,6 +8,7 @@ publish = false
 description = "Go-compatible durable project tasks, memories, and event-sourced stores"
 
 [dependencies]
+adk-core.workspace = true
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["arbitrary_precision"] }
@@ -20,4 +21,5 @@ sha2 = "0.10"
 rusqlite = { version = "0.37", features = ["bundled"] }
 
 [dev-dependencies]
+tokio = { workspace = true }
 tempfile = "3"

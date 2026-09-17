@@ -230,3 +230,24 @@ rejection, torn tails and interior corruption, privacy hooks, provider fallback,
 retention/purge and failure-before-deletion/reopen cache reconciliation. Reverse
 roundtrip verification opens Rust output in Go, compares tasks/memories/summaries/
 ready work/priming, then appends a Go event. Tests require no API keys or live provider.
+
+## State-backed tool contracts
+
+`adk_project_state::tools::tools(Arc<dyn Store>, actor)` returns the 15 baseline
+project-state tools as `adk_core::Tool` objects. This is independent of the full
+#7 registry. Synchronous store I/O runs on the caller's executor thread, just as
+with direct store calls; hosts should dedicate a blocking-capable execution
+thread. Tool errors are model-visible; authorization/approval belongs to the
+runner before dispatch. No store mutation is presumed replayable merely because
+its tool name or read-only metadata is known.
+
+`tests/tools.rs` tests both filesystem and SQLite adapters, including reopening,
+actor/priority defaults, links, task updates, memory updates/deletion/recall/stats,
+priming, schema metadata and error results. Go definitions and output traces are
+compared against `fixtures/project-state/tools.json`. Regenerate using:
+
+```sh
+(cd repos/sdk && go run ../../fixtures/project-state/tools.go > ../../fixtures/project-state/tools.json)
+```
+
+The fixture normalizes generated task/memory/comment IDs and timestamps only.

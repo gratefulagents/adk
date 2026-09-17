@@ -22,7 +22,8 @@
 #[path = "durable.rs"]
 pub mod durable;
 pub use durable::{
-    CheckpointStore, DurableRun, GoRecovery, RunnerCheckpoint, StoredCheckpointStore,
+    CheckpointStore, ChildCheckpointOwner, DurableRun, GoRecovery, RunnerCheckpoint,
+    StoredCheckpointStore,
 };
 
 use std::{
@@ -249,6 +250,11 @@ pub enum Observation {
 /// Awaited and fail-closed. RawToolOutput precedes truncation/trust wrapping;
 /// hooks must not forward sensitive raw data to untrusted telemetry sinks.
 pub trait RunHooks: Send + Sync {
+    /// Opt in only for observational callbacks that tolerate missing/repeated delivery.
+    /// This does not provide effect idempotency or recovery for callback side effects.
+    fn durable_observer(&self) -> bool {
+        false
+    }
     fn observe<'a>(
         &'a self,
         context: &'a Context,
@@ -478,13 +484,15 @@ impl Continuation {
                 return Err(self.engine.fail(error).await);
             }
         }
-        self.engine.turns = 0;
-        self.engine.policy.max_turns = self.engine.base_turn_limit;
-        self.engine.stop_gate_blocks = 0;
-        self.engine.consecutive_tool_errors = 0;
-        self.engine.tool_error_escalated = false;
-        self.engine.fallbacks.clear();
-        self.engine.calibration = EstimateCalibration::default();
+        if self.engine.durable_state.is_none() {
+            self.engine.turns = 0;
+            self.engine.policy.max_turns = self.engine.base_turn_limit;
+            self.engine.stop_gate_blocks = 0;
+            self.engine.consecutive_tool_errors = 0;
+            self.engine.tool_error_escalated = false;
+            self.engine.fallbacks.clear();
+            self.engine.calibration = EstimateCalibration::default();
+        }
         self.engine.tool_final = None;
         self.engine.drive().await
     }

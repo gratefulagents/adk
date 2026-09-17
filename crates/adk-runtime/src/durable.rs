@@ -84,6 +84,8 @@ pub struct RuntimeCheckpoint {
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
     approval_journal_present: bool,
+    #[serde(default)]
+    approval_journal: Vec<crate::compat::ApprovalJournalEntry>,
 }
 impl RuntimeCheckpoint {
     pub fn wall_time_ms(&self, now: DateTime<Utc>) -> i64 {
@@ -114,11 +116,24 @@ pub trait CheckpointStore: Send + Sync {
     ) -> BoxFuture<'a, Result<(), Error>>;
 }
 
+/// Host-owned scheduler state. Restore must not dispatch children; active records
+/// arrive as reconciling and need explicit child-worker/operator resolution.
+/// Implementations must preserve delivery, security and steering-message state.
+pub trait ChildCheckpointOwner: Send + Sync {
+    fn restore<'a>(
+        &'a self,
+        context: &'a Context,
+        checkpoint: Value,
+    ) -> BoxFuture<'a, Result<(), Error>>;
+    fn checkpoint<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, Result<Value, Error>>;
+}
+
 pub struct DurableRun {
     pub store: Arc<dyn CheckpointStore>,
     /// New attempts must have a distinct ID; effects retain their original key.
     pub attempt_id: String,
     pub resume: Option<RunnerCheckpoint>,
+    pub children: Option<Arc<dyn ChildCheckpointOwner>>,
 }
 impl DurableRun {
     pub fn new(store: Arc<dyn CheckpointStore>) -> Self {
@@ -126,11 +141,14 @@ impl DurableRun {
             store,
             attempt_id: AttemptId::new().to_string(),
             resume: None,
+            children: None,
         }
     }
 }
 
 pub(super) struct DurableState {
+    children: Option<Arc<dyn ChildCheckpointOwner>>,
+    child_checkpoint: Option<Value>,
     store: Arc<dyn CheckpointStore>,
     started_at: DateTime<Utc>,
     deadline_at: Option<DateTime<Utc>>,
@@ -149,9 +167,67 @@ fn unsupported(message: &str) -> Error {
     Error::new(ErrorCategory::Unsupported, message)
 }
 
+fn reconcile_children(mut children: Value) -> Result<Value, Error> {
+    if children.is_null() {
+        return Ok(children);
+    }
+    if children.get("records").is_some_and(Value::is_null) {
+        return Ok(children);
+    }
+    let records = children
+        .get_mut("records")
+        .and_then(Value::as_array_mut)
+        .ok_or_else(|| invalid("invalid child records"))?;
+    let mut ids = HashSet::new();
+    for record in records {
+        let task = record
+            .get_mut("task")
+            .and_then(Value::as_object_mut)
+            .ok_or_else(|| invalid("missing child task"))?;
+        let id = task
+            .get("id")
+            .and_then(Value::as_str)
+            .filter(|id| !id.is_empty())
+            .ok_or_else(|| invalid("missing child task ID"))?;
+        if !ids.insert(id.to_owned()) {
+            return Err(invalid("duplicate child task ID"));
+        }
+        match task.get("status").and_then(Value::as_str) {
+            Some("completed" | "failed" | "cancelled") => {}
+            Some("pending" | "waiting" | "running" | "reconciling") => {
+                task.insert("status".into(), Value::String("reconciling".into()));
+                task.insert("error".into(), Value::String("sub-agent runtime restarted while this task was active; durable reconciliation is required".into()));
+                task.remove("waiting_on");
+            }
+            _ => return Err(unsupported("unknown child task status")),
+        }
+    }
+    Ok(children)
+}
+
+fn has_active_children(children: Option<&Value>) -> bool {
+    let Some(children) = children.filter(|v| !v.is_null()) else {
+        return false;
+    };
+    let Some(records) = children.get("records") else {
+        return true;
+    };
+    if records.is_null() {
+        return false;
+    }
+    records.as_array().is_none_or(|records| {
+        records.iter().any(|record| {
+            !matches!(
+                record.pointer("/task/status").and_then(Value::as_str),
+                Some("completed" | "failed" | "cancelled")
+            )
+        })
+    })
+}
+
 impl Runner {
     /// Run or recover a durable invocation. Recovery never accepts extra input.
-    /// Streaming and deferred approvals retain their separate in-process APIs.
+    /// Deferred approvals never authorize dispatch merely by reopening a checkpoint.
     pub async fn run_durable(
         &self,
         context: Context,
@@ -159,17 +235,54 @@ impl Runner {
         host: Arc<dyn Host>,
         durable: DurableRun,
     ) -> Result<RunOutcome, RunError> {
+        self.drive_durable(context, request, host, durable, None)
+            .await
+    }
+
+    /// Lazy durable streaming; dropping the stream leaves dispatched effects unresolved.
+    pub fn stream_durable(
+        &self,
+        context: Context,
+        request: RunRequest,
+        host: Arc<dyn Host>,
+        durable: DurableRun,
+    ) -> RunStream {
+        let runner = self.clone();
+        let (sender, receiver) = mpsc::channel(1);
+        RunStream {
+            producer: Some(Box::pin(async move {
+                runner
+                    .drive_durable(context, request, host, durable, Some(sender))
+                    .await
+            })),
+            receiver,
+            outcome: None,
+        }
+    }
+
+    async fn drive_durable(
+        &self,
+        context: Context,
+        request: RunRequest,
+        host: Arc<dyn Host>,
+        durable: DurableRun,
+        sender: Option<mpsc::Sender<RunEvent>>,
+    ) -> Result<RunOutcome, RunError> {
         if context.run_id.is_empty() || durable.attempt_id.is_empty() {
             return Err(invalid("durable run and attempt IDs must be nonempty").into());
         }
         let fingerprint = self.durable_fingerprint()?;
         let mut engine = self.engine(context, request, host);
+        engine.streaming = sender.is_some();
+        engine.sender = sender;
         let now = Utc::now();
         let deadline_at = engine.context.deadline.map(|deadline| {
             now + chrono::Duration::from_std(deadline.saturating_duration_since(Instant::now()))
                 .unwrap_or(chrono::Duration::MAX)
         });
         let mut state = DurableState {
+            children: durable.children,
+            child_checkpoint: None,
             started_at: now,
             deadline_at,
             store: durable.store,
@@ -191,11 +304,15 @@ impl Runner {
                     invalid("recovery requires the same run ID and a new attempt ID").into(),
                 );
             }
-            if checkpoint.children.as_ref().is_some_and(|v| !v.is_null()) {
+            if has_active_children(checkpoint.children.as_ref()) && state.children.is_none() {
                 return Err(
-                    unsupported("child checkpoints require scheduler reconciliation").into(),
+                    unsupported("active child checkpoints require a scheduler owner").into(),
                 );
             }
+            if let Some(children) = checkpoint.children.clone() {
+                reconcile_children(children)?;
+            }
+            state.child_checkpoint = checkpoint.children.clone();
             if checkpoint
                 .interruptions
                 .as_ref()
@@ -277,12 +394,18 @@ impl Runner {
                     | "tool_completed"
                     | "handoff_completed"
                     | "run_completed"
+                    | "paused"
+                    | "child_changed"
+                    | "approval_pending"
             ) {
                 return Err(
                     unsupported("checkpoint boundary requires explicit reconciliation").into(),
                 );
             }
-            if saved.approval_journal_present && execution_boundary != "run_completed" {
+            if saved.approval_journal_present
+                && saved.approval_journal.is_empty()
+                && execution_boundary != "run_completed"
+            {
                 return Err(unsupported(
                     "approval journal recovery requires explicit reconciliation",
                 )
@@ -302,6 +425,12 @@ impl Runner {
             }
             engine.agent =
                 found.ok_or_else(|| unsupported("checkpoint agent is not registered"))?;
+            engine.approval_journal = crate::compat::ApprovalJournal::restore(
+                saved.approval_journal,
+                saved.result.history.len(),
+                saved.result.new_items.len(),
+            )
+            .map_err(invalid)?;
             engine.result = saved.result;
             engine.phase = if execution_boundary == "run_started" {
                 Phase::Model
@@ -309,6 +438,24 @@ impl Runner {
                 saved.phase
             };
             engine.calls = saved.calls;
+            for entry in engine.approval_journal.entries() {
+                let call =
+                    adk_codec::approval::approval_call(&entry.marker.data).map_err(invalid)?;
+                if engine.calls.iter().any(|pending| *pending == call) {
+                    use adk_codec::approval::ApprovalPhase;
+                    match entry.marker.phase {
+                        ApprovalPhase::Approved => {
+                            engine.approvals.insert(call.id, ApprovalDecision::Approve);
+                        }
+                        ApprovalPhase::Denied => {
+                            engine.approvals.insert(call.id, ApprovalDecision::Deny);
+                        }
+                        ApprovalPhase::Pending => {
+                            engine.approvals.remove(&call.id);
+                        }
+                    }
+                }
+            }
             engine.turns = saved.turns;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
@@ -317,6 +464,7 @@ impl Runner {
             engine.consecutive_tool_errors = saved.consecutive_tool_errors;
             engine.tool_error_escalated = saved.tool_error_escalated;
             engine.committed_cursor = engine.result.new_items.len();
+            engine.committed_markers = engine.approval_journal.entries().len();
             state.started_at = saved.started_at;
             state.deadline_at = match (state.deadline_at, saved.deadline_at) {
                 (Some(a), Some(b)) => Some(a.min(b)),
@@ -330,6 +478,27 @@ impl Runner {
             state.step_id = checkpoint.step_id;
             state.effect = checkpoint.effect;
             state.tool_calls = saved.tool_calls;
+            if let (Some(owner), Some(children)) = (&state.children, &state.child_checkpoint) {
+                let children = reconcile_children(children.clone())?;
+                bounded(
+                    &engine.context,
+                    None,
+                    owner.restore(&engine.context, children),
+                )
+                .await?;
+            }
+            if matches!(execution_boundary.as_str(), "approval_pending" | "paused")
+                && !engine.result.pending_approvals.is_empty()
+            {
+                engine.result.status = RunStatus::Paused;
+                engine.durable_state = Some(state);
+                engine.sender = None;
+                return Ok(RunOutcome {
+                    result: engine.result.clone(),
+                    spills: vec![],
+                    continuation: Some(Continuation { engine }),
+                });
+            }
             if execution_boundary == "run_completed" {
                 if engine.result.status != RunStatus::Completed {
                     return Err(invalid("completed checkpoint has an incomplete result").into());
@@ -350,7 +519,10 @@ impl Runner {
         if config.compaction.is_some()
             || config.turn_context.is_some()
             || config.stop_gate.is_some()
-            || config.hooks.is_some()
+            || config
+                .hooks
+                .as_ref()
+                .is_some_and(|hooks| !hooks.durable_observer())
             || config.durable.is_some()
         {
             return Err(unsupported(
@@ -367,7 +539,10 @@ impl Runner {
             }
             if !names.insert(agent.name.clone())
                 || agent.output_parser.is_some()
-                || agent.hooks.is_some()
+                || agent
+                    .hooks
+                    .as_ref()
+                    .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
                     "durable agents require unique names and no custom parsers or hooks",
@@ -407,6 +582,11 @@ impl Engine {
         let Some(state) = &mut self.durable_state else {
             return Ok(());
         };
+        if let Some(owner) = &state.children {
+            let children = bounded(&self.context, None, owner.checkpoint(&self.context)).await?;
+            reconcile_children(children.clone())?;
+            state.child_checkpoint = Some(children);
+        }
         let name = match boundary {
             Boundary::Started => "run_started",
             Boundary::ModelPrepared => "model_prepared",
@@ -470,7 +650,7 @@ impl Engine {
         let agent = adk_codec::dto::AgentRef {
             name: self.agent.name.clone(),
         };
-        let history = self
+        let mut history = self
             .result
             .history
             .iter()
@@ -483,9 +663,49 @@ impl Engine {
                     }
                     _ => Some(&agent),
                 };
+                let projected;
+                let item = match item {
+                    RunItem::Handoff { call_id, agent } => {
+                        projected = RunItem::ToolResult {
+                            call_id: call_id.clone(),
+                            output: ToolOutput {
+                                content: vec![Content::Text {
+                                    text: format!("Handing off to {agent}"),
+                                }],
+                                is_error: false,
+                                should_pause: false,
+                            },
+                        };
+                        &projected
+                    }
+                    RunItem::ToolResult { call_id, output } if output.should_pause => {
+                        let mut output = output.clone();
+                        output.should_pause = false;
+                        projected = RunItem::ToolResult {
+                            call_id: call_id.clone(),
+                            output,
+                        };
+                        &projected
+                    }
+                    _ => item,
+                };
                 adk_codec::approval::encode_item(item, provenance).map_err(invalid)
             })
             .collect::<Result<Vec<_>, _>>()?;
+        for (offset, marker) in self
+            .approval_journal
+            .history_markers()
+            .map_err(invalid)?
+            .into_iter()
+            .enumerate()
+        {
+            let index = marker
+                .before_item
+                .checked_add(offset)
+                .filter(|i| *i <= history.len())
+                .ok_or_else(|| invalid("approval marker outside history"))?;
+            history.insert(index, marker.marker.to_wire().map_err(invalid)?);
+        }
         let count = |n: u64| i64::try_from(n).map_err(invalid);
         let sequence = state
             .sequence
@@ -508,7 +728,7 @@ impl Engine {
             agent_name: self.agent.name.clone(),
             history: adk_codec::snapshot_items(&history),
             interruptions: None,
-            children: None,
+            children: state.child_checkpoint.clone(),
             usage: adk_codec::dto::Usage {
                 requests: i64::from(self.turns),
                 input_tokens: count(self.result.usage.input_tokens)?,
@@ -537,6 +757,7 @@ impl Engine {
                 consecutive_tool_errors: self.consecutive_tool_errors,
                 tool_error_escalated: self.tool_error_escalated,
                 approval_journal_present: !self.approval_journal.entries().is_empty(),
+                approval_journal: self.approval_journal.entries(),
             }),
         };
         bounded(
@@ -579,14 +800,18 @@ impl Runner {
         }
         if !matches!(
             checkpoint.boundary.as_str(),
-            "run_started" | "run_completed"
+            "run_started"
+                | "run_completed"
+                | "tool_completed"
+                | "handoff_completed"
+                | "paused"
+                | "child_changed"
         ) {
             return Err(unsupported(
                 "Go boundary requires operator reconciliation; prepared does not prove undispatched",
             ));
         }
         if checkpoint.effect.is_some()
-            || checkpoint.children.as_ref().is_some_and(|v| !v.is_null())
             || checkpoint
                 .interruptions
                 .as_ref()
@@ -595,6 +820,9 @@ impl Runner {
             return Err(unsupported(
                 "Go child, effect or approval state requires reconciliation",
             ));
+        }
+        if let Some(children) = checkpoint.children.clone().filter(|v| !v.is_null()) {
+            reconcile_children(children)?;
         }
         let count = |n: i64| u64::try_from(n).map_err(invalid);
         if u64::from(recovery.turns) < count(checkpoint.usage.requests)?
@@ -610,6 +838,7 @@ impl Runner {
             ));
         }
         let mut history = vec![];
+        let mut approval_journal = vec![];
         for item in &checkpoint.history {
             use adk_codec::dto::{RunItemType, SnapshotType};
             let mut wire = adk_codec::dto::RunItem {
@@ -656,6 +885,33 @@ impl Runner {
                         )
                         .map_err(invalid)?,
                     );
+                }
+                SnapshotType::ToolApproval => {
+                    let approval = item
+                        .tool_approval
+                        .as_ref()
+                        .ok_or_else(|| invalid("missing Go approval payload"))?;
+                    let data = adk_codec::dto::ToolApprovalData {
+                        tool_name: approval.tool_name.clone(),
+                        input: approval.input.clone(),
+                        call_id: approval.call_id.clone(),
+                        approved: approval.approved,
+                    };
+                    approval_journal.push(crate::compat::ApprovalJournalEntry {
+                        marker: adk_codec::approval::ApprovalMarker {
+                            phase: if data.approved {
+                                adk_codec::approval::ApprovalPhase::Approved
+                            } else {
+                                adk_codec::approval::ApprovalPhase::Pending
+                            },
+                            data,
+                            agent: wire.agent.clone(),
+                        },
+                        new_items_before: 0,
+                        history_before: Some(history.len()),
+                        reason: None,
+                    });
+                    continue;
                 }
                 SnapshotType::Compaction => {
                     wire.kind = RunItemType(7);
@@ -721,7 +977,8 @@ impl Runner {
             tool_turn_start: None,
             consecutive_tool_errors: 0,
             tool_error_escalated: false,
-            approval_journal_present: false,
+            approval_journal_present: !approval_journal.is_empty(),
+            approval_journal,
         });
         if !completed {
             checkpoint.boundary = "model_completed".into();

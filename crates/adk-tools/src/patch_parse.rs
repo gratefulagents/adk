@@ -327,10 +327,10 @@ fn finish_unified(
             return Err("patch headers or rename metadata disagree with diff paths".into());
         }
     }
-    if !file.old.is_empty()
-        && !file.new.is_empty()
-        && file.old != file.new
-        && !(headers.rename_from && headers.rename_to)
+    if !(file.old.is_empty()
+        || file.new.is_empty()
+        || file.old == file.new
+        || (headers.rename_from && headers.rename_to))
     {
         return Err(format!(
             "rename from {} to {} requires paired rename metadata",

@@ -4,7 +4,7 @@ use crate::{
     write::{atomic_write, clean, resolve_existing},
 };
 use adk_core::{
-    BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
+    AccessMode, BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
 };
 use rustix::fs::{Mode, OFlags, open};
 use serde::Deserialize;
@@ -187,6 +187,14 @@ impl Edit {
     }
 }
 impl Tool for Edit {
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        (access == AccessMode::WorkspaceWrite && !self.confined).then(|| {
+            Arc::new(Self {
+                definition: self.definition.clone(),
+                confined: true,
+            }) as Arc<dyn Tool>
+        })
+    }
     fn definition(&self) -> &ToolDefinition {
         &self.definition
     }

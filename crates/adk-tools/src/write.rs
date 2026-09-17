@@ -1,6 +1,6 @@
 use crate::{Capability, workspace::Workspace};
 use adk_core::{
-    BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
+    AccessMode, BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
 };
 use rustix::fs::{
     AtFlags, FileType, Mode, OFlags, fchmod, mkdirat, open, openat, renameat, statat, unlinkat,
@@ -236,6 +236,14 @@ impl FileWrite {
     }
 }
 impl Tool for FileWrite {
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        (access == AccessMode::WorkspaceWrite && !self.confined).then(|| {
+            Arc::new(Self {
+                definition: self.definition.clone(),
+                confined: true,
+            }) as Arc<dyn Tool>
+        })
+    }
     fn definition(&self) -> &ToolDefinition {
         &self.definition
     }

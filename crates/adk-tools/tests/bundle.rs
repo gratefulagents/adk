@@ -85,6 +85,113 @@ async fn prepare_filters_once_and_close_invalidates_existing_handles() {
     );
 }
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[tokio::test]
+async fn prepared_file_tools_enforce_workspace_confinement_even_when_allowlisted() {
+    for configured_access in [AccessMode::FullAccess, AccessMode::WorkspaceWrite] {
+        for allowlisted in [false, true] {
+            let root = tempfile::tempdir().unwrap();
+            let outside = tempfile::tempdir().unwrap();
+            let mut cfg = config(&["Write", "Edit"]);
+            cfg.access = configured_access;
+            let bundle = BundleBuilder::new(cfg)
+                .build(ToolPolicy {
+                    access: AccessMode::WorkspaceWrite,
+                    allowed_mutating_tools: if allowlisted {
+                        ["Write".into(), "Edit".into()].into()
+                    } else {
+                        Default::default()
+                    },
+                    ..Default::default()
+                })
+                .unwrap();
+            let prepared = bundle.prepared();
+            assert_eq!(prepared.tools.len(), 2);
+            let mut ctx = context();
+            ctx.work_dir = root.path().into();
+            ctx.policy = prepared.policy;
+            for tool in prepared.tools {
+                for (directory, denied) in [(outside.path(), true), (root.path(), false)] {
+                    let path = directory.join(tool.definition().name.as_str());
+                    assert!(path.is_absolute());
+                    std::fs::write(&path, "original").unwrap();
+                    let arguments = if tool.definition().name == "Write" {
+                        json!({"file_path": path, "content": "changed"})
+                    } else {
+                        json!({"file_path": path, "old_string": "original", "new_string": "changed"})
+                    };
+                    let output = tool
+                        .execute(
+                            &ctx,
+                            ToolCall {
+                                arguments,
+                                ..call(&tool.definition().name)
+                            },
+                        )
+                        .await
+                        .unwrap();
+                    assert_eq!(output.is_error, denied, "{output:?}");
+                    assert_eq!(
+                        std::fs::read_to_string(path).unwrap(),
+                        if denied { "original" } else { "changed" }
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[tokio::test]
+async fn prepared_file_tools_preserve_exact_read_only_exceptions() {
+    for allowed in [None, Some("Write"), Some("Edit")] {
+        let root = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let mut cfg = config(&["Write", "Edit"]);
+        cfg.access = AccessMode::FullAccess;
+        let bundle = BundleBuilder::new(cfg)
+            .build(ToolPolicy {
+                access: AccessMode::ReadOnly,
+                allowed_mutating_tools: allowed.into_iter().map(String::from).collect(),
+                ..Default::default()
+            })
+            .unwrap();
+        let prepared = bundle.prepared();
+        assert_eq!(
+            prepared
+                .tools
+                .iter()
+                .map(|tool| tool.definition().name.as_str())
+                .collect::<Vec<_>>(),
+            allowed.into_iter().collect::<Vec<_>>()
+        );
+        let mut ctx = context();
+        ctx.work_dir = root.path().into();
+        ctx.policy = prepared.policy;
+        for tool in prepared.tools {
+            let path = outside.path().join("file");
+            std::fs::write(&path, "original").unwrap();
+            let arguments = if tool.definition().name == "Write" {
+                json!({"file_path": path, "content": "changed"})
+            } else {
+                json!({"file_path": path, "old_string": "original", "new_string": "changed"})
+            };
+            let output = tool
+                .execute(
+                    &ctx,
+                    ToolCall {
+                        arguments,
+                        ..call(&tool.definition().name)
+                    },
+                )
+                .await
+                .unwrap();
+            assert!(!output.is_error, "{output:?}");
+            assert_eq!(std::fs::read_to_string(path).unwrap(), "changed");
+        }
+    }
+}
+
 struct PendingTool {
     definition: ToolDefinition,
     started: Arc<tokio::sync::Notify>,

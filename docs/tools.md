@@ -16,6 +16,8 @@ Selection applies access variants, explicit-name filtering, mutable-tool grants,
 
 `Registry::prepare` returns `PreparedTools`: the model-visible tools after access adaptation and policy filtering, together with the matching `ToolPolicy`. `ToolBundle::prepared()` wraps those handles with owner-lifetime cancellation and freezes `allowed_tools` to the prepared names. Registration and preparation never grant policy or approval permission.
 
+Preparing a full-access Write/Edit under workspace-write policy narrows its filesystem implementation; a mutation allowlist never waives that confinement. Exact-name exceptions under read-only policy instead retain the host-configured implementation, as in the SDK. Bash honors those explicit exceptions without raising its configured access ceiling. These are dispatch-level guarantees, not just changes to model-visible metadata.
+
 ## Implemented tool families
 
 | Family | Implementation and boundary |

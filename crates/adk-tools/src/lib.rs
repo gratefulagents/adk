@@ -252,9 +252,10 @@ impl Registry {
             .tools
             .values()
             .map(|tool| {
-                if policy
-                    .allowed_mutating_tools
-                    .contains(&tool.definition().name)
+                if policy.access == AccessMode::ReadOnly
+                    && policy
+                        .allowed_mutating_tools
+                        .contains(&tool.definition().name)
                 {
                     tool.clone()
                 } else {

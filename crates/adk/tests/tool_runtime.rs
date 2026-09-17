@@ -137,10 +137,11 @@ async fn model_and_dispatch_use_exactly_prepared_tools_not_agent_or_request_tool
         .await
         .unwrap();
     assert_eq!(calls.load(Ordering::SeqCst), 1);
-    let requests = model.requests.lock().unwrap();
-    assert_eq!(requests.len(), 2);
-    assert!(requests.iter().all(|names| names == &["visible"]));
-    drop(requests);
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert!(requests.iter().all(|names| names == &["visible"]));
+    }
     runner.close().await.unwrap();
     let error = runner
         .run(context(), request(), Arc::new(TestHost))

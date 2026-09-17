@@ -237,7 +237,19 @@ impl ShellTool {
         if self.read_only_adapter {
             return AccessMode::ReadOnly;
         }
-        match (self.state.access, context.policy.access) {
+        // Preparation retains the configured implementation for an exact-name
+        // read-only exception. Honor that grant without raising the host ceiling.
+        let policy_access = if context.policy.access == AccessMode::ReadOnly
+            && context
+                .policy
+                .allowed_mutating_tools
+                .contains(&self.definition.name)
+        {
+            self.state.access
+        } else {
+            context.policy.access
+        };
+        match (self.state.access, policy_access) {
             (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
             (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
                 AccessMode::WorkspaceWrite

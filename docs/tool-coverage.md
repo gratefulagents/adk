@@ -157,6 +157,7 @@ missing-evidence observations in the per-name tables above.
 | Gap | Added evidence / status |
 |---|---|
 | Runtime composition and dispatch | `tests/bundle.rs` and `crates/adk/tests/tool_runtime.rs` pass. The bundle module is exported. The facade replaces model and dispatch lists together, preserves approval policy, invalidates handles on close/drop, and tests stream cancellation. |
+| Access narrowing and exact grants | Bundle regressions prove full-access Write/Edit cannot escape workspace-write preparation, including allowlisted names. Read-only exact exceptions remain functional. `shell.rs::prepared_exact_bash_grant_preserves_but_never_raises_host_access` checks effective dispatch under all three host access ceilings. |
 | State filters, binding limits, errors and actor overrides | `state.rs::pinned_go_filters_limits_semantic_errors_and_actor_overrides_on_both_stores` replays all 51 calls against both durable backends. All 102 outputs match; nine real differences per backend were fixed, not normalized away. |
 | Namespace Memory | `memory.rs::pinned_go_nullable_fields_tags_and_padded_uuid_delete` checks actual Go results; `recording_store_proves_forwarding_binding_limits_defaults_and_tag_exclusion` uses 55 competing records and records forwarded arguments. Missing host injection is explicitly tested. |
 | Plan artifacts | `signals.rs::pinned_go_empty_artifact_and_summary_byte_boundaries` covers actual Go empty/absent and 200-byte/UTF-8 boundaries. Host injection remains mandatory by type and is tested separately from Go nil-store errors. |
@@ -168,6 +169,11 @@ missing-evidence observations in the per-name tables above.
 No live-GitHub, public-network or real-analyzer test is required for the
 host-adapter contracts. Fake boundaries are identified as such; native Chrome
 rendering and live GitHub actions are not claimed.
+
+The Git replay module is Unix-only because its pinned Go command/result corpus
+contains native Unix paths, including JSON-encoded paths. Windows still compiles
+the Git library and runs the registry/schema and unsupported-target checks; the
+Unix corpus is not asserted to encode Windows-native path rendering.
 
 ## Enforcing skips and fresh verification status
 
@@ -181,4 +187,6 @@ rendering and live GitHub actions are not claimed.
 
 The ledger's own `verification_status` fields are historical inventory metadata, not fresh test verdicts. Reconcile this document against the parent's final test snapshot before closing issue 7.
 
-Parent integration verification: `cargo test --workspace --all-features --all-targets` passed (573 harness passes, 2 ignored helpers) after bundle exports, independent schemas, state corrections, and Browser/LSP cleanup fixes. Locally unavailable enforcing tests can still return early; these counts are not a claim that native OS checks ran here. Required Linux/macOS CI remains the authority for those checks.
+Parent integration verification (2026-09-17): `cargo test --locked --workspace --all-features --all-targets` passed on the pinned Rust **1.88.0** (580 harness passes, 0 failures, 2 ignored helpers, 77 targets) after bundle exports, independent schemas, state corrections, and Browser/LSP/Git cleanup fixes. All six regenerated Go oracle files matched their prior SHA-256 hashes. The shell corpus contains 168 policy cases and four environment-specific schemas. Pinned rustfmt, strict Clippy, warning-free rustdoc, doctests, manifest comparison, dependency purity and Python replay tests also pass. Two new-code Clippy warnings were corrected without changing behavior.
+
+Locally unavailable enforcing tests can still return early; these counts are **not** a claim that native OS checks ran here. Required Linux/macOS CI remains the authority for those checks. On implementation head `03ad3a76b39213769fc0ab98354b2027f1d1593a`, all 20 GitHub check records failed or were cancelled within seconds. Logs for both enforcing jobs and the quality job were unavailable (`log not found`), so no code-level diagnosis or native verification can be inferred from those failures. The prior macOS launcher fix remains unverified; Windows unsupported-target behavior likewise still requires a functioning runner. Keep PR #23 draft and issue #7 open until fresh native checks pass.

@@ -1,3 +1,6 @@
+// This replay includes native Unix paths and their JSON rendering from Go.
+// Windows still compiles the library and runs registry/schema/fail-closed tests.
+#![cfg(unix)]
 #![deny(warnings)]
 use adk_core::*;
 use adk_tools::capabilities;

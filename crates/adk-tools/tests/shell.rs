@@ -191,7 +191,8 @@ async fn bundle_drop_cancels_even_if_tool_handles_survive() {
 #[tokio::test]
 async fn restrictive_access_never_falls_back_to_local() {
     let (_dir, bundle, mut ctx, _) = setup();
-    ctx.policy.access = AccessMode::ReadOnly;
+    // Workspace confinement is not waived by read-only mutation exceptions.
+    ctx.policy.access = AccessMode::WorkspaceWrite;
     ctx.policy.allowed_mutating_tools.insert("Bash".into());
     let out = call(&bundle, "Bash", &ctx, json!({"command":"printf safe"})).await;
     assert!(out.is_error && text(&out).contains("local requires explicit FullAccess"));
@@ -598,4 +599,65 @@ async fn combined_output_does_not_shift_command_line_numbers() {
     assert!(!output.is_error, "{output:?}");
     assert_eq!(text(&output), "1\n2\n");
     bundle.close().await;
+}
+
+#[tokio::test]
+async fn prepared_exact_bash_grant_preserves_but_never_raises_host_access() {
+    let (dir, initial, mut ctx, _) = setup();
+    initial.close().await;
+    for access in [
+        AccessMode::FullAccess,
+        AccessMode::WorkspaceWrite,
+        AccessMode::ReadOnly,
+    ] {
+        let mut sandbox = adk_sandbox::Config::new(dir.path());
+        sandbox.backend = adk_sandbox::Backend::Local;
+        let owner = shell::ShellBundle::new(shell::Config {
+            sandbox,
+            access,
+            git_remote_writes: true,
+            environment: BTreeMap::new(),
+        })
+        .unwrap();
+        let registry = adk_tools::Registry::build(
+            &adk_tools::Config {
+                access,
+                features: adk_tools::Features::Strict(["Bash".into()].into()),
+                allowed_names: Some(["Bash".into()].into()),
+                ..Default::default()
+            },
+            [tool(&owner, "Bash")],
+        )
+        .unwrap();
+        let prepared = registry.prepare(ToolPolicy {
+            access: AccessMode::ReadOnly,
+            allowed_mutating_tools: ["Bash".into()].into(),
+            ..Default::default()
+        });
+        assert_eq!(prepared.tools.len(), 1);
+        assert_eq!(
+            prepared.tools[0].definition().read_only,
+            access == AccessMode::ReadOnly
+        );
+        ctx.policy = prepared.policy;
+        let output = invoke(
+            prepared.tools[0].as_ref(),
+            &ctx,
+            json!({"command":"touch granted"}),
+        )
+        .await;
+        if access == AccessMode::FullAccess {
+            assert!(!output.is_error, "{output:?}");
+            assert!(dir.path().join("granted").exists());
+            std::fs::remove_file(dir.path().join("granted")).unwrap();
+        } else {
+            assert!(output.is_error, "{output:?}");
+            assert!(!dir.path().join("granted").exists());
+            if access == AccessMode::WorkspaceWrite {
+                // Retain workspace-write, never unrestricted Local execution.
+                assert!(text(&output).contains("local requires explicit FullAccess"));
+            }
+        }
+        owner.close().await;
+    }
 }

@@ -21,6 +21,15 @@ struct Request {
 async fn main() {
     for line in io::stdin().lock().lines() {
         let request: Request = serde_json::from_str(&line.unwrap()).unwrap();
+        #[cfg(target_os = "linux")]
+        let skills = adk_tools::skills::tools(
+            serde_json::from_str(include_str!("../../../fixtures/tools/skill-catalog.json"))
+                .unwrap(),
+            request.work_dir.clone(),
+            Default::default(),
+        );
+        #[cfg(not(target_os = "linux"))]
+        let skills: Vec<Arc<dyn adk_core::Tool>> = Vec::new();
         let registry = Registry::build(
             &Config {
                 access: if request.full_access {
@@ -29,11 +38,13 @@ async fn main() {
                     adk_core::AccessMode::WorkspaceWrite
                 },
                 features: Features::Strict(
-                    ["Move", "Delete", "Write", "Edit"].map(String::from).into(),
+                    ["Move", "Delete", "Write", "Edit", "ExtraTools"]
+                        .map(String::from)
+                        .into(),
                 ),
                 ..Default::default()
             },
-            [],
+            skills,
         )
         .unwrap();
         let context = ToolContext {

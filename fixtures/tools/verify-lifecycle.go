@@ -16,6 +16,7 @@ import (
 
 	"github.com/gratefulagents/sdk/pkg/agentsdk"
 	tools "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs"
+	"github.com/gratefulagents/sdk/pkg/agentsdk/tools/skills"
 )
 
 func must(err error) {
@@ -69,14 +70,27 @@ func tree(root string) map[string]string {
 func main() {
 	data, err := os.ReadFile("../../fixtures/tools/lifecycle.json")
 	must(err)
-	var cases []struct {
+	type Case struct {
 		Name       string          `json:"name"`
 		Arguments  json.RawMessage `json:"arguments"`
 		ErrorOnly  bool            `json:"error_only"`
 		FullAccess bool            `json:"full_access"`
 		Content    *string         `json:"content"`
+		Config     json.RawMessage `json:"config"`
 	}
+	var cases []Case
 	must(json.Unmarshal(data, &cases))
+	skillCases, err := os.ReadFile("../../fixtures/tools/skills.json")
+	must(err)
+	var additional []Case
+	must(json.Unmarshal(skillCases, &additional))
+	cases = append(cases, additional...)
+	catalogBytes, err := os.ReadFile("../../fixtures/tools/skill-catalog.json")
+	must(err)
+	var entries []skills.SkillEntry
+	must(json.Unmarshal(catalogBytes, &entries))
+	catalog := skills.NewRegistryFromEntries(entries)
+	must(os.Unsetenv("DEMO_TOKEN"))
 	root, err := os.MkdirTemp("", "adk-lifecycle-parity-")
 	must(err)
 	defer os.RemoveAll(root)
@@ -91,6 +105,9 @@ func main() {
 	encoder := json.NewEncoder(stdin)
 	scanner := bufio.NewScanner(stdout)
 	implementations := map[string]agentsdk.Tool{"Move": &tools.MoveTool{}, "Delete": &tools.DeleteTool{}, "Write": &tools.WorkspaceWriteFileTool{}, "Edit": &tools.WorkspaceEditTool{}}
+	for _, tool := range skills.Tools(catalog, skills.NewInstaller(catalog), "") {
+		implementations[tool.Name()] = tool
+	}
 	for i, test := range cases {
 		goRoot := filepath.Join(root, fmt.Sprintf("go-%d", i))
 		rustRoot := filepath.Join(root, fmt.Sprintf("rust-%d", i))
@@ -101,6 +118,10 @@ func main() {
 		if test.Content != nil {
 			must(os.WriteFile(filepath.Join(goRoot, "a"), []byte(*test.Content), 0600))
 			must(os.WriteFile(filepath.Join(rustRoot, "a"), []byte(*test.Content), 0600))
+		}
+		if len(test.Config) > 0 {
+			must(os.WriteFile(filepath.Join(goRoot, ".mcp.json"), test.Config, 0644))
+			must(os.WriteFile(filepath.Join(rustRoot, ".mcp.json"), test.Config, 0644))
 		}
 		implementation := implementations[test.Name]
 		if test.Name == "Write" && test.FullAccess {

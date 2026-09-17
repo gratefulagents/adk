@@ -21,6 +21,8 @@ pub mod plan;
 mod search;
 mod search_pattern;
 pub mod signal;
+#[cfg(target_os = "linux")]
+pub mod skills;
 mod workspace;
 #[cfg(target_os = "linux")]
 mod write;

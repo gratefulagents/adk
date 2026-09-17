@@ -37,9 +37,11 @@ cd repos/sdk
 go run ../../fixtures/tools/verify-lifecycle.go ../../target/debug/examples/lifecycle_replay
 ```
 
-These 77 cases exercise both write-access variants, exact matching, merged and
-truncated Edit diffs, directory lifecycle, hard links, symlinks, and failure
-restoration. Temporary workspace roots are normalized in result strings;
+The verifier runs 77 filesystem cases plus 18 cases from `skills.json`, using the
+host catalog in `skill-catalog.json`. Filesystem cases exercise both write-access
+variants, exact matching, merged and truncated Edit diffs, directory lifecycle,
+hard links, symlinks, and failure restoration. Skills cases compare search,
+Unicode matching, installation/reinstallation merges, listing, and config bytes. Temporary workspace roots are normalized in result strings;
 `error_only` cases compare error status and filesystem effects, not OS diagnostics.
 
 This is an explicit subset of tool behavior, not the full security corpus.

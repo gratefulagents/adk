@@ -121,6 +121,25 @@ async fn os_enforcement_required_in_ci() {
     assert!(result.status.success(), "{result:?}");
     assert_eq!(result.stdout, b"terminal");
 
+    for output in [OutputMode::Pipes, OutputMode::Pty { rows: 24, cols: 80 }] {
+        let mut request = shell(
+            "read line; if (printf bad > data/original) 2>/dev/null; then exit 31; fi; if cat .aws/credential >/dev/null 2>&1; then exit 32; fi; printf 'session:%s' \"$line\"",
+            AccessMode::ReadOnly,
+        );
+        request.output = output;
+        let mut session = executor.start_session(&ctx, request).unwrap();
+        let mut input = session.take_input().unwrap();
+        input.write_all(b"confined\n").await.unwrap();
+        let result = session.wait().await.unwrap();
+        assert!(result.status.success(), "session confinement: {result:?}");
+        assert!(String::from_utf8_lossy(&result.stdout).contains("session:confined"));
+        assert_eq!(
+            fs::read(workspace.join("data/original")).unwrap(),
+            b"original"
+        );
+        assert_eq!(fs::read(&outside).unwrap(), b"outside-private");
+    }
+
     let listener = TcpListener::bind("127.0.0.1:0").unwrap();
     fs::write(
         workspace.join("address"),
@@ -139,6 +158,26 @@ async fn os_enforcement_required_in_ci() {
     request.timeout = Some(Duration::from_secs(5));
     let result = executor.run(&ctx, request).await.unwrap();
     assert!(result.status.success(), "network deny test: {result:?}");
+    assert!(String::from_utf8_lossy(&result.stdout).contains("network-denied"));
+
+    let mut request = Request::new(workspace.join("network-helper"));
+    request.args = vec![
+        "--ignored".into(),
+        "--exact".into(),
+        "network_helper".into(),
+        "--nocapture".into(),
+    ];
+    request.timeout = Some(Duration::from_secs(5));
+    let result = executor
+        .start_session(&ctx, request)
+        .unwrap()
+        .wait()
+        .await
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "session network denial: {result:?}"
+    );
     assert!(String::from_utf8_lossy(&result.stdout).contains("network-denied"));
 
     #[cfg(target_os = "macos")]

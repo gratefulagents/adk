@@ -11,6 +11,7 @@ use std::{
 };
 use tokio::process::Command;
 
+#[derive(Debug)]
 pub(crate) struct PrivateDir(pub PathBuf);
 impl PrivateDir {
     pub fn new() -> Result<Self, Error> {
@@ -46,6 +47,11 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
     };
     let mut command = match backend {
         Backend::Local => {
+            if request.hide_git_credentials {
+                return Err(Error::Invalid(
+                    "credential masking requires an enforcing backend".into(),
+                ));
+            }
             let mut cmd = Command::new(&request.program);
             cmd.args(&request.args).current_dir(&request.cwd);
             cmd.env_clear()
@@ -64,10 +70,32 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
         Backend::Seatbelt if cfg!(target_os = "macos") => {
             validate_tree(&config.workspace)?;
             let mut cmd = Command::new("/usr/bin/sandbox-exec");
-            cmd.arg("-p").arg(seatbelt_profile(config, request)?);
+            let masks = credential_masks(config, request)?;
+            cmd.arg("-p")
+                .arg(seatbelt_profile_with_masks(config, request, &masks)?);
+            for (i, path) in masks.iter().enumerate() {
+                let path = path
+                    .to_str()
+                    .ok_or_else(|| Error::Invalid("non-UTF8 Git config path".into()))?;
+                cmd.arg(format!("-DGITCONFIG{i}={path}"));
+            }
+            for (i, path) in credential_ancestors(config, request, &masks)
+                .iter()
+                .enumerate()
+            {
+                let path = path
+                    .to_str()
+                    .ok_or_else(|| Error::Invalid("non-UTF8 Git ancestor path".into()))?;
+                cmd.arg(format!("-DGITPARENT{i}={path}"));
+            }
             cmd.arg(format!("-DWORKSPACE={}", config.workspace.display()));
             cmd.arg(format!("-DGIT={}", config.workspace.join(".git").display()));
             cmd.arg(format!("-DPRIVATE={}", private.0.display()));
+            if request.access == AccessMode::WorkspaceWrite {
+                for (i, scratch) in request.scratch.iter().enumerate() {
+                    cmd.arg(format!("-DSCRATCH{i}={}", scratch.path().display()));
+                }
+            }
             for (i, name) in PROTECTED.iter().chain(SECRET.iter()).enumerate() {
                 cmd.arg(format!(
                     "-DMASK{i}={}",
@@ -198,6 +226,13 @@ fn bwrap_args(
         config.workspace.as_os_str().to_owned(),
     ]);
     if request.access == AccessMode::WorkspaceWrite {
+        for scratch in &request.scratch {
+            args.extend([
+                "--bind".into(),
+                scratch.path().as_os_str().to_owned(),
+                scratch.path().as_os_str().to_owned(),
+            ]);
+        }
         for name in PROTECTED {
             let path = config.workspace.join(name);
             let metadata = fs::symlink_metadata(&path).map_err(|_| {
@@ -238,6 +273,13 @@ fn bwrap_args(
             ]);
         }
     }
+    for path in credential_masks(config, request)? {
+        args.extend([
+            "--ro-bind".into(),
+            empty_file.as_os_str().to_owned(),
+            path.into_os_string(),
+        ]);
+    }
     for (key, value) in policy::environment(&request.env, Path::new("/tmp"))? {
         args.extend(["--setenv".into(), key.into(), value.into()]);
     }
@@ -251,7 +293,46 @@ fn bwrap_args(
     Ok(args)
 }
 
+fn credential_masks(config: &Config, request: &Request) -> Result<Vec<PathBuf>, Error> {
+    if !request.hide_git_credentials {
+        return Ok(Vec::new());
+    }
+    let mut roots = vec![config.workspace.clone()];
+    for scratch in &request.scratch {
+        validate_tree(scratch.path())?;
+        roots.push(scratch.path().to_owned());
+    }
+    crate::git_credentials::discover(&roots)
+}
+
+fn credential_ancestors(config: &Config, request: &Request, masks: &[PathBuf]) -> Vec<PathBuf> {
+    let mut ancestors = std::collections::BTreeSet::new();
+    for path in masks {
+        for parent in path.ancestors().skip(1) {
+            if !parent.starts_with(&config.workspace)
+                && !request
+                    .scratch
+                    .iter()
+                    .any(|scratch| parent.starts_with(scratch.path()))
+            {
+                break;
+            }
+            ancestors.insert(parent.to_owned());
+        }
+    }
+    ancestors.into_iter().collect()
+}
+
+#[cfg(test)]
 fn seatbelt_profile(config: &Config, request: &Request) -> Result<String, Error> {
+    seatbelt_profile_with_masks(config, request, &credential_masks(config, request)?)
+}
+
+fn seatbelt_profile_with_masks(
+    config: &Config,
+    request: &Request,
+    masks: &[PathBuf],
+) -> Result<String, Error> {
     // Paths are passed as sandbox parameters, never interpolated as policy code.
     CString::new(config.workspace.as_os_str().as_bytes())
         .map_err(|_| Error::Invalid("NUL in workspace".into()))?;
@@ -267,6 +348,10 @@ fn seatbelt_profile(config: &Config, request: &Request) -> Result<String, Error>
     }
     profile.push_str("))\n");
     if request.access == AccessMode::WorkspaceWrite {
+        for i in 0..request.scratch.len() {
+            // Keep the grant root pinned: only its descendants may be mutated.
+            profile.push_str(&format!("(allow file-read* (subpath (param \"SCRATCH{i}\")))\n(allow file-write* (require-all (subpath (param \"SCRATCH{i}\")) (require-not (literal (param \"SCRATCH{i}\")))))\n"));
+        }
         profile.push_str("(allow file-write* (require-all (subpath (param \"WORKSPACE\")) (require-not (literal (param \"WORKSPACE\")))");
         profile.push_str(" (require-not (literal (param \"GIT\")))");
         for i in 0..PROTECTED.len() + SECRET.len() {
@@ -274,11 +359,25 @@ fn seatbelt_profile(config: &Config, request: &Request) -> Result<String, Error>
         }
         profile.push_str("))\n");
     }
+    for i in 0..masks.len() {
+        // ENOENT keeps optional repository config reads compatible with status/diff.
+        profile.push_str(&format!("(deny file-read* (with errno 2) (literal (param \"GITCONFIG{i}\")))\n(deny file-write* (literal (param \"GITCONFIG{i}\")))\n"));
+    }
+    for i in 0..credential_ancestors(config, request, masks).len() {
+        // A rename must not move the credential out of its path-based read mask.
+        profile.push_str(&format!(
+            "(deny file-write* (literal (param \"GITPARENT{i}\")))\n"
+        ));
+    }
     if request.network == Network::Allow {
         profile.push_str("(allow network*)\n");
     }
     Ok(profile)
 }
+
+#[cfg(test)]
+#[path = "scratch_tests.rs"]
+mod scratch_tests;
 
 #[cfg(test)]
 mod tests {
@@ -305,6 +404,56 @@ mod tests {
         assert!(profile.contains("(deny sysctl-read (sysctl-name-prefix \"kern.procargs\"))"));
         assert!(!profile.contains("(allow network*)"));
         assert!(!profile.contains("(allow file-write*"));
+    }
+
+    #[test]
+    fn git_credential_plans_mask_nested_worktree_and_scratch_configs() {
+        let private = PrivateDir::new().unwrap();
+        let root = private.0.join("home");
+        for dir in [".git", "nested/.git", "linked", "metadata"] {
+            fs::create_dir_all(root.join(dir)).unwrap();
+        }
+        for path in [
+            ".git/config",
+            "nested/.git/config",
+            "metadata/config.worktree",
+        ] {
+            fs::write(
+                root.join(path),
+                "[remote \"origin\"]\nurl=https://secret@example.invalid\n",
+            )
+            .unwrap();
+        }
+        fs::write(root.join("linked/.git"), "gitdir: ../metadata\n").unwrap();
+        fs::write(root.join("metadata/commondir"), "../.git\n").unwrap();
+        let config = Config::new(&root);
+        let mut request = Request::new("/bin/sh");
+        request.hide_git_credentials = true;
+        let masks = credential_masks(&config, &request).unwrap();
+        assert_eq!(masks.len(), 3);
+        let args = bwrap_args(&config, &request, &private).unwrap();
+        for path in &masks {
+            assert!(args.windows(3).any(|args| args[0] == "--ro-bind"
+                && args[1] == private.0.join("empty").as_os_str()
+                && args[2] == path.as_os_str()));
+        }
+        let profile = seatbelt_profile(&config, &request).unwrap();
+        assert!(
+            profile.contains("(deny file-read* (with errno 2) (literal (param \"GITCONFIG2\")))")
+        );
+        assert!(profile.contains("(deny file-write* (literal (param \"GITPARENT0\")))"));
+        assert!(!profile.contains("secret@example.invalid"));
+        let scratch = std::sync::Arc::new(crate::ScratchDirectory::new().unwrap());
+        fs::create_dir(scratch.path().join(".git")).unwrap();
+        fs::write(scratch.path().join(".git/config"), "").unwrap();
+        request.scratch.push(scratch);
+        assert_eq!(credential_masks(&config, &request).unwrap().len(), 4);
+        fs::write(root.join("metadata/commondir"), "/usr\n").unwrap();
+        assert!(credential_masks(&config, &request).is_err());
+        fs::write(root.join("metadata/commondir"), "../.git\n").unwrap();
+        fs::remove_file(root.join("nested/.git/config")).unwrap();
+        std::os::unix::fs::symlink("../../.git/config", root.join("nested/.git/config")).unwrap();
+        assert!(credential_masks(&config, &request).is_err());
     }
 
     #[test]

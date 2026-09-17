@@ -1,16 +1,18 @@
+use crate::session::{FinishOutput, InputCommand, Output};
 use crate::{Completion, Config, Error, OutputMode, Request, RunResult, backend, policy};
 use adk_core::Context;
 use std::{
     fs::File,
-    io::{self, Read},
+    io::{self, Read, Write},
     os::fd::{AsRawFd, FromRawFd, OwnedFd},
     process::Stdio,
-    sync::{Arc, Mutex},
+    sync::Arc,
     time::{Duration, Instant},
 };
 use tokio::{
-    io::{AsyncReadExt, unix::AsyncFd},
+    io::{AsyncReadExt, AsyncWriteExt, unix::AsyncFd},
     process::Child,
+    sync::{mpsc, watch},
     task::JoinHandle,
 };
 use tokio_util::sync::CancellationToken;
@@ -18,31 +20,70 @@ use tokio_util::sync::CancellationToken;
 pub(crate) fn start(config: Config, context: Context, request: Request) -> crate::RunningProcess {
     let abandoned = CancellationToken::new();
     // The supervisor is intentionally not aborted when its caller disappears.
-    let task = tokio::spawn(supervise(config, context, request, abandoned.clone(), true));
+    let task = tokio::spawn(supervise(
+        config,
+        context,
+        request,
+        abandoned.clone(),
+        true,
+        None,
+    ));
     crate::RunningProcess {
         task,
         cancel: abandoned,
     }
 }
 
-#[derive(Default)]
-struct Capture {
-    stdout: Vec<u8>,
-    stderr: Vec<u8>,
-    truncated: bool,
-    limit: usize,
+pub(crate) fn start_session(
+    config: Config,
+    context: Context,
+    request: Request,
+) -> crate::ProcessSession {
+    let cancel = CancellationToken::new();
+    let output = Arc::new(Output::new(config.output_limit));
+    let (sender, input) = mpsc::channel(1);
+    let (ready, readiness) = watch::channel(None);
+    let io = SessionIo {
+        output: output.clone(),
+        input,
+        ready: ready.clone(),
+    };
+    let abandoned = cancel.clone();
+    let finish = FinishOutput(output.clone());
+    let task = tokio::spawn(async move {
+        let _finish = finish;
+        let result = supervise(config, context, request, abandoned, true, Some(io)).await;
+        if let Err(error) = &result {
+            ready.send_if_modified(|state| {
+                if state.is_some() {
+                    return false;
+                }
+                *state = Some(Err(error.to_string()));
+                true
+            });
+        }
+        result
+    });
+    crate::ProcessSession {
+        running: crate::RunningProcess { task, cancel },
+        output,
+        input: Some(crate::SessionInput { sender }),
+        readiness,
+    }
 }
-impl Capture {
-    fn append(&mut self, bytes: &[u8], stderr: bool) {
-        let remaining = self
-            .limit
-            .saturating_sub(self.stdout.len() + self.stderr.len());
-        let kept = remaining.min(bytes.len());
-        self.truncated |= kept != bytes.len();
-        if stderr {
-            self.stderr.extend_from_slice(&bytes[..kept]);
-        } else {
-            self.stdout.extend_from_slice(&bytes[..kept]);
+
+struct SessionIo {
+    output: Arc<Output>,
+    input: mpsc::Receiver<InputCommand>,
+    ready: watch::Sender<Option<Result<(), String>>>,
+}
+
+#[derive(Default)]
+struct IoTasks(Vec<JoinHandle<io::Result<()>>>);
+impl Drop for IoTasks {
+    fn drop(&mut self) {
+        for task in &self.0 {
+            task.abort();
         }
     }
 }
@@ -108,6 +149,7 @@ async fn supervise(
     request: Request,
     abandoned: CancellationToken,
     probe: bool,
+    session: Option<SessionIo>,
 ) -> Result<RunResult, Error> {
     let start = Instant::now();
     let deadline = match (
@@ -143,6 +185,7 @@ async fn supervise(
             probe_request,
             abandoned.clone(),
             false,
+            None,
         ))
         .await?;
         if !result.status.success()
@@ -162,15 +205,20 @@ async fn supervise(
         }
     }
     let mut built = backend::build(&config, &request)?;
-    let capture = Arc::new(Mutex::new(Capture {
-        limit: config.output_limit,
-        ..Capture::default()
-    }));
+    let interactive = session.is_some();
+    let capture = session
+        .as_ref()
+        .map(|s| s.output.clone())
+        .unwrap_or_else(|| Arc::new(Output::new(config.output_limit)));
     let master = match request.output {
         OutputMode::Pipes => {
             built
                 .command
-                .stdin(Stdio::null())
+                .stdin(if interactive {
+                    Stdio::piped()
+                } else {
+                    Stdio::null()
+                })
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped());
             None
@@ -182,7 +230,7 @@ async fn supervise(
                 .stdin(Stdio::from(slave.try_clone()?))
                 .stdout(Stdio::from(slave.try_clone()?))
                 .stderr(Stdio::from(slave));
-            Some(master)
+            Some(Arc::new(master))
         }
     };
     let has_pty = master.is_some();
@@ -225,16 +273,35 @@ async fn supervise(
         child,
         armed: true,
     };
+    if let Some(session) = &session {
+        session.ready.send_replace(Some(Ok(())));
+    }
     // Command retains Stdio handles; release the PTY slave copies before reading.
     drop(built.command);
-    let mut readers: Vec<JoinHandle<io::Result<()>>> = Vec::new();
+    let mut writer = IoTasks::default();
+    if let Some(session) = session {
+        let input = match &master {
+            Some(master) => Input::Pty(master.clone()),
+            None => Input::Pipe(group.child.stdin.take().expect("piped stdin")),
+        };
+        writer
+            .0
+            .push(tokio::spawn(write_input(input, session.input)));
+    }
+    let mut readers = IoTasks::default();
     if let Some(master) = master {
-        readers.push(tokio::spawn(drain_pty(master, capture.clone())));
+        readers
+            .0
+            .push(tokio::spawn(drain_pty(master, capture.clone())));
     } else {
         let stdout = group.child.stdout.take().expect("piped stdout");
         let stderr = group.child.stderr.take().expect("piped stderr");
-        readers.push(tokio::spawn(drain(stdout, capture.clone(), false)));
-        readers.push(tokio::spawn(drain(stderr, capture.clone(), true)));
+        readers
+            .0
+            .push(tokio::spawn(drain(stdout, capture.clone(), false)));
+        readers
+            .0
+            .push(tokio::spawn(drain(stderr, capture.clone(), true)));
     }
     let timer = async {
         match deadline {
@@ -250,13 +317,17 @@ async fn supervise(
         _ = timer => Completion::TimedOut,
         result = exited_unreaped(group.pid) => { wait_error = result.err(); Completion::Exited }
     };
+    for task in &mut writer.0 {
+        task.abort();
+        let _ = task.await;
+    }
     let status = group.cleanup(config.term_grace).await;
     // Escaped setsid descendants may keep descriptors open on local/Seatbelt.
     // Bound draining even there, and never leave detached reader tasks behind.
     let drain_deadline = tokio::time::Instant::now() + Duration::from_millis(250);
     let mut drain_error = None;
-    for mut reader in readers {
-        match tokio::time::timeout_at(drain_deadline, &mut reader).await {
+    for reader in &mut readers.0 {
+        match tokio::time::timeout_at(drain_deadline, &mut *reader).await {
             Ok(Ok(Ok(()))) => {}
             Ok(Ok(Err(error))) => {
                 drain_error = Some(Error::Io(error));
@@ -267,7 +338,7 @@ async fn supervise(
             Err(_) => {
                 reader.abort();
                 let _ = reader.await;
-                capture.lock().unwrap().truncated = true;
+                capture.truncate();
             }
         }
     }
@@ -278,19 +349,27 @@ async fn supervise(
     if let Some(error) = drain_error {
         return Err(error);
     }
-    let mut capture = capture.lock().unwrap();
+    let mut capture = capture.buffer.lock().unwrap();
     Ok(RunResult {
         status,
         completion,
-        stdout: std::mem::take(&mut capture.stdout),
-        stderr: std::mem::take(&mut capture.stderr),
+        stdout: if interactive {
+            Vec::new()
+        } else {
+            std::mem::take(&mut capture.stdout)
+        },
+        stderr: if interactive {
+            Vec::new()
+        } else {
+            std::mem::take(&mut capture.stderr)
+        },
         truncated: capture.truncated,
     })
 }
 
 async fn drain(
     mut reader: impl tokio::io::AsyncRead + Unpin,
-    capture: Arc<Mutex<Capture>>,
+    capture: Arc<Output>,
     stderr: bool,
 ) -> io::Result<()> {
     let mut bytes = [0u8; 8192];
@@ -299,7 +378,7 @@ async fn drain(
         if n == 0 {
             return Ok(());
         }
-        capture.lock().unwrap().append(&bytes[..n], stderr);
+        capture.append(&bytes[..n], stderr);
     }
 }
 
@@ -337,16 +416,52 @@ fn pty(rows: u16, cols: u16) -> io::Result<(AsyncFd<File>, OwnedFd)> {
     Ok((AsyncFd::new(master)?, slave))
 }
 
-async fn drain_pty(master: AsyncFd<File>, capture: Arc<Mutex<Capture>>) -> io::Result<()> {
+async fn drain_pty(master: Arc<AsyncFd<File>>, capture: Arc<Output>) -> io::Result<()> {
     let mut bytes = [0u8; 8192];
     loop {
         let mut ready = master.readable().await?;
         match ready.try_io(|inner| inner.get_ref().read(&mut bytes)) {
             Ok(Ok(0)) => return Ok(()),
-            Ok(Ok(n)) => capture.lock().unwrap().append(&bytes[..n], false),
+            Ok(Ok(n)) => capture.append(&bytes[..n], false),
             Ok(Err(error)) if error.raw_os_error() == Some(libc::EIO) => return Ok(()),
             Ok(Err(error)) => return Err(error),
             Err(_) => {}
         }
     }
+}
+
+enum Input {
+    Pipe(tokio::process::ChildStdin),
+    Pty(Arc<AsyncFd<File>>),
+}
+
+async fn write_input(
+    mut input: Input,
+    mut commands: mpsc::Receiver<InputCommand>,
+) -> io::Result<()> {
+    while let Some(command) = commands.recv().await {
+        let result = match &mut input {
+            Input::Pipe(stdin) => stdin.write_all(&command.bytes).await,
+            Input::Pty(master) => write_pty(master, &command.bytes).await,
+        };
+        let failed = result.is_err();
+        let _ = command.done.send(result);
+        if failed {
+            break;
+        }
+    }
+    Ok(())
+}
+
+async fn write_pty(master: &AsyncFd<File>, mut bytes: &[u8]) -> io::Result<()> {
+    while !bytes.is_empty() {
+        let mut ready = master.writable().await?;
+        match ready.try_io(|inner| inner.get_ref().write(bytes)) {
+            Ok(Ok(0)) => return Err(io::ErrorKind::WriteZero.into()),
+            Ok(Ok(n)) => bytes = &bytes[n..],
+            Ok(Err(error)) => return Err(error),
+            Err(_) => {}
+        }
+    }
+    Ok(())
 }

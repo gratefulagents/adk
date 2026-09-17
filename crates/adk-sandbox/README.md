@@ -10,7 +10,34 @@ Trusted-host OS execution boundary. It consumes `adk_core::Context` cancellation
 - `Executor::start` returns `RunningProcess`. `wait().await` waits for completion; `cancel_and_wait().await` cancels and explicitly awaits cleanup. Cancellation before spawn returns `Error::Cancelled` instead of a fabricated exit status.
 - Each independently owned Tokio supervisor uses a new session/process group, sends TERM then KILL after the configured grace, and awaits the direct child's reaping on **all** exit paths, including successful leader exit with background descendants. The leader is observed with `waitid(WNOWAIT)` and retained until group signalling finishes, preventing recycled-PID group signalling.
 - Dropping a handle or an in-flight `run`/`wait` future requests supervisor cancellation, not supervisor abortion. RAII provides best-effort KILL on unexpected supervisor destruction; Tokio owns fallback direct-child reaping. **Keep the runtime alive** to complete async cleanup; use retained handles and `cancel_and_wait` before runtime shutdown. There is no executor-wide shutdown registry. Host crash, SIGKILL, runtime destruction and power loss cannot guarantee async reaping.
-- `OutputMode::Pty { rows, cols }` captures a private PTY with stdout/stderr merged into stdout. It is not an interactive terminal/session API. Pipes have null stdin. Capture keeps the first `output_limit` combined bytes and continuously drains/discards excess. Reader tasks are bounded and joined/aborted after cleanup; inherited descriptors held by escaped local/macOS daemons cannot hang completion forever.
+- `OutputMode::Pty { rows, cols }` captures a private PTY with stdout/stderr merged into stdout. Legacy `run`/`start` pipes have null stdin. Their capture keeps the first `output_limit` combined bytes and continuously drains/discards excess. I/O tasks are bounded and joined/aborted after cleanup; inherited descriptors held by escaped local/macOS daemons cannot hang completion forever.
+
+### Interactive / streaming sessions
+
+`Executor::start_session(&Context, Request) -> Result<ProcessSession, Error>` is an owned, independently supervised session for background commands, terminals, and stdio protocols. It uses **the same policy validation, backend construction, enforcement probe, cancellation/deadline handling and process-group cleanup** as `start`; it never substitutes Local for an unavailable backend. Existing request/config struct literals and `run`/`start` APIs remain compatible.
+
+- `take_input() -> Option<SessionInput>` separates the single writer for concurrent input and output. `SessionInput::write_all(&mut self, &[u8]).await` acknowledges OS writes in bounded 8 KiB chunks with a one-command queue. There is no unbounded input queue. `close(self)` or drop closes pipe stdin after queued writes. A PTY cannot half-close: send its configured EOF character (typically `\x04` in canonical mode) instead. Writers are revoked and their descriptors closed on process termination, even if a writer handle outlives its session. Cancelling a write future can leave a prefix written; protocol callers must not blindly retry it.
+- `poll(&mut self) -> SessionOutput` drains the current buffer without waiting; `next_output(&mut self).await` waits for output, truncation, or finished cleanup and is cancellation-safe. `SessionOutput` contains byte vectors `stdout`, `stderr`, and flags `truncated` and `finished`. A PTY merges stderr into stdout. Output remains available after exit until polled or waited. Streams are ordered individually, not globally across stdout/stderr.
+- The combined unread output budget is `Config::output_limit`. Polling replenishes it. Readers continuously drain/discard excess so a silent or slow client cannot block cancellation or accumulate unbounded output. `truncated` describes loss **since the previous poll**, not lifetime loss. Protocol consumers (e.g. LSP) must continuously consume output and treat truncation as fatal rather than parsing corrupted frames. This is not a lossless backpressured stream. Zero output limit discards every byte with the truncation flag.
+- `is_finished()` reports completed supervisor cleanup, not successful execution. `cancel()` requests termination. `wait(self).await` closes input still owned by the session, waits/reaps, and returns a `RunResult` with only unread output. A writer previously taken by the caller must be explicitly closed if the child needs EOF. `cancel_and_wait(self).await` requests termination and waits for cleanup; use it for BashKill and bundle shutdown. Status and startup/backend errors are reported by `wait`, just as for `RunningProcess`; `finished` alone is not success.
+- Hosts should retain session handles in their own bundle/session registry, call `cancel()` on every handle, then await each `cancel_and_wait()` before shutting down Tokio. Dropping the registry requests cleanup for every session but does not synchronously await it. Dropping in-flight `wait` requests cancellation too. Runtime destruction, host death, and escaped local/macOS daemons retain the limitations above. No executor-global registry, terminal resizing, job-control API, or writable-outside-workspace grants are added.
+
+```rust,no_run
+# async fn example(executor: &adk_sandbox::Executor, context: &adk_core::Context) -> Result<(), adk_sandbox::Error> {
+let mut session = executor.start_session(context, adk_sandbox::Request::new("/bin/cat"))?;
+let mut input = session.take_input().unwrap();
+input.write_all(b"hello\n").await?;
+input.close();
+loop {
+    let output = session.next_output().await;
+    // Forward untrusted output; fail protocol consumers if output.truncated.
+    if output.finished { break; }
+}
+let result = session.wait().await?;
+assert!(result.status.success());
+# Ok(())
+# }
+```
 
 ## Containment
 

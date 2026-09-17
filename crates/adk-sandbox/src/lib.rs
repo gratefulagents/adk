@@ -3,11 +3,20 @@
 //! See the crate README for containment and lifecycle limitations.
 
 use adk_core::{AccessMode, Context};
-use std::{collections::BTreeMap, path::PathBuf, time::Duration};
+use std::{
+    collections::BTreeMap,
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 
 #[cfg(unix)]
 mod backend;
+#[cfg(unix)]
+mod git_credentials;
 mod policy;
+mod session;
+pub use session::{ProcessSession, SessionInput, SessionOutput};
 #[cfg(unix)]
 mod process;
 
@@ -33,7 +42,7 @@ pub enum OutputMode {
     #[default]
     Pipes,
     /// Capture a private terminal; stdout and stderr are merged into stdout.
-    /// No interactive input API is provided.
+    /// `Executor::start_session` also exposes interactive input.
     Pty { rows: u16, cols: u16 },
 }
 
@@ -57,6 +66,45 @@ impl Config {
     }
 }
 
+/// Host-owned private staging directory, removed when its last owner is dropped.
+/// Share through `Arc` to retain files after a request completes. Only
+/// `WorkspaceWrite` requests may grant access to these directories.
+#[derive(Debug)]
+pub struct ScratchDirectory {
+    #[cfg(unix)]
+    directory: backend::PrivateDir,
+    #[cfg(not(unix))]
+    path: PathBuf,
+}
+
+impl ScratchDirectory {
+    pub fn new() -> Result<Self, Error> {
+        #[cfg(unix)]
+        {
+            Ok(Self {
+                directory: backend::PrivateDir::new()?,
+            })
+        }
+        #[cfg(not(unix))]
+        {
+            Err(Error::Unavailable(
+                "private scratch directories require Unix".into(),
+            ))
+        }
+    }
+
+    pub fn path(&self) -> &Path {
+        #[cfg(unix)]
+        {
+            &self.directory.0
+        }
+        #[cfg(not(unix))]
+        {
+            &self.path
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct Request {
     /// Absolute executable path; no parent PATH lookup takes place.
@@ -70,6 +118,10 @@ pub struct Request {
     pub env: BTreeMap<String, String>,
     pub timeout: Option<Duration>,
     pub output: OutputMode,
+    /// Owned, host-created staging grants; retained through supervisor cleanup.
+    pub scratch: Vec<Arc<ScratchDirectory>>,
+    /// Mask standard host Git credential files; requires an enforcing backend.
+    pub hide_git_credentials: bool,
 }
 
 impl Request {
@@ -83,6 +135,8 @@ impl Request {
             env: BTreeMap::new(),
             timeout: None,
             output: OutputMode::Pipes,
+            scratch: Vec::new(),
+            hide_git_credentials: false,
         }
     }
 }
@@ -177,6 +231,34 @@ impl Executor {
     /// alive to complete it. Normal returns have reaped the direct child.
     pub async fn run(&self, context: &Context, request: Request) -> Result<RunResult, Error> {
         self.start(context, request)?.wait().await
+    }
+
+    /// Start a bidirectional, incrementally polled session using exactly the same
+    /// policy and backend as `start`. Pipes have writable stdin; PTYs merge output.
+    /// Await `ProcessSession::ready` to confirm child spawn without waiting for
+    /// output or exit. `ProcessSession::wait` retains original startup errors.
+    pub fn start_session(
+        &self,
+        context: &Context,
+        request: Request,
+    ) -> Result<ProcessSession, Error> {
+        policy::active(context)?;
+        let request = policy::validate(&self.config, request)?;
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        {
+            Ok(process::start_session(
+                self.config.clone(),
+                context.clone(),
+                request,
+            ))
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+        {
+            let _ = request;
+            Err(Error::Unavailable(
+                "only Unix process lifecycle is implemented".into(),
+            ))
+        }
     }
 
     /// Start independently supervised work. Keep this handle to explicitly

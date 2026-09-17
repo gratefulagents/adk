@@ -79,10 +79,19 @@ fn request(script: &str, access: AccessMode) -> Request {
     req
 }
 
+fn sandbox_config(root: &Path) -> Config {
+    let mut config = Config::new(root);
+    #[cfg(target_os = "macos")]
+    config
+        .runtime_roots
+        .push(adk_sandbox::macos_developer_toolchain_root().unwrap());
+    config
+}
+
 #[tokio::test]
 async fn local_and_unsupported_metadata_fail_closed() {
     let temp = fixture();
-    let mut config = Config::new(temp.path());
+    let mut config = sandbox_config(temp.path());
     config.backend = Backend::Local;
     let executor = Executor::new(config).unwrap();
     assert!(matches!(
@@ -91,7 +100,7 @@ async fn local_and_unsupported_metadata_fail_closed() {
             .await,
         Err(Error::Invalid(_))
     ));
-    let executor = Executor::new(Config::new(temp.path())).unwrap();
+    let executor = Executor::new(sandbox_config(temp.path())).unwrap();
     fs::write(
         temp.path().join("nested/.git/config"),
         "[include]\npath = ../../private-config\n",
@@ -127,7 +136,7 @@ async fn local_and_unsupported_metadata_fail_closed() {
 #[tokio::test]
 async fn credential_read_masks_enforced_or_required_in_ci() {
     let temp = fixture();
-    let executor = Executor::new(Config::new(temp.path())).unwrap();
+    let executor = Executor::new(sandbox_config(temp.path())).unwrap();
     // Probe without masking so a broken mask never gets classified as unavailable.
     let mut probe = request("printf probe", AccessMode::ReadOnly);
     probe.hide_git_credentials = false;

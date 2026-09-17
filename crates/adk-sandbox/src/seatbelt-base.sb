@@ -9,6 +9,9 @@
 ; Without it the command runs but emits a warning into every captured PTY.
 (allow file-read-metadata (literal "/var"))
 (allow file-read* (literal "/private/var/select/sh"))
+; Apple developer-tool launchers read this selector; the selected toolchain
+; itself must still be supplied as a validated, host-configured runtime root.
+(allow file-read-metadata (literal "/private/var/select/developer_dir"))
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))

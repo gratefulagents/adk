@@ -50,6 +50,9 @@ pub enum OutputMode {
 pub struct Config {
     pub workspace: PathBuf,
     pub backend: Backend,
+    /// Explicit host-selected, read-only runtime directories (for example, an
+    /// Apple developer toolchain). Never construct these from model input.
+    pub runtime_roots: Vec<PathBuf>,
     /// Combined retained stdout/stderr byte budget; excess bytes are drained.
     pub output_limit: usize,
     pub term_grace: Duration,
@@ -60,6 +63,7 @@ impl Config {
         Self {
             workspace: workspace.into(),
             backend: Backend::Auto,
+            runtime_roots: Vec::new(),
             output_limit: 1024 * 1024,
             term_grace: Duration::from_millis(250),
         }
@@ -215,9 +219,73 @@ impl Drop for RunningProcess {
     }
 }
 
+fn trusted_runtime_roots(workspace: &Path, roots: Vec<PathBuf>) -> Result<Vec<PathBuf>, Error> {
+    let mut trusted = Vec::with_capacity(roots.len());
+    for root in roots {
+        if !root.is_absolute()
+            || root
+                .components()
+                .any(|part| part == std::path::Component::ParentDir)
+        {
+            return Err(Error::Invalid(
+                "runtime root must be absolute without '..'".into(),
+            ));
+        }
+        let root = root.canonicalize()?;
+        if !root.is_dir()
+            || root.parent().is_none()
+            || root.starts_with(workspace)
+            || workspace.starts_with(&root)
+        {
+            return Err(Error::Invalid(
+                "runtime root must be a non-overlapping existing directory".into(),
+            ));
+        }
+        if [
+            "/",
+            "/Applications",
+            "/Users",
+            "/home",
+            "/private",
+            "/tmp",
+            "/private/tmp",
+            "/var",
+            "/private/var",
+            "/etc",
+            "/private/etc",
+            "/Library",
+            "/System",
+            "/usr",
+            "/bin",
+            "/sbin",
+            "/opt",
+        ]
+        .iter()
+        .any(|forbidden| root == Path::new(forbidden))
+        {
+            return Err(Error::Invalid("runtime root is too broad".into()));
+        }
+        if !trusted.contains(&root) {
+            trusted.push(root);
+        }
+    }
+    Ok(trusted)
+}
+
+/// Resolve the host-selected Apple developer toolchain for a trusted
+/// [`Config::runtime_roots`] entry. This is host configuration, not a
+/// request/model-controlled grant.
+#[cfg(target_os = "macos")]
+pub fn macos_developer_toolchain_root() -> Result<PathBuf, Error> {
+    Path::new("/var/select/developer_dir")
+        .canonicalize()
+        .map_err(Error::from)
+}
+
 impl Executor {
     pub fn new(mut config: Config) -> Result<Self, Error> {
         config.workspace = policy::workspace(&config.workspace)?;
+        config.runtime_roots = trusted_runtime_roots(&config.workspace, config.runtime_roots)?;
         if config.output_limit > 64 * 1024 * 1024 || config.term_grace > Duration::from_secs(30) {
             return Err(Error::Invalid(
                 "output limit exceeds 64 MiB or grace exceeds 30 seconds".into(),

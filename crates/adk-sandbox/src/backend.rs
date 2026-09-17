@@ -91,6 +91,9 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
             cmd.arg(format!("-DWORKSPACE={}", config.workspace.display()));
             cmd.arg(format!("-DGIT={}", config.workspace.join(".git").display()));
             cmd.arg(format!("-DPRIVATE={}", private.0.display()));
+            for (i, root) in config.runtime_roots.iter().enumerate() {
+                cmd.arg(format!("-DRUNTIME{i}={}", root.display()));
+            }
             if request.access == AccessMode::WorkspaceWrite {
                 for (i, scratch) in request.scratch.iter().enumerate() {
                     cmd.arg(format!("-DSCRATCH{i}={}", scratch.path().display()));
@@ -215,6 +218,13 @@ fn bwrap_args(
         .into_iter()
         .map(Into::into),
     );
+    for root in &config.runtime_roots {
+        args.extend([
+            "--ro-bind".into(),
+            root.as_os_str().to_owned(),
+            root.as_os_str().to_owned(),
+        ]);
+    }
     let mode = if request.access == AccessMode::ReadOnly {
         "--ro-bind"
     } else {
@@ -342,6 +352,11 @@ fn seatbelt_profile_with_masks(
     let mut profile = String::from(include_str!("seatbelt-base.sb"));
     profile.push_str("(allow file-read* (subpath \"/usr\") (subpath \"/bin\") (subpath \"/sbin\") (subpath \"/System/Library\") (subpath \"/Library/Apple\") (subpath \"/private/var/db/dyld\") (literal \"/dev/null\") (literal \"/dev/urandom\") (literal \"/dev/random\"))\n");
     profile.push_str("(allow file-read* file-write* (subpath (param \"PRIVATE\")))\n(allow file-write-data (literal \"/dev/null\"))\n");
+    for i in 0..config.runtime_roots.len() {
+        profile.push_str(&format!(
+            "(allow file-read* (subpath (param \"RUNTIME{i}\")))\n"
+        ));
+    }
     profile.push_str("(allow file-read* (require-all (subpath (param \"WORKSPACE\"))");
     for i in PROTECTED.len()..PROTECTED.len() + SECRET.len() {
         profile.push_str(&format!(" (require-not (subpath (param \"MASK{i}\")))"));
@@ -397,6 +412,7 @@ mod tests {
         assert!(profile.contains("(allow file-read* (literal \"/\"))"));
         assert!(!profile.contains("(subpath \"/\")"));
         assert!(profile.contains("(literal \"/private/var/select/sh\")"));
+        assert!(profile.contains("(literal \"/private/var/select/developer_dir\")"));
         assert!(!profile.contains("(subpath \"/private/var\")"));
         assert!(profile.contains("(sysctl-name \"hw.pagesize_compat\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
@@ -404,6 +420,28 @@ mod tests {
         assert!(profile.contains("(deny sysctl-read (sysctl-name-prefix \"kern.procargs\"))"));
         assert!(!profile.contains("(allow network*)"));
         assert!(!profile.contains("(allow file-write*"));
+    }
+
+    #[test]
+    fn runtime_roots_are_host_only_and_cannot_overlap_the_workspace() {
+        let private = PrivateDir::new().unwrap();
+        let workspace = private.0.join("work");
+        let runtime = private.0.join("runtime");
+        fs::create_dir(&workspace).unwrap();
+        fs::create_dir(&runtime).unwrap();
+        let mut config = Config::new(&workspace);
+        config.runtime_roots.push(runtime.clone());
+        let executor = crate::Executor::new(config.clone()).unwrap();
+        let profile = seatbelt_profile(&executor.config, &Request::new("/bin/sh")).unwrap();
+        assert!(profile.contains("(allow file-read* (subpath (param \"RUNTIME0\")))"));
+        assert!(!profile.contains(&runtime.display().to_string()));
+        let args = bwrap_args(&executor.config, &Request::new("/bin/sh"), &private).unwrap();
+        assert!(args.windows(3).any(|args| args[0] == "--ro-bind"
+            && args[1] == executor.config.runtime_roots[0].as_os_str()
+            && args[2] == executor.config.runtime_roots[0].as_os_str()));
+
+        config.runtime_roots = vec![workspace];
+        assert!(crate::Executor::new(config).is_err());
     }
 
     #[test]

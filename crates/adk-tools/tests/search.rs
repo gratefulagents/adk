@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 use adk_core::*;
 use adk_tools::{Config, Features, Registry};
 use serde_json::{Value, json};
@@ -421,4 +421,44 @@ async fn symlink_swap_during_read_cannot_escape() {
     }
     stop.store(true, Ordering::Release);
     thread.join().unwrap();
+}
+
+#[tokio::test]
+async fn every_search_name_rejects_escape_and_pre_cancelled_execution() {
+    let root = tempfile::tempdir().unwrap();
+    let outside = tempfile::tempdir().unwrap();
+    write(outside.path(), "private.txt", "outside-secret");
+    let registry = registry();
+    for name in ["read_file", "list_files", "glob", "grep"] {
+        let path = if name == "read_file" {
+            outside.path().join("private.txt")
+        } else {
+            outside.path().to_path_buf()
+        };
+        let args = json!({"path":path,"pattern":"private"});
+        let error = execute(root.path(), name, args.clone()).await.unwrap_err();
+        assert!(
+            error.to_string().contains("outside the workspace root"),
+            "{name}: {error}"
+        );
+        assert!(!error.to_string().contains("outside-secret"));
+        let cancel = Arc::new(adk_runtime::CancellationToken::new());
+        cancel.cancel();
+        let mut ctx = context(root.path());
+        ctx.operation.cancellation = cancel;
+        let error = registry
+            .get(name)
+            .unwrap()
+            .execute(
+                &ctx,
+                ToolCall {
+                    id: "cancel".into(),
+                    name: name.into(),
+                    arguments: args,
+                },
+            )
+            .await
+            .unwrap_err();
+        assert_eq!(error.info.category, ErrorCategory::Cancelled, "{name}");
+    }
 }

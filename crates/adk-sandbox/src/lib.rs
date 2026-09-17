@@ -277,9 +277,22 @@ fn trusted_runtime_roots(workspace: &Path, roots: Vec<PathBuf>) -> Result<Vec<Pa
 /// request/model-controlled grant.
 #[cfg(target_os = "macos")]
 pub fn macos_developer_toolchain_root() -> Result<PathBuf, Error> {
-    Path::new("/var/select/developer_dir")
-        .canonicalize()
-        .map_err(Error::from)
+    let developer = Path::new("/var/select/developer_dir").canonicalize()?;
+    // Xcode launchers also read Info.plist and load sibling SharedFrameworks.
+    // Grant only the selected application bundle's Contents, never /Applications.
+    if let Some(contents) = developer.parent()
+        && developer
+            .file_name()
+            .is_some_and(|name| name == "Developer")
+        && contents.file_name().is_some_and(|name| name == "Contents")
+        && contents
+            .parent()
+            .and_then(Path::extension)
+            .is_some_and(|ext| ext == "app")
+    {
+        return Ok(contents.to_owned());
+    }
+    Ok(developer)
 }
 
 impl Executor {

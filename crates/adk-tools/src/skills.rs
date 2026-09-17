@@ -119,7 +119,7 @@ pub fn tools(
         .collect()
 }
 
-fn go_lower(value: &str) -> String {
+pub(crate) fn go_lower(value: &str) -> String {
     value
         .chars()
         .map(|character| character.to_lowercase().next().expect("case mapping"))

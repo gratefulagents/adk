@@ -131,7 +131,7 @@ impl State {
     fn task_mut(&mut self, id: &str) -> Result<&mut Task> {
         self.tasks
             .get_mut(id)
-            .ok_or_else(|| Error::NotFound(format!("task {id}")))
+            .ok_or_else(|| Error::NotFound(format!("task {id:?}")))
     }
     fn recompute_blocks(&mut self) {
         let links: Vec<_> = self
@@ -413,7 +413,7 @@ impl ProjectStore {
         self.state()?
             .tasks
             .remove(id.trim())
-            .ok_or_else(|| Error::NotFound(format!("task {id}")))
+            .ok_or_else(|| Error::NotFound(format!("task {id:?}")))
     }
     pub fn add_dependency(&self, task_id: &str, depends_on: &str) -> Result<()> {
         self.dependency(task_id, depends_on, true)
@@ -433,7 +433,9 @@ impl ProjectStore {
                 let depends_on = depends_on.trim();
                 state.task_mut(task_id)?;
                 if add {
-                    state.task_mut(depends_on)?;
+                    if !state.tasks.contains_key(depends_on) {
+                        return Err(Error::NotFound(format!("dependency task {depends_on:?}")));
+                    }
                     if task_id == depends_on {
                         return Err(Error::Invalid("task cannot depend on itself".into()));
                     }
@@ -498,7 +500,7 @@ impl ProjectStore {
         self.mutate("memory.deleted", |state, now| {
             let id = id.trim();
             if !state.memories.contains_key(id) {
-                return Err(Error::NotFound(format!("memory {id}")));
+                return Err(Error::NotFound(format!("memory {id:?}")));
             }
             Ok((json!({"id":id,"at":now}), ()))
         })

@@ -20,6 +20,14 @@ fn config(access: AccessMode) -> Config {
     }
 }
 async fn invoke(registry: &Registry, name: &str, arguments: Value) -> String {
+    invoke_expected(registry, name, arguments, false).await
+}
+async fn invoke_expected(
+    registry: &Registry,
+    name: &str,
+    arguments: Value,
+    is_error: bool,
+) -> String {
     let context = ToolContext {
         operation: Context {
             run_id: "registry-state".into(),
@@ -46,7 +54,7 @@ async fn invoke(registry: &Registry, name: &str, arguments: Value) -> String {
         )
         .await
         .unwrap();
-    assert!(!output.is_error, "{name}: {output:?}");
+    assert_eq!(output.is_error, is_error, "{name}: {output:?}");
     assert!(!output.should_pause);
     match &output.content[..] {
         [Content::Text { text }] => text.clone(),
@@ -163,8 +171,14 @@ async fn all_fifteen_tools_integrate_with_durable_filesystem_and_sqlite_stores()
         );
         drop(registry);
         let registry = build(AccessMode::ReadOnly);
+        assert_eq!(registry.names().count(), 15);
+        let prepared = registry.prepare(ToolPolicy::default());
         assert_eq!(
-            registry.names().collect::<Vec<_>>(),
+            prepared
+                .tools
+                .iter()
+                .map(|tool| tool.definition().name.as_str())
+                .collect::<Vec<_>>(),
             [
                 "memory_list",
                 "memory_recall",
@@ -187,4 +201,102 @@ async fn all_fifteen_tools_integrate_with_durable_filesystem_and_sqlite_stores()
         call(&registry, "memory_delete", json!({"id":memory["id"]})).await;
         assert_eq!(call(&registry, "memory_stats", json!({})).await["total"], 0);
     }
+}
+
+fn normalize_contract(value: &mut Value, ids: &std::collections::BTreeMap<String, String>) {
+    match value {
+        Value::Object(fields) => {
+            for (key, value) in fields {
+                if matches!(key.as_str(), "created_at" | "updated_at" | "closed_at")
+                    && value.is_string()
+                {
+                    *value = json!("<time>");
+                } else {
+                    normalize_contract(value, ids);
+                }
+            }
+        }
+        Value::Array(values) => {
+            for value in values {
+                normalize_contract(value, ids);
+            }
+        }
+        Value::String(text) => {
+            if text.starts_with("comment_") {
+                *text = "<comment>".into();
+            } else {
+                for (id, alias) in ids {
+                    *text = text.replace(id, alias);
+                }
+            }
+        }
+        _ => {}
+    }
+}
+
+#[tokio::test]
+async fn pinned_go_filters_limits_semantic_errors_and_actor_overrides_on_both_stores() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/tools/state-memory-plan-expected.json"
+    ))
+    .unwrap();
+    let mut differences = Vec::new();
+    for sqlite in [false, true] {
+        let dir = tempfile::tempdir().unwrap();
+        let options = StoreOptions {
+            project_id: "tool-contract".into(),
+            ..Default::default()
+        };
+        let store = if sqlite {
+            ProjectStore::sqlite(SQLiteOptions {
+                path: dir.path().join("state.db"),
+                store: options,
+                ..Default::default()
+            })
+            .unwrap()
+        } else {
+            ProjectStore::filesystem(FilesystemOptions {
+                state_dir: dir.path().join("state"),
+                store: options,
+                ..Default::default()
+            })
+            .unwrap()
+        };
+        let registry = Registry::build(
+            &config(AccessMode::WorkspaceWrite),
+            project_state_tools(Arc::new(store), " agent "),
+        )
+        .unwrap();
+        let mut ids = std::collections::BTreeMap::new();
+        let mut reverse = std::collections::BTreeMap::new();
+        for (index, step) in fixture["state"].as_array().unwrap().iter().enumerate() {
+            let mut input = step["input"].clone();
+            normalize_contract(&mut input, &ids);
+            let output = invoke_expected(
+                &registry,
+                step["name"].as_str().unwrap(),
+                input,
+                step["is_error"].as_bool().unwrap(),
+            )
+            .await;
+            let mut result = if step["format"] == "text" {
+                json!(output)
+            } else {
+                serde_json::from_str(&output).unwrap()
+            };
+            if let Some(alias) = step["save"].as_str() {
+                let id = result["id"].as_str().unwrap().to_owned();
+                ids.insert(alias.to_owned(), id.clone());
+                reverse.insert(id, alias.to_owned());
+            }
+            normalize_contract(&mut result, &reverse);
+            if result != step["output"] {
+                differences.push(format!(
+                    "step {index} {} sqlite={sqlite}: Rust={result} Go={}",
+                    step["name"], step["output"]
+                ));
+            }
+        }
+    }
+    assert!(differences.is_empty(), "{}", differences.join("\n"));
 }

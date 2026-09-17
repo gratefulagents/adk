@@ -1,0 +1,1505 @@
+[
+  {
+    "name": "pr-dirty-title-draft",
+    "tool": "create_pull_request",
+    "input": {
+      "title": "Add feature",
+      "base_branch": "main",
+      "draft": true
+    },
+    "git": {
+      "status --porcelain": {
+        "output": " M changed\n?? new\n",
+        "error": ""
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-untracked-default-message",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": "?? new\n",
+        "error": ""
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-existing",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "create failed",
+        "error": "already exists"
+      },
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-fallback",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      },
+      "pr view --json url -q .url": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "pr-unvalidated-fallback-sdk",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "not a url",
+        "error": ""
+      },
+      "pr view --json url -q .url": {
+        "output": "not https",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-body-only",
+    "tool": "create_pull_request",
+    "input": {
+      "body": "hello <world> & friends\u2028\u2029"
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-title-body",
+    "tool": "create_pull_request",
+    "input": {
+      "title": "x",
+      "body": "details"
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-empty-output",
+    "tool": "create_pull_request",
+    "input": {}
+  },
+  {
+    "name": "pr-create-failure",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "bad",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "pr-guard-main",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "main\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-master",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "master\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-HEAD",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "HEAD\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-develop",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "develop\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-release",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "release\n",
+        "error": ""
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-guard-error",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "fatal",
+        "error": "not a repository"
+      }
+    }
+  },
+  {
+    "name": "pr-default-unavailable",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "",
+        "error": "not set"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-status-failure-still-pushes",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": " M file",
+        "error": "exit status 1"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-error-add -A",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": " M file",
+        "error": ""
+      },
+      "add -A": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "pr-error-commit --no-verify -m changes from agent run",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": " M file",
+        "error": ""
+      },
+      "commit --no-verify -m changes from agent run": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "pr-error-push --no-verify -u origin HEAD",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": " M file",
+        "error": ""
+      },
+      "push --no-verify -u origin HEAD": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "pr-subrepo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "repos/repo"
+    },
+    "setup": "subrepo",
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "pr-missing-repo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "nope"
+    }
+  },
+  {
+    "name": "pr-outside-repo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "../outside"
+    }
+  },
+  {
+    "name": "invalid-{}",
+    "tool": "create_github_issue",
+    "input": {}
+  },
+  {
+    "name": "invalid-{'title': '  '}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "  "
+    }
+  },
+  {
+    "name": "invalid-{'title': 3}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": 3
+    }
+  },
+  {
+    "name": "invalid-{'draft': 'yes'}",
+    "tool": "create_pull_request",
+    "input": {
+      "draft": "yes"
+    }
+  },
+  {
+    "name": "invalid-['bad']",
+    "tool": "create_pull_request",
+    "input": [
+      "bad"
+    ]
+  },
+  {
+    "name": "null-fields",
+    "tool": "create_pull_request",
+    "input": {
+      "title": null,
+      "draft": null
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "case-insensitive",
+    "tool": "create_github_issue",
+    "input": {
+      "TITLE": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-simple",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "body": "Details",
+      "assignees": [
+        "octo"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --body Details --assignee octo": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-normalize-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        " tests ",
+        "sdk",
+        "TESTS",
+        ""
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[]",
+        "error": ""
+      },
+      "label create --color BFD4F2 -- sdk": {
+        "output": "label already exists\n",
+        "error": "exit status 1"
+      },
+      "issue create --title Bug --label tests --label sdk": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-existing-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug",
+        "SDK"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"Bug\"},{\"name\":\"sdk\"}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug --label SDK": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-dash-label",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "--help"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[]",
+        "error": ""
+      },
+      "issue create --title Bug --label --help": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-output-bad",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "bad",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-output-",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-output-stderr",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-error",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "issue-label-create-error",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[]",
+        "error": ""
+      },
+      "label create --color BFD4F2 -- bug": {
+        "output": "denied",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-null",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "null",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-[{\"name\":null},null,{}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":null},null,{}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-not json",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "not json",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-{}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "{}",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-[3]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[3]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-list-[{\"name\":3}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":3}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-subrepo",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "repo_path": "repos/repo"
+    },
+    "setup": "subrepo",
+    "gh": {
+      "issue create --title Bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-defaults",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "base": " main ",
+    "branch": " agent/work ",
+    "setup": "root_git"
+  },
+  {
+    "name": "attach-repo-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repo": "github.com/Acme/Repo.git",
+      "alias": " My strange REPO.git "
+    }
+  },
+  {
+    "name": "attach-custom-store",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "store": "clones",
+    "setup": "root_git"
+  },
+  {
+    "name": "attach-root-store",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "store": ".",
+    "setup": "root_git"
+  },
+  {
+    "name": "attach-empty-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "...___---"
+    }
+  },
+  {
+    "name": "attach-long-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  },
+  {
+    "name": "attach-fallback",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "missing",
+      "branch_name": "work"
+    },
+    "git": {
+      "clone missing": {
+        "output": "fatal: Remote branch missing not found in upstream origin",
+        "error": "exit status 128"
+      }
+    }
+  },
+  {
+    "name": "attach-fallback-fails",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "missing"
+    },
+    "git": {
+      "clone missing": {
+        "output": "Remote branch missing not found in upstream",
+        "error": "exit status 128"
+      },
+      "clone": {
+        "output": "denied",
+        "error": "exit status 128"
+      }
+    }
+  },
+  {
+    "name": "attach-clone-signal: killed",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "signal: killed"
+      }
+    }
+  },
+  {
+    "name": "attach-clone-timeout",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "timeout"
+      }
+    }
+  },
+  {
+    "name": "attach-clone-context deadline exceeded",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "context deadline exceeded"
+      }
+    }
+  },
+  {
+    "name": "attach-clone-context canceled",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "context canceled"
+      }
+    }
+  },
+  {
+    "name": "attach-clone-exit status 128",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "exit status 128"
+      }
+    }
+  },
+  {
+    "name": "attach-checkout-error",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "bad"
+    },
+    "git": {
+      "checkout -B bad": {
+        "output": "bad branch",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "attach-existing",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-plain",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "plain",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-incomplete",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "incomplete",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n",
+        "error": ""
+      },
+      "rev-parse --verify --quiet HEAD^{commit}": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "attach-working",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "working",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n",
+        "error": ""
+      },
+      "rev-parse --verify --quiet HEAD^{commit}": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "attach-origin-git@github.com:acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "git@github.com:acme/repo.git",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-origin-https://github.com/acme/other.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/other.git",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-origin-https://user@github.com/acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://user@github.com/acme/repo.git",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-origin-failed",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    }
+  },
+  {
+    "name": "attach-url-",
+    "tool": "attach_repository",
+    "input": {
+      "repository": ""
+    }
+  },
+  {
+    "name": "attach-url-../repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "../repo"
+    }
+  },
+  {
+    "name": "attach-url--uploader",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "-uploader"
+    }
+  },
+  {
+    "name": "attach-url-git@github.com:acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "git@github.com:acme/repo.git"
+    }
+  },
+  {
+    "name": "attach-url-ssh://git@github.com/acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "ssh://git@github.com/acme/repo.git"
+    }
+  },
+  {
+    "name": "attach-url-git://github.com/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "git://github.com/acme/repo"
+    }
+  },
+  {
+    "name": "attach-url-file:///tmp/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "file:///tmp/repo"
+    }
+  },
+  {
+    "name": "attach-url-ext::helper",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "ext::helper"
+    }
+  },
+  {
+    "name": "attach-url-https://user@github.com/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://user@github.com/acme/repo"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com:443/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com:443/acme/repo"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo?q=1",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo?q=1"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo#frag",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo#frag"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com.evil.test/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com.evil.test/acme/repo"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo/extra",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo/extra"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/%72epo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/%72epo"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/../repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/../repo"
+    }
+  },
+  {
+    "name": "attach-url-acme/re po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/re po"
+    }
+  },
+  {
+    "name": "attach-url-HTTPS://GITHUB.COM/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "HTTPS://GITHUB.COM/acme/repo"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo?",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo?"
+    }
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo#",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo#"
+    }
+  },
+  {
+    "name": "issue-label-edge-[",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-{bad}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "{bad}",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":\"bug\",}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"bug\",}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":\"bug\"} false]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"bug\"} false]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[] trailing",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[] trailing",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-true",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "true",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-\"string\"",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "\"string\"",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-3",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "3",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[false]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[false]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "issue-label-edge-[{\"NAME\":\"Bug\"}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[{\"NAME\":\"Bug\"}]",
+        "error": ""
+      },
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%20po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%20po"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%3Fpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%3Fpo"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%5Cpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%5Cpo"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re\\po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re\\po"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%7Fpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%7Fpo"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%ffpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%ffpo"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%41po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%41po"
+    }
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%00po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%00po"
+    }
+  },
+  {
+    "name": "invalid-edge-{'title': True}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": true
+    }
+  },
+  {
+    "name": "invalid-edge-{'title': []}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": []
+    }
+  },
+  {
+    "name": "invalid-edge-{'title': {}}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": {}
+    }
+  },
+  {
+    "name": "invalid-edge-{'title': 'Bug', 'labels': 3}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": 3
+    }
+  },
+  {
+    "name": "invalid-edge-{'title': 'Bug', 'labels': [3]}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        3
+      ]
+    }
+  },
+  {
+    "name": "invalid-edge-{'repository': 3}",
+    "tool": "attach_repository",
+    "input": {
+      "repository": 3
+    }
+  },
+  {
+    "name": "invalid-edge-{'repository': 'acme/repo', 'alias': False}",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": false
+    }
+  },
+  {
+    "name": "attach-unicode-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "\u0130foo \u039f\u03a3 bar"
+    }
+  },
+  {
+    "name": "issue-unicode-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "\u0130foo",
+        "ifoo",
+        "\u039f\u03a3",
+        "\u039f\u03c3"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "[]",
+        "error": ""
+      },
+      "issue create --title Bug --label \u0130foo --label \u039f\u03a3": {
+        "output": "https://github.com/acme/repo/issues/3\n",
+        "error": ""
+      }
+    }
+  },
+  {
+    "name": "unicode-case-folding-keys",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "ba\u017fe_branch": "main"
+    }
+  }
+]

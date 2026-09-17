@@ -18,11 +18,12 @@ use std::{
 };
 
 pub(crate) fn builtin(capability: &Capability) -> Option<Arc<dyn Tool>> {
-    (cfg!(target_os = "linux") && capability.family == "workspace-search").then(|| {
-        Arc::new(Search {
-            definition: capability.definition.clone().expect("search definition"),
-        }) as Arc<dyn Tool>
-    })
+    (cfg!(any(target_os = "linux", target_os = "macos")) && capability.family == "workspace-search")
+        .then(|| {
+            Arc::new(Search {
+                definition: capability.definition.clone().expect("search definition"),
+            }) as Arc<dyn Tool>
+        })
 }
 struct Search {
     definition: ToolDefinition,

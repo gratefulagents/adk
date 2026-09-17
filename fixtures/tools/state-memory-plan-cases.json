@@ -1,0 +1,445 @@
+[
+  {
+    "name": "task_create",
+    "input": {
+      "title": "ready-first",
+      "priority": 0,
+      "assignee": "",
+      "labels": [
+        "keep"
+      ]
+    },
+    "save": "$a"
+  },
+  {
+    "name": "task_create",
+    "input": {
+      "title": "ready-second",
+      "priority": 1,
+      "assignee": "",
+      "labels": [
+        "keep"
+      ]
+    },
+    "save": "$b"
+  },
+  {
+    "name": "task_create",
+    "input": {
+      "title": "assigned-other",
+      "priority": 2,
+      "assignee": "other",
+      "labels": [
+        "keep"
+      ]
+    },
+    "save": "$c"
+  },
+  {
+    "name": "task_create",
+    "input": {
+      "title": "assigned-host",
+      "priority": 3,
+      "assignee": "agent",
+      "labels": [
+        "keep"
+      ]
+    },
+    "save": "$d"
+  },
+  {
+    "name": "task_create",
+    "input": {
+      "title": "label-excluded",
+      "priority": 4,
+      "assignee": "",
+      "labels": [
+        "skip"
+      ]
+    },
+    "save": "$e"
+  },
+  {
+    "name": "task_create",
+    "input": {
+      "title": "blocked",
+      "priority": 0,
+      "assignee": "",
+      "labels": [
+        "keep"
+      ]
+    },
+    "save": "$f"
+  },
+  {
+    "name": "task_link",
+    "input": {
+      "id": "$f",
+      "depends_on": "$a"
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {}
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "include_assigned": true
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "assignee": "other"
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "assignee": "agent"
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "labels": [
+        "keep"
+      ],
+      "include_assigned": true
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "labels": [
+        "skip"
+      ]
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "labels": [
+        "keep"
+      ],
+      "limit": 1
+    }
+  },
+  {
+    "name": "task_ready",
+    "input": {
+      "labels": [
+        "keep"
+      ],
+      "limit": 2
+    }
+  },
+  {
+    "name": "task_show",
+    "input": {
+      "id": "missing"
+    }
+  },
+  {
+    "name": "task_update",
+    "input": {
+      "id": "missing"
+    }
+  },
+  {
+    "name": "task_close",
+    "input": {
+      "id": "missing"
+    }
+  },
+  {
+    "name": "task_claim",
+    "input": {
+      "id": "$a",
+      "actor": " override "
+    }
+  },
+  {
+    "name": "task_claim",
+    "input": {
+      "id": "$a",
+      "actor": "competitor"
+    }
+  },
+  {
+    "name": "task_comment",
+    "input": {
+      "id": "$a",
+      "actor": " writer ",
+      "body": "explicit actor"
+    }
+  },
+  {
+    "name": "task_comment",
+    "input": {
+      "id": "$a",
+      "body": ""
+    }
+  },
+  {
+    "name": "task_link",
+    "input": {
+      "id": "missing",
+      "depends_on": "$a"
+    }
+  },
+  {
+    "name": "task_link",
+    "input": {
+      "id": "$b",
+      "depends_on": "missing"
+    }
+  },
+  {
+    "name": "task_link",
+    "input": {
+      "id": "$b",
+      "depends_on": "$b"
+    }
+  },
+  {
+    "name": "task_link",
+    "input": {
+      "id": "$a",
+      "depends_on": "$f"
+    }
+  },
+  {
+    "name": "memory_remember",
+    "input": {
+      "content": "evidence m",
+      "kind": "pinned",
+      "scope": "project",
+      "tags": [
+        "keep",
+        "shared"
+      ]
+    },
+    "save": "$m"
+  },
+  {
+    "name": "memory_remember",
+    "input": {
+      "content": "evidence n",
+      "kind": "pinned",
+      "scope": "user",
+      "tags": [
+        "keep"
+      ]
+    },
+    "save": "$n"
+  },
+  {
+    "name": "memory_remember",
+    "input": {
+      "content": "evidence o",
+      "kind": "semantic",
+      "scope": "task",
+      "tags": [
+        "keep"
+      ]
+    },
+    "save": "$o"
+  },
+  {
+    "name": "memory_remember",
+    "input": {
+      "content": "evidence p",
+      "kind": "pinned",
+      "scope": "file",
+      "tags": [
+        "skip"
+      ]
+    },
+    "save": "$p"
+  },
+  {
+    "name": "memory_list",
+    "input": {
+      "kinds": [
+        "pinned"
+      ],
+      "tags": [
+        "keep"
+      ]
+    }
+  },
+  {
+    "name": "memory_list",
+    "input": {
+      "kinds": [
+        "pinned"
+      ],
+      "tags": [
+        "keep"
+      ],
+      "limit": 1
+    }
+  },
+  {
+    "name": "memory_list",
+    "input": {
+      "kinds": [
+        "semantic"
+      ],
+      "tags": [
+        "keep"
+      ]
+    }
+  },
+  {
+    "name": "memory_list",
+    "input": {
+      "tags": [
+        "missing"
+      ]
+    }
+  },
+  {
+    "name": "memory_recall",
+    "input": {
+      "kinds": [
+        "pinned"
+      ],
+      "tags": [
+        "keep"
+      ],
+      "query": "evidence"
+    }
+  },
+  {
+    "name": "memory_recall",
+    "input": {
+      "kinds": [
+        "pinned"
+      ],
+      "tags": [
+        "keep"
+      ],
+      "limit": 1,
+      "query": "evidence"
+    }
+  },
+  {
+    "name": "memory_recall",
+    "input": {
+      "kinds": [
+        "semantic"
+      ],
+      "tags": [
+        "keep"
+      ],
+      "query": "evidence"
+    }
+  },
+  {
+    "name": "memory_recall",
+    "input": {
+      "tags": [
+        "missing"
+      ],
+      "query": "evidence"
+    }
+  },
+  {
+    "name": "memory_stats",
+    "input": {}
+  },
+  {
+    "name": "memory_stats",
+    "input": {
+      "kinds": [
+        "pinned"
+      ],
+      "tags": [
+        "keep"
+      ]
+    }
+  },
+  {
+    "name": "memory_stats",
+    "input": {
+      "tags": [
+        "skip"
+      ]
+    }
+  },
+  {
+    "name": "prime_context",
+    "input": {
+      "memory_limit": 1,
+      "ready_limit": 1
+    }
+  },
+  {
+    "name": "prime_context",
+    "input": {
+      "active_task_id": "missing",
+      "memory_limit": 1,
+      "ready_limit": 1
+    }
+  },
+  {
+    "name": "memory_update",
+    "input": {
+      "id": "$m",
+      "kind": "procedural"
+    }
+  },
+  {
+    "name": "memory_update",
+    "input": {
+      "id": "$m",
+      "scope": "user"
+    }
+  },
+  {
+    "name": "memory_update",
+    "input": {
+      "id": "$m",
+      "file_paths": [
+        "src/contract.rs"
+      ]
+    }
+  },
+  {
+    "name": "memory_update",
+    "input": {
+      "id": "$m",
+      "task_ids": [
+        "$b"
+      ]
+    }
+  },
+  {
+    "name": "memory_update",
+    "input": {
+      "id": "$m",
+      "source_run": "explicit-run"
+    }
+  },
+  {
+    "name": "memory_list",
+    "input": {
+      "kinds": [
+        "procedural"
+      ]
+    }
+  },
+  {
+    "name": "memory_delete",
+    "input": {}
+  },
+  {
+    "name": "memory_delete",
+    "input": {
+      "id": "missing"
+    }
+  }
+]

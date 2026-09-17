@@ -46,13 +46,17 @@ impl Drop for Temporary<'_> {
     }
 }
 
-fn make_parents(workspace: &Workspace, path: &Path) -> io::Result<()> {
+pub(crate) fn make_parents(workspace: &Workspace, path: &Path) -> io::Result<()> {
+    make_parents_mode(workspace, path, 0o755)
+}
+
+pub(crate) fn make_parents_mode(workspace: &Workspace, path: &Path, mode: u32) -> io::Result<()> {
     let mut parent = workspace.open(Path::new("."))?;
     for component in path.components() {
         let Component::Normal(name) = component else {
             continue;
         };
-        match mkdirat(&parent, name, Mode::from_raw_mode(0o755)) {
+        match mkdirat(&parent, name, Mode::from_raw_mode(mode as _)) {
             Ok(()) | Err(rustix::io::Errno::EXIST) => {}
             Err(error) => return Err(error.into()),
         }
@@ -72,6 +76,16 @@ pub(crate) fn atomic_write(
     bytes: &[u8],
     mode: Option<u32>,
 ) -> io::Result<()> {
+    atomic_write_default(workspace, path, bytes, mode, 0o644)
+}
+
+pub(crate) fn atomic_write_default(
+    workspace: &Workspace,
+    path: &Path,
+    bytes: &[u8],
+    mode: Option<u32>,
+    default_mode: u32,
+) -> io::Result<()> {
     let directory = path
         .parent()
         .filter(|p| !p.as_os_str().is_empty())
@@ -90,7 +104,9 @@ pub(crate) fn atomic_write(
         Err(rustix::io::Errno::NOENT) => None,
         Err(error) => return Err(error.into()),
     };
-    let mode = Mode::from_raw_mode(mode.or(existing_mode).unwrap_or(0o644));
+    #[cfg(target_os = "macos")]
+    let existing_mode = existing_mode.map(u32::from);
+    let mode = Mode::from_raw_mode(mode.or(existing_mode).unwrap_or(default_mode) as _);
     let temporary_name = format!(".agentsdk-write-{}", uuid::Uuid::new_v4().simple());
     let mut file = File::from(openat(
         &parent,

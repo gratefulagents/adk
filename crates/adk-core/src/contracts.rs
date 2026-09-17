@@ -113,6 +113,11 @@ pub trait ModelStream: Send {
 /// infrastructure, cancellation and authorization failures use `Err`.
 pub trait Tool: Send + Sync {
     fn definition(&self) -> &ToolDefinition;
+    /// Optional host-authored access adapter. None retains this implementation;
+    /// policy must still filter and authorize the resulting tool before dispatch.
+    fn for_access(&self, _access: crate::AccessMode) -> Option<Arc<dyn Tool>> {
+        None
+    }
     /// Host-authored lifecycle/control capability, never inferred from a tool name.
     /// Exempts mutation-only approval policy, not authorization or tool-owned approval.
     fn is_control_flow(&self) -> bool {

@@ -310,3 +310,117 @@ async fn actual_go_tool_outputs_match_both_stores() {
         }
     }
 }
+
+#[tokio::test]
+async fn missing_ids_and_empty_memory_results_match_go_on_both_stores() {
+    for sqlite in [false, true] {
+        let dir = tempfile::tempdir().unwrap();
+        let store = Arc::new(if sqlite {
+            ProjectStore::sqlite(SQLiteOptions {
+                path: dir.path().join("state.db"),
+                ..Default::default()
+            })
+            .unwrap()
+        } else {
+            ProjectStore::filesystem(FilesystemOptions {
+                state_dir: dir.path().join("state"),
+                ..Default::default()
+            })
+            .unwrap()
+        });
+        let tools = tools::tools(store.clone(), "agent");
+        let task = json_call(&tools, "task_create", json!({"title":"existing"})).await;
+        let seq = store.state().unwrap().last_seq;
+        for name in [
+            "task_show",
+            "task_update",
+            "task_claim",
+            "task_close",
+            "task_comment",
+            "task_link",
+        ] {
+            for (input, expected) in [
+                (json!({}), "task \"\" not found"),
+                (json!({"id":"missing"}), "task \"missing\" not found"),
+            ] {
+                assert_eq!(
+                    invoke(&tools, name, input, true).await,
+                    expected,
+                    "{name} sqlite={sqlite}"
+                );
+            }
+        }
+        for (input, expected) in [
+            (json!({"id":task["id"]}), "dependency task \"\" not found"),
+            (
+                json!({"id":task["id"],"depends_on":" missing "}),
+                "dependency task \"missing\" not found",
+            ),
+            (
+                json!({"id":"missing","depends_on":"missing"}),
+                "task \"missing\" not found",
+            ),
+            (
+                json!({"id":task["id"],"depends_on":task["id"]}),
+                "task cannot depend on itself",
+            ),
+        ] {
+            assert_eq!(invoke(&tools, "task_link", input, true).await, expected);
+        }
+        assert_eq!(
+            invoke(&tools, "task_comment", json!({"id":task["id"]}), true).await,
+            "comment body is required"
+        );
+        for (input, expected) in [
+            (json!({}), "memory \"\" not found"),
+            (json!({"id":" missing "}), "memory \"missing\" not found"),
+        ] {
+            assert_eq!(invoke(&tools, "memory_delete", input, true).await, expected);
+        }
+        assert_eq!(
+            invoke(&tools, "memory_update", json!({}), true).await,
+            "memory id is required"
+        );
+        assert_eq!(
+            invoke(&tools, "memory_recall", json!({}), true).await,
+            "query is required"
+        );
+        assert_eq!(store.state().unwrap().last_seq, seq);
+        assert_eq!(
+            invoke(&tools, "memory_list", json!({}), false).await,
+            "null"
+        );
+        assert_eq!(
+            invoke(&tools, "memory_recall", json!({"query":"absent"}), false).await,
+            "null"
+        );
+        json_call(
+            &tools,
+            "memory_remember",
+            json!({"content":"existing memory","tags":["present"]}),
+        )
+        .await;
+        assert_eq!(
+            invoke(&tools, "memory_list", json!({"tags":["absent"]}), false).await,
+            "null"
+        );
+        assert_eq!(
+            invoke(&tools, "memory_recall", json!({"query":"absent"}), false).await,
+            "null"
+        );
+        assert_eq!(
+            json_call(&tools, "memory_stats", json!({"tags":["absent"]})).await,
+            json!({"total":0,"by_kind":{},"by_scope":{},"by_tag":{}})
+        );
+        assert_eq!(
+            invoke(&tools, "task_ready", json!({"labels":["absent"]}), false).await,
+            "[]"
+        );
+        json_call(
+            &tools,
+            "task_link",
+            json!({"id":task["id"],"depends_on":"missing","action":"remove"}),
+        )
+        .await;
+    }
+}

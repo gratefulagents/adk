@@ -1,66 +1,79 @@
-# Built-in tool registry port — incomplete parity
+# Built-in tool registry port — implementation status: draft
 
-`adk-tools` is opt-in through `adk`'s `tools` feature. It currently provides a source-backed contract catalog, deterministic selection/composition, signal tools, host-backed plan tools, and integration with the existing project-state implementation. **This is not the complete tool implementation requested by issue #7. The issue must remain open.** No production runner automatically enables this registry.
+`adk-tools` is opt-in through `adk`'s `tools` feature. Its 51 access-specific manifest entries cover all 46 distinct names in the pinned SDK's `pkg/agentsdk/tools` tree. Every name now has either a built-in implementation or a trusted host adapter; the owning host supplies the resources and authority for adapters. This is an implementation-status document, **not acceptance evidence**. Full CI and the security review are still pending, so issue #7 remains **draft** and must not be treated as accepted or closed.
 
-## Canonical catalog and construction
+## Catalog, selection, and construction
 
-`crates/adk-tools/src/manifest.json` contains 51 access-specific entries covering all 46 distinct names in the pinned SDK's `pkg/agentsdk/tools` tree. Definitions derive from the v0.0.115 ledger (GPL-3.0-only); they preserve static schemas, descriptions, read-only and approval flags. Source type and acceptance ID accompany each entry. This includes the 15 registry families plus independently constructed skills and project-state tools. Dynamic MCP/subagent tools and platform-specific Git/GitHub tools belong to their separate integrations.
+Definitions derive from the v0.0.115 ledger (GPL-3.0-only) and retain their static schemas, descriptions, read-only and approval flags, source type, and acceptance ID. `capabilities()` and `select(&Config)` select from that manifest deterministically.
 
-Regenerate/check the catalog:
+`Features::Strict` accepts exact tool-producing feature paths (`Grep`, `Signals.Finish`, `ProjectState.TaskTools`, and `ExtraTools`); an empty set enables nothing. `Features::Legacy` preserves the legacy tool/subagent and default/web/signal/async/state switches. Analyzer configuration such as `VisionAnalyzer` is not a tool-producing feature.
 
-```sh
-python3 scripts/tool-manifest.py
-python3 scripts/tool-manifest.py --check
-```
+Selection applies access variants, explicit-name filtering, mutable-tool grants, remote-write policy, the Browser private-network gate, the Terminal full-access gate, and async-shell write gating. Browser's read-only contract excludes screenshots. WebFetch does not inherit Browser's unrestricted-network gate. Selection is an eligibility matrix, not execution authorization.
 
-`capabilities()` and `select(&Config)` use that catalog. `Features::Strict` accepts exact tool-producing feature paths (`Grep`, `Signals.Finish`, `ProjectState.TaskTools`, etc.); an empty set enables nothing. `Features::Legacy` models the legacy tool/subagent enable flags and default/web/signal/async/state toggles. Features which configure analyzers rather than select tools, such as `VisionAnalyzer`, are not accepted as tool-producing switches.
+`Registry::build` matches supplied implementations to selected SDK contracts and rejects duplicate names, unknown built-ins, contract drift, and missing selected implementations. Built-ins cover the in-process families. Trusted host adapters provide plan and memory stores, skills catalogs, Git/GitHub command and repository hosts, and configured shell, LSP, and browser resources. A selected dependency that an owned `ToolBundle` lacks fails closed with the deterministic missing-name list; the bundle does not discover an executable, credential, store, or identity.
 
-Selection applies access variants, exact-name filtering, mutating-tool grants, the Browser private-network gate, Terminal full-access/remote-write gate and async-shell write gate. Browser's read-only contract excludes screenshot. WebFetch is not gated behind Browser's unrestricted-network opt-in. A selection is only a list of eligible contracts, **not evidence of implementation or execution permission**.
+`Registry::build_with_extra_tools` composes host-supplied extensions explicitly after canonical built-ins. It enables them only through `ExtraTools` (or the legacy tool/subagent switch), filters them through `allowed_names`, rejects duplicate names, and does not allow extensions to bypass preparation or dispatch authorization.
 
-`Registry::build` receives real `Arc<dyn Tool>` implementations. It rejects duplicate names, unknown built-in names, static schema/description/access/control/timeout drift, and missing selected runtime implementations. Host-only entries describe optional supplied implementations and do not fabricate stores or identity. Dynamic Bash schemas are explicitly absent in the catalog and construction remains unavailable until their environment-dependent schema generator is ported, even if a caller supplies a tool of that name. There are no registered “not implemented” tools. This built-in registry does not yet provide the SDK's arbitrary extra-tool extension path.
+`Registry::prepare` returns `PreparedTools`: the model-visible tools after access adaptation and policy filtering, together with the matching `ToolPolicy`. `ToolBundle::prepared()` wraps those handles with owner-lifetime cancellation and freezes `allowed_tools` to the prepared names. Registration and preparation never grant policy or approval permission.
 
-Every selected call still needs the existing executor's policy and approval checks. In particular, cataloguing a lifecycle/control tool is not an authorization bypass: a host executing `save_plan` in read-only mode must permit that name in its execution policy. Injected adapters and their external resources remain host-owned; this implementation does not claim bundle teardown for unported shell/LSP/browser resources.
+## Implemented tool families
 
-## Implemented behavior
+| Family | Implementation and boundary |
+| --- | --- |
+| Workspace search and files | `read_file`, `list_files`, `glob`, `grep`, `Write`, `Edit`, `Move`, `Delete`, and `ApplyPatch` use the secure workspace layer. Search has deterministic text/JSON output, query-bound pagination, include/exclude/default-directory and gitignore controls. Mutation uses prevalidation and scoped rollback/quarantine where applicable. |
+| Shell and terminal | `Bash`, `BashStart`, `BashPoll`, `BashKill`, and `Terminal` run through `adk_sandbox::Executor::start_session`; the tools do not spawn commands directly. The host owns the sandbox configuration and must keep the bundle alive, then call `close().await` before stopping Tokio. |
+| LSP | `LSP` uses configured, host-trusted server definitions and the confined bidirectional session API. It implements the read-only operation set, aliases, bounded framing, UTF-16 result adaptation, workspace-scoped routing, cancellation, and explicit close. It does not guess a server executable or use PATH discovery. |
+| Browser and vision | `Browser` and `AnalyzeImage` are implemented through configured adapters. Browser runs only the configured absolute executable and uses the sandbox/scratch path for captures; it is not a claim that native Chrome is installed, that a live browser environment has been certified, or that arbitrary browser networking is safe. |
+| Web and signals | `WebFetch`, `think`, `AskUserQuestion`, `present_plan`, and `finish` implement their catalogued contracts. WebFetch retains its pinned-address SSRF controls, redirect revalidation, bounded body/pagination, HTML extraction, and cancellation cleanup. |
+| Durable state and plans | The 15 project-state tools, `Memory`, `get_plan`, `save_plan`, and `prime_context` use trusted host stores and identity. The adapters do not invent persistence, tenant/run identity, or authorization. |
+| Skills | `skill_search`, `skill_install`, and `skill_list_installed` use a host-owned catalog, fallback workspace, and environment-availability snapshot. Installation updates `.mcp.json` but does not start servers. |
+| Git and GitHub | `attach_repository`, `create_github_issue`, and `create_pull_request` use host-supplied confined command, repository, credential, attribution, and optional artifact adapters. They do not run a default Git/GH command path, discover credentials, or establish live GitHub behavior. |
 
-- `read_file`, `list_files`, `glob`, `grep`: bounded reads and lines, deterministic text/JSON results, query-bound cursor pagination, include/exclude/default-directory and gitignore filtering, context and files/count modes. Linux descriptor-relative `openat2` reads reject symlinks and hard links; unsupported platforms fail closed. Go glob/regex compatibility is translated explicitly rather than using Rust defaults. Differential fixtures cover 56 cases and 80 paginated calls against the pinned SDK. This does not yet establish exhaustive regex or cross-platform parity.
+All external effects still pass the caller's executor policy and approval checks. A catalogued lifecycle/control tool is not an authorization bypass.
 
-- `Write`, `Edit` (Linux): workspace writes stage and sync a new file before descriptor-relative replacement, preserving permissions; edits require byte-exact unique matches unless `replace_all` is set. Edit reads are bounded to 5 MiB and result diffs to the baseline 256-match/8 KiB limits. Workspace Edit rejects hard links; Workspace Write replaces a hard-linked destination without changing its aliases. Full-access variants preserve direct-write inode semantics and allow paths outside the workspace, but reject special files rather than blocking on FIFOs/devices.
-- `Move`, `Delete` (Linux): quarantine entries before inode validation, reject symlinks/hard links/special files, never overwrite move destinations, and restore quarantined entries on failure. Delete accepts only regular files or empty directories. Restoration conflicts are reported, not hidden or overwritten.
-- `WebFetch`: pinned-address SSRF validation on each redirect, no proxy or automatic decompression, 2 MiB raw-body cap, byte pagination, HTML text extraction, and cancellation/deadline socket cleanup. Twenty actual SDK HTTP/HTML comparisons and policy/header/size/cleanup tests pass; malformed-input and OS transport diagnostics are not claimed byte-identical.
-- `think`: validates a nonblank thought and returns the SDK acknowledgement.
-- `AskUserQuestion`: plain-text or structured-choice result, including default freeform behavior. The SDK tool itself does not set `should_pause`; the port preserves this.
-- `present_plan`: validates summary/actions, emits the baseline structured result, ignores unsupported action fields rather than granting a mode transition.
-- `finish`: emits the baseline summary with `should_pause`; `signal::finish` optionally invokes a host `FinishSink`. A failed sink reports an error and does not claim completion.
-- `plan::tools`: supplies `save_plan`/`get_plan` using a trusted host artifact-store/session identity. Includes missing-plan handling, error reporting, byte counts and the baseline 200-byte default summary rule. Store implementations own durable persistence, timestamp metadata and cancellation-aware I/O; tests use a recording store, not a new production artifact backend.
-- `memory::tool`: supplies the separate host-only `Memory` tool using #9's namespace-store contract. Namespace, source run and repository metadata are host-owned. Store/search/list/delete actions preserve the SDK's empty-result messages and mutating classification; no store or identity is invented.
-- `skills::tools` (Linux): supplies `skill_search`, `skill_install`, and `skill_list_installed` from a host-owned catalog, fallback workspace, and environment-name availability snapshot. Search preserves query precedence, ordering, and Unicode simple-case matching. Installation writes `.mcp.json` without starting servers, merges the baseline environment/tool/enabled restrictions, preserves other configured servers, and tightens permissions. Config reads reject hard links as an additional confinement restriction. The pinned SDK's default catalog is empty; passing an empty catalog preserves that behavior.
-- `project_state_tools`: supplies all 15 existing #9 tools without changing their behavior. Registry integration tests exercise each name, restart persistence and read-only filtering against filesystem and SQLite backends.
+## Confinement, shell, and lifecycle guarantees
 
-## Verification and mapping
+### Filesystem policy
+
+On Linux, workspace operations use descriptor-relative `openat2` resolution with `BENEATH | NO_SYMLINKS`. On macOS, the confined filesystem pins the workspace descriptor and walks one component at a time with `openat` and `NOFOLLOW`; an ancestor swap cannot redirect a later lookup through a symlink. Unsupported platforms fail closed rather than use an unconstrained fallback.
+
+The workspace reader accepts regular, single-link files only. It rejects symlinks and hard-linked reads. Mutating tools reject symlinks, special files, traversal, and operation-specific unsafe links; `Move` never overwrites its destination, and `Delete` accepts only regular files or empty directories. Write replacement can intentionally sever an existing destination hard link rather than mutate its aliases; operations that require an existing single-link file reject a hard link. These policies are stricter confinement behavior, not a claim of exhaustive SDK diagnostic parity.
+
+### Hardened shell behavior
+
+Shell tools invoke `/bin/bash --noprofile --norc` through the sandbox. Full access requires an explicitly configured Local backend. Restricted variants do not fall back to Local; when remote Git writes are disabled, the tool fails closed unless the command sandbox enforces filesystem confinement.
+
+Restricted-mode classification deliberately tightens the SDK oracle. It rejects dynamic or compound shell syntax, indirect Git execution, configuration aliases, and pushes with implicit or protected destinations even when filesystem enforcement exists. In enforced restricted mode it also treats newline statements as separators and inspects literal `printf`/`echo | shell` bodies. This classifier is defense in depth, not a shell interpreter, program allowlist, or OS containment boundary: commands such as build tools, interpreters, hooks, and package managers still require sandbox policy.
+
+Host-selected executable dependencies outside standard system directories require explicit `adk_sandbox::Config::runtime_roots`. These are canonical, read-only grants, never model arguments, and may not overlap the workspace or name broad filesystem roots. Linux binds only those directories; Seatbelt uses parameterized read rules. For Apple Git/Python launchers, the host can add `macos_developer_toolchain_root()`; no broad `/Applications` or home-directory grant is inferred. Disabled-remote shell execution additionally masks discovered repository credential configuration, and subprocess output is screened for recognizable secrets.
+
+### Asynchronous ownership
+
+`Executor::start_session` supplies a bidirectional `ProcessSession` for pipes and PTYs. Input is acknowledged in bounded chunks; cancelling an input write can leave a prefix written. Output is bounded between polls; loss is reported as `truncated`, and protocol consumers must treat truncation as fatal.
+
+`ProcessSession::ready()` waits for backend setup and child spawn, not exit. `wait()` closes any remaining input and awaits cleanup; `cancel_and_wait()` requests cancellation and awaits it. Dropping a session requests cancellation. `ToolBundle::close()` cancels owner-scoped tool calls and awaits owned shell/LSP/browser cleanup, including abandoned calls. Browser supervisors and LSP driver completions remain owned independently of request futures. Dropping the bundle requests cancellation but cannot itself await cleanup. In all cases, keep the Tokio runtime alive for TERM/grace/KILL, process-group cleanup, and direct-child reaping. Cancellation cannot undo effects that completed before it was observed.
+
+Injected Git dependencies remain host-owned. Retain the typed `git_host::ExecutorCommandRunner`, stop tool dispatch, then call its `close().await` before shutting down Tokio. It joins active and abandoned commands through reaping; clone operations retain their failure cleanup in the same owned task, so close also awaits removal of an incomplete clone. Custom `CommandRunner` implementations must uphold that cancellation/cleanup contract. A completed external commit, push, issue or PR cannot be undone by cancellation.
+
+## Verification evidence
 
 | Evidence | Scope |
 | --- | --- |
-| `crates/adk-tools/tests/registry.rs` | Strict-family isolation across all three access modes, unique names, legacy defaults, Browser/WebFetch policy distinction, Terminal/async/remote-write gates, exact-name filtering, duplicate/drift/missing implementation errors and all 15 state schemas. These are selection tests, not behavior tests for missing families. |
-| `fixtures/tools/signals.json`, `crates/adk-tools/tests/signals.rs` | Deterministic signal results, malformed input, cancellation before execution, JSON escaping, no action-based mode transitions, host callback failures and plan artifact behavior. |
-| `fixtures/tools/verify-signals.go` | Executes the JSON fixtures against actual SDK signal implementations. Run from `repos/sdk` at the pinned commit with `go run ../../fixtures/tools/verify-signals.go`. |
-| `crates/adk-tools/tests/write.rs`, `edit.rs`, `lifecycle.rs` | Mutation success/errors, read-only selection, cancellation, modes/inode semantics, byte preservation, symlink/hard-link/special-file rejection, source restoration and concurrent parent swaps. |
-| `fixtures/tools/lifecycle.json`, `skills.json`, `verify-lifecycle.go` | 95 pinned SDK comparisons of results and resulting filesystem trees: 77 filesystem cases plus 18 skills cases, including Unicode matching and exact installed config bytes. |
-| `crates/adk-tools/tests/skills.rs` | Catalog search, install/reinstall hardening merges, environment availability, host fallback workspace, list ordering, malformed config, confinement, cancellation and read-only selection. |
-| `crates/adk-tools/tests/state.rs` | All 15 tools through registry composition, both durable backends, trusted actor, restart and read-only surfaces. |
-| Existing `adk-project-state` tests | Full underlying task/memory/error/security and Go result fixtures remain authoritative; they are not duplicated or bypassed here. |
+| `crates/adk-tools/src/manifest.json` | 51 access-specific entries and 46 distinct tool names. |
+| `fixtures/tools/registry-matrix.json`, `crates/adk-tools/tests/registry_matrix.rs` | 3,768 raw pinned-SDK feature/access matrix cases. |
+| `crates/adk-tools/tests/registry.rs`, `bundle.rs`, `crates/adk/tests/tool_runtime.rs` | Contract matching, explicit ExtraTools composition, `PreparedTools` adaptation, missing host dependencies, owner cancellation, and close/drop invalidation. |
+| `fixtures/tools/{search,lifecycle,skills,signals,web,patch,browser,vision,lsp-cases,git-cases}.json` and their tool tests | Differential fixtures and per-family behavior, malformed input, policy, cancellation, and lifecycle cases. Fixture breadth is evidence, not full acceptance. |
+| `crates/adk-tools/tests/{shell,shell_security,terminal,lsp,browser,git,git_host,macos_filesystem}.rs` | Sandboxed session behavior, hardened shell policy, terminal/LSP lifecycle, configured-adapter behavior, Git host boundaries, and macOS filesystem confinement. No test establishes native Chrome or live GitHub operation. |
+| `crates/adk-sandbox/src/scratch_tests.rs`, `crates/adk-sandbox/tests/lifecycle.rs` | Scratch-directory ownership and session/process cleanup behavior. |
 
-Commands:
+Verify that the generated catalog still matches its pinned ledger from the repository root:
 
 ```sh
-cargo test -p adk-tools -p adk-project-state
-cargo clippy -p adk-tools --all-targets -- -D warnings
-cargo check -p adk --features tools
 python3 scripts/tool-manifest.py --check
 ```
 
-## Remaining acceptance work (not waived)
+The integrated tools, project-state, sandbox and security test targets pass locally with the direct Rust toolchain. Native enforcing tests explicitly skip here because Bubblewrap cannot access `/proc/sys/kernel/overflowuid`; `ADK_REQUIRE_SANDBOX=1` makes those skips failures in Linux/macOS CI. The stock rustup wrapper also needs `/proc/self/exe`, so local verification uses direct compiler binaries and the system linker. Full CI on the integrated head remains pending.
 
-Exhaustive search/regex and cross-platform parity; ApplyPatch parsing/prevalidation/rollback; exhaustive filesystem security-corpus coverage and platform-specific error diagnostics; foreground/background shell; Terminal; LSP; exhaustive HTTP/HTML diagnostic parity; Browser and vision; repository attachment and GitHub; dynamic Bash schemas; arbitrary extra-tool composition; runtime auto-wiring; resource-owning bundle teardown; full feature/configuration-mode comparisons; per-tool happy/error/policy mappings and the full security corpus.
+## Acceptance status
 
-The current sandbox has no bidirectional stdio/PTY session API, preventing a safe LSP/Terminal adapter using its public executor surface. See [research](tools-research.md). That specific dependency gap does **not** explain away the other unfinished families, which remain implementation work. Do not close issue #7 or advertise SDK behavioral parity based on this catalog.
+**Draft — pending full CI and security review.** The implementation and focused fixtures above do not declare complete SDK parity, a completed security corpus, cross-platform acceptance, native-Chrome availability, or live-GitHub validation. Do not close issue #7 or advertise full acceptance until those reviews complete.

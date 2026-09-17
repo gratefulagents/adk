@@ -56,26 +56,26 @@ impl Fetch {
                     .await
                     .map_err(|e| format!("Fetch failed: {e}"))?;
                 let status = response.status();
-                if matches!(status.as_u16(), 301 | 302 | 303 | 307 | 308) {
-                    if let Some(location) = response.headers().get(reqwest::header::LOCATION) {
-                        let next = url
-                            .join(
-                                location
-                                    .to_str()
-                                    .map_err(|e| format!("Fetch failed: {e}"))?,
-                            )
-                            .map_err(|e| format!("Fetch failed: {e}"))?;
-                        let resolved = network::resolve(next.as_str(), self.allow_private)
-                            .await
-                            .map_err(|e| format!("Fetch failed: {e}"))?;
-                        referer = if url.scheme() == "https" && next.scheme() == "http" {
-                            None
-                        } else {
-                            Some(url.to_string())
-                        };
-                        (url, addresses) = resolved;
-                        continue;
-                    }
+                if matches!(status.as_u16(), 301 | 302 | 303 | 307 | 308)
+                    && let Some(location) = response.headers().get(reqwest::header::LOCATION)
+                {
+                    let next = url
+                        .join(
+                            location
+                                .to_str()
+                                .map_err(|e| format!("Fetch failed: {e}"))?,
+                        )
+                        .map_err(|e| format!("Fetch failed: {e}"))?;
+                    let resolved = network::resolve(next.as_str(), self.allow_private)
+                        .await
+                        .map_err(|e| format!("Fetch failed: {e}"))?;
+                    referer = if url.scheme() == "https" && next.scheme() == "http" {
+                        None
+                    } else {
+                        Some(url.to_string())
+                    };
+                    (url, addresses) = resolved;
+                    continue;
                 }
                 if status.as_u16() >= 400 {
                     return Err(format!(

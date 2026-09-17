@@ -28,3 +28,7 @@ pub mod execution;
 pub use adk_sandbox as sandbox;
 #[cfg(feature = "execution")]
 pub use adk_security as security;
+
+/// Lifecycle-owned prepared tool integration with the standalone runner.
+#[cfg(all(feature = "tools", feature = "runtime"))]
+pub mod tool_runtime;

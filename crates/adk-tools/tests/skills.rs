@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 use adk_core::*;
 use adk_tools::{Config, Features, Registry, skills};
 use serde_json::{Value, json};
@@ -126,7 +126,14 @@ async fn absence_errors_confinement_and_read_only_surface() {
     assert!(!root.path().join(".mcp.json").exists());
     let readonly = registry(root.path(), AccessMode::ReadOnly);
     assert!(readonly.get("skill_search").is_some());
-    assert!(readonly.get("skill_install").is_none());
+    assert!(readonly.get("skill_install").is_some());
+    assert!(
+        !readonly
+            .prepare(ToolPolicy::default())
+            .tools
+            .iter()
+            .any(|tool| tool.definition().name == "skill_install")
+    );
     fs::write(root.path().join(".mcp.json"), "{broken").unwrap();
     assert!(
         call(root.path(), "skill_install", json!({"name":"demo"}))

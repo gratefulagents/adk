@@ -1,0 +1,1204 @@
+{
+  "policy": [
+    {
+      "blocked": false,
+      "command": "echo safe",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo gh",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git status",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "git remote -v",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git remote is not allowed — remote configuration is platform-managed; use git_status or the built-in git/GitHub tools instead"
+    },
+    {
+      "blocked": true,
+      "command": "git commit -m local",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git commit is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "git push origin feature",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "git push origin main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "git\tpush origin HEAD:main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "/usr/bin/git -C repo push origin +feature:refs/heads/master",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "command git push origin master:release",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "env -u GIT_ASKPASS git push origin main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "sudo -u deploy git push origin HEAD:master",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "nice -n 5 git push origin main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "git;push origin main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "bash -c 'git push origin main'",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git push is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "printf 'git push origin main' | bash",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: piping into \"bash\" is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "gh pr merge 5 --squash",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "bash -c 'gh pr create --fill'",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "echo body | gh issue create --title t",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "env -S 'gh pr list'",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "env -u GITHUB_TOKEN gh pr merge 5",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "sudo -u deploy gh pr merge 5",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "nice -n 10 gh api /user",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "timeout 30 gh pr checks 5",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": false,
+      "command": "env -u GITHUB_TOKEN ls",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "timeout 30 make test",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "X=1 git push origin main",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: shell assignment X cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "echo $HOME",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: shell substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "wc -l $(find . -name '*.go')",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: shell substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "echo `ls`",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: backtick substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "printf $'hello'",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: ANSI-C shell quoting cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "cat \u003c\u003c\u003c hello",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: heredocs and here-strings cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "cat \u003c(ls)",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: process substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "eval ls",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: eval cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "source file",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: source cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": ". file",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: . cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "alias foo=ls",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: shell assignment foo cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "foo() { ls; }",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: function definitions cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "rm -fr /",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: recursive removal of root paths is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "sudo rm -r /*",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: recursive removal of root paths is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "chmod -R /",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: chmod recursive at root is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "chown -R /",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: chown recursive at root is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "dd if=x of=/dev/sda",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: shell assignment if cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "mkfs.ext4 /tmp/foo",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: mkfs.ext4 is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "tee /etc/hosts",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: tee to protected path \"/etc/hosts\" is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "echo x \u003e/etc/hosts",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: redirect to protected path \"/etc/hosts\" is not allowed"
+    },
+    {
+      "blocked": false,
+      "command": "ls 2\u003e/dev/null",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x \u003e/dev/stderr",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x | tee /dev/stdout",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "git add file",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git add is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": true,
+      "command": "git reset --hard",
+      "mode": "read-only",
+      "reason": "Command blocked in read-only mode: git reset is not allowed — this session cannot mutate the repository"
+    },
+    {
+      "blocked": false,
+      "command": "git checkout feature",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git fetch origin",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$(literal)'",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$HOME'",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo \\$HOME",
+      "mode": "read-only",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo safe",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo gh",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git status",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "git remote -v",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: git remote is not allowed — remote configuration is platform-managed; use git_status or the built-in git/GitHub tools instead"
+    },
+    {
+      "blocked": false,
+      "command": "git commit -m local",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git push origin feature",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "git push origin main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "git\tpush origin HEAD:main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "/usr/bin/git -C repo push origin +feature:refs/heads/master",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "command git push origin master:release",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "env -u GIT_ASKPASS git push origin main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "sudo -u deploy git push origin HEAD:master",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "nice -n 5 git push origin main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "git;push origin main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "bash -c 'git push origin main'",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: push to main/master is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "printf 'git push origin main' | bash",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: piping into \"bash\" is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "gh pr merge 5 --squash",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "bash -c 'gh pr create --fill'",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "echo body | gh issue create --title t",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "env -S 'gh pr list'",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "env -u GITHUB_TOKEN gh pr merge 5",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "sudo -u deploy gh pr merge 5",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "nice -n 10 gh api /user",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": true,
+      "command": "timeout 30 gh pr checks 5",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: the gh CLI is not allowed; use the built-in GitHub tools (create_pull_request, get_pull_request, list_review_threads, submit_pull_request_review, create_github_issue, ...) instead"
+    },
+    {
+      "blocked": false,
+      "command": "env -u GITHUB_TOKEN ls",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "timeout 30 make test",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": true,
+      "command": "X=1 git push origin main",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: shell assignment X cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "echo $HOME",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: shell substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "wc -l $(find . -name '*.go')",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: shell substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "echo `ls`",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: backtick substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "printf $'hello'",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: ANSI-C shell quoting cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "cat \u003c\u003c\u003c hello",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: heredocs and here-strings cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "cat \u003c(ls)",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: process substitution cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "eval ls",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: eval cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "source file",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: source cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": ". file",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: . cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "alias foo=ls",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: shell assignment foo cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "foo() { ls; }",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: function definitions cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "rm -fr /",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: recursive removal of root paths is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "sudo rm -r /*",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: recursive removal of root paths is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "chmod -R /",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: chmod recursive at root is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "chown -R /",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: chown recursive at root is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "dd if=x of=/dev/sda",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: shell assignment if cannot be authorized statically — write the command with only literal arguments, or split it into separate Bash calls"
+    },
+    {
+      "blocked": true,
+      "command": "mkfs.ext4 /tmp/foo",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: mkfs.ext4 is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "tee /etc/hosts",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: tee to protected path \"/etc/hosts\" is not allowed"
+    },
+    {
+      "blocked": true,
+      "command": "echo x \u003e/etc/hosts",
+      "mode": "workspace-write",
+      "reason": "Command blocked in workspace-write mode: redirect to protected path \"/etc/hosts\" is not allowed"
+    },
+    {
+      "blocked": false,
+      "command": "ls 2\u003e/dev/null",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x \u003e/dev/stderr",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x | tee /dev/stdout",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git add file",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git reset --hard",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git checkout feature",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git fetch origin",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$(literal)'",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$HOME'",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo \\$HOME",
+      "mode": "workspace-write",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo safe",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo gh",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git status",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git remote -v",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git commit -m local",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git push origin feature",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git push origin main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git\tpush origin HEAD:main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "/usr/bin/git -C repo push origin +feature:refs/heads/master",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "command git push origin master:release",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "env -u GIT_ASKPASS git push origin main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "sudo -u deploy git push origin HEAD:master",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "nice -n 5 git push origin main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git;push origin main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "bash -c 'git push origin main'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "printf 'git push origin main' | bash",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "gh pr merge 5 --squash",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "bash -c 'gh pr create --fill'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo body | gh issue create --title t",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "env -S 'gh pr list'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "env -u GITHUB_TOKEN gh pr merge 5",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "sudo -u deploy gh pr merge 5",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "nice -n 10 gh api /user",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "timeout 30 gh pr checks 5",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "env -u GITHUB_TOKEN ls",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "timeout 30 make test",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "X=1 git push origin main",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo $HOME",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "wc -l $(find . -name '*.go')",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo `ls`",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "printf $'hello'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "cat \u003c\u003c\u003c hello",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "cat \u003c(ls)",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "eval ls",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "source file",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": ". file",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "alias foo=ls",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "foo() { ls; }",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "rm -fr /",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "sudo rm -r /*",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "chmod -R /",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "chown -R /",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "dd if=x of=/dev/sda",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "mkfs.ext4 /tmp/foo",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "tee /etc/hosts",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x \u003e/etc/hosts",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "ls 2\u003e/dev/null",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x \u003e/dev/stderr",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo x | tee /dev/stdout",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git add file",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git reset --hard",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git checkout feature",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "git fetch origin",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$(literal)'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo '$HOME'",
+      "mode": "danger-full-access",
+      "reason": ""
+    },
+    {
+      "blocked": false,
+      "command": "echo \\$HOME",
+      "mode": "danger-full-access",
+      "reason": ""
+    }
+  ],
+  "schemas": [
+    {
+      "Bash": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 600000, default 120000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "BashStart": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 600000, default 600000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "bash_description": "Executes a bash command and returns its output (stdout and stderr combined). Use for running shell commands, build tools, git operations, and other CLI tasks. Each call runs in a fresh process: cd and environment variables do not persist between calls, so chain dependent steps with \u0026\u0026 in one command. Disable pagers (git --no-pager, | cat) for interactive-output commands. For long-running commands use BashStart/BashPoll; for interactive programs use the Terminal tool if available. In restricted sessions (read-only/plan mode, read-only sub-agents, or hosts without an enforcing OS sandbox) commands are statically authorized before running: command substitution $(...) or backticks, heredocs/here-strings, VAR=value prefixes, eval/source/alias, function definitions, `git remote`, dynamically-built `git push` refs, and the gh CLI are rejected — write plain literal commands, split pipelines into separate calls, and use the built-in git/GitHub tools for anything git must not do here.",
+      "environment": {},
+      "start_description": "Starts a long-running bash command in the background and returns a job id. Use with BashPoll for builds, training, simulations, OCR, and other commands that may run for a long time."
+    },
+    {
+      "Bash": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 1000, default 1000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "BashStart": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 1000, default 1000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "bash_description": "Executes a bash command and returns its output (stdout and stderr combined). Use for running shell commands, build tools, git operations, and other CLI tasks. Each call runs in a fresh process: cd and environment variables do not persist between calls, so chain dependent steps with \u0026\u0026 in one command. Disable pagers (git --no-pager, | cat) for interactive-output commands. For long-running commands use BashStart/BashPoll; for interactive programs use the Terminal tool if available. In restricted sessions (read-only/plan mode, read-only sub-agents, or hosts without an enforcing OS sandbox) commands are statically authorized before running: command substitution $(...) or backticks, heredocs/here-strings, VAR=value prefixes, eval/source/alias, function definitions, `git remote`, dynamically-built `git push` refs, and the gh CLI are rejected — write plain literal commands, split pipelines into separate calls, and use the built-in git/GitHub tools for anything git must not do here.",
+      "environment": {
+        "GRATEFUL_BASH_DEFAULT_TIMEOUT_MS": "999",
+        "GRATEFUL_BASH_MAX_OUTPUT_BYTES": "999999999",
+        "GRATEFUL_BASH_MAX_TIMEOUT_MS": "500"
+      },
+      "start_description": "Starts a long-running bash command in the background and returns a job id. Use with BashPoll for builds, training, simulations, OCR, and other commands that may run for a long time."
+    },
+    {
+      "Bash": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 240000, default 240000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "BashStart": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 240000, default 240000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "bash_description": "Executes a bash command and returns its output (stdout and stderr combined). Use for running shell commands, build tools, git operations, and other CLI tasks. Each call runs in a fresh process: cd and environment variables do not persist between calls, so chain dependent steps with \u0026\u0026 in one command. Disable pagers (git --no-pager, | cat) for interactive-output commands. For long-running commands use BashStart/BashPoll; for interactive programs use the Terminal tool if available. In restricted sessions (read-only/plan mode, read-only sub-agents, or hosts without an enforcing OS sandbox) commands are statically authorized before running: command substitution $(...) or backticks, heredocs/here-strings, VAR=value prefixes, eval/source/alias, function definitions, `git remote`, dynamically-built `git push` refs, and the gh CLI are rejected — write plain literal commands, split pipelines into separate calls, and use the built-in git/GitHub tools for anything git must not do here.",
+      "environment": {
+        "GRATEFUL_BASH_DEFAULT_TIMEOUT_MS": "240000",
+        "GRATEFUL_BASH_MAX_TIMEOUT_MS": "120000"
+      },
+      "start_description": "Starts a long-running bash command in the background and returns a job id. Use with BashPoll for builds, training, simulations, OCR, and other commands that may run for a long time."
+    },
+    {
+      "Bash": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 600000, default 120000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "BashStart": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The bash command to execute"
+          },
+          "timeout": {
+            "type": "number",
+            "description": "Timeout in milliseconds (max 600000, default 600000)"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what the command does"
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "bash_description": "Executes a bash command and returns its output (stdout and stderr combined). Use for running shell commands, build tools, git operations, and other CLI tasks. Each call runs in a fresh process: cd and environment variables do not persist between calls, so chain dependent steps with \u0026\u0026 in one command. Disable pagers (git --no-pager, | cat) for interactive-output commands. For long-running commands use BashStart/BashPoll; for interactive programs use the Terminal tool if available. In restricted sessions (read-only/plan mode, read-only sub-agents, or hosts without an enforcing OS sandbox) commands are statically authorized before running: command substitution $(...) or backticks, heredocs/here-strings, VAR=value prefixes, eval/source/alias, function definitions, `git remote`, dynamically-built `git push` refs, and the gh CLI are rejected — write plain literal commands, split pipelines into separate calls, and use the built-in git/GitHub tools for anything git must not do here.",
+      "environment": {
+        "GRATEFUL_BASH_DEFAULT_TIMEOUT_MS": "bad",
+        "GRATEFUL_BASH_MAX_TIMEOUT_MS": "-1"
+      },
+      "start_description": "Starts a long-running bash command in the background and returns a job id. Use with BashPoll for builds, training, simulations, OCR, and other commands that may run for a long time."
+    }
+  ]
+}

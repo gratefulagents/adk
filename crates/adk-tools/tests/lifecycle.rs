@@ -1,4 +1,4 @@
-#![cfg(target_os = "linux")]
+#![cfg(any(target_os = "linux", target_os = "macos"))]
 use adk_core::*;
 use adk_tools::{Config, Features, Registry};
 use serde_json::{Value, json};

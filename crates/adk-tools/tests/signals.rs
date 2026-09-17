@@ -236,3 +236,45 @@ async fn artifact_failures_are_not_success_and_finish_sink_failures_do_not_pause
     assert!(!result.should_pause);
     assert!(text(&result).starts_with("Failed to mark run as completed:"));
 }
+
+#[tokio::test]
+async fn pinned_go_empty_artifact_and_summary_byte_boundaries() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/tools/state-memory-plan-expected.json"
+    ))
+    .unwrap();
+    for case in fixture["plans"].as_array().unwrap() {
+        let store = Arc::new(Store {
+            plan: Mutex::new(case["stored"].as_str().map(str::to_owned)),
+            ..Default::default()
+        });
+        let registry = Registry::build(
+            &config(),
+            adk_tools::plan::tools(store.clone(), "trusted-session"),
+        )
+        .unwrap();
+        let result = invoke(
+            &registry,
+            case["name"].as_str().unwrap(),
+            case["input"].clone(),
+        )
+        .await;
+        assert_eq!(text(&result), case["text"]);
+        assert_eq!(result.is_error, case["is_error"]);
+        assert!(!result.should_pause);
+        if case["name"] == "save_plan" {
+            assert_eq!(*store.summary.lock().unwrap(), case["summary"]);
+            assert_eq!(
+                store.plan.lock().unwrap().as_deref(),
+                case["input"]["plan"].as_str()
+            );
+        }
+    }
+}
+
+#[test]
+fn plan_tools_require_explicit_host_injection() {
+    let registry = Registry::build(&config(), []).unwrap();
+    assert!(registry.get("save_plan").is_none());
+    assert!(registry.get("get_plan").is_none());
+}

@@ -31,9 +31,13 @@ Crates.io metadata was also inspected for [ignore](https://crates.io/api/v1/crat
 - [regex 1.13.1](https://docs.rs/regex/1.13.1/regex/) and regex-syntax 0.8.11, MIT OR Apache-2.0: adapt bounded regular-expression compilation plus HIR inspection. Reject unmodified syntax as Go parity: ASCII Perl classes, word boundaries, quoted literals, octal, bracket syntax and repeat bounds differ. The adapter is checked against actual pinned Go tools, with explicit remaining exhaustive-parity work.
 - Do not adopt `ignore` defaults: the search port explicitly applies the SDK's smaller ignore surface and deterministic ordering. Cursors bind to the normalized query through SHA-256; they do not confer path authority.
 
-## Lifecycle dependency gap
+## Adopted session and lifecycle boundary
 
-`adk-sandbox::Executor::run/start` captures output and returns it on completion. `OutputMode::Pty` explicitly offers no interactive input API. Current `RunningProcess` supports cancellation and reaping, but cannot drive a stdio language server or an interactive terminal. Therefore a confined bidirectional session API is required before those tools can be implemented without bypassing sandbox policy. Creating `std::process::Command` directly in a tool is not a safe substitute. Browser ownership, network transport pinning and secure filesystem lifecycle primitives also remain implementation work, not properties supplied by the registry.
+`adk-sandbox::Executor::start_session` now supplies the confined bidirectional session required by LSP and Terminal. It uses the same request validation, backend, access policy, and output limits as `start`: pipes expose acknowledged input and separate stdout/stderr; PTYs merge output. `ProcessSession::ready()` confirms backend setup and successful child spawn without waiting for output or exit. `poll()` and `next_output()` return bytes accumulated since the previous poll; a bounded buffer reports discarded bytes as `truncated`, which LSP treats as a fatal framing error.
+
+Ownership is explicit. `wait()` closes any remaining input and awaits cleanup; `cancel_and_wait()` requests cancellation and awaits it. Dropping a `ProcessSession` or `RunningProcess` requests cancellation. A `ToolBundle` owns configured shell/LSP resources: `close().await` cancels owner-scoped work and awaits their cleanup, while bundle drop requests cancellation but cannot await it. The Tokio runtime must remain alive for TERM/grace/KILL, process-group cleanup, and direct-child reaping. A cancelled `SessionInput::write_all` can leave a prefix written, and cancellation cannot undo an effect already performed.
+
+This removes the prior missing-session dependency; tools still must not bypass it with direct `std::process::Command` use. Browser and Git/GitHub remain host-configured adapters. Their implemented adapters do not turn configured executable paths, network transport, credentials, native browser availability, or live external-service behavior into accepted guarantees.
 
 ## Adopted HTTP and HTML primitives
 

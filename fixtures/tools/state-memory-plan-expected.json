@@ -1,0 +1,1536 @@
+{
+  "memory": [
+    {
+      "name": "Memory",
+      "input": {
+        "action": "store",
+        "content": "nullable",
+        "id": null,
+        "limit": null,
+        "tags": null
+      },
+      "format": "json",
+      "save": "$m",
+      "output": {
+        "content": "nullable",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "metadata": {},
+        "namespace": "trusted",
+        "source_run": "source",
+        "tags": null
+      },
+      "is_error": false
+    },
+    {
+      "name": "Memory",
+      "input": {
+        "action": "store",
+        "content": "null tag",
+        "tags": [
+          null,
+          "keep"
+        ]
+      },
+      "format": "json",
+      "save": "$n",
+      "output": {
+        "content": "null tag",
+        "created_at": "\u003ctime\u003e",
+        "id": "$n",
+        "metadata": {},
+        "namespace": "trusted",
+        "source_run": "source",
+        "tags": [
+          "",
+          "keep"
+        ]
+      },
+      "is_error": false
+    },
+    {
+      "name": "Memory",
+      "input": {
+        "action": "list",
+        "limit": 1,
+        "tags": [
+          null
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "null tag",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "metadata": {},
+          "namespace": "trusted",
+          "source_run": "source",
+          "tags": [
+            "",
+            "keep"
+          ]
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "Memory",
+      "input": {
+        "action": "search",
+        "content": "tag",
+        "limit": 1,
+        "tags": [
+          null,
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "null tag",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "metadata": {},
+          "namespace": "trusted",
+          "similarity": 1,
+          "source_run": "source",
+          "tags": [
+            "",
+            "keep"
+          ]
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "Memory",
+      "input": {
+        "action": "delete",
+        "id": " \t$m\n"
+      },
+      "format": "text",
+      "output": "Memory $m deleted.",
+      "is_error": false
+    },
+    {
+      "name": "Memory",
+      "input": {
+        "action": "list",
+        "content": null,
+        "limit": null,
+        "tags": null
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "null tag",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "metadata": {},
+          "namespace": "trusted",
+          "source_run": "source",
+          "tags": [
+            "",
+            "keep"
+          ]
+        }
+      ],
+      "is_error": false
+    }
+  ],
+  "missing_store": [
+    {
+      "is_error": true,
+      "name": "Memory",
+      "text": "memory store is not configured"
+    },
+    {
+      "is_error": true,
+      "name": "save_plan",
+      "text": "save_plan requires a configured artifact store"
+    },
+    {
+      "is_error": true,
+      "name": "get_plan",
+      "text": "get_plan requires a configured artifact store"
+    }
+  ],
+  "plans": [
+    {
+      "input": {},
+      "is_error": false,
+      "name": "get_plan",
+      "stored": null,
+      "text": "No plan found. Use save_plan to create one first."
+    },
+    {
+      "input": {},
+      "is_error": false,
+      "name": "get_plan",
+      "stored": "",
+      "text": "No plan found. Use save_plan to create one first."
+    },
+    {
+      "input": {
+        "plan": "short",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "short",
+      "text": "Plan saved (5 bytes) to artifact store"
+    },
+    {
+      "input": {
+        "plan": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "text": "Plan saved (199 bytes) to artifact store"
+    },
+    {
+      "input": {
+        "plan": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "text": "Plan saved (200 bytes) to artifact store"
+    },
+    {
+      "input": {
+        "plan": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+      "text": "Plan saved (200 bytes) to artifact store"
+    },
+    {
+      "input": {
+        "plan": "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€��...",
+      "text": "Plan saved (210 bytes) to artifact store"
+    },
+    {
+      "input": {
+        "plan": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "summary": null
+      },
+      "is_error": false,
+      "name": "save_plan",
+      "summary": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...",
+      "text": "Plan saved (201 bytes) to artifact store"
+    }
+  ],
+  "state": [
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "title": "ready-first"
+      },
+      "format": "json",
+      "save": "$a",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "status": "open",
+        "title": "ready-first",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "",
+        "labels": [
+          "keep"
+        ],
+        "priority": 1,
+        "title": "ready-second"
+      },
+      "format": "json",
+      "save": "$b",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$b",
+        "labels": [
+          "keep"
+        ],
+        "priority": 1,
+        "status": "open",
+        "title": "ready-second",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "other",
+        "labels": [
+          "keep"
+        ],
+        "priority": 2,
+        "title": "assigned-other"
+      },
+      "format": "json",
+      "save": "$c",
+      "output": {
+        "assignee": "other",
+        "created_at": "\u003ctime\u003e",
+        "id": "$c",
+        "labels": [
+          "keep"
+        ],
+        "priority": 2,
+        "status": "open",
+        "title": "assigned-other",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "agent",
+        "labels": [
+          "keep"
+        ],
+        "priority": 3,
+        "title": "assigned-host"
+      },
+      "format": "json",
+      "save": "$d",
+      "output": {
+        "assignee": "agent",
+        "created_at": "\u003ctime\u003e",
+        "id": "$d",
+        "labels": [
+          "keep"
+        ],
+        "priority": 3,
+        "status": "open",
+        "title": "assigned-host",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "",
+        "labels": [
+          "skip"
+        ],
+        "priority": 4,
+        "title": "label-excluded"
+      },
+      "format": "json",
+      "save": "$e",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$e",
+        "labels": [
+          "skip"
+        ],
+        "priority": 4,
+        "status": "open",
+        "title": "label-excluded",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_create",
+      "input": {
+        "assignee": "",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "title": "blocked"
+      },
+      "format": "json",
+      "save": "$f",
+      "output": {
+        "created_at": "\u003ctime\u003e",
+        "id": "$f",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "status": "open",
+        "title": "blocked",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$a",
+        "id": "$f"
+      },
+      "format": "json",
+      "output": {
+        "action": "add",
+        "depends_on": "$a",
+        "id": "$f"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {},
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "agent",
+          "created_at": "\u003ctime\u003e",
+          "id": "$d",
+          "labels": [
+            "keep"
+          ],
+          "priority": 3,
+          "status": "open",
+          "title": "assigned-host",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$e",
+          "labels": [
+            "skip"
+          ],
+          "priority": 4,
+          "status": "open",
+          "title": "label-excluded",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "include_assigned": true
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "other",
+          "created_at": "\u003ctime\u003e",
+          "id": "$c",
+          "labels": [
+            "keep"
+          ],
+          "priority": 2,
+          "status": "open",
+          "title": "assigned-other",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "agent",
+          "created_at": "\u003ctime\u003e",
+          "id": "$d",
+          "labels": [
+            "keep"
+          ],
+          "priority": 3,
+          "status": "open",
+          "title": "assigned-host",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$e",
+          "labels": [
+            "skip"
+          ],
+          "priority": 4,
+          "status": "open",
+          "title": "label-excluded",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "assignee": "other"
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$e",
+          "labels": [
+            "skip"
+          ],
+          "priority": 4,
+          "status": "open",
+          "title": "label-excluded",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "assignee": "agent"
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "agent",
+          "created_at": "\u003ctime\u003e",
+          "id": "$d",
+          "labels": [
+            "keep"
+          ],
+          "priority": 3,
+          "status": "open",
+          "title": "assigned-host",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$e",
+          "labels": [
+            "skip"
+          ],
+          "priority": 4,
+          "status": "open",
+          "title": "label-excluded",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "include_assigned": true,
+        "labels": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "other",
+          "created_at": "\u003ctime\u003e",
+          "id": "$c",
+          "labels": [
+            "keep"
+          ],
+          "priority": 2,
+          "status": "open",
+          "title": "assigned-other",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "assignee": "agent",
+          "created_at": "\u003ctime\u003e",
+          "id": "$d",
+          "labels": [
+            "keep"
+          ],
+          "priority": 3,
+          "status": "open",
+          "title": "assigned-host",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "labels": [
+          "skip"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$e",
+          "labels": [
+            "skip"
+          ],
+          "priority": 4,
+          "status": "open",
+          "title": "label-excluded",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "labels": [
+          "keep"
+        ],
+        "limit": 1
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_ready",
+      "input": {
+        "labels": [
+          "keep"
+        ],
+        "limit": 2
+      },
+      "format": "json",
+      "output": [
+        {
+          "blocks": [
+            "$f"
+          ],
+          "created_at": "\u003ctime\u003e",
+          "id": "$a",
+          "labels": [
+            "keep"
+          ],
+          "priority": 0,
+          "status": "open",
+          "title": "ready-first",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "created_at": "\u003ctime\u003e",
+          "id": "$b",
+          "labels": [
+            "keep"
+          ],
+          "priority": 1,
+          "status": "open",
+          "title": "ready-second",
+          "type": "task",
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "task_show",
+      "input": {
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "task \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "task_update",
+      "input": {
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "task \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "task_close",
+      "input": {
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "task \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "task_claim",
+      "input": {
+        "actor": " override ",
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "assignee": "override",
+        "blocks": [
+          "$f"
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "status": "in_progress",
+        "title": "ready-first",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_claim",
+      "input": {
+        "actor": "competitor",
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "assignee": "competitor",
+        "blocks": [
+          "$f"
+        ],
+        "created_at": "\u003ctime\u003e",
+        "id": "$a",
+        "labels": [
+          "keep"
+        ],
+        "priority": 0,
+        "status": "in_progress",
+        "title": "ready-first",
+        "type": "task",
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_comment",
+      "input": {
+        "actor": " writer ",
+        "body": "explicit actor",
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "actor": "writer",
+        "body": "explicit actor",
+        "created_at": "\u003ctime\u003e",
+        "id": "\u003ccomment\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "task_comment",
+      "input": {
+        "body": "",
+        "id": "$a"
+      },
+      "format": "text",
+      "output": "comment body is required",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$a",
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "task \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "missing",
+        "id": "$b"
+      },
+      "format": "text",
+      "output": "dependency task \"missing\" not found",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$b",
+        "id": "$b"
+      },
+      "format": "text",
+      "output": "task cannot depend on itself",
+      "is_error": true
+    },
+    {
+      "name": "task_link",
+      "input": {
+        "depends_on": "$f",
+        "id": "$a"
+      },
+      "format": "json",
+      "output": {
+        "action": "add",
+        "depends_on": "$f",
+        "id": "$a"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "evidence m",
+        "kind": "pinned",
+        "scope": "project",
+        "tags": [
+          "keep",
+          "shared"
+        ]
+      },
+      "format": "json",
+      "save": "$m",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "pinned",
+        "scope": "project",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "evidence n",
+        "kind": "pinned",
+        "scope": "user",
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "save": "$n",
+      "output": {
+        "content": "evidence n",
+        "created_at": "\u003ctime\u003e",
+        "id": "$n",
+        "kind": "pinned",
+        "scope": "user",
+        "tags": [
+          "keep"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "evidence o",
+        "kind": "semantic",
+        "scope": "task",
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "save": "$o",
+      "output": {
+        "content": "evidence o",
+        "created_at": "\u003ctime\u003e",
+        "id": "$o",
+        "kind": "semantic",
+        "scope": "task",
+        "tags": [
+          "keep"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_remember",
+      "input": {
+        "content": "evidence p",
+        "kind": "pinned",
+        "scope": "file",
+        "tags": [
+          "skip"
+        ]
+      },
+      "format": "json",
+      "save": "$p",
+      "output": {
+        "content": "evidence p",
+        "created_at": "\u003ctime\u003e",
+        "id": "$p",
+        "kind": "pinned",
+        "scope": "file",
+        "tags": [
+          "skip"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "pinned"
+        ],
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence n",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "pinned",
+          "scope": "user",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "content": "evidence m",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "pinned",
+          "scope": "project",
+          "tags": [
+            "keep",
+            "shared"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "pinned"
+        ],
+        "limit": 1,
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence n",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "pinned",
+          "scope": "user",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "semantic"
+        ],
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence o",
+          "created_at": "\u003ctime\u003e",
+          "id": "$o",
+          "kind": "semantic",
+          "scope": "task",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "tags": [
+          "missing"
+        ]
+      },
+      "format": "json",
+      "output": null,
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "kinds": [
+          "pinned"
+        ],
+        "query": "evidence",
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence n",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "pinned",
+          "scope": "user",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        },
+        {
+          "content": "evidence m",
+          "created_at": "\u003ctime\u003e",
+          "id": "$m",
+          "kind": "pinned",
+          "scope": "project",
+          "tags": [
+            "keep",
+            "shared"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "kinds": [
+          "pinned"
+        ],
+        "limit": 1,
+        "query": "evidence",
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence n",
+          "created_at": "\u003ctime\u003e",
+          "id": "$n",
+          "kind": "pinned",
+          "scope": "user",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "kinds": [
+          "semantic"
+        ],
+        "query": "evidence",
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence o",
+          "created_at": "\u003ctime\u003e",
+          "id": "$o",
+          "kind": "semantic",
+          "scope": "task",
+          "tags": [
+            "keep"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_recall",
+      "input": {
+        "query": "evidence",
+        "tags": [
+          "missing"
+        ]
+      },
+      "format": "json",
+      "output": null,
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {},
+      "format": "json",
+      "output": {
+        "by_kind": {
+          "pinned": 3,
+          "semantic": 1
+        },
+        "by_scope": {
+          "file": 1,
+          "project": 1,
+          "task": 1,
+          "user": 1
+        },
+        "by_tag": {
+          "keep": 3,
+          "shared": 1,
+          "skip": 1
+        },
+        "total": 4
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {
+        "kinds": [
+          "pinned"
+        ],
+        "tags": [
+          "keep"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "by_kind": {
+          "pinned": 2
+        },
+        "by_scope": {
+          "project": 1,
+          "user": 1
+        },
+        "by_tag": {
+          "keep": 2,
+          "shared": 1
+        },
+        "total": 2
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_stats",
+      "input": {
+        "tags": [
+          "skip"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "by_kind": {
+          "pinned": 1
+        },
+        "by_scope": {
+          "file": 1
+        },
+        "by_tag": {
+          "skip": 1
+        },
+        "total": 1
+      },
+      "is_error": false
+    },
+    {
+      "name": "prime_context",
+      "input": {
+        "memory_limit": 1,
+        "ready_limit": 1
+      },
+      "format": "text",
+      "output": "## Durable Project State\nProject: tool-contract\n\n### Ready Work\n- $b [P1 open] ready-second\n\n### Blocked Work\n- $f [P0 open] blocked\n\n### Pinned Memories\n- evidence p (pinned; skip)",
+      "is_error": false
+    },
+    {
+      "name": "prime_context",
+      "input": {
+        "active_task_id": "missing",
+        "memory_limit": 1,
+        "ready_limit": 1
+      },
+      "format": "text",
+      "output": "## Durable Project State\nProject: tool-contract\n\n### Ready Work\n- $b [P1 open] ready-second\n\n### Blocked Work\n- $f [P0 open] blocked\n\n### Pinned Memories\n- evidence p (pinned; skip)",
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": "$m",
+        "kind": "procedural"
+      },
+      "format": "json",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "procedural",
+        "scope": "project",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": "$m",
+        "scope": "user"
+      },
+      "format": "json",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "id": "$m",
+        "kind": "procedural",
+        "scope": "user",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "file_paths": [
+          "src/contract.rs"
+        ],
+        "id": "$m"
+      },
+      "format": "json",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "file_paths": [
+          "src/contract.rs"
+        ],
+        "id": "$m",
+        "kind": "procedural",
+        "scope": "user",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": "$m",
+        "task_ids": [
+          "$b"
+        ]
+      },
+      "format": "json",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "file_paths": [
+          "src/contract.rs"
+        ],
+        "id": "$m",
+        "kind": "procedural",
+        "scope": "user",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "task_ids": [
+          "$b"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_update",
+      "input": {
+        "id": "$m",
+        "source_run": "explicit-run"
+      },
+      "format": "json",
+      "output": {
+        "content": "evidence m",
+        "created_at": "\u003ctime\u003e",
+        "file_paths": [
+          "src/contract.rs"
+        ],
+        "id": "$m",
+        "kind": "procedural",
+        "scope": "user",
+        "source_run": "explicit-run",
+        "tags": [
+          "keep",
+          "shared"
+        ],
+        "task_ids": [
+          "$b"
+        ],
+        "updated_at": "\u003ctime\u003e"
+      },
+      "is_error": false
+    },
+    {
+      "name": "memory_list",
+      "input": {
+        "kinds": [
+          "procedural"
+        ]
+      },
+      "format": "json",
+      "output": [
+        {
+          "content": "evidence m",
+          "created_at": "\u003ctime\u003e",
+          "file_paths": [
+            "src/contract.rs"
+          ],
+          "id": "$m",
+          "kind": "procedural",
+          "scope": "user",
+          "source_run": "explicit-run",
+          "tags": [
+            "keep",
+            "shared"
+          ],
+          "task_ids": [
+            "$b"
+          ],
+          "updated_at": "\u003ctime\u003e"
+        }
+      ],
+      "is_error": false
+    },
+    {
+      "name": "memory_delete",
+      "input": {},
+      "format": "text",
+      "output": "memory \"\" not found",
+      "is_error": true
+    },
+    {
+      "name": "memory_delete",
+      "input": {
+        "id": "missing"
+      },
+      "format": "text",
+      "output": "memory \"missing\" not found",
+      "is_error": true
+    }
+  ]
+}

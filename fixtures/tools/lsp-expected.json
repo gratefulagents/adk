@@ -1,0 +1,696 @@
+{
+  "cases": [
+    {
+      "is_error": false,
+      "name": "null-goToDefinition",
+      "result": {
+        "operation": "definition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-definition",
+      "result": {
+        "operation": "definition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-findReferences",
+      "result": {
+        "operation": "references"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-references",
+      "result": {
+        "operation": "references"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-hover",
+      "result": {
+        "operation": "hover"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-documentSymbol",
+      "result": {
+        "operation": "documentSymbol"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-workspaceSymbol",
+      "result": {
+        "operation": "workspaceSymbol"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-implementation",
+      "result": {
+        "operation": "implementation"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-typeDefinition",
+      "result": {
+        "operation": "typeDefinition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "null-diagnostics",
+      "result": {
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "locations-definition",
+      "result": {
+        "locations": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          },
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "definition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "locations-references",
+      "result": {
+        "locations": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          },
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "references"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "locations-implementation",
+      "result": {
+        "locations": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          },
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "implementation"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "locations-typeDefinition",
+      "result": {
+        "locations": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          },
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "typeDefinition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "single-location",
+      "result": {
+        "locations": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "definition"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "hover-text",
+      "result": {
+        "hover": {
+          "contents": "docs",
+          "range": {
+            "end": {
+              "character": 4,
+              "line": 3
+            },
+            "start": {
+              "character": 1,
+              "line": 1
+            }
+          }
+        },
+        "operation": "hover"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "hover-markup",
+      "result": {
+        "hover": {
+          "contents": "**docs**",
+          "range": {
+            "end": {
+              "character": 4,
+              "line": 3
+            },
+            "start": {
+              "character": 1,
+              "line": 1
+            }
+          }
+        },
+        "operation": "hover"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "hover-marked",
+      "result": {
+        "hover": {
+          "contents": "fn main()",
+          "range": {
+            "end": {
+              "character": 4,
+              "line": 3
+            },
+            "start": {
+              "character": 1,
+              "line": 1
+            }
+          }
+        },
+        "operation": "hover"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "hover-array",
+      "result": {
+        "hover": {
+          "contents": "first\n\nsecond",
+          "range": {
+            "end": {
+              "character": 4,
+              "line": 3
+            },
+            "start": {
+              "character": 1,
+              "line": 1
+            }
+          }
+        },
+        "operation": "hover"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "document-tree",
+      "result": {
+        "operation": "documentSymbol",
+        "symbols": [
+          {
+            "children": [
+              {
+                "kind": 13,
+                "name": "Inner",
+                "range": {
+                  "end": {
+                    "character": 4,
+                    "line": 3
+                  },
+                  "start": {
+                    "character": 1,
+                    "line": 1
+                  }
+                },
+                "selectionRange": {
+                  "end": {
+                    "character": 4,
+                    "line": 3
+                  },
+                  "start": {
+                    "character": 1,
+                    "line": 1
+                  }
+                }
+              }
+            ],
+            "detail": "detail",
+            "kind": 12,
+            "name": "Outer",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            },
+            "selectionRange": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "is_error": false,
+      "name": "workspace-symbol",
+      "result": {
+        "operation": "workspaceSymbol",
+        "symbols": [
+          {
+            "detail": "module",
+            "kind": 12,
+            "location": {
+              "filePath": "@ROOT@/sample.txt",
+              "range": {
+                "end": {
+                  "character": 4,
+                  "line": 3
+                },
+                "start": {
+                  "character": 1,
+                  "line": 1
+                }
+              }
+            },
+            "name": "Inside"
+          }
+        ]
+      }
+    },
+    {
+      "is_error": false,
+      "name": "diagnostic-numeric",
+      "result": {
+        "diagnostics": [
+          {
+            "code": "42",
+            "filePath": "@ROOT@/sample.txt",
+            "message": "message",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            },
+            "severity": 2,
+            "source": "fixture"
+          }
+        ],
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "diagnostic-string",
+      "result": {
+        "diagnostics": [
+          {
+            "code": "E42",
+            "filePath": "@ROOT@/sample.txt",
+            "message": "message",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            },
+            "severity": 2,
+            "source": "fixture"
+          }
+        ],
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "diagnostic-null",
+      "result": {
+        "diagnostics": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "message": "message",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            },
+            "severity": 2,
+            "source": "fixture"
+          }
+        ],
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "diagnostic-object",
+      "result": {
+        "diagnostics": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "message": "message",
+            "range": {
+              "end": {
+                "character": 4,
+                "line": 3
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            },
+            "severity": 2,
+            "source": "fixture"
+          }
+        ],
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "is_error": false,
+      "name": "diagnostic-defaults",
+      "result": {
+        "diagnostics": [
+          {
+            "filePath": "@ROOT@/sample.txt",
+            "message": "default",
+            "range": {
+              "end": {
+                "character": 1,
+                "line": 1
+              },
+              "start": {
+                "character": 1,
+                "line": 1
+              }
+            }
+          }
+        ],
+        "operation": "diagnostics"
+      }
+    },
+    {
+      "error": "json: cannot unmarshal number into Go value of type lsp.lspLocation",
+      "is_error": true,
+      "name": "error-location-scalar"
+    },
+    {
+      "error": "json: cannot unmarshal number into Go value of type struct { Contents json.RawMessage \"json:\\\"contents\\\"\"; Range *lsp.lspRange \"json:\\\"range\\\"\" }",
+      "is_error": true,
+      "name": "error-hover-scalar"
+    },
+    {
+      "error": "json: cannot unmarshal number into Go value of type []json.RawMessage",
+      "is_error": true,
+      "name": "error-hover-contents"
+    },
+    {
+      "error": "json: cannot unmarshal object into Go value of type []json.RawMessage",
+      "is_error": true,
+      "name": "error-symbol-object"
+    },
+    {
+      "error": "document symbol \"bad\" has no range",
+      "is_error": true,
+      "name": "error-symbol-range"
+    },
+    {
+      "error": "symbol \"bad\" has no location",
+      "is_error": true,
+      "name": "error-symbol-location"
+    },
+    {
+      "error": "json: cannot unmarshal object into Go value of type []struct { Range lsp.lspRange \"json:\\\"range\\\"\"; Severity int \"json:\\\"severity\\\"\"; Code json.RawMessage \"json:\\\"code\\\"\"; Source string \"json:\\\"source\\\"\"; Message string \"json:\\\"message\\\"\" }",
+      "is_error": true,
+      "name": "error-diagnostic-object"
+    },
+    {
+      "error": "json: cannot unmarshal string into Go struct field .severity of type int",
+      "is_error": true,
+      "name": "error-diagnostic-severity"
+    }
+  ],
+  "definition": {
+    "description": "Performs read-only LSP operations (definition, references, hover, document/workspace symbols, implementation, type definition, diagnostics) using a configured language server.",
+    "input_schema": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "type": "string",
+          "enum": [
+            "goToDefinition",
+            "definition",
+            "findReferences",
+            "references",
+            "hover",
+            "documentSymbol",
+            "workspaceSymbol",
+            "implementation",
+            "typeDefinition",
+            "diagnostics"
+          ],
+          "description": "The read-only LSP operation to perform"
+        },
+        "filePath": {
+          "type": "string",
+          "description": "Workspace-relative or absolute path to the source file"
+        },
+        "languageId": {
+          "type": "string",
+          "description": "Language identifier used to select the configured server"
+        },
+        "line": {
+          "type": "number",
+          "description": "1-based source line for position-based operations"
+        },
+        "character": {
+          "type": "number",
+          "description": "1-based UTF-16 code-unit position for position-based operations"
+        },
+        "query": {
+          "type": "string",
+          "description": "Search query for workspaceSymbol"
+        }
+      },
+      "required": [
+        "operation"
+      ]
+    },
+    "name": "LSP",
+    "read_only": true,
+    "requires_approval": false
+  },
+  "operations": [
+    {
+      "input": "goToDefinition",
+      "is_error": false,
+      "normalized": "definition"
+    },
+    {
+      "input": "definition",
+      "is_error": false,
+      "normalized": "definition"
+    },
+    {
+      "input": "findReferences",
+      "is_error": false,
+      "normalized": "references"
+    },
+    {
+      "input": "references",
+      "is_error": false,
+      "normalized": "references"
+    },
+    {
+      "input": "hover",
+      "is_error": false,
+      "normalized": "hover"
+    },
+    {
+      "input": "documentSymbol",
+      "is_error": false,
+      "normalized": "documentSymbol"
+    },
+    {
+      "input": "workspaceSymbol",
+      "is_error": false,
+      "normalized": "workspaceSymbol"
+    },
+    {
+      "input": "implementation",
+      "is_error": false,
+      "normalized": "implementation"
+    },
+    {
+      "input": "typeDefinition",
+      "is_error": false,
+      "normalized": "typeDefinition"
+    },
+    {
+      "input": "diagnostics",
+      "is_error": false,
+      "normalized": "diagnostics"
+    },
+    {
+      "error": "unknown or non-read-only LSP operation: ",
+      "input": "",
+      "is_error": true
+    },
+    {
+      "error": "unknown or non-read-only LSP operation: rename",
+      "input": "rename",
+      "is_error": true
+    },
+    {
+      "error": "unknown or non-read-only LSP operation: formatting",
+      "input": "formatting",
+      "is_error": true
+    },
+    {
+      "error": "unknown or non-read-only LSP operation: codeAction",
+      "input": "codeAction",
+      "is_error": true
+    },
+    {
+      "error": "unknown or non-read-only LSP operation: executeCommand",
+      "input": "executeCommand",
+      "is_error": true
+    }
+  ],
+  "sdk_commit": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+}

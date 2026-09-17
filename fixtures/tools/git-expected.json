@@ -1,0 +1,4713 @@
+[
+  {
+    "name": "pr-dirty-title-draft",
+    "tool": "create_pull_request",
+    "input": {
+      "title": "Add feature",
+      "base_branch": "main",
+      "draft": true
+    },
+    "git": {
+      "status --porcelain": {
+        "output": " M changed\n?? new\n"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": " M changed\n?? new\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "add",
+          "-A"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "commit",
+          "--no-verify",
+          "-m",
+          "Add feature"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--title",
+          "Add feature",
+          "--body",
+          "",
+          "--base",
+          "main",
+          "--draft"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-untracked-default-message",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": "?? new\n"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": "?? new\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "add",
+          "-A"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "commit",
+          "--no-verify",
+          "-m",
+          "changes from agent run"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-existing",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "create failed",
+        "error": "already exists"
+      },
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": "create failed",
+        "error": "already exists"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR already exists\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-fallback",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      },
+      "pr view --json url -q .url": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-unvalidated-fallback-sdk",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "not a url"
+      },
+      "pr view --json url -q .url": {
+        "output": "not https"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": "not a url"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "not https"
+      }
+    ],
+    "content": "{\"pr_url\":\"not a url\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:not a url"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-body-only",
+    "tool": "create_pull_request",
+    "input": {
+      "body": "hello \u003cworld\u003e \u0026 friends\u2028\u2029"
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--body",
+          "hello \u003cworld\u003e \u0026 friends\u2028\u2029"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-title-body",
+    "tool": "create_pull_request",
+    "input": {
+      "title": "x",
+      "body": "details"
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--title",
+          "x",
+          "--body",
+          "details"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-empty-output",
+    "tool": "create_pull_request",
+    "input": {},
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"gh pr create returned empty output\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-create-failure",
+    "tool": "create_pull_request",
+    "input": {},
+    "gh": {
+      "pr create --head agent/work --fill": {
+        "output": "bad",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": "bad",
+        "error": "exit status 1"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"gh pr create failed: exit status 1\\nbad\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-main",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "main\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "main\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push protected branch \\\"main\\\"; create a work branch first (git checkout -b \\u003cbranch\\u003e) and open the pull request from it\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-master",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "master\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "master\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push protected branch \\\"master\\\"; create a work branch first (git checkout -b \\u003cbranch\\u003e) and open the pull request from it\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-HEAD",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "HEAD\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "HEAD\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push from a detached HEAD; create a work branch first (git checkout -b \\u003cbranch\\u003e)\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push: could not determine the current branch\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-develop",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "develop\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "develop\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "origin/develop\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push default branch \\\"develop\\\"; create a work branch first (git checkout -b \\u003cbranch\\u003e) and open the pull request from it\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-release",
+    "tool": "create_pull_request",
+    "input": {
+      "base_branch": " release "
+    },
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "release\n"
+      },
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "origin/develop\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "release\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "origin/develop\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"current branch \\\"release\\\" is the same as base_branch; create a work branch first (git checkout -b \\u003cbranch\\u003e)\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-guard-error",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "rev-parse --abbrev-ref HEAD": {
+        "output": "fatal",
+        "error": "not a repository"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "fatal",
+        "error": "not a repository"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"refusing to push: could not determine the current branch: not a repository\\nfatal\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-default-unavailable",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "symbolic-ref --short refs/remotes/origin/HEAD": {
+        "output": "",
+        "error": "not set"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "",
+        "error": "not set"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-status-failure-still-pushes",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "status --porcelain": {
+        "output": " M file",
+        "error": "exit status 1"
+      }
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": " M file",
+        "error": "exit status 1"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-error-add -A",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "add -A": {
+        "output": "stderr",
+        "error": "exit status 1"
+      },
+      "status --porcelain": {
+        "output": " M file"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": " M file"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "add",
+          "-A"
+        ],
+        "cwd": "/WORK",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"git add failed: exit status 1\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-error-commit --no-verify -m changes from agent run",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "commit --no-verify -m changes from agent run": {
+        "output": "stderr",
+        "error": "exit status 1"
+      },
+      "status --porcelain": {
+        "output": " M file"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": " M file"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "add",
+          "-A"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "commit",
+          "--no-verify",
+          "-m",
+          "changes from agent run"
+        ],
+        "cwd": "/WORK",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"git commit failed: exit status 1\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-error-push --no-verify -u origin HEAD",
+    "tool": "create_pull_request",
+    "input": {},
+    "git": {
+      "push --no-verify -u origin HEAD": {
+        "output": "stderr",
+        "error": "exit status 1"
+      },
+      "status --porcelain": {
+        "output": " M file"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": " M file"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "add",
+          "-A"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "commit",
+          "--no-verify",
+          "-m",
+          "changes from agent run"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"git push failed: exit status 1\\nstderr\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-subrepo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "repos/repo"
+    },
+    "setup": "subrepo",
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "pr-missing-repo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "nope"
+    },
+    "steps": [],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"repo_path rejected: nope is not a git repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "pr-outside-repo",
+    "tool": "create_pull_request",
+    "input": {
+      "repo_path": "../outside"
+    },
+    "steps": [],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"repo_path rejected: path ../outside is outside the workspace root /WORK - use a relative path like \\\"outside\\\" instead\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-{}",
+    "tool": "create_github_issue",
+    "input": {},
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"title is required\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-{'title': '  '}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "  "
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"title is required\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-{'title': 3}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": 3
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal number into Go struct field createIssueInput.title of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-{'draft': 'yes'}",
+    "tool": "create_pull_request",
+    "input": {
+      "draft": "yes"
+    },
+    "steps": [],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal string into Go struct field createPullRequestInput.draft of type bool\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-['bad']",
+    "tool": "create_pull_request",
+    "input": [
+      "bad"
+    ],
+    "steps": [],
+    "content": "{\"pr_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal array into Go value of type git.createPullRequestInput\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "null-fields",
+    "tool": "create_pull_request",
+    "input": {
+      "title": null,
+      "draft": null
+    },
+    "gh": {
+      "pr view --json url -q .url": {
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "symbolic-ref",
+          "--short",
+          "refs/remotes/origin/HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "status",
+          "--porcelain"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "push",
+          "--no-verify",
+          "-u",
+          "origin",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--abbrev-ref",
+          "HEAD"
+        ],
+        "cwd": "/WORK",
+        "output": "agent/work\n"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "create",
+          "--head",
+          "agent/work",
+          "--fill"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "pr",
+          "view",
+          "--json",
+          "url",
+          "-q",
+          ".url"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/pull/7\n"
+      }
+    ],
+    "content": "{\"pr_url\":\"https://github.com/acme/repo/pull/7\",\"status\":\"PR created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "pr:https://github.com/acme/repo/pull/7"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "case-insensitive",
+    "tool": "create_github_issue",
+    "input": {
+      "TITLE": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-simple",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "body": "Details",
+      "assignees": [
+        "octo"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --body Details --assignee octo": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--body",
+          "Details",
+          "--assignee",
+          "octo"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-normalize-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        " tests ",
+        "sdk",
+        "TESTS",
+        ""
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label tests --label sdk": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label create --color BFD4F2 -- sdk": {
+        "output": "label already exists\n",
+        "error": "exit status 1"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "tests"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "sdk"
+        ],
+        "cwd": "/WORK",
+        "output": "label already exists\n",
+        "error": "exit status 1"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "tests",
+          "--label",
+          "sdk"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-existing-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug",
+        "SDK"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug --label SDK": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"Bug\"},{\"name\":\"sdk\"}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":\"Bug\"},{\"name\":\"sdk\"}]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "bug",
+          "--label",
+          "SDK"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-dash-label",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "--help"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label --help": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "--help"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "--help"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-output-bad",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "bad"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug"
+        ],
+        "cwd": "/WORK",
+        "output": "bad"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh issue create returned unexpected output: bad\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-output-",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": ""
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh issue create returned empty output\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-output-stderr",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug"
+    },
+    "gh": {
+      "issue create --title Bug": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug"
+        ],
+        "cwd": "/WORK",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh issue create failed: exit status 1\\nstderr\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-error",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label list --limit 1000 --json name": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list failed: exit status 1\\nstderr\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-create-error",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "label create --color BFD4F2 -- bug": {
+        "output": "denied",
+        "error": "exit status 1"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": "denied",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label create failed: exit status 1\\ndenied\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-null",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "null"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "null"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-[{\"name\":null},null,{}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":null},null,{}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":null},null,{}]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-not json",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "not json"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "not json"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character 'o' in literal null (expecting 'u')\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-{}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "{}"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "{}"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal object into Go value of type []struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-[3]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[3]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[3]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal number into Go value of type struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-list-[{\"name\":3}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":3}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":3}]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal number into Go struct field .name of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-subrepo",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "repo_path": "repos/repo"
+    },
+    "setup": "subrepo",
+    "gh": {
+      "issue create --title Bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-defaults",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "root_git",
+    "base": " main ",
+    "branch": " agent/work ",
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "checkout",
+          "-B",
+          "agent/work"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"base_branch\":\"main\",\"branch_name\":\"agent/work\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "repos/\n",
+    "removed": false
+  },
+  {
+    "name": "attach-repo-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repo": "github.com/Acme/Repo.git",
+      "alias": " My strange REPO.git "
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/Acme/Repo.git",
+          "/WORK/repos/my-strange-repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/Acme/Repo.git\",\"path\":\"repos/my-strange-repo\",\"absolute_path\":\"/WORK/repos/my-strange-repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-custom-store",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "root_git",
+    "store": "clones",
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/clones/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"clones/repo\",\"absolute_path\":\"/WORK/clones/repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "clones/\n",
+    "removed": true
+  },
+  {
+    "name": "attach-root-store",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "root_git",
+    "store": ".",
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repo\",\"absolute_path\":\"/WORK/repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-empty-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "...___---"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"alias could not be derived from repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-long-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\",\"absolute_path\":\"/WORK/repos/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-fallback",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "missing",
+      "branch_name": "work"
+    },
+    "git": {
+      "clone missing": {
+        "output": "fatal: Remote branch missing not found in upstream origin",
+        "error": "exit status 128"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "missing",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "fatal: Remote branch missing not found in upstream origin",
+        "error": "exit status 128"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "checkout",
+          "-B",
+          "work"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"branch_name\":\"work\",\"note\":\"requested base branch \\\"missing\\\" not found on the remote; cloned the repository default branch instead\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-fallback-fails",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "missing"
+    },
+    "git": {
+      "clone": {
+        "output": "denied",
+        "error": "exit status 128"
+      },
+      "clone missing": {
+        "output": "Remote branch missing not found in upstream",
+        "error": "exit status 128"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "missing",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Remote branch missing not found in upstream",
+        "error": "exit status 128"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "denied",
+        "error": "exit status 128"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: exit status 128\\ndenied\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-clone-signal: killed",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "signal: killed"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Cloning into dest\n",
+        "error": "signal: killed"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: signal: killed\\nCloning into dest\\n\\nThe clone was interrupted before it completed; the partial checkout at /WORK/repos/repo was removed. Large repositories may need a retry.\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-clone-timeout",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "timeout"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Cloning into dest\n",
+        "error": "timeout"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: timeout\\nCloning into dest\\n\\nThe clone was interrupted before it completed; the partial checkout at /WORK/repos/repo was removed. Large repositories may need a retry.\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-clone-context deadline exceeded",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "context deadline exceeded"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Cloning into dest\n",
+        "error": "context deadline exceeded"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: context deadline exceeded\\nCloning into dest\\n\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-clone-context canceled",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "context canceled"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Cloning into dest\n",
+        "error": "context canceled"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: context canceled\\nCloning into dest\\n\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-clone-exit status 128",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "base_branch": "main"
+    },
+    "git": {
+      "clone main": {
+        "output": "Cloning into dest\n",
+        "error": "exit status 128"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": "Cloning into dest\n",
+        "error": "exit status 128"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git clone failed: exit status 128\\nCloning into dest\\n\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-checkout-error",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "bad"
+    },
+    "git": {
+      "checkout -B bad": {
+        "output": "bad branch",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "checkout",
+          "-B",
+          "bad"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "bad branch",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"git checkout failed: exit status 1\\nbad branch\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-existing",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://github.com/acme/repo.git\n"
+      }
+    ],
+    "content": "{\"status\":\"already_attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"branch_name\":\"ignored\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-plain",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "plain",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n"
+      }
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository alias \\\"repo\\\" already exists at /WORK/repos/repo but is not a git repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-incomplete",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "incomplete",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n"
+      },
+      "rev-parse --verify --quiet HEAD^{commit}": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "",
+        "error": "exit status 1"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "checkout",
+          "-B",
+          "ignored"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"branch_name\":\"ignored\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-working",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "branch_name": "ignored"
+    },
+    "setup": "working",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/repo.git\n"
+      },
+      "rev-parse --verify --quiet HEAD^{commit}": {
+        "output": "",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "",
+        "error": "exit status 1"
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://github.com/acme/repo.git\n"
+      }
+    ],
+    "content": "{\"status\":\"already_attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"branch_name\":\"ignored\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-origin-git@github.com:acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "git@github.com:acme/repo.git"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "git@github.com:acme/repo.git"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"repository alias \\\"repo\\\" already exists at /WORK/repos/repo with origin \\\"git@github.com:acme/repo.git\\\", not \\\"https://github.com/acme/repo.git\\\"\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-origin-https://github.com/acme/other.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://github.com/acme/other.git"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://github.com/acme/other.git"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"repository alias \\\"repo\\\" already exists at /WORK/repos/repo with origin \\\"https://github.com/acme/other.git\\\", not \\\"https://github.com/acme/repo.git\\\"\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-origin-https://user@github.com/acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "https://user@github.com/acme/repo.git"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "https://user@github.com/acme/repo.git"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"repository alias \\\"repo\\\" already exists at /WORK/repos/repo with origin \\\"https://user@github.com/acme/repo.git\\\", not \\\"https://github.com/acme/repo.git\\\"\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-origin-failed",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo"
+    },
+    "setup": "existing",
+    "git": {
+      "remote get-url origin": {
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "rev-parse",
+          "--verify",
+          "--quiet",
+          "HEAD^{commit}"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": ""
+      },
+      {
+        "program": "git",
+        "argv": [
+          "remote",
+          "get-url",
+          "origin"
+        ],
+        "cwd": "/WORK/repos/repo",
+        "output": "stderr",
+        "error": "exit status 1"
+      }
+    ],
+    "content": "{\"status\":\"error\",\"error\":\"repository alias \\\"repo\\\" already exists at /WORK/repos/repo but its origin could not be read: exit status 1\\nstderr\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-url-",
+    "tool": "attach_repository",
+    "input": {
+      "repository": ""
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository is required\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-../repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "../repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url--uploader",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "-uploader"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a GitHub owner/repository name or credential-free HTTPS github.com URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-git@github.com:acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "git@github.com:acme/repo.git"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-ssh://git@github.com/acme/repo.git",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "ssh://git@github.com/acme/repo.git"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-git://github.com/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "git://github.com/acme/repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-file:///tmp/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "file:///tmp/repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-ext::helper",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "ext::helper"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://user@github.com/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://user@github.com/acme/repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com:443/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com:443/acme/repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo?q=1",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo?q=1"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo#frag",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo#frag"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com.evil.test/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com.evil.test/acme/repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo/extra",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo/extra"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com/acme/%72epo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/%72epo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-https://github.com/acme/../repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/../repo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-acme/re po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/re po"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a GitHub owner/repository name or credential-free HTTPS github.com URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-HTTPS://GITHUB.COM/acme/repo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "HTTPS://GITHUB.COM/acme/repo"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo?",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo?"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "attach-url-https://github.com/acme/repo#",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/repo#"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  },
+  {
+    "name": "issue-label-edge-[",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "["
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "["
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: unexpected end of JSON input\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-{bad}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "{bad}"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "{bad}"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character 'b' looking for beginning of object key string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":}]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character '}' looking for beginning of value\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":\"bug\",}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"bug\",}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":\"bug\",}]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character '}' looking for beginning of object key string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[{\"name\":\"bug\"} false]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"name\":\"bug\"} false]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"name\":\"bug\"} false]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character 'f' after array element\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[] trailing",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[] trailing"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[] trailing"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: invalid character 't' after top-level value\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-true",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "true"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "true"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal bool into Go value of type []struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-\"string\"",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "\"string\""
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "\"string\""
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal string into Go value of type []struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-3",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "3"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "3"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal number into Go value of type []struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[false]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[false]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[false]"
+      }
+    ],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"gh label list returned invalid output: json: cannot unmarshal bool into Go value of type struct { Name string \\\"json:\\\\\\\"name\\\\\\\"\\\" }\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-label-edge-[{\"NAME\":\"Bug\"}]",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "bug"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label bug": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[{\"NAME\":\"Bug\"}]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[{\"NAME\":\"Bug\"}]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "bug"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%20po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%20po"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%3Fpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%3Fpo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%5Cpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%5Cpo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re\\po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re\\po"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%7Fpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%7Fpo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%ffpo",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%ffpo"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%41po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%41po"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must be a credential-free HTTPS github.com owner/repository URL\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-url-edge-https://github.com/acme/re%00po",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "https://github.com/acme/re%00po"
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"repository must identify exactly one GitHub owner/repository\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'title': True}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": true
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal bool into Go struct field createIssueInput.title of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'title': []}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": []
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal array into Go struct field createIssueInput.title of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'title': {}}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": {}
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal object into Go struct field createIssueInput.title of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'title': 'Bug', 'labels': 3}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": 3
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal number into Go struct field createIssueInput.labels of type []string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'title': 'Bug', 'labels': [3]}",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        3
+      ]
+    },
+    "steps": [],
+    "content": "{\"issue_url\":\"\",\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal number into Go struct field createIssueInput.labels of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'repository': 3}",
+    "tool": "attach_repository",
+    "input": {
+      "repository": 3
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal number into Go struct field attachRepositoryInput.repository of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "invalid-edge-{'repository': 'acme/repo', 'alias': False}",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": false
+    },
+    "steps": [],
+    "content": "{\"status\":\"error\",\"error\":\"Invalid input: json: cannot unmarshal bool into Go struct field attachRepositoryInput.alias of type string\"}",
+    "is_error": true,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "attach-unicode-alias",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "alias": "\u0130foo \u039f\u03a3 bar"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/ifoo-bar"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/ifoo-bar\",\"absolute_path\":\"/WORK/repos/ifoo-bar\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "issue-unicode-labels",
+    "tool": "create_github_issue",
+    "input": {
+      "title": "Bug",
+      "labels": [
+        "\u0130foo",
+        "ifoo",
+        "\u039f\u03a3",
+        "\u039f\u03c3"
+      ]
+    },
+    "gh": {
+      "issue create --title Bug --label İfoo --label ΟΣ": {
+        "output": "https://github.com/acme/repo/issues/3\n"
+      },
+      "label list --limit 1000 --json name": {
+        "output": "[]"
+      }
+    },
+    "steps": [
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "list",
+          "--limit",
+          "1000",
+          "--json",
+          "name"
+        ],
+        "cwd": "/WORK",
+        "output": "[]"
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "İfoo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "label",
+          "create",
+          "--color",
+          "BFD4F2",
+          "--",
+          "ΟΣ"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      },
+      {
+        "program": "gh",
+        "argv": [
+          "issue",
+          "create",
+          "--title",
+          "Bug",
+          "--label",
+          "İfoo",
+          "--label",
+          "ΟΣ"
+        ],
+        "cwd": "/WORK",
+        "output": "https://github.com/acme/repo/issues/3\n"
+      }
+    ],
+    "content": "{\"issue_url\":\"https://github.com/acme/repo/issues/3\",\"status\":\"Issue created successfully\"}",
+    "is_error": false,
+    "artifacts": [
+      "issue:https://github.com/acme/repo/issues/3"
+    ],
+    "exclude": "",
+    "removed": true
+  },
+  {
+    "name": "unicode-case-folding-keys",
+    "tool": "attach_repository",
+    "input": {
+      "repository": "acme/repo",
+      "ba\u017fe_branch": "main"
+    },
+    "steps": [
+      {
+        "program": "git",
+        "argv": [
+          "-c",
+          "protocol.allow=never",
+          "-c",
+          "protocol.https.allow=always",
+          "clone",
+          "--depth",
+          "1",
+          "--single-branch",
+          "--no-tags",
+          "--branch",
+          "main",
+          "--",
+          "https://github.com/acme/repo.git",
+          "/WORK/repos/repo"
+        ],
+        "cwd": "/WORK",
+        "output": ""
+      }
+    ],
+    "content": "{\"status\":\"attached\",\"repository\":\"https://github.com/acme/repo.git\",\"path\":\"repos/repo\",\"absolute_path\":\"/WORK/repos/repo\",\"base_branch\":\"main\"}",
+    "is_error": false,
+    "artifacts": [],
+    "exclude": "",
+    "removed": false
+  }
+]

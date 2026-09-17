@@ -1,0 +1,4411 @@
+[
+  {
+    "name": "unified modify False",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n+new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai modify False",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai multi False",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: renamed\n-old\n+new\n*** Delete File: b\n*** Add File: created\n+one\n+two\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"rename\",\"path\":\"renamed\",\"from_path\":\"a\",\"mode\":\"0600\",\"bytes\":4},{\"operation\":\"delete\",\"path\":\"b\"},{\"operation\":\"create\",\"path\":\"created\",\"mode\":\"0644\",\"bytes\":8}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n*** Move to: renamed\\n-old\\n+new\\n*** Delete File: b\\n*** Add File: created\\n+one\\n+two\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "created": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b25lCnR3bwo="
+      },
+      "renamed": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      }
+    }
+  },
+  {
+    "name": "missing parent False",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: missing/new\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": true,
+    "expected": {
+      "content": "Error applying patch: destination parent for missing/new: no such file or directory",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "unified modify True",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n",
+      "dry_run": true
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":true,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n+new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai modify True",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": true
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":true,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai multi True",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: renamed\n-old\n+new\n*** Delete File: b\n*** Add File: created\n+one\n+two\n*** End Patch\n",
+      "dry_run": true
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":true,\"operations\":[{\"operation\":\"rename\",\"path\":\"renamed\",\"from_path\":\"a\",\"mode\":\"0600\",\"bytes\":4},{\"operation\":\"delete\",\"path\":\"b\"},{\"operation\":\"create\",\"path\":\"created\",\"mode\":\"0644\",\"bytes\":8}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n*** Move to: renamed\\n-old\\n+new\\n*** Delete File: b\\n*** Add File: created\\n+one\\n+two\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "missing parent True",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: missing/new\n+new\n*** End Patch\n",
+      "dry_run": true
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":true,\"operations\":[{\"operation\":\"create\",\"path\":\"missing/new\",\"mode\":\"0644\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Add File: missing/new\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "unified multi",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n--- a/b\n+++ /dev/null\n@@ -1 +0,0 @@\n-remove\n--- /dev/null\n+++ b/created\n@@ -0,0 +1 @@\n+created\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4},{\"operation\":\"delete\",\"path\":\"b\"},{\"operation\":\"create\",\"path\":\"created\",\"mode\":\"0644\",\"bytes\":8}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n+new\\n--- a/b\\n+++ /dev/null\\n@@ -1 +0,0 @@\\n-remove\\n--- /dev/null\\n+++ b/created\\n@@ -0,0 +1 @@\\n+created\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      },
+      "created": {
+        "kind": "file",
+        "mode": 420,
+        "data": "Y3JlYXRlZAo="
+      }
+    }
+  },
+  {
+    "name": "mode executable",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nold mode 100644\nnew mode 100755\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0711\",\"bytes\":4}],\"diff\":\"diff --git a/a b/a\\nold mode 100644\\nnew mode 100755\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 457,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "mode nonexec permissions",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nold mode 100755\nnew mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 457
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"diff --git a/a b/a\\nold mode 100755\\nnew mode 100644\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "mode conflict",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nold mode 100755\nnew mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: mode conflict for a",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "git rename",
+    "arguments": {
+      "patch": "diff --git a/a b/renamed\nsimilarity index 100%\nrename from a\nrename to renamed\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"rename\",\"path\":\"renamed\",\"from_path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"diff --git a/a b/renamed\\nsimilarity index 100%\\nrename from a\\nrename to renamed\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      },
+      "renamed": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "git literal a rename",
+    "arguments": {
+      "patch": "diff --git a/a/old b/a/new\nrename from a/old\nrename to a/new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a/old": {
+        "content": "literal\n",
+        "mode": 416
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"rename\",\"path\":\"a/new\",\"from_path\":\"a/old\",\"mode\":\"0640\",\"bytes\":8}],\"diff\":\"diff --git a/a/old b/a/new\\nrename from a/old\\nrename to a/new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "directory",
+        "mode": 493
+      },
+      "a/new": {
+        "kind": "file",
+        "mode": 416,
+        "data": "bGl0ZXJhbAo="
+      }
+    }
+  },
+  {
+    "name": "empty add",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: empty\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"create\",\"path\":\"empty\",\"mode\":\"0644\"}],\"diff\":\"*** Begin Patch\\n*** Add File: empty\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      },
+      "empty": {
+        "kind": "file",
+        "mode": 420
+      }
+    }
+  },
+  {
+    "name": "empty unified add",
+    "arguments": {
+      "patch": "diff --git a/empty b/empty\nnew file mode 100755\n--- /dev/null\n+++ b/empty\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"create\",\"path\":\"empty\",\"mode\":\"0755\"}],\"diff\":\"diff --git a/empty b/empty\\nnew file mode 100755\\n--- /dev/null\\n+++ b/empty\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      },
+      "empty": {
+        "kind": "file",
+        "mode": 493
+      }
+    }
+  },
+  {
+    "name": "move only",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: renamed\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"rename\",\"path\":\"renamed\",\"from_path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n*** Move to: renamed\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      },
+      "renamed": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "delete all",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"delete\",\"path\":\"a\"}],\"diff\":\"*** Begin Patch\\n*** Delete File: a\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "new missing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: missing\n-x\n+y\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: modify source missing does not exist",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "delete missing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: missing\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: delete source missing does not exist",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "rename missing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: missing\n*** Move to: renamed\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: rename source missing does not exist",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "create existing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: create destination a already exists",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "rename existing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: b\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: rename destination b already exists",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "multi validation atomic",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n-old\n+new\n*** Update File: b\n-wrong\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: b: range-less hunk does not match file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "line endings 'old\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3Cg=="
+      }
+    }
+  },
+  {
+    "name": "line endings 'old\\r\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\r\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":5}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3DQo="
+      }
+    }
+  },
+  {
+    "name": "line endings 'first\\nold'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "first\nold"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":9}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "Zmlyc3QKbmV3"
+      }
+    }
+  },
+  {
+    "name": "line endings 'first\\r\\nold'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "first\r\nold"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":10}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "Zmlyc3QNCm5ldw=="
+      }
+    }
+  },
+  {
+    "name": "line endings 'old'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":3}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3"
+      }
+    }
+  },
+  {
+    "name": "line endings 'old\\r'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\r"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk does not match file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkDQ=="
+      }
+    }
+  },
+  {
+    "name": "crlf envelope",
+    "arguments": {
+      "patch": "*** Begin Patch\r\n*** Update File: a\r\n@@\r\n-old\r\n+new\r\n*** End Patch\r\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\r\\n*** Update File: a\\r\\n@@\\r\\n-old\\r\\n+new\\r\\n*** End Patch\\r\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "unified crlf",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\r\n+new\r\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\r\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":5}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\r\\n+new\\r\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3DQo="
+      }
+    }
+  },
+  {
+    "name": "unterminated insert",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n old\n+after\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":9}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n old\\n+after\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCmFmdGVy"
+      }
+    }
+  },
+  {
+    "name": "unterminated delete",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n first\n-old\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "first\nold"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":6}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n first\\n-old\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "Zmlyc3QK"
+      }
+    }
+  },
+  {
+    "name": "no newline markers",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n\\ No newline at end of file\n+new\n\\ No newline at end of file\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":3}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n\\\\ No newline at end of file\\n+new\\n\\\\ No newline at end of file\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3"
+      }
+    }
+  },
+  {
+    "name": "repeated newline markers",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n\\ No newline at end of file\n\\ No newline at end of file\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":3}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n+new\\n\\\\ No newline at end of file\\n\\\\ No newline at end of file\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3"
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "locator",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@ locator text\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\nlocator text\nold\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":21}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@ locator text\\n-old\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCmxvY2F0b3IgdGV4dApuZXcK"
+      }
+    }
+  },
+  {
+    "name": "locator missing",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@ not found\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk locator does not match file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "eof",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End of File\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\nold\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":8}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n-old\\n+new\\n*** End of File\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCm5ldwo="
+      }
+    }
+  },
+  {
+    "name": "ambiguous",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\nold\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk matches file content more than once",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCm9sZAo="
+      }
+    }
+  },
+  {
+    "name": "shared context",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n one\n-two\n+TWO\n three\n@@\n three\n-four\n+FOUR\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "one\ntwo\nthree\nfour\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":19}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n one\\n-two\\n+TWO\\n three\\n@@\\n three\\n-four\\n+FOUR\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b25lClRXTwp0aHJlZQpGT1VSCg=="
+      }
+    }
+  },
+  {
+    "name": "out of order",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-three\n+THREE\n@@\n-one\n+ONE\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "one\ntwo\nthree\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk does not match file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b25lCnR3bwp0aHJlZQo="
+      }
+    }
+  },
+  {
+    "name": "overlap",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: overlapping range-less hunks",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "range-less insertion empty",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {}
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0644\",\"bytes\":4}],\"diff\":\"*** Begin Patch\\n*** Update File: a\\n@@\\n+new\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "bmV3Cg=="
+      }
+    }
+  },
+  {
+    "name": "range-less insertion nonempty",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk has no context or removed lines",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "suffix match refused",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "prefix-old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: range-less hunk does not match file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cHJlZml4LW9sZAo="
+      }
+    }
+  },
+  {
+    "name": "unified insert",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1,0 +2 @@\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":8}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -1,0 +2 @@\\n+new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCm5ldwo="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "unified delta",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -0,0 +1 @@\n+first\n@@ -1 +2 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":10}],\"diff\":\"--- a/a\\n+++ b/a\\n@@ -0,0 +1 @@\\n+first\\n@@ -1 +2 @@\\n-old\\n+new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "Zmlyc3QKbmV3Cg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "unified overlap",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n@@ -1 +1 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: overlapping hunks",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "new range",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +2 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: hunk new-file range is inconsistent: got 2, want 1",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "old range",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -2 +2 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: hunk line range does not exist",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "insert range",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -3,0 +4 @@\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: hunk insertion line range does not exist",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "partial delete",
+    "arguments": {
+      "patch": "--- a/a\n+++ /dev/null\n@@ -1 +0,0 @@\n-old\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\nleft\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: delete patch for a does not remove all file content",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCmxlZnQK"
+      }
+    }
+  },
+  {
+    "name": "header timestamp",
+    "arguments": {
+      "patch": "--- a/a\tstamp\n+++ b/a\tstamp\n@@ -1 +1 @@ trailing text\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"modify\",\"path\":\"a\",\"mode\":\"0600\",\"bytes\":4}],\"diff\":\"--- a/a\\tstamp\\n+++ b/a\\tstamp\\n@@ -1 +1 @@ trailing text\\n-old\\n+new\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "bmV3Cg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "escaped audit",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: \u003c\u003e\u0026\n+\u003c\u003e\u0026\u2028\u2029\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":false,\"operations\":[{\"operation\":\"create\",\"path\":\"\\u003c\\u003e\\u0026\",\"mode\":\"0644\",\"bytes\":10}],\"diff\":\"*** Begin Patch\\n*** Add File: \\u003c\\u003e\\u0026\\n+\\u003c\\u003e\\u0026\\u2028\\u2029\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "\u003c\u003e\u0026": {
+        "kind": "file",
+        "mode": 420,
+        "data": "PD4m4oCo4oCpCg=="
+      },
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path '../outside'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: ../outside\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path traversal is not allowed",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path './a'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: ./a\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path traversal is not allowed",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'a/../b'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a/../b\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path traversal is not allowed",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path '/absolute'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: /absolute\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path must be a relative slash-separated path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'bad\\\\path'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: bad\\path\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path must be a relative slash-separated path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'a\\tb'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a\tb\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path must be a relative slash-separated path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'a//new'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a//new\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": true,
+    "expected": {
+      "content": "Patch validation failed: a/new: not a directory",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'a/'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a/\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: create destination a already exists",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path '/dev/null'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: /dev/null\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path cannot be /dev/null",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path ''",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: \n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "path 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: add file path: path is too long (513 bytes, limit 512)",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: update file a contains no changes",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n@@\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: range-less hunk has no body",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n@@\\n old\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n old\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: range-less hunk has no changes",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Add File: new\\nraw\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: new\nraw\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported OpenAI patch line \"raw\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Move to: new\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Move to: new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: move destination must follow one update file directive",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n*** Move to: new\\n*** Move to: newer\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: new\n*** Move to: newer\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: move destination must follow one update file directive",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** End of File\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** End of File\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: *** End of File must follow an update hunk",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n-old\\n+new\\n*** End of File\\n*** End of File\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n-old\n+new\n*** End of File\n*** End of File\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: duplicate *** End of File",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n-old\\n+new\\n*** End of File\\n@@\\n-old\\n+new\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n-old\n+new\n*** End of File\n@@\n-old\n+new\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: *** End of File must terminate an update",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Add File: new\\n@@\\n+x\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: new\n@@\n+x\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: range-less hunk must follow an update file directive",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Delete File: a\\n-old\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n-old\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported OpenAI patch line \"-old\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid 'unsupported\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\nunsupported\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported OpenAI patch line \"unsupported\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "openai invalid '*** Update File: a\\n@@\\n\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n@@\n\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: malformed range-less hunk body",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid ''",
+    "arguments": {
+      "patch": "",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '  \\n'",
+    "arguments": {
+      "patch": "  \n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '*** Begin Patch\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported OpenAI patch line \"\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '*** Begin Patch\\n*** End Patch\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch contains no file changes",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '*** Begin Patch\\n*** Add File: a\\n+x\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: a\n+x\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported OpenAI patch line \"\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '*** Begin Patch\\n*** Add File: new\\n+x\\n*** End Patch\\n\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: new\n+x\n*** End Patch\n\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: content follows *** End Patch",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'GIT binary patch\\n'",
+    "arguments": {
+      "patch": "GIT binary patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: binary patches are not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'Binary files a and b differ\\n'",
+    "arguments": {
+      "patch": "Binary files a and b differ\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: binary patches are not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'x\\x00y'",
+    "arguments": {
+      "patch": "x\u0000y",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: binary patch data is not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '+++ b/a\\n'",
+    "arguments": {
+      "patch": "+++ b/a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: new path appears before old path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'old mode 100644\\n'",
+    "arguments": {
+      "patch": "old mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: old mode appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'new mode 100755\\n'",
+    "arguments": {
+      "patch": "new mode 100755\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: new mode appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'new file mode 100644\\n'",
+    "arguments": {
+      "patch": "new file mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: new file mode appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'deleted file mode 100644\\n'",
+    "arguments": {
+      "patch": "deleted file mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: deleted file mode appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'rename from a\\n'",
+    "arguments": {
+      "patch": "rename from a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: rename source appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'rename to b\\n'",
+    "arguments": {
+      "patch": "rename to b\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: rename destination appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'copy from a\\n'",
+    "arguments": {
+      "patch": "copy from a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: copy directives are not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'copy to b\\n'",
+    "arguments": {
+      "patch": "copy to b\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: copy directives are not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '@@ -1 +1 @@\\n'",
+    "arguments": {
+      "patch": "@@ -1 +1 @@\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: hunk appears before a file path",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/a\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch file a contains no changes",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git \"a/a space\" \"b/a space\"\\n'",
+    "arguments": {
+      "patch": "diff --git \"a/a space\" \"b/a space\"\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: quoted or malformed diff paths are not supported",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/b\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/b\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: rename from a to b requires paired rename metadata",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/a\\nrename from a\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nrename from a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: rename requires paired rename from/to directives",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n--- a/a\\n'",
+    "arguments": {
+      "patch": "--- a/a\n--- a/a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: duplicate old-file header",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n+++ b/a\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n+++ b/a\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: duplicate new-file header",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- /dev/null\\n+++ /dev/null\\n'",
+    "arguments": {
+      "patch": "--- /dev/null\n+++ /dev/null\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch file cannot have /dev/null as both paths",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/a\\nnew mode 100600\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nnew mode 100600\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported Git blob mode \"100600\" (only 100644 and 100755 are supported)",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/a\\nnew mode 100755\\nnew mode 100644\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/a\nnew mode 100755\nnew mode 100644\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: duplicate new mode",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid 'diff --git a/a b/a\\n--- a/a\\n+++ b/b\\n@@ -1 +1 @@\\n-old\\n+new\\n'",
+    "arguments": {
+      "patch": "diff --git a/a b/a\n--- a/a\n+++ b/b\n@@ -1 +1 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch headers or rename metadata disagree with diff paths",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -0 +1 @@\\n-old\\n+new\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -0 +1 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: invalid hunk line range",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -9999999999999999999999 +1 @@\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -9999999999999999999999 +1 @@\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: strconv.Atoi: parsing \"9999999999999999999999\": value out of range",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ bad\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ bad\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: malformed hunk header \"@@ bad\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -1 +1 @@\\n-old\\n+new\\n+excess\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1 +1 @@\n-old\n+new\n+excess\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: unsupported or out-of-hunk patch line \"+excess\"",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -1,0 +1,0 @@\\n\\\\ No newline at end of file\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1,0 +1,0 @@\n\\ No newline at end of file\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: newline marker without a hunk line",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -1,2 +1 @@\\n-old\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1,2 +1 @@\n-old\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: malformed hunk body",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "invalid '--- a/a\\n+++ b/a\\n@@ -1,0 +1 @@\\n-old\\n+new\\n'",
+    "arguments": {
+      "patch": "--- a/a\n+++ b/a\n@@ -1,0 +1 @@\n-old\n+new\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: hunk body is longer than its header",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "conflicting '*** Delete File: a\\n*** Delete File: a\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: multiple patch operations use source a",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "conflicting '*** Add File: new\\n+x\\n*** Add File: new\\n+y\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: new\n+x\n*** Add File: new\n+y\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: multiple patch operations use destination new",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "conflicting '*** Update File: a\\n*** Move to: b\\n*** Delete File: b\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Update File: a\n*** Move to: b\n*** Delete File: b\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: conflicting patch paths include b",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "conflicting '*** Add File: new\\n+x\\n*** Add File: new/child\\n+y\\n'",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: new\n+x\n*** Add File: new/child\n+y\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: conflicting ancestor patch paths new and new/child",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input None",
+    "arguments": {
+      "patch": null
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input {}",
+    "arguments": {},
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input []",
+    "arguments": [],
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal array into Go value of type fs.applyPatchInput",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input True",
+    "arguments": true,
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal bool into Go value of type fs.applyPatchInput",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input 4",
+    "arguments": 4,
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal number into Go value of type fs.applyPatchInput",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input 'foo'",
+    "arguments": "foo",
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal string into Go value of type fs.applyPatchInput",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input {'patch': None}",
+    "arguments": {
+      "patch": null
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid patch: patch is required",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input {'patch': 2}",
+    "arguments": {
+      "patch": 2
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal number into Go struct field applyPatchInput.patch of type string",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input {'patch': '', 'dry_run': 'yes'}",
+    "arguments": {
+      "patch": "",
+      "dry_run": "yes"
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Invalid input: json: cannot unmarshal string into Go struct field applyPatchInput.dry_run of type bool",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "input {'PATCH': '*** Begin Patch\\n*** Add File: new\\n+x\\n*** End Patch\\n', 'DRY_RUN': True}",
+    "arguments": {
+      "PATCH": "*** Begin Patch\n*** Add File: new\n+x\n*** End Patch\n",
+      "DRY_RUN": true
+    },
+    "files": {
+      "a": {
+        "content": "old\n",
+        "mode": 384
+      },
+      "b": {
+        "content": "remove\n",
+        "mode": 420
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "{\"dry_run\":true,\"operations\":[{\"operation\":\"create\",\"path\":\"new\",\"mode\":\"0644\",\"bytes\":2}],\"diff\":\"*** Begin Patch\\n*** Add File: new\\n+x\\n*** End Patch\\n\"}",
+      "is_error": false
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 384,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "cmVtb3ZlCg=="
+      }
+    }
+  },
+  {
+    "name": "reject binary",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "content": "a\u0000b",
+        "kind": "binary",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: is a binary file",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "YQBi"
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "reject invalid_utf8",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "kind": "invalid_utf8",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: is a binary file",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "/w=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "reject fifo",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "kind": "fifo",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: is not a regular file",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "fifo",
+        "mode": 420
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "reject symlink",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "kind": "symlink",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": true,
+    "expected": {
+      "content": "Patch validation failed: a: path a escapes workspace or contains symlink: too many levels of symbolic links",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "symlink",
+        "mode": 511,
+        "target": "b"
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "reject hardlink",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "kind": "hardlink",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: file must have exactly one hard link",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "reject directory",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Delete File: a\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "a": {
+        "kind": "directory",
+        "target": "b"
+      },
+      "b": {
+        "content": "old\n"
+      }
+    },
+    "error_only": false,
+    "expected": {
+      "content": "Patch validation failed: a: is not a regular file",
+      "is_error": true
+    },
+    "tree": {
+      "a": {
+        "kind": "directory",
+        "mode": 493
+      },
+      "b": {
+        "kind": "file",
+        "mode": 420,
+        "data": "b2xkCg=="
+      }
+    }
+  },
+  {
+    "name": "symlink parent",
+    "arguments": {
+      "patch": "*** Begin Patch\n*** Add File: link/new\n+x\n*** End Patch\n",
+      "dry_run": false
+    },
+    "files": {
+      "dir": {
+        "kind": "directory"
+      },
+      "link": {
+        "kind": "symlink",
+        "target": "dir"
+      }
+    },
+    "error_only": true,
+    "expected": {
+      "content": "Patch validation failed: link/new: path link/new escapes workspace or contains symlink: too many levels of symbolic links",
+      "is_error": true
+    },
+    "tree": {
+      "dir": {
+        "kind": "directory",
+        "mode": 493
+      },
+      "link": {
+        "kind": "symlink",
+        "mode": 511,
+        "target": "dir"
+      }
+    }
+  }
+]

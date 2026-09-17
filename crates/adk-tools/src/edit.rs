@@ -156,7 +156,7 @@ impl Edit {
                         | OFlags::NOFOLLOW
                         | OFlags::CLOEXEC
                         | OFlags::NONBLOCK,
-                    Mode::from_raw_mode(mode),
+                    Mode::from_raw_mode(mode as _),
                 )
                 .map_err(|e| format!("Error writing file: {e}"))?,
             );

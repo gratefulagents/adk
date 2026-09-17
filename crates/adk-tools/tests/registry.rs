@@ -157,7 +157,7 @@ fn terminal_remote_write_and_async_shell_gates_cannot_be_allowlisted_away() {
 fn missing_implementations_are_reported_at_construction_not_tool_execution() {
     let config = strict(&["LSP", "Vision", "Think"], AccessMode::ReadOnly);
     assert!(
-        matches!(Registry::build(&config, []), Err(BuildError::Unavailable(names)) if names == ["AnalyzeImage", "LSP"])
+        matches!(Registry::build(&config, []), Err(BuildError::Unavailable(names)) if names == ["LSP"])
     );
     let empty = Registry::build(&Config::default(), []).unwrap();
     assert_eq!(empty.names().count(), 0);
@@ -217,4 +217,41 @@ fn supplied_contract_drift_is_rejected() {
     assert!(
         matches!(Registry::build(&config, [tool]), Err(BuildError::Contract(name)) if name == "think")
     );
+}
+
+#[test]
+fn explicit_extra_tools_are_feature_gated_and_prepared_with_the_same_policy() {
+    let builtins = Registry::build(&strict(&["Think"], AccessMode::ReadOnly), []).unwrap();
+    let source = builtins.get("think").unwrap().clone();
+    let mut definition = source.definition().clone();
+    definition.name = "host_extension".into();
+    definition.read_only = false;
+    let extension = Arc::new(Altered {
+        tool: source,
+        definition,
+    }) as Arc<dyn Tool>;
+    assert!(matches!(
+        Registry::build(&Config::default(), [extension.clone()]),
+        Err(BuildError::UnknownTool(_))
+    ));
+    assert!(
+        Registry::build_with_extra_tools(&Config::default(), [], [extension.clone()])
+            .unwrap()
+            .names()
+            .next()
+            .is_none()
+    );
+    let config = strict(&["ExtraTools"], AccessMode::ReadOnly);
+    let registry = Registry::build_with_extra_tools(&config, [], [extension.clone()]).unwrap();
+    assert_eq!(registry.names().collect::<Vec<_>>(), ["host_extension"]);
+    assert!(registry.prepare(Default::default()).tools.is_empty());
+    let prepared = registry.prepare(adk_core::ToolPolicy {
+        allowed_mutating_tools: ["host_extension".into()].into(),
+        ..Default::default()
+    });
+    assert_eq!(prepared.tools.len(), 1);
+    assert!(matches!(
+        Registry::build_with_extra_tools(&config, [], [extension.clone(), extension]),
+        Err(BuildError::Duplicate(_))
+    ));
 }

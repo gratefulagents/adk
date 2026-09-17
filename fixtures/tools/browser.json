@@ -1,0 +1,18 @@
+[
+ {"arguments":{"action":"navigate","url":"https://example.com/path"},"dom":"<title> hello &amp; bye </title>"},
+ {"arguments":{"action":"navigate","url":"https://example.com"},"dom":"<div>no title</div>"},
+ {"arguments":{"action":"navigate","url":"HTTP://Example.com:80/A%2fb?x=2#hi"},"dom":"<TITLE x='x'>Case</TITLE>"},
+ {"arguments":{"action":"navigate","url":"https://example.com/a b/é?q=é#hello world"},"dom":"<title>Unicode</title>"},
+ {"arguments":{"action":"get_text","url":"http://example.com"},"dom":"<h1>Title</h1><p>Hello <a href='/x'>link</a></p><script>ignore</script>"},
+ {"arguments":{"action":"get_text","url":"http://example.com"},"dom":"x","repeat":50001},
+ {"arguments":{"action":"screenshot","url":"http://example.com","output_path":"sub/test.png","width":300,"height":400}},
+ {"arguments":{"action":"screenshot","url":"http://example.com"},"read_only":true},
+ {"arguments":{"action":"navigate","url":"http://example.com"},"private":false},
+ {"arguments":{"action":"navigate","url":"http://u:p@example.com"}},
+ {"arguments":{"action":"navigate","url":"file:///etc/passwd"}},
+ {"arguments":{"action":"click","url":"http://example.com"}},
+ {"arguments":{"action":"navigate","url":"http://example.com","width":-1}},
+ {"arguments":{"action":"navigate","url":"http://example.com","height":4097}},
+ {"arguments":{"action":"navigate","url":"http://example.com"},"dom":"stderr","exit":1},
+ {"arguments":{"action":"get_text","url":"http://example.com"},"dom":"stderr","exit":1}
+]

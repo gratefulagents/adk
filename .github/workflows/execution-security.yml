@@ -25,7 +25,7 @@ jobs:
       - name: Require functional OS enforcement and lifecycle regressions
         env:
           ADK_REQUIRE_SANDBOX: '1'
-        run: cargo test --locked -p adk-sandbox -p adk-security --all-targets
+        run: cargo test --locked -p adk-sandbox -p adk-security -p adk-tools --all-targets
       - name: Public execution feature
         run: cargo test --locked -p adk --no-default-features --features execution --all-targets
       - name: Seatbelt denial diagnostics
@@ -39,4 +39,4 @@ jobs:
       - uses: actions/checkout@v4
       - run: rustup show active-toolchain
       - name: Unsupported targets compile and fail closed
-        run: cargo test --locked -p adk-sandbox -p adk-security --all-targets
+        run: cargo test --locked -p adk-sandbox -p adk-security -p adk-tools --all-targets

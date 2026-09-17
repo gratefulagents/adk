@@ -1,33 +1,45 @@
 //! Pinned SDK tool contracts and fail-closed registry composition.
 //!
-//! This crate does not yet implement every catalogued tool. Selection is separate
-//! from construction: missing selected implementations are construction errors,
-//! never model-visible placeholders. See docs/tools.md for the parity boundary.
-use adk_core::{AccessMode, Tool, ToolDefinition};
+//! Selection is separate from construction: missing selected runtime dependencies
+//! are construction errors, never model-visible placeholders. Trusted hosts supply
+//! stores, executables and external-service adapters. See docs/tools.md for verification.
+use adk_core::{AccessMode, Tool, ToolDecision, ToolDefinition, ToolPolicy};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
     sync::{Arc, OnceLock},
 };
 
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub mod browser;
+pub mod bundle;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 mod edit;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 mod edit_diff;
+pub mod git;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub mod git_host;
 mod html;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 mod lifecycle;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+pub mod lsp;
 pub mod memory;
 mod network;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+mod patch;
 pub mod plan;
 mod search;
 mod search_pattern;
+pub mod shell;
 pub mod signal;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub mod skills;
+pub mod vision;
 mod web;
 mod workspace;
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 mod write;
 
 fn json_text(value: &impl serde::Serialize) -> Result<String, serde_json::Error> {
@@ -119,6 +131,8 @@ pub struct Config {
     pub allowed_names: Option<BTreeSet<String>>,
     pub git_remote_writes: bool,
     pub allow_private_network_urls: bool,
+    /// Trusted values used to freeze environment-dependent shell contracts.
+    pub shell_environment: BTreeMap<String, String>,
 }
 
 #[derive(Debug, thiserror::Error, PartialEq, Eq)]
@@ -157,6 +171,7 @@ pub fn select(config: &Config) -> Result<Vec<&'static Capability>, BuildError> {
                 || (c.name == "Browser" && !config.allow_private_network_urls)
                 || (c.family == "interactive-terminal" && config.access != AccessMode::FullAccess)
                 || (c.family == "async-shell" && config.access == AccessMode::ReadOnly)
+                || (c.family == "workspace-filesystem" && config.access == AccessMode::ReadOnly)
             {
                 return false;
             }
@@ -169,7 +184,9 @@ pub fn select(config: &Config) -> Result<Vec<&'static Capability>, BuildError> {
                 _ => false,
             };
             mode_matches
-                && (c.read_only
+                && (c.classification == "host-only"
+                    || c.family == "project-state"
+                    || c.read_only
                     || c.control_flow
                     || config.access != AccessMode::ReadOnly
                     || config.allowed_mutating_tools.contains(&c.name))
@@ -183,7 +200,72 @@ pub struct Registry {
     tools: BTreeMap<String, Arc<dyn Tool>>,
 }
 
+/// A model-visible tool list and its matching dispatch policy. Registration alone
+/// never authorizes a mutable state or host-supplied tool in read-only mode.
+pub struct PreparedTools {
+    pub tools: Vec<Arc<dyn Tool>>,
+    pub policy: ToolPolicy,
+}
+
 impl Registry {
+    /// Compose explicitly host-supplied extensions after the canonical built-ins.
+    /// Extensions are enabled only by ExtraTools (or the legacy tool/subagent
+    /// switch), and never bypass model preparation or dispatch authorization.
+    pub fn build_with_extra_tools(
+        config: &Config,
+        implementations: impl IntoIterator<Item = Arc<dyn Tool>>,
+        extra_tools: impl IntoIterator<Item = Arc<dyn Tool>>,
+    ) -> Result<Self, BuildError> {
+        let mut registry = Self::build(config, implementations)?;
+        let enabled = match &config.features {
+            Features::Strict(features) => features.contains("ExtraTools"),
+            Features::Legacy(features) => features.enable_tools || features.enable_subagents,
+        };
+        if enabled {
+            for tool in extra_tools {
+                let name = tool.definition().name.clone();
+                if config
+                    .allowed_names
+                    .as_ref()
+                    .is_some_and(|names| !names.contains(&name))
+                {
+                    continue;
+                }
+                if registry.tools.contains_key(&name) {
+                    return Err(BuildError::Duplicate(name));
+                }
+                registry.tools.insert(name, tool);
+            }
+        }
+        Ok(registry)
+    }
+
+    pub fn prepare(&self, mut policy: ToolPolicy) -> PreparedTools {
+        for tool in self.tools.values() {
+            if tool.is_control_flow() {
+                policy
+                    .allowed_mutating_tools
+                    .insert(tool.definition().name.clone());
+            }
+        }
+        let tools = self
+            .tools
+            .values()
+            .map(|tool| {
+                if policy
+                    .allowed_mutating_tools
+                    .contains(&tool.definition().name)
+                {
+                    tool.clone()
+                } else {
+                    tool.for_access(policy.access)
+                        .unwrap_or_else(|| tool.clone())
+                }
+            })
+            .filter(|tool| policy.decision(tool.definition()) != ToolDecision::Deny)
+            .collect();
+        PreparedTools { tools, policy }
+    }
     pub fn build(
         config: &Config,
         implementations: impl IntoIterator<Item = Arc<dyn Tool>>,
@@ -202,20 +284,25 @@ impl Registry {
         let mut tools = BTreeMap::new();
         let mut missing = Vec::new();
         for capability in selected {
-            if capability.definition.is_none() {
-                missing.push(capability.name.clone());
-                continue;
-            }
+            let expected = capability.definition.clone().or_else(|| {
+                shell::definition(
+                    &capability.name,
+                    config.access,
+                    &shell::Limits::from_environment(&config.shell_environment),
+                )
+            });
             let implementation = supplied
                 .remove(&capability.name)
                 .or_else(|| signal::builtin(capability))
                 .or_else(|| search::builtin(capability))
-                .or_else(|| web::builtin(capability, config.allow_private_network_urls));
-            #[cfg(target_os = "linux")]
+                .or_else(|| web::builtin(capability, config.allow_private_network_urls))
+                .or_else(|| vision::builtin(capability, config.allow_private_network_urls));
+            #[cfg(any(target_os = "linux", target_os = "macos"))]
             let implementation = implementation
                 .or_else(|| lifecycle::builtin(capability))
                 .or_else(|| write::builtin(capability))
-                .or_else(|| edit::builtin(capability));
+                .or_else(|| edit::builtin(capability))
+                .or_else(|| patch::builtin(capability));
             let Some(tool) = implementation else {
                 if capability.classification != "host-only" {
                     missing.push(capability.name.clone());
@@ -224,10 +311,7 @@ impl Registry {
             };
             if tool.definition().read_only != capability.read_only
                 || tool.definition().requires_approval
-                || capability
-                    .definition
-                    .as_ref()
-                    .is_some_and(|definition| definition != tool.definition())
+                || expected.as_ref() != Some(tool.definition())
                 || tool.is_control_flow() != capability.control_flow
                 || tool.timeout().is_some_and(|timeout| !timeout.is_zero())
             {

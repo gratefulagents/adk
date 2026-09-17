@@ -167,6 +167,8 @@ dependencies = [
  "adk-core",
  "adk-project-state",
  "adk-runtime",
+ "adk-sandbox",
+ "adk-security",
  "base64",
  "html5ever",
  "ipnet",

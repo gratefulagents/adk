@@ -15,11 +15,12 @@ import (
 )
 
 type step struct {
-	Name    string         `json:"name"`
-	Input   map[string]any `json:"input"`
-	Save    string         `json:"save,omitempty"`
-	Output  any            `json:"output"`
-	IsError bool           `json:"is_error"`
+	Name    string `json:"name"`
+	Input   any    `json:"input"`
+	Format  string `json:"format"`
+	Save    string `json:"save,omitempty"`
+	Output  any    `json:"output"`
+	IsError bool   `json:"is_error"`
 }
 
 func main() {
@@ -57,19 +58,49 @@ func main() {
 		{Name: "memory_list", Input: map[string]any{"kinds": []string{"semantic"}}},
 		{Name: "memory_recall", Input: map[string]any{"query": "engineering"}},
 		{Name: "memory_stats", Input: map[string]any{}},
+		{Name: "prime_context", Input: map[string]any{"active_task_id": "$b", "memory_limit": nil, "ready_limit": nil}},
 		{Name: "memory_delete", Input: map[string]any{"id": "$m"}},
 		{Name: "memory_stats", Input: map[string]any{}},
+	}
+	steps = append(steps,
+		step{Name: "task_create", Input: map[string]any{"title": "nullable", "description": nil, "priority": nil, "type": nil, "assignee": nil, "labels": nil, "depends_on": nil}, Save: "$c"},
+		step{Name: "task_ready", Input: map[string]any{"limit": nil, "labels": nil, "assignee": nil, "include_assigned": nil}},
+		step{Name: "task_update", Input: map[string]any{"id": "$c", "description": nil, "priority": nil, "title": nil, "labels": nil}},
+		step{Name: "memory_remember", Input: map[string]any{"content": "nullable memory", "kind": nil, "scope": nil, "tags": nil, "task_ids": nil, "file_paths": nil, "source_run": nil}, Save: "$n"},
+		step{Name: "memory_update", Input: map[string]any{"id": "$n", "content": nil, "kind": nil, "scope": nil, "tags": nil}},
+		step{Name: "memory_list", Input: map[string]any{"limit": nil, "kinds": nil, "tags": nil}},
+		step{Name: "memory_recall", Input: map[string]any{"query": "nullable", "limit": nil, "kinds": nil, "tags": nil}},
+		step{Name: "memory_update", Input: map[string]any{"id": "$n", "tags": []any{nil, "keep"}}},
+		step{Name: "task_update", Input: map[string]any{"id": "$c", "labels": []any{nil, "keep"}}},
+		step{Name: "memory_stats", Input: nil},
+		step{Name: "prime_context", Input: nil},
+		step{Name: "task_create", Input: nil},
+		step{Name: "task_create", Input: map[string]any{"title": ""}},
+		step{Name: "memory_remember", Input: map[string]any{"content": ""}},
+		step{Name: "memory_update", Input: map[string]any{"id": "missing", "content": "absent"}},
+		step{Name: "memory_update", Input: map[string]any{"id": nil}},
+		step{Name: "task_create", Input: map[string]any{"title": 42}},
+		step{Name: "task_ready", Input: map[string]any{"limit": "oops"}},
+	)
+	for _, tool := range catalog {
+		for _, input := range []any{[]any{}, "oops", 42, false} {
+			steps = append(steps, step{Name: tool.Name(), Input: input})
+		}
 	}
 	ids := map[string]string{}
 	reverse := map[string]string{}
 	for i := range steps {
 		st := &steps[i]
-		input := map[string]any{}
-		for key, value := range st.Input {
-			if s, ok := value.(string); ok && ids[s] != "" {
-				value = ids[s]
+		input := st.Input
+		if fields, ok := st.Input.(map[string]any); ok {
+			resolved := map[string]any{}
+			for key, value := range fields {
+				if str, ok := value.(string); ok && ids[str] != "" {
+					value = ids[str]
+				}
+				resolved[key] = value
 			}
-			input[key] = value
+			input = resolved
 		}
 		raw, _ := json.Marshal(input)
 		result, err := byName[st.Name].Execute(context.Background(), raw, "call")
@@ -78,7 +109,11 @@ func main() {
 		}
 		st.IsError = result.IsError
 		var output any
-		if err := json.Unmarshal([]byte(result.Content), &output); err != nil {
+		st.Format = "json"
+		if result.IsError || st.Name == "prime_context" {
+			st.Format = "text"
+			output = result.Content
+		} else if err := json.Unmarshal([]byte(result.Content), &output); err != nil {
 			panic(err)
 		}
 		if st.Save != "" {
@@ -114,6 +149,10 @@ func normalize(value any, ids map[string]string) any {
 		if strings.HasPrefix(v, "comment_") {
 			return "<comment>"
 		}
+		for id, alias := range ids {
+			v = strings.ReplaceAll(v, id, alias)
+		}
+		return v
 	}
 	return value
 }

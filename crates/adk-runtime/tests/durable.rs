@@ -402,6 +402,8 @@ async fn restart_does_not_reset_deadline_or_turn_budget() {
 fn verified() -> GoRecovery {
     GoRecovery {
         policy: RunPolicy::default(),
+        stop_gate_blocks: None,
+        effective_max_turns: None,
         turns: 2,
         usage: Usage {
             input_tokens: 11,
@@ -1300,4 +1302,240 @@ async fn native_tool_pause_restarts_after_completed_tool_without_dispatching_it_
     assert_eq!(outcome.result.status, RunStatus::Completed);
     assert_eq!(tool.keys.lock().unwrap().len(), 1);
     assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}
+
+struct ReplaySafeGate {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+}
+impl StopGate for ReplaySafeGate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a serde_json::Value,
+    ) -> BoxFuture<'a, Result<Option<String>, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(Some(String::new()))
+        })
+    }
+}
+fn gated_runner(
+    model: Arc<ModelImpl>,
+    tool: Arc<ToolImpl>,
+    gate: Arc<ReplaySafeGate>,
+    cap: usize,
+) -> Runner {
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    agent.tools.push(tool);
+    Runner::new(
+        agent,
+        RunnerConfig {
+            stop_gate: Some(gate),
+            stop_gate_max_blocks: cap,
+            ..Default::default()
+        },
+    )
+    .unwrap()
+}
+
+#[tokio::test]
+async fn durable_stop_gate_matches_go_across_crashes_and_tool_progress() {
+    let baseline: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/go-stop-gate.json")).unwrap();
+    for name in ["cap", "tool_reset"] {
+        let expected = &baseline[name];
+        let (_, model, tool) = setup(vec![], false, false);
+        let candidate = response(vec![message(Role::Assistant, "candidate")]);
+        *model.responses.lock().unwrap() = if name == "cap" {
+            VecDeque::from([candidate.clone(), candidate.clone(), candidate])
+        } else {
+            VecDeque::from([
+                candidate.clone(),
+                response(vec![call("one")]),
+                candidate.clone(),
+                candidate.clone(),
+                candidate,
+            ])
+        };
+        let gate = Arc::new(ReplaySafeGate {
+            key: Some("always-block-v1"),
+            calls: AtomicUsize::new(0),
+        });
+        let runner = gated_runner(model.clone(), tool.clone(), gate.clone(), 2);
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+        let mut req = request(false);
+        req.policy.max_turns =
+            std::num::NonZeroU32::new(expected["max_turns"].as_u64().unwrap() as u32).unwrap();
+        let mut checkpoint = None;
+        let mut result = None;
+        for iteration in 0..20 {
+            match runner
+                .run_durable(
+                    context(),
+                    req.clone(),
+                    Arc::new(HostImpl),
+                    durable(store.clone(), checkpoint),
+                )
+                .await
+            {
+                Ok(outcome) => {
+                    result = Some(outcome.result);
+                    break;
+                }
+                Err(error) => assert_eq!(error.error.info.category, ErrorCategory::Host),
+            }
+            let saved = store.latest();
+            let value = serde_json::to_value(&saved).unwrap();
+            if iteration == 0 {
+                assert_eq!(value["runtime"]["phase"], "Finalize");
+                assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+                assert_eq!(gate.calls.load(Ordering::SeqCst), 0);
+            }
+            assert_eq!(value["runtime"]["base_turn_limit"], expected["max_turns"]);
+            if name == "cap" && value["runtime"]["phase"] == "Model" {
+                assert_eq!(
+                    value["runtime"]["policy"]["max_turns"].as_u64().unwrap(),
+                    value["runtime"]["stop_gate_blocks"].as_u64().unwrap() + 1
+                );
+            }
+            checkpoint = Some(saved);
+            req.input.clear();
+        }
+        let result = result.expect("gate cap must terminate after recovery");
+        let feedback: Vec<_> = result
+            .history
+            .iter()
+            .filter_map(|item| match item {
+                RunItem::Message { message } => {
+                    message.content.iter().find_map(|content| match content {
+                        Content::Text { text }
+                            if text.starts_with("[SYSTEM] Final answer blocked") =>
+                        {
+                            Some(text.clone())
+                        }
+                        _ => None,
+                    })
+                }
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            serde_json::to_value(feedback).unwrap(),
+            expected["feedback"]
+        );
+        assert_eq!(
+            result.final_output.as_ref().unwrap(),
+            &expected["final_output"]
+        );
+        assert_eq!(
+            model.calls.load(Ordering::SeqCst) as u64,
+            expected["calls"].as_u64().unwrap()
+        );
+        assert_eq!(
+            gate.calls.load(Ordering::SeqCst) as u64,
+            expected["gate_calls"].as_u64().unwrap()
+        );
+        assert_eq!(
+            tool.keys.lock().unwrap().len(),
+            usize::from(name == "tool_reset")
+        );
+    }
+}
+
+#[tokio::test]
+async fn stop_gate_replay_uses_saved_candidate_and_refuses_changed_configuration() {
+    let (_, model, tool) = setup(vec![message(Role::Assistant, "candidate")], false, false);
+    model
+        .responses
+        .lock()
+        .unwrap()
+        .push_back(response(vec![message(Role::Assistant, "candidate")]));
+    let gate = Arc::new(ReplaySafeGate {
+        key: Some("v1"),
+        calls: AtomicUsize::new(0),
+    });
+    let runner = gated_runner(model.clone(), tool.clone(), gate.clone(), 2);
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let candidate = store.latest();
+    for (key, cap) in [(Some("v2"), 2), (Some("v1"), 3), (None, 2)] {
+        let changed = gated_runner(
+            model.clone(),
+            tool.clone(),
+            Arc::new(ReplaySafeGate {
+                key,
+                calls: AtomicUsize::new(0),
+            }),
+            cap,
+        );
+        assert!(
+            run(
+                &changed,
+                Arc::new(Store::default()),
+                Some(candidate.clone())
+            )
+            .await
+            .is_err()
+        );
+    }
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), false));
+    assert!(run(&runner, store.clone(), Some(candidate)).await.is_err());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(gate.calls.load(Ordering::SeqCst), 1);
+    *store.fail.lock().unwrap() = None;
+    let result = run(&runner, store.clone(), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.status, RunStatus::Completed);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 3);
+    assert_eq!(gate.calls.load(Ordering::SeqCst), 3);
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    assert!(
+        runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .is_err()
+    );
+    let mut evidence = verified();
+    evidence.stop_gate_blocks = Some(1);
+    evidence.effective_max_turns = Some(evidence.policy.max_turns);
+    let migrated = runner.migrate_go_checkpoint(cp, evidence).unwrap();
+    assert_eq!(
+        serde_json::to_value(migrated).unwrap()["runtime"]["stop_gate_blocks"],
+        1
+    );
+}
+
+#[test]
+fn actual_go_stop_gate_fixture_is_current() {
+    if std::env::var_os("ADK_TEST_GO").is_none() {
+        return;
+    }
+    let output = std::process::Command::new("go")
+        .current_dir(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../../repos/sdk"))
+        .args([
+            "run",
+            "../../crates/adk-runtime/tests/fixtures/boundaries.go",
+            "stop-gate",
+        ])
+        .env("GOTOOLCHAIN", "local")
+        .env("GOTELEMETRY", "off")
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(
+        serde_json::from_slice::<serde_json::Value>(&output.stdout).unwrap(),
+        serde_json::from_str::<serde_json::Value>(include_str!("fixtures/go-stop-gate.json"))
+            .unwrap()
+    );
 }

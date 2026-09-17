@@ -14,7 +14,7 @@ Model and tool effects have prepared/dispatched/completed records. All effects a
 
 ModelCompleted includes the accepted response and exact next phase. ToolCompleted includes remaining queued calls, so completed siblings are never replayed. Handoff checkpoints identify the next registered agent. Terminal recovery returns the saved result without dispatch or another store write. Run usage, model attempts, tool dispatch count, monetary cost, original wall-clock start and absolute deadline survive process restarts. Recovery rejects agent/configuration or policy changes; function implementation identity remains the host's responsibility.
 
-Durable tool batches execute serially. Custom compaction, dynamic turn context, stop gates, custom parsers and non-opted-in observation hooks are rejected because they have no crash-replay protocol. Durable output truncation does not create ephemeral spill-file references. Event delivery is observational, not exactly-once.
+Durable tool batches execute serially. Custom compaction, dynamic turn context, replay-unsafe stop gates, custom parsers and non-opted-in observation hooks are rejected because they have no crash-replay protocol. Durable output truncation does not create ephemeral spill-file references. Event delivery is observational, not exactly-once.
 
 ## Go compatibility
 
@@ -33,3 +33,19 @@ Rust writes retain Go-readable schema-1 envelopes. Critically, the baseline Go r
 `tests/durable.rs` covers fault injection before/after committing prepared, dispatched and completed records; unknown outcomes; stable keys/steps; cumulative budget/deadline exhaustion; partial batches; terminal replay prevention; cancellation during persistence; approval callback ordering; unknown versions/security policy changes; and the real fenced filesystem RunStore adapter.
 
 `tests/fixtures/checkpoint.go` generates `go-checkpoint.json` using the baseline SDK's public DurableCheckpoint aliases. Run from `repos/sdk` with `go run ../../crates/adk-runtime/tests/fixtures/checkpoint.go`. No production data migrations or exactly-once external-effect claims are made.
+
+## Deterministic stop gates
+
+`StopGate::durable_key()` opts a gate into durable execution. The nonempty stable
+key must cover its behavior/configuration; the gate must be deterministic,
+side-effect-free and independent of unpersisted mutable state. Default `None`
+rejects gates without that guarantee. Gate presence/key and block cap are part of
+the configuration fingerprint.
+
+The accepted candidate is persisted before checking the gate. Subsequent
+checkpoints retain feedback, consecutive block count, original and effective turn
+limits, and the exact next phase. A lost gate result can be recomputed without a
+model dispatch; an acknowledged result is not applied twice. Go's bounded
+finalization-turn extension is preserved without resetting cumulative usage.
+Go checkpoint migration with a gate requires verified `stop_gate_blocks` and
+`effective_max_turns` in addition to the original `policy`.

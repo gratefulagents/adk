@@ -217,6 +217,10 @@ fn normalize(value: &mut Value, ids: &std::collections::BTreeMap<String, String>
                 *text = "<time>".into();
             } else if text.starts_with("comment_") {
                 *text = "<comment>".into();
+            } else {
+                for (id, alias) in ids {
+                    *text = text.replace(id, alias);
+                }
             }
         }
         _ => {}
@@ -259,12 +263,43 @@ async fn actual_go_tool_outputs_match_both_stores() {
             .unwrap(),
             fixture["definitions"]
         );
+        let covered: std::collections::BTreeSet<_> = fixture["steps"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|step| step["name"].as_str().unwrap())
+            .collect();
+        assert_eq!(covered.len(), 15);
+        assert!(
+            fixture["steps"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|step| step["is_error"] == true)
+        );
         let mut ids = std::collections::BTreeMap::new();
         let mut reverse = std::collections::BTreeMap::new();
         for step in fixture["steps"].as_array().unwrap() {
             let mut input = step["input"].clone();
             normalize(&mut input, &ids);
-            let mut result = json_call(&tools, step["name"].as_str().unwrap(), input).await;
+            let is_error = step["is_error"].as_bool().unwrap();
+            let output = invoke(&tools, step["name"].as_str().unwrap(), input, is_error).await;
+            let mut result = if step["format"] == "text" {
+                Value::String(output)
+            } else {
+                serde_json::from_str(&output).unwrap()
+            };
+            if is_error
+                && step["output"]
+                    .as_str()
+                    .is_some_and(|s| s.starts_with("Invalid input:"))
+            {
+                assert!(
+                    result.as_str().unwrap().starts_with("Invalid input:"),
+                    "{result}"
+                );
+                continue;
+            }
             if let Some(save) = step["save"].as_str() {
                 let id = result["id"].as_str().unwrap().to_owned();
                 ids.insert(save.to_owned(), id.clone());

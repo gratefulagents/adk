@@ -11,7 +11,9 @@ external effect did not happen.
 All supported nonterminal migrations require the original policy, cumulative
 usage/attempt/tool/cost counters, original start/deadline, registered agent, and
 complete call/result pairs. `GoRecovery` makes the missing metadata explicit;
-counters cannot decrease recorded Go usage. Terminal migration also requires the
+counters cannot decrease recorded Go usage. When a stop gate is configured, the
+host must also supply `GoRecovery::stop_gate_blocks` and `effective_max_turns`;
+Go does not persist those values. Terminal migration also requires the
 verified final output (Go's checkpoint does not store the parsed result).
 
 | Go boundary/state | Pinned Go behavior | Rust migration/recovery |
@@ -61,7 +63,9 @@ SDK-derived GPL-3.0-only; see `fixtures/licenses/SDK-GPL-3.0.txt`.
 | Go lifecycle callbacks | Supported through `GoCallbackAdapter`. Delivery is observational and can be missing/repeated across crash; callbacks must not be used as an exactly-once effect boundary |
 | Native observational hooks | Explicit `RunHooks::durable_observer()` opt-in. Default false; opting in asserts replay-tolerant observation, not permission to perform non-replayable effects |
 | Local compaction | Supported by existing deterministic engine and approval-journal anchoring |
-| Custom compactor, dynamic turn context, stop gate, output parser, legacy durable hook, or non-opted-in hook | Rejected before dispatch. These function-valued native extensions are not represented in the pinned Go checkpoint contract and have no durable effect protocol. Go observers are no longer rejected with this group |
+| Deterministic/replay-safe stop gate | Supported through `StopGate::durable_key()`: a stable identity/version covering gate behavior and configuration. Candidate final output is persisted in `Finalize` before invoking the gate; recovery can rerun this pure check without replaying the model. Block count, original/effective turn limits and post-gate next phase are persisted. Identity/cap/policy changes fail closed. Go-compatible block-cap bypass, tool-progress reset and turn-limit extension are tested against actual Go output |
+| Stop gate without replay-safe opt-in | Rejected before dispatch: the host has not asserted deterministic, side-effect-free behavior. This is not a blanket rejection of the baseline Go stop-gate mode |
+| Custom compactor, dynamic turn context, output parser, legacy durable hook, or non-opted-in hook | Rejected before dispatch. These function-valued extensions have no durable effect protocol here; they are separate from the supported Go observers and deterministic stop gates |
 | Old native checkpoint declaring a journal but omitting its entries | Nonterminal recovery rejected: cannot reconstruct lost approval provenance. New checkpoints persist entries; terminal results remain readable |
 
 ## Children
@@ -108,3 +112,28 @@ against those Go outputs on both stores (normalizing generated IDs/timestamps
 only). Priming is tested through the adapter and separately against the existing
 exact Go `prime.txt` fixture. Thus #7's full registry is not a reverse dependency
 for state-tool contract verification.
+
+## Stop-gate baseline regression
+
+The baseline explicitly defines the gate as deterministic in
+[`run_config.go:409–418`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go#L409-L418)
+and runs it with durability enabled in
+[`runner.go:1397–1419`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/runner.go#L1397-L1419).
+The earlier matrix incorrectly classified all stop gates as unsupported; this is
+corrected by the explicit replay-safe path above.
+
+Run `go run ../../crates/adk-runtime/tests/fixtures/boundaries.go stop-gate` from
+`repos/sdk` to regenerate `go-stop-gate.json`. The fixture records actual Go
+feedback, callback/model counts and final output for cap/turn-limit extension
+and tool-progress reset. Rust reproduces both traces while crashing after every
+accepted-candidate/post-gate checkpoint. Another test fails the post-gate write
+before commit, replays only the deterministic gate, and checks changed identity,
+cap and missing imported gate metadata fail closed. `ADK_TEST_GO=1` also
+regenerates and compares the fixture through the real Go runner.
+
+The state-tool fixture now includes all 15 tools, optional-null/default inputs,
+plain-text priming, store errors and malformed roots on every tool. Tests compare
+`is_error` as well as outputs. Business errors and priming text are compared
+exactly after ID/time normalization; language-specific JSON decode diagnostics
+are compared by the baseline `Invalid input:` error prefix, not Go's struct-type
+spelling versus serde's diagnostic wording.

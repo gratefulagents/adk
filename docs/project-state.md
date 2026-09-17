@@ -250,4 +250,8 @@ compared against `fixtures/project-state/tools.json`. Regenerate using:
 (cd repos/sdk && go run ../../fixtures/project-state/tools.go > ../../fixtures/project-state/tools.json)
 ```
 
-The fixture normalizes generated task/memory/comment IDs and timestamps only.
+The fixture covers all 15 tools, nullable/default inputs, malformed roots,
+store errors and plain-text priming. It normalizes generated task/memory/comment
+IDs and timestamps. Tests check `is_error` and compare business errors/priming
+text exactly; language-specific JSON decoding errors retain the `Invalid input:`
+classification instead of requiring identical Go/serde diagnostic wording.

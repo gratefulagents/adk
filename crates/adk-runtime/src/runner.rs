@@ -331,6 +331,12 @@ pub trait TurnContext: Send + Sync {
 
 /// None accepts the answer; Some(feedback) asks the same engine to continue.
 pub trait StopGate: Send + Sync {
+    /// Stable identity/version of a deterministic, replay-safe gate and its configuration.
+    /// Opting in forbids external effects and dependence on unpersisted mutable state.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+
     fn check<'a>(
         &'a self,
         context: &'a Context,
@@ -680,6 +686,7 @@ enum Phase {
     Start,
     Model,
     Tools,
+    Finalize,
     Finish,
 }
 
@@ -1081,6 +1088,16 @@ impl Engine {
                         }
                     }
                 }
+                Phase::Finalize => {
+                    let output = self.result.final_output.take().ok_or_else(|| {
+                        Error::new(
+                            ErrorCategory::InvalidInput,
+                            "missing durable final candidate",
+                        )
+                    })?;
+                    self.finish_candidate(output).await?;
+                    self.checkpoint(Boundary::ModelCompleted, None).await?;
+                }
                 Phase::Finish => return Ok(RunStatus::Completed),
             }
         }
@@ -1477,49 +1494,55 @@ impl Engine {
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
-            if let Some(gate) = &self.config.stop_gate {
-                let has_tools = self
-                    .agent
+            if self.durable_state.is_some() && self.config.stop_gate.is_some() {
+                self.result.final_output = Some(output);
+                self.phase = Phase::Finalize;
+            } else {
+                self.finish_candidate(output).await?;
+            }
+        }
+        if self.durable_state.is_some() {
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
+        }
+        Ok(())
+    }
+    async fn finish_candidate(&mut self, output: Value) -> Result<(), Error> {
+        if let Some(gate) = &self.config.stop_gate {
+            let has_tools =
+                self.agent
                     .tools
                     .iter()
                     .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
                     || self.agent.handoffs.iter().any(|handoff| {
                         self.tool_decision(&handoff.definition) != ToolDecision::Deny
                     });
-                if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
-                    if let Some(mut feedback) =
-                        bounded(&self.context, None, gate.check(&self.context, &output)).await?
-                    {
-                        self.stop_gate_blocks += 1;
-                        if feedback.trim().is_empty() {
-                            feedback =
-                                "the finalization check failed; continue working until it passes"
-                                    .into();
-                        }
-                        self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
-                        if self.turns >= self.policy.max_turns.get() {
-                            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
-                        }
-                        self.phase = Phase::Model;
-                        if self.durable_state.is_some() {
-                            self.checkpoint(Boundary::ModelCompleted, None).await?;
-                        }
-                        return Ok(());
+            if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
+                if let Some(mut feedback) =
+                    bounded(&self.context, None, gate.check(&self.context, &output)).await?
+                {
+                    self.stop_gate_blocks += 1;
+                    if feedback.trim().is_empty() {
+                        feedback =
+                            "the finalization check failed; continue working until it passes"
+                                .into();
                     }
-                    self.stop_gate_blocks = 0;
+                    self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                    if self.turns >= self.policy.max_turns.get() {
+                        self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                    }
+                    self.phase = Phase::Model;
+                    return Ok(());
                 }
+                self.stop_gate_blocks = 0;
             }
-            self.result.final_output = Some(output.clone());
-            self.observe(Observation::AgentEnded {
-                agent: self.agent.name.clone(),
-                output,
-            })
-            .await?;
-            self.phase = Phase::Finish;
         }
-        if self.durable_state.is_some() {
-            self.checkpoint(Boundary::ModelCompleted, None).await?;
-        }
+        self.result.final_output = Some(output.clone());
+        self.observe(Observation::AgentEnded {
+            agent: self.agent.name.clone(),
+            output,
+        })
+        .await?;
+        self.phase = Phase::Finish;
         Ok(())
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {

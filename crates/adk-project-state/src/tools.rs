@@ -28,6 +28,25 @@ struct StateTool {
 
 impl StateTool {
     fn invoke(&self, input: Value) -> Result<String> {
+        let mut fields = match input {
+            Value::Object(fields) => fields,
+            Value::Null => serde_json::Map::new(),
+            _ => return Err(Error::Invalid("Invalid input: expected an object".into())),
+        };
+        // Go unmarshalling null into a zero-valued struct field leaves its default.
+        fields.retain(|_, value| !value.is_null());
+        for (name, value) in &mut fields {
+            if self.definition.input_schema.as_value()["properties"][name]["items"]["type"]
+                == "string"
+            {
+                if let Some(items) = value.as_array_mut() {
+                    for item in items.iter_mut().filter(|item| item.is_null()) {
+                        *item = Value::String(String::new());
+                    }
+                }
+            }
+        }
+        let input = Value::Object(fields);
         let text = |key: &str| -> Result<String> {
             match input.get(key) {
                 None | Some(Value::Null) => Ok(String::new()),
@@ -119,6 +138,9 @@ impl StateTool {
             }
             "memory_update" => {
                 let id = text("id")?;
+                if id.trim().is_empty() {
+                    return Err(Error::Invalid("memory id is required".into()));
+                }
                 let memory = self
                     .store
                     .list_memories(MemoryFilter::default())?
@@ -169,6 +191,7 @@ impl Tool for StateTool {
         Box::pin(async move {
             let (text, is_error) = match self.invoke(call.arguments) {
                 Ok(text) => (text, false),
+                Err(Error::Json(error)) => (format!("Invalid input: {error}"), true),
                 Err(error) => (error.to_string(), true),
             };
             Ok(ToolOutput {

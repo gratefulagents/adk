@@ -73,6 +73,10 @@ pub struct RuntimeCheckpoint {
     fingerprint: String,
     result: RunResult,
     policy: RunPolicy,
+    #[serde(default)]
+    base_turn_limit: Option<std::num::NonZeroU32>,
+    #[serde(default)]
+    stop_gate_blocks: usize,
     phase: Phase,
     calls: VecDeque<ToolCall>,
     turns: u32,
@@ -331,7 +335,16 @@ impl Runner {
             if saved.version != 1 {
                 return Err(unsupported("unknown runtime continuation schema").into());
             }
-            if saved.fingerprint != state.fingerprint || saved.policy != engine.policy {
+            let mut original_policy = saved.policy.clone();
+            original_policy.max_turns = saved.base_turn_limit.unwrap_or(saved.policy.max_turns);
+            if (self.config.stop_gate.is_none()
+                && (saved.policy.max_turns != original_policy.max_turns
+                    || saved.stop_gate_blocks != 0))
+                || saved.policy.max_turns < original_policy.max_turns
+                || saved.stop_gate_blocks > self.config.stop_gate_max_blocks
+                || saved.fingerprint != state.fingerprint
+                || original_policy != engine.policy
+            {
                 return Err(
                     unsupported("durable agent configuration or security policy changed").into(),
                 );
@@ -456,6 +469,9 @@ impl Runner {
                     }
                 }
             }
+            engine.policy = saved.policy;
+            engine.base_turn_limit = original_policy.max_turns;
+            engine.stop_gate_blocks = saved.stop_gate_blocks;
             engine.turns = saved.turns;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
@@ -518,7 +534,10 @@ impl Runner {
         let config = &self.config;
         if config.compaction.is_some()
             || config.turn_context.is_some()
-            || config.stop_gate.is_some()
+            || config
+                .stop_gate
+                .as_ref()
+                .is_some_and(|gate| gate.durable_key().is_none_or(str::is_empty))
             || config
                 .hooks
                 .as_ref()
@@ -526,7 +545,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, replay-unsafe stop gates or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -558,7 +577,7 @@ impl Runner {
             }));
             agents.extend(agent.handoffs.iter().map(|h| h.target.clone()));
         }
-        let baseline = serde_json::json!({
+        let mut baseline = serde_json::json!({
             "catalog": catalog, "work_dir": config.work_dir, "max_tokens": config.limits.max_tokens,
             "max_cost": config.limits.max_cost, "output_cap": config.output.max_bytes,
             "untrusted": config.output.untrusted, "validate": config.validate_tool_arguments,
@@ -566,6 +585,9 @@ impl Runner {
             "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
             "tool_error_limit": config.consecutive_tool_error_limit,
         });
+        if let Some(gate) = &config.stop_gate {
+            baseline["stop_gate"] = serde_json::json!({"key":gate.durable_key(), "max_blocks":config.stop_gate_max_blocks});
+        }
         Ok(format!(
             "{:x}",
             Sha256::digest(serde_json::to_vec(&baseline).map_err(invalid)?)
@@ -746,6 +768,8 @@ impl Engine {
                 fingerprint: state.fingerprint.clone(),
                 result: self.result.clone(),
                 policy: self.policy.clone(),
+                base_turn_limit: Some(self.base_turn_limit),
+                stop_gate_blocks: self.stop_gate_blocks,
                 phase: self.phase,
                 calls: self.calls.clone(),
                 turns: self.turns,
@@ -776,6 +800,9 @@ impl Engine {
 /// security policy match this runner and preserve the original absolute deadline.
 pub struct GoRecovery {
     pub policy: RunPolicy,
+    /// Required when a stop gate is configured: Go does not persist these values.
+    pub stop_gate_blocks: Option<usize>,
+    pub effective_max_turns: Option<std::num::NonZeroU32>,
     pub turns: u32,
     pub usage: Usage,
     pub cost: f64,
@@ -942,6 +969,22 @@ impl Runner {
                 "terminal Go migration requires verified final output",
             ));
         }
+        let base_turn_limit = recovery.policy.max_turns;
+        let mut policy = recovery.policy;
+        let stop_gate_blocks = if self.config.stop_gate.is_some() {
+            let blocks = recovery
+                .stop_gate_blocks
+                .ok_or_else(|| invalid("Go stop gate migration requires verified block count"))?;
+            policy.max_turns = recovery.effective_max_turns.ok_or_else(|| {
+                invalid("Go stop gate migration requires verified effective turn limit")
+            })?;
+            if blocks > self.config.stop_gate_max_blocks || policy.max_turns < base_turn_limit {
+                return Err(invalid("invalid verified Go stop gate state"));
+            }
+            blocks
+        } else {
+            0
+        };
         checkpoint.runtime = Some(RuntimeCheckpoint {
             version: 1,
             boundary: checkpoint.boundary.clone(),
@@ -962,7 +1005,9 @@ impl Runner {
                 pending_approvals: vec![],
                 last_agent: Some(checkpoint.agent_name.clone()),
             },
-            policy: recovery.policy,
+            base_turn_limit: Some(base_turn_limit),
+            stop_gate_blocks,
+            policy,
             phase: if completed {
                 Phase::Finish
             } else {

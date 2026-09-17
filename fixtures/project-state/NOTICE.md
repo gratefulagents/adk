@@ -37,6 +37,7 @@ read these fixtures without modifying them. The test scenarios are purpose-built
 no claim is made that they represent the complete upstream Go test suite.
 
 - `tools.go` / `tools.json`: actual baseline `pkg/agentsdk/tools/projectstate`
-  definitions and task/memory operation results, with only generated IDs and
+  definitions and task/memory/priming success and error results (including nulls
+  and malformed roots), with only generated IDs and
   timestamps normalized. `crates/adk-project-state/src/tool-definitions.json`
   is derived from these same pinned Go tool definitions, under GPL-3.0-only.

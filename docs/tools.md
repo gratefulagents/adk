@@ -23,6 +23,8 @@ Every selected call still needs the existing executor's policy and approval chec
 
 ## Implemented behavior
 
+- `read_file`, `list_files`, `glob`, `grep`: bounded reads and lines, deterministic text/JSON results, query-bound cursor pagination, include/exclude/default-directory and gitignore filtering, context and files/count modes. Linux descriptor-relative `openat2` reads reject symlinks and hard links; unsupported platforms fail closed. Go glob/regex compatibility is translated explicitly rather than using Rust defaults. Differential fixtures cover 56 cases and 80 paginated calls against the pinned SDK. This does not yet establish exhaustive regex or cross-platform parity.
+
 - `think`: validates a nonblank thought and returns the SDK acknowledgement.
 - `AskUserQuestion`: plain-text or structured-choice result, including default freeform behavior. The SDK tool itself does not set `should_pause`; the port preserves this.
 - `present_plan`: validates summary/actions, emits the baseline structured result, ignores unsupported action fields rather than granting a mode transition.
@@ -52,6 +54,6 @@ python3 scripts/tool-manifest.py --check
 
 ## Remaining acceptance work (not waived)
 
-Search/list/read/glob/grep and query-bound pagination; exact edit and patch validation; filesystem confinement and atomic lifecycle operations; foreground/background shell; Terminal; LSP; bounded SSRF-safe WebFetch; Browser and vision; repository attachment and GitHub; skills; dynamic Bash schemas; arbitrary extra-tool composition; runtime auto-wiring; resource-owning bundle teardown; full feature/configuration-mode comparisons; per-tool happy/error/policy mappings and the full security corpus.
+Exhaustive search/regex and cross-platform parity; exact edit and patch validation; filesystem confinement and atomic lifecycle operations; foreground/background shell; Terminal; LSP; bounded SSRF-safe WebFetch; Browser and vision; repository attachment and GitHub; skills; dynamic Bash schemas; arbitrary extra-tool composition; runtime auto-wiring; resource-owning bundle teardown; full feature/configuration-mode comparisons; per-tool happy/error/policy mappings and the full security corpus.
 
 The current sandbox has no bidirectional stdio/PTY session API, preventing a safe LSP/Terminal adapter using its public executor surface. See [research](tools-research.md). That specific dependency gap does **not** explain away the other unfinished families, which remain implementation work. Do not close issue #7 or advertise SDK behavioral parity based on this catalog.

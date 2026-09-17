@@ -12,7 +12,10 @@ use std::{
 
 pub mod memory;
 pub mod plan;
+mod search;
+mod search_pattern;
 pub mod signal;
+mod workspace;
 
 fn json_text(value: &impl serde::Serialize) -> Result<String, serde_json::Error> {
     Ok(serde_json::to_string(value)?
@@ -192,7 +195,8 @@ impl Registry {
             }
             let implementation = supplied
                 .remove(&capability.name)
-                .or_else(|| signal::builtin(capability));
+                .or_else(|| signal::builtin(capability))
+                .or_else(|| search::builtin(capability));
             let Some(tool) = implementation else {
                 if capability.classification != "host-only" {
                     missing.push(capability.name.clone());

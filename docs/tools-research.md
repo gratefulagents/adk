@@ -1,6 +1,6 @@
 # Rust tool design research
 
-This is bounded source/API research for the tool port, not evidence of behavioral parity. No framework or search/patch/browser dependency below was added. Package versions identify the inspected material, not floating recommendations. The canonical compatibility source is Grateful Agents SDK v0.0.115, commit `1dc92b73900fac74dc357a938e4b5eee6392b418` (GPL-3.0-only).
+This is bounded source/API research for the tool port, not evidence of behavioral parity. No framework, patch or browser dependency below was added. Search uses the explicitly adopted low-level dependencies below. Package versions identify the inspected material, not floating recommendations. The canonical compatibility source is Grateful Agents SDK v0.0.115, commit `1dc92b73900fac74dc357a938e4b5eee6392b418` (GPL-3.0-only).
 
 ## Frameworks and typed contracts
 
@@ -24,6 +24,12 @@ Registry composition is a sorted map of actual `Arc<dyn Tool>` implementations c
 | [chromiumoxide 0.9.1 Browser](https://docs.rs/chromiumoxide/0.9.1/chromiumoxide/browser/struct.Browser.html), MIT OR Apache-2.0 | Launch/connect return Browser plus Handler. `close` requests shutdown; `wait` reaps launched children; `kill` waits. Connected browsers are not owned spawned children. | Reject default `launch` as an automatic sandbox integration. An owned handler/process must be cancelled and awaited through trusted confinement. Neither CDP nor initial URL validation enforces public-only policy for redirects/subresources. Preserve Browser's private-network opt-in, separate from WebFetch. |
 
 Crates.io metadata was also inspected for [ignore](https://crates.io/api/v1/crates/ignore), [diffy](https://crates.io/api/v1/crates/diffy), [lsp-types](https://crates.io/api/v1/crates/lsp-types) and [chromiumoxide](https://crates.io/api/v1/crates/chromiumoxide). The lsp-types metadata's last publication is older than the framework releases; availability of protocol types is not proof of current protocol completeness. None of these libraries has been vetted against the SDK security corpus yet.
+
+## Adopted search primitives
+
+- [rustix 1.1.5 `openat2`](https://docs.rs/rustix/1.1.5/rustix/fs/fn.openat2.html), Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT: adopt owned descriptors and explicit `BENEATH | NO_SYMLINKS` resolution, with RAII closure. Reject canonicalize-then-open as a confinement primitive. Built-in search construction is currently Linux-only; unsupported platforms require a supplied implementation rather than an unconstrained fallback.
+- [regex 1.13.1](https://docs.rs/regex/1.13.1/regex/) and regex-syntax 0.8.11, MIT OR Apache-2.0: adapt bounded regular-expression compilation plus HIR inspection. Reject unmodified syntax as Go parity: ASCII Perl classes, word boundaries, quoted literals, octal, bracket syntax and repeat bounds differ. The adapter is checked against actual pinned Go tools, with explicit remaining exhaustive-parity work.
+- Do not adopt `ignore` defaults: the search port explicitly applies the SDK's smaller ignore surface and deterministic ordering. Cursors bind to the normalized query through SHA-256; they do not confer path authority.
 
 ## Lifecycle dependency gap
 

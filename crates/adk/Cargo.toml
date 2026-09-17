@@ -19,7 +19,7 @@ tools = ["dep:adk-tools"]
 
 [dependencies]
 adk-core.workspace = true
-adk-tools = { path = "../adk-tools", optional = true }
+adk-tools = { version = "0.1.0", path = "../adk-tools", optional = true }
 adk-codec = { workspace = true, optional = true }
 adk-runtime = { workspace = true, optional = true }
 adk-providers = { version = "0.1.0", path = "../adk-providers", optional = true }

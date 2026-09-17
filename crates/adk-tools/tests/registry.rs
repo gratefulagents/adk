@@ -155,9 +155,9 @@ fn terminal_remote_write_and_async_shell_gates_cannot_be_allowlisted_away() {
 
 #[test]
 fn missing_implementations_are_reported_at_construction_not_tool_execution() {
-    let config = strict(&["LSP", "WebFetch", "Think"], AccessMode::ReadOnly);
+    let config = strict(&["LSP", "Vision", "Think"], AccessMode::ReadOnly);
     assert!(
-        matches!(Registry::build(&config, []), Err(BuildError::Unavailable(names)) if names == ["LSP", "WebFetch"])
+        matches!(Registry::build(&config, []), Err(BuildError::Unavailable(names)) if names == ["AnalyzeImage", "LSP"])
     );
     let empty = Registry::build(&Config::default(), []).unwrap();
     assert_eq!(empty.names().count(), 0);

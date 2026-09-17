@@ -34,3 +34,11 @@ Crates.io metadata was also inspected for [ignore](https://crates.io/api/v1/crat
 ## Lifecycle dependency gap
 
 `adk-sandbox::Executor::run/start` captures output and returns it on completion. `OutputMode::Pty` explicitly offers no interactive input API. Current `RunningProcess` supports cancellation and reaping, but cannot drive a stdio language server or an interactive terminal. Therefore a confined bidirectional session API is required before those tools can be implemented without bypassing sandbox policy. Creating `std::process::Command` directly in a tool is not a safe substitute. Browser ownership, network transport pinning and secure filesystem lifecycle primitives also remain implementation work, not properties supplied by the registry.
+
+## Adopted HTTP and HTML primitives
+
+- [reqwest 0.12.28](https://docs.rs/reqwest/0.12.28/reqwest/), MIT OR Apache-2.0, with rustls and no default features: adopt cancellable streaming responses and explicit DNS address overrides. Disable proxies, automatic redirects and all automatic decompression. Validate every resolved address before pinning the dial, and revalidate redirects. The HTTP stack is not itself an SSRF policy.
+- [url 2.5.8](https://docs.rs/url/2.5.8/url/), MIT OR Apache-2.0, and [ipnet 2.12.2](https://docs.rs/ipnet/2.12.2/ipnet/), MIT OR Apache-2.0: adapt parsed authorities and explicit IP-prefix containment. Reject URL-parser defaults that reinterpret missing authorities or backslashes. Preserve the SDK's private-network option separately from browser selection.
+- [html5ever 0.40.1 tokenizer](https://docs.rs/html5ever/0.40.1/html5ever/tokenizer/), MIT OR Apache-2.0: adopt incremental tokens rather than a DOM or regex HTML stripping. Adapt raw-text state, skipped elements, whitespace, links and literal NUL handling to the Go tokenizer's observable output. Twenty local HTTP/HTML cases are compared with the actual pinned SDK; this is not exhaustive malformed-HTML parity.
+
+WebFetch drops response/client futures on operation cancellation/deadline; socket-closure tests verify this. Requests cap retained raw bytes at 2 MiB and use the baseline 15-second request and 5-second DNS limits. Output pagination counts bytes and preserves Go JSON replacement of invalid UTF-8.

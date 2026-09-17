@@ -14,7 +14,7 @@ sandbox invokes host-installed Bubblewrap or Seatbelt; it does not redistribute
 those OS/backend binaries. Research comparisons do not relicense or copy the
 external agent implementations cited in the design document.
 
-The `adk-tools` manifest, signal/plan/search/filesystem/skills behavior and fixtures derive from Grateful
+The `adk-tools` manifest, signal/plan/search/filesystem/skills/web behavior and fixtures derive from Grateful
 Agents SDK v0.0.115 (`1dc92b73900fac74dc357a938e4b5eee6392b418`), under
 GPL-3.0-only. Source types and acceptance IDs are retained in the manifest;
 [`docs/tools.md`](docs/tools.md) records the implementation/verification boundary.

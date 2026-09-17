@@ -14,15 +14,18 @@ use std::{
 mod edit;
 #[cfg(target_os = "linux")]
 mod edit_diff;
+mod html;
 #[cfg(target_os = "linux")]
 mod lifecycle;
 pub mod memory;
+mod network;
 pub mod plan;
 mod search;
 mod search_pattern;
 pub mod signal;
 #[cfg(target_os = "linux")]
 pub mod skills;
+mod web;
 mod workspace;
 #[cfg(target_os = "linux")]
 mod write;
@@ -206,7 +209,8 @@ impl Registry {
             let implementation = supplied
                 .remove(&capability.name)
                 .or_else(|| signal::builtin(capability))
-                .or_else(|| search::builtin(capability));
+                .or_else(|| search::builtin(capability))
+                .or_else(|| web::builtin(capability, config.allow_private_network_urls));
             #[cfg(target_os = "linux")]
             let implementation = implementation
                 .or_else(|| lifecycle::builtin(capability))

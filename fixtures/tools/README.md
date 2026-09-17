@@ -49,3 +49,16 @@ Rust malformed-input diagnostics are not yet byte-for-byte Go diagnostics.
 Plan artifact and namespace-memory tests use injected recording/in-memory stores;
 project-state integration tests use the existing real filesystem/SQLite stores.
 The original project-state Go comparison fixtures remain in `../project-state`.
+
+`web.json` and `verify-web.go` compare 20 locally served HTTP/HTML cases, including
+byte pagination across invalid UTF-8 boundaries, literal NUL, entities, raw text,
+redirects and status errors. Build `web_replay`, then run from the pinned SDK:
+
+```sh
+go run ../../fixtures/tools/verify-web.go ../../target/debug/examples/web_replay
+```
+
+`tests/web.rs` additionally verifies trusted private-network opt-in, credentials,
+request headers, redirect validation, raw compressed bodies, the 2 MiB byte cap,
+and cancellation/deadline connection closure. Network-class tests cover mapped
+IPv4, IPv6, metadata and reserved ranges.

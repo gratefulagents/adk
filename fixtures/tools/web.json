@@ -1,0 +1,22 @@
+[
+  {"body":"raw  text\nwith spaces\n","content_type":"text/plain"},
+  {"body":"abcdef","arguments":{"max_length":2}},
+  {"body":"abcdef","arguments":{"max_length":2,"start_index":2}},
+  {"body":"abcdef","arguments":{"start_index":6}},
+  {"body":"abcdef","arguments":{"max_length":2,"start_index":-2}},
+  {"body":"€abc","arguments":{"max_length":1,"start_index":1}},
+  {"body":"<h1>Title</h1><p>Hello <b>world</b> &amp; others.</p>","content_type":"text/html"},
+  {"body":"<nav>skip<nav>nested</nav>end</nav><main>Keep</main><footer>hide</footer>","content_type":"text/html"},
+  {"body":"<script>let x='<p>hidden</p>';</script><style>p{}</style><p>visible</p>","content_type":"text/html"},
+  {"body":"<ul><li>One</li><li>Two<br>line</li></ul><pre><code>a  b\nc</code></pre>","content_type":"text/html"},
+  {"body":"<a href='/one?x=1&amp;y=2'>Link</a><a>plain</a><a href='x'><a href='y'>nested</a></a>","content_type":"text/html"},
+  {"body":"<p>a<!-- comment -->b &nbsp; c&#65;&#x42;</p>","content_type":"application/xhtml+xml"},
+  {"body":"<h5>Five</h5><h6>Six</h6><section><article><div>text</div></article></section>","content_type":"text/html"},
+  {"body":"<textarea>a &amp; <b>not a tag</b></textarea><title>T &lt;</title><xmp><b>raw</b></xmp>","content_type":"text/html"},
+  {"body":"<script/>ignored <p>forever</p>","content_type":"text/html"},
+  {"body":"a\u0000b\r\nc","content_type":"text/html"},
+  {"body":"<p>unchanged markup</p>","content_type":"TEXT/HTML"},
+  {"body":"x","repeat":2100000,"arguments":{"max_length":3000000}},
+  {"status":404,"body":"not found"},
+  {"status":302,"redirect":"/case/0"}
+]

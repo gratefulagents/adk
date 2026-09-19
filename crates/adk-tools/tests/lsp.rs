@@ -304,7 +304,12 @@ async fn all_operations_sync_and_read_only_server_requests() {
             "workspaceSymbol" => assert_eq!(value["symbols"].as_array().unwrap().len(), 1),
             "diagnostics" => assert_eq!(
                 value["diagnostics"][0]["filePath"],
-                root.path().join("sample.txt").to_str().unwrap()
+                root.path()
+                    .canonicalize()
+                    .unwrap()
+                    .join("sample.txt")
+                    .to_str()
+                    .unwrap()
             ),
             _ => {
                 assert_eq!(value["locations"].as_array().unwrap().len(), 1);

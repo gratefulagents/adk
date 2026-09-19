@@ -334,11 +334,11 @@ mod tests {
         assert!(
             confined_uri(
                 &workspace,
-                &file_uri(&root.path().join("escape/missing.txt")).unwrap()
+                &file_uri(&workspace.root.join("escape/missing.txt")).unwrap()
             )
             .is_none()
         );
-        let uri = file_uri(&root.path().join("missing.txt")).unwrap();
+        let uri = file_uri(&workspace.root.join("missing.txt")).unwrap();
         assert!(confined_uri(&workspace, &uri).is_some());
         assert!(confined_uri(&workspace, "https://example.com/a").is_none());
         let range = json!({"start":{"line":0,"character":0},"end":{"line":2,"character":3}});
@@ -394,7 +394,7 @@ mod tests {
     fn results_and_limits() {
         let root = tempfile::tempdir().unwrap();
         let workspace = Workspace::new(root.path()).unwrap();
-        let uri = file_uri(&root.path().join("a b.txt")).unwrap();
+        let uri = file_uri(&workspace.root.join("a b.txt")).unwrap();
         let r = json!({"start":{"line":0,"character":3},"end":{"line":1,"character":0}});
         let result = parse("definition", &json!([{"targetUri":uri,"targetSelectionRange":r},{"uri":"file:///outside","range":r}]), &workspace, "").unwrap();
         assert_eq!(result.locations.len(), 1);

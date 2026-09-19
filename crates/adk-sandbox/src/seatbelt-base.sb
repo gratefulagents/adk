@@ -12,6 +12,9 @@
 ; Apple developer-tool launchers read this selector; the selected toolchain
 ; itself must still be supplied as a validated, host-configured runtime root.
 (allow file-read-metadata (literal "/private/var/select/developer_dir"))
+; The Apple Git/Python launchers check the system-wide Xcode license receipt.
+; Do not grant the preferences directory or user preferences/credentials.
+(allow file-read* (literal "/Library/Preferences/com.apple.dt.Xcode.plist"))
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))

@@ -413,6 +413,8 @@ mod tests {
         assert!(!profile.contains("(subpath \"/\")"));
         assert!(profile.contains("(literal \"/private/var/select/sh\")"));
         assert!(profile.contains("(literal \"/private/var/select/developer_dir\")"));
+        assert!(profile.contains("(literal \"/Library/Preferences/com.apple.dt.Xcode.plist\")"));
+        assert!(!profile.contains("(subpath \"/Library/Preferences\")"));
         assert!(!profile.contains("(subpath \"/private/var\")"));
         assert!(profile.contains("(sysctl-name \"hw.pagesize_compat\")"));
         assert!(!profile.contains("(allow sysctl-read)"));

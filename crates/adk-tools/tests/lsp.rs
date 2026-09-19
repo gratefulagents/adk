@@ -71,7 +71,7 @@ fn fixture() -> tempfile::TempDir {
 }
 async fn available(root: &Path) -> bool {
     let executor = adk_sandbox::Executor::new(sandbox_config(root)).unwrap();
-    let mut request = adk_sandbox::Request::new("/bin/true");
+    let mut request = adk_sandbox::Request::new("/usr/bin/true");
     request.timeout = Some(Duration::from_secs(3));
     let result = executor.run(&context(root).operation, request).await;
     if result.as_ref().is_ok_and(|r| r.status.success()) {

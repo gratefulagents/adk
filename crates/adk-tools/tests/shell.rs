@@ -589,15 +589,19 @@ async fn readonly_adapter_preserves_schema_and_uses_enforcing_backend() {
 #[tokio::test]
 async fn combined_output_does_not_shift_command_line_numbers() {
     let (_dir, bundle, ctx, _) = setup();
-    let output = call(
-        &bundle,
-        "Bash",
-        &ctx,
-        json!({"command":"printf '%s\\n' \"$LINENO\"\nprintf '%s\\n' \"$LINENO\" >&2"}),
-    )
-    .await;
+    let command = "printf '%s\\n' \"$LINENO\"\nprintf '%s\\n' \"$LINENO\" >&2";
+    let direct = std::process::Command::new("/bin/bash")
+        .args(["--noprofile", "--norc", "-c", command])
+        .env_clear()
+        .output()
+        .unwrap();
+    assert!(direct.status.success());
+    let output = call(&bundle, "Bash", &ctx, json!({"command":command})).await;
     assert!(!output.is_error, "{output:?}");
-    assert_eq!(text(&output), "1\n2\n");
+    assert_eq!(
+        text(&output).as_bytes(),
+        [direct.stdout, direct.stderr].concat()
+    );
     bundle.close().await;
 }
 

@@ -150,14 +150,14 @@ async fn rejects_links_special_files_and_path_traversal_without_touching_targets
     symlink(outside.path().join("secret"), root.path().join("link")).unwrap();
     symlink(outside.path(), root.path().join("parent-link")).unwrap();
     fs::hard_link(outside.path().join("secret"), root.path().join("hard")).unwrap();
-    rustix::fs::mknodat(
-        rustix::fs::CWD,
-        root.path().join("fifo"),
-        rustix::fs::FileType::Fifo,
-        rustix::fs::Mode::RUSR,
-        0,
-    )
-    .unwrap();
+    assert!(
+        std::process::Command::new("mkfifo")
+            .args(["-m", "400"])
+            .arg(root.path().join("fifo"))
+            .status()
+            .unwrap()
+            .success()
+    );
     for path in [
         "link",
         "hard",

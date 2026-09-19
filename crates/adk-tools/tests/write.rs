@@ -255,14 +255,14 @@ async fn cancelled_write_and_special_files_never_change_contents() {
         fs::read_to_string(root.path().join("a")).unwrap(),
         "unchanged"
     );
-    rustix::fs::mknodat(
-        rustix::fs::CWD,
-        root.path().join("fifo"),
-        rustix::fs::FileType::Fifo,
-        rustix::fs::Mode::RUSR,
-        0,
-    )
-    .unwrap();
+    assert!(
+        std::process::Command::new("mkfifo")
+            .args(["-m", "400"])
+            .arg(root.path().join("fifo"))
+            .status()
+            .unwrap()
+            .success()
+    );
     for access in [AccessMode::FullAccess, AccessMode::WorkspaceWrite] {
         assert!(
             call(

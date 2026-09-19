@@ -330,14 +330,14 @@ impl Driver {
             _ = &mut stop => Ok(()),
         };
         drop(self.input);
-        let cleanup = self
-            .process
-            .cancel_and_wait()
-            .await
-            .map_err(|e| e.to_string());
+        let cleanup = match self.process.cancel_and_wait().await {
+            Ok(output) => Ok(Some(output)),
+            Err(adk_sandbox::Error::Cancelled | adk_sandbox::Error::TimedOut) => Ok(None),
+            Err(error) => Err(error.to_string()),
+        };
         let mut error = result.err();
         match &cleanup {
-            Ok(output) => {
+            Ok(Some(output)) => {
                 let keep = output.stderr.len().min(
                     self.config
                         .max_stderr_bytes
@@ -354,6 +354,7 @@ impl Driver {
                     );
                 }
             }
+            Ok(None) => {}
             Err(cleanup) => error = Some(cleanup.clone()),
         }
         if let Some(error) = error {

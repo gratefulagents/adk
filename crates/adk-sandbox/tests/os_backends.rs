@@ -197,6 +197,17 @@ async fn os_enforcement_required_in_ci() {
             "host environment denial: {result:?}"
         );
         assert!(String::from_utf8_lossy(&result.stdout).contains("host-environment-denied"));
+        for delay in [0, 1, 10] {
+            let session = executor
+                .start_session(&ctx, shell("sleep 30", AccessMode::ReadOnly))
+                .unwrap();
+            tokio::time::sleep(Duration::from_millis(delay)).await;
+            match session.cancel_and_wait().await {
+                Err(adk_sandbox::Error::Cancelled) => {}
+                Ok(result) => assert_eq!(result.completion, Completion::Cancelled),
+                Err(error) => panic!("cancelled setup must not be a backend failure: {error}"),
+            }
+        }
     }
 
     #[cfg(target_os = "linux")]

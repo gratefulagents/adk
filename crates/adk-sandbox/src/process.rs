@@ -188,6 +188,11 @@ async fn supervise(
             None,
         ))
         .await?;
+        match result.completion {
+            Completion::Cancelled => return Err(Error::Cancelled),
+            Completion::TimedOut => return Err(Error::TimedOut),
+            Completion::Exited => {}
+        }
         if !result.status.success()
             || result.stdout != b"enforced"
             || denied.exists()

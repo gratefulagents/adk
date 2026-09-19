@@ -5,8 +5,9 @@ contracts separated from platform integration. The opt-in `runtime` feature runs
 host-supplied models and tools, including streamed execution and approval
 continuations. The opt-in `execution` feature adds sandbox backends, subprocess
 ownership, and policy/guardrails. Opt-in `durable` and `project-state` features
-provide compatible persistence and project memory. MCP transport and deployment
-remain separate work; this is not a production platform worker.
+provide compatible persistence and project memory. Opt-in `mcp` adds bounded MCP
+client transports and host-policy-gated server mode; see [MCP integration](docs/mcp.md).
+Deployment remains separate work; this is not a production platform worker.
 
 ## Workspace
 
@@ -19,6 +20,8 @@ remain separate work; this is not a production platform worker.
   stores, snapshot CAS, immutable events and conservative effect recovery.
 - `adk-project-state`: event-sourced project tasks and memories, filesystem/SQLite
   stores and separate embedding-assisted recall.
+- `adk-mcp`: pinned configuration, bounded MCP client transports, discovery,
+  reusable tools/resources and authenticated, policy-gated Streamable HTTP server mode.
 - `adk-security`: composed permissions, command and secret guardrails, exact-call approval.
 - `adk-sandbox`: Linux Bubblewrap/macOS Seatbelt and explicit full-access local
   execution, with owned process groups and PTY lifecycle.

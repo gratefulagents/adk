@@ -1,0 +1,8 @@
+[
+  {"name":"single-text","input":{"content":[{"type":"text","text":"hello"}]},"text":"hello"},
+  {"name":"empty","input":{"content":[]},"text":""},
+  {"name":"nil","input":null,"text":""},
+  {"name":"structured","input":{"content":[{"type":"text","text":"hello"}],"structuredContent":{"answer":42}},"json":{"content":[{"type":"text","text":"hello"}],"structuredContent":{"answer":42}}},
+  {"name":"multiple","input":{"content":[{"type":"text","text":"one"},{"type":"text","text":"two"}],"isError":true},"json":{"content":[{"type":"text","text":"one"},{"type":"text","text":"two"}]}},
+  {"name":"embedded","input":{"content":[{"type":"resource","resource":{"uri":"test://item","mimeType":"text/plain","text":"resource"}}]},"json":{"content":[{"type":"resource","uri":"test://item","mimeType":"text/plain","text":"resource"}]}}
+]

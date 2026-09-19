@@ -1,0 +1,12 @@
+[
+  {"name":"embedded credentials","config":{"mcpServers":{"bad":{"type":"streamable-http","url":"https://user:secret@example.com/mcp"}}}},
+  {"name":"query secret","config":{"mcpServers":{"bad":{"type":"sse","url":"https://example.com/mcp?token=secret"}}}},
+  {"name":"fragment","config":{"mcpServers":{"bad":{"type":"sse","url":"https://example.com/mcp#secret"}}}},
+  {"name":"file origin","config":{"mcpServers":{"bad":{"type":"streamable-http","url":"file:///etc/passwd"}}}},
+  {"name":"unsupported transport","config":{"mcpServers":{"bad":{"type":"exec","command":"test"}}}},
+  {"name":"missing command","config":{"mcpServers":{"bad":{}}}},
+  {"name":"invalid env name","config":{"mcpServers":{"bad":{"command":"test","env":{"A=B":"value"}}}}},
+  {"name":"invalid env value","config":{"mcpServers":{"bad":{"command":"test","env":{"A":"value\u0000"}}}}},
+  {"name":"empty server name","config":{"mcpServers":{" ":{"command":"test"}}}},
+  {"name":"wrong tool list type","config":{"mcpServers":{"bad":{"command":"test","allowedTools":"*"}}}}
+]

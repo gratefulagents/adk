@@ -14,6 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: rustup show active-toolchain
+      - name: Use canonical macOS temporary workspace paths
+        if: runner.os == 'macOS'
+        run: python3 -c 'import os,pathlib; print("TMPDIR=" + str(pathlib.Path(os.environ["TMPDIR"]).resolve()), file=open(os.environ["GITHUB_ENV"], "a"))'
       - name: Install Bubblewrap
         if: runner.os == 'Linux'
         run: |

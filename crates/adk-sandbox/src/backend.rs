@@ -94,6 +94,9 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
             for (i, root) in config.runtime_roots.iter().enumerate() {
                 cmd.arg(format!("-DRUNTIME{i}={}", root.display()));
             }
+            for (i, parent) in runtime_ancestors(config).iter().enumerate() {
+                cmd.arg(format!("-DRUNTIMEPARENT{i}={}", parent.display()));
+            }
             if request.access == AccessMode::WorkspaceWrite {
                 for (i, scratch) in request.scratch.iter().enumerate() {
                     cmd.arg(format!("-DSCRATCH{i}={}", scratch.path().display()));
@@ -303,6 +306,16 @@ fn bwrap_args(
     Ok(args)
 }
 
+fn runtime_ancestors(config: &Config) -> Vec<PathBuf> {
+    config
+        .runtime_roots
+        .iter()
+        .flat_map(|root| root.ancestors().skip(1).map(PathBuf::from))
+        .collect::<std::collections::BTreeSet<_>>()
+        .into_iter()
+        .collect()
+}
+
 fn credential_masks(config: &Config, request: &Request) -> Result<Vec<PathBuf>, Error> {
     if !request.hide_git_credentials {
         return Ok(Vec::new());
@@ -355,6 +368,13 @@ fn seatbelt_profile_with_masks(
     for i in 0..config.runtime_roots.len() {
         profile.push_str(&format!(
             "(allow file-read* (subpath (param \"RUNTIME{i}\")))\n"
+        ));
+    }
+    for i in 0..runtime_ancestors(config).len() {
+        // realpath must stat each ancestor of an explicitly granted runtime.
+        // This does not allow directory listing, file contents, or writes there.
+        profile.push_str(&format!(
+            "(allow file-read-metadata (literal (param \"RUNTIMEPARENT{i}\")))\n"
         ));
     }
     profile.push_str("(allow file-read* (require-all (subpath (param \"WORKSPACE\"))");
@@ -437,6 +457,18 @@ mod tests {
         let profile = seatbelt_profile(&executor.config, &Request::new("/bin/sh")).unwrap();
         assert!(profile.contains("(allow file-read* (subpath (param \"RUNTIME0\")))"));
         assert!(!profile.contains(&runtime.display().to_string()));
+        let ancestors = runtime_ancestors(&executor.config);
+        assert!(ancestors.contains(&runtime.parent().unwrap().to_path_buf()));
+        assert!(!ancestors.contains(&runtime));
+        for i in 0..ancestors.len() {
+            assert!(profile.contains(&format!(
+                "(allow file-read-metadata (literal (param \"RUNTIMEPARENT{i}\")))"
+            )));
+            assert!(!profile.contains(&format!("(subpath (param \"RUNTIMEPARENT{i}\"))")));
+            assert!(!profile.contains(&format!(
+                "(allow file-read* (literal (param \"RUNTIMEPARENT{i}\")))"
+            )));
+        }
         let args = bwrap_args(&executor.config, &Request::new("/bin/sh"), &private).unwrap();
         assert!(args.windows(3).any(|args| args[0] == "--ro-bind"
             && args[1] == executor.config.runtime_roots[0].as_os_str()

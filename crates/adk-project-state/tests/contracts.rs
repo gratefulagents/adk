@@ -70,6 +70,33 @@ fn events() -> Vec<Event> {
 }
 
 #[test]
+fn both_stores_create_missing_parents_and_reopen_after_repeated_writes() {
+    for sqlite in [false, true] {
+        let temp = TempDir::new().unwrap();
+        let path = temp.path().join("missing").join("nested");
+        let store = open(&path, sqlite);
+        let first = task(&store, "first");
+        let second = task(&store, "second");
+        store.close_task(&first.id, "done").unwrap();
+        let saved = memory(&store, "durable memory");
+        drop(store);
+
+        let store = open(&path, sqlite);
+        assert_eq!(store.get_task(&first.id).unwrap().status, "closed");
+        assert_eq!(store.get_task(&second.id).unwrap().title, "second");
+        assert_eq!(
+            store.list_memories(MemoryFilter::default()).unwrap()[0].id,
+            saved.id
+        );
+        assert_eq!(store.list_tasks().unwrap().len(), 2);
+        task(&store, "after reopen");
+        drop(store);
+
+        assert_eq!(open(&path, sqlite).list_tasks().unwrap().len(), 3);
+    }
+}
+
+#[test]
 fn go_event_schemas_roundtrip_without_precision_loss() {
     for line in fs::read_to_string(fixture("baseline/events.jsonl"))
         .unwrap()
@@ -869,6 +896,41 @@ fn child_process_writer() {
     let store = open(Path::new(&path), sqlite);
     for n in 0..10 {
         task(&store, &format!("{}-{n}", std::process::id()));
+    }
+}
+
+#[test]
+fn live_and_unknown_lock_owners_are_preserved() {
+    let temp = TempDir::new().unwrap();
+    let store = open(temp.path(), false);
+    let lock = store.state_dir().join("locks/state.lock");
+    let mut owners = vec![
+        format!("pid={}\n", std::process::id()),
+        String::new(),
+        "pid=unknown\n".into(),
+        "pid=0\n".into(),
+        "pid=-1\n".into(),
+        "pid=4294967296\n".into(),
+    ];
+    if cfg!(windows) {
+        // Windows denies OpenProcess access to the System process, even for administrators.
+        owners.push("pid=4\n".into());
+    }
+    for owner in owners {
+        let contents = format!("{owner}token=untouched\ntime=2000-01-01T00:00:00Z\n");
+        fs::write(&lock, &contents).unwrap();
+        assert!(
+            matches!(
+                ProjectStore::filesystem(FilesystemOptions {
+                    state_dir: store.state_dir().into(),
+                    store: options(),
+                    lock_timeout: Duration::from_millis(25),
+                }),
+                Err(Error::LockTimeout)
+            ),
+            "unexpected recovery for {owner:?}"
+        );
+        assert_eq!(fs::read_to_string(&lock).unwrap(), contents);
     }
 }
 

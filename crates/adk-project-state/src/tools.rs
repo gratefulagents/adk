@@ -132,6 +132,8 @@ impl StateTool {
                         }
                     }
                     json!({"total":memories.len(),"by_kind":kinds,"by_scope":scopes,"by_tag":tags})
+                } else if memories.is_empty() {
+                    Value::Null
                 } else {
                     serde_json::to_value(memories)?
                 }

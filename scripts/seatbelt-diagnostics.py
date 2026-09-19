@@ -7,7 +7,7 @@ roots = [pathlib.Path.home() / "Library/Logs/DiagnosticReports",
          pathlib.Path("/Library/Logs/DiagnosticReports")]
 for root in roots:
     for path in sorted(root.glob("*.ips")):
-        if not path.name.startswith(("env-", "sh-", "sandbox-exec-")):
+        if not path.name.startswith(("env-", "sh-", "sandbox-exec-", "git-", "python3-", "Python-")):
             continue
         try:
             text = path.read_text()

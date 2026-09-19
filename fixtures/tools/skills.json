@@ -1,0 +1,158 @@
+[
+  {
+    "name": "skill_search",
+    "arguments": {}
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "query": "LOOKUP",
+      "category": "absent"
+    }
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "category": "SEARCH"
+    }
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "query": "absent"
+    }
+  },
+  {
+    "name": "skill_search",
+    "arguments": null
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "query": 1
+    },
+    "error_only": true
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "demo"
+    }
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "local"
+    }
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "missing"
+    }
+  },
+  {
+    "name": "skill_install",
+    "arguments": null
+  },
+  {
+    "name": "skill_list_installed",
+    "arguments": [
+      "ignored"
+    ]
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "demo"
+    },
+    "config": {
+      "mcpServers": {
+        "demo": {
+          "command": "old",
+          "env": {
+            "DEFAULT": "old",
+            "CUSTOM": "preserved"
+          },
+          "enabled": false,
+          "allowEnv": [
+            "OTHER",
+            "DEMO_TOKEN",
+            "OTHER",
+            ""
+          ],
+          "allowedTools": [
+            "lookup"
+          ],
+          "trustReadOnlyHint": true
+        },
+        "other": {
+          "command": "other"
+        }
+      }
+    }
+  },
+  {
+    "name": "skill_list_installed",
+    "arguments": {},
+    "config": {
+      "mcpServers": {
+        "other": {
+          "command": "other"
+        },
+        "demo": {
+          "command": "demo"
+        }
+      }
+    }
+  },
+  {
+    "name": "skill_list_installed",
+    "arguments": {},
+    "config": {
+      "mcpServers": {
+        "other": null
+      }
+    }
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "demo"
+    },
+    "config": {
+      "mcpServers": {
+        "other": {
+          "args": [
+            null
+          ],
+          "env": {
+            "A": null
+          },
+          "enabled": false
+        }
+      }
+    }
+  },
+  {
+    "name": "skill_install",
+    "arguments": {
+      "name": "demo"
+    },
+    "config": {
+      "mcpServers": null
+    }
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "query": "İ"
+    }
+  },
+  {
+    "name": "skill_search",
+    "arguments": {
+      "category": "ς"
+    }
+  }
+]

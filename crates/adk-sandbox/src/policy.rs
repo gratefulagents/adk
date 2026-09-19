@@ -79,6 +79,20 @@ pub(crate) fn workspace(path: &Path) -> Result<PathBuf, Error> {
 }
 
 pub(crate) fn validate(config: &Config, mut request: Request) -> Result<Request, Error> {
+    if !request.scratch.is_empty() && request.access != AccessMode::WorkspaceWrite {
+        return Err(Error::Invalid(
+            "scratch grants require WorkspaceWrite".into(),
+        ));
+    }
+    for scratch in &request.scratch {
+        if scratch.path().starts_with(&config.workspace)
+            || config.workspace.starts_with(scratch.path())
+        {
+            return Err(Error::Invalid(
+                "scratch directory overlaps workspace".into(),
+            ));
+        }
+    }
     if request
         .timeout
         .is_some_and(|timeout| Instant::now().checked_add(timeout).is_none())

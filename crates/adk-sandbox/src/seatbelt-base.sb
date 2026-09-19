@@ -9,11 +9,19 @@
 ; Without it the command runs but emits a warning into every captured PTY.
 (allow file-read-metadata (literal "/var"))
 (allow file-read* (literal "/private/var/select/sh"))
+; Apple developer-tool launchers read this selector; the selected toolchain
+; itself must still be supplied as a validated, host-configured runtime root.
+(allow file-read-metadata (literal "/private/var/select/developer_dir"))
+; The Apple Git/Python launchers check the system-wide Xcode license receipt.
+; Do not grant the preferences directory or user preferences/credentials.
+(allow file-read* (literal "/Library/Preferences/com.apple.dt.Xcode.plist"))
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))
-; Host process metadata is not required to execute commands.
-(deny process-info*)
+; Developer-tool launchers query their own process identity. The procargs
+; sysctls also use process-info checks, so deny other targets explicitly.
+(deny process-info* (require-not (target self)))
+(allow process-info* (target self))
 ; These legacy sysctls expose same-UID argv/environment; deny explicitly,
 ; including PID suffixes, rather than relying on default-deny or process-info.
 (deny sysctl-read (sysctl-name-prefix "kern.procargs"))

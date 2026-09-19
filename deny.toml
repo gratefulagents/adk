@@ -25,6 +25,9 @@ multiple-versions = "deny"
 wildcards = "deny"
 # ring's OS bindings/RNG intentionally coexist with the runtime's newer APIs.
 skip = [
+  # html5ever atom generation uses phf 0.14; tokio-postgres retains 0.13.
+  { name = "phf", version = "=0.13.1" },
+  { name = "phf_shared", version = "=0.13.1" },
   { name = "getrandom", version = "=0.2.17" },
   { name = "windows-sys", version = "=0.52.0" },
   # Existing ahash/jsonschema RNG and proc-macro ecosystem use distinct majors.

@@ -19,9 +19,16 @@ pub use adk_project_state as project_state;
 pub use adk_providers as providers;
 #[cfg(feature = "runtime")]
 pub use adk_runtime as runtime;
+/// Source-backed tool registry composition; not yet complete SDK tool parity.
+#[cfg(feature = "tools")]
+pub use adk_tools as tools;
 #[cfg(feature = "execution")]
 pub mod execution;
 #[cfg(feature = "execution")]
 pub use adk_sandbox as sandbox;
 #[cfg(feature = "execution")]
 pub use adk_security as security;
+
+/// Lifecycle-owned prepared tool integration with the standalone runner.
+#[cfg(all(feature = "tools", feature = "runtime"))]
+pub mod tool_runtime;

@@ -23,5 +23,7 @@ fn unsupported_platform_fails_closed() {
     };
     let result = executor.start(&context, Request::new(std::env::current_exe().unwrap()));
     assert!(matches!(result, Err(Error::Unavailable(_))));
+    let result = executor.start_session(&context, Request::new(std::env::current_exe().unwrap()));
+    assert!(matches!(result, Err(Error::Unavailable(_))));
     std::fs::remove_dir(workspace).unwrap();
 }

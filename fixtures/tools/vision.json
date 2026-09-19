@@ -1,0 +1,21 @@
+[
+  {"name":"png-default","path":"pixel.png","data":[137,80,78,71],"arguments":{"image_path":"pixel.png","prompt":"inspect"},"mime":"image/png","detail":"high"},
+  {"name":"file-wins-url","path":"pixel.png","data":[1],"arguments":{"image_path":"pixel.png","url":"file:///never-fetch","prompt":"inspect","detail_level":" LOW "},"mime":"image/png","detail":"low"},
+  {"name":"extension-wins","path":"pixel.JPEG","data":[137,80,78,71],"arguments":{"image_path":"pixel.JPEG","prompt":"inspect","detail_level":"invalid"},"mime":"image/jpeg","detail":"high"},
+  {"name":"jpeg-magic","path":"pixel","data":[255,216],"arguments":{"image_path":"pixel","prompt":"inspect"},"mime":"image/jpeg","detail":"high"},
+  {"name":"gif-magic","path":"pixel","data":[71,73,70,56],"arguments":{"image_path":"pixel","prompt":"inspect"},"mime":"image/gif","detail":"high"},
+  {"name":"webp-magic","path":"pixel","data":[82,73,70,70,0,0,0,0,87,69,66,80],"arguments":{"image_path":"pixel","prompt":"inspect"},"mime":"image/webp","detail":"high"},
+  {"name":"svg-extension","path":"pixel.svg","data":[1],"arguments":{"image_path":"pixel.svg","prompt":"inspect"},"mime":"image/svg+xml","detail":"high"},
+  {"name":"empty-unknown","path":"pixel","data":[],"arguments":{"image_path":"pixel","prompt":" "},"mime":"application/octet-stream","detail":"high"},
+  {"name":"literal-spaces","path":" pixel.png ","data":[71,73,70,56],"arguments":{"image_path":" pixel.png ","prompt":"inspect","detail_level":null},"mime":"image/gif","detail":"high"},
+  {"name":"dot-cleaning","path":"pixel.png","data":[1],"arguments":{"image_path":"absent/../pixel.png","prompt":"inspect"},"mime":"image/png","detail":"high"},
+  {"name":"dotfile-extension","path":".png","data":[1],"arguments":{"image_path":".png","prompt":"inspect"},"mime":"image/png","detail":"high"},
+  {"name":"field-case","path":"pixel","data":[1],"arguments":{"IMAGE_PATH":"pixel","prompt":"inspect","DETAIL_LEVEL":"low"},"mime":"application/octet-stream","detail":"low"},
+  {"name":"null","arguments":null,"error":"prompt is required"},
+  {"name":"null-prompt","arguments":{"prompt":null},"error":"prompt is required"},
+  {"name":"no-source","arguments":{"prompt":"inspect"},"error":"either image_path or url is required"},
+  {"name":"null-source","arguments":{"prompt":"inspect","image_path":null,"url":null},"error":"either image_path or url is required"},
+  {"name":"array-input","arguments":[],"error_prefix":"Invalid input:"},
+  {"name":"wrong-type","arguments":{"prompt":1},"error_prefix":"Invalid input:"},
+  {"name":"wrong-detail-type","arguments":{"prompt":"inspect","image_path":"none","detail_level":false},"error_prefix":"Invalid input:"}
+]

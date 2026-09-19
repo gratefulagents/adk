@@ -1,0 +1,35 @@
+[package]
+name = "adk-tools"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+adk-core.workspace = true
+adk-sandbox = { version = "0.1.0", path = "../adk-sandbox" }
+adk-security = { version = "0.1.0", path = "../adk-security" }
+adk-project-state = { version = "0.1.0", path = "../adk-project-state" }
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+uuid = { version = "1", features = ["v4"] }
+base64 = "0.22"
+sha2 = "0.10"
+regex = "1"
+regex-syntax = "0.8"
+memchr = "2"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+tokio = { workspace = true, features = ["net"] }
+url = "2"
+ipnet = "2"
+html5ever = "0.40"
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+rustix = { version = "1", features = ["fs"] }
+
+[dev-dependencies]
+tempfile = "3"
+adk-runtime.workspace = true
+tokio = { workspace = true, features = ["io-util"] }

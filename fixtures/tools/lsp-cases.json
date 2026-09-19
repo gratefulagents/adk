@@ -1,0 +1,665 @@
+{
+  "sdk_commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "operations": [
+    "goToDefinition",
+    "definition",
+    "findReferences",
+    "references",
+    "hover",
+    "documentSymbol",
+    "workspaceSymbol",
+    "implementation",
+    "typeDefinition",
+    "diagnostics",
+    "",
+    "rename",
+    "formatting",
+    "codeAction",
+    "executeCommand"
+  ],
+  "cases": [
+    {
+      "name": "null-goToDefinition",
+      "operation": "goToDefinition",
+      "raw": null
+    },
+    {
+      "name": "null-definition",
+      "operation": "definition",
+      "raw": null
+    },
+    {
+      "name": "null-findReferences",
+      "operation": "findReferences",
+      "raw": null
+    },
+    {
+      "name": "null-references",
+      "operation": "references",
+      "raw": null
+    },
+    {
+      "name": "null-hover",
+      "operation": "hover",
+      "raw": null
+    },
+    {
+      "name": "null-documentSymbol",
+      "operation": "documentSymbol",
+      "raw": null
+    },
+    {
+      "name": "null-workspaceSymbol",
+      "operation": "workspaceSymbol",
+      "raw": null
+    },
+    {
+      "name": "null-implementation",
+      "operation": "implementation",
+      "raw": null
+    },
+    {
+      "name": "null-typeDefinition",
+      "operation": "typeDefinition",
+      "raw": null
+    },
+    {
+      "name": "null-diagnostics",
+      "operation": "diagnostics",
+      "raw": null
+    },
+    {
+      "name": "locations-definition",
+      "operation": "definition",
+      "raw": [
+        {
+          "uri": "file://@ROOT@/sample.txt",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "targetUri": "file://@ROOT@/sample.txt",
+          "targetSelectionRange": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "file:///outside",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "https://example.test/a",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "locations-references",
+      "operation": "references",
+      "raw": [
+        {
+          "uri": "file://@ROOT@/sample.txt",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "targetUri": "file://@ROOT@/sample.txt",
+          "targetSelectionRange": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "file:///outside",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "https://example.test/a",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "locations-implementation",
+      "operation": "implementation",
+      "raw": [
+        {
+          "uri": "file://@ROOT@/sample.txt",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "targetUri": "file://@ROOT@/sample.txt",
+          "targetSelectionRange": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "file:///outside",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "https://example.test/a",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "locations-typeDefinition",
+      "operation": "typeDefinition",
+      "raw": [
+        {
+          "uri": "file://@ROOT@/sample.txt",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "targetUri": "file://@ROOT@/sample.txt",
+          "targetSelectionRange": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "file:///outside",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        },
+        {
+          "uri": "https://example.test/a",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "single-location",
+      "operation": "definition",
+      "raw": {
+        "uri": "file://@ROOT@/sample.txt",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 3
+          }
+        }
+      }
+    },
+    {
+      "name": "hover-text",
+      "operation": "hover",
+      "raw": {
+        "contents": "docs",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 3
+          }
+        }
+      }
+    },
+    {
+      "name": "hover-markup",
+      "operation": "hover",
+      "raw": {
+        "contents": {
+          "kind": "markdown",
+          "value": "**docs**"
+        },
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 3
+          }
+        }
+      }
+    },
+    {
+      "name": "hover-marked",
+      "operation": "hover",
+      "raw": {
+        "contents": {
+          "language": "rust",
+          "value": "fn main()"
+        },
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 3
+          }
+        }
+      }
+    },
+    {
+      "name": "hover-array",
+      "operation": "hover",
+      "raw": {
+        "contents": [
+          "first",
+          {
+            "value": "second"
+          },
+          null,
+          ""
+        ],
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 0
+          },
+          "end": {
+            "line": 2,
+            "character": 3
+          }
+        }
+      }
+    },
+    {
+      "name": "document-tree",
+      "operation": "documentSymbol",
+      "raw": [
+        {
+          "name": "Outer",
+          "kind": 12,
+          "detail": "detail",
+          "range": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          },
+          "selectionRange": {
+            "start": {
+              "line": 0,
+              "character": 0
+            },
+            "end": {
+              "line": 2,
+              "character": 3
+            }
+          },
+          "children": [
+            {
+              "name": "Inner",
+              "kind": 13,
+              "range": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 2,
+                  "character": 3
+                }
+              },
+              "selectionRange": {
+                "start": {
+                  "line": 0,
+                  "character": 0
+                },
+                "end": {
+                  "line": 2,
+                  "character": 3
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "workspace-symbol",
+      "operation": "workspaceSymbol",
+      "raw": [
+        {
+          "name": "Inside",
+          "kind": 12,
+          "containerName": "module",
+          "location": {
+            "uri": "file://@ROOT@/sample.txt",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            }
+          }
+        },
+        {
+          "name": "Outside",
+          "kind": 12,
+          "location": {
+            "uri": "file:///outside",
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "diagnostic-numeric",
+      "operation": "diagnostics",
+      "raw": {
+        "kind": "full",
+        "items": [
+          {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            },
+            "severity": 2,
+            "code": 42,
+            "source": "fixture",
+            "message": "message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diagnostic-string",
+      "operation": "diagnostics",
+      "raw": {
+        "kind": "full",
+        "items": [
+          {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            },
+            "severity": 2,
+            "code": "E42",
+            "source": "fixture",
+            "message": "message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diagnostic-null",
+      "operation": "diagnostics",
+      "raw": {
+        "kind": "full",
+        "items": [
+          {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            },
+            "severity": 2,
+            "code": null,
+            "source": "fixture",
+            "message": "message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diagnostic-object",
+      "operation": "diagnostics",
+      "raw": {
+        "kind": "full",
+        "items": [
+          {
+            "range": {
+              "start": {
+                "line": 0,
+                "character": 0
+              },
+              "end": {
+                "line": 2,
+                "character": 3
+              }
+            },
+            "severity": 2,
+            "code": {},
+            "source": "fixture",
+            "message": "message"
+          }
+        ]
+      }
+    },
+    {
+      "name": "diagnostic-defaults",
+      "operation": "diagnostics",
+      "raw": [
+        {
+          "message": "default"
+        }
+      ]
+    },
+    {
+      "name": "error-location-scalar",
+      "operation": "definition",
+      "raw": 42
+    },
+    {
+      "name": "error-hover-scalar",
+      "operation": "hover",
+      "raw": 42
+    },
+    {
+      "name": "error-hover-contents",
+      "operation": "hover",
+      "raw": {
+        "contents": 42
+      }
+    },
+    {
+      "name": "error-symbol-object",
+      "operation": "documentSymbol",
+      "raw": {}
+    },
+    {
+      "name": "error-symbol-range",
+      "operation": "documentSymbol",
+      "raw": [
+        {
+          "name": "bad",
+          "kind": 1
+        }
+      ]
+    },
+    {
+      "name": "error-symbol-location",
+      "operation": "workspaceSymbol",
+      "raw": [
+        {
+          "name": "bad",
+          "kind": 1
+        }
+      ]
+    },
+    {
+      "name": "error-diagnostic-object",
+      "operation": "diagnostics",
+      "raw": {}
+    },
+    {
+      "name": "error-diagnostic-severity",
+      "operation": "diagnostics",
+      "raw": [
+        {
+          "severity": "bad"
+        }
+      ]
+    }
+  ]
+}

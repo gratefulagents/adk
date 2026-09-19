@@ -1,0 +1,54 @@
+[
+  {
+    "name": "demo",
+    "description": "Demo search service",
+    "category": "Search",
+    "version": "1.2.3",
+    "source": {
+      "repository": "example/demo"
+    },
+    "mcpConfig": {
+      "type": "stdio",
+      "command": "demo-server",
+      "args": [
+        "serve"
+      ],
+      "env": {
+        "DEFAULT": "catalog"
+      }
+    },
+    "tags": [
+      "lookup",
+      "test"
+    ],
+    "verified": true,
+    "requiresEnvVars": [
+      "DEMO_TOKEN"
+    ]
+  },
+  {
+    "name": "local",
+    "description": "Local tools",
+    "category": "developer-tools",
+    "version": "2",
+    "mcpConfig": {
+      "command": "local-server"
+    },
+    "tags": [
+      "files"
+    ],
+    "verified": false
+  },
+  {
+    "name": "I",
+    "description": "Unicode casing",
+    "category": "Σ",
+    "version": "1",
+    "mcpConfig": {
+      "command": "unicode-server"
+    },
+    "tags": [
+      "symbols"
+    ]
+  }
+]

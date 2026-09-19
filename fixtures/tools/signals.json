@@ -1,0 +1,14 @@
+[
+  {"name":"think","input":{"thought":"Check output before acting"},"text":"(thought recorded)","is_error":false,"should_pause":false},
+  {"name":"think","input":{"thought":" \n "},"text":"thought is required","is_error":true,"should_pause":false},
+  {"name":"think","input":null,"text":"thought is required","is_error":true,"should_pause":false},
+  {"name":"AskUserQuestion","input":{"question":"Choose"},"text":"Choose","is_error":false,"should_pause":false},
+  {"name":"AskUserQuestion","input":{"question":"Choose","choices":["Yes","No"]},"text":"{\"question\":\"Choose\",\"choices\":[\"Yes\",\"No\"],\"allow_freeform\":true}","is_error":false,"should_pause":false},
+  {"name":"AskUserQuestion","input":{"question":"Choose","choices":[null,"No"],"allow_freeform":false},"text":"{\"question\":\"Choose\",\"choices\":[\"\",\"No\"],\"allow_freeform\":false}","is_error":false,"should_pause":false},
+  {"name":"present_plan","input":{"summary":"Plan","actions":[{"id":"go","label":"Go","style":"primary","mode":"full_access"}],"recommended":"go"},"text":"Plan presented to user.\n{\"summary\":\"Plan\",\"actions\":[{\"id\":\"go\",\"label\":\"Go\",\"style\":\"primary\"}],\"recommended\":\"go\"}","is_error":false,"should_pause":false},
+  {"name":"present_plan","input":{"summary":"Plan","actions":[{"id":"go","label":"Go"}]},"text":"Plan presented to user.\n{\"summary\":\"Plan\",\"actions\":[{\"id\":\"go\",\"label\":\"Go\"}],\"recommended\":\"\"}","is_error":false,"should_pause":false},
+  {"name":"present_plan","input":{"actions":[{"id":"go","label":"Go"}]},"text":"summary is required","is_error":true,"should_pause":false},
+  {"name":"present_plan","input":{"summary":"Plan"},"text":"at least one action is required","is_error":true,"should_pause":false},
+  {"name":"finish","input":{"summary":"Done"},"text":"Run completed.\n\nSummary: Done","is_error":false,"should_pause":true},
+  {"name":"finish","input":{},"text":"Run completed.\n\nSummary: ","is_error":false,"should_pause":true}
+]

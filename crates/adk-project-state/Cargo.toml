@@ -20,6 +20,9 @@ sha1 = "0.10"
 sha2 = "0.10"
 rusqlite = { version = "0.37", features = ["bundled"] }
 
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_System_Threading"] }
+
 [dev-dependencies]
 tokio = { workspace = true }
 tempfile = "3"

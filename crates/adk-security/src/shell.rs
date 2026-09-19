@@ -28,6 +28,7 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
     let mut word = String::new();
     let mut started = false;
     let mut quote = None;
+    let mut literal = true;
     while let Some(c) = chars.next() {
         if c == '\0'
             || (c.is_control() && !matches!(c, '\n' | '\t'))
@@ -44,6 +45,7 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
             continue;
         }
         if c == '\\' {
+            literal = false;
             let next = chars
                 .next()
                 .ok_or_else(|| blocked("incomplete shell escape"))?;
@@ -71,6 +73,7 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
         match c {
             '\'' | '"' => {
                 quote = Some(c);
+                literal = false;
                 started = true;
             }
             ' ' | '\t' => {
@@ -78,12 +81,14 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
                     tokens.push(Token::Word(std::mem::take(&mut word)));
                     started = false;
                 }
+                literal = true;
             }
             '\n' | ';' | '|' | '&' => {
                 if started {
                     tokens.push(Token::Word(std::mem::take(&mut word)));
                     started = false;
                 }
+                literal = true;
                 if matches!(c, '|' | '&') && chars.peek() == Some(&c) {
                     chars.next();
                 } else if c == '&' {
@@ -94,12 +99,13 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
             '>' | '<' => {
                 if started {
                     // An unquoted adjacent numeric word is an IO descriptor, not argv.
-                    if !word.chars().all(|c| c.is_ascii_digit()) {
+                    if !literal || !word.chars().all(|c| c.is_ascii_digit()) {
                         tokens.push(Token::Word(std::mem::take(&mut word)));
                     }
                     word.clear();
                     started = false;
                 }
+                literal = true;
                 if c == '>' && chars.peek() == Some(&'>') {
                     chars.next();
                 }
@@ -130,6 +136,42 @@ fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
         return Err(blocked("too many shell tokens"));
     }
     Ok(tokens)
+}
+
+/// Inspect argv in the bounded literal grammar, removing IO descriptors and
+/// redirect targets. This is syntax inspection, NOT program authorization or
+/// filesystem confinement; callers must apply their own command policy.
+pub fn inspect_literal_commands(command: &str) -> Result<Vec<Vec<String>>, Error> {
+    let tokens = tokenize(command)?;
+    let mut commands = Vec::new();
+    let mut argv = Vec::new();
+    let mut iter = tokens.into_iter().peekable();
+    while let Some(token) = iter.next() {
+        match token {
+            Token::Word(word) => argv.push(word),
+            Token::Redirect(_) => {
+                if !matches!(iter.next(), Some(Token::Word(_))) {
+                    return Err(blocked("missing redirect target"));
+                }
+            }
+            Token::Separator(terminal) => {
+                if !terminal && iter.peek().is_none() {
+                    return Err(blocked("incomplete shell operator"));
+                }
+                if argv.is_empty() {
+                    return Err(blocked("empty shell statement"));
+                }
+                commands.push(std::mem::take(&mut argv));
+            }
+        }
+    }
+    if !argv.is_empty() {
+        commands.push(argv);
+    }
+    if commands.is_empty() {
+        return Err(blocked("empty shell command"));
+    }
+    Ok(commands)
 }
 
 /// Classify a bounded literal grammar. Unknown programs, options and dynamic
@@ -390,25 +432,7 @@ fn classify_git(args: &[&str], remote: bool) -> Result<CommandClass, Error> {
             if !remote {
                 return Err(blocked("git remote writes are disabled"));
             }
-            let rest = if matches!(rest.first(), Some(&"-u" | &"--set-upstream")) {
-                &rest[1..]
-            } else {
-                rest
-            };
-            if rest.len() != 2 || !simple_ref(rest[0]) {
-                return Err(blocked("push requires explicit remote and single refspec"));
-            }
-            let spec = rest[1];
-            let (source, dest) = spec.split_once(':').unwrap_or((spec, spec));
-            if !simple_ref(source) || !simple_ref(dest) {
-                return Err(blocked("unsupported push refspec"));
-            }
-            let branch = dest.strip_prefix("refs/heads/").unwrap_or(dest);
-            if matches!(branch, "main" | "master" | "HEAD")
-                || (dest.starts_with("refs/") && !dest.starts_with("refs/heads/"))
-            {
-                return Err(blocked("push to protected or ambiguous ref"));
-            }
+            validate_git_push(rest)?;
             return Ok(CommandClass::Mutating);
         }
         // Local mutations still need an enforcing workspace sandbox.
@@ -424,6 +448,32 @@ fn classify_git(args: &[&str], remote: bool) -> Result<CommandClass, Error> {
         return Err(blocked("unsupported git subcommand or options"));
     }
     Ok(CommandClass::ReadOnly)
+}
+
+/// Validate arguments after `git push`: an explicit remote and one literal,
+/// nonprotected branch destination, optionally preceded by `-u`.
+/// This does not grant remote-write permission or authorize Git configuration.
+pub fn validate_git_push(rest: &[&str]) -> Result<(), Error> {
+    let rest = if matches!(rest.first(), Some(&"-u" | &"--set-upstream")) {
+        &rest[1..]
+    } else {
+        rest
+    };
+    if rest.len() != 2 || !simple_ref(rest[0]) {
+        return Err(blocked("push requires explicit remote and single refspec"));
+    }
+    let spec = rest[1];
+    let (source, dest) = spec.split_once(':').unwrap_or((spec, spec));
+    if !simple_ref(source) || !simple_ref(dest) {
+        return Err(blocked("unsupported push refspec"));
+    }
+    let branch = dest.strip_prefix("refs/heads/").unwrap_or(dest);
+    if matches!(branch, "main" | "master" | "HEAD")
+        || (dest.starts_with("refs/") && !dest.starts_with("refs/heads/"))
+    {
+        return Err(blocked("push to protected or ambiguous ref"));
+    }
+    Ok(())
 }
 
 fn simple_ref(value: &str) -> bool {

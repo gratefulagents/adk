@@ -3,11 +3,20 @@
 //! See the crate README for containment and lifecycle limitations.
 
 use adk_core::{AccessMode, Context};
-use std::{collections::BTreeMap, path::PathBuf, time::Duration};
+use std::{
+    collections::BTreeMap,
+    path::{Path, PathBuf},
+    sync::Arc,
+    time::Duration,
+};
 
 #[cfg(unix)]
 mod backend;
+#[cfg(unix)]
+mod git_credentials;
 mod policy;
+mod session;
+pub use session::{ProcessSession, SessionInput, SessionOutput};
 #[cfg(unix)]
 mod process;
 
@@ -33,7 +42,7 @@ pub enum OutputMode {
     #[default]
     Pipes,
     /// Capture a private terminal; stdout and stderr are merged into stdout.
-    /// No interactive input API is provided.
+    /// `Executor::start_session` also exposes interactive input.
     Pty { rows: u16, cols: u16 },
 }
 
@@ -41,6 +50,9 @@ pub enum OutputMode {
 pub struct Config {
     pub workspace: PathBuf,
     pub backend: Backend,
+    /// Explicit host-selected, read-only runtime directories (for example, an
+    /// Apple developer toolchain). Never construct these from model input.
+    pub runtime_roots: Vec<PathBuf>,
     /// Combined retained stdout/stderr byte budget; excess bytes are drained.
     pub output_limit: usize,
     pub term_grace: Duration,
@@ -51,8 +63,48 @@ impl Config {
         Self {
             workspace: workspace.into(),
             backend: Backend::Auto,
+            runtime_roots: Vec::new(),
             output_limit: 1024 * 1024,
             term_grace: Duration::from_millis(250),
+        }
+    }
+}
+
+/// Host-owned private staging directory, removed when its last owner is dropped.
+/// Share through `Arc` to retain files after a request completes. Only
+/// `WorkspaceWrite` requests may grant access to these directories.
+#[derive(Debug)]
+pub struct ScratchDirectory {
+    #[cfg(unix)]
+    directory: backend::PrivateDir,
+    #[cfg(not(unix))]
+    path: PathBuf,
+}
+
+impl ScratchDirectory {
+    pub fn new() -> Result<Self, Error> {
+        #[cfg(unix)]
+        {
+            Ok(Self {
+                directory: backend::PrivateDir::new()?,
+            })
+        }
+        #[cfg(not(unix))]
+        {
+            Err(Error::Unavailable(
+                "private scratch directories require Unix".into(),
+            ))
+        }
+    }
+
+    pub fn path(&self) -> &Path {
+        #[cfg(unix)]
+        {
+            &self.directory.0
+        }
+        #[cfg(not(unix))]
+        {
+            &self.path
         }
     }
 }
@@ -70,6 +122,10 @@ pub struct Request {
     pub env: BTreeMap<String, String>,
     pub timeout: Option<Duration>,
     pub output: OutputMode,
+    /// Owned, host-created staging grants; retained through supervisor cleanup.
+    pub scratch: Vec<Arc<ScratchDirectory>>,
+    /// Mask standard host Git credential files; requires an enforcing backend.
+    pub hide_git_credentials: bool,
 }
 
 impl Request {
@@ -83,6 +139,8 @@ impl Request {
             env: BTreeMap::new(),
             timeout: None,
             output: OutputMode::Pipes,
+            scratch: Vec::new(),
+            hide_git_credentials: false,
         }
     }
 }
@@ -161,9 +219,86 @@ impl Drop for RunningProcess {
     }
 }
 
+fn trusted_runtime_roots(workspace: &Path, roots: Vec<PathBuf>) -> Result<Vec<PathBuf>, Error> {
+    let mut trusted = Vec::with_capacity(roots.len());
+    for root in roots {
+        if !root.is_absolute()
+            || root
+                .components()
+                .any(|part| part == std::path::Component::ParentDir)
+        {
+            return Err(Error::Invalid(
+                "runtime root must be absolute without '..'".into(),
+            ));
+        }
+        let root = root.canonicalize()?;
+        if !root.is_dir()
+            || root.parent().is_none()
+            || root.starts_with(workspace)
+            || workspace.starts_with(&root)
+        {
+            return Err(Error::Invalid(
+                "runtime root must be a non-overlapping existing directory".into(),
+            ));
+        }
+        if [
+            "/",
+            "/Applications",
+            "/Users",
+            "/home",
+            "/private",
+            "/tmp",
+            "/private/tmp",
+            "/var",
+            "/private/var",
+            "/etc",
+            "/private/etc",
+            "/Library",
+            "/System",
+            "/usr",
+            "/bin",
+            "/sbin",
+            "/opt",
+        ]
+        .iter()
+        .any(|forbidden| root == Path::new(forbidden))
+        {
+            return Err(Error::Invalid("runtime root is too broad".into()));
+        }
+        if !trusted.contains(&root) {
+            trusted.push(root);
+        }
+    }
+    Ok(trusted)
+}
+
+/// Resolve the host-selected Apple developer toolchain for a trusted
+/// [`Config::runtime_roots`] entry. This is host configuration, not a
+/// request/model-controlled grant.
+#[cfg(target_os = "macos")]
+pub fn macos_developer_toolchain_root() -> Result<PathBuf, Error> {
+    let developer = Path::new("/var/select/developer_dir").canonicalize()?;
+    // Xcode launchers also read Info.plist and load sibling SharedFrameworks.
+    // Grant only the selected application bundle's Contents, never /Applications.
+    if let Some(contents) = developer.parent()
+        && developer
+            .file_name()
+            .is_some_and(|name| name == "Developer")
+        && contents.file_name().is_some_and(|name| name == "Contents")
+        && contents
+            .parent()
+            .and_then(Path::extension)
+            .is_some_and(|ext| ext == "app")
+    {
+        return Ok(contents.to_owned());
+    }
+    Ok(developer)
+}
+
 impl Executor {
     pub fn new(mut config: Config) -> Result<Self, Error> {
         config.workspace = policy::workspace(&config.workspace)?;
+        config.runtime_roots = trusted_runtime_roots(&config.workspace, config.runtime_roots)?;
         if config.output_limit > 64 * 1024 * 1024 || config.term_grace > Duration::from_secs(30) {
             return Err(Error::Invalid(
                 "output limit exceeds 64 MiB or grace exceeds 30 seconds".into(),
@@ -177,6 +312,34 @@ impl Executor {
     /// alive to complete it. Normal returns have reaped the direct child.
     pub async fn run(&self, context: &Context, request: Request) -> Result<RunResult, Error> {
         self.start(context, request)?.wait().await
+    }
+
+    /// Start a bidirectional, incrementally polled session using exactly the same
+    /// policy and backend as `start`. Pipes have writable stdin; PTYs merge output.
+    /// Await `ProcessSession::ready` to confirm child spawn without waiting for
+    /// output or exit. `ProcessSession::wait` retains original startup errors.
+    pub fn start_session(
+        &self,
+        context: &Context,
+        request: Request,
+    ) -> Result<ProcessSession, Error> {
+        policy::active(context)?;
+        let request = policy::validate(&self.config, request)?;
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        {
+            Ok(process::start_session(
+                self.config.clone(),
+                context.clone(),
+                request,
+            ))
+        }
+        #[cfg(not(any(target_os = "linux", target_os = "macos")))]
+        {
+            let _ = request;
+            Err(Error::Unavailable(
+                "only Unix process lifecycle is implemented".into(),
+            ))
+        }
     }
 
     /// Start independently supervised work. Keep this handle to explicitly

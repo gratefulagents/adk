@@ -55,11 +55,10 @@ Object-safe `TaskStore`, `MemoryStore`, `SessionStore`, `PrimeStore`, and combin
 `State::replay`, `events()`, `state()`, `memory_stats()`, and retention methods are
 also exposed. There is no global singleton or implicit network provider.
 
-**Issue #7 tool-registry integration remains external/pending.** Inspection found
-only `adk_core::Tool`, not an existing Rust task/memory-specific store interface.
-No registry, authorization bypass, or unrelated tool catalog is added here. A #7
-adapter should deserialize the input DTOs, call these traits on its blocking
-executor, and preserve the host's `ToolContext` authorization/cancellation rules.
+`adk_tools::project_state_tools` integrates all 15 task/memory/context tools with
+the canonical registry. Its adapters deserialize the input DTOs, call these traits
+on a blocking executor, and preserve the host's `ToolContext` authorization and
+cancellation rules. Namespace `Memory` is a separate host-injected tool.
 Host policy, not a model-selected project ID or filesystem path, must select the
 store. The serde DTO names/fields match the Go tool input contracts.
 
@@ -116,8 +115,9 @@ record lacking a newline is preserved and separated before the next append.
 
 A stable OS advisory lock (`fs4`) covers Rust recovery, replay, mutation and snapshot
 replacement. Rust also acquires the Go token lock, so normal mixed-client operations
-honor Go's lock. Rust only reclaims token locks whose Unix owner PID is demonstrably
-dead; old live/unknown-owner locks time out instead of being stolen. An incomplete
+honor Go's lock. Rust only reclaims token locks whose owner PID is demonstrably
+dead (Unix signal-zero probing or Windows `OpenProcess` reporting an invalid PID);
+access-denied, live and unknown-owner locks time out instead of being stolen. An incomplete
 lock with no PID needs operator recovery while all clients are stopped. PID reuse
 can also require operator recovery. **Go itself has a stale-lock rename race and
 age-based live-lock stealing; concurrent mixed-language stale recovery is not made
@@ -125,6 +125,12 @@ safe by a Rust-only lock.** For multiwriter guarantees use only Rust writers or
 externally serialize/upgrade Go writers. Advisory locking requires a filesystem
 with reliable lock/rename/fsync semantics; distributed/network filesystems are not
 claimed safe.
+
+Regular-file writes are synchronized on every supported platform. On Unix,
+directory creation and atomic replacement additionally synchronize the containing
+directories. Windows does not support the Unix `File::open(directory).sync_all()`
+operation; the portable filesystem backend does not claim that extra directory
+power-loss guarantee there. SQLite retains its native FULL synchronous durability.
 
 SQLite tables match Go exactly, default prefix `projectstate_`:
 

@@ -15,9 +15,11 @@ providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 execution = ["dep:adk-security", "dep:adk-sandbox"]
 durable = ["dep:adk-durable"]
 project-state = ["dep:adk-project-state"]
+tools = ["dep:adk-tools"]
 
 [dependencies]
 adk-core.workspace = true
+adk-tools = { version = "0.1.0", path = "../adk-tools", optional = true }
 adk-codec = { workspace = true, optional = true }
 adk-runtime = { workspace = true, optional = true }
 adk-providers = { version = "0.1.0", path = "../adk-providers", optional = true }

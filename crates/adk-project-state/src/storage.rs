@@ -120,6 +120,14 @@ fn reject_symlinks(path: &Path) -> Result<()> {
     }
     Ok(())
 }
+fn sync_directory(path: &Path) -> Result<()> {
+    // Windows cannot open directories with File::open; only Unix supports this directory fsync.
+    #[cfg(unix)]
+    File::open(path)?.sync_all()?;
+    #[cfg(not(unix))]
+    let _ = path;
+    Ok(())
+}
 fn private_dir(path: &Path) -> Result<()> {
     reject_symlinks(path)?;
     let mut missing = Vec::new();
@@ -147,8 +155,8 @@ fn private_dir(path: &Path) -> Result<()> {
         fs::set_permissions(path, fs::Permissions::from_mode(0o700))?;
     }
     for dir in missing.iter().rev() {
-        File::open(dir)?.sync_all()?;
-        File::open(dir.parent().unwrap())?.sync_all()?;
+        sync_directory(dir)?;
+        sync_directory(dir.parent().unwrap())?;
     }
     Ok(())
 }
@@ -218,7 +226,7 @@ fn atomic_write(path: &Path, data: &[u8]) -> Result<()> {
         f.write_all(data)?;
         f.sync_all()?;
         fs::rename(&tmp, path)?;
-        File::open(path.parent().unwrap())?.sync_all()?;
+        sync_directory(path.parent().unwrap())?;
         Ok(())
     })();
     if result.is_err() {
@@ -331,7 +339,7 @@ impl Backend {
             private_dir(parent)?;
         }
         drop(private_open(path, false, false)?);
-        File::open(path.parent().unwrap())?.sync_all()?;
+        sync_directory(path.parent().unwrap())?;
         Self::connection(Connection::open(path)?, prefix, project_id)
     }
     pub fn connection(conn: Connection, prefix: &str, project_id: &str) -> Result<Self> {
@@ -435,7 +443,7 @@ impl Transaction for FsTransaction<'_> {
         let mut f = private_open(&self.path.join("events.jsonl"), true, false)?;
         f.write_all(&bytes)?;
         f.sync_all()?;
-        File::open(self.path)?.sync_all()?;
+        sync_directory(self.path)?;
         Ok(())
     }
     fn replace(&mut self, events: &[Event]) -> Result<()> {
@@ -593,26 +601,50 @@ impl Transaction for SqlTransaction<'_> {
 }
 
 fn dead_lock_owner(path: &Path) -> bool {
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         let Some(pid) = fs::read_to_string(path).ok().and_then(|s| {
             s.lines().find_map(|line| {
                 line.strip_prefix("pid=")
-                    .and_then(|v| v.parse::<i32>().ok())
+                    .and_then(|v| v.parse::<u32>().ok())
             })
         }) else {
             return false;
         };
-        if pid <= 0 {
+        if pid == 0 {
             return false;
         }
-        // Signal zero probes existence without sending a signal; EPERM means the owner is alive.
-        unsafe {
-            libc::kill(pid, 0) == -1
-                && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+        #[cfg(unix)]
+        {
+            let Ok(pid) = i32::try_from(pid) else {
+                return false;
+            };
+            // Signal zero probes existence without sending a signal; EPERM means the owner is alive.
+            unsafe {
+                libc::kill(pid, 0) == -1
+                    && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+            }
+        }
+        #[cfg(windows)]
+        {
+            use windows_sys::Win32::{
+                Foundation::{CloseHandle, ERROR_INVALID_PARAMETER, GetLastError},
+                System::Threading::{OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION},
+            };
+
+            unsafe {
+                let handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid);
+                if handle.is_null() {
+                    // Access denied and other errors cannot prove the owner is dead.
+                    GetLastError() == ERROR_INVALID_PARAMETER
+                } else {
+                    CloseHandle(handle);
+                    false
+                }
+            }
         }
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = path;
         false

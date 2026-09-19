@@ -601,26 +601,50 @@ impl Transaction for SqlTransaction<'_> {
 }
 
 fn dead_lock_owner(path: &Path) -> bool {
-    #[cfg(unix)]
+    #[cfg(any(unix, windows))]
     {
         let Some(pid) = fs::read_to_string(path).ok().and_then(|s| {
             s.lines().find_map(|line| {
                 line.strip_prefix("pid=")
-                    .and_then(|v| v.parse::<i32>().ok())
+                    .and_then(|v| v.parse::<u32>().ok())
             })
         }) else {
             return false;
         };
-        if pid <= 0 {
+        if pid == 0 {
             return false;
         }
-        // Signal zero probes existence without sending a signal; EPERM means the owner is alive.
-        unsafe {
-            libc::kill(pid, 0) == -1
-                && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+        #[cfg(unix)]
+        {
+            let Ok(pid) = i32::try_from(pid) else {
+                return false;
+            };
+            // Signal zero probes existence without sending a signal; EPERM means the owner is alive.
+            unsafe {
+                libc::kill(pid, 0) == -1
+                    && std::io::Error::last_os_error().raw_os_error() == Some(libc::ESRCH)
+            }
+        }
+        #[cfg(windows)]
+        {
+            use windows_sys::Win32::{
+                Foundation::{CloseHandle, ERROR_INVALID_PARAMETER, GetLastError},
+                System::Threading::{OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION},
+            };
+
+            unsafe {
+                let handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid);
+                if handle.is_null() {
+                    // Access denied and other errors cannot prove the owner is dead.
+                    GetLastError() == ERROR_INVALID_PARAMETER
+                } else {
+                    CloseHandle(handle);
+                    false
+                }
+            }
         }
     }
-    #[cfg(not(unix))]
+    #[cfg(not(any(unix, windows)))]
     {
         let _ = path;
         false

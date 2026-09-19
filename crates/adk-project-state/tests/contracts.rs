@@ -900,6 +900,41 @@ fn child_process_writer() {
 }
 
 #[test]
+fn live_and_unknown_lock_owners_are_preserved() {
+    let temp = TempDir::new().unwrap();
+    let store = open(temp.path(), false);
+    let lock = store.state_dir().join("locks/state.lock");
+    let mut owners = vec![
+        format!("pid={}\n", std::process::id()),
+        String::new(),
+        "pid=unknown\n".into(),
+        "pid=0\n".into(),
+        "pid=-1\n".into(),
+        "pid=4294967296\n".into(),
+    ];
+    if cfg!(windows) {
+        // Windows denies OpenProcess access to the System process, even for administrators.
+        owners.push("pid=4\n".into());
+    }
+    for owner in owners {
+        let contents = format!("{owner}token=untouched\ntime=2000-01-01T00:00:00Z\n");
+        fs::write(&lock, &contents).unwrap();
+        assert!(
+            matches!(
+                ProjectStore::filesystem(FilesystemOptions {
+                    state_dir: store.state_dir().into(),
+                    store: options(),
+                    lock_timeout: Duration::from_millis(25),
+                }),
+                Err(Error::LockTimeout)
+            ),
+            "unexpected recovery for {owner:?}"
+        );
+        assert_eq!(fs::read_to_string(&lock).unwrap(), contents);
+    }
+}
+
+#[test]
 fn independent_processes_recover_one_abandoned_lock_without_lost_events() {
     for sqlite in [false, true] {
         let temp = TempDir::new().unwrap();

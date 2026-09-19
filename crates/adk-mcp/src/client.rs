@@ -290,7 +290,7 @@ impl Client {
         self.state = State::Failed;
         let result =
             tokio::time::timeout(self.limits.timeout, self.transport.request(method, params)).await;
-        let reusable = matches!(
+        let mut reusable = matches!(
             &result,
             Ok(Ok(_)) | Ok(Err(Error::Remote { .. } | Error::Policy(_)))
         );
@@ -298,8 +298,14 @@ impl Client {
             Ok(Ok(value)) => {
                 if serde_json::to_vec(&value).map_err(|_| Error::Limit)?.len()
                     > self.limits.max_message_bytes
+                    || (method == "tools/call"
+                        && (!value.get("content").is_some_and(Value::is_array)
+                            || value.get("isError").is_some_and(|v| !v.is_boolean())))
                 {
-                    Err(Error::Limit)
+                    // A response that cannot convey the dispatched result is
+                    // not evidence that the operation had no side effects.
+                    reusable = false;
+                    Err(self.unknown(method))
                 } else {
                     Ok(value)
                 }
@@ -556,11 +562,6 @@ impl Client {
                 &context,
             )
             .await?;
-        if !result.get("content").is_some_and(Value::is_array)
-            || result.get("isError").is_some_and(|v| !v.is_boolean())
-        {
-            return Err(Error::Protocol("malformed tool result".into()));
-        }
         Ok(result)
     }
     pub async fn list_resources(&mut self) -> Result<Vec<ResourceDescriptor>, Error> {

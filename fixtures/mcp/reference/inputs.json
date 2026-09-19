@@ -1,0 +1,673 @@
+{
+  "schemas": [
+    {
+      "name": "schema-00",
+      "input": null
+    },
+    {
+      "name": "schema-01",
+      "input": false
+    },
+    {
+      "name": "schema-02",
+      "input": true
+    },
+    {
+      "name": "schema-03",
+      "input": []
+    },
+    {
+      "name": "schema-04",
+      "input": 42
+    },
+    {
+      "name": "schema-05",
+      "input": "invalid"
+    },
+    {
+      "name": "schema-06",
+      "input": {}
+    },
+    {
+      "name": "schema-07",
+      "input": {
+        "required": [
+          "x"
+        ],
+        "properties": {
+          "x": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "schema-08",
+      "input": {
+        "type": "object",
+        "description": "metadata"
+      }
+    },
+    {
+      "name": "schema-09",
+      "input": {
+        "type": "",
+        "title": "empty-type"
+      }
+    },
+    {
+      "name": "schema-10",
+      "input": {
+        "type": [
+          "object",
+          "null"
+        ]
+      }
+    },
+    {
+      "name": "schema-11",
+      "input": {
+        "type": false
+      }
+    },
+    {
+      "name": "schema-12",
+      "input": {
+        "type": "object",
+        "properties": null
+      }
+    },
+    {
+      "name": "schema-13",
+      "input": {
+        "type": "array",
+        "items": {
+          "type": "integer"
+        }
+      }
+    },
+    {
+      "name": "schema-14",
+      "input": {
+        "type": "string"
+      }
+    },
+    {
+      "name": "schema-15",
+      "input": {
+        "$ref": "#/$defs/T",
+        "$defs": {
+          "T": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "results": [
+    {
+      "name": "nil",
+      "kind": "call",
+      "input": null
+    },
+    {
+      "name": "empty",
+      "kind": "call",
+      "input": {
+        "content": []
+      }
+    },
+    {
+      "name": "text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "hello 界"
+          }
+        ]
+      }
+    },
+    {
+      "name": "text-error",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "denied"
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "name": "structured",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "hello"
+          }
+        ],
+        "structuredContent": {
+          "answer": 42
+        }
+      }
+    },
+    {
+      "name": "multiple-error",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "one"
+          },
+          {
+            "type": "text",
+            "text": "two"
+          }
+        ],
+        "isError": true
+      }
+    },
+    {
+      "name": "image",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "mimeType": "image/png",
+            "data": "aGVsbG8="
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio",
+            "mimeType": "audio/wav",
+            "data": "aGVsbG8="
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "uri": "test://item",
+              "mimeType": "text/plain",
+              "text": "resource"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "uri": "test://item",
+              "mimeType": "application/octet-stream",
+              "blob": "aGVsbG8="
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "link",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "uri": "test://item",
+            "name": "item",
+            "title": "Title",
+            "description": "Description",
+            "mimeType": "text/plain"
+          }
+        ]
+      }
+    },
+    {
+      "name": "long-text",
+      "kind": "call",
+      "input": null,
+      "generate": "long-text"
+    },
+    {
+      "name": "oversized-blob",
+      "kind": "call",
+      "input": null,
+      "generate": "oversized-blob"
+    },
+    {
+      "name": "symlink-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "mimeType": "image/png",
+            "data": "aGVsbG8="
+          }
+        ]
+      },
+      "setup": "symlink"
+    },
+    {
+      "name": "invalid-base64",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "mimeType": "image/png",
+            "data": "%%%"
+          }
+        ]
+      },
+      "delta": "Go wire decoder rejects invalid base64; Rust renderer returns a redacted per-block error"
+    },
+    {
+      "name": "resource-nil",
+      "kind": "resource",
+      "input": null
+    },
+    {
+      "name": "resource-empty",
+      "kind": "resource",
+      "input": {
+        "contents": []
+      }
+    },
+    {
+      "name": "resource-text",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "uri": "test://item",
+            "mimeType": "text/plain",
+            "text": "resource"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "uri": "test://item",
+            "mimeType": "application/octet-stream",
+            "blob": "aGVsbG8="
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-mixed",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "uri": "test://item",
+            "mimeType": "application/octet-stream",
+            "blob": "aGVsbG8=",
+            "text": "kept"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-long",
+      "kind": "resource",
+      "input": null,
+      "generate": "long-text"
+    },
+    {
+      "name": "resource-oversized",
+      "kind": "resource",
+      "input": null,
+      "generate": "oversized-blob"
+    },
+    {
+      "name": "resource-symlink",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "uri": "test://item",
+            "mimeType": "application/octet-stream",
+            "blob": "aGVsbG8="
+          }
+        ]
+      },
+      "setup": "symlink"
+    }
+  ],
+  "configs": [
+    {
+      "name": "valid-stdio",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "",
+      "delta": ""
+    },
+    {
+      "name": "userinfo",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "streamable-http",
+            "url": "https://user:secret@8.8.8.8/mcp"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "remote",
+      "delta": "Go LoadConfig accepts; Go endpoint policy and Rust snapshot reject"
+    },
+    {
+      "name": "query",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "streamable-http",
+            "url": "https://8.8.8.8/mcp?token=secret"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "remote",
+      "delta": "Go LoadConfig accepts; Go endpoint policy and Rust snapshot reject"
+    },
+    {
+      "name": "fragment",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "streamable-http",
+            "url": "https://8.8.8.8/mcp#secret"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "remote",
+      "delta": "Go LoadConfig accepts; Go endpoint policy and Rust snapshot reject"
+    },
+    {
+      "name": "file",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "streamable-http",
+            "url": "file:///etc/passwd"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "remote",
+      "delta": "Go LoadConfig accepts; Go endpoint policy and Rust snapshot reject"
+    },
+    {
+      "name": "public-https",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "sse",
+            "url": "https://8.8.8.8/mcp"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "remote",
+      "delta": "Rust snapshot is not network authorization; host policy/transport validate at connect"
+    },
+    {
+      "name": "plaintext",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "sse",
+            "url": "http://8.8.8.8/mcp"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "remote",
+      "delta": "Rust snapshot is not network authorization; host policy/transport validate at connect"
+    },
+    {
+      "name": "loopback",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "sse",
+            "url": "https://127.0.0.1/mcp"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "remote",
+      "delta": "Rust snapshot is not network authorization; host policy/transport validate at connect"
+    },
+    {
+      "name": "metadata",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "sse",
+            "url": "http://169.254.169.254/latest"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "remote",
+      "delta": "Rust snapshot is not network authorization; host policy/transport validate at connect"
+    },
+    {
+      "name": "ipv6-loopback",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "sse",
+            "url": "https://[::1]/mcp"
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "remote",
+      "delta": "Rust snapshot is not network authorization; host policy/transport validate at connect"
+    },
+    {
+      "name": "unsupported",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "exec",
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "dispatch",
+      "delta": "Go LoadConfig accepts; Go dispatch and Rust snapshot reject"
+    },
+    {
+      "name": "missing-command",
+      "config": {
+        "mcpServers": {
+          "bad": {}
+        }
+      },
+      "rustAccept": false,
+      "layer": "dispatch",
+      "delta": "Go LoadConfig accepts; Go dispatch and Rust snapshot reject"
+    },
+    {
+      "name": "invalid-env-name",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed",
+            "env": {
+              "A=B": "value"
+            }
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Go LoadConfig accepts; Rust snapshot rejects; no Go process launched"
+    },
+    {
+      "name": "invalid-env-value",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed",
+            "env": {
+              "A": "value\u0000"
+            }
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Go LoadConfig accepts; Rust snapshot rejects; no Go process launched"
+    },
+    {
+      "name": "wrong-tool-list",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed",
+            "allowedTools": "*"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Both JSON decoders reject wrong field type"
+    },
+    {
+      "name": "repository-credential-opt-in",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed",
+            "env": {
+              "GITHUB_TOKEN": "synthetic-secret",
+              "NORMAL": "value"
+            },
+            "allowEnv": [
+              "GITHUB_TOKEN"
+            ]
+          }
+        }
+      },
+      "rustAccept": true,
+      "layer": "env",
+      "delta": "Go FilterCredentialEnv permits repository opt-in; Rust requires intersecting host grant"
+    },
+    {
+      "name": "empty-name",
+      "config": {
+        "mcpServers": {
+          " ": {
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Go LoadConfig accepts; Rust snapshot rejects empty name"
+    },
+    {
+      "name": "symlink-config",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Go LoadConfig follows symlink; Rust snapshot refuses",
+      "setup": "symlink"
+    },
+    {
+      "name": "oversized-config",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "",
+      "delta": "Go LoadConfig has no byte bound; Rust snapshot limited to 1 MiB",
+      "setup": "oversized"
+    },
+    {
+      "name": "stdio-with-url",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "command": "never-executed",
+            "url": "https://8.8.8.8/mcp"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "dispatch",
+      "delta": "Rust rejects mixed transport fields during snapshot validation; actual Go dispatch independently rejects the same combination after its permissive parser"
+    },
+    {
+      "name": "remote-with-command",
+      "config": {
+        "mcpServers": {
+          "bad": {
+            "type": "streamable-http",
+            "url": "https://8.8.8.8/mcp",
+            "command": "never-executed"
+          }
+        }
+      },
+      "rustAccept": false,
+      "layer": "dispatch",
+      "delta": "Rust rejects mixed transport fields during snapshot validation; actual Go dispatch independently rejects the same combination after its permissive parser"
+    }
+  ]
+}

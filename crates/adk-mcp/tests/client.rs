@@ -627,9 +627,11 @@ fn schema_fixture_corpus() {
 #[tokio::test]
 async fn legacy_protocol_is_only_negotiated_for_stdio_and_sse() {
     for kind in ["stdio", "sse", "streamable-http"] {
-        let cfg = serde_json::from_value(
-            json!({"type":kind,"command":"mock","url":"https://example.com/mcp"}),
-        )
+        let cfg = serde_json::from_value(if kind == "stdio" {
+            json!({"type":kind,"command":"mock"})
+        } else {
+            json!({"type":kind,"url":"https://example.com/mcp"})
+        })
         .unwrap();
         let mut p = policy();
         p.servers
@@ -768,4 +770,36 @@ async fn context_digest_separates_tenants_servers_tools_and_arguments() {
         approvals[1].arguments_sha256()
     );
     assert_eq!(approvals[0].tenant_id(), "t1");
+}
+
+#[tokio::test]
+async fn malformed_dispatched_tool_result_is_unknown_not_a_reusable_protocol_error() {
+    for malformed in [
+        json!({"content":"invalid"}),
+        json!({"content":[],"isError":"invalid"}),
+        Value::Null,
+    ] {
+        let (mut client, log) = client(vec![
+            Ok(json!({"tools":[tool("lookup",true)]})),
+            Ok(malformed),
+        ])
+        .await;
+        client.list_tools().await.unwrap();
+        assert!(matches!(
+            client.call_tool("lookup", json!({})).await,
+            Err(Error::ReconciliationRequired { .. })
+        ));
+        assert_eq!(
+            client.call_tool("lookup", json!({})).await,
+            Err(Error::Closed)
+        );
+        assert_eq!(
+            log.lock()
+                .unwrap()
+                .iter()
+                .filter(|(method, _)| method == "tools/call")
+                .count(),
+            1
+        );
+    }
 }

@@ -79,6 +79,7 @@ dependencies = [
  "adk-core",
  "axum",
  "base64",
+ "jsonschema",
  "reqwest",
  "rustix",
  "schemars",

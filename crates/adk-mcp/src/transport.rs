@@ -47,7 +47,7 @@ fn message(method: &str, params: Value, id: Option<u64>, limit: usize) -> Result
     Ok(bytes)
 }
 
-fn reply(value: Value, id: u64) -> Result<Value, Error> {
+fn reply(value: &Value, id: u64) -> Result<Value, Error> {
     if value.get("jsonrpc").and_then(Value::as_str) != Some("2.0")
         || value.get("id").and_then(Value::as_u64) != Some(id)
         || value.get("method").is_some()
@@ -56,7 +56,7 @@ fn reply(value: Value, id: u64) -> Result<Value, Error> {
     }
     match (value.get("result"), value.get("error")) {
         (Some(result), None) => Ok(result.clone()),
-        (None, Some(error)) => error
+        (None, Some(error)) if error.get("message").is_some_and(Value::is_string) => error
             .get("code")
             .and_then(Value::as_i64)
             .map(|code| Err(Error::Remote { code }))
@@ -65,12 +65,81 @@ fn reply(value: Value, id: u64) -> Result<Value, Error> {
     }
 }
 
-fn notification(value: &Value) -> bool {
-    value.get("jsonrpc").and_then(Value::as_str) == Some("2.0")
-        && value.get("method").and_then(Value::as_str).is_some()
-        && value.get("id").is_none()
-        && value.get("result").is_none()
-        && value.get("error").is_none()
+struct Incoming {
+    response: Option<Result<Value, Error>>,
+    replies: Option<Value>,
+}
+
+fn incoming(value: &Value, id: u64, remaining: &mut usize) -> Result<Incoming, Error> {
+    let batch = value.is_array();
+    let items = value
+        .as_array()
+        .map(Vec::as_slice)
+        .unwrap_or_else(|| std::slice::from_ref(value));
+    if items.is_empty() || items.len() > *remaining {
+        return Err(Error::Limit);
+    }
+    *remaining -= items.len();
+    let mut response = None;
+    let mut replies = Vec::new();
+    for value in items {
+        if value.get("jsonrpc").and_then(Value::as_str) != Some("2.0") {
+            return Err(Error::Protocol("invalid JSON-RPC message".into()));
+        }
+        if let Some(method) = value.get("method") {
+            let method = method
+                .as_str()
+                .ok_or_else(|| Error::Protocol("invalid method".into()))?;
+            if value.get("result").is_some()
+                || value.get("error").is_some()
+                || value
+                    .get("params")
+                    .is_some_and(|p| !p.is_object() && !p.is_array())
+            {
+                return Err(Error::Protocol("invalid peer request".into()));
+            }
+            if let Some(peer_id) = value.get("id") {
+                if !(peer_id.is_string() || peer_id.is_i64() || peer_id.is_u64())
+                    || replies.iter().any(|r: &Value| r.get("id") == Some(peer_id))
+                {
+                    return Err(Error::Protocol("invalid peer request id".into()));
+                }
+                replies.push(if method == "ping" {
+                    json!({"jsonrpc":"2.0", "id":peer_id, "result":{}})
+                } else {
+                    json!({"jsonrpc":"2.0", "id":peer_id,
+                        "error":{"code":-32601,"message":"Method not found"}})
+                });
+            }
+        } else {
+            if response.is_some() {
+                return Err(Error::Protocol("duplicate response".into()));
+            }
+            let result = reply(value, id);
+            if !matches!(result, Ok(_) | Err(Error::Remote { .. })) {
+                return Err(Error::Protocol("invalid response".into()));
+            }
+            response = Some(result);
+        }
+    }
+    Ok(Incoming {
+        response,
+        replies: if replies.is_empty() {
+            None
+        } else if batch {
+            Some(Value::Array(replies))
+        } else {
+            replies.pop()
+        },
+    })
+}
+
+fn peer_reply_bytes(value: &Value, limit: usize) -> Result<Vec<u8>, Error> {
+    let bytes = serde_json::to_vec(value).map_err(|_| Error::Protocol("invalid reply".into()))?;
+    if bytes.len() > limit {
+        return Err(Error::Limit);
+    }
+    Ok(bytes)
 }
 
 pub struct StdioTransport {
@@ -185,7 +254,8 @@ impl StdioTransport {
             if !response {
                 return Ok(Value::Null);
             }
-            for _ in 0..self.limits.max_items {
+            let mut remaining = self.limits.max_items;
+            while remaining > 0 {
                 let mut line = Vec::new();
                 loop {
                     let available = session
@@ -211,10 +281,19 @@ impl StdioTransport {
                 }
                 let value: Value = serde_json::from_slice(&line)
                     .map_err(|_| Error::Protocol("invalid JSON".into()))?;
-                if notification(&value) {
-                    continue;
+                let incoming = incoming(&value, id, &mut remaining)?;
+                if let Some(replies) = incoming.replies {
+                    let mut bytes = peer_reply_bytes(&replies, self.limits.max_message_bytes)?;
+                    bytes.push(b'\n');
+                    stdin
+                        .write_all(&bytes)
+                        .await
+                        .map_err(|_| Error::Transport)?;
+                    stdin.flush().await.map_err(|_| Error::Transport)?;
                 }
-                return reply(value, id);
+                if let Some(response) = incoming.response {
+                    return response;
+                }
             }
             Err(Error::Limit)
         })
@@ -466,7 +545,7 @@ pub struct HttpTransport {
     limits: Limits,
     legacy: Option<SseReader>,
     legacy_mode: bool,
-    legacy_secrets: Vec<String>,
+    credential_history: Vec<String>,
     post_url: Url,
     session: Option<HeaderValue>,
     next_id: u64,
@@ -503,7 +582,7 @@ impl HttpTransport {
             limits,
             legacy: None,
             legacy_mode: legacy_sse,
-            legacy_secrets: Vec::new(),
+            credential_history: Vec::new(),
             session: None,
             next_id: 1,
             poisoned: false,
@@ -512,8 +591,13 @@ impl HttpTransport {
         timeout(transport.limits.timeout, async {
             if legacy_sse {
                 let (builder, secrets) = transport
-                    .prepare(reqwest::Method::GET, &transport.url)
+                    .prepare(reqwest::Method::GET, &transport.url, None)
                     .await?;
+                remember_credentials(
+                    &mut transport.credential_history,
+                    secrets,
+                    &transport.limits,
+                )?;
                 let response = builder.send().await.map_err(|_| Error::Transport)?;
                 if !response.status().is_success() || content_type(&response) != "text/event-stream"
                 {
@@ -532,12 +616,23 @@ impl HttpTransport {
                 if endpoint.origin() != transport.url.origin() {
                     return Err(Error::Policy("cross-origin SSE endpoint denied".into()));
                 }
-                transport.legacy_secrets = secrets;
-                transport.legacy_secrets.extend(
+                remember_credentials(
+                    &mut transport.credential_history,
                     endpoint
                         .query_pairs()
-                        .filter_map(|(_, value)| (!value.is_empty()).then(|| value.into_owned())),
-                );
+                        .map(|(_, value)| value.into_owned())
+                        .chain(
+                            endpoint
+                                .query()
+                                .into_iter()
+                                .flat_map(|query| query.split('&'))
+                                .filter_map(|pair| {
+                                    pair.split_once('=').map(|(_, value)| value.to_owned())
+                                }),
+                        )
+                        .collect(),
+                    &transport.limits,
+                )?;
                 transport.post_url = endpoint;
                 transport.legacy = Some(reader);
             } else {
@@ -595,6 +690,7 @@ impl HttpTransport {
         &self,
         method: reqwest::Method,
         url: &Url,
+        session: Option<&HeaderValue>,
     ) -> Result<(reqwest::RequestBuilder, Vec<String>), Error> {
         let client = self.checked_client(url).await?;
         let mut provider_url = url.clone();
@@ -692,7 +788,7 @@ impl HttpTransport {
             HeaderName::from_static("mcp-protocol-version"),
             HeaderValue::from_static(crate::PROTOCOL_VERSION),
         );
-        if let Some(session) = &self.session {
+        if let Some(session) = session {
             secrets.push(
                 session
                     .to_str()
@@ -726,22 +822,27 @@ impl HttpTransport {
         self.next_id = self.next_id.checked_add(1).ok_or(Error::Limit)?;
         self.poisoned = true;
         let mut legacy = self.legacy.take();
-        let prepared = timeout(
-            self.limits.timeout,
-            self.prepare(reqwest::Method::POST, &self.post_url),
-        )
+        // Exchange-local ownership releases the stream and history if this future is cancelled.
+        let mut history = std::mem::take(&mut self.credential_history);
+        let prepared = timeout(self.limits.timeout, async {
+            let (builder, secrets) = self
+                .prepare(reqwest::Method::POST, &self.post_url, self.session.as_ref())
+                .await?;
+            remember_credentials(&mut history, secrets, &self.limits)?;
+            Ok::<_, Error>(builder)
+        })
         .await
         .map_err(|_| Error::Transport)
         .and_then(|result| result);
-        let (builder, mut secrets) = match prepared {
-            Ok(prepared) => prepared,
+        let builder = match prepared {
+            Ok(builder) => builder,
             Err(error) => {
                 self.legacy = legacy;
+                self.credential_history = history;
                 self.poisoned = false;
                 return Err(error);
             }
         };
-        secrets.extend(self.legacy_secrets.iter().cloned());
         let result = timeout(self.limits.timeout, async {
             let response = builder
                 .header(reqwest::header::CONTENT_TYPE, "application/json")
@@ -752,25 +853,7 @@ impl HttpTransport {
             if !response.status().is_success() {
                 return Err(Error::Transport);
             }
-            if let Some(session) = response.headers().get("mcp-session-id") {
-                if (self.session.as_ref().is_some_and(|old| old != session)
-                    || (self.session.is_none() && method != "initialize"))
-                    || session.as_bytes().is_empty()
-                    || session.as_bytes().len() > self.limits.max_message_bytes
-                    || !session.as_bytes().iter().all(|b| (0x21..=0x7e).contains(b))
-                {
-                    return Err(Error::Protocol("unexpected session id".into()));
-                }
-                secrets.push(
-                    session
-                        .to_str()
-                        .map_err(|_| Error::Protocol("invalid session".into()))?
-                        .to_owned(),
-                );
-                let mut session = session.clone();
-                session.set_sensitive(true);
-                self.session = Some(session);
-            }
+            self.accept_session(&response, method == "initialize", &mut history)?;
             if !response_expected {
                 read_body(response, self.limits.max_message_bytes).await?;
                 return Ok(Value::Null);
@@ -778,22 +861,23 @@ impl HttpTransport {
             if let Some(reader) = &mut legacy {
                 read_body(response, self.limits.max_message_bytes).await?;
                 reader.total = reader.buffer.len().saturating_add(reader.data.len());
-                return sse_reply(reader, id, self.limits.max_items, &secrets).await;
+                return self.sse_reply(reader, id, &mut history).await;
             }
             match content_type(&response) {
                 "application/json" => {
                     let bytes = read_body(response, self.limits.max_message_bytes).await?;
                     let value = serde_json::from_slice(&bytes)
                         .map_err(|_| Error::Protocol("invalid JSON".into()))?;
-                    check_reflection(&value, &secrets)?;
-                    reply(value, id)
+                    let mut remaining = self.limits.max_items;
+                    self.handle_incoming(value, id, &mut remaining, &mut history)
+                        .await?
+                        .ok_or_else(|| Error::Protocol("missing response".into()))?
                 }
                 "text/event-stream" => {
-                    sse_reply(
+                    self.sse_reply(
                         &mut SseReader::new(response, self.limits.max_message_bytes),
                         id,
-                        self.limits.max_items,
-                        &secrets,
+                        &mut history,
                     )
                     .await
                 }
@@ -804,16 +888,109 @@ impl HttpTransport {
         match result {
             Ok(Ok(value)) => {
                 self.legacy = legacy;
+                self.credential_history = history;
                 self.poisoned = false;
                 Ok(value)
             }
             Ok(Err(error @ Error::Remote { .. })) => {
                 self.legacy = legacy;
+                self.credential_history = history;
                 self.poisoned = false;
                 Err(error)
             }
             _ => Err(unknown(&self.server, method)),
         }
+    }
+
+    fn accept_session(
+        &mut self,
+        response: &Response,
+        initialize: bool,
+        history: &mut Vec<String>,
+    ) -> Result<(), Error> {
+        if let Some(session) = response.headers().get("mcp-session-id") {
+            if self.session.as_ref().is_some_and(|old| old != session)
+                || (self.session.is_none() && !initialize)
+                || session.as_bytes().is_empty()
+                || !session.as_bytes().iter().all(|b| (0x21..=0x7e).contains(b))
+            {
+                return Err(Error::Protocol("unexpected session id".into()));
+            }
+            remember_credentials(
+                history,
+                vec![
+                    session
+                        .to_str()
+                        .map_err(|_| Error::Protocol("invalid session".into()))?
+                        .to_owned(),
+                ],
+                &self.limits,
+            )?;
+            let mut session = session.clone();
+            session.set_sensitive(true);
+            self.session = Some(session);
+        }
+        Ok(())
+    }
+
+    async fn handle_incoming(
+        &mut self,
+        value: Value,
+        id: u64,
+        remaining: &mut usize,
+        history: &mut Vec<String>,
+    ) -> Result<Option<Result<Value, Error>>, Error> {
+        check_reflection(&value, history)?;
+        let incoming = incoming(&value, id, remaining)?;
+        if let Some(replies) = incoming.replies {
+            let bytes = peer_reply_bytes(&replies, self.limits.max_message_bytes)?;
+            let (builder, secrets) = self
+                .prepare(reqwest::Method::POST, &self.post_url, self.session.as_ref())
+                .await?;
+            remember_credentials(history, secrets, &self.limits)?;
+            // A rotating provider can introduce a secret that was present in this envelope.
+            check_reflection(&value, history)?;
+            let response = builder
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .body(bytes)
+                .send()
+                .await
+                .map_err(|_| Error::Transport)?;
+            self.accept_session(&response, false, history)?;
+            if response.status() != reqwest::StatusCode::ACCEPTED
+                || !read_body(response, self.limits.max_message_bytes)
+                    .await?
+                    .is_empty()
+            {
+                return Err(Error::Protocol("peer reply not accepted".into()));
+            }
+        }
+        check_reflection(&value, history)?;
+        Ok(incoming.response)
+    }
+
+    async fn sse_reply(
+        &mut self,
+        reader: &mut SseReader,
+        id: u64,
+        history: &mut Vec<String>,
+    ) -> Result<Value, Error> {
+        let mut remaining = self.limits.max_items;
+        while remaining > 0 {
+            let (event, data) = reader.next().await?;
+            if !event.is_empty() && event != "message" {
+                return Err(Error::Protocol("unexpected SSE event".into()));
+            }
+            let value = serde_json::from_str(&data)
+                .map_err(|_| Error::Protocol("invalid SSE JSON".into()))?;
+            if let Some(response) = self
+                .handle_incoming(value, id, &mut remaining, history)
+                .await?
+            {
+                return response;
+            }
+        }
+        Err(Error::Limit)
     }
 }
 
@@ -865,26 +1042,28 @@ fn check_reflection(value: &Value, secrets: &[String]) -> Result<(), Error> {
     Ok(())
 }
 
-async fn sse_reply(
-    reader: &mut SseReader,
-    id: u64,
-    max_items: usize,
-    secrets: &[String],
-) -> Result<Value, Error> {
-    for _ in 0..max_items {
-        let (event, data) = reader.next().await?;
-        if !event.is_empty() && event != "message" {
-            return Err(Error::Protocol("unexpected SSE event".into()));
-        }
-        let value: Value =
-            serde_json::from_str(&data).map_err(|_| Error::Protocol("invalid SSE JSON".into()))?;
-        check_reflection(&value, secrets)?;
-        if notification(&value) {
+fn remember_credentials(
+    history: &mut Vec<String>,
+    credentials: Vec<String>,
+    limits: &Limits,
+) -> Result<(), Error> {
+    let mut additions = Vec::new();
+    let mut bytes = history.iter().map(String::len).sum::<usize>();
+    for credential in credentials {
+        if credential.is_empty() || history.contains(&credential) || additions.contains(&credential)
+        {
             continue;
         }
-        return reply(value, id);
+        bytes = bytes.checked_add(credential.len()).ok_or(Error::Limit)?;
+        if bytes > limits.max_message_bytes
+            || history.len().saturating_add(additions.len()) >= limits.max_items.min(64)
+        {
+            return Err(Error::Limit);
+        }
+        additions.push(credential);
     }
-    Err(Error::Limit)
+    history.extend(additions);
+    Ok(())
 }
 
 impl Transport for HttpTransport {
@@ -908,15 +1087,19 @@ impl Transport for HttpTransport {
                 return Ok(());
             }
             self.poisoned = true;
+            self.closed = true;
             self.legacy.take();
-            if self.session.is_some() {
-                let (builder, _) = timeout(
+            let mut history = std::mem::take(&mut self.credential_history);
+            let session = self.session.take();
+            self.post_url.set_query(None);
+            if session.is_some() {
+                let (builder, secrets) = timeout(
                     self.limits.timeout,
-                    self.prepare(reqwest::Method::DELETE, &self.url),
+                    self.prepare(reqwest::Method::DELETE, &self.url, session.as_ref()),
                 )
                 .await
                 .map_err(|_| Error::Transport)??;
-                self.closed = true;
+                remember_credentials(&mut history, secrets, &self.limits)?;
                 let result = timeout(self.limits.timeout, async {
                     let response = builder.send().await.map_err(|_| Error::Transport)?;
                     if !response.status().is_success()
@@ -932,7 +1115,6 @@ impl Transport for HttpTransport {
                     return Err(unknown(&self.server, "DELETE"));
                 }
             }
-            self.closed = true;
             Ok(())
         })
     }

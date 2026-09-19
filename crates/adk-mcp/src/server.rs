@@ -151,6 +151,7 @@ struct Sessions {
 }
 pub struct ServerMode {
     tools: Vec<ToolDefinition>,
+    validators: HashMap<String, jsonschema::Validator>,
     policy: Arc<dyn ServerToolPolicy>,
     tenants: Arc<dyn TenantResolver>,
     resources: Vec<ServerResource>,
@@ -195,6 +196,16 @@ impl ServerMode {
                 "tool names must be nonempty and unique".into(),
             ));
         }
+        let mut validators = HashMap::new();
+        for tool in &tools {
+            let validator = jsonschema::options()
+                .with_retriever(NoExternalSchemas)
+                .build(tool.input_schema.as_value())
+                .map_err(|_| {
+                    Error::Config("invalid or externally referenced tool schema".into())
+                })?;
+            validators.insert(tool.name.clone(), validator);
+        }
         resources.sort_by(|a, b| a.definition.uri.cmp(&b.definition.uri));
         if resources.iter().any(|r| {
             r.definition.name.trim().is_empty() || url::Url::parse(&r.definition.uri).is_err()
@@ -218,6 +229,7 @@ impl ServerMode {
         }
         Ok(Self {
             tools,
+            validators,
             policy,
             tenants,
             resources,
@@ -347,6 +359,60 @@ impl ServerMode {
             Ok(value) => value,
             Err(_) => return self.rpc_error(Value::Null, -32700, "parse error"),
         };
+        if let Value::Array(messages) = message {
+            if messages.is_empty() || messages.len() > self.options.limits.max_items {
+                return self.rpc_error(Value::Null, -32600, "empty or oversized batch");
+            }
+            // MCP initialization must not be part of a JSON-RPC batch. Reject
+            // before processing any element, so no hidden session is created.
+            if messages
+                .iter()
+                .any(|m| m.get("method").and_then(Value::as_str) == Some("initialize"))
+            {
+                return self.rpc_error(Value::Null, -32600, "initialize cannot be batched");
+            }
+            let mut output = vec![b'['];
+            let mut count = 0;
+            for message in messages {
+                let response = self.dispatch(&tenant, session_id, message).await;
+                if response.status() == StatusCode::ACCEPTED {
+                    continue;
+                }
+                // A failed dispatched operation must keep its ambiguous HTTP
+                // outcome, not be flattened into a definitive batch RPC error.
+                if response.status() != StatusCode::OK {
+                    return response;
+                }
+                let remaining = self
+                    .options
+                    .limits
+                    .max_message_bytes
+                    .saturating_sub(output.len() + 2);
+                let body = match to_bytes(response.into_body(), remaining).await {
+                    Ok(body) => body,
+                    Err(_) => return status(StatusCode::PAYLOAD_TOO_LARGE),
+                };
+                if count > 0 {
+                    output.push(b',');
+                }
+                output.extend_from_slice(&body);
+                count += 1;
+            }
+            if count == 0 {
+                return status(StatusCode::ACCEPTED);
+            }
+            output.push(b']');
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header("content-type", "application/json")
+                .header("cache-control", "no-store")
+                .body(Body::from(output))
+                .unwrap();
+        }
+        self.dispatch(&tenant, session_id, message).await
+    }
+
+    async fn dispatch(&self, tenant: &str, session_id: Option<&str>, message: Value) -> Response {
         let id = message.get("id").cloned();
         if !message.is_object()
             || message.get("jsonrpc").and_then(Value::as_str) != Some("2.0")
@@ -410,7 +476,7 @@ impl ServerMode {
             sessions.bindings.insert(
                 session_id,
                 SessionBinding {
-                    tenant,
+                    tenant: tenant.to_owned(),
                     last_seen: Instant::now(),
                     initialized: false,
                 },
@@ -460,15 +526,15 @@ impl ServerMode {
                 let Some(tool) = tool else {
                     return self.rpc_error(id, -32602, "unknown tool");
                 };
-                if !args.is_object() {
+                if !args.is_object() || !self.validators[&tool.name].is_valid(&args) {
                     return self.rpc_error(id, -32602, "invalid tool arguments");
                 }
                 let arguments = serde_json::to_vec(&args).unwrap();
-                let request_sha256 = request_digest(&tenant, &tool.name, &arguments);
+                let request_sha256 = request_digest(tenant, &tool.name, &arguments);
                 match self
                     .policy
                     .execute_mcp_tool(ServerToolRequest {
-                        tenant_id: tenant,
+                        tenant_id: tenant.to_owned(),
                         tool: tool.clone(),
                         arguments,
                         request_sha256,
@@ -497,11 +563,7 @@ impl ServerMode {
                 else {
                     return self.rpc_error(id, -32602, "unknown resource");
                 };
-                match resource
-                    .policy
-                    .read(&tenant, &resource.definition.uri)
-                    .await
-                {
+                match resource.policy.read(tenant, &resource.definition.uri).await {
                     Ok(result) => Ok(result),
                     Err(Error::ReconciliationRequired { .. }) => {
                         return status(StatusCode::BAD_GATEWAY);
@@ -536,7 +598,7 @@ impl ServerMode {
                 {
                     return self.rpc_error(id, -32602, "invalid prompt arguments");
                 }
-                match prompt.policy.get(&tenant, args).await {
+                match prompt.policy.get(tenant, args).await {
                     Ok(result) => Ok(result),
                     Err(Error::ReconciliationRequired { .. }) => {
                         return status(StatusCode::BAD_GATEWAY);
@@ -572,6 +634,18 @@ impl ServerMode {
             .header("cache-control", "no-store")
             .body(Body::from(writer.bytes))
             .unwrap()
+    }
+}
+
+/// Explicitly refuse external retrieval even if an embedding application's
+/// Cargo feature unification enables jsonschema's HTTP/file default resolvers.
+struct NoExternalSchemas;
+impl jsonschema::Retrieve for NoExternalSchemas {
+    fn retrieve(
+        &self,
+        _: &jsonschema::Uri<String>,
+    ) -> Result<Value, Box<dyn std::error::Error + Send + Sync>> {
+        Err("external schema retrieval denied".into())
     }
 }
 

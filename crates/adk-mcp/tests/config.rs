@@ -141,3 +141,41 @@ fn sdk_fields_defaults_and_private_snapshot_getters() {
     assert!(!remote.enabled());
     assert_eq!(remote.origin().unwrap(), "https://example.com");
 }
+
+#[test]
+fn transport_normalization_and_inactive_fields_match_dispatch_boundary() {
+    use adk_mcp::config::ServerConfig;
+    for (value, expected) in [
+        (json!({"type":" StDiO ","command":"mock"}), "stdio"),
+        (
+            json!({"type":" SSE ","url":"https://example.com/mcp"}),
+            "sse",
+        ),
+        (
+            json!({"type":" STREAMABLE-HTTP ","url":"https://example.com/mcp"}),
+            "streamable-http",
+        ),
+    ] {
+        let config: ServerConfig = serde_json::from_value(value).unwrap();
+        assert_eq!(config.transport_type(), expected);
+        config.validate().unwrap();
+    }
+    for extra in [
+        json!({"command":"mock"}),
+        json!({"args":["x"]}),
+        json!({"env":{"NORMAL":"x"}}),
+        json!({"allowEnv":["NORMAL"]}),
+    ] {
+        let mut value = json!({"type":"sse","url":"https://example.com/mcp"});
+        value
+            .as_object_mut()
+            .unwrap()
+            .extend(extra.as_object().unwrap().clone());
+        assert!(
+            serde_json::from_value::<ServerConfig>(value)
+                .unwrap()
+                .validate()
+                .is_err()
+        );
+    }
+}

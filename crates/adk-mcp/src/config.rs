@@ -49,10 +49,15 @@ pub struct ServerConfig {
 }
 impl ServerConfig {
     pub fn transport_type(&self) -> &str {
-        if self.transport_type.is_empty() {
+        let transport = self.transport_type.trim();
+        if transport.is_empty() || transport.eq_ignore_ascii_case("stdio") {
             "stdio"
+        } else if transport.eq_ignore_ascii_case("streamable-http") {
+            "streamable-http"
+        } else if transport.eq_ignore_ascii_case("sse") {
+            "sse"
         } else {
-            &self.transport_type
+            transport
         }
     }
     pub fn command(&self) -> &str {
@@ -87,9 +92,22 @@ impl ServerConfig {
     }
     pub fn validate(&self) -> Result<(), Error> {
         match self.transport_type() {
-            "stdio" if !self.command.trim().is_empty() => {}
+            "stdio" if !self.command.trim().is_empty() => {
+                if !self.url.trim().is_empty() {
+                    return Err(Error::Config("stdio transport cannot set url".into()));
+                }
+            }
             "stdio" => return Err(Error::Config("stdio command is required".into())),
             "streamable-http" | "sse" => {
+                if !self.command.trim().is_empty()
+                    || !self.args.is_empty()
+                    || !self.env.is_empty()
+                    || !self.allow_env.is_empty()
+                {
+                    return Err(Error::Config(
+                        "remote transport cannot set command, args, env, or allowEnv".into(),
+                    ));
+                }
                 self.origin()?;
             }
             _ => return Err(Error::Config("unsupported transport".into())),

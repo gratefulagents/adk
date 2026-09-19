@@ -41,6 +41,12 @@ impl ServerToolPolicy for Policy {
         Box::pin(async move {
             let args: Value = serde_json::from_slice(request.arguments()).unwrap();
             self.calls.lock().unwrap().push(request);
+            if args["uncertain"] == true {
+                return Err(Error::ReconciliationRequired {
+                    server: "private-backend".into(),
+                    operation: "private-operation".into(),
+                });
+            }
             if args["deny"] == true {
                 return Err(Error::Policy("TOP_SECRET policy details".into()));
             }
@@ -675,5 +681,144 @@ fn selected_tool_names_are_validated() {
             ),
             Err(Error::Config(_))
         ));
+    }
+}
+
+#[tokio::test]
+async fn batches_preserve_per_element_policy_notifications_and_tenant_binding() {
+    let (mode, policy) = mode(ServerOptions::default());
+    let http = HttpServer::start(mode.clone()).await;
+    let session = http.connect("tenant").await;
+    let batch = json!([
+        {"jsonrpc":"2.0","id":2,"method":"ping"},
+        {"jsonrpc":"2.0","method":"tools/call","params":{"name":"lookup","arguments":{}}},
+        {"jsonrpc":"2.0","id":"call","method":"tools/call","params":{"name":"lookup","arguments":{}}},
+        {"jsonrpc":"2.0","id":3,"method":"tools/list"},
+        17
+    ]);
+    let response = http
+        .post("other", Some(&session))
+        .json(&batch)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::FORBIDDEN);
+    assert!(policy.calls.lock().unwrap().is_empty());
+    let response = http
+        .post("tenant", Some(&session))
+        .json(&batch)
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let response: Value = response.json().await.unwrap();
+    assert_eq!(response.as_array().unwrap().len(), 4);
+    assert_eq!(response[0], json!({"jsonrpc":"2.0","id":2,"result":{}}));
+    assert_eq!(response[1]["id"], "call");
+    assert!(response[2]["result"]["tools"].is_array());
+    assert_eq!(response[3]["error"]["code"], -32600);
+    assert_eq!(policy.calls.lock().unwrap().len(), 1);
+    let response = http
+        .post("tenant", Some(&session))
+        .json(&json!([
+            {"jsonrpc":"2.0","method":"notifications/cancelled","params":{"requestId":2}},
+            {"jsonrpc":"2.0","method":"tools/call","params":{"name":"lookup"}}
+        ]))
+        .send()
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::ACCEPTED);
+    assert!(response.bytes().await.unwrap().is_empty());
+    assert_eq!(policy.calls.lock().unwrap().len(), 1);
+    mode.close();
+}
+
+#[tokio::test]
+async fn batches_are_bounded_and_never_initialize_or_hide_ambiguous_outcomes() {
+    let options = ServerOptions {
+        limits: adk_mcp::Limits {
+            max_items: 2,
+            max_message_bytes: 1024,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let (mode, policy) = mode(options);
+    let http = HttpServer::start(mode.clone()).await;
+    let session = http.connect("tenant").await;
+    for batch in [
+        json!([]),
+        json!([{}, {}, {}]),
+        json!([
+            {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"lookup"}},
+            {"jsonrpc":"2.0","id":3,"method":"initialize"}
+        ]),
+    ] {
+        let response: Value = http
+            .post("tenant", Some(&session))
+            .json(&batch)
+            .send()
+            .await
+            .unwrap()
+            .json()
+            .await
+            .unwrap();
+        assert_eq!(response["error"]["code"], -32600);
+    }
+    assert!(policy.calls.lock().unwrap().is_empty());
+    assert_eq!(mode.session_count(), 1);
+    let response = http.post("tenant",Some(&session)).json(&json!([
+        {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"lookup","arguments":{"uncertain":true}}}
+    ])).send().await.unwrap();
+    assert_eq!(response.status(), StatusCode::BAD_GATEWAY);
+    assert!(response.bytes().await.unwrap().is_empty());
+    assert_eq!(policy.calls.lock().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn tool_schema_validation_is_offline_and_precedes_policy_even_in_batches() {
+    let policy = Arc::new(Policy::default());
+    let mut selected = tool("lookup");
+    selected.input_schema=json!({"type":"object","properties":{"id":{"$ref":"#/$defs/id"}},"required":["id"],"additionalProperties":false,"$defs":{"id":{"type":"string","minLength":2}}}).try_into().unwrap();
+    let server = Arc::new(
+        ServerMode::new(
+            vec![selected],
+            policy.clone(),
+            Arc::new(Tenants),
+            vec![],
+            vec![],
+            ServerOptions::default(),
+        )
+        .unwrap(),
+    );
+    let http = HttpServer::start(server).await;
+    let session = http.connect("tenant").await;
+    let response:Value=http.post("tenant",Some(&session)).json(&json!([
+        {"jsonrpc":"2.0","id":2,"method":"tools/call","params":{"name":"lookup","arguments":{"id":12}}},
+        {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"lookup","arguments":{"id":"ok"}}},
+        {"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"lookup","arguments":{"id":"ok","extra":true}}}
+    ])).send().await.unwrap().json().await.unwrap();
+    assert_eq!(response[0]["error"]["code"], -32602);
+    assert!(response[1]["result"].is_object());
+    assert_eq!(response[2]["error"]["code"], -32602);
+    assert_eq!(policy.calls.lock().unwrap().len(), 1);
+    for schema in [
+        json!({"$ref":"http://127.0.0.1:9/schema"}),
+        json!({"$ref":"file:///etc/passwd"}),
+        json!({"type":"not-a-type"}),
+    ] {
+        let mut selected = tool("lookup");
+        selected.input_schema = schema.try_into().unwrap();
+        assert!(
+            ServerMode::new(
+                vec![selected],
+                policy.clone(),
+                Arc::new(Tenants),
+                vec![],
+                vec![],
+                ServerOptions::default()
+            )
+            .is_err()
+        );
     }
 }

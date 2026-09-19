@@ -825,3 +825,778 @@ async fn cancellation_releases_legacy_sse_without_dropping_transport() {
     server.await.unwrap();
     transport.close().await.unwrap();
 }
+
+struct RotatingCredentials {
+    calls: AtomicUsize,
+    size: usize,
+}
+impl RotatingCredentials {
+    fn next(&self) -> String {
+        let n = self.calls.fetch_add(1, Ordering::SeqCst);
+        match n {
+            0 => format!("alpha-secret{}", "x".repeat(self.size)),
+            1 => format!("beta-secret{}", "x".repeat(self.size)),
+            _ => format!("rotated-secret-{n}{}", "x".repeat(self.size)),
+        }
+    }
+}
+impl HeaderProvider for RotatingCredentials {
+    fn headers<'a>(
+        &'a self,
+        _: &'a str,
+        _: &'a str,
+        endpoint: &'a Url,
+    ) -> BoxFuture<'a, Result<HeaderMap, Error>> {
+        Box::pin(async move {
+            assert!(endpoint.query().is_none());
+            let mut headers = HeaderMap::new();
+            headers.insert("x-api-key", HeaderValue::from_str(&self.next()).unwrap());
+            Ok(headers)
+        })
+    }
+}
+impl OAuthTokenProvider for RotatingCredentials {
+    fn token<'a>(&'a self, _: &'a str, _: &'a str) -> BoxFuture<'a, Result<OAuthToken, Error>> {
+        Box::pin(async move {
+            Ok(OAuthToken {
+                access_token: self.next(),
+                audience: "mcp-audience".into(),
+                scopes: vec!["tools".into()],
+                expiry: SystemTime::now() + Duration::from_secs(60),
+            })
+        })
+    }
+}
+
+#[tokio::test]
+async fn rotated_header_and_oauth_history_rejects_decoded_old_credentials() {
+    for oauth in [false, true] {
+        for kind in ["application/json", "text/event-stream"] {
+            let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+            let server = tokio::spawn(async move {
+                for (id, secret) in [(1, "alpha-secret"), (2, "beta-secret")] {
+                    let (mut stream, _) = listener.accept().await.unwrap();
+                    let (headers, body) = request(&mut stream).await;
+                    assert!(headers.contains(secret));
+                    assert_eq!(body["id"], id);
+                    let body = if id == 1 {
+                        r#"{"jsonrpc":"2.0","id":1,"result":{}}"#
+                    } else {
+                        r#"{"jsonrpc":"2.0","id":2,"result":{"text":"\u0061lpha-secret"}}"#
+                    };
+                    let body = if kind == "text/event-stream" {
+                        format!("data: {body}\n\n")
+                    } else {
+                        body.into()
+                    };
+                    respond(&mut stream, "200 OK", kind, &body, "").await;
+                }
+                assert!(
+                    tokio::time::timeout(Duration::from_millis(100), listener.accept())
+                        .await
+                        .is_err()
+                );
+            });
+            let provider = Arc::new(RotatingCredentials {
+                calls: AtomicUsize::new(0),
+                size: 0,
+            });
+            let options = if oauth {
+                RemoteOptions {
+                    oauth: Some(OAuthPolicy {
+                        provider,
+                        audience: "mcp-audience".into(),
+                        required_scopes: vec!["tools".into()],
+                    }),
+                    ..options()
+                }
+            } else {
+                RemoteOptions {
+                    headers: Some(provider),
+                    ..options()
+                }
+            };
+            let mut transport = HttpTransport::connect("mock", &url, false, options, limits())
+                .await
+                .unwrap();
+            assert_eq!(
+                transport.request("tools/call", json!({})).await.unwrap(),
+                json!({})
+            );
+            uncertain(
+                transport
+                    .request("tools/call", json!({}))
+                    .await
+                    .unwrap_err(),
+                "tools/call",
+            );
+            assert_eq!(
+                transport.request("tools/call", json!({})).await,
+                Err(Error::Closed)
+            );
+            transport.close().await.unwrap();
+            server.await.unwrap();
+        }
+    }
+}
+
+#[tokio::test]
+async fn credential_history_count_and_bytes_fail_before_dispatch() {
+    for (byte_bound, max_items, issued) in [(false, 2, 2), (true, 100, 2), (false, 128, 64)] {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+        let provider = Arc::new(RotatingCredentials {
+            calls: AtomicUsize::new(0),
+            size: if byte_bound { 1800 } else { 0 },
+        });
+        let server = tokio::spawn(async move {
+            for id in 1..=issued {
+                let (mut stream, _) = listener.accept().await.unwrap();
+                let (_, body) = request(&mut stream).await;
+                assert_eq!(body["id"], id);
+                respond(
+                    &mut stream,
+                    "200 OK",
+                    "application/json",
+                    &json!({"jsonrpc":"2.0","id":id,"result":{}}).to_string(),
+                    "",
+                )
+                .await;
+            }
+            assert!(
+                tokio::time::timeout(Duration::from_millis(100), listener.accept())
+                    .await
+                    .is_err()
+            );
+        });
+        let mut transport = HttpTransport::connect(
+            "mock",
+            &url,
+            false,
+            RemoteOptions {
+                headers: Some(provider),
+                ..options()
+            },
+            Limits {
+                max_items,
+                ..limits()
+            },
+        )
+        .await
+        .unwrap();
+        for _ in 0..issued {
+            transport.request("tools/call", json!({})).await.unwrap();
+        }
+        assert_eq!(
+            transport.request("tools/call", json!({})).await,
+            Err(Error::Limit)
+        );
+        transport.close().await.unwrap();
+        assert_eq!(
+            transport.request("tools/call", json!({})).await,
+            Err(Error::Closed)
+        );
+        server.await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn stdio_peer_ping_and_batches_preserve_ids_and_original_call() {
+    for batch in [false, true] {
+        let script = format!(
+            r#"
+import sys,json
+r=json.loads(sys.stdin.readline())
+assert r['id']==1 and r['method']=='tools/call'
+messages=[{{'jsonrpc':'2.0','method':'notifications/progress'}},
+ {{'jsonrpc':'2.0','id':'peer-ping','method':'ping'}},
+ {{'jsonrpc':'2.0','id':-7,'method':'sampling/createMessage'}}]
+result={{'jsonrpc':'2.0','id':r['id'],'result':{{'ok':True}}}}
+expected=[{{'jsonrpc':'2.0','id':'peer-ping','result':{{}}}},
+ {{'jsonrpc':'2.0','id':-7,'error':{{'code':-32601,'message':'Method not found'}}}}]
+if {batch}:
+ print(json.dumps(messages+[result]))
+ assert json.loads(sys.stdin.readline())==expected
+else:
+ print(json.dumps(messages[0]))
+ for m,e in zip(messages[1:],expected):
+  print(json.dumps(m))
+  assert json.loads(sys.stdin.readline())==e
+ print(json.dumps(result))
+r=json.loads(sys.stdin.readline())
+assert r['id']==2 and r['method']=='tools/call'
+print(json.dumps({{'jsonrpc':'2.0','id':r['id'],'result':{{'verified':True}}}}))
+"#,
+            batch = if batch { "True" } else { "False" }
+        );
+        let mut transport = python(&script, BTreeMap::new(), limits()).await;
+        assert_eq!(
+            transport.request("tools/call", json!({})).await.unwrap(),
+            json!({"ok":true})
+        );
+        assert_eq!(
+            transport.request("tools/call", json!({})).await.unwrap(),
+            json!({"verified":true})
+        );
+        transport.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn http_peer_ping_and_batches_use_separate_authenticated_posts() {
+    for (legacy, streaming, batch) in [
+        (false, true, false),
+        (true, true, false),
+        (false, false, true),
+        (false, true, true),
+        (true, true, true),
+    ] {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+        let server = tokio::spawn(async move {
+            let mut legacy_stream = if legacy {
+                let (mut stream, _) = listener.accept().await.unwrap();
+                request(&mut stream).await;
+                stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\nevent: endpoint\ndata: /messages?sessionId=query-secret\n\n").await.unwrap();
+                Some(stream)
+            } else {
+                None
+            };
+            let (mut init, _) = listener.accept().await.unwrap();
+            let (_, body) = request(&mut init).await;
+            assert_eq!(body["method"], "initialize");
+            let initialized = json!({"jsonrpc":"2.0","id":1,"result":{}});
+            if let Some(stream) = &mut legacy_stream {
+                respond(
+                    &mut init,
+                    "202 Accepted",
+                    "application/json",
+                    "",
+                    "Mcp-Session-Id: session-secret\r\n",
+                )
+                .await;
+                stream
+                    .write_all(format!("data: {initialized}\n\n").as_bytes())
+                    .await
+                    .unwrap();
+            } else {
+                respond(
+                    &mut init,
+                    "200 OK",
+                    "application/json",
+                    &initialized.to_string(),
+                    "Mcp-Session-Id: session-secret\r\n",
+                )
+                .await;
+            }
+            let (mut call, _) = listener.accept().await.unwrap();
+            let (_, body) = request(&mut call).await;
+            assert_eq!(body["method"], "tools/call");
+            assert_eq!(body["id"], 2);
+            let result = json!({"jsonrpc":"2.0","id":2,"result":{"ok":true}});
+            let ping = json!({"jsonrpc":"2.0","id":"peer-ping","method":"ping"});
+            let envelope = if batch {
+                json!([
+                    {"jsonrpc":"2.0","method":"notifications/progress"},
+                    ping,
+                    {"jsonrpc":"2.0","id":-7,"method":"sampling/createMessage"},
+                    result
+                ])
+            } else {
+                ping
+            };
+            if legacy {
+                respond(&mut call, "202 Accepted", "application/json", "", "").await;
+            } else if streaming {
+                call.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\n").await.unwrap();
+            } else {
+                respond(
+                    &mut call,
+                    "200 OK",
+                    "application/json",
+                    &envelope.to_string(),
+                    "",
+                )
+                .await;
+            }
+            let stream = legacy_stream.as_mut().unwrap_or(&mut call);
+            if streaming {
+                stream
+                    .write_all(format!("data: {envelope}\n\n").as_bytes())
+                    .await
+                    .unwrap();
+            }
+            let (mut peer, _) = listener.accept().await.unwrap();
+            let (headers, body) = request(&mut peer).await;
+            assert!(headers.starts_with(if legacy {
+                "POST /messages?sessionId=query-secret "
+            } else {
+                "POST /mcp "
+            }));
+            assert!(headers.contains("x-api-key: host-secret"));
+            assert!(headers.contains("mcp-session-id: session-secret"));
+            assert!(headers.contains("mcp-protocol-version: 2025-03-26"));
+            let expected = json!({"jsonrpc":"2.0","id":"peer-ping","result":{}});
+            assert_eq!(
+                body,
+                if batch {
+                    json!([expected, {"jsonrpc":"2.0","id":-7,"error":{"code":-32601,"message":"Method not found"}}])
+                } else {
+                    expected
+                }
+            );
+            respond(&mut peer, "202 Accepted", "application/json", "", "").await;
+            if !batch {
+                stream
+                    .write_all(format!("data: {result}\n\n").as_bytes())
+                    .await
+                    .unwrap();
+            }
+            let (mut next, _) = listener.accept().await.unwrap();
+            let (_, body) = request(&mut next).await;
+            assert_eq!(body["method"], "tools/call");
+            assert_eq!(body["id"], 3);
+            let result = json!({"jsonrpc":"2.0","id":3,"result":{}});
+            if legacy {
+                respond(&mut next, "202 Accepted", "application/json", "", "").await;
+                stream
+                    .write_all(format!("data: {result}\n\n").as_bytes())
+                    .await
+                    .unwrap();
+            } else {
+                respond(
+                    &mut next,
+                    "200 OK",
+                    "application/json",
+                    &result.to_string(),
+                    "",
+                )
+                .await;
+            }
+            let (mut delete, _) = listener.accept().await.unwrap();
+            let (headers, body) = request(&mut delete).await;
+            assert!(headers.starts_with("DELETE /mcp "));
+            assert!(headers.contains("mcp-session-id: session-secret"));
+            assert_eq!(body, Value::Null);
+            respond(&mut delete, "204 No Content", "application/json", "", "").await;
+        });
+        let mut transport = HttpTransport::connect(
+            "mock",
+            &url,
+            legacy,
+            RemoteOptions {
+                headers: Some(Arc::new(Headers { name: "x-api-key" })),
+                ..options()
+            },
+            limits(),
+        )
+        .await
+        .unwrap();
+        transport.request("initialize", json!({})).await.unwrap();
+        assert_eq!(
+            transport.request("tools/call", json!({})).await.unwrap(),
+            json!({"ok":true})
+        );
+        transport.request("tools/call", json!({})).await.unwrap();
+        transport.close().await.unwrap();
+        server.await.unwrap();
+    }
+}
+
+fn invalid_envelopes() -> Vec<Value> {
+    let notification = json!({"jsonrpc":"2.0","method":"notifications/progress"});
+    let ping = json!({"jsonrpc":"2.0","id":"peer-ping","method":"ping"});
+    let result = json!({"jsonrpc":"2.0","id":1,"result":{"must_not_escape":true}});
+    let mut envelopes = vec![
+        json!([]),
+        json!([notification, ping, result, result]),
+        json!([notification, ping, result, {"jsonrpc":"2.0","id":99,"result":{}}]),
+        json!([notification, ping, result, [notification]]),
+        json!([notification, ping, result, null]),
+        json!([notification, ping, result, ping]),
+        json!([notification, ping, result, {"jsonrpc":"1.0","method":"ping"}]),
+        json!([notification, ping, result, {"jsonrpc":"2.0","method":7}]),
+        json!([notification, ping, result, {"jsonrpc":"2.0","method":"ping","params":true}]),
+        json!([notification, ping, {"jsonrpc":"2.0","id":1,"result":{},"error":{"code":-1,"message":"bad"}}]),
+        json!([notification, ping, {"jsonrpc":"2.0","id":1,"error":{"code":-1}}]),
+        json!([notification, notification, ping, result, notification]),
+    ];
+    for id in [Value::Null, json!(true), json!([]), json!({}), json!(1.5)] {
+        envelopes
+            .push(json!([notification, ping, result, {"jsonrpc":"2.0","method":"ping","id":id}]));
+    }
+    envelopes
+}
+
+#[tokio::test]
+async fn malformed_or_overlimit_stdio_batches_never_return_partial_results() {
+    for envelope in invalid_envelopes() {
+        let script = format!(
+            "import sys,time\nsys.stdin.readline()\nprint({:?})\ntime.sleep(30)",
+            envelope.to_string()
+        );
+        let mut transport = python(
+            &script,
+            BTreeMap::new(),
+            Limits {
+                max_items: 4,
+                ..limits()
+            },
+        )
+        .await;
+        uncertain(
+            transport
+                .request("tools/call", json!({}))
+                .await
+                .unwrap_err(),
+            "tools/call",
+        );
+        assert_eq!(
+            transport.request("tools/call", json!({})).await,
+            Err(Error::Closed)
+        );
+        transport.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn malformed_or_overlimit_http_batches_never_reply_or_return_partial_results() {
+    for (legacy, streaming) in [(false, false), (false, true), (true, true)] {
+        for envelope in invalid_envelopes() {
+            let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+            let server = tokio::spawn(async move {
+                let mut legacy_stream = if legacy {
+                    let (mut stream, _) = listener.accept().await.unwrap();
+                    request(&mut stream).await;
+                    stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\nevent: endpoint\ndata: /messages\n\n").await.unwrap();
+                    Some(stream)
+                } else {
+                    None
+                };
+                let (mut stream, _) = listener.accept().await.unwrap();
+                request(&mut stream).await;
+                let data = format!("data: {envelope}\n\n");
+                if let Some(sse) = &mut legacy_stream {
+                    respond(&mut stream, "202 Accepted", "application/json", "", "").await;
+                    sse.write_all(data.as_bytes()).await.unwrap();
+                } else if streaming {
+                    respond(&mut stream, "200 OK", "text/event-stream", &data, "").await;
+                } else {
+                    respond(
+                        &mut stream,
+                        "200 OK",
+                        "application/json",
+                        &envelope.to_string(),
+                        "",
+                    )
+                    .await;
+                }
+                assert!(
+                    tokio::time::timeout(Duration::from_millis(30), listener.accept())
+                        .await
+                        .is_err(),
+                    "partial batch reply or replay"
+                );
+            });
+            let mut transport = HttpTransport::connect(
+                "mock",
+                &url,
+                legacy,
+                options(),
+                Limits {
+                    max_items: 4,
+                    ..limits()
+                },
+            )
+            .await
+            .unwrap();
+            uncertain(
+                transport
+                    .request("tools/call", json!({}))
+                    .await
+                    .unwrap_err(),
+                "tools/call",
+            );
+            assert_eq!(
+                transport.request("tools/call", json!({})).await,
+                Err(Error::Closed)
+            );
+            transport.close().await.unwrap();
+            server.await.unwrap();
+        }
+    }
+}
+
+#[tokio::test]
+async fn legacy_rotation_and_session_query_reflection_are_rejected() {
+    for reflected in [
+        r"\u0062eta-secret",
+        r"\u0071uery-secret",
+        r"\u0073ession-secret",
+        "%71uery-secret",
+    ] {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/sse", listener.local_addr().unwrap());
+        let server = tokio::spawn(async move {
+            let (mut sse, _) = listener.accept().await.unwrap();
+            let (headers, _) = request(&mut sse).await;
+            assert!(headers.contains("alpha-secret"));
+            sse.write_all(b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\nevent: endpoint\ndata: /messages?key=%71uery-secret\n\n").await.unwrap();
+            for id in 1..=2 {
+                let (mut stream, _) = listener.accept().await.unwrap();
+                let (headers, body) = request(&mut stream).await;
+                assert!(headers.contains(if id == 1 {
+                    "beta-secret"
+                } else {
+                    "rotated-secret-2"
+                }));
+                assert_eq!(body["id"], id);
+                respond(
+                    &mut stream,
+                    "202 Accepted",
+                    "application/json",
+                    "",
+                    "Mcp-Session-Id: session-secret\r\n",
+                )
+                .await;
+                let value = if id == 1 {
+                    "{}".into()
+                } else {
+                    format!("\"{reflected}\"")
+                };
+                sse.write_all(
+                    format!("data: {{\"jsonrpc\":\"2.0\",\"id\":{id},\"result\":{value}}}\n\n")
+                        .as_bytes(),
+                )
+                .await
+                .unwrap();
+            }
+            let (mut delete, _) = listener.accept().await.unwrap();
+            let (headers, _) = request(&mut delete).await;
+            assert!(headers.starts_with("DELETE /sse "));
+            respond(&mut delete, "204 No Content", "application/json", "", "").await;
+        });
+        let mut transport = HttpTransport::connect(
+            "mock",
+            &url,
+            true,
+            RemoteOptions {
+                headers: Some(Arc::new(RotatingCredentials {
+                    calls: AtomicUsize::new(0),
+                    size: 0,
+                })),
+                ..options()
+            },
+            limits(),
+        )
+        .await
+        .unwrap();
+        transport.request("initialize", json!({})).await.unwrap();
+        uncertain(
+            transport
+                .request("tools/call", json!({}))
+                .await
+                .unwrap_err(),
+            "tools/call",
+        );
+        transport.close().await.unwrap();
+        server.await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn peer_reply_failure_does_not_recurse_or_replay_original_call() {
+    for (status, kind, body, extra) in [
+        (
+            "307 Temporary Redirect",
+            "application/json",
+            "",
+            "Location: http://127.0.0.1:9/leak\r\n",
+        ),
+        (
+            "200 OK",
+            "text/event-stream",
+            "data: {\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"ping\"}\n\n",
+            "",
+        ),
+        (
+            "202 Accepted",
+            "application/json",
+            "{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"ping\"}",
+            "",
+        ),
+        (
+            "202 Accepted",
+            "application/json",
+            "",
+            "Mcp-Session-Id: unsolicited-secret\r\n",
+        ),
+    ] {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+        let server = tokio::spawn(async move {
+            let (mut call, _) = listener.accept().await.unwrap();
+            request(&mut call).await;
+            respond(
+                &mut call,
+                "200 OK",
+                "text/event-stream",
+                "data: {\"jsonrpc\":\"2.0\",\"id\":\"peer-ping\",\"method\":\"ping\"}\n\n",
+                "",
+            )
+            .await;
+            let (mut peer, _) = listener.accept().await.unwrap();
+            let (_, reply) = request(&mut peer).await;
+            assert_eq!(reply, json!({"jsonrpc":"2.0","id":"peer-ping","result":{}}));
+            respond(&mut peer, status, kind, body, extra).await;
+            assert!(
+                tokio::time::timeout(Duration::from_millis(50), listener.accept())
+                    .await
+                    .is_err()
+            );
+        });
+        let mut transport = HttpTransport::connect("mock", &url, false, options(), limits())
+            .await
+            .unwrap();
+        uncertain(
+            transport
+                .request("tools/call", json!({}))
+                .await
+                .unwrap_err(),
+            "tools/call",
+        );
+        assert_eq!(
+            transport.request("tools/call", json!({})).await,
+            Err(Error::Closed)
+        );
+        transport.close().await.unwrap();
+        server.await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn cancellation_during_peer_post_releases_both_http_streams() {
+    for legacy in [false, true] {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/mcp", listener.local_addr().unwrap());
+        let (sent, received) = tokio::sync::oneshot::channel();
+        let server = tokio::spawn(async move {
+            let (mut sse, _) = listener.accept().await.unwrap();
+            request(&mut sse).await;
+            sse.write_all(
+                b"HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nConnection: close\r\n\r\n",
+            )
+            .await
+            .unwrap();
+            if legacy {
+                sse.write_all(b"event: endpoint\ndata: /messages?key=query-secret\n\n")
+                    .await
+                    .unwrap();
+                let (mut call, _) = listener.accept().await.unwrap();
+                request(&mut call).await;
+                respond(&mut call, "202 Accepted", "application/json", "", "").await;
+            }
+            sse.write_all(
+                b"data: {\"jsonrpc\":\"2.0\",\"id\":\"peer-ping\",\"method\":\"ping\"}\n\n",
+            )
+            .await
+            .unwrap();
+            let (mut peer, _) = listener.accept().await.unwrap();
+            let (_, reply) = request(&mut peer).await;
+            assert_eq!(reply, json!({"jsonrpc":"2.0","id":"peer-ping","result":{}}));
+            sent.send(()).unwrap();
+            let mut byte = [0];
+            for stream in [&mut sse, &mut peer] {
+                assert_eq!(
+                    tokio::time::timeout(Duration::from_secs(1), stream.read(&mut byte))
+                        .await
+                        .unwrap()
+                        .unwrap(),
+                    0
+                );
+            }
+            assert!(
+                tokio::time::timeout(Duration::from_millis(30), listener.accept())
+                    .await
+                    .is_err()
+            );
+        });
+        let mut transport = HttpTransport::connect("mock", &url, legacy, options(), limits())
+            .await
+            .unwrap();
+        {
+            let pending = transport.request("tools/call", json!({}));
+            tokio::pin!(pending);
+            tokio::select! {
+                result = &mut pending => panic!("call finished before cancellation: {result:?}"),
+                result = received => result.unwrap(),
+            }
+        }
+        assert_eq!(
+            transport.request("tools/call", json!({})).await,
+            Err(Error::Closed)
+        );
+        transport.close().await.unwrap();
+        server.await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn peer_batch_reply_size_is_bounded_before_dispatch() {
+    let envelope = json!([
+        {"jsonrpc":"2.0","id":"a","method":"x"},
+        {"jsonrpc":"2.0","id":"b","method":"x"},
+        {"jsonrpc":"2.0","id":1,"result":{}}
+    ]);
+    let reply = json!([
+        {"jsonrpc":"2.0","id":"a","error":{"code":-32601,"message":"Method not found"}},
+        {"jsonrpc":"2.0","id":"b","error":{"code":-32601,"message":"Method not found"}}
+    ]);
+    let limit = envelope.to_string().len() + 1;
+    assert!(reply.to_string().len() > limit);
+    let script = format!(
+        "import sys,time\nsys.stdin.readline()\nprint({:?})\ntime.sleep(30)",
+        envelope.to_string()
+    );
+    let mut stdio = python(
+        &script,
+        BTreeMap::new(),
+        Limits {
+            max_message_bytes: limit,
+            ..limits()
+        },
+    )
+    .await;
+    uncertain(
+        stdio.request("tools/call", json!({})).await.unwrap_err(),
+        "tools/call",
+    );
+    stdio.close().await.unwrap();
+    let (url, server) = one_response(
+        "200 OK",
+        "application/json",
+        envelope.to_string(),
+        "".into(),
+    )
+    .await;
+    let mut http = HttpTransport::connect(
+        "mock",
+        &url,
+        false,
+        options(),
+        Limits {
+            max_message_bytes: limit,
+            ..limits()
+        },
+    )
+    .await
+    .unwrap();
+    uncertain(
+        http.request("tools/call", json!({})).await.unwrap_err(),
+        "tools/call",
+    );
+    http.close().await.unwrap();
+    server.await.unwrap();
+}

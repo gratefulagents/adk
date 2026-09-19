@@ -1,0 +1,740 @@
+{
+  "configs": [
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "valid-stdio"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": false,
+        "error": "embedded credentials are not allowed"
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "embedded credentials are not allowed"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "userinfo"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": false,
+        "error": "query strings and fragments are not allowed"
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "query strings and fragments are not allowed"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "query"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": false,
+        "error": "query strings and fragments are not allowed"
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "query strings and fragments are not allowed"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "fragment"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": false,
+        "error": "URL is malformed"
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "URL is malformed"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "file"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": true
+      },
+      "endpointPublic": {
+        "accept": true
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "public-https"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": true
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "HTTPS is required"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "plaintext"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": true
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "URL is blocked by network policy"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "loopback"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": true
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "HTTPS is required"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "metadata"
+    },
+    {
+      "endpointPrivateOptIn": {
+        "accept": true
+      },
+      "endpointPublic": {
+        "accept": false,
+        "error": "URL is blocked by network policy"
+      },
+      "exists": true,
+      "hostDenied": "MCP server \"bad\": remote transport is not enabled by host policy",
+      "loadAccept": true,
+      "name": "ipv6-loopback"
+    },
+    {
+      "dispatchError": "MCP server \"bad\" uses unsupported type \"exec\"",
+      "exists": true,
+      "loadAccept": true,
+      "name": "unsupported"
+    },
+    {
+      "dispatchError": "MCP server \"bad\": command is required",
+      "exists": true,
+      "loadAccept": true,
+      "name": "missing-command"
+    },
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "invalid-env-name"
+    },
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "invalid-env-value"
+    },
+    {
+      "exists": true,
+      "loadAccept": false,
+      "loadError": "parse <workspace>/.mcp.json: json: cannot unmarshal string into Go struct field ServerConfig.mcpServers.allowedTools of type []string",
+      "name": "wrong-tool-list"
+    },
+    {
+      "exists": true,
+      "filteredEnv": {
+        "GITHUB_TOKEN": "synthetic-secret",
+        "NORMAL": "value"
+      },
+      "loadAccept": true,
+      "name": "repository-credential-opt-in"
+    },
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "empty-name"
+    },
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "symlink-config"
+    },
+    {
+      "exists": true,
+      "loadAccept": true,
+      "name": "oversized-config"
+    },
+    {
+      "dispatchError": "MCP server \"bad\": stdio transport cannot set url",
+      "exists": true,
+      "loadAccept": true,
+      "name": "stdio-with-url"
+    },
+    {
+      "dispatchError": "MCP server \"bad\": remote transport cannot set command, args, env, or allowEnv",
+      "exists": true,
+      "loadAccept": true,
+      "name": "remote-with-command"
+    }
+  ],
+  "provenance": {
+    "command": "go test -count=1 -run ^TestReferenceCorpus$ -v ./pkg/agentsdk/mcp",
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "fixtures/mcp/reference/inputs.json": "d8b4836fdca37e1dd5b87ef735d4d2540422e776d027a7ec55278e284fa5d598",
+      "scripts/mcp-reference/reference_test.go": "094b232183ae13c91ea9670d250d4038ea823a3ffd0886a8107f38d203100836",
+      "scripts/mcp-reference/run.py": "da8c30b0abbc0c77bb4c999376bf8c16329b2387e43edcb47391cb0e7868198e"
+    },
+    "module": "github.com/gratefulagents/sdk",
+    "normalization": "JSON key order ignored; saved paths -> <blob>; blob bytes/SHA256/mode/confinement retained; blob errors -> <blob-error> with Go diagnostics retained; long text -> bytes/SHA256; no expected observations read by Go",
+    "protocolModule": "github.com/modelcontextprotocol/go-sdk v1.4.1",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "pkg/agentsdk/mcp/breakglass.go": "16d19ced7c3a7cc0f3e70f6fbdd1379b3be82ff6cff049b9e96f34162f692757",
+      "pkg/agentsdk/mcp/breakglass_test.go": "b32c94fb43af3449d348a60284ad3448bef577486e4e636c703c1fa354b61f4b",
+      "pkg/agentsdk/mcp/breakglass_tool.go": "c43e23d8b6d32dd46f9eb82a00a5e28a77f071c9a79bf7adad2e1624027b3154",
+      "pkg/agentsdk/mcp/breakglass_tool_test.go": "b095f956c0595d1eb040e1e74bfb98d468ff761f5a05b7f5d9d26084e6b1639a",
+      "pkg/agentsdk/mcp/config.go": "eaf22da7fa4979869fa14338fc1cfc5b8815b80f0156892dde3d3d8241eb4cb4",
+      "pkg/agentsdk/mcp/config_test.go": "20c10c7174e1fe1e9e773b5ee188862d10870bf418d5a6c3b8fbaa7df926378a",
+      "pkg/agentsdk/mcp/env_filter.go": "a3068abca940f5c93c81f5855a1958f59f789032fe4904fd467b07c46d0f046f",
+      "pkg/agentsdk/mcp/env_filter_test.go": "7b2fcc6bf1a116c01567882940b415d5c5d5386ad322a244050adf53aa55c8d6",
+      "pkg/agentsdk/mcp/lifecycle.go": "f164bdafd635745b96a8e9ae21815dd6a01e8fb5c9bb9a58bb78fdbefa582568",
+      "pkg/agentsdk/mcp/lifecycle_other.go": "4defce62921b6f36252ead25d9633622c2401d63a86a61f78442a60802becfd8",
+      "pkg/agentsdk/mcp/lifecycle_unix.go": "e66e60e90e2ebd1a1adcbcfd8e1c39e6482a4f2362d0ad781ff473e13ded0dce",
+      "pkg/agentsdk/mcp/lifecycle_unix_test.go": "0e2589cf1ba496a84d702b786154c9fa22f12641430aa4ab3dfbcd90518e58cd",
+      "pkg/agentsdk/mcp/manager.go": "61727c866586886f430d634e97039c76e4d9e40e7c7f100642aac153f17cdcb1",
+      "pkg/agentsdk/mcp/manager_lifecycle_test.go": "45b496d1bdf83b21c86e8cd0b6dc956533b1fceacac19e4285bc71edc6a878f4",
+      "pkg/agentsdk/mcp/manager_options_test.go": "622dc9585c2fc67f75460928389a165c9f463d121680a81fd4324c4e68ce70c0",
+      "pkg/agentsdk/mcp/manager_test.go": "c742ac3da29a9f26295c55d7fb60239d84af951c1f3f64d26cc23f2204015f2b",
+      "pkg/agentsdk/mcp/names.go": "a1d0e009004b1a7e413c83ddc64ccc14367c3301efc7c356580f33d00fbe94df",
+      "pkg/agentsdk/mcp/names_test.go": "35a93b8c39878abb32f13462bc4659250bf75da4f1c56ebfa4867bfba60c3d75",
+      "pkg/agentsdk/mcp/nofollow_other.go": "47c59702caa6b3d490c5e23ba8faa3a0603d90c498b511f6acbd7deb402416fc",
+      "pkg/agentsdk/mcp/nofollow_unix.go": "7ec1070f95f0af4df5877f4ba6e3246c041b7f3e2ae20519495f3b9f93eaf648",
+      "pkg/agentsdk/mcp/remote.go": "e16f0613da7ddac3b925726cd6c184962adb9a896d5f3d40d4679b6ce6f680a7",
+      "pkg/agentsdk/mcp/remote_test.go": "e8d5de1e0208f0fbaeb9417b9bed83d3cd45c3553116ae298b4c0a71a0205136",
+      "pkg/agentsdk/mcp/sanitize.go": "90332c3a1b957a68f0d79d10df021f0adc53de7f9bf0087edf1be6161e25afb8",
+      "pkg/agentsdk/mcp/sanitize_test.go": "93c9e8ba115c8a14fd8b858f0d858cd7b203827ed4c1cb9040bf81788e3a07a8",
+      "pkg/agentsdk/mcp/server_mode.go": "3961513ab1d1cad5eb03717d31672e4f2d4e11da91768e9f26f31289257ac3fa",
+      "pkg/agentsdk/mcp/server_mode_test.go": "e91f16f0552b5e446724ea78e7a64d95ebfa275012ce2d2208291b9a810cd857",
+      "pkg/agentsdk/mcp/snapshot.go": "b61f5de5681c5acf0adbdf32ecb6a2b7d69d236531186d900e0779d1a3822977",
+      "pkg/agentsdk/mcp/snapshot_test.go": "72fe8fe08cf9fcf6573a301c02e9c0858615b3a635c8db6fe7bbcb8c897d3afa",
+      "pkg/agentsdk/mcp/stderr_tail.go": "2e6b53b30da995f8be656484c420406e77547d67541980a164ac3f4d17e6293c",
+      "pkg/agentsdk/mcp/stderr_tail_test.go": "f8503bfdc39fbef1debe25987e8989111203f4e1a0f6729130d0f350eade05d6",
+      "pkg/agentsdk/mcp/tools.go": "884e896f460dc473f93ffe51e0d9ea6d06704ccff057e99b8ff6677d554f8852",
+      "pkg/agentsdk/mcp/tools_test.go": "6ed6d96e28d534b7fa167f35cb1f02b7f202b16eed969de2c85e9dc8035cfddf",
+      "pkg/agentsdk/tools/web/audit_h5_h6_test.go": "2890908c4ae605cbfa3203f9a9dd6b19d28dce60a2818bc579c933f76563e007",
+      "pkg/agentsdk/tools/web/url_security.go": "4c444214bf97ac92abc7fe24b5ec0b22430d45facaf3d2319a034d84f06ff623",
+      "pkg/agentsdk/tools/web/webfetch.go": "96aaf227bcb262989ebb540144979fd690b68e69ddeff9908610e24cad13baa0",
+      "pkg/agentsdk/tools/web/webfetch_test.go": "057c130eb2fd3c368c78d75185ca348e13f39504329f7ab73fe870fa84a51c12"
+    }
+  },
+  "results": [
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "nil",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "empty",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "text",
+      "rendered": "hello 界"
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": true,
+      "name": "text-error",
+      "rendered": "denied"
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "structured",
+      "rendered": {
+        "content": [
+          {
+            "text": "hello",
+            "type": "text"
+          }
+        ],
+        "structuredContent": {
+          "answer": 42
+        }
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": true,
+      "name": "multiple-error",
+      "rendered": {
+        "content": [
+          {
+            "text": "one",
+            "type": "text"
+          },
+          {
+            "text": "two",
+            "type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "image",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "image/png",
+            "note": "Binary content saved to <blob> (5 bytes, image/png)",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "audio/wav",
+            "note": "Binary content saved to <blob> (5 bytes, audio/wav)",
+            "type": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-text",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "text/plain",
+            "text": "resource",
+            "type": "resource",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-blob",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "application/octet-stream",
+            "note": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "type": "resource",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "link",
+      "rendered": {
+        "content": [
+          {
+            "description": "Description",
+            "mimeType": "text/plain",
+            "name": "item",
+            "title": "Title",
+            "type": "resource_link",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "long-text",
+      "rendered": {
+        "textBytes": 262171,
+        "textSHA256": "dd054b8f589df386dc3f2be657b2a155cf8d28813f945eff85a79b68f4c8658e"
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [
+        "binary content is 10485761 bytes; max allowed is 10485760 bytes"
+      ],
+      "isError": false,
+      "name": "oversized-blob",
+      "rendered": {
+        "content": [
+          {
+            "error": "<blob-error>",
+            "mimeType": "application/octet-stream",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [
+        "output path .mcp/blobs is outside workspace root <workspace>"
+      ],
+      "isError": false,
+      "name": "symlink-blob",
+      "outsideEmpty": true,
+      "rendered": {
+        "content": [
+          {
+            "error": "<blob-error>",
+            "mimeType": "image/png",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 0",
+      "diagnostics": [],
+      "isError": false,
+      "name": "invalid-base64"
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-nil",
+      "rendered": {
+        "contents": []
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-empty",
+      "rendered": {
+        "contents": []
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-text",
+      "rendered": {
+        "contents": [
+          {
+            "mimeType": "text/plain",
+            "text": "resource",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-blob",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 5,
+            "mimeType": "application/octet-stream",
+            "text": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-mixed",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 5,
+            "mimeType": "application/octet-stream",
+            "text": "kept",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-long",
+      "rendered": {
+        "contents": [
+          {
+            "text": {
+              "textBytes": 262171,
+              "textSHA256": "dd054b8f589df386dc3f2be657b2a155cf8d28813f945eff85a79b68f4c8658e"
+            },
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [
+        "Binary content could not be saved: binary content is 10485761 bytes; max allowed is 10485760 bytes"
+      ],
+      "isError": false,
+      "name": "resource-oversized",
+      "rendered": {
+        "contents": [
+          {
+            "mimeType": "application/octet-stream",
+            "text": "<blob-error>",
+            "uri": "test://item"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [
+        "Binary content could not be saved: output path .mcp/blobs is outside workspace root <workspace>"
+      ],
+      "isError": false,
+      "name": "resource-symlink",
+      "outsideEmpty": true,
+      "rendered": {
+        "contents": [
+          {
+            "mimeType": "application/octet-stream",
+            "text": "<blob-error>",
+            "uri": "test://item"
+          }
+        ]
+      }
+    }
+  ],
+  "schemas": [
+    {
+      "name": "schema-00",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-01",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-02",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-03",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-04",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-05",
+      "normalized": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-06",
+      "normalized": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-07",
+      "normalized": {
+        "additionalProperties": false,
+        "properties": {
+          "x": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x"
+        ],
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-08",
+      "normalized": {
+        "description": "metadata",
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-09",
+      "normalized": {
+        "properties": {},
+        "title": "empty-type",
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-10",
+      "normalized": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-11",
+      "normalized": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-12",
+      "normalized": {
+        "properties": null,
+        "type": "object"
+      }
+    },
+    {
+      "name": "schema-13",
+      "normalized": {
+        "items": {
+          "type": "integer"
+        },
+        "type": "array"
+      }
+    },
+    {
+      "name": "schema-14",
+      "normalized": {
+        "type": "string"
+      }
+    },
+    {
+      "name": "schema-15",
+      "normalized": {
+        "$defs": {
+          "T": {
+            "type": "object"
+          }
+        },
+        "$ref": "#/$defs/T",
+        "properties": {},
+        "type": "object"
+      }
+    }
+  ]
+}

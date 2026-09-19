@@ -27,7 +27,7 @@ Crates.io metadata was also inspected for [ignore](https://crates.io/api/v1/crat
 
 ## Adopted search primitives
 
-- [rustix 1.1.5 `openat2`](https://docs.rs/rustix/1.1.5/rustix/fs/fn.openat2.html), Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT: adopt owned descriptors and explicit `BENEATH | NO_SYMLINKS` resolution, with RAII closure. Reject canonicalize-then-open as a confinement primitive. Built-in search construction is currently Linux-only; unsupported platforms require a supplied implementation rather than an unconstrained fallback.
+- [rustix 1.1.5 `openat2`](https://docs.rs/rustix/1.1.5/rustix/fs/fn.openat2.html), Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT: adopt owned descriptors and explicit `BENEATH | NO_SYMLINKS` resolution, with RAII closure. Reject canonicalize-then-open as a confinement primitive. Linux uses `openat2`; macOS uses an owned-descriptor `openat` walk with `NOFOLLOW` on every component. Both are covered by filesystem and symlink-swap regressions. Unsupported platforms require a supplied implementation rather than an unconstrained fallback.
 - [regex 1.13.1](https://docs.rs/regex/1.13.1/regex/) and regex-syntax 0.8.11, MIT OR Apache-2.0: adapt bounded regular-expression compilation plus HIR inspection. Reject unmodified syntax as Go parity: ASCII Perl classes, word boundaries, quoted literals, octal, bracket syntax and repeat bounds differ. The adapter is checked against actual pinned Go tools, with explicit remaining exhaustive-parity work.
 - Do not adopt `ignore` defaults: the search port explicitly applies the SDK's smaller ignore surface and deterministic ordering. Cursors bind to the normalized query through SHA-256; they do not confer path authority.
 

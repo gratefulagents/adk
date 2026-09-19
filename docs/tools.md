@@ -74,8 +74,10 @@ Verify that the generated catalog still matches its pinned ledger from the repos
 python3 scripts/tool-manifest.py --check
 ```
 
-The integrated tools, project-state, sandbox and security test targets pass locally with the direct Rust toolchain. Native enforcing tests explicitly skip here because Bubblewrap cannot access `/proc/sys/kernel/overflowuid`; `ADK_REQUIRE_SANDBOX=1` makes those skips failures in Linux/macOS CI. The stock rustup wrapper also needs `/proc/self/exe`, so local verification uses direct compiler binaries and the system linker. Full CI on the integrated head remains pending.
+On 2026-09-19, implementation head `728f169aca907547005279048a0cb226d94b9136` passed all 20 push/PR check records on pinned Rust 1.88.0. The workspace all-feature/all-target run passed **582 tests, zero failures, two ignored helpers across 77 targets**. Required enforcing Linux and macOS runs each passed **250 tests**, plus three public execution-feature tests. Windows passed **90 tests**, including the complete project-state suite and unsupported-backend checks. Formatting, strict Clippy, rustdoc, doctests, dependency checks, purity, manifest and replay checks passed. See [the coverage audit](tool-coverage.md#native-acceptance-verification-2026-09-19) for run links, fixture counts and evidence boundaries.
+
+Local native-enforcement probes still skip because this worker cannot provide Bubblewrap's required `/proc` files. Those local results are not containment evidence; the successful native CI jobs set `ADK_REQUIRE_SANDBOX=1`, which makes an unavailable backend a failure.
 
 ## Acceptance status
 
-**Draft — pending full CI and security review.** The implementation and focused fixtures above do not declare complete SDK parity, a completed security corpus, cross-platform acceptance, native-Chrome availability, or live-GitHub validation. Do not close issue #7 or advertise full acceptance until those reviews complete.
+**Implemented and regression-verified for all 46 pinned SDK names / 51 access variants; ready for maintainer review.** This includes runtime composition, state integration, independent schema comparisons, deterministic results, security and lifecycle regressions. Platform-specific tools outside the SDK registry remain outside this issue. Native Chrome rendering, live GitHub service calls and real third-party analyzer operation are not claimed: those are explicit host dependencies, tested through their adapter contracts. Windows has fail-closed behavior for unsupported confinement, not a new enforcing process/filesystem backend.

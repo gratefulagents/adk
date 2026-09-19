@@ -2,7 +2,7 @@
 
 ## Scope and evidence boundary
 
-Audit snapshot: **2026-09-17, inspection/verification through 04:35 UTC**, working tree based on `5b43fdaaab4f0d740fa00d4d4aeadc4e6fa3a0b3`. Source/tests were changing concurrently; this is an actionable snapshot, not a completion certificate. Only this document is owned by the audit.
+Initial audit snapshot: **2026-09-17, inspection/verification through 04:35 UTC**, working tree based on `5b43fdaaab4f0d740fa00d4d4aeadc4e6fa3a0b3`. The per-name tables preserve that audit and its evidence distinctions. The follow-up gap table and [native acceptance verification](#native-acceptance-verification-2026-09-19) supersede the initial missing-evidence and CI-blocked observations.
 
 Baseline: SDK **v0.0.115**, commit `1dc92b73900fac74dc357a938e4b5eee6392b418`; `docs/migration/ledger/sdk-v0.0.115/inventory.json`, tool records under `pkg/agentsdk/tools/`, plus the projected `crates/adk-tools/src/manifest.json`. The ledger's 62 tool-type records include wrappers, subagents and MCP; **62 is not the issue-7 name count**. The projection contains **46 distinct names / 51 variants**. Extra variants: Bash ×3 (`read_only`, `workspace_write`, `full_access`), Browser ×2 (`read_only`, `write`), Edit ×2 and Write ×2 (`workspace_write`, `full_access`). All other names occur once. Host-only names are Memory, save_plan, get_plan and the three skill tools; they must not disappear from the audit just because the runtime registry excludes them.
 
@@ -190,3 +190,60 @@ The ledger's own `verification_status` fields are historical inventory metadata,
 Parent integration verification (2026-09-17): `cargo test --locked --workspace --all-features --all-targets` passed on the pinned Rust **1.88.0** (580 harness passes, 0 failures, 2 ignored helpers, 77 targets) after bundle exports, independent schemas, state corrections, and Browser/LSP/Git cleanup fixes. All six regenerated Go oracle files matched their prior SHA-256 hashes. The shell corpus contains 168 policy cases and four environment-specific schemas. Pinned rustfmt, strict Clippy, warning-free rustdoc, doctests, manifest comparison, dependency purity and Python replay tests also pass. Two new-code Clippy warnings were corrected without changing behavior.
 
 Locally unavailable enforcing tests can still return early; these counts are **not** a claim that native OS checks ran here. Required Linux/macOS CI remains the authority for those checks. On implementation head `03ad3a76b39213769fc0ab98354b2027f1d1593a`, all 20 GitHub check records failed or were cancelled within seconds. Logs for both enforcing jobs and the quality job were unavailable (`log not found`), so no code-level diagnosis or native verification can be inferred from those failures. The prior macOS launcher fix remains unverified; Windows unsupported-target behavior likewise still requires a functioning runner. Keep PR #23 draft and issue #7 open until fresh native checks pass.
+
+## Native acceptance verification (2026-09-19)
+
+The infrastructure blockage above is resolved. Implementation head
+`728f169aca907547005279048a0cb226d94b9136` passed **all 20 push/PR checks**.
+This snapshot covers the complete implementation, not a demo subset.
+
+| Fresh pinned Rust 1.88 CI evidence | Result |
+|---|---|
+| [All workspace features/targets](https://github.com/gratefulagents/adk/actions/runs/35471218710/job/105972410166) | 582 passed, 0 failed, 2 ignored helpers; 77 targets |
+| [Required Linux enforcement](https://github.com/gratefulagents/adk/actions/runs/35471218702/job/105972410211) | 250 passed, 0 failed, 1 ignored subprocess helper; 36 targets; public execution feature adds 3 passes |
+| [Required macOS enforcement](https://github.com/gratefulagents/adk/actions/runs/35471218702/job/105972410178) | 250 passed, 0 failed, 2 ignored subprocess helpers; 36 targets; public execution feature adds 3 passes |
+| [Windows unsupported-target and state](https://github.com/gratefulagents/adk/actions/runs/35471218702/job/105972410117) | 90 passed, 0 failed, 0 ignored; 40 targets |
+| Quality and dependency jobs | fmt, strict Clippy, warning-free rustdoc, doctests, dependency licenses/advisories, purity, manifest and replay checks pass |
+
+Ignored helper entry points are invoked explicitly by their parent enforcement
+or independent-process tests; they are not omitted security scenarios. Both
+native enforcement jobs set `ADK_REQUIRE_SANDBOX=1`. The Windows job checks
+unsupported confinement fails closed and exercises durable state; it does not
+claim Unix process/filesystem containment on Windows.
+
+Fresh pinned-Go execution verified 12 signal results, 80 search calls across 56
+cases (including pagination), 95 filesystem/skills cases, 1,176 patch cases,
+20 WebFetch cases, 16 Browser cases and 38 vision results. Regeneration of all
+six Git/LSP/registry/schema/shell/state-memory-plan oracle files was byte-identical
+(SHA-256/cmp). These comprise 118 Git cases, 50 LSP checks, 3,768 registry rows,
+500 independent schema instances across 12 bundles, 168 shell policy cases,
+and 68 state/namespace-Memory/plan cases. The 51 state-tool calls are replayed
+against both filesystem and SQLite stores: 102 matching outputs. All 15 state
+tools also retain the separate baseline project-state contract suite.
+
+Native failures were resolved without dropping test families or security cases:
+
+- Real FIFO fixtures use portable `mkfifo`; symlink fixtures initialize the
+  recorded mode on macOS instead of ignoring permission comparisons.
+- Windows retains regular-file synchronization, uses Unix-only directory fsync,
+  preserves exact fixture bytes, and recovers only demonstrably dead lock owners.
+- Seatbelt grants only the selected Xcode license receipt and metadata on ancestors
+  of explicit read roots, never broader content or write grants. Explicit non-self
+  process-info denial closes the observed parent-environment leak; the original
+  native leak regression passes.
+- Cancellation during Seatbelt setup keeps its cancellation/timeout category,
+  and LSP teardown does not misreport a never-started cancelled server as a cleanup
+  failure. Early-cancellation, active-server, abandoned-call and bundle-close tests
+  pass natively.
+- macOS CI uses canonical temporary workspace paths; LSP fixtures use canonical
+  protocol URIs and an existing system probe executable. Protocol-rejection cases
+  no longer inherit the separate startup-timeout case's deliberately short timer.
+- Shell line-number parity is checked against the actual native Bash, accounting
+  for Apple Bash 3.2's different `-c` numbering without changing tool output.
+
+All baseline families now have implemented behavior and mapped happy/error/policy,
+limit/pagination, schema and lifecycle evidence. No registered placeholder or
+missing selected implementation is silently tolerated. External-adapter limits
+remain explicit: no live GitHub, native Chrome rendering, public-network service
+or third-party analyzer execution is claimed. This is regression-backed acceptance
+of the pinned contracts, not a proof over every possible input or host environment.

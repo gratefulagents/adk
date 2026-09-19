@@ -94,8 +94,8 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
             for (i, root) in config.runtime_roots.iter().enumerate() {
                 cmd.arg(format!("-DRUNTIME{i}={}", root.display()));
             }
-            for (i, parent) in runtime_ancestors(config).iter().enumerate() {
-                cmd.arg(format!("-DRUNTIMEPARENT{i}={}", parent.display()));
+            for (i, parent) in read_ancestors(config, request).iter().enumerate() {
+                cmd.arg(format!("-DREADPARENT{i}={}", parent.display()));
             }
             if request.access == AccessMode::WorkspaceWrite {
                 for (i, scratch) in request.scratch.iter().enumerate() {
@@ -306,10 +306,13 @@ fn bwrap_args(
     Ok(args)
 }
 
-fn runtime_ancestors(config: &Config) -> Vec<PathBuf> {
+fn read_ancestors(config: &Config, request: &Request) -> Vec<PathBuf> {
     config
         .runtime_roots
         .iter()
+        .map(PathBuf::as_path)
+        .chain(std::iter::once(config.workspace.as_path()))
+        .chain(request.scratch.iter().map(|scratch| scratch.path()))
         .flat_map(|root| root.ancestors().skip(1).map(PathBuf::from))
         .collect::<std::collections::BTreeSet<_>>()
         .into_iter()
@@ -370,11 +373,11 @@ fn seatbelt_profile_with_masks(
             "(allow file-read* (subpath (param \"RUNTIME{i}\")))\n"
         ));
     }
-    for i in 0..runtime_ancestors(config).len() {
-        // realpath must stat each ancestor of an explicitly granted runtime.
+    for i in 0..read_ancestors(config, request).len() {
+        // realpath must stat each ancestor of an explicitly granted read root.
         // This does not allow directory listing, file contents, or writes there.
         profile.push_str(&format!(
-            "(allow file-read-metadata (literal (param \"RUNTIMEPARENT{i}\")))\n"
+            "(allow file-read-metadata (literal (param \"READPARENT{i}\")))\n"
         ));
     }
     profile.push_str("(allow file-read* (require-all (subpath (param \"WORKSPACE\"))");
@@ -457,16 +460,16 @@ mod tests {
         let profile = seatbelt_profile(&executor.config, &Request::new("/bin/sh")).unwrap();
         assert!(profile.contains("(allow file-read* (subpath (param \"RUNTIME0\")))"));
         assert!(!profile.contains(&runtime.display().to_string()));
-        let ancestors = runtime_ancestors(&executor.config);
+        let ancestors = read_ancestors(&executor.config, &Request::new("/bin/sh"));
         assert!(ancestors.contains(&runtime.parent().unwrap().to_path_buf()));
         assert!(!ancestors.contains(&runtime));
         for i in 0..ancestors.len() {
             assert!(profile.contains(&format!(
-                "(allow file-read-metadata (literal (param \"RUNTIMEPARENT{i}\")))"
+                "(allow file-read-metadata (literal (param \"READPARENT{i}\")))"
             )));
-            assert!(!profile.contains(&format!("(subpath (param \"RUNTIMEPARENT{i}\"))")));
+            assert!(!profile.contains(&format!("(subpath (param \"READPARENT{i}\"))")));
             assert!(!profile.contains(&format!(
-                "(allow file-read* (literal (param \"RUNTIMEPARENT{i}\")))"
+                "(allow file-read* (literal (param \"READPARENT{i}\")))"
             )));
         }
         let args = bwrap_args(&executor.config, &Request::new("/bin/sh"), &private).unwrap();

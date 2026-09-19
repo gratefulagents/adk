@@ -39,4 +39,4 @@ jobs:
       - uses: actions/checkout@v4
       - run: rustup show active-toolchain
       - name: Unsupported targets compile and fail closed
-        run: cargo test --locked -p adk-sandbox -p adk-security -p adk-tools --all-targets
+        run: cargo test --locked -p adk-sandbox -p adk-security -p adk-tools -p adk-project-state --all-targets

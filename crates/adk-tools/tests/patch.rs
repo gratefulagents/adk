@@ -91,14 +91,16 @@ fn setup(root: &Path, files: &BTreeMap<String, File>) {
                 continue;
             }
             "fifo" => {
-                rustix::fs::mknodat(
-                    rustix::fs::CWD,
-                    &path,
-                    rustix::fs::FileType::Fifo,
-                    rustix::fs::Mode::from_raw_mode(mode),
-                    0,
-                )
-                .unwrap();
+                assert!(
+                    std::process::Command::new("mkfifo")
+                        .arg("-m")
+                        .arg(format!("{mode:o}"))
+                        .arg(&path)
+                        .status()
+                        .unwrap()
+                        .success(),
+                    "could not create FIFO fixture"
+                );
             }
             _ => {
                 fs::write(

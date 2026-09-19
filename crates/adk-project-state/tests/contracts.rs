@@ -70,6 +70,33 @@ fn events() -> Vec<Event> {
 }
 
 #[test]
+fn both_stores_create_missing_parents_and_reopen_after_repeated_writes() {
+    for sqlite in [false, true] {
+        let temp = TempDir::new().unwrap();
+        let path = temp.path().join("missing").join("nested");
+        let store = open(&path, sqlite);
+        let first = task(&store, "first");
+        let second = task(&store, "second");
+        store.close_task(&first.id, "done").unwrap();
+        let saved = memory(&store, "durable memory");
+        drop(store);
+
+        let store = open(&path, sqlite);
+        assert_eq!(store.get_task(&first.id).unwrap().status, "closed");
+        assert_eq!(store.get_task(&second.id).unwrap().title, "second");
+        assert_eq!(
+            store.list_memories(MemoryFilter::default()).unwrap()[0].id,
+            saved.id
+        );
+        assert_eq!(store.list_tasks().unwrap().len(), 2);
+        task(&store, "after reopen");
+        drop(store);
+
+        assert_eq!(open(&path, sqlite).list_tasks().unwrap().len(), 3);
+    }
+}
+
+#[test]
 fn go_event_schemas_roundtrip_without_precision_loss() {
     for line in fs::read_to_string(fixture("baseline/events.jsonl"))
         .unwrap()

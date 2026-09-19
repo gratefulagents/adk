@@ -431,13 +431,15 @@ mod tests {
                     match kind {
                         "symlink" => std::os::unix::fs::symlink(&secret, &path)?,
                         "hardlink" => fs::hard_link(&secret, &path)?,
-                        _ => rustix::fs::mknodat(
-                            rustix::fs::CWD,
-                            &path,
-                            rustix::fs::FileType::Fifo,
-                            Mode::from_raw_mode(0o600),
-                            0,
-                        )?,
+                        _ => {
+                            // mknodat is not available on Darwin. This test-only
+                            // fixture still creates a real FIFO on both platforms.
+                            let status = std::process::Command::new("mkfifo")
+                                .args(["-m", "600"])
+                                .arg(&path)
+                                .status()?;
+                            assert!(status.success(), "could not create FIFO fixture");
+                        }
                     }
                 }
                 Ok(())

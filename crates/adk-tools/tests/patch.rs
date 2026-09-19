@@ -119,6 +119,16 @@ fn setup(root: &Path, files: &BTreeMap<String, File>) {
     for (name, file) in files {
         if file.kind == "symlink" {
             symlink(&file.target, root.join(name)).unwrap();
+            // Linux-created corpus links have mode 0777; macOS applies umask.
+            #[cfg(target_os = "macos")]
+            assert!(
+                std::process::Command::new("/bin/chmod")
+                    .args(["-h", "777"])
+                    .arg(root.join(name))
+                    .status()
+                    .unwrap()
+                    .success()
+            );
         }
         if file.kind == "hardlink" {
             fs::hard_link(root.join(&file.target), root.join(name)).unwrap();

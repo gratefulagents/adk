@@ -18,10 +18,10 @@
 (allow process-exec)
 (allow process-fork)
 (allow signal (target same-sandbox))
-; Developer-tool launchers query their own process identity. Restrict these
-; queries to this sandbox's clean-environment processes; host processes remain
-; default-denied, and argv/environment sysctls stay explicitly denied below.
-(allow process-info* (target same-sandbox))
+; Developer-tool launchers query their own process identity. The procargs
+; sysctls also use process-info checks, so deny other targets explicitly.
+(deny process-info* (require-not (target self)))
+(allow process-info* (target self))
 ; These legacy sysctls expose same-UID argv/environment; deny explicitly,
 ; including PID suffixes, rather than relying on default-deny or process-info.
 (deny sysctl-read (sysctl-name-prefix "kern.procargs"))

@@ -441,6 +441,9 @@ mod tests {
         assert!(!profile.contains("(subpath \"/private/var\")"));
         assert!(profile.contains("(sysctl-name \"hw.pagesize_compat\")"));
         assert!(!profile.contains("(allow sysctl-read)"));
+        assert!(profile.contains("(deny process-info* (require-not (target self)))"));
+        assert!(profile.contains("(allow process-info* (target self))"));
+        assert!(!profile.contains("(allow process-info* (target same-sandbox))"));
         assert!(!profile.contains("(sysctl-name \"kern.procargs2\")"));
         assert!(profile.contains("(deny sysctl-read (sysctl-name-prefix \"kern.procargs\"))"));
         assert!(!profile.contains("(allow network*)"));

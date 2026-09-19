@@ -380,7 +380,9 @@ async fn timeouts_framing_limits_and_restarts() {
         ("flood", "truncated"),
     ] {
         let mut config = server(mode);
-        config.startup_timeout = Duration::from_millis(200);
+        if mode == "startup-timeout" {
+            config.startup_timeout = Duration::from_millis(200);
+        }
         config.max_stderr_bytes = 16;
         let tool = make(
             root.path(),

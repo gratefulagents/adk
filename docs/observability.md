@@ -1,5 +1,10 @@
 # Observability
 
+For the separate SDK category-store APIs and host-owned exporter constructors,
+see [trace-store and telemetry ownership](trace-store.md). The native event
+pipeline documented here retains schema 1; it is not silently relabeled schema 2.
+
+
 ## Parent wiring
 
 The implementation is owned by `crates/adk/src/observability.rs` and is opt-in:

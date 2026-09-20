@@ -40,6 +40,14 @@ pub mod tool_runtime;
 #[cfg(feature = "observability")]
 pub mod observability;
 
+/// Compatible SDK trace documents and Linux confined category storage.
+#[cfg(feature = "observability")]
+pub mod tracestore;
+
+/// Explicitly owned stdout/OTLP exporters and SDK endpoint defaults.
+#[cfg(feature = "otel")]
+pub mod telemetry;
+
 /// Host configuration, provider/tool composition and explicit bundle/session ownership.
 #[cfg(feature = "builder")]
 pub mod builder;

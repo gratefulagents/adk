@@ -18,8 +18,8 @@ durable = ["dep:adk-durable"]
 project-state = ["dep:adk-project-state"]
 tools = ["dep:adk-tools"]
 mcp = ["dep:adk-mcp"]
-observability = ["runtime", "dep:adk-security", "dep:sha2", "dep:rustix"]
-otel = ["observability", "dep:opentelemetry"]
+observability = ["runtime", "dep:adk-security", "dep:sha2", "dep:rustix", "dep:chrono"]
+otel = ["observability", "dep:opentelemetry", "dep:opentelemetry_sdk", "dep:opentelemetry-otlp", "dep:opentelemetry-stdout"]
 
 [dependencies]
 serde = { workspace = true, optional = true }
@@ -27,7 +27,11 @@ serde_json = { workspace = true, optional = true }
 serde_yaml = { package = "serde_yaml_ng", version = "0.10", optional = true }
 tokio = { workspace = true, optional = true }
 sha2 = { version = "0.10", optional = true }
+chrono = { version = "0.4", default-features = false, features = ["std", "serde"], optional = true }
 opentelemetry = { version = "0.31", default-features = false, features = ["trace"], optional = true }
+opentelemetry_sdk = { version = "0.31", default-features = false, features = ["trace"], optional = true }
+opentelemetry-otlp = { version = "0.31", default-features = false, features = ["trace", "grpc-tonic", "tls-roots"], optional = true }
+opentelemetry-stdout = { version = "0.31", default-features = false, features = ["trace"], optional = true }
 adk-core.workspace = true
 adk-mcp = { version = "0.1.0", path = "../adk-mcp", optional = true }
 adk-tools = { version = "0.1.0", path = "../adk-tools", optional = true }

@@ -149,10 +149,80 @@ explicit local subprocess backend, not a claim of sandbox enforcement.
    explicit unsupported/different behavior in the builder document.
 4. Go OTLP endpoint/environment/stdout constructor defaults and complete child/
    session progress inference are not provided by the injected-tracer bridge.
-5. Live-provider, external-service and cross-OS evidence is unverified. Restore
-   the pinned SDK checkout before rerunning the strict baseline validator.
+5. Live-provider, external-service and cross-OS evidence is unverified. The
+   checkout-pin discrepancy was resolved in the continuation below.
 
 These are blockers, **not accepted divergences or capabilities hidden behind
 flags**. The PR must remain draft and must not auto-close #11. No worker CLI,
 evaluation/Terminal-Bench adapter, release, merge or production default switch
 is part of this delivery.
+
+## PR33 continuation: authoritative reference and store/exporter APIs
+
+The source checkout is now clean at the authoritative
+`1dc92b73900fac74dc357a938e4b5eee6392b418`. Both
+`python3 scripts/inventory/validate.py` and
+`python3 scripts/check-source-lock.py` pass. The latter also required restoring
+the clean attached platform reference to its already-accepted source-lock
+revision `08e65c970830f05042c251bcbb46ec6a9e3719b9`; no platform source was
+changed. No accepted baseline, source lock, archived hash or historical audit
+snapshot was rewritten.
+
+Fresh independent Go execution is recorded in
+[`issue-11-pinned-reference.json`](issue-11-pinned-reference.json):
+`go test -count=1 -json ./pkg/agentsdk/...`, Go 1.26.8, **729 passed test/subtest
+records, 5 skipped**, across 34 packages. Package results include packages
+without tests; they are not counted as passing tests. The overlay now attaches
+exact source-test execution evidence to **644 acceptance IDs**, separately from
+Rust semantic verification. These source results do not close the 8,891 retained
+Rust obligations.
+
+New [category-store and exporter APIs](../trace-store.md):
+
+- Linux `tracestore::TraceStore` / `FilesystemTraceStore`, metadata and scores,
+  category rotation, artifact writes, reopen, list/filter, private atomic
+  metadata replacement and explicit close.
+- An independently generated pinned-Go store fixture plus Rust filesystem and
+  quota regressions. The original schema-1 event writer is unchanged.
+- `telemetry::Telemetry` constructors with explicit/environment/stdout endpoint
+  selection, gRPC/TLS, five-second batching, service resource/instrumentation
+  defaults, flush/shutdown and explicit global installation.
+
+### Fresh continuation verification
+
+Rust **1.88.0**, Linux x86_64:
+
+| Check | Result |
+| --- | --- |
+| Full locked workspace/all-features/all-targets | **797 passed, 0 failed, 30 ignored** |
+| Locked workspace doctests | **1 passed** |
+| Strict workspace Clippy via direct driver | Passed |
+| Strict all-feature rustdoc and workspace Rustfmt | Passed |
+| Facade feature matrix and independent consumer | Passed |
+| Offline feature scenarios | **20/20 passed** |
+| Store and telemetry targeted regressions | **5 + 4 passed** |
+| Cargo deny 0.20.2 | advisories, bans, licenses, sources passed |
+| Python purity/replay tests | **4 + 17 passed** |
+| Pinned Go store fixture, source lock, inventory and overlay | Passed |
+
+The dependency review added exact duplicate-version exceptions for `rand` and
+`rand_core` 0.9.5: OpenTelemetry SDK 0.31 requires them while Postgres requires
+0.10. No advisory or license failure was waived. The older locally installed
+cargo-deny 0.18.4 could not parse a CVSS 4 advisory; the repository's already-pinned
+0.20.2 checker was installed and used instead. Direct compiler/Clippy binaries
+avoid the worker's missing `/proc/self/exe`; no new compiler was substituted for
+project verification.
+
+The 30 ignored Rust tests remain unverified, not passing. The five skipped Go
+records are the MCP subprocess helper, Linux automatic confinement/daemonized
+child checks, and two Darwin Seatbelt checks (exact names are in the reference
+report). No live collector, provider credentials, external Postgres/pgvector or
+non-Linux target was verified in this continuation. Fresh independent Rust code
+re-review has not been obtained.
+
+The remaining trace work is **producer parity**, including the complete Go
+schema-2 hook/span writer. Constructor defaults now have offline coverage, but
+Go stdout JSON format, complete span attributes and trace-ID callbacks are not
+implemented. Higher-level runtime/session/guardrail helper parity and complete
+acceptance-ID Rust closure remain unfinished implementation, not external
+blockers. This continuation must not be represented as completion of #11.

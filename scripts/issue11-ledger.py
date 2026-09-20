@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "docs/migration/ledger/sdk-v0.0.115/inventory.json"
 MANIFEST = ROOT / "docs/migration/ledger/sdk-v0.0.115/manifest.json"
 OVERLAY = ROOT / "docs/migration/ledger/issue-11-overlay.json"
+REFERENCE_EVIDENCE = ROOT / "docs/verification/issue-11-pinned-reference.json"
 SNAPSHOT = ROOT / "docs/migration/ledger/sdk-v0.0.115"
 
 BASELINE_REVISION = "1dc92b73900fac74dc357a938e4b5eee6392b418"
@@ -120,6 +121,11 @@ def overlay() -> dict[str, object]:
         for row in sorted(groups, key=lambda item: item["id"])
     }
 
+    reference = read_json(REFERENCE_EVIDENCE)
+    if reference["sdk_revision"] != BASELINE_REVISION or reference["exit_code"] != 0:
+        raise SystemExit("reference evidence must come from successful pinned SDK tests")
+    if reference["baseline_inventory_sha256"] != sha256(LEDGER):
+        raise SystemExit("reference evidence was generated for another baseline")
     entries: dict[str, dict[str, object]] = {}
     category_counts: dict[str, Counter[str]] = {}
     for category in sorted(records):
@@ -149,6 +155,16 @@ def overlay() -> dict[str, object]:
                 "semantic_closure": "excluded" if is_excluded else "unresolved",
                 "approved_divergence_reference": None,
             }
+            if category == "tests" and record.get("source"):
+                package = "github.com/gratefulagents/sdk/" + str(Path(record["source"]).parent)
+                key = package + "/" + record["name"]
+                if key in reference["tests"]:
+                    entries[acceptance_id]["pinned_reference_verification"] = {
+                        "evidence_path": str(REFERENCE_EVIDENCE.relative_to(ROOT)),
+                        "test": key,
+                        "status": reference["tests"][key],
+                        "rust_semantic_closure": False,
+                    }
 
     counts = Counter(entry["disposition"] for entry in entries.values())
     if (len(entries), counts["excluded"], counts["unresolved"]) != (TOTAL, EXCLUDED, UNRESOLVED):
@@ -163,6 +179,13 @@ def overlay() -> dict[str, object]:
             "inventory_sha256": sha256(LEDGER),
             "sources_sha256": manifest["artifact_sha256"]["sources.json"],
             "record_count": sum(len(rows) for rows in records.values()),
+        },
+        "pinned_reference_execution": {
+            "evidence_path": str(REFERENCE_EVIDENCE.relative_to(ROOT)),
+            "evidence_sha256": sha256(REFERENCE_EVIDENCE),
+            "sdk_revision": reference["sdk_revision"],
+            "counts": reference["counts"],
+            "rust_semantic_closure": False,
         },
         "audit_snapshot": {
             "rust_revision": AUDIT_RUST_REVISION,

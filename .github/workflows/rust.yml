@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        features: [minimal, default, runtime, all]
+        features: [minimal, default, compat, runtime, providers, providers-runtime, execution, durable, project-state, tools, mcp, observability, otel, builder, composition, all]
     steps:
       - uses: actions/checkout@v4
       - name: Install pinned compiler and components
@@ -20,8 +20,9 @@ jobs:
           case '${{ matrix.features }}' in
             minimal) cargo test --locked -p adk --no-default-features --all-targets ;;
             default) cargo test --locked --all-targets ;;
-            runtime) cargo test --locked -p adk --no-default-features --features runtime --all-targets ;;
+            composition) cargo test --locked -p adk --no-default-features --features runtime,tools,providers-runtime --all-targets ;;
             all) cargo test --locked --workspace --all-features --all-targets ;;
+            *) cargo test --locked -p adk --no-default-features --features '${{ matrix.features }}' --all-targets ;;
           esac
       - name: Standalone example
         run: cargo run --locked -p adk --example standalone --no-default-features
@@ -60,7 +61,12 @@ jobs:
           RUSTDOCFLAGS: -D warnings
       - run: cargo test --locked --workspace --all-features --doc
       - run: python3 scripts/check-purity.py
+      - name: Independent all-feature consumer workspace
+        run: cargo run --locked --manifest-path fixtures/standalone-consumer/Cargo.toml
+      - name: Run all offline feature examples
+        run: sh scripts/check-feature-examples.sh
       - run: python3 scripts/tool-manifest.py --check
+      - run: python3 scripts/issue11-ledger.py check
       - run: python3 -m unittest discover -s scripts -p 'test_purity.py' -v
       - run: python3 -m unittest discover -s scripts/replay -p 'test_*.py' -v
       - name: Compare Rust against pinned Go outputs

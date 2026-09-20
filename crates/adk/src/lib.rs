@@ -35,3 +35,11 @@ pub use adk_security as security;
 /// Lifecycle-owned prepared tool integration with the standalone runner.
 #[cfg(all(feature = "tools", feature = "runtime"))]
 pub mod tool_runtime;
+
+/// Ordered native events, explicit capture policy and host-owned telemetry.
+#[cfg(feature = "observability")]
+pub mod observability;
+
+/// Host configuration, provider/tool composition and explicit bundle/session ownership.
+#[cfg(feature = "builder")]
+pub mod builder;

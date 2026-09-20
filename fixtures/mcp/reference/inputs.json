@@ -103,6 +103,65 @@
           }
         }
       }
+    },
+    {
+      "name": "null-type",
+      "input": {
+        "type": null
+      }
+    },
+    {
+      "name": "null-required",
+      "input": {
+        "required": null
+      }
+    },
+    {
+      "name": "empty-required",
+      "input": {
+        "required": []
+      }
+    },
+    {
+      "name": "false-properties",
+      "input": {
+        "properties": false
+      }
+    },
+    {
+      "name": "array-properties",
+      "input": {
+        "properties": []
+      }
+    },
+    {
+      "name": "null-additional",
+      "input": {
+        "additionalProperties": null
+      }
+    },
+    {
+      "name": "default-property",
+      "input": {
+        "properties": {
+          "x": {
+            "type": "string",
+            "default": "fallback"
+          }
+        }
+      }
+    },
+    {
+      "name": "empty-defs",
+      "input": {
+        "$defs": {}
+      }
+    },
+    {
+      "name": "whitespace-type",
+      "input": {
+        "type": " object "
+      }
     }
   ],
   "results": [
@@ -286,8 +345,7 @@
             "data": "%%%"
           }
         ]
-      },
-      "delta": "Go wire decoder rejects invalid base64; Rust renderer returns a redacted per-block error"
+      }
     },
     {
       "name": "resource-nil",
@@ -366,6 +424,2199 @@
         ]
       },
       "setup": "symlink"
+    },
+    {
+      "name": "absent-content",
+      "kind": "call",
+      "input": {}
+    },
+    {
+      "name": "null-content",
+      "kind": "call",
+      "input": {
+        "content": null
+      }
+    },
+    {
+      "name": "object-content",
+      "kind": "call",
+      "input": {
+        "content": {}
+      }
+    },
+    {
+      "name": "scalar-result",
+      "kind": "call",
+      "input": 42
+    },
+    {
+      "name": "null-block",
+      "kind": "call",
+      "input": {
+        "content": [
+          null
+        ]
+      }
+    },
+    {
+      "name": "unknown-block",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "future",
+            "text": "ignored"
+          }
+        ]
+      }
+    },
+    {
+      "name": "missing-type",
+      "kind": "call",
+      "input": {
+        "content": [
+          {}
+        ]
+      }
+    },
+    {
+      "name": "wrong-error",
+      "kind": "call",
+      "input": {
+        "isError": "true"
+      }
+    },
+    {
+      "name": "null-error",
+      "kind": "call",
+      "input": {
+        "isError": null
+      }
+    },
+    {
+      "name": "null-structured",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "hello"
+          }
+        ],
+        "structuredContent": null
+      }
+    },
+    {
+      "name": "empty-structured",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "hello"
+          }
+        ],
+        "structuredContent": {}
+      }
+    },
+    {
+      "name": "scalar-structured",
+      "kind": "call",
+      "input": {
+        "structuredContent": false
+      }
+    },
+    {
+      "name": "text-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "name": "text-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": "",
+            "mimeType": "",
+            "uri": "",
+            "name": "",
+            "data": "",
+            "resource": {
+              "uri": "",
+              "text": "",
+              "blob": "",
+              "mimeType": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "text-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": null,
+            "mimeType": null,
+            "data": null,
+            "resource": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "text-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "text": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "text-wrong-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "mimeType": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "text": "",
+            "mimeType": "",
+            "uri": "",
+            "name": "",
+            "data": "",
+            "resource": {
+              "uri": "",
+              "text": "",
+              "blob": "",
+              "mimeType": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "text": null,
+            "mimeType": null,
+            "data": null,
+            "resource": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "text": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-wrong-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "mimeType": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio",
+            "text": "",
+            "mimeType": "",
+            "uri": "",
+            "name": "",
+            "data": "",
+            "resource": {
+              "uri": "",
+              "text": "",
+              "blob": "",
+              "mimeType": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio",
+            "text": null,
+            "mimeType": null,
+            "data": null,
+            "resource": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio",
+            "text": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "audio-wrong-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "audio",
+            "mimeType": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource_link-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource_link-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "text": "",
+            "mimeType": "",
+            "uri": "",
+            "name": "",
+            "data": "",
+            "resource": {
+              "uri": "",
+              "text": "",
+              "blob": "",
+              "mimeType": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource_link-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "text": null,
+            "mimeType": null,
+            "data": null,
+            "resource": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource_link-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "text": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource_link-wrong-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "mimeType": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource"
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "text": "",
+            "mimeType": "",
+            "uri": "",
+            "name": "",
+            "data": "",
+            "resource": {
+              "uri": "",
+              "text": "",
+              "blob": "",
+              "mimeType": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "text": null,
+            "mimeType": null,
+            "data": null,
+            "resource": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "text": 7
+          }
+        ]
+      }
+    },
+    {
+      "name": "resource-wrong-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "mimeType": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-extras",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "uri": "x",
+            "size": 5,
+            "annotations": {
+              "priority": 0.5
+            },
+            "_meta": {
+              "x": true
+            },
+            "icons": [
+              {
+                "src": "x"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-empty-resource",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {}
+        ]
+      }
+    },
+    {
+      "name": "embedded-empty-resource",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {}
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-null-text-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "text": null,
+            "blob": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-null-text-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "text": null,
+              "blob": null
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-empty-text-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "text": "",
+            "blob": ""
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-empty-text-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "text": "",
+              "blob": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-text-no-mime",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "text": "hello"
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-text-no-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "text": "hello"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-blob-no-mime",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGVsbG8="
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-blob-no-mime",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": "aGVsbG8="
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-wrong-uri",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "uri": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-wrong-uri",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "uri": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-wrong-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-wrong-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-wrong-text",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "text": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-wrong-text",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "text": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-invalid-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": "%%%"
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-invalid-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": "%%%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-newline-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGVs\nbG8=\r\n"
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-newline-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": "aGVs\nbG8=\r\n"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-array-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": [
+              104,
+              105
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-array-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": [
+                104,
+                105
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-null-byte",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": [
+              null,
+              105
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "embedded-null-byte",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": [
+                null,
+                105
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-absent",
+      "kind": "resource",
+      "input": {}
+    },
+    {
+      "name": "read-null-contents",
+      "kind": "resource",
+      "input": {
+        "contents": null
+      }
+    },
+    {
+      "name": "read-null-entry",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          null
+        ]
+      }
+    },
+    {
+      "name": "read-wrong-contents",
+      "kind": "resource",
+      "input": {
+        "contents": {}
+      }
+    },
+    {
+      "name": "read-scalar",
+      "kind": "resource",
+      "input": false
+    },
+    {
+      "name": "embedded-newlines-only",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource",
+            "resource": {
+              "blob": "\r\n"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "read-newlines-only",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": "\r\n"
+          }
+        ]
+      }
+    },
+    {
+      "name": "image-noncanonical-base64",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGl="
+          }
+        ]
+      }
+    },
+    {
+      "name": "malformed-after-blob",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "text": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "malformed-resource-after-blob",
+      "kind": "resource",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGk="
+          },
+          {
+            "text": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "meta-null",
+      "kind": "call",
+      "input": {
+        "_meta": null
+      }
+    },
+    {
+      "name": "meta-wrong",
+      "kind": "call",
+      "input": {
+        "_meta": []
+      }
+    },
+    {
+      "name": "annotations-empty",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "annotations": {}
+          }
+        ]
+      }
+    },
+    {
+      "name": "annotations-wrong",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "text",
+            "annotations": "wrong"
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-size-wrong",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "size": "7"
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-size-null",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "resource_link",
+            "size": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "tool-use-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "tool_use"
+          }
+        ]
+      }
+    },
+    {
+      "name": "tool-result-missing",
+      "kind": "call",
+      "input": {
+        "content": [
+          {
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-type",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-text",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "text": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-mimeType",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "mimeType": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-data",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "data": "%%%"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-resource",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "resource": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-uri",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "uri": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-name",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "name": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-title",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "title": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-description",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "description": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-size",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "size": 1.5
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-_meta",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "_meta": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-annotations",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "annotations": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-icons",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "icons": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-id",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "id": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-input",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "input": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-toolUseId",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "toolUseId": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-content",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "content": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-field-isError",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text",
+                "isError": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-resource_link-src",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              {
+                "src": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-text-src",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "icons": [
+              {
+                "src": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-resource_link-mimeType",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              {
+                "mimeType": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-text-mimeType",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "icons": [
+              {
+                "mimeType": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-resource_link-theme",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              {
+                "theme": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-text-theme",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "icons": [
+              {
+                "theme": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-resource_link-sizes",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              {
+                "sizes": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-text-sizes",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "icons": [
+              {
+                "sizes": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-block-meta-scalar",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "_meta": 3
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-resource-meta-scalar",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource",
+            "resource": {
+              "_meta": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-result-meta-scalar",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          }
+        ],
+        "_meta": 3
+      }
+    },
+    {
+      "name": "preflight-read-meta-scalar",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGk="
+          }
+        ],
+        "_meta": 3
+      },
+      "kind": "resource"
+    },
+    {
+      "name": "preflight-read-entry-meta-scalar",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGk="
+          },
+          {
+            "_meta": 3
+          }
+        ]
+      },
+      "kind": "resource"
+    },
+    {
+      "name": "preflight-block-meta-array",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "_meta": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-resource-meta-array",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource",
+            "resource": {
+              "_meta": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-result-meta-array",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          }
+        ],
+        "_meta": []
+      }
+    },
+    {
+      "name": "preflight-read-meta-array",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGk="
+          }
+        ],
+        "_meta": []
+      },
+      "kind": "resource"
+    },
+    {
+      "name": "preflight-read-entry-meta-array",
+      "input": {
+        "contents": [
+          {
+            "blob": "aGk="
+          },
+          {
+            "_meta": []
+          }
+        ]
+      },
+      "kind": "resource"
+    },
+    {
+      "name": "preflight-nested-kind-null",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              null
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-kind-unknown",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "unknown"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-kind-tool-use",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "tool_use"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-kind-tool-result",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "tool_result"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-block-scalar",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-entry-scalar",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-nested-block-array",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              []
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-entry-array",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "resource_link",
+            "icons": [
+              []
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-icon-sizes-entry",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "icons": [
+              {
+                "sizes": [
+                  3
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-nested-invalid-field",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "unknown",
+                "text": 3
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-deep-invalid-field",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "content": [
+              {
+                "type": "unknown",
+                "content": [
+                  {
+                    "icons": [
+                      {
+                        "src": 3
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-annotation-audience-150",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "annotations": {
+              "audience": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-annotation-audience-151",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "annotations": {
+              "audience": [
+                3
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-annotation-priority-152",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "annotations": {
+              "priority": "bad"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-annotation-lastModified-153",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "annotations": {
+              "lastModified": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-resource-uri",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "resource": {
+              "uri": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-resource-mimeType",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "resource": {
+              "mimeType": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-resource-text",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "resource": {
+              "text": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-irrelevant-resource-blob",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "resource": {
+              "blob": "%%%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-valid-nested-null",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-valid-nested-empty",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-valid-nested-zero-types",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "content": [
+              {
+                "type": "text"
+              },
+              {
+                "type": "image"
+              },
+              {
+                "type": "audio"
+              },
+              {
+                "type": "resource"
+              },
+              {
+                "type": "resource_link"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-valid-nested-optionals",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "tool_result",
+            "toolUseId": "id",
+            "isError": true,
+            "structuredContent": false,
+            "_meta": {
+              "x": 1
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "hi",
+                "unknown": "drop",
+                "annotations": {
+                  "audience": [
+                    null,
+                    "user"
+                  ],
+                  "priority": 0,
+                  "lastModified": "",
+                  "unknown": "drop"
+                },
+                "_meta": {}
+              },
+              {
+                "type": "image",
+                "data": [
+                  104,
+                  105
+                ],
+                "mimeType": "image/png",
+                "annotations": {}
+              },
+              {
+                "type": "audio",
+                "data": "aGk=\n",
+                "_meta": {
+                  "x": 1
+                }
+              },
+              {
+                "type": "resource_link",
+                "uri": "x",
+                "name": "n",
+                "size": 0,
+                "icons": [
+                  null,
+                  {},
+                  {
+                    "src": "x",
+                    "sizes": [
+                      null,
+                      "any"
+                    ],
+                    "mimeType": "image/png",
+                    "theme": "dark",
+                    "unknown": 1
+                  }
+                ],
+                "annotations": {
+                  "priority": 0.5
+                }
+              },
+              {
+                "type": "resource",
+                "resource": {
+                  "blob": "",
+                  "text": "",
+                  "_meta": {},
+                  "unknown": 1
+                }
+              },
+              {
+                "type": "resource",
+                "resource": {
+                  "uri": "u",
+                  "blob": [
+                    104,
+                    105
+                  ],
+                  "text": "t",
+                  "_meta": {
+                    "x": 1
+                  }
+                }
+              },
+              {
+                "type": "resource",
+                "resource": {}
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-valid-irrelevant-nested-fields",
+      "input": {
+        "content": [
+          {
+            "type": "image",
+            "data": "aGk="
+          },
+          {
+            "type": "text",
+            "text": "ok",
+            "content": [
+              null,
+              {},
+              {
+                "type": "unknown"
+              },
+              {
+                "type": "tool_result",
+                "content": [
+                  {
+                    "type": "tool_use"
+                  }
+                ]
+              }
+            ],
+            "icons": [
+              {
+                "_meta": 3
+              }
+            ],
+            "annotations": {
+              "_meta": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "preflight-oversized-malformed-call",
+      "kind": "call",
+      "generate": "oversized-malformed-blob"
+    },
+    {
+      "name": "preflight-oversized-malformed-resource",
+      "kind": "resource",
+      "generate": "oversized-malformed-blob"
     }
   ],
   "configs": [
@@ -668,6 +2919,306 @@
       "rustAccept": false,
       "layer": "dispatch",
       "delta": "Rust rejects mixed transport fields during snapshot validation; actual Go dispatch independently rejects the same combination after its permissive parser"
+    }
+  ],
+  "wire": [
+    {
+      "name": "tools/list-absent",
+      "input": {
+        "method": "tools/list",
+        "params": {}
+      }
+    },
+    {
+      "name": "tools/list-empty",
+      "input": {
+        "method": "tools/list",
+        "params": {
+          "cursor": ""
+        }
+      }
+    },
+    {
+      "name": "tools/list-null",
+      "input": {
+        "method": "tools/list",
+        "params": {
+          "cursor": null
+        }
+      }
+    },
+    {
+      "name": "tools/list-malformed",
+      "input": {
+        "method": "tools/list",
+        "params": {
+          "cursor": 7
+        }
+      }
+    },
+    {
+      "name": "tools/list-unknown",
+      "input": {
+        "method": "tools/list",
+        "params": {
+          "cursor": "not-a-cursor"
+        }
+      }
+    },
+    {
+      "name": "resources/list-absent",
+      "input": {
+        "method": "resources/list",
+        "params": {}
+      }
+    },
+    {
+      "name": "resources/list-empty",
+      "input": {
+        "method": "resources/list",
+        "params": {
+          "cursor": ""
+        }
+      }
+    },
+    {
+      "name": "resources/list-null",
+      "input": {
+        "method": "resources/list",
+        "params": {
+          "cursor": null
+        }
+      }
+    },
+    {
+      "name": "resources/list-malformed",
+      "input": {
+        "method": "resources/list",
+        "params": {
+          "cursor": 7
+        }
+      }
+    },
+    {
+      "name": "resources/list-unknown",
+      "input": {
+        "method": "resources/list",
+        "params": {
+          "cursor": "not-a-cursor"
+        }
+      }
+    },
+    {
+      "name": "prompts/list-absent",
+      "input": {
+        "method": "prompts/list",
+        "params": {}
+      }
+    },
+    {
+      "name": "prompts/list-empty",
+      "input": {
+        "method": "prompts/list",
+        "params": {
+          "cursor": ""
+        }
+      }
+    },
+    {
+      "name": "prompts/list-null",
+      "input": {
+        "method": "prompts/list",
+        "params": {
+          "cursor": null
+        }
+      }
+    },
+    {
+      "name": "prompts/list-malformed",
+      "input": {
+        "method": "prompts/list",
+        "params": {
+          "cursor": 7
+        }
+      }
+    },
+    {
+      "name": "prompts/list-unknown",
+      "input": {
+        "method": "prompts/list",
+        "params": {
+          "cursor": "not-a-cursor"
+        }
+      }
+    },
+    {
+      "name": "tools/call-absent",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup"
+        }
+      }
+    },
+    {
+      "name": "tools/call-null",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": null
+        }
+      }
+    },
+    {
+      "name": "tools/call-empty",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": {}
+        }
+      }
+    },
+    {
+      "name": "tools/call-array",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": []
+        }
+      }
+    },
+    {
+      "name": "tools/call-wrong-id",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": {
+            "id": 7
+          }
+        }
+      }
+    },
+    {
+      "name": "tools/call-empty-text",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": {
+            "empty": true
+          }
+        }
+      }
+    },
+    {
+      "name": "tools/call-error-result",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": {
+            "error": true
+          }
+        }
+      }
+    },
+    {
+      "name": "tools/call-callback-error",
+      "input": {
+        "method": "tools/call",
+        "params": {
+          "name": "lookup",
+          "arguments": {
+            "deny": true
+          }
+        }
+      }
+    },
+    {
+      "name": "tools/list-params-null",
+      "input": {
+        "method": "tools/list",
+        "params": null
+      }
+    },
+    {
+      "name": "tools/list-params-omitted",
+      "input": {
+        "method": "tools/list"
+      }
+    },
+    {
+      "name": "resources/list-params-null",
+      "input": {
+        "method": "resources/list",
+        "params": null
+      }
+    },
+    {
+      "name": "resources/list-params-omitted",
+      "input": {
+        "method": "resources/list"
+      }
+    },
+    {
+      "name": "prompts/list-params-null",
+      "input": {
+        "method": "prompts/list",
+        "params": null
+      }
+    },
+    {
+      "name": "prompts/list-params-omitted",
+      "input": {
+        "method": "prompts/list"
+      }
+    },
+    {
+      "name": "resources/read-unknown",
+      "input": {
+        "method": "resources/read",
+        "params": {
+          "uri": "memory://not-selected"
+        }
+      }
+    },
+    {
+      "name": "resources/read-empty",
+      "input": {
+        "method": "resources/read",
+        "params": {
+          "uri": ""
+        }
+      }
+    },
+    {
+      "name": "resources/read-null",
+      "input": {
+        "method": "resources/read",
+        "params": {
+          "uri": null
+        }
+      }
+    },
+    {
+      "name": "resources/read-absent",
+      "input": {
+        "method": "resources/read",
+        "params": {}
+      }
+    },
+    {
+      "name": "resources/read-wrong-type",
+      "input": {
+        "method": "resources/read",
+        "params": {
+          "uri": 7
+        }
+      }
     }
   ]
 }

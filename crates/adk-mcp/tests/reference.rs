@@ -114,11 +114,14 @@ fn result_input(case: &Value) -> Value {
     };
     let mut block = match generate {
         "long-text" => json!({"type":"text","text":"界".repeat(100000)}),
-        "oversized-blob" => {
+        "oversized-blob" | "oversized-malformed-blob" => {
             json!({"type":"image","mimeType":"application/octet-stream","data":base64::engine::general_purpose::STANDARD.encode(vec![0; 10*1024*1024+1])})
         }
         _ => panic!("unknown recipe"),
     };
+    if generate == "oversized-malformed-blob" {
+        block["data"] = format!("{}!", block["data"].as_str().unwrap()).into();
+    }
     if case["kind"] == "resource" {
         let block = block.as_object_mut().unwrap();
         block.remove("type");
@@ -126,7 +129,13 @@ fn result_input(case: &Value) -> Value {
         if let Some(data) = block.remove("data") {
             block.insert("blob".into(), data);
         }
-        json!({"contents":[block]})
+        if generate == "oversized-malformed-blob" {
+            json!({"contents":[{"blob":"aGk="},block]})
+        } else {
+            json!({"contents":[block]})
+        }
+    } else if generate == "oversized-malformed-blob" {
+        json!({"content":[{"type":"image","data":"aGk="},block]})
     } else {
         json!({"content":[block]})
     }
@@ -180,7 +189,7 @@ fn normalize_rendered(
 }
 
 #[test]
-fn results_match_running_go_including_blob_effects_and_explicit_decode_delta() {
+fn results_match_running_go_including_decode_rejection_and_blob_effects() {
     let (inputs, observed) = corpus();
     let cases = inputs["results"].as_array().unwrap();
     let observations = observed["results"].as_array().unwrap();
@@ -197,26 +206,25 @@ fn results_match_running_go_including_blob_effects_and_explicit_decode_delta() {
             format_resource_result(workspace.path(), "server-resource", &input)
         } else {
             format_call_result(workspace.path(), "server-tool", &input)
+        };
+        if observation.get("decodeError").is_some() {
+            assert!(
+                matches!(rendered, Err(adk_mcp::Error::Protocol(_))),
+                "{}: {rendered:?}",
+                case["name"]
+            );
+            assert_eq!(observation["workspaceEmpty"], true, "{}", case["name"]);
+            assert_eq!(fs::read_dir(workspace.path()).unwrap().count(), 0);
+            continue;
         }
-        .unwrap();
+        let rendered = rendered.unwrap_or_else(|error| panic!("{}: {error}", case["name"]));
         let mut rendered = serde_json::from_str(&rendered).unwrap_or(Value::String(rendered));
         let mut blobs = Vec::new();
         let mut errors = 0;
         normalize_rendered(&mut rendered, workspace.path(), &mut blobs, &mut errors);
         assert_eq!(json!(blobs), observation["blobs"], "{}", case["name"]);
-        if observation.get("decodeError").is_some() {
-            assert_eq!(case["name"], "invalid-base64");
-            assert!(case["delta"].as_str().unwrap().contains("decoder rejects"));
-            assert_eq!(
-                observation["decodeError"],
-                "illegal base64 data at input byte 0"
-            );
-            assert_eq!(rendered["content"][0]["error"], "<blob-error>");
-            assert_eq!(errors, 1);
-        } else {
-            assert_eq!(rendered, observation["rendered"], "{}", case["name"]);
-            assert_eq!(errors, observation["diagnostics"].as_array().unwrap().len());
-        }
+        assert_eq!(rendered, observation["rendered"], "{}", case["name"]);
+        assert_eq!(errors, observation["diagnostics"].as_array().unwrap().len());
         assert_eq!(
             input["isError"].as_bool().unwrap_or(false),
             observation["isError"].as_bool().unwrap()

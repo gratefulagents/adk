@@ -195,8 +195,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "fixtures/mcp/reference/inputs.json": "d8b4836fdca37e1dd5b87ef735d4d2540422e776d027a7ec55278e284fa5d598",
-      "scripts/mcp-reference/reference_test.go": "094b232183ae13c91ea9670d250d4038ea823a3ffd0886a8107f38d203100836",
+      "fixtures/mcp/reference/inputs.json": "6be4772acb16f903e7ed436ec833fb20aca034c4f8bc9b5b055c0265e7f185dd",
+      "scripts/mcp-reference/reference_test.go": "dca5398a0f7a7ecbbda693773b492e7073ceac1fff3a54982b3a7e2fe9074bd8",
       "scripts/mcp-reference/run.py": "da8c30b0abbc0c77bb4c999376bf8c16329b2387e43edcb47391cb0e7868198e"
     },
     "module": "github.com/gratefulagents/sdk",
@@ -462,7 +462,8 @@
       "decodeError": "illegal base64 data at input byte 0",
       "diagnostics": [],
       "isError": false,
-      "name": "invalid-base64"
+      "name": "invalid-base64",
+      "workspaceEmpty": true
     },
     {
       "blobs": [],
@@ -598,6 +599,1717 @@
           }
         ]
       }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "absent-content",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "null-content",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"{}\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }.content of type []*mcp.wireContent",
+      "diagnostics": [],
+      "isError": false,
+      "name": "object-content",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"42\" into Go value of type struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }",
+      "diagnostics": [],
+      "isError": false,
+      "name": "scalar-result",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "nil content",
+      "diagnostics": [],
+      "isError": false,
+      "name": "null-block",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "unrecognized content type \"future\"",
+      "diagnostics": [],
+      "isError": false,
+      "name": "unknown-block",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "unrecognized content type \"\"",
+      "diagnostics": [],
+      "isError": false,
+      "name": "missing-type",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"\\\"true\\\"\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }.isError of type bool",
+      "diagnostics": [],
+      "isError": false,
+      "name": "wrong-error",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "null-error",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "null-structured",
+      "rendered": "hello"
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "empty-structured",
+      "rendered": {
+        "content": [
+          {
+            "text": "hello",
+            "type": "text"
+          }
+        ],
+        "structuredContent": {}
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "scalar-structured",
+      "rendered": {
+        "structuredContent": false
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "text-missing",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "text-empty",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "text-null",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"7\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "text-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "text-wrong-mime",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-missing",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-empty",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-null",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"7\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-wrong-mime",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio-missing",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio-empty",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 0,
+          "confined": true,
+          "mode": "600",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio-null",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (0 bytes, application/octet-stream)",
+            "type": "audio"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"7\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "audio-wrong-mime",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource_link-missing",
+      "rendered": {
+        "content": [
+          {
+            "description": "",
+            "mimeType": "",
+            "name": "",
+            "title": "",
+            "type": "resource_link",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource_link-empty",
+      "rendered": {
+        "content": [
+          {
+            "description": "",
+            "mimeType": "",
+            "name": "",
+            "title": "",
+            "type": "resource_link",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource_link-null",
+      "rendered": {
+        "content": [
+          {
+            "description": "",
+            "mimeType": "",
+            "name": "",
+            "title": "",
+            "type": "resource_link",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"7\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource_link-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource_link-wrong-mime",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-missing",
+      "rendered": {
+        "content": [
+          {
+            "resource": null,
+            "type": "resource"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-empty",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-null",
+      "rendered": {
+        "content": [
+          {
+            "resource": null,
+            "type": "resource"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"7\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "resource-wrong-mime",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "link-extras",
+      "rendered": {
+        "content": [
+          {
+            "description": "",
+            "mimeType": "",
+            "name": "",
+            "title": "",
+            "type": "resource_link",
+            "uri": "x"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-empty-resource",
+      "rendered": {
+        "contents": [
+          {
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-empty-resource",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-null-text-blob",
+      "rendered": {
+        "contents": [
+          {
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-null-text-blob",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-empty-text-blob",
+      "rendered": {
+        "contents": [
+          {
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-empty-text-blob",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-text-no-mime",
+      "rendered": {
+        "contents": [
+          {
+            "text": "hello",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-text-no-mime",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "text": "hello",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-blob-no-mime",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 5,
+            "text": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-blob-no-mime",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal number into Go struct field ResourceContents.contents.uri of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-wrong-uri",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.0.resource.uri of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-wrong-uri",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal bool into Go struct field ResourceContents.contents.blob of type []uint8",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-wrong-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"false\\n            }\\n          }\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.0.resource.blob of type []uint8",
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-wrong-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal array into Go struct field ResourceContents.contents.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n            }\\n          }\\n   ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.0.resource.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-wrong-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 0",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-invalid-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 0",
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-invalid-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-newline-blob",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 5,
+            "text": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 5,
+          "confined": true,
+          "mode": "600",
+          "sha256": "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-newline-blob",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (5 bytes, application/octet-stream)",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-array-blob",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 2,
+            "text": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-array-blob",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "0f2c7f7e50abf7ce2200ae61f3ae429ca9f31d1c7cd57e94248f0b9b5d4fac03"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-null-byte",
+      "rendered": {
+        "contents": [
+          {
+            "binaryHint": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "blobSavedTo": "<blob>",
+            "blobSize": 2,
+            "text": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "0f2c7f7e50abf7ce2200ae61f3ae429ca9f31d1c7cd57e94248f0b9b5d4fac03"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-null-byte",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-absent",
+      "rendered": {
+        "contents": []
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-null-contents",
+      "rendered": {
+        "contents": []
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-null-entry",
+      "rendered": {
+        "contents": []
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal object into Go struct field ReadResourceResult.contents of type []*mcp.ResourceContents",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-wrong-contents",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal bool into Go value of type mcp.ReadResourceResult",
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "embedded-newlines-only",
+      "rendered": {
+        "content": [
+          {
+            "mimeType": "",
+            "type": "resource",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "read-newlines-only",
+      "rendered": {
+        "contents": [
+          {
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "image-noncanonical-base64",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.1.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "malformed-after-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal number into Go struct field ResourceContents.contents.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "malformed-resource-after-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "meta-null",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "meta-wrong",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "annotations-empty",
+      "rendered": ""
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"\\\"wrong\\\"\\n          }\\n        ]\\n  ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.annotations of type mcp.Annotations",
+      "diagnostics": [],
+      "isError": false,
+      "name": "annotations-wrong",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"\\\"7\\\"\\n          }\\n        ]\\n      ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.0.size of type int64",
+      "diagnostics": [],
+      "isError": false,
+      "name": "link-size-wrong",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "link-size-null",
+      "rendered": {
+        "content": [
+          {
+            "description": "",
+            "mimeType": "",
+            "name": "",
+            "title": "",
+            "type": "resource_link",
+            "uri": ""
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "tool-use-missing",
+      "rendered": {
+        "content": [
+          {
+            "id": "",
+            "input": {},
+            "name": "",
+            "type": "tool_use"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "diagnostics": [],
+      "isError": false,
+      "name": "tool-result-missing",
+      "rendered": {
+        "content": [
+          {
+            "content": [],
+            "toolUseId": "",
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.type of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-type",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-mimeType",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 0",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-data",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.resource of type mcp.ResourceContents",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-resource",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.uri of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-uri",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.name of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-name",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.title of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-title",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.description of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-description",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"1.5\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.size of type int64",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-size",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-_meta",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.annotations of type mcp.Annotations",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-annotations",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.icons of type []mcp.Icon",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-icons",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.id of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-id",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n              }\\n            ]...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.input of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-input",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.toolUseId of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-toolUseId",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.content of type []*mcp.wireContent",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-content",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.isError of type bool",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-field-isError",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.src of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-resource_link-src",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.src of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-text-src",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-resource_link-mimeType",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-text-mimeType",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.theme of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-resource_link-theme",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.theme of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-text-theme",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.sizes of type []string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-resource_link-sizes",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.icons.0.sizes of type []string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-text-sizes",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n          }\\n        ]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.1._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-block-meta-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.1.resource._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-resource-meta-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-result-meta-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal number into Go struct field ReadResourceResult._meta of type mcp.Meta",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-read-meta-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal number into Go struct field ResourceContents.contents._meta of type mcp.Meta",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-read-entry-meta-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n          }\\n        ]\\n      }...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent.content.1._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-block-meta-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n            }\\n          }\\n   ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.1.resource._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-resource-meta-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n      }\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }._meta of type map[string]interface {}",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-result-meta-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal array into Go struct field ReadResourceResult._meta of type mcp.Meta",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-read-meta-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal array into Go struct field ResourceContents.contents._meta of type mcp.Meta",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-read-entry-meta-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "tool_result nested content: nil content",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-kind-null",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "tool_result nested content: invalid content type \"unknown\"",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-kind-unknown",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "tool_result nested content: invalid content type \"tool_use\"",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-kind-tool-use",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "tool_result nested content: invalid content type \"tool_result\"",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-kind-tool-result",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            ]\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContent.content.1.content.0 of type mcp.wireContent",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-block-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            ]\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Icon.content.1.icons.0 of type mcp.Icon",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-entry-scalar",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n            ]\\n          }\\n   ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContent.content.1.content.0 of type mcp.wireContent",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-nested-block-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"[]\\n            ]\\n          }\\n   ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Icon.content.1.icons.0 of type mcp.Icon",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-entry-array",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n                ]\\n            ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon[]string.content.1.icons.0.sizes.0 of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-icon-sizes-entry",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              }\\n            ]\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent.content.1.content.0.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-nested-invalid-field",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n                      }\\n      ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent[]*mcp.wireContentmcp.wireContent[]mcp.Iconmcp.Icon.content.1.content.0.content.0.icons.0.src of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-deep-invalid-field",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.Annotations.content.1.annotations.audience of type []mcp.Role",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-annotation-audience-150",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n              ]\\n            }\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.Annotations[]mcp.Role.content.1.annotations.audience.0 of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-annotation-audience-151",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"\\\"bad\\\"\\n            }\\n          }\\n...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.Annotations.content.1.annotations.priority of type float64",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-annotation-priority-152",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.Annotations.content.1.annotations.lastModified of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-annotation-lastModified-153",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.1.resource.uri of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-resource-uri",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.1.resource.mimeType of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-resource-mimeType",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "json: cannot unmarshal \"3\\n            }\\n          }\\n    ...\" into Go struct field struct { mcp.res; Content []*mcp.wireContent \"json:\\\"content\\\"\" }[]*mcp.wireContentmcp.wireContentmcp.ResourceContents.content.1.resource.text of type string",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-resource-text",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 0",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-irrelevant-resource-blob",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-valid-nested-null",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          },
+          {
+            "content": [],
+            "toolUseId": "",
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-valid-nested-empty",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          },
+          {
+            "content": [],
+            "toolUseId": "",
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-valid-nested-zero-types",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          },
+          {
+            "content": [
+              {
+                "type": "text"
+              },
+              {
+                "type": "image"
+              },
+              {
+                "type": "audio"
+              },
+              {
+                "type": "resource"
+              },
+              {
+                "type": "resource_link"
+              }
+            ],
+            "toolUseId": "",
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-valid-nested-optionals",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          },
+          {
+            "_meta": {
+              "x": 1
+            },
+            "content": [
+              {
+                "annotations": {
+                  "audience": [
+                    "",
+                    "user"
+                  ]
+                },
+                "text": "hi",
+                "type": "text"
+              },
+              {
+                "annotations": {},
+                "data": "aGk=",
+                "mimeType": "image/png",
+                "type": "image"
+              },
+              {
+                "_meta": {
+                  "x": 1
+                },
+                "data": "aGk=",
+                "type": "audio"
+              },
+              {
+                "annotations": {
+                  "priority": 0.5
+                },
+                "icons": [
+                  {
+                    "src": ""
+                  },
+                  {
+                    "src": ""
+                  },
+                  {
+                    "mimeType": "image/png",
+                    "sizes": [
+                      "",
+                      "any"
+                    ],
+                    "src": "x",
+                    "theme": "dark"
+                  }
+                ],
+                "name": "n",
+                "size": 0,
+                "type": "resource_link",
+                "uri": "x"
+              },
+              {
+                "resource": {
+                  "blob": "",
+                  "uri": ""
+                },
+                "type": "resource"
+              },
+              {
+                "resource": {
+                  "_meta": {
+                    "x": 1
+                  },
+                  "blob": "aGk=",
+                  "text": "t",
+                  "uri": "u"
+                },
+                "type": "resource"
+              },
+              {
+                "resource": {
+                  "uri": ""
+                },
+                "type": "resource"
+              }
+            ],
+            "isError": true,
+            "structuredContent": false,
+            "toolUseId": "id",
+            "type": "tool_result"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [
+        {
+          "bytes": 2,
+          "confined": true,
+          "mode": "600",
+          "sha256": "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4"
+        }
+      ],
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-valid-irrelevant-nested-fields",
+      "rendered": {
+        "content": [
+          {
+            "blobSavedTo": "<blob>",
+            "mimeType": "",
+            "note": "Binary content saved to <blob> (2 bytes, application/octet-stream)",
+            "type": "image"
+          },
+          {
+            "text": "ok",
+            "type": "text"
+          }
+        ]
+      }
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 24",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-oversized-malformed-call",
+      "workspaceEmpty": true
+    },
+    {
+      "blobs": [],
+      "decodeError": "illegal base64 data at input byte 13981016",
+      "diagnostics": [],
+      "isError": false,
+      "name": "preflight-oversized-malformed-resource",
+      "workspaceEmpty": true
     }
   ],
   "schemas": [
@@ -735,6 +2447,672 @@
         "properties": {},
         "type": "object"
       }
+    },
+    {
+      "name": "null-type",
+      "normalized": {
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "null-required",
+      "normalized": {
+        "properties": {},
+        "required": null,
+        "type": "object"
+      }
+    },
+    {
+      "name": "empty-required",
+      "normalized": {
+        "properties": {},
+        "required": [],
+        "type": "object"
+      }
+    },
+    {
+      "name": "false-properties",
+      "normalized": {
+        "properties": false,
+        "type": "object"
+      }
+    },
+    {
+      "name": "array-properties",
+      "normalized": {
+        "properties": [],
+        "type": "object"
+      }
+    },
+    {
+      "name": "null-additional",
+      "normalized": {
+        "additionalProperties": null,
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "default-property",
+      "normalized": {
+        "properties": {
+          "x": {
+            "default": "fallback",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      }
+    },
+    {
+      "name": "empty-defs",
+      "normalized": {
+        "$defs": {},
+        "properties": {},
+        "type": "object"
+      }
+    },
+    {
+      "name": "whitespace-type",
+      "normalized": {
+        "type": " object "
+      }
+    }
+  ],
+  "wire": [
+    {
+      "name": "tools/list-absent",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "tools": [
+            {
+              "annotations": {},
+              "inputSchema": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "lookup"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-empty",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "tools": [
+            {
+              "annotations": {},
+              "inputSchema": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "lookup"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "tools": [
+            {
+              "annotations": {},
+              "inputSchema": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "lookup"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-malformed",
+      "response": {
+        "error": {
+          "code": 0,
+          "message": "handling 'tools/list': unmarshaling \"{\\\"cursor\\\":7}\" into a *mcp.ListToolsParams: json: cannot unmarshal \"7}\" into Go struct field mcp.ListToolsParams.cursor of type string"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-unknown",
+      "response": {
+        "error": {
+          "code": -32602,
+          "message": "invalid params"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-absent",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "resources": [
+            {
+              "name": "",
+              "uri": "memory://note/1"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-empty",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "resources": [
+            {
+              "name": "",
+              "uri": "memory://note/1"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "resources": [
+            {
+              "name": "",
+              "uri": "memory://note/1"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-malformed",
+      "response": {
+        "error": {
+          "code": 0,
+          "message": "handling 'resources/list': unmarshaling \"{\\\"cursor\\\":7}\" into a *mcp.ListResourcesParams: json: cannot unmarshal \"7}\" into Go struct field mcp.ListResourcesParams.cursor of type string"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-unknown",
+      "response": {
+        "error": {
+          "code": -32602,
+          "message": "invalid params"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-absent",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "prompts": [
+            {
+              "name": "empty"
+            },
+            {
+              "arguments": [
+                {
+                  "name": "subject"
+                }
+              ],
+              "name": "optional"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-empty",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "prompts": [
+            {
+              "name": "empty"
+            },
+            {
+              "arguments": [
+                {
+                  "name": "subject"
+                }
+              ],
+              "name": "optional"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "prompts": [
+            {
+              "name": "empty"
+            },
+            {
+              "arguments": [
+                {
+                  "name": "subject"
+                }
+              ],
+              "name": "optional"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-malformed",
+      "response": {
+        "error": {
+          "code": 0,
+          "message": "handling 'prompts/list': unmarshaling \"{\\\"cursor\\\":7}\" into a *mcp.ListPromptsParams: json: cannot unmarshal \"7}\" into Go struct field mcp.ListPromptsParams.cursor of type string"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-unknown",
+      "response": {
+        "error": {
+          "code": -32602,
+          "message": "invalid params"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-absent",
+      "policyArguments": {},
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "policy result",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-null",
+      "policyArguments": null,
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "policy result",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-empty",
+      "policyArguments": {},
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "policy result",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-array",
+      "response": {
+        "error": {
+          "code": -32602,
+          "message": "invalid params: validating \"arguments\": unmarshaling arguments: json: cannot unmarshal \"[]\" into Go value of type map[string]interface {}"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-wrong-id",
+      "response": {
+        "error": {
+          "code": -32602,
+          "message": "invalid params: validating \"arguments\": validating root: validating /properties/id: type: 7 has type \"integer\", want \"string\""
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-empty-text",
+      "policyArguments": {
+        "empty": true
+      },
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "",
+              "type": "text"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-error-result",
+      "policyArguments": {
+        "error": true
+      },
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "policy result",
+              "type": "text"
+            }
+          ],
+          "isError": true
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/call-callback-error",
+      "policyArguments": {
+        "deny": true
+      },
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "text": "tool execution denied or failed",
+              "type": "text"
+            }
+          ],
+          "isError": true
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-params-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "tools": [
+            {
+              "annotations": {},
+              "inputSchema": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "lookup"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "tools/list-params-omitted",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "tools": [
+            {
+              "annotations": {},
+              "inputSchema": {
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "name": "lookup"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-params-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "resources": [
+            {
+              "name": "",
+              "uri": "memory://note/1"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/list-params-omitted",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "resources": [
+            {
+              "name": "",
+              "uri": "memory://note/1"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-params-null",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "prompts": [
+            {
+              "name": "empty"
+            },
+            {
+              "arguments": [
+                {
+                  "name": "subject"
+                }
+              ],
+              "name": "optional"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "prompts/list-params-omitted",
+      "response": {
+        "id": 7,
+        "jsonrpc": "2.0",
+        "result": {
+          "prompts": [
+            {
+              "name": "empty"
+            },
+            {
+              "arguments": [
+                {
+                  "name": "subject"
+                }
+              ],
+              "name": "optional"
+            }
+          ]
+        }
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/read-unknown",
+      "response": {
+        "error": {
+          "code": -32002,
+          "data": {
+            "uri": "memory://not-selected"
+          },
+          "message": "Resource not found"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/read-empty",
+      "response": {
+        "error": {
+          "code": -32002,
+          "data": {
+            "uri": ""
+          },
+          "message": "Resource not found"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/read-null",
+      "response": {
+        "error": {
+          "code": -32002,
+          "data": {
+            "uri": ""
+          },
+          "message": "Resource not found"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/read-absent",
+      "response": {
+        "error": {
+          "code": -32002,
+          "data": {
+            "uri": ""
+          },
+          "message": "Resource not found"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
+    },
+    {
+      "name": "resources/read-wrong-type",
+      "response": {
+        "error": {
+          "code": 0,
+          "message": "handling 'resources/read': unmarshaling \"{\\\"uri\\\":7}\" into a *mcp.ReadResourceParams: json: cannot unmarshal \"7}\" into Go struct field mcp.ReadResourceParams.uri of type string"
+        },
+        "id": 7,
+        "jsonrpc": "2.0"
+      },
+      "status": 200
     }
   ]
 }

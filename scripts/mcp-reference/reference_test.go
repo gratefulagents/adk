@@ -7,9 +7,14 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/gratefulagents/sdk/pkg/agentsdk"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 
 	mcpsdk "github.com/modelcontextprotocol/go-sdk/mcp"
@@ -39,6 +44,7 @@ func TestReferenceCorpus(t *testing.T) {
 		Schemas []referenceCase `json:"schemas"`
 		Results []referenceCase `json:"results"`
 		Configs []referenceCase `json:"configs"`
+		Wire    []referenceCase `json:"wire"`
 	}
 	if err := json.Unmarshal(input, &cases); err != nil {
 		t.Fatal(err)
@@ -66,6 +72,9 @@ func TestReferenceCorpus(t *testing.T) {
 			} else {
 				block = map[string]any{"type": "image", "mimeType": "application/octet-stream", "data": base64.StdEncoding.EncodeToString(make([]byte, 10*1024*1024+1))}
 			}
+			if c.Generate == "oversized-malformed-blob" {
+				block["data"] = block["data"].(string) + "!"
+			}
 			value := map[string]any{"content": []any{block}}
 			if c.Kind == "resource" {
 				delete(block, "type")
@@ -75,6 +84,13 @@ func TestReferenceCorpus(t *testing.T) {
 					delete(block, "data")
 				}
 				value = map[string]any{"contents": []any{block}}
+			}
+			if c.Generate == "oversized-malformed-blob" {
+				if c.Kind == "resource" {
+					value["contents"] = []any{map[string]any{"blob": "aGk="}, block}
+				} else {
+					value["content"] = []any{map[string]any{"type": "image", "data": "aGk="}, block}
+				}
 			}
 			wire, err = json.Marshal(value)
 			if err != nil {
@@ -160,6 +176,16 @@ func TestReferenceCorpus(t *testing.T) {
 			}
 			observation["rendered"] = normalize(value)
 		}
+		if observation["decodeError"] != nil {
+			entries, err := os.ReadDir(workspace)
+			if err != nil {
+				t.Fatal(err)
+			}
+			observation["workspaceEmpty"] = len(entries) == 0
+			if len(entries) != 0 {
+				t.Fatalf("%s: decode failure wrote files", c.Name)
+			}
+		}
 		if c.Setup == "symlink" {
 			entries, err := os.ReadDir(outside)
 			if err != nil {
@@ -227,6 +253,7 @@ func TestReferenceCorpus(t *testing.T) {
 		}
 		out["configs"] = append(out["configs"].([]any), observation)
 	}
+	out["wire"] = referenceWire(t, cases.Wire)
 	data, err := json.MarshalIndent(out, "", "  ")
 	if err != nil {
 		t.Fatal(err)
@@ -234,5 +261,106 @@ func TestReferenceCorpus(t *testing.T) {
 	if err := os.WriteFile(os.Getenv("MCP_REFERENCE_OUTPUT"), data, 0600); err != nil {
 		t.Fatal(err)
 	}
-	t.Logf("observed %d schemas, %d results, %d configs against actual SDK", len(cases.Schemas), len(cases.Results), len(cases.Configs))
+	t.Logf("observed %d schemas, %d results, %d configs, %d server requests against actual SDK", len(cases.Schemas), len(cases.Results), len(cases.Configs), len(cases.Wire))
+}
+
+func referenceWire(t *testing.T, cases []referenceCase) []any {
+	var policyMu sync.Mutex
+	var policyArguments json.RawMessage
+	tool := &agentsdk.FunctionTool{ToolName: "lookup", Schema: json.RawMessage(`{"type":"object","properties":{"id":{"type":"string"}}}`)}
+	mode, err := NewServerMode(&mcpsdk.Implementation{Name: "reference", Version: "1"}, []agentsdk.Tool{tool},
+		ServerToolPolicyFunc(func(_ context.Context, request ServerToolRequest) (agentsdk.ToolResult, error) {
+			policyMu.Lock()
+			policyArguments = append(json.RawMessage(nil), request.Arguments...)
+			policyMu.Unlock()
+			var args map[string]any
+			if err := json.Unmarshal(request.Arguments, &args); err != nil {
+				t.Fatal(err)
+			}
+			if args["deny"] == true {
+				return agentsdk.ToolResult{}, fmt.Errorf("TOP_SECRET policy details")
+			}
+			text := "policy result"
+			if args["empty"] == true {
+				text = ""
+			}
+			return agentsdk.ToolResult{Content: text, IsError: args["error"] == true}, nil
+		}), TenantResolverFunc(func(*http.Request) (string, error) { return "tenant", nil }),
+		WithServerResources(ServerResource{Definition: &mcpsdk.Resource{URI: "memory://note/1", Name: ""}, Read: func(context.Context, string, *mcpsdk.ReadResourceRequest) (*mcpsdk.ReadResourceResult, error) {
+			return &mcpsdk.ReadResourceResult{}, nil
+		}}),
+		WithServerPrompts(ServerPrompt{Definition: &mcpsdk.Prompt{Name: "empty"}, Get: func(context.Context, string, *mcpsdk.GetPromptRequest) (*mcpsdk.GetPromptResult, error) {
+			return &mcpsdk.GetPromptResult{}, nil
+		}},
+			ServerPrompt{Definition: &mcpsdk.Prompt{Name: "optional", Arguments: []*mcpsdk.PromptArgument{{Name: "subject"}}}, Get: func(context.Context, string, *mcpsdk.GetPromptRequest) (*mcpsdk.GetPromptResult, error) {
+				return &mcpsdk.GetPromptResult{}, nil
+			}}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer mode.Close()
+	server := httptest.NewServer(mode.Handler())
+	defer server.Close()
+	client := mcpsdk.NewClient(&mcpsdk.Implementation{Name: "reference", Version: "1"}, nil)
+	session, err := client.Connect(t.Context(), &mcpsdk.StreamableClientTransport{Endpoint: server.URL, DisableStandaloneSSE: true}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	observations := []any{}
+	for _, c := range cases {
+		policyMu.Lock()
+		policyArguments = nil
+		policyMu.Unlock()
+		var message map[string]any
+		if err := json.Unmarshal(c.Input, &message); err != nil {
+			t.Fatal(err)
+		}
+		message["jsonrpc"] = "2.0"
+		message["id"] = 7
+		data, err := json.Marshal(message)
+		if err != nil {
+			t.Fatal(err)
+		}
+		request, err := http.NewRequestWithContext(t.Context(), http.MethodPost, server.URL, strings.NewReader(string(data)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		request.Header.Set("Content-Type", "application/json")
+		request.Header.Set("Accept", "application/json, text/event-stream")
+		request.Header.Set("Mcp-Session-Id", session.ID())
+		request.Header.Set("Mcp-Protocol-Version", "2025-06-18")
+		response, err := http.DefaultClient.Do(request)
+		if err != nil {
+			t.Fatal(err)
+		}
+		body, err := io.ReadAll(response.Body)
+		response.Body.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		var value any
+		if strings.HasPrefix(response.Header.Get("Content-Type"), "text/event-stream") {
+			for _, line := range strings.Split(string(body), "\n") {
+				if strings.HasPrefix(line, "data: ") {
+					if err := json.Unmarshal([]byte(strings.TrimPrefix(line, "data: ")), &value); err != nil {
+						t.Fatal(err)
+					}
+				}
+			}
+		} else if err := json.Unmarshal(body, &value); err != nil {
+			t.Fatalf("%s: %s", c.Name, body)
+		}
+		if value == nil {
+			t.Fatalf("no response for %s: %s", c.Name, body)
+		}
+		observation := map[string]any{"name": c.Name, "status": response.StatusCode, "response": value}
+		policyMu.Lock()
+		if policyArguments != nil {
+			observation["policyArguments"] = policyArguments
+		}
+		policyMu.Unlock()
+		observations = append(observations, observation)
+	}
+	return observations
 }

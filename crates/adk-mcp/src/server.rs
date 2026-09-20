@@ -95,14 +95,18 @@ pub trait ServerToolPolicy: Send + Sync {
     ) -> BoxFuture<'_, Result<ServerToolResult, Error>>;
 }
 
+fn empty_string(value: &Option<String>) -> bool {
+    value.as_ref().is_none_or(String::is_empty)
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ResourceDefinition {
     pub uri: String,
     pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "empty_string")]
     pub description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "empty_string")]
     pub mime_type: Option<String>,
 }
 pub trait ResourcePolicy: Send + Sync {
@@ -116,15 +120,17 @@ pub struct ServerResource {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PromptArgument {
     pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "empty_string")]
     pub description: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub required: bool,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PromptDefinition {
     pub name: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "empty_string")]
     pub description: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub arguments: Vec<PromptArgument>,
 }
 pub trait PromptPolicy: Send + Sync {
@@ -207,14 +213,15 @@ impl ServerMode {
             validators.insert(tool.name.clone(), validator);
         }
         resources.sort_by(|a, b| a.definition.uri.cmp(&b.definition.uri));
-        if resources.iter().any(|r| {
-            r.definition.name.trim().is_empty() || url::Url::parse(&r.definition.uri).is_err()
-        }) || resources
-            .windows(2)
-            .any(|p| p[0].definition.uri == p[1].definition.uri)
+        if resources
+            .iter()
+            .any(|r| url::Url::parse(&r.definition.uri).is_err())
+            || resources
+                .windows(2)
+                .any(|p| p[0].definition.uri == p[1].definition.uri)
         {
             return Err(Error::Config(
-                "resources require unique absolute URIs and names".into(),
+                "resources require unique absolute URIs".into(),
             ));
         }
         prompts.sort_by(|a, b| a.definition.name.cmp(&b.definition.name));
@@ -420,12 +427,18 @@ impl ServerMode {
             || id
                 .as_ref()
                 .is_some_and(|v| !v.is_string() && !v.is_i64() && !v.is_u64())
-            || message.get("params").is_some_and(|p| !p.is_object())
+            || message
+                .get("params")
+                .is_some_and(|p| !p.is_null() && !p.is_object())
         {
             return self.rpc_error(Value::Null, -32600, "invalid request");
         }
         let method = message["method"].as_str().unwrap();
-        let params = message.get("params").cloned().unwrap_or_else(|| json!({}));
+        let params = message
+            .get("params")
+            .filter(|p| !p.is_null())
+            .cloned()
+            .unwrap_or_else(|| json!({}));
         if method == "initialize" {
             let Some(id) = id else {
                 return status(StatusCode::BAD_REQUEST);
@@ -506,14 +519,24 @@ impl ServerMode {
             // Notifications must never invoke an execution callback.
             return status(StatusCode::ACCEPTED);
         };
+        if matches!(method, "tools/list" | "resources/list" | "prompts/list") {
+            let cursor = &params["cursor"];
+            if !cursor.is_null() && !cursor.is_string() {
+                // The pinned protocol SDK uses code 0 for typed parameter decoding failures.
+                return self.rpc_error(id, 0, "invalid cursor");
+            }
+            if cursor.as_str().is_some_and(|cursor| !cursor.is_empty()) {
+                return self.rpc_error(id, -32602, "invalid cursor");
+            }
+        }
         let result = match method {
             "ping" => Ok(json!({})),
-            "tools/list" if !params.as_object().unwrap().contains_key("cursor") => {
-                Ok(json!({"tools": self.tools.iter().map(|t| json!({
-                "name": t.name, "description": t.description, "inputSchema": t.input_schema,
-                "annotations": {"readOnlyHint": t.read_only}
-            })).collect::<Vec<_>>()}))
-            }
+            "tools/list" => Ok(json!({"tools": self.tools.iter().map(|t| {
+                    let mut tool = json!({"name": t.name, "inputSchema": t.input_schema, "annotations": {}});
+                    if !t.description.is_empty() { tool["description"] = t.description.clone().into(); }
+                    if t.read_only { tool["annotations"]["readOnlyHint"] = true.into(); }
+                    tool
+                }).collect::<Vec<_>>()})),
             "tools/call" => {
                 let tool = self
                     .tools
@@ -526,7 +549,11 @@ impl ServerMode {
                 let Some(tool) = tool else {
                     return self.rpc_error(id, -32602, "unknown tool");
                 };
-                if !args.is_object() || !self.validators[&tool.name].is_valid(&args) {
+                let empty = json!({});
+                let validated_args = if args.is_null() { &empty } else { &args };
+                if !validated_args.is_object()
+                    || !self.validators[&tool.name].is_valid(validated_args)
+                {
                     return self.rpc_error(id, -32602, "invalid tool arguments");
                 }
                 let arguments = serde_json::to_vec(&args).unwrap();
@@ -541,27 +568,39 @@ impl ServerMode {
                     })
                     .await
                 {
-                    Ok(r) => Ok(
-                        json!({"content": [{"type": "text", "text": r.content}], "isError": r.is_error}),
-                    ),
+                    Ok(r) => {
+                        let mut result = json!({"content": [{"type": "text", "text": r.content}]});
+                        if r.is_error {
+                            result["isError"] = true.into();
+                        }
+                        Ok(result)
+                    }
                     // A downstream outcome-unknown is not a definitive JSON-RPC
                     // error. Preserve ambiguity without reflecting callback text.
                     Err(Error::ReconciliationRequired { .. }) => {
                         return status(StatusCode::BAD_GATEWAY);
                     }
-                    Err(_) => Err("tool execution denied or failed"),
+                    Err(_) => Ok(json!({
+                        "content": [{"type": "text", "text": "tool execution denied or failed"}],
+                        "isError": true
+                    })),
                 }
             }
-            "resources/list" if !params.as_object().unwrap().contains_key("cursor") => Ok(
+            "resources/list" => Ok(
                 json!({"resources": self.resources.iter().map(|r| &r.definition).collect::<Vec<_>>()}),
             ),
             "resources/read" => {
+                if !params["uri"].is_null() && !params["uri"].is_string() {
+                    // The pinned Go decoder reports a typed-field decode error
+                    // with code 0, distinct from resource-not-found (-32002).
+                    return self.rpc_error(id, 0, "invalid resource URI");
+                }
                 let Some(resource) = self
                     .resources
                     .iter()
                     .find(|r| Some(r.definition.uri.as_str()) == params["uri"].as_str())
                 else {
-                    return self.rpc_error(id, -32602, "unknown resource");
+                    return self.rpc_error(id, -32002, "resource not found");
                 };
                 match resource.policy.read(tenant, &resource.definition.uri).await {
                     Ok(result) => Ok(result),
@@ -571,7 +610,7 @@ impl ServerMode {
                     Err(_) => Err("resource access denied or failed"),
                 }
             }
-            "prompts/list" if !params.as_object().unwrap().contains_key("cursor") => Ok(
+            "prompts/list" => Ok(
                 json!({"prompts": self.prompts.iter().map(|p| &p.definition).collect::<Vec<_>>()}),
             ),
             "prompts/get" => {
@@ -584,6 +623,7 @@ impl ServerMode {
                 };
                 let args = params
                     .get("arguments")
+                    .filter(|value| !value.is_null())
                     .cloned()
                     .unwrap_or_else(|| json!({}));
                 let Some(args) = args.as_object() else {

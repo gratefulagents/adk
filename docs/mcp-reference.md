@@ -69,14 +69,14 @@ this container even with telemetry disabled; the recorded tests still exit zero.
 
 ## Corpus contracts and exact comparison boundary
 
-**16 schemas:** nil, scalar/boolean/array junk, empty objects, implicit/empty/object
+**25 schemas:** nil, scalar/boolean/array junk, empty objects, implicit/empty/object
 and non-object types, non-string type, explicit null properties, constraints,
 metadata and `$ref`/`$defs`. Actual SDK normalization is compared structurally,
 not against expectations derived from Rust. This is normalization, not complete
 JSON Schema validation. Go-only non-JSON values (marshal failures, typed nils)
 are outside this wire-JSON corpus.
 
-**23 results:** nil/empty, single and multiple text, `isError`, structured output,
+**165 results:** nil/empty, single and multiple text, `isError`, structured output,
 image/audio, embedded text/blob resources, resource links, resource reads,
 text-plus-blob, UTF-8 truncation, oversized blobs and symlink escape attempts.
 The shared recipes generate 300,000-byte UTF-8 text and 10 MiB + 1 byte blobs.
@@ -89,17 +89,40 @@ not claimed equal. Human-readable notes retain size/MIME and normalized path.
 Go error diagnostics are retained in observations; Rust's intentionally redacted
 blob errors are compared by error placement/count, not error wording.
 
-Malformed base64 is an **explicit layer delta**: Go's real protocol decoder
-rejects it before formatting; Rust's Value-based renderer produces a redacted
-per-block error. `isError` in this corpus records the Go decoded result flag;
+The expanded corpus exercises missing/null/empty fields, malformed types,
+base64 whitespace/padding, zero-byte media and empty resource fields. Both
+implementations reject malformed protocol content before filesystem writes;
+Rust now normalizes optional fields to the actual Go decoder/formatter behavior.
+Nested tool-result content, icons, annotations and metadata are fully preflighted
+even when their fields are discarded by the selected content kind. The final
+review added 62 actual-Go cases: 57 rejections with empty workspaces and five
+accepted nested-normalization cases. A shared 128-block budget and 32-level depth
+bound prevent nested content from bypassing pre-I/O bounds.
+This same no-I/O preflight runs before the client's terminal audit/session
+restoration. Nested malformations are audited `OutcomeUnknown`, leave the client
+failed, and cannot be reclassified as ordinary formatting errors or redispatched
+on that session; the regression asserts exactly one tool dispatch.
+`isError` in this corpus records the Go decoded result flag;
 it is not a new end-to-end assertion of native tool adapter execution. Existing
 Go `TestDynamicToolExecutesAndReturnsSingleTextContent` and Rust
 `tool_adapter.rs` test the adapters separately. This corpus does not claim parity
-for unknown future content kinds, missing/empty optional fields (Go typed structs
-omit some empty strings/blobs while Rust Values retain them), all MIME types,
+for unknown future content kinds, all MIME types,
 concurrent filesystem races, or every platform. Existing exclusivity/symlink tests
 supply additional independent evidence; Rust's 128-block pre-I/O cap is stricter
 than the Go renderer, not a shared limit.
+
+**34 actual Go server requests:** selected tool/resource/prompt listing and tool
+invocation, plus resource-read rejection cases, including absent/null/empty
+params, cursors and arguments. Each runs in an actually initialized session.
+Rust compares normalized response bodies and captures policy arguments, not just
+success codes. Fixed differences include omitted empty descriptions/false flags/
+prompt arguments, accepted empty resource names, and explicit null tool arguments
+preserved at the policy boundary while validated as an empty object. These are
+actual `NewServerMode` HTTP exchanges, not inferred wire fixtures.
+Ordinary tool callback errors now produce the same sanitized MCP `isError`
+result, while explicit reconciliation-required callbacks retain HTTP 502 rather
+than becoming definitive failures. Resource-not-found and malformed URI fields
+also match the actual reference error codes (-32002 and 0, respectively).
 
 **21 configs:** valid stdio, userinfo/query/fragment/file URLs, public HTTPS,
 plaintext HTTP, IPv4/IPv6 loopback, metadata IP, unsupported type, missing command,
@@ -146,7 +169,9 @@ Evidence labels: **D** = running shared corpus and Rust comparison;
 Go names below omit the `Test` prefix; Rust names refer to test functions/files
 under `crates/adk-mcp/tests`. Source names refer to the pinned MCP package unless
 otherwise noted. Separate G and R evidence does not establish Go↔Rust wire
-interoperability.
+interoperability by themselves. **I** below refers to the additional running
+[cross-wire harness](../scripts/mcp-interop/README.md) and its
+[28 observed cases](../fixtures/mcp/interop/results.json).
 
 ### Configuration, manager, discovery and adapters
 
@@ -154,14 +179,14 @@ interoperability.
 | --- | --- | --- |
 | Missing config, `mcpServers` fields, stdio/enabled defaults | D; G `LoadConfig_FileMissing`, `LoadConfig_Parse`; `config.go` | D; R `config.rs`; stricter load validation described above; both trim/case-normalize supported transport names |
 | Snapshot path/content pinning, changed-file rejection | G `LoadConfigSnapshot_PinsPathAndContent`, `VerifyUnchanged_DetectsModification`, `LoadConfigSnapshot_FlagsAgentWritablePath`; `snapshot.go` | R `config.rs`; Unix descriptor-relative no-follow, byte cap and immutable parsed snapshot are stricter; no non-Unix safe-config support |
-| Host process/network authority, enabled servers, sandbox options | G `ConnectStdioServerNetworkAccessAllowlist`, `ResolveManagerOptionsTrustsManagerWorkDir`; S `NewManagerFromConfig` | R `end_to_end::composition_rejects_host_denial_before_any_subprocess`; Rust requires explicit grants and host launcher; no built-in equivalent of Go sandbox executor/permission-mode/environment expansion |
-| Per-server environment credential filtering | D; G `FilterCredentialEnv_*`; `env_filter.go` | D; R `config.rs`; repository cannot widen host grants; arbitrary safe env inheritance/expansion intentionally not mirrored |
+| Host process/network authority, enabled servers, sandbox options | G `ConnectStdioServerNetworkAccessAllowlist`, `ResolveManagerOptionsTrustsManagerWorkDir`; S `NewManagerFromConfig` | R `end_to_end::composition_rejects_host_denial_before_any_subprocess`; native host grants and approved sandbox launcher replace Go executor/options types; neither repository config nor transport alone grants containment |
+| Per-server environment credential filtering | D; G `FilterCredentialEnv_*`; `env_filter.go` | D; R `config.rs`; repository cannot widen host grants; host explicitly supplies selected inherited environment. No automatic environment interpolation is implemented in the reference MCP package either |
 | Initialize once, capabilities, protocol versions | G remote/stdio lifecycle tests exercise actual protocol SDK; S `connect*Server` | R `client::initializes_once_negotiates_and_gates_capabilities`, `legacy_protocol_is_only_negotiated_for_stdio_and_sse`; baseline 2025-03-26, legacy 2024-11-05 only stdio/SSE; not all protocol SDK versions/features |
 | Tools/resources/prompts discovery and 100-page/10,000-item caps, repeated cursors | S `listAllTools`, `listAllResources`, `listAllPrompts`; G server-mode lists basic resources/prompts | R `client.rs` pagination/atomic-validation tests; repeated/malformed/duplicate entries fail atomically; Go pagination attack corpus not executed differentially |
-| Resource/prompt cache TTL and explicit invalidation | S `cachedResources`, `cachedPrompts`, `WithDiscoveryCacheTTL`, `InvalidateDiscovery` | Rust session-pinned discovery caches reset on reconnect; **no TTL refresh or public invalidation counterpart**; no live list-changed notifications |
-| Qualified tool names and collision routing | G `NormalizeNameForMCP`, `BuildToolName_LengthAndPrefix`, `EnsureUniqueToolName`; `names.go` | R client/name unit tests; ambiguous exposed names fail atomically instead of Go's suffix disambiguation; no new live name corpus |
+| Resource/prompt cache TTL and explicit invalidation | G `RemoteStreamableHTTPUnauthenticated`; S `cachedResources`, `cachedPrompts`, `WithDiscoveryCacheTTL`, `InvalidateDiscovery` | R client TTL/disabled-cache/scoped-all invalidation tests: 30-second default, zero disables reuse, expiry measured from discovery start; tools stay pinned. Manager forwards prompt operations and aggregate discovery skips incapable servers |
+| Qualified tool names and collision routing | G `NormalizeNameForMCP`, `BuildToolName_LengthAndPrefix`, `EnsureUniqueToolName`; `names.go` | R client/name tests: Go-compatible suffix/truncation/hash allocation, sorted server order and discovery-page order after policy filtering; exact original-name routing. Deliberate final-hash collision fails closed instead of overwriting a route |
 | Exact repository allowlist; read-only hint requires opt-in; remote host read-only allowlist | G `TrustedMCPReadOnlyRequiresServerOptIn`, `RemoteHintAloneDoesNotExposeTool`, `RemoteStreamableHTTPReadOnlyAuthenticated`; `manager.go`, `remote.go` | R `client::remote_requires_all_four_readonly_conditions_and_breakglass_cannot_widen`, exact discovered-name invocation; hints alone never authority |
-| Call tool, list/read resource, list/get prompt surfaces | G remote tests and `ServerModeUsesPolicyBoundaryAndImmutableRequest`; `manager.go` | R `client.rs`, `end_to_end.rs`; exact host resource/prompt allowlists and typed arguments; cross-language sessions not yet tested |
+| Call tool, list/read resource, list/get prompt surfaces | G remote tests and `ServerModeUsesPolicyBoundaryAndImmutableRequest`; `manager.go` | R `client.rs`, `end_to_end.rs`; I exercises each operation across all three baseline client transports and the reference's supported server mode, with exact host resource/prompt allowlists |
 | Break-glass catalog/request, permission/approval, immutable audit context | G `BreakGlass*`, `RequestBreakGlassTool*`, `BlockedMessages`; `breakglass*.go` | R client policy/break-glass/digest tests; host callbacks rather than a Go question/catalog or model-visible request-break-glass tool clone |
 | Discovery/tool adapters, untrusted descriptions, errors | G `BuildToolsIncludesResourcesWhenAvailable`, `DynamicTool*`, `Sanitize*`; `tools.go`, `sanitize.go` | R `tool_adapter.rs`, `tools.rs`; native ADK types, cancellation/deadline handling, redacted operational errors; not byte-identical Go diagnostics |
 | Schema/result rendering and filesystem effects | D; G `NormalizeInputSchema*`, `FormatCallToolResult*`, `CreateExclusiveBeneath*` | D; R `tools.rs`; normalization boundaries and untested optional-field cases stated above |
@@ -170,12 +195,12 @@ interoperability.
 
 | Contract | Pinned Go evidence | Rust evidence / precise delta or limitation |
 | --- | --- | --- |
-| stdio newline JSON-RPC, initialization, notifications, correlation | G `ConnectStdioServerChildOutlivesConnectReturn`; protocol SDK transport | R `transports::stdio_scoped_env_notifications_stderr_and_reaped_shutdown`; bounded own transport; not a full protocol SDK replacement |
+| stdio newline JSON-RPC, initialization, notifications, correlation | G `ConnectStdioServerChildOutlivesConnectReturn`; protocol SDK transport | R `transports::stdio_scoped_env_notifications_stderr_and_reaped_shutdown`; I Rust client → pinned go-sdk stdio peer, discovery/invocation/reaped shutdown |
 | Peer-initiated ping, unsupported requests, JSON-RPC batch correlation | S protocol SDK delegation in Go transports (no targeted shared corpus) | R `stdio_peer_ping_and_batches_preserve_ids_and_original_call`, `http_peer_ping_and_batches_use_separate_authenticated_posts`; bounded replies preserve IDs; unsupported peer requests get method-not-found, no sampling/elicitation callbacks |
 | Child lifetime independent of handshake deadline; process group termination, close | G `ConnectStdioServerChildOutlivesConnectReturn`, `TerminateProcess_*`; `lifecycle*.go` | R stdio cancellation/reap tests; Unix group kill, explicit close reaps, drop kills; Windows process-group guarantees not established |
-| stderr bounded and drained | G `StderrTailKeepsBoundedTail`, `ErrWithStderr`, `ConnectStdioServerReportsChildStderr` | R stdio tests; Rust never surfaces peer stderr, unlike Go diagnostic tails; limits/default text intentionally differ |
+| stderr bounded and drained | G `StderrTailKeepsBoundedTail`, `ErrWithStderr`, `ConnectStdioServerReportsChildStderr` | R `diagnostics.rs` and tail unit tests reproduce trailing `defghXYZ` and startup `boom-traceback`; same 4,096-byte default. Host getters and `connect_with_diagnostics` retain tail after failure/close, with bounded drain, credential redaction and control sanitation; ordinary errors retain typed uncertainty and omit potentially sensitive peer text |
 | Streamable HTTP request/session headers, JSON and POST SSE replies | G `RemoteStreamableHTTPUnauthenticated`, authenticated/OAuth tests; protocol SDK | R `http_json_and_sse_replies`, `http_session_initialize_notification_and_delete`; no standalone GET event stream or resumption in Rust; Go wrapper disables standalone SSE too |
-| Legacy SSE GET endpoint event, correlated POST, same-origin endpoint | G `RemoteLegacySSECompatibility`, `RemoteTransportPinsOriginBeforeCredentials`; `remote.go` | R `legacy_sse_endpoint_query_posts_and_correlates`, `legacy_sse_cross_origin_endpoint_rejected`; SSE must be explicitly configured; no automatic discovery/fallback |
+| Legacy SSE GET endpoint event, correlated POST, same-origin endpoint | G `RemoteLegacySSECompatibility`, `RemoteTransportPinsOriginBeforeCredentials`; `remote.go` | R `legacy_sse_endpoint_query_posts_and_correlates`, `legacy_sse_cross_origin_endpoint_rejected`; I Rust client → pinned go-sdk SSE peer; explicitly configured SSE, no silent protocol fallback |
 | HTTPS default, private-network opt-in, no userinfo/query/fragment | D; G `RemotePolicyFailsClosed`; actual `tools/web` validation | D + R `http_ssrf_url_policy_and_redirects`; literal-IP policy parity only, not every reserved range/DNS environment |
 | DNS/address validation and origin pin before credentials, redirects/proxies disabled | G `RemoteTransportPinsOriginBeforeCredentials`, `RemoteRedirectRejectedWithoutCredentialLeak`; S `newRemoteHTTPClient` and web safe client | R `http_ssrf_url_policy_and_redirects`; per-request checked address pinning; no adversarial DNS-rebinding race or ambient proxy runtime test in shared corpus |
 | TLS certificate/hostname verification and custom CA roots | G `RemoteTLSVerificationAndCustomRoots` | R `tls::explicit_ca_trust_preserves_certificate_and_hostname_verification`; no insecure TLS mode; no public PKI/real deployment smoke test |
@@ -194,7 +219,7 @@ interoperability.
 | --- | --- | --- |
 | Selected tools only, mandatory policy + tenant resolver; never execute around policy | G `ServerModeRequiresPolicyAndTenant`, `ServerModeUsesPolicyBoundaryAndImmutableRequest`; `NewServerMode`, `addTool` | R `server::real_http_policy_boundary_and_immutable_digest`, selected-name tests; Rust accepts definitions, not executable tool objects |
 | Tool argument digest includes tenant, name, serialized arguments using length prefixes | G `ServerModeUsesPolicyBoundaryAndImmutableRequest`; `serverRequestDigest` | R immutable digest tests; **no cross-language canonical JSON/digest parity claim**, especially HTML escaping/numeric representations |
-| Streamable HTTP handler, init/initialized, session headers, JSON-RPC dispatch | G server-mode roundtrip through actual Go SDK | R `server.rs` and `end_to_end.rs`; JSON responses, GET 405, no server stdio or legacy SSE; those modes rejected explicitly |
+| Streamable HTTP handler, init/initialized, session headers, JSON-RPC dispatch | G server-mode roundtrip through actual Go SDK; I archived wrapper AST/surface test | R `server.rs` and `end_to_end.rs`; I Rust client → actual Go ServerMode and actual Go Manager → Rust ServerMode. JSON responses, GET 405; reference wrapper itself exposes only Streamable HTTP server mode, proven by executable surface test, not a reduced transport scope |
 | Selected resource list/read and prompt list/get, tenant-aware callbacks | G `ServerModeUsesPolicyBoundaryAndImmutableRequest`; `WithServerResources`, `WithServerPrompts` | R `selected_resources_and_prompts_are_tenant_aware_and_redacted`; only explicit entries, no templates/subscriptions/dynamic listing; constructor validates selection |
 | Authentication before protocol, tenant-bound sessions, unknown/cross-tenant session denial | G server-mode unauthorized/cross-tenant cases | R `tenant_auth_session_binding_and_cleanup`; real HTTP tests; trusted tenant resolver is host responsibility, never a client tenant-header trust scheme |
 | 1,024 global / 128 tenant sessions, 30-minute idle TTL, DELETE and close cleanup | G `ServerModeRequiresPolicyAndTenant`; S reservation/pruning/removal helpers | R `atomic_total_and_tenant_capacity_and_delete_releases_slot`, unit TTL pruning, close tests; Go handler underlying sessions expire on TTL after close; no 30-minute wall-clock or distributed/multiprocess quota test |
@@ -213,9 +238,11 @@ from Rust is not an available runner path. The original Go suite reports **84
 passing test/subtest outcomes and one intentional helper skip** (including the
 injected corpus test). This is not 84 distinct integration scenarios.
 
-Fresh Rust 1.88 verification after independent review fixes:
-`cargo test --locked --workspace --all-features --all-targets` passed **659 tests**,
-including **77 MCP tests** and all four reference tests. A second run of
+Fresh Rust 1.88 verification after compatibility and review fixes:
+`cargo test --locked --workspace --all-features --all-targets` passed **679 tests**,
+including **97 MCP tests** and all four reference tests. The workspace reports
+30 ignored entries: 28 interoperability cases executed separately by the pinned
+runner, plus two pre-existing explicit Go/sandbox helper entries. A fresh run of
 `python3 scripts/mcp-reference/run.py --check --baseline-tests` reproduced the
 committed Go observations and baseline outcomes exactly. The pinned
 `cargo-deny 0.20.2 --locked check` passed advisories, bans, licenses and sources;
@@ -236,15 +263,44 @@ cargo check --locked -p adk-mcp --all-targets
 ```
 
 This uses the same Rust/loader/target environment above; it does not suppress
-warnings or skip the modified test target. Raw Rust logs from this run are in
-`../scratch/mcp-reference-all-tests.log`, `../scratch/mcp-reference-clippy.log`
-(the launcher failure), and `../scratch/mcp-reference-clippy-driver.log` (success).
+warnings or skip the modified test target. Final logs are in
+`../scratch/pr24-final-workspace.log`, `../scratch/pr24-final-clippy.log`,
+`../scratch/pr24-final-interop.log` and `../scratch/pr24-final-go-reference.log`.
+These disposable logs supplement the committed observed/provenance artifacts.
 
-Remaining acceptance boundary: no Go-client↔Rust-server or Rust-client↔Go-server
-cross-wire session was run by this harness. Transport/server-mode confidence is
-independent original Go runtime tests + Rust runtime tests + the explicit source
-and limitation map above, not an invented differential transport transcript.
-Non-Unix, production credentials/listeners, adversarial DNS races and the listed
-optional protocol/JSON edge cases remain outside the evidence. The mixed-field
-config gap detected by this corpus has been repaired; earlier validation is the
-remaining explicit layer difference.
+## Compatibility follow-up: delivered behavior and remaining boundaries
+
+The maintainer-identified observable differences are implemented and tested:
+cache TTL/public invalidation, deterministic collision suffixing and routing,
+bounded host-visible failure diagnostics, and the expanded optional/empty wire
+corpus above. They are not deferred by documentation.
+
+The independent cross-wire runner passed **28/28 cases** across stdio, Streamable
+HTTP and legacy SSE clients, plus actual Go Manager → Rust Streamable HTTP
+server. Shutdown observations include HTTP DELETE, zero remaining Rust sessions,
+successful helper exits and a reaped stdio process. The exact Go wrapper supports
+only HTTP server mode; an executable archived-source AST test proves its exported
+surface and constructor. Stdio/SSE peers are explicitly the pinned go-sdk protocol
+server, not an invented wrapper API. See the linked runner for commands and exact
+provenance; this closes the previously reported absence of cross-wire evidence.
+
+Remaining representational differences do not remove a baseline operation:
+
+- Blob filenames are normalized because the Go implementation itself uses
+  timestamps/MIME-derived names. Actual bytes, hashes, confinement and modes are
+  compared, rather than an unstable generated path.
+- Human-readable operational error wording is not copied into Rust. Both sides'
+  acceptance/rejection and output placement are compared; Rust exposes typed
+  errors. Stderr tail contents are restored through explicit host access (same
+  bounded-tail/startup-failure reference cases), rather than copying peer text
+  into ordinary errors that may reach a model or logs. This preserves diagnostic
+  access and reconciliation classification without weakening credential controls.
+- Earlier config rejection and stricter bounds remain explicit fail-closed
+  security differences; they never grant permissions or hide a remote replay.
+
+This is baseline compatibility evidence, not exhaustive future protocol conformance.
+Unadvertised optional protocol extensions, every MIME/JSON combination, adversarial
+DNS scheduling, non-Unix filesystem guarantees and production identity/ingress
+integration are outside these tests. Production deployment was not requested or
+performed. Host-owned sandbox launchers, identity, approvals and platform adapters
+remain required boundaries, not new library authority.

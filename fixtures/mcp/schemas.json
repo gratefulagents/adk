@@ -8,5 +8,14 @@
   {"input":{"type":"object","description":"metadata"},"expected":{"type":"object","properties":{},"description":"metadata"}},
   {"input":{"type":"","title":"test"},"expected":{"type":"object","properties":{},"title":"test"}},
   {"input":{"type":"array","items":{"type":"integer"}},"expected":{"type":"array","items":{"type":"integer"}}},
-  {"input":{"type":"string"},"expected":{"type":"string"}}
+  {"input":{"type":"string"},"expected":{"type":"string"}},
+  {"input":{"type":null},"expected":{"properties":{},"type":"object"}},
+  {"input":{"required":null},"expected":{"properties":{},"required":null,"type":"object"}},
+  {"input":{"required":[]},"expected":{"properties":{},"required":[],"type":"object"}},
+  {"input":{"properties":false},"expected":{"properties":false,"type":"object"}},
+  {"input":{"properties":[]},"expected":{"properties":[],"type":"object"}},
+  {"input":{"additionalProperties":null},"expected":{"additionalProperties":null,"properties":{},"type":"object"}},
+  {"input":{"properties":{"x":{"type":"string","default":"fallback"}}},"expected":{"properties":{"x":{"default":"fallback","type":"string"}},"type":"object"}},
+  {"input":{"$defs":{}},"expected":{"$defs":{},"properties":{},"type":"object"}},
+  {"input":{"type":" object "},"expected":{"type":" object "}}
 ]

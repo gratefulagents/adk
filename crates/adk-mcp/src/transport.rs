@@ -5,12 +5,12 @@ use reqwest::{
 };
 use serde_json::{Value, json};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, VecDeque},
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::Path,
     process::Stdio,
-    sync::Arc,
-    time::SystemTime,
+    sync::{Arc, Mutex},
+    time::{Duration, SystemTime},
 };
 use tokio::{
     io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt, BufReader},
@@ -142,8 +142,158 @@ fn peer_reply_bytes(value: &Value, limit: usize) -> Result<Vec<u8>, Error> {
     Ok(bytes)
 }
 
+struct StderrTail {
+    bytes: VecDeque<u8>,
+    credentials: Vec<Vec<u8>>,
+    limit: usize,
+    overlap: usize,
+}
+
+impl StderrTail {
+    fn new(limit: usize, env: &BTreeMap<String, String>) -> Self {
+        let mut credentials = Vec::new();
+        let mut credential_bytes = 0usize;
+        for (name, value) in env {
+            if !crate::config::is_credential_env_name(name) || value.is_empty() {
+                continue;
+            }
+            // Suppress diagnostics rather than retain unbounded redaction history.
+            if value.len() > 16 * 1024 {
+                return Self {
+                    bytes: VecDeque::new(),
+                    credentials: Vec::new(),
+                    limit: 0,
+                    overlap: 0,
+                };
+            }
+            let encoded = serde_json::to_string(value).unwrap();
+            let escaped = &encoded.as_bytes()[1..encoded.len() - 1];
+            for form in [value.as_bytes(), escaped] {
+                if credentials.iter().any(|existing| existing == form) {
+                    continue;
+                }
+                credential_bytes += form.len();
+                if credentials.len() == 64 || credential_bytes > 16 * 1024 {
+                    return Self {
+                        bytes: VecDeque::new(),
+                        credentials: Vec::new(),
+                        limit: 0,
+                        overlap: 0,
+                    };
+                }
+                credentials.push(form.to_vec());
+            }
+        }
+        let overlap = credentials.iter().map(Vec::len).max().unwrap_or(0);
+        Self {
+            bytes: VecDeque::new(),
+            credentials,
+            limit,
+            overlap,
+        }
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        if self.limit == 0 {
+            return;
+        }
+        // Keep credential overlap so truncation cannot expose the end of a secret.
+        let capacity = self.limit.saturating_add(self.overlap);
+        for &byte in bytes {
+            if self.bytes.len() == capacity {
+                self.bytes.pop_front();
+            }
+            self.bytes.push_back(byte);
+        }
+    }
+
+    fn diagnostics(&self) -> Option<String> {
+        let raw: Vec<u8> = self.bytes.iter().copied().collect();
+        let mut safe = raw.clone();
+        for credential in &self.credentials {
+            for (offset, window) in raw.windows(credential.len()).enumerate() {
+                if window == credential {
+                    safe[offset..offset + credential.len()].fill(b'*');
+                }
+            }
+            // A snapshot may arrive between writes of a credential, or at EOF
+            // after only its prefix was written. Do not publish that prefix.
+            for length in 1..credential.len().min(raw.len() + 1) {
+                if raw.ends_with(&credential[..length]) {
+                    safe[raw.len() - length..].fill(b'*');
+                }
+            }
+        }
+        let start = safe.len().saturating_sub(self.limit);
+        let mut text: String = String::from_utf8_lossy(&safe[start..])
+            .chars()
+            .map(|ch| if ch.is_control() || matches!(ch, '\u{200b}'..='\u{200f}' | '\u{202a}'..='\u{202e}' | '\u{2060}'..='\u{206f}' | '\u{feff}') { ' ' } else { ch })
+            .collect();
+        let mut start = text.len().saturating_sub(self.limit);
+        while !text.is_char_boundary(start) {
+            start += 1;
+        }
+        text.drain(..start);
+        let text = text.trim().to_owned();
+        (!text.is_empty()).then_some(text)
+    }
+}
+
+#[cfg(test)]
+mod stderr_tests {
+    use super::*;
+
+    #[test]
+    fn tail_matches_go_and_redacts_partial_overlapping_and_escaped_credentials() {
+        let mut tail = StderrTail::new(8, &BTreeMap::new());
+        tail.write(b"abcdefgh");
+        tail.write(b"XYZ");
+        assert_eq!(tail.diagnostics().as_deref(), Some("defghXYZ"));
+        assert_eq!(tail.bytes.len(), 8);
+
+        let env = BTreeMap::from([
+            ("API_TOKEN".into(), "abcdef".into()),
+            ("PASSWORD".into(), "defghi".into()),
+            ("GH_TOKEN".into(), "quote\"slash\\line\n".into()),
+        ]);
+        let mut tail = StderrTail::new(64, &env);
+        tail.write(b"abc");
+        assert_eq!(tail.diagnostics().as_deref(), Some("***"));
+        tail.write(b"defghi ");
+        assert_eq!(tail.diagnostics().as_deref(), Some("*********"));
+        let encoded = serde_json::to_string(&env["GH_TOKEN"]).unwrap();
+        tail.write(encoded.as_bytes());
+        let diagnostic = tail.diagnostics().unwrap();
+        assert!(!diagnostic.contains("quote"));
+        assert!(!diagnostic.contains("slash"));
+        tail.write(&[b'x'; 1000]);
+        assert!(tail.bytes.len() <= tail.limit + tail.overlap);
+    }
+
+    #[test]
+    fn excessive_credential_history_suppresses_diagnostics() {
+        for env in [
+            BTreeMap::from([("PASSWORD".into(), "x".repeat(16 * 1024 + 1))]),
+            (0..65)
+                .map(|n| (format!("C{n}_TOKEN"), format!("secret-{n}")))
+                .collect(),
+            BTreeMap::from([
+                ("PASSWORD".into(), "x".repeat(9000)),
+                ("API_TOKEN".into(), "y".repeat(9000)),
+            ]),
+        ] {
+            let mut tail = StderrTail::new(4096, &env);
+            tail.write(b"sensitive peer diagnostic");
+            assert_eq!(tail.diagnostics(), None);
+            assert!(tail.bytes.is_empty());
+            assert!(tail.credentials.is_empty());
+        }
+    }
+}
+
 pub struct StdioTransport {
     server: String,
+    diagnostics: Arc<Mutex<StderrTail>>,
     session: Option<StdioSession>,
     limits: Limits,
     next_id: u64,
@@ -190,20 +340,15 @@ impl StdioTransport {
         let stdin = child.stdin.take();
         let stdout = BufReader::new(child.stdout.take().ok_or(Error::Transport)?);
         let mut stderr_pipe = child.stderr.take().ok_or(Error::Transport)?;
-        let stderr_limit = limits.max_stderr_bytes;
+        let diagnostics = Arc::new(Mutex::new(StderrTail::new(limits.max_stderr_bytes, env)));
+        let stderr_tail = diagnostics.clone();
         let stderr = tokio::spawn(async move {
             let mut buffer = [0u8; 4096];
-            let mut diagnostic = Vec::new();
             while let Ok(size) = stderr_pipe.read(&mut buffer).await {
                 if size == 0 {
                     break;
                 }
-                // Never surface server-controlled diagnostics in errors or logs; keep only a bounded, control-free prefix.
-                for byte in buffer[..size].iter().copied().filter(u8::is_ascii_graphic) {
-                    if diagnostic.len() < stderr_limit {
-                        diagnostic.push(byte);
-                    }
-                }
+                stderr_tail.lock().unwrap().write(&buffer[..size]);
             }
         });
         Ok(Self {
@@ -216,6 +361,7 @@ impl StdioTransport {
                 stdout,
                 stderr,
             }),
+            diagnostics,
             limits,
             next_id: 1,
             poisoned: false,
@@ -310,8 +456,10 @@ impl StdioTransport {
                 Err(error)
             }
             _ => {
+                session.drain_stderr().await;
                 let _ = session.kill();
                 let _ = timeout(self.limits.timeout, session.child.as_mut().unwrap().wait()).await;
+                session.drain_stderr().await;
                 Err(unknown(&self.server, method))
             }
         }
@@ -319,6 +467,9 @@ impl StdioTransport {
 }
 
 impl Transport for StdioTransport {
+    fn diagnostics(&self) -> Option<String> {
+        self.diagnostics.lock().unwrap().diagnostics()
+    }
     fn request<'a>(
         &'a mut self,
         method: &'a str,
@@ -343,6 +494,7 @@ impl Transport for StdioTransport {
                     .await
                     .map_err(|_| Error::Transport)?
                     .map_err(|_| Error::Transport)?;
+                session.drain_stderr().await;
             }
             Ok(())
         })
@@ -350,9 +502,14 @@ impl Transport for StdioTransport {
 }
 
 impl StdioSession {
+    async fn drain_stderr(&mut self) {
+        if !self.stderr.is_finished() {
+            let _ = timeout(Duration::from_millis(250), &mut self.stderr).await;
+        }
+    }
+
     fn kill(&mut self) -> Result<(), Error> {
         self.stdin.take();
-        self.stderr.abort();
         #[cfg(unix)]
         if let Some(group) = self.process_group.take() {
             let _ = rustix::process::kill_process_group(group, rustix::process::Signal::KILL);
@@ -368,6 +525,7 @@ impl StdioSession {
 impl Drop for StdioSession {
     fn drop(&mut self) {
         let _ = self.kill();
+        self.stderr.abort();
         if let Some(mut child) = self.child.take()
             && let Ok(runtime) = tokio::runtime::Handle::try_current()
         {

@@ -54,12 +54,14 @@ impl ServerToolPolicy for Policy {
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }
             Ok(ServerToolResult {
-                content: if args["large"] == true {
+                content: if args["empty"] == true {
+                    String::new()
+                } else if args["large"] == true {
                     "s".repeat(20_000)
                 } else {
                     "policy result".into()
                 },
-                is_error: false,
+                is_error: args["error"] == true,
             })
         })
     }
@@ -407,7 +409,6 @@ async fn malformed_messages_never_execute_policy() {
     }
     for params in [
         json!({"name":"unselected"}),
-        json!({"name":"lookup","arguments":null}),
         json!({"name":"lookup","arguments":[]}),
     ] {
         assert!(http.rpc("a", &session, "tools/call", params).await["error"].is_object());
@@ -469,8 +470,15 @@ async fn failure_redaction_request_result_bounds_and_timeout() {
         )
         .await;
     assert_eq!(
-        denied["error"]["message"],
-        "tool execution denied or failed"
+        denied,
+        json!({
+            "jsonrpc": "2.0",
+            "id": 7,
+            "result": {
+                "content": [{"type": "text", "text": "tool execution denied or failed"}],
+                "isError": true
+            }
+        })
     );
     assert!(!denied.to_string().contains("TOP_SECRET"));
     let response = http
@@ -482,14 +490,19 @@ async fn failure_redaction_request_result_bounds_and_timeout() {
     assert_eq!(response.status(), StatusCode::PAYLOAD_TOO_LARGE);
     assert_eq!(policy.calls.lock().unwrap().len(), 1);
     for (args, status) in [
+        (json!({"uncertain":true}), StatusCode::BAD_GATEWAY),
         (json!({"large":true}), StatusCode::PAYLOAD_TOO_LARGE),
         (json!({"slow":true}), StatusCode::GATEWAY_TIMEOUT),
     ] {
         let response = http.post("a", Some(&session)).json(&json!({"jsonrpc":"2.0", "id":1, "method":"tools/call", "params":{"name":"lookup", "arguments":args}})).send().await.unwrap();
         assert_eq!(response.status(), status);
-        assert!(response.bytes().await.unwrap().len() <= 1024);
+        let body = response.bytes().await.unwrap();
+        assert!(body.len() <= 1024);
+        if status == StatusCode::BAD_GATEWAY {
+            assert!(body.is_empty());
+        }
     }
-    assert_eq!(policy.calls.lock().unwrap().len(), 3);
+    assert_eq!(policy.calls.lock().unwrap().len(), 4);
 }
 
 #[tokio::test]
@@ -820,5 +833,100 @@ async fn tool_schema_validation_is_offline_and_precedes_policy_even_in_batches()
             )
             .is_err()
         );
+    }
+}
+
+#[tokio::test]
+async fn optional_and_empty_wire_fields_match_actual_go_server() {
+    let inputs: Value =
+        serde_json::from_str(include_str!("../../../fixtures/mcp/reference/inputs.json")).unwrap();
+    let observations: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mcp/reference/observations.json"
+    ))
+    .unwrap();
+    let mut selected = tool("lookup");
+    selected.description.clear();
+    selected.read_only = false;
+    let policy = Arc::new(Policy::default());
+    let server = Arc::new(
+        ServerMode::new(
+            vec![selected],
+            policy.clone(),
+            Arc::new(Tenants),
+            vec![ServerResource {
+                definition: ResourceDefinition {
+                    uri: "memory://note/1".into(),
+                    name: String::new(),
+                    description: Some(String::new()),
+                    mime_type: Some(String::new()),
+                },
+                policy: Arc::new(Resource),
+            }],
+            vec![
+                ServerPrompt {
+                    definition: PromptDefinition {
+                        name: "empty".into(),
+                        description: Some(String::new()),
+                        arguments: vec![],
+                    },
+                    policy: Arc::new(Prompt),
+                },
+                ServerPrompt {
+                    definition: PromptDefinition {
+                        name: "optional".into(),
+                        description: None,
+                        arguments: vec![PromptArgument {
+                            name: "subject".into(),
+                            description: Some(String::new()),
+                            required: false,
+                        }],
+                    },
+                    policy: Arc::new(Prompt),
+                },
+            ],
+            ServerOptions::default(),
+        )
+        .unwrap(),
+    );
+    let http = HttpServer::start(server).await;
+    let session = http.connect("tenant").await;
+    let cases = inputs["wire"].as_array().unwrap();
+    let observed = observations["wire"].as_array().unwrap();
+    assert_eq!(cases.len(), observed.len());
+    for (case, observation) in cases.iter().zip(observed) {
+        assert_eq!(case["name"], observation["name"]);
+        assert_eq!(observation["status"], 200);
+        let before = policy.calls.lock().unwrap().len();
+        let mut message = case["input"].clone();
+        message["id"] = 7.into();
+        message["jsonrpc"] = "2.0".into();
+        let response = http
+            .post("tenant", Some(&session))
+            .json(&message)
+            .send()
+            .await
+            .unwrap();
+        assert_eq!(
+            response.status().as_u16(),
+            observation["status"].as_u64().unwrap() as u16
+        );
+        let response: Value = response.json().await.unwrap();
+        if observation["response"].get("error").is_some() {
+            assert_eq!(
+                response["error"]["code"], observation["response"]["error"]["code"],
+                "{}",
+                case["name"]
+            );
+            assert_eq!(policy.calls.lock().unwrap().len(), before);
+        } else {
+            assert_eq!(response, observation["response"], "{}", case["name"]);
+            if let Some(arguments) = observation.get("policyArguments") {
+                let calls = policy.calls.lock().unwrap();
+                assert_eq!(calls.len(), before + 1);
+                let actual: Value =
+                    serde_json::from_slice(calls.last().unwrap().arguments()).unwrap();
+                assert_eq!(actual, *arguments, "{}", case["name"]);
+            }
+        }
     }
 }

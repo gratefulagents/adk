@@ -55,12 +55,27 @@ Discovery supports tools, resources and prompts, with at most 100 pages and
 10,000 entries by default. Duplicate/malformed cursors and oversized messages
 fail rather than producing a partially trusted catalog. Default message size is
 8 MiB and operation deadline is 30 seconds; host limits may narrow these.
+Resource/prompt caches default to a 30-second TTL; use
+`Client::set_discovery_cache_ttl` (`Duration::ZERO` disables reuse) and
+`Client::invalidate_discovery` to control refresh. The manager exposes scoped
+invalidation (`""` means all servers), prompt listing and prompt retrieval.
+Invalidation does not replace the pinned tool catalog. Aggregate discovery skips
+servers without the requested capability, while explicitly selecting an
+incapable server returns an error. Qualified-name collisions use deterministic
+bounded suffixes; routing and authorization retain the original server/tool names.
 
 Each mutable transport owns one serialized session: there is at most one active
 request per transport, stricter than the reference's eight-request concurrency
 cap. Stdio drops/close kill the owned process group on Unix and drain stderr
 without exposing peer text or credentials in errors. Explicit close reaps the
 child. The host should explicitly close clients during orderly shutdown.
+`Transport::diagnostics()` / `Client::diagnostics()` expose the bounded stderr
+tail separately to the host, including after failure/close. Use
+`connection::connect_with_diagnostics` to retain startup diagnostics in a typed
+`ConnectionFailure`; its ordinary `Debug`/`Display` omit peer text. The default
+tail is 4,096 bytes, with bounded drain grace, control sanitation and known
+credential redaction (history overflow suppresses diagnostics). This is still
+untrusted, potentially sensitive host-only text, never automatic model/log input.
 
 ### Remote security
 
@@ -132,6 +147,11 @@ Unix. Unsafe blob directories return a safe formatting error rather than escapin
 the workspace. Safe config loading and blob persistence fail closed on platforms
 without the required filesystem primitives.
 
+The complete no-I/O tool-result preflight also runs at the dispatched client
+boundary, before a completed audit or session reuse. Malformed nested content,
+icons or metadata therefore produce `ReconciliationRequired`, not a later
+ordinary formatting error; the failed session cannot silently dispatch again.
+
 CRD mapping, Kubernetes secrets, platform audit persistence and tenant identity
 acquisition belong in platform adapters. There are no Kubernetes dependencies in
 `adk-mcp` and no production deployment in this change.
@@ -152,4 +172,7 @@ explicit reconnect, plus checked-in schema/result/config fixtures under
 an immutable commit and compared against Rust. See [running Go reference evidence
 and contract matrix](mcp-reference.md) for commands, source/toolchain hashes,
 intentional validation-layer differences, and precise coverage limitations.
-This is not a claim of exhaustive protocol equivalence or Go↔Rust cross-wire tests.
+The separate [pinned Go↔Rust runner](../scripts/mcp-interop/README.md) executes
+28 live cross-wire cases over all three baseline client transports and the
+reference wrapper's Streamable HTTP server mode, including transport shutdown.
+This is tested baseline interoperability, not exhaustive protocol equivalence.

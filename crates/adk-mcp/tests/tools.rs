@@ -79,13 +79,14 @@ fn blobs_saved_exclusively_and_symlink_escape_refused() {
 #[test]
 fn resource_blob_and_invalid_data() {
     let temp = tempfile::tempdir().unwrap();
-    let actual: Value = serde_json::from_str(&format_resource_result(temp.path(), "s", &json!({"contents":[{"uri":"x://y","mimeType":"application/octet-stream","blob":"%%%"}]})).unwrap()).unwrap();
-    assert!(
-        actual["contents"][0]["text"]
-            .as_str()
-            .unwrap()
-            .contains("could not be saved")
-    );
+    assert!(matches!(
+        format_resource_result(
+            temp.path(),
+            "s",
+            &json!({"contents":[{"uri":"x://y","mimeType":"application/octet-stream","blob":"%%%"}]})
+        ),
+        Err(adk_mcp::Error::Protocol(_))
+    ));
     assert_eq!(
         format_resource_result(temp.path(), "s", &Value::Null).unwrap(),
         "{\"contents\":[]}"
@@ -108,4 +109,67 @@ fn excessive_content_is_rejected_before_writing_any_blob() {
         Err(Error::Limit)
     );
     assert_eq!(std::fs::read_dir(temp.path()).unwrap().count(), 0);
+}
+
+#[test]
+fn nested_wire_bounds_include_discarded_content_before_any_writes() {
+    use adk_mcp::{
+        Error,
+        tools::{MAX_CONTENT_DEPTH, MAX_RENDER_BLOCKS},
+    };
+    for kind in ["text", "tool_result"] {
+        let temp = tempfile::tempdir().unwrap();
+        let block =
+            json!({"type":kind,"content":vec![json!({"type":"text"}); MAX_RENDER_BLOCKS - 1]});
+        assert_eq!(
+            format_call_result(
+                temp.path(),
+                "s",
+                &json!({"content":[{"type":"image","data":"aGk="},block]})
+            ),
+            Err(Error::Limit)
+        );
+        assert_eq!(std::fs::read_dir(temp.path()).unwrap().count(), 0);
+    }
+    let temp = tempfile::tempdir().unwrap();
+    let mut block = json!({"type":"text"});
+    for _ in 1..MAX_CONTENT_DEPTH {
+        block = json!({"type":"text","content":[block]});
+    }
+    assert!(format_call_result(temp.path(), "s", &json!({"content":[block.clone()]})).is_ok());
+    block = json!({"type":"text","content":[block]});
+    assert_eq!(
+        format_call_result(
+            temp.path(),
+            "s",
+            &json!({"content":[{"type":"image","data":"aGk="},block]})
+        ),
+        Err(Error::Limit)
+    );
+    assert_eq!(std::fs::read_dir(temp.path()).unwrap().count(), 0);
+    let block =
+        json!({"type":"tool_result","content":vec![json!({"type":"text"}); MAX_RENDER_BLOCKS - 1]});
+    assert!(format_call_result(temp.path(), "s", &json!({"content":[block]})).is_ok());
+}
+
+#[test]
+fn oversized_nested_bytes_are_rejected_before_writes() {
+    use adk_mcp::{Error, tools::MAX_BLOB_BYTES};
+    use base64::Engine;
+    let data = base64::engine::general_purpose::STANDARD.encode(vec![0; MAX_BLOB_BYTES + 1]);
+    for child in [
+        json!({"type":"image","data":data}),
+        json!({"type":"resource","resource":{"blob":data}}),
+    ] {
+        let temp = tempfile::tempdir().unwrap();
+        assert_eq!(
+            format_call_result(
+                temp.path(),
+                "s",
+                &json!({"content":[{"type":"image","data":"aGk="},{"type":"tool_result","content":[child]}]})
+            ),
+            Err(Error::Limit)
+        );
+        assert_eq!(std::fs::read_dir(temp.path()).unwrap().count(), 0);
+    }
 }

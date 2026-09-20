@@ -5,6 +5,7 @@ use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet},
     sync::Arc,
+    time::{Duration, Instant},
 };
 
 #[derive(Clone, Default)]
@@ -144,9 +145,12 @@ pub struct Client {
     limits: Limits,
     state: State,
     capabilities: Capabilities,
-    tools: Option<BTreeMap<String, ToolDescriptor>>,
+    tools: Option<Vec<ToolDescriptor>>,
     resources: Option<BTreeMap<String, ResourceDescriptor>>,
     prompts: Option<BTreeMap<String, PromptDescriptor>>,
+    discovery_cache_ttl: Duration,
+    resources_discovered_at: Option<Instant>,
+    prompts_discovered_at: Option<Instant>,
 }
 impl Client {
     pub fn new(
@@ -187,12 +191,31 @@ impl Client {
             tools: None,
             resources: None,
             prompts: None,
+            discovery_cache_ttl: Duration::from_secs(30),
+            resources_discovered_at: None,
+            prompts_discovered_at: None,
         };
         client.check_server()?;
         Ok(client)
     }
     pub fn server_name(&self) -> &str {
         &self.server
+    }
+    pub fn diagnostics(&self) -> Option<String> {
+        self.transport.diagnostics()
+    }
+    /// Sets resource/prompt cache lifetime (default 30 seconds). Zero disables reuse.
+    /// Tool discovery remains pinned until an explicit reconnect.
+    pub fn set_discovery_cache_ttl(&mut self, ttl: Duration) {
+        self.discovery_cache_ttl = ttl;
+        self.invalidate_discovery();
+    }
+    /// Clears resource and prompt discovery, leaving tool discovery pinned.
+    pub fn invalidate_discovery(&mut self) {
+        self.resources = None;
+        self.prompts = None;
+        self.resources_discovered_at = None;
+        self.prompts_discovered_at = None;
     }
     pub fn capabilities(&self) -> Capabilities {
         self.capabilities
@@ -300,7 +323,8 @@ impl Client {
                     > self.limits.max_message_bytes
                     || (method == "tools/call"
                         && (!value.get("content").is_some_and(Value::is_array)
-                            || value.get("isError").is_some_and(|v| !v.is_boolean())))
+                            || value.get("isError").is_some_and(|v| !v.is_boolean())
+                            || crate::tools::validate_call_result(&value).is_err()))
                 {
                     // A response that cannot convey the dispatched result is
                     // not evidence that the operation had no side effects.
@@ -386,8 +410,7 @@ impl Client {
         self.transport = fresh_transport;
         self.capabilities = Capabilities::default();
         self.tools = None;
-        self.resources = None;
-        self.prompts = None;
+        self.invalidate_discovery();
         self.state = State::New;
         self.initialize().await
     }
@@ -449,7 +472,8 @@ impl Client {
         }
         if self.tools.is_none() {
             let items = self.pages("tools/list", "tools").await?;
-            let mut tools = BTreeMap::new();
+            let mut tools = Vec::new();
+            let mut original_names = BTreeSet::new();
             let mut qualified = BTreeSet::new();
             for item in items {
                 let name = required_string(&item, "name")?;
@@ -463,7 +487,10 @@ impl Client {
                     },
                     Some(_) => return Err(Error::Protocol("invalid annotations".into())),
                 };
-                let descriptor = ToolDescriptor {
+                if !original_names.insert(name.clone()) {
+                    return Err(Error::Protocol("ambiguous tool name".into()));
+                }
+                let mut descriptor = ToolDescriptor {
                     qualified_name: qualified_tool_name(&self.server, &name),
                     server_name: self.server.clone(),
                     tool_name: name.clone(),
@@ -478,22 +505,27 @@ impl Client {
                     ),
                     read_only: self.config.trust_read_only_hint() && hint,
                 };
-                if !qualified.insert(descriptor.qualified_name.clone())
-                    || tools.insert(name, descriptor).is_some()
-                {
-                    return Err(Error::Protocol("ambiguous tool name".into()));
+                if self.tool_allowed(&name) && self.remote_read_only(&descriptor) {
+                    descriptor.qualified_name = crate::names::ensure_unique_tool_name(
+                        &descriptor.qualified_name,
+                        &mut qualified,
+                    )
+                    .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
                 }
+                tools.push(descriptor);
             }
             self.tools = Some(tools);
         }
-        Ok(self
+        let mut tools: Vec<_> = self
             .tools
             .as_ref()
             .expect("catalog loaded")
-            .values()
+            .iter()
             .filter(|d| self.tool_allowed(&d.tool_name) && self.remote_read_only(d))
             .cloned()
-            .collect())
+            .collect();
+        tools.sort_by(|a, b| a.qualified_name.cmp(&b.qualified_name));
+        Ok(tools)
     }
     pub async fn call_tool(&mut self, name: &str, arguments: Value) -> Result<Value, Error> {
         self.call_tool_inner(name, arguments, None).await
@@ -519,7 +551,7 @@ impl Client {
         let descriptor = self
             .tools
             .as_ref()
-            .and_then(|t| t.get(name))
+            .and_then(|tools| tools.iter().find(|tool| tool.tool_name == name))
             .cloned()
             .ok_or_else(|| Error::Policy("tool not discovered".into()))?;
         let context = self.context("tools/call", Some(name), &arguments);
@@ -569,7 +601,13 @@ impl Client {
         if !self.capabilities.resources {
             return Ok(Vec::new());
         }
-        if self.resources.is_none() {
+        if self
+            .resources_discovered_at
+            .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
+        {
+            self.resources = None;
+            self.resources_discovered_at = None;
+            let discovered_at = Instant::now();
             let items = self.pages("resources/list", "resources").await?;
             let mut resources = BTreeMap::new();
             for item in items {
@@ -587,6 +625,7 @@ impl Client {
                 }
             }
             self.resources = Some(resources);
+            self.resources_discovered_at = Some(discovered_at);
         }
         Ok(self
             .resources
@@ -624,7 +663,13 @@ impl Client {
         if !self.capabilities.prompts {
             return Ok(Vec::new());
         }
-        if self.prompts.is_none() {
+        if self
+            .prompts_discovered_at
+            .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
+        {
+            self.prompts = None;
+            self.prompts_discovered_at = None;
+            let discovered_at = Instant::now();
             let items = self.pages("prompts/list", "prompts").await?;
             let mut prompts = BTreeMap::new();
             for item in items {
@@ -650,6 +695,7 @@ impl Client {
                 }
             }
             self.prompts = Some(prompts);
+            self.prompts_discovered_at = Some(discovered_at);
         }
         Ok(self
             .prompts
@@ -744,6 +790,62 @@ pub struct ClientManager {
     resources: bool,
 }
 impl ClientManager {
+    pub async fn list_prompts(&self, server: Option<&str>) -> Result<Vec<PromptDescriptor>, Error> {
+        if server.is_some_and(|s| !self.clients.contains_key(s)) {
+            return Err(Error::Policy("unknown server".into()));
+        }
+        let mut prompts = Vec::new();
+        let mut error = None;
+        for (name, client) in &self.clients {
+            if server.is_none_or(|s| s == name) {
+                let mut client = client.lock().await;
+                if !client.capabilities.prompts {
+                    if server.is_some() {
+                        return Err(Error::Protocol("server does not support prompts".into()));
+                    }
+                    continue;
+                }
+                match client.list_prompts().await {
+                    Ok(items) => prompts.extend(items),
+                    Err(e @ Error::ReconciliationRequired { .. }) => return Err(e),
+                    Err(e) if server.is_some() => return Err(e),
+                    Err(e) => {
+                        error.get_or_insert(e);
+                    }
+                }
+            }
+        }
+        if prompts.is_empty() {
+            if let Some(error) = error {
+                return Err(error);
+            }
+        }
+        Ok(prompts)
+    }
+    pub async fn get_prompt(
+        &self,
+        server: &str,
+        name: &str,
+        arguments: Value,
+    ) -> Result<Value, Error> {
+        let client = self
+            .clients
+            .get(server)
+            .ok_or_else(|| Error::Policy("unknown server".into()))?;
+        let mut client = client.lock().await;
+        if !client.capabilities.prompts {
+            return Err(Error::Protocol("server does not support prompts".into()));
+        }
+        client.get_prompt(name, arguments).await
+    }
+    /// Clears resource/prompt discovery for one server, or every server when empty.
+    pub async fn invalidate_discovery(&self, server: &str) {
+        for (name, client) in &self.clients {
+            if server.is_empty() || server == name {
+                client.lock().await.invalidate_discovery();
+            }
+        }
+    }
     pub async fn close(&self) -> Result<(), Error> {
         let mut error = None;
         for client in self.clients.values() {
@@ -775,13 +877,15 @@ impl ClientManager {
         }
         Ok(())
     }
-    pub async fn new(clients: Vec<Client>) -> Result<Self, Error> {
+    pub async fn new(mut clients: Vec<Client>) -> Result<Self, Error> {
         let mut manager = Self {
             clients: BTreeMap::new(),
             definitions: Vec::new(),
             routes: BTreeMap::new(),
             resources: false,
         };
+        clients.sort_by(|a, b| a.server.cmp(&b.server));
+        let mut qualified = BTreeSet::new();
         for mut client in clients {
             if manager.clients.contains_key(client.server_name()) {
                 return Err(Error::Config("duplicate server name".into()));
@@ -789,23 +893,25 @@ impl ClientManager {
             if client.state == State::New {
                 client.initialize().await?;
             }
-            let tools = client.list_tools().await?;
-            for tool in tools {
-                if manager
-                    .routes
-                    .insert(
-                        tool.qualified_name.clone(),
-                        (tool.server_name.clone(), tool.tool_name.clone()),
-                    )
-                    .is_some()
-                {
-                    return Err(Error::Protocol("ambiguous qualified tool name".into()));
-                }
+            client.list_tools().await?;
+            for tool in client.tools.iter().flatten().filter(|tool| {
+                client.tool_allowed(&tool.tool_name) && client.remote_read_only(tool)
+            }) {
+                let name = crate::names::ensure_unique_tool_name(
+                    &qualified_tool_name(&tool.server_name, &tool.tool_name),
+                    &mut qualified,
+                )
+                .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
+                manager.routes.insert(
+                    name.clone(),
+                    (tool.server_name.clone(), tool.tool_name.clone()),
+                );
                 manager.definitions.push(adk_core::ToolDefinition {
-                    name: tool.qualified_name,
-                    description: tool.display_description,
+                    name,
+                    description: tool.display_description.clone(),
                     input_schema: tool
                         .input_schema
+                        .clone()
                         .try_into()
                         .map_err(|_| Error::Protocol("invalid tool schema".into()))?,
                     read_only: tool.read_only,
@@ -850,9 +956,31 @@ impl crate::tools::ToolManager for ClientManager {
                 return Err(Error::Policy("unknown server".into()));
             }
             let mut resources = Vec::new();
+            let mut error = None;
             for (name, client) in &self.clients {
                 if server.is_none_or(|s| s == name) {
-                    resources.extend(client.lock().await.list_resources().await?);
+                    let mut client = client.lock().await;
+                    if !client.capabilities.resources {
+                        if server.is_some() {
+                            return Err(Error::Protocol(
+                                "server does not support resources".into(),
+                            ));
+                        }
+                        continue;
+                    }
+                    match client.list_resources().await {
+                        Ok(items) => resources.extend(items),
+                        Err(e @ Error::ReconciliationRequired { .. }) => return Err(e),
+                        Err(e) if server.is_some() => return Err(e),
+                        Err(e) => {
+                            error.get_or_insert(e);
+                        }
+                    }
+                }
+            }
+            if resources.is_empty() {
+                if let Some(error) = error {
+                    return Err(error);
                 }
             }
             serde_json::to_value(resources)

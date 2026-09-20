@@ -21,6 +21,9 @@ struct Mock {
     hang: bool,
 }
 impl Transport for Mock {
+    fn diagnostics(&self) -> Option<String> {
+        Some("bounded host-only peer diagnostic".into())
+    }
     fn request<'a>(
         &'a mut self,
         method: &'a str,
@@ -154,7 +157,7 @@ async fn tools_paginate_pin_and_only_invoke_discovered_names() {
 }
 
 #[tokio::test]
-async fn malformed_pagination_and_ambiguous_names_fail_atomically() {
+async fn malformed_pagination_and_duplicate_original_names_fail_atomically() {
     for bad in [
         json!({"tools":[] ,"nextCursor":null}),
         json!({"tools":[],"nextCursor":7}),
@@ -180,12 +183,6 @@ async fn malformed_pagination_and_ambiguous_names_fail_atomically() {
             0
         );
     }
-    let (mut client, _) = client(vec![Ok(
-        json!({"tools":[tool("a b",true),tool("a?b",true)]}),
-    )])
-    .await;
-    assert!(client.list_tools().await.is_err());
-    assert!(client.call_tool("a b", json!({})).await.is_err());
 }
 
 #[tokio::test]
@@ -778,12 +775,24 @@ async fn malformed_dispatched_tool_result_is_unknown_not_a_reusable_protocol_err
         json!({"content":"invalid"}),
         json!({"content":[],"isError":"invalid"}),
         Value::Null,
+        json!({"content":[{"type":"tool_result","content":[{"type":"text","icons":3}]}]}),
+        json!({"content":[{"type":"resource_link","icons":[{"src":3}]}]}),
+        json!({"content":[{"type":"text","text":"bad metadata","_meta":7}]}),
+        json!({"content":[{"type":"tool_result","content":[{"type":"text","text":3}]}]}),
     ] {
-        let (mut client, log) = client(vec![
+        let (transport, log) = transport(vec![
+            handshake(),
             Ok(json!({"tools":[tool("lookup",true)]})),
             Ok(malformed),
-        ])
-        .await;
+        ]);
+        let hooks = Arc::new(Hooks {
+            approval: true,
+            ..Hooks::default()
+        });
+        let mut host = policy();
+        host.hooks = Some(hooks.clone());
+        let mut client = Client::new(transport, "server", config(), host).unwrap();
+        client.initialize().await.unwrap();
         client.list_tools().await.unwrap();
         assert!(matches!(
             client.call_tool("lookup", json!({})).await,
@@ -801,5 +810,431 @@ async fn malformed_dispatched_tool_result_is_unknown_not_a_reusable_protocol_err
                 .count(),
             1
         );
+        let outcomes: Vec<_> = hooks
+            .events
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|(context, event)| context.operation() == "tools/call" && event != "approval")
+            .map(|(_, event)| event.clone())
+            .collect();
+        assert_eq!(outcomes, ["Attempted", "OutcomeUnknown"]);
     }
+}
+
+#[tokio::test]
+async fn discovery_cache_defaults_invalidate_both_catalogs_but_keep_tools_pinned() {
+    let (mut c, log) = client(vec![
+        Ok(json!({"tools":[tool("read",true)]})),
+        Ok(json!({"resources":[{"uri":"old","name":"old"}]})),
+        Ok(json!({"prompts":[{"name":"old","arguments":[{"name":"arg"}]}]})),
+        Ok(json!({"resources":[{"uri":"new","name":"new"}]})),
+        Ok(json!({"prompts":[{"name":"new"}]})),
+    ])
+    .await;
+    let tools = c.list_tools().await.unwrap();
+    let mut resources = c.list_resources().await.unwrap();
+    let mut prompts = c.list_prompts().await.unwrap();
+    resources[0].name = "mutated".into();
+    prompts[0].arguments[0].name = "mutated".into();
+    assert_eq!(c.list_resources().await.unwrap()[0].name, "old");
+    assert_eq!(c.list_prompts().await.unwrap()[0].arguments[0].name, "arg");
+    assert_eq!(log.lock().unwrap().len(), 5);
+    c.invalidate_discovery();
+    assert!(c.read_resource("old").await.is_err());
+    assert!(c.get_prompt("old", json!({})).await.is_err());
+    assert_eq!(c.list_tools().await.unwrap(), tools);
+    assert_eq!(c.list_resources().await.unwrap()[0].uri, "new");
+    assert_eq!(c.list_prompts().await.unwrap()[0].name, "new");
+    assert_eq!(log.lock().unwrap().len(), 7);
+}
+
+#[tokio::test]
+async fn discovery_ttl_expiry_and_zero_ttl_refresh_resources_and_prompts() {
+    for ttl in [Duration::from_millis(1), Duration::ZERO] {
+        let (mut c, log) = client(vec![
+            Ok(json!({"resources":[{"uri":"old","name":"old"}]})),
+            Ok(json!({"prompts":[{"name":"old"}]})),
+            Ok(json!({"resources":[{"uri":"new","name":"new"}]})),
+            Ok(json!({"prompts":[{"name":"new"}]})),
+            Ok(json!({"contents":[]})),
+            Ok(json!({"messages":[]})),
+        ])
+        .await;
+        c.set_discovery_cache_ttl(ttl);
+        assert_eq!(c.list_resources().await.unwrap()[0].uri, "old");
+        assert_eq!(c.list_prompts().await.unwrap()[0].name, "old");
+        if !ttl.is_zero() {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+        assert_eq!(c.list_resources().await.unwrap()[0].uri, "new");
+        assert_eq!(c.list_prompts().await.unwrap()[0].name, "new");
+        assert!(c.read_resource("old").await.is_err());
+        assert!(c.get_prompt("old", json!({})).await.is_err());
+        c.read_resource("new").await.unwrap();
+        c.get_prompt("new", json!({})).await.unwrap();
+        assert_eq!(log.lock().unwrap().len(), 8);
+    }
+}
+
+#[tokio::test]
+async fn failed_discovery_refresh_is_not_replayed_or_served_stale() {
+    for resources in [true, false] {
+        let result = if resources {
+            json!({"resources":[{"uri":"old","name":"old"}]})
+        } else {
+            json!({"prompts":[{"name":"old"}]})
+        };
+        let (mut c, log) = client(vec![
+            Ok(result),
+            Err(Error::ReconciliationRequired {
+                server: "peer-private".into(),
+                operation: "peer-private".into(),
+            }),
+        ])
+        .await;
+        assert_eq!(
+            c.diagnostics().as_deref(),
+            Some("bounded host-only peer diagnostic")
+        );
+        c.set_discovery_cache_ttl(Duration::ZERO);
+        if resources {
+            c.list_resources().await.unwrap();
+            assert!(matches!(
+                c.list_resources().await,
+                Err(Error::ReconciliationRequired { .. })
+            ));
+            assert_eq!(c.list_resources().await, Err(Error::Closed));
+            assert_eq!(c.read_resource("old").await, Err(Error::Closed));
+        } else {
+            c.list_prompts().await.unwrap();
+            assert!(matches!(
+                c.list_prompts().await,
+                Err(Error::ReconciliationRequired { .. })
+            ));
+            assert_eq!(c.list_prompts().await, Err(Error::Closed));
+            assert_eq!(c.get_prompt("old", json!({})).await, Err(Error::Closed));
+        }
+        assert_eq!(
+            c.diagnostics().as_deref(),
+            Some("bounded host-only peer diagnostic")
+        );
+        assert_eq!(log.lock().unwrap().len(), 4);
+    }
+}
+
+#[tokio::test]
+async fn collision_suffixes_follow_discovery_order_and_route_exact_originals() {
+    for reverse in [false, true] {
+        let mut clients = Vec::new();
+        let mut logs = Vec::new();
+        for (server, names) in [
+            ("a b", vec!["z?x", "z x", "z_x_2", "z_x"]),
+            ("a?b", vec!["z_x"]),
+        ] {
+            let mut p = policy();
+            let mut grant = p.servers.remove("server").unwrap();
+            grant.allowed_tools = Some(names.iter().map(|name| (*name).to_owned()).collect());
+            p.servers.insert(server.into(), grant);
+            let mut first_page = vec![tool("z/x", true), tool(names[0], true)];
+            if server == "a?b" {
+                first_page.remove(0);
+            }
+            let mut replies = vec![
+                handshake(),
+                Ok(json!({"tools":first_page,"nextCursor":"next"})),
+                Ok(
+                    json!({"tools":names[1..].iter().map(|name| tool(name,true)).collect::<Vec<_>>()}),
+                ),
+            ];
+            replies.extend(names.iter().map(|_| Ok(json!({"content":[]}))));
+            let (t, log) = transport(replies);
+            let mut c = Client::new(t, server, config(), p).unwrap();
+            c.initialize().await.unwrap();
+            let discovered = c.list_tools().await.unwrap();
+            assert_eq!(discovered[0].tool_name, names[0]);
+            assert_eq!(discovered[0].qualified_name, "mcp__a_b__z_x");
+            assert!(c.call_tool("z/x", json!({})).await.is_err());
+            clients.push(c);
+            logs.push(log);
+        }
+        if reverse {
+            clients.reverse();
+        }
+        let manager = ClientManager::new(clients).await.unwrap();
+        let expected = [
+            ("mcp__a_b__z_x", 0, "z?x"),
+            ("mcp__a_b__z_x_2", 0, "z x"),
+            ("mcp__a_b__z_x_2_2", 0, "z_x_2"),
+            ("mcp__a_b__z_x_3", 0, "z_x"),
+            ("mcp__a_b__z_x_4", 1, "z_x"),
+        ];
+        assert_eq!(
+            manager
+                .definitions()
+                .iter()
+                .map(|d| d.name.as_str())
+                .collect::<Vec<_>>(),
+            expected
+                .iter()
+                .map(|(name, _, _)| *name)
+                .collect::<Vec<_>>()
+        );
+        for (qualified, server_index, original) in expected {
+            manager
+                .call(qualified, json!({"route":qualified}))
+                .await
+                .unwrap();
+            assert_eq!(
+                logs[server_index].lock().unwrap().last().unwrap().1,
+                json!({"name":original,"arguments":{"route":qualified}})
+            );
+        }
+        assert!(manager.call("mcp__a_b__z_x_5", json!({})).await.is_err());
+        assert!(manager.call("z?x", json!({})).await.is_err());
+        assert_eq!(
+            logs[0]
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(m, _)| m == "tools/call")
+                .count(),
+            4
+        );
+        assert_eq!(
+            logs[1]
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(m, _)| m == "tools/call")
+                .count(),
+            1
+        );
+    }
+}
+
+#[tokio::test]
+async fn manager_discovery_partial_success_preserves_scoped_errors_and_reconciliation() {
+    for field in ["resources", "prompts"] {
+        let method = format!("{field}/list");
+        let healthy = Ok(json!({field:[{"uri":"healthy", "name":"healthy"}]}));
+        let empty = Ok(json!({field:[]}));
+        let failure = Error::Remote { code: -32603 };
+        let other_failure = Error::Remote { code: -32000 };
+        let unknown = |server: &str| Error::ReconciliationRequired {
+            server: server.into(),
+            operation: method.clone(),
+        };
+        for (case, replies, scope, expected, requests) in [
+            (
+                "failure before healthy",
+                [Err(failure.clone()), healthy.clone()],
+                None,
+                Ok(1),
+                [1, 1],
+            ),
+            (
+                "failure after healthy",
+                [healthy.clone(), Err(failure.clone())],
+                None,
+                Ok(1),
+                [1, 1],
+            ),
+            (
+                "failure before empty",
+                [Err(failure.clone()), empty.clone()],
+                None,
+                Err(failure.clone()),
+                [1, 1],
+            ),
+            (
+                "failure after empty",
+                [empty.clone(), Err(failure.clone())],
+                None,
+                Err(failure.clone()),
+                [1, 1],
+            ),
+            (
+                "all failed",
+                [Err(failure.clone()), Err(other_failure)],
+                None,
+                Err(failure.clone()),
+                [1, 1],
+            ),
+            (
+                "scoped failure before healthy",
+                [Err(failure.clone()), healthy.clone()],
+                Some("a"),
+                Err(failure.clone()),
+                [1, 0],
+            ),
+            (
+                "scoped failure after healthy",
+                [healthy.clone(), Err(failure.clone())],
+                Some("b"),
+                Err(failure.clone()),
+                [0, 1],
+            ),
+            ("all empty", [empty.clone(), empty], None, Ok(0), [1, 1]),
+            (
+                "reconciliation before healthy",
+                [Err(unknown("a")), healthy.clone()],
+                None,
+                Err(unknown("a")),
+                [1, 0],
+            ),
+            (
+                "reconciliation after healthy",
+                [healthy, Err(unknown("b"))],
+                None,
+                Err(unknown("b")),
+                [1, 1],
+            ),
+            (
+                "reconciliation after ordinary failure",
+                [Err(failure), Err(unknown("b"))],
+                None,
+                Err(unknown("b")),
+                [1, 1],
+            ),
+        ] {
+            let mut clients = Vec::new();
+            let mut logs = Vec::new();
+            for (server, reply) in ["a", "b"].into_iter().zip(replies) {
+                let mut p = policy();
+                let grant = p.servers.remove("server").unwrap();
+                p.servers.insert(server.into(), grant);
+                let (t, log) = transport(vec![handshake(), Ok(json!({"tools":[]})), reply]);
+                clients.push(Client::new(t, server, config(), p).unwrap());
+                logs.push(log);
+            }
+            let manager = ClientManager::new(clients).await.unwrap();
+            let result = if field == "resources" {
+                manager.list_resources(scope).await
+            } else {
+                manager
+                    .list_prompts(scope)
+                    .await
+                    .map(|items| serde_json::to_value(items).unwrap())
+            };
+            if let Ok(items) = &result {
+                for item in items.as_array().unwrap() {
+                    assert_eq!(item["name"], "healthy", "{field}: {case}");
+                    assert_eq!(
+                        item["server"],
+                        if case == "failure before healthy" {
+                            "b"
+                        } else {
+                            "a"
+                        },
+                        "{field}: {case}"
+                    );
+                }
+            }
+            assert_eq!(
+                result.map(|items| items.as_array().unwrap().len()),
+                expected,
+                "{field}: {case}"
+            );
+            for (log, expected_requests) in logs.iter().zip(requests) {
+                assert_eq!(
+                    log.lock()
+                        .unwrap()
+                        .iter()
+                        .filter(|(m, _)| m == &method)
+                        .count(),
+                    expected_requests,
+                    "{field}: {case}"
+                );
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn manager_scoped_and_all_invalidation_and_prompt_routing_respect_capabilities() {
+    let mut clients = Vec::new();
+    let mut logs = Vec::new();
+    for server in ["a", "b", "unsupported"] {
+        let mut p = policy();
+        let grant = p.servers.remove("server").unwrap();
+        p.servers.insert(server.into(), grant);
+        let mut replies = if server == "unsupported" {
+            vec![Ok(
+                json!({"protocolVersion":PROTOCOL_VERSION,"capabilities":{}}),
+            )]
+        } else {
+            vec![handshake(), Ok(json!({"tools":[]}))]
+        };
+        if server != "unsupported" {
+            for version in 0..if server == "a" { 3 } else { 2 } {
+                replies.push(Ok(
+                    json!({"resources":[{"uri":format!("{server}-{version}"),"name":"resource"}]}),
+                ));
+                replies.push(Ok(json!({"prompts":[{"name":format!("{server}-{version}"),"arguments":[{"name":"topic","required":true}]}]})));
+            }
+            replies.push(Ok(json!({"messages":[]})));
+        }
+        let (t, log) = transport(replies);
+        clients.push(Client::new(t, server, config(), p).unwrap());
+        logs.push(log);
+    }
+    let manager = ClientManager::new(clients).await.unwrap();
+    for invalid in ["missing", "unsupported"] {
+        assert!(manager.list_resources(Some(invalid)).await.is_err());
+        assert!(manager.list_prompts(Some(invalid)).await.is_err());
+        assert!(manager.get_prompt(invalid, "a-0", json!({})).await.is_err());
+    }
+    for _ in 0..2 {
+        assert_eq!(
+            manager
+                .list_resources(None)
+                .await
+                .unwrap()
+                .as_array()
+                .unwrap()
+                .len(),
+            2
+        );
+        assert_eq!(manager.list_prompts(None).await.unwrap().len(), 2);
+    }
+    manager.invalidate_discovery("missing").await;
+    manager.invalidate_discovery("a").await;
+    assert!(
+        manager
+            .get_prompt("a", "a-0", json!({"topic":"test"}))
+            .await
+            .is_err()
+    );
+    let resources = manager.list_resources(None).await.unwrap();
+    let prompts = manager.list_prompts(None).await.unwrap();
+    assert_eq!(resources[0]["uri"], "a-1");
+    assert_eq!(resources[1]["uri"], "b-0");
+    assert_eq!(prompts[0].name, "a-1");
+    assert_eq!(prompts[1].name, "b-0");
+    manager.invalidate_discovery("").await;
+    assert_eq!(manager.list_resources(None).await.unwrap()[1]["uri"], "b-1");
+    assert_eq!(manager.list_prompts(None).await.unwrap()[0].name, "a-2");
+    for (server, name) in [("a", "a-2"), ("b", "b-1")] {
+        assert!(manager.get_prompt(server, name, json!({})).await.is_err());
+        manager
+            .get_prompt(server, name, json!({"topic":"test"}))
+            .await
+            .unwrap();
+    }
+    for (i, log) in logs.iter().enumerate().take(2) {
+        assert_eq!(
+            log.lock().unwrap().last().unwrap().1,
+            json!({"name":if i == 0 {"a-2"} else {"b-1"},"arguments":{"topic":"test"}})
+        );
+        assert_eq!(
+            log.lock()
+                .unwrap()
+                .iter()
+                .filter(|(m, _)| m == "tools/list")
+                .count(),
+            1
+        );
+    }
+    assert_eq!(logs[2].lock().unwrap().len(), 2);
 }

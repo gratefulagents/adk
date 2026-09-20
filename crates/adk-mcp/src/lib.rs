@@ -49,7 +49,7 @@ impl Default for Limits {
             max_message_bytes: 8 << 20,
             max_pages: 100,
             max_items: 10000,
-            max_stderr_bytes: 8192,
+            max_stderr_bytes: 4096,
             timeout: Duration::from_secs(30),
         }
     }
@@ -58,6 +58,11 @@ impl Default for Limits {
 /// A transport owns one session; no implementation may replay a dispatched request.
 /// Failures after dispatch must be ReconciliationRequired (even for read operations).
 pub trait Transport: Send {
+    /// Host-only, bounded peer diagnostics, possibly containing sensitive untrusted
+    /// text despite best-effort redaction. Never forward to models or ordinary logs.
+    fn diagnostics(&self) -> Option<String> {
+        None
+    }
     fn request<'a>(
         &'a mut self,
         method: &'a str,

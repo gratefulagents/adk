@@ -96,11 +96,14 @@ async fn bash_combines_streams_empty_exit_timeout_and_stdin_eof() {
         assert!(!out.is_error, "{}", text(&out));
         assert_eq!(text(&out), expected);
     }
+    // The assertion requires the child to run `printf` before its deadline.
+    // A 20 ms budget raced process startup on loaded macOS CI runners; allow
+    // startup time while keeping the deadline well below the five-second sleep.
     let out = call(
         &bundle,
         "Bash",
         &ctx,
-        json!({"command":"printf before; sleep 5","timeout":20}),
+        json!({"command":"printf before; sleep 5","timeout":1000}),
     )
     .await;
     assert!(!out.is_error);

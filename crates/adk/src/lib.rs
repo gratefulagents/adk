@@ -12,6 +12,9 @@ pub use adk_core as core;
 /// Compatible durable documents, stores and effect recovery.
 #[cfg(feature = "durable")]
 pub use adk_durable as durable;
+/// Host-owned MCP sessions, discovery and policy-gated server mode.
+#[cfg(feature = "mcp")]
+pub use adk_mcp as mcp;
 /// Project tasks, memory and independent embedding storage.
 #[cfg(feature = "project-state")]
 pub use adk_project_state as project_state;

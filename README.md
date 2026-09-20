@@ -72,7 +72,9 @@ OS support, enforced CI tests and limitations. None adds Kubernetes/platform cod
 See [durable runs and project state](docs/durable-runs.md) for fenced store
 ownership, compatible Go checkpoints, recovery limits and memory APIs.
 See [runner design and behavior](docs/runner-design.md) for lifecycle contracts,
-Go compatibility mapping, research and explicit integration boundaries. Purity checks walk
+Go compatibility mapping, research and explicit integration boundaries.
+See [managed subagents](docs/subagents.md) for session ownership, DAG tools,
+security narrowing, steering and conservative scheduler recovery. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect
 platform/Kubernetes dependencies.
 

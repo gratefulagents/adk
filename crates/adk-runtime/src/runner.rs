@@ -79,6 +79,7 @@ impl ModelBinding {
     }
 }
 
+#[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
@@ -88,6 +89,7 @@ pub trait OutputParser: Send + Sync {
     fn parse(&self, raw: &str) -> Result<Value, Error>;
 }
 
+#[derive(Clone)]
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
@@ -134,6 +136,7 @@ pub trait ModelErrorHandler: Send + Sync {
 
 /// Policy retries supplement provider advice before any visible model event.
 /// Tools and host callbacks are never retried.
+#[derive(Clone)]
 pub struct RetryPolicy {
     pub max_retries: u32,
     pub initial_delay: Duration,
@@ -152,7 +155,7 @@ impl Default for RetryPolicy {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub struct Limits {
     pub max_tokens: Option<u64>,
     /// Monetary units are selected by the host's CostEstimator.
@@ -287,6 +290,7 @@ pub trait Compactor: Send + Sync {
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>>;
 }
 
+#[derive(Clone)]
 pub struct CompactionConfig {
     pub trigger_tokens: u64,
     pub target_tokens: u64,
@@ -343,6 +347,7 @@ pub trait StopGate: Send + Sync {
         output: &'a Value,
     ) -> BoxFuture<'a, Result<Option<String>, Error>>;
 }
+#[derive(Clone)]
 pub struct RunnerConfig {
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
@@ -366,6 +371,8 @@ pub struct RunnerConfig {
     pub stop_gate: Option<Arc<dyn StopGate>>,
     pub stop_gate_max_blocks: usize,
     pub turn_context: Option<Arc<dyn TurnContext>>,
+    /// Session-owned children survive individual runs; the scheduler owner closes them.
+    pub subagents: Option<Arc<crate::subagent_tools::SubagentSession>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
     pub hooks: Option<Arc<dyn RunHooks>>,
@@ -395,6 +402,7 @@ impl Default for RunnerConfig {
             stop_gate: None,
             stop_gate_max_blocks: 8,
             turn_context: None,
+            subagents: None,
             transient_context: vec![],
             hooks: None,
             durable: None,
@@ -636,8 +644,13 @@ impl Runner {
         RunStream::new(self.engine(context, request, host))
     }
     fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
+        if let Some(session) = &self.config.subagents {
+            session.begin_run();
+        }
         Engine {
             durable_state: None,
+            child_control: None,
+            applied_child_messages: HashSet::new(),
             agent: self.initial.clone(),
             config: self.config.clone(),
             context,
@@ -696,6 +709,8 @@ struct ExecutedTool {
 }
 
 struct Engine {
+    child_control: Option<crate::subagent::ChildControl>,
+    applied_child_messages: HashSet<String>,
     durable_state: Option<durable::DurableState>,
     agent: Arc<AgentConfig>,
     config: Arc<RunnerConfig>,
@@ -775,7 +790,7 @@ impl std::fmt::Display for OperationTimeout {
 }
 impl std::error::Error for OperationTimeout {}
 
-async fn bounded<T>(
+pub(crate) async fn bounded<T>(
     context: &Context,
     timeout: Option<Duration>,
     future: impl Future<Output = Result<T, Error>>,
@@ -909,6 +924,11 @@ impl Engine {
             return Ok(());
         }
         self.persist_boundary(boundary, pending).await?;
+        if self.durable_state.is_none()
+            && let Some(session) = &self.config.subagents
+        {
+            session.commit_delivery(&session.delivery_ids()).await?;
+        }
         if let Some(hook) = &self.config.durable {
             bounded(
                 &self.context,
@@ -1077,7 +1097,18 @@ impl Engine {
                         self.settle_tool_turn();
                         if self.config.return_tool_output {
                             let output = self.tool_final.take().unwrap();
-                            self.result.final_output = Some(self.validate_output(output).await?);
+                            let output = self.validate_output(output).await?;
+                            if self.config.subagents.is_some() || self.child_control.is_some() {
+                                if self.durable_state.is_some() {
+                                    self.result.final_output = Some(output);
+                                    self.phase = Phase::Finalize;
+                                    self.checkpoint(Boundary::ToolCompleted, None).await?;
+                                } else {
+                                    self.finish_candidate(output).await?;
+                                }
+                                continue;
+                            }
+                            self.result.final_output = Some(output);
                         }
                         self.phase = Phase::Finish;
                     } else {
@@ -1191,6 +1222,7 @@ impl Engine {
             }
         };
         self.account_usage(&compacted.usage, compacted.cost)?;
+        self.charge_child_usage().await?;
         self.observe(Observation::Usage {
             usage: self.result.usage.clone(),
             cost: self.cost,
@@ -1327,6 +1359,18 @@ impl Engine {
     }
     async fn model_turn(&mut self) -> Result<(), Error> {
         self.settle_tool_turn();
+        self.apply_child_messages(false).await?;
+        if let Some(control) = &self.child_control {
+            control
+                .charge(crate::subagent::BudgetUsage::default())
+                .await?;
+        }
+        if let Some(session) = self.config.subagents.clone() {
+            for item in session.collect(&self.context).await? {
+                self.append(item);
+            }
+            session.update_parent(&self.result.history);
+        }
         self.publish_committed().await?;
         if self.turns >= self.policy.max_turns.get() {
             return Err(Error::new(
@@ -1415,13 +1459,18 @@ impl Engine {
         };
         self.compact_local(&mut request, false).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
-        let (response, model, streamed) = self.model_response(request).await?;
+        let Some((response, model, streamed)) = self.model_response(request).await? else {
+            self.phase = Phase::Model;
+            self.checkpoint(Boundary::ModelCompleted, None).await?;
+            return Ok(());
+        };
         self.observe(Observation::ModelAccepted {
             agent: self.agent.name.clone(),
             response: response.clone(),
         })
         .await?;
         self.record_response(response.clone(), &model)?;
+        self.charge_child_usage().await?;
         self.publish_committed().await?;
         if !streamed {
             self.emit(RunEvent::Model {
@@ -1494,7 +1543,9 @@ impl Engine {
                 .find(|t| !t.is_empty())
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
-            if self.durable_state.is_some() && self.config.stop_gate.is_some() {
+            if self.durable_state.is_some()
+                && (self.config.stop_gate.is_some() || self.config.subagents.is_some())
+            {
                 self.result.final_output = Some(output);
                 self.phase = Phase::Finalize;
             } else {
@@ -1506,7 +1557,54 @@ impl Engine {
         }
         Ok(())
     }
+    async fn apply_child_messages(&mut self, finishing: bool) -> Result<bool, Error> {
+        let Some(control) = self.child_control.clone() else {
+            return Ok(false);
+        };
+        let messages = if finishing {
+            control.finish_or_take_messages().await?
+        } else {
+            control.take_messages().await?
+        };
+        let messages: Vec<_> = messages
+            .into_iter()
+            .filter(|message| self.applied_child_messages.insert(message.id.clone()))
+            .collect();
+        let ids: Vec<_> = messages.iter().map(|message| message.id.clone()).collect();
+        for message in messages {
+            self.append(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text { text: message.text }],
+                },
+            });
+        }
+        if !ids.is_empty() {
+            self.publish_committed().await?;
+            if self.durable_state.is_none() {
+                control.acknowledge_messages(&ids).await?;
+            }
+        }
+        Ok(!ids.is_empty())
+    }
     async fn finish_candidate(&mut self, output: Value) -> Result<(), Error> {
+        if self.apply_child_messages(false).await? {
+            self.phase = Phase::Model;
+            return Ok(());
+        }
+        if let Some(session) = self.config.subagents.clone() {
+            let items = session.join(&self.context).await?;
+            if !items.is_empty() {
+                for item in items {
+                    self.append(item);
+                }
+                if self.turns >= self.policy.max_turns.get() {
+                    self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                }
+                self.phase = Phase::Model;
+                return Ok(());
+            }
+        }
         if let Some(gate) = &self.config.stop_gate {
             let has_tools =
                 self.agent
@@ -1535,6 +1633,10 @@ impl Engine {
                 }
                 self.stop_gate_blocks = 0;
             }
+        }
+        if self.apply_child_messages(true).await? {
+            self.phase = Phase::Model;
+            return Ok(());
         }
         self.result.final_output = Some(output.clone());
         self.observe(Observation::AgentEnded {
@@ -1581,6 +1683,25 @@ impl Engine {
             Ok(Value::String(output))
         }
     }
+    async fn charge_child_usage(&self) -> Result<(), Error> {
+        if let Some(control) = &self.child_control {
+            let used = control.usage();
+            control
+                .charge(crate::subagent::BudgetUsage {
+                    tokens: self
+                        .result
+                        .usage
+                        .input_tokens
+                        .saturating_add(self.result.usage.output_tokens)
+                        .saturating_sub(used.tokens),
+                    cost_micros: ((self.cost * 1_000_000.0).ceil() as u64)
+                        .saturating_sub(used.cost_micros),
+                    ..Default::default()
+                })
+                .await?;
+        }
+        Ok(())
+    }
     fn account_usage(&mut self, used: &Usage, cost: f64) -> Result<(), Error> {
         let usage = &mut self.result.usage;
         usage.input_tokens = usage.input_tokens.saturating_add(used.input_tokens);
@@ -1618,7 +1739,7 @@ impl Engine {
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
-    ) -> Result<(ModelResponse, String, bool), Error> {
+    ) -> Result<Option<(ModelResponse, String, bool)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
@@ -1657,8 +1778,37 @@ impl Engine {
                         + estimate_request_overhead_tokens(&request)
                         - output_reserve_tokens(&request)
                         - REQUEST_SAFETY_BUFFER;
+                if let Some(control) = &self.child_control {
+                    control
+                        .reserve(crate::subagent::BudgetUsage {
+                            turns: 1,
+                            ..Default::default()
+                        })
+                        .await?;
+                }
                 self.checkpoint(Boundary::ModelDispatched, None).await?;
-                match self.model_attempt(binding, request.clone()).await {
+                let control = self.child_control.clone();
+                let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
+                let attempt_result = {
+                    let attempt = self.model_attempt(binding, request.clone(), visible.clone());
+                    tokio::pin!(attempt);
+                    if let Some(control) = control {
+                        tokio::select! {
+                            biased;
+                            message = control.wait_for_messages() => {
+                                message?;
+                                if !visible.load(std::sync::atomic::Ordering::Acquire) {
+                                    return Ok(None);
+                                }
+                                attempt.await
+                            }
+                            result = &mut attempt => result,
+                        }
+                    } else {
+                        attempt.await
+                    }
+                };
+                match attempt_result {
                     Ok(response) => {
                         self.calibration.observe_estimate(
                             response
@@ -1673,14 +1823,14 @@ impl Engine {
                                 self.fallbacks.remove(&agent_key);
                             }
                         }
-                        return Ok((
+                        return Ok(Some((
                             response,
                             binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
-                        ));
+                        )));
                     }
                     Err((error, committed)) => {
-                        if self.durable_state.is_some() {
+                        if self.durable_state.is_some() && self.child_control.is_none() {
                             return Err(error);
                         }
                         self.context.check_active()?;
@@ -1693,6 +1843,10 @@ impl Engine {
                             || (error.info.category == ErrorCategory::DeadlineExceeded && !idle)
                         {
                             return Err(error);
+                        }
+                        if self.durable_state.is_some() {
+                            self.checkpoint(Boundary::ModelCompleted, None).await?;
+                            self.checkpoint(Boundary::ModelPrepared, None).await?;
                         }
                         let message = error.info.message.to_lowercase();
                         if (message.contains("context_length_exceeded")
@@ -1789,11 +1943,22 @@ impl Engine {
                             delay,
                         })
                         .await?;
-                        bounded(&self.context, None, async {
+                        let backoff = bounded(&self.context, None, async {
                             tokio::time::sleep(delay).await;
                             Ok(())
-                        })
-                        .await?;
+                        });
+                        if let Some(control) = &self.child_control {
+                            tokio::select! {
+                                biased;
+                                message = control.wait_for_messages() => {
+                                    message?;
+                                    return Ok(None);
+                                }
+                                result = backoff => result?,
+                            }
+                        } else {
+                            backoff.await?;
+                        }
                     }
                 }
             }
@@ -1804,6 +1969,7 @@ impl Engine {
         &mut self,
         binding: &ModelBinding,
         request: ModelRequest,
+        visible: Arc<std::sync::atomic::AtomicBool>,
     ) -> Result<ModelResponse, (Error, bool)> {
         let timeout = self.config.model_idle_timeout;
         match binding {
@@ -1840,6 +2006,7 @@ impl Engine {
                                 ));
                             }
                             committed = true;
+                            visible.store(true, std::sync::atomic::Ordering::Release);
                             match &event {
                                 ModelEvent::Complete { response } => {
                                     complete = Some(response.clone())
@@ -1878,6 +2045,7 @@ impl Engine {
                     Err(error) => {
                         if let Some(response) = complete {
                             let _ = self.record_response(response, binding.name());
+                            let _ = self.charge_child_usage().await;
                         } else {
                             if !delta_text.is_empty() {
                                 items.push(RunItem::Message {
@@ -2208,6 +2376,15 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
+        if let Some(control) = &self.child_control {
+            control
+                .activity(crate::subagent::Activity {
+                    current_step: "tool".into(),
+                    last_tool: call.name.clone(),
+                    ..Default::default()
+                })
+                .await?;
+        }
         self.observe(Observation::ToolStarted {
             agent: self.agent.name.clone(),
             call: call.clone(),
@@ -2236,6 +2413,14 @@ impl Engine {
                     ),
             ),
         };
+        if let Some(control) = &self.child_control {
+            control
+                .reserve(crate::subagent::BudgetUsage {
+                    tool_calls: 1,
+                    ..Default::default()
+                })
+                .await?;
+        }
         let raw = match bounded(
             &context.operation,
             timeout,
@@ -2455,5 +2640,166 @@ impl Conversation {
         self.history = outcome.result.history.clone();
         self.paused = outcome.result.status == RunStatus::Paused;
         self.spills.extend(outcome.spills.iter().cloned());
+    }
+}
+
+struct ChildRunnerStore(crate::subagent::ChildControl);
+impl durable::CheckpointStore for ChildRunnerStore {
+    fn persist<'a>(
+        &'a self,
+        _: &'a Context,
+        checkpoint: &'a durable::RunnerCheckpoint,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            let ids = checkpoint
+                .runtime
+                .as_ref()
+                .map(|runtime| runtime.applied_child_messages())
+                .unwrap_or_default();
+            self.0.persist_checkpoint(checkpoint, &ids).await
+        })
+    }
+}
+
+impl Runner {
+    pub(crate) async fn run_child(
+        &self,
+        mut invocation: crate::subagent::ChildInvocation,
+        control: crate::subagent::ChildControl,
+        host: Arc<dyn Host>,
+    ) -> Result<crate::subagent::ChildOutcome, Error> {
+        use crate::subagent::{ChildOutcome, TaskStatus};
+        let session = Arc::new(crate::subagent_tools::SubagentSession::for_child(&control));
+        fn bind_agent(
+            agent: &Arc<AgentConfig>,
+            session: &Arc<crate::subagent_tools::SubagentSession>,
+            bound: &mut HashMap<usize, Arc<AgentConfig>>,
+        ) -> Result<Arc<AgentConfig>, Error> {
+            let key = Arc::as_ptr(agent) as usize;
+            if let Some(agent) = bound.get(&key) {
+                return Ok(agent.clone());
+            }
+            let mut agent = agent.as_ref().clone();
+            for tool in &mut agent.tools {
+                if tool.is_delegation() {
+                    *tool = tool.for_delegation(session).ok_or_else(|| {
+                        Error::new(
+                            ErrorCategory::Unsupported,
+                            "child scheduler tool cannot bind to child scope",
+                        )
+                    })?;
+                }
+            }
+            for handoff in &mut agent.handoffs {
+                handoff.target = bind_agent(&handoff.target, session, bound)?;
+            }
+            let agent = Arc::new(agent);
+            bound.insert(key, agent.clone());
+            Ok(agent)
+        }
+        let mut config = self.config.as_ref().clone();
+        config.subagents = Some(session.clone());
+        let scoped = Runner {
+            initial: bind_agent(&self.initial, &session, &mut HashMap::new())?,
+            config: Arc::new(config),
+        };
+        let security = &invocation.security;
+        if !security.input_guardrails.is_empty() || !security.output_guardrails.is_empty() {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "named child guardrails require an enforcing adapter",
+            ));
+        }
+        if (security.untrusted_tool_outputs && !self.config.output.untrusted)
+            || security
+                .max_output_bytes
+                .is_some_and(|limit| self.config.output.max_bytes.is_none_or(|cap| cap > limit))
+        {
+            return Err(Error::new(
+                ErrorCategory::PermissionDenied,
+                "child output policy is weaker than the session baseline",
+            ));
+        }
+        invocation.request.policy.tools = security.tools.clone();
+        let result = if control.delegation_handle().is_durable() {
+            let mut durable = durable::DurableRun::new(Arc::new(ChildRunnerStore(control.clone())));
+            durable.resume = invocation.resume;
+            if durable.resume.is_some() {
+                invocation.request.input.clear();
+            }
+            scoped
+                .drive_durable(
+                    invocation.context,
+                    invocation.request,
+                    host,
+                    durable,
+                    None,
+                    Some(control.clone()),
+                )
+                .await
+        } else {
+            let mut engine = scoped.engine(invocation.context, invocation.request, host);
+            engine.child_control = Some(control.clone());
+            engine.streaming = true;
+            engine.drive().await
+        };
+        let (snapshot, status, error) = match result {
+            Ok(outcome) => {
+                let status = if outcome.result.status == RunStatus::Completed {
+                    TaskStatus::Completed
+                } else {
+                    TaskStatus::Failed
+                };
+                let error = (status == TaskStatus::Failed)
+                    .then(|| "child paused without a resumable session".into());
+                (outcome.result, status, error)
+            }
+            Err(error) => {
+                let status = if error.error.info.category == ErrorCategory::Cancelled {
+                    TaskStatus::Cancelled
+                } else {
+                    TaskStatus::Failed
+                };
+                let Some(snapshot) = error.partial else {
+                    return Err(error.error);
+                };
+                (*snapshot, status, Some(error.error.info.message))
+            }
+        };
+        Ok(ChildOutcome {
+            status,
+            result: snapshot
+                .final_output
+                .map(|value| match value {
+                    Value::String(text) => text,
+                    value => value.to_string(),
+                })
+                .unwrap_or_else(|| {
+                    let progress = snapshot
+                        .new_items
+                        .iter()
+                        .filter_map(|item| match item {
+                            RunItem::Message { message }
+                            | RunItem::PhasedMessage { message, .. }
+                                if message.role == Role::Assistant =>
+                            {
+                                Some(text(&message.content))
+                            }
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    progress
+                        .chars()
+                        .rev()
+                        .take(4096)
+                        .collect::<Vec<_>>()
+                        .into_iter()
+                        .rev()
+                        .collect()
+                }),
+            error,
+            usage: control.usage(),
+        })
     }
 }

@@ -87,6 +87,10 @@ pub struct RuntimeCheckpoint {
     tool_turn_start: Option<usize>,
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
+    #[serde(default)]
+    applied_child_messages: HashSet<String>,
+    #[serde(default)]
+    child_deliveries: Vec<String>,
     approval_journal_present: bool,
     #[serde(default)]
     approval_journal: Vec<crate::compat::ApprovalJournalEntry>,
@@ -103,6 +107,12 @@ impl RuntimeCheckpoint {
     }
     pub fn tool_calls(&self) -> u64 {
         self.tool_calls
+    }
+    pub fn child_deliveries(&self) -> Vec<String> {
+        self.child_deliveries.clone()
+    }
+    pub fn applied_child_messages(&self) -> Vec<String> {
+        self.applied_child_messages.iter().cloned().collect()
     }
     pub fn result(&self) -> &RunResult {
         &self.result
@@ -239,7 +249,7 @@ impl Runner {
         host: Arc<dyn Host>,
         durable: DurableRun,
     ) -> Result<RunOutcome, RunError> {
-        self.drive_durable(context, request, host, durable, None)
+        self.drive_durable(context, request, host, durable, None, None)
             .await
     }
 
@@ -256,7 +266,7 @@ impl Runner {
         RunStream {
             producer: Some(Box::pin(async move {
                 runner
-                    .drive_durable(context, request, host, durable, Some(sender))
+                    .drive_durable(context, request, host, durable, Some(sender), None)
                     .await
             })),
             receiver,
@@ -264,20 +274,34 @@ impl Runner {
         }
     }
 
-    async fn drive_durable(
+    pub(super) async fn drive_durable(
         &self,
         context: Context,
         request: RunRequest,
         host: Arc<dyn Host>,
         durable: DurableRun,
         sender: Option<mpsc::Sender<RunEvent>>,
+        child_control: Option<crate::subagent::ChildControl>,
     ) -> Result<RunOutcome, RunError> {
         if context.run_id.is_empty() || durable.attempt_id.is_empty() {
             return Err(invalid("durable run and attempt IDs must be nonempty").into());
         }
+        if child_control.is_none()
+            && self
+                .config
+                .subagents
+                .as_ref()
+                .is_some_and(|session| !session.scheduler.is_durable())
+        {
+            return Err(unsupported(
+                "native durable child sessions require a durable scheduler store",
+            )
+            .into());
+        }
         let fingerprint = self.durable_fingerprint()?;
         let mut engine = self.engine(context, request, host);
-        engine.streaming = sender.is_some();
+        engine.streaming = sender.is_some() || child_control.is_some();
+        engine.child_control = child_control;
         engine.sender = sender;
         let now = Utc::now();
         let deadline_at = engine.context.deadline.map(|deadline| {
@@ -285,7 +309,15 @@ impl Runner {
                 .unwrap_or(chrono::Duration::MAX)
         });
         let mut state = DurableState {
-            children: durable.children,
+            children: durable.children.or_else(|| {
+                self.config
+                    .subagents
+                    .as_ref()
+                    .filter(|_| engine.child_control.is_none())
+                    .map(|session| {
+                        Arc::new(session.scheduler.clone()) as Arc<dyn ChildCheckpointOwner>
+                    })
+            }),
             child_checkpoint: None,
             started_at: now,
             deadline_at,
@@ -330,16 +362,31 @@ impl Runner {
                 return Err(invalid("recovery does not accept additional input").into());
             }
             let execution_boundary = checkpoint.execution_boundary().to_owned();
-            let saved = checkpoint.runtime.ok_or_else(|| unsupported(
+            let mut saved = checkpoint.runtime.ok_or_else(|| unsupported(
                 "Go checkpoint requires migration: missing policy, cumulative turns/cost and exact continuation"))?;
             if saved.version != 1 {
                 return Err(unsupported("unknown runtime continuation schema").into());
             }
+            if engine.child_control.is_some() {
+                let previous = crate::subagent::SecurityBaseline {
+                    tools: saved.policy.tools.clone(),
+                    ..Default::default()
+                };
+                let current = crate::subagent::SecurityBaseline {
+                    tools: engine.policy.tools.clone(),
+                    ..Default::default()
+                };
+                if !previous.allows_resume_under(&current) {
+                    return Err(unsupported("child recovery cannot weaken the tool policy").into());
+                }
+                saved.policy.tools = engine.policy.tools.clone();
+            }
             let mut original_policy = saved.policy.clone();
             original_policy.max_turns = saved.base_turn_limit.unwrap_or(saved.policy.max_turns);
-            if (self.config.stop_gate.is_none()
-                && (saved.policy.max_turns != original_policy.max_turns
-                    || saved.stop_gate_blocks != 0))
+            if (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
+                || (self.config.stop_gate.is_none()
+                    && self.config.subagents.is_none()
+                    && saved.policy.max_turns != original_policy.max_turns)
                 || saved.policy.max_turns < original_policy.max_turns
                 || saved.stop_gate_blocks > self.config.stop_gate_max_blocks
                 || saved.fingerprint != state.fingerprint
@@ -473,6 +520,7 @@ impl Runner {
             engine.base_turn_limit = original_policy.max_turns;
             engine.stop_gate_blocks = saved.stop_gate_blocks;
             engine.turns = saved.turns;
+            engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
             engine.tool_final = saved.tool_final;
@@ -502,6 +550,11 @@ impl Runner {
                     owner.restore(&engine.context, children),
                 )
                 .await?;
+            }
+            if engine.child_control.is_some()
+                && let Some(session) = &self.config.subagents
+            {
+                session.commit_delivery(&saved.child_deliveries).await?;
             }
             if matches!(execution_boundary.as_str(), "approval_pending" | "paused")
                 && !engine.result.pending_approvals.is_empty()
@@ -585,6 +638,9 @@ impl Runner {
             "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
             "tool_error_limit": config.consecutive_tool_error_limit,
         });
+        if config.subagents.is_some() {
+            baseline["subagents"] = serde_json::json!({"version": 1});
+        }
         if let Some(gate) = &config.stop_gate {
             baseline["stop_gate"] = serde_json::json!({"key":gate.durable_key(), "max_blocks":config.stop_gate_max_blocks});
         }
@@ -608,6 +664,28 @@ impl Engine {
             let children = bounded(&self.context, None, owner.checkpoint(&self.context)).await?;
             reconcile_children(children.clone())?;
             state.child_checkpoint = Some(children);
+        }
+        let delivery_ids = self
+            .config
+            .subagents
+            .as_ref()
+            .map(|session| session.delivery_ids())
+            .unwrap_or_default();
+        if let Some(records) = state
+            .child_checkpoint
+            .as_mut()
+            .and_then(|children| children.get_mut("records"))
+            .and_then(Value::as_array_mut)
+        {
+            for record in records {
+                if record
+                    .pointer("/task/id")
+                    .and_then(Value::as_str)
+                    .is_some_and(|id| delivery_ids.iter().any(|pending| pending == id))
+                {
+                    record["result_delivered"] = Value::Bool(true);
+                }
+            }
         }
         let name = match boundary {
             Boundary::Started => "run_started",
@@ -780,6 +858,8 @@ impl Engine {
                 tool_turn_start: self.tool_turn_start,
                 consecutive_tool_errors: self.consecutive_tool_errors,
                 tool_error_escalated: self.tool_error_escalated,
+                applied_child_messages: self.applied_child_messages.clone(),
+                child_deliveries: delivery_ids.clone(),
                 approval_journal_present: !self.approval_journal.entries().is_empty(),
                 approval_journal: self.approval_journal.entries(),
             }),
@@ -791,6 +871,9 @@ impl Engine {
         )
         .await?;
         state.sequence = sequence;
+        if let Some(session) = &self.config.subagents {
+            session.commit_delivery(&delivery_ids).await?;
+        }
         Ok(())
     }
 }
@@ -1022,6 +1105,8 @@ impl Runner {
             tool_turn_start: None,
             consecutive_tool_errors: 0,
             tool_error_escalated: false,
+            applied_child_messages: HashSet::new(),
+            child_deliveries: Vec::new(),
             approval_journal_present: !approval_journal.is_empty(),
             approval_journal,
         });

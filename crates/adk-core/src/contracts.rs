@@ -123,6 +123,15 @@ pub trait Tool: Send + Sync {
     fn is_control_flow(&self) -> bool {
         false
     }
+    /// Session-bound child scheduling capability requiring a scoped scheduler.
+    fn is_delegation(&self) -> bool {
+        false
+    }
+    /// Rebind a session-bound tool to a host-provided child scope. Unknown scope
+    /// types must return None rather than retain the original session authority.
+    fn for_delegation(&self, _scope: &dyn std::any::Any) -> Option<Arc<dyn Tool>> {
+        None
+    }
     /// Optional tool default; explicit host policy takes precedence.
     fn timeout(&self) -> Option<Duration> {
         None

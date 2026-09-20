@@ -1,0 +1,1952 @@
+{
+  "cases": [
+    {
+      "expected": {
+        "model_calls": {
+          "worker": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ]
+        },
+        "scheduler": {
+          "single": {
+            "agent": "worker",
+            "depends_on": [],
+            "has_error": false,
+            "result": "evidence:worker",
+            "status": "completed"
+          }
+        },
+        "tools": {
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": null,
+              "nodes": [
+                {
+                  "agent": "worker",
+                  "id": "task:single",
+                  "status": "completed"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "single",
+                  "task_id": "task:single"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "single",
+                  "task_id": "task:single"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn": {
+            "content": {
+              "agent": "worker",
+              "duration": "<time>",
+              "result": "evidence:worker",
+              "status": "completed",
+              "task_id": "task:single"
+            },
+            "is_error": false
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 0,
+                "completed": 1,
+                "failed": 0,
+                "pending": 0,
+                "running": 0,
+                "total": 1,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:single"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "wait_again": {
+            "content": {
+              "note": "previously_delivered results were already returned earlier and are omitted here — re-read them any time with subagent_status detail=\"results\"",
+              "previously_delivered": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "status": "completed",
+                  "task_id": "task:single"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "any"
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [],
+        "name": "single_sync",
+        "steps": [
+          {
+            "args": {
+              "message": "single"
+            },
+            "name": "spawn",
+            "tool": "subagent"
+          },
+          {
+            "args": {
+              "task_ids": [
+                "$single"
+              ],
+              "wait_for": "any"
+            },
+            "name": "wait_again",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    },
+    {
+      "expected": {
+        "model_calls": {
+          "fast": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": []
+            }
+          ],
+          "slow": [
+            {
+              "dependency_evidence": true,
+              "parent_secret": false,
+              "tools": []
+            }
+          ],
+          "worker": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": []
+            }
+          ]
+        },
+        "scheduler": {
+          "dependent": {
+            "agent": "slow",
+            "depends_on": [
+              "task:isolated"
+            ],
+            "has_error": false,
+            "result": "evidence:slow",
+            "status": "completed"
+          },
+          "isolated": {
+            "agent": "fast",
+            "depends_on": [
+              "task:root"
+            ],
+            "has_error": false,
+            "result": "evidence:fast",
+            "status": "completed"
+          },
+          "root": {
+            "agent": "worker",
+            "depends_on": [],
+            "has_error": false,
+            "result": "evidence:worker",
+            "status": "completed"
+          }
+        },
+        "tools": {
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": [
+                {
+                  "from": "task:root",
+                  "to": "task:isolated"
+                },
+                {
+                  "from": "task:isolated",
+                  "to": "task:dependent"
+                }
+              ],
+              "nodes": [
+                {
+                  "agent": "worker",
+                  "id": "task:root",
+                  "status": "completed"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:root"
+                  ],
+                  "id": "task:isolated",
+                  "status": "completed"
+                },
+                {
+                  "agent": "slow",
+                  "depends_on": [
+                    "task:isolated"
+                  ],
+                  "id": "task:dependent",
+                  "status": "completed"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "root",
+                  "task_id": "task:root"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "isolated",
+                  "task_id": "task:isolated"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task": "dependent",
+                  "task_id": "task:dependent"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "root",
+                  "task_id": "task:root"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "isolated",
+                  "task_id": "task:isolated"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task": "dependent",
+                  "task_id": "task:dependent"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task_id": "task:root"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task_id": "task:isolated"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task_id": "task:dependent"
+                }
+              ],
+              "task_ids_by_key": {
+                "a": "task:root",
+                "b": "task:isolated",
+                "c": "task:dependent"
+              },
+              "tasks": [
+                {
+                  "agent": "worker",
+                  "key": "a",
+                  "task_id": "task:root"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:root"
+                  ],
+                  "key": "b",
+                  "task_id": "task:isolated"
+                },
+                {
+                  "agent": "slow",
+                  "depends_on": [
+                    "task:isolated"
+                  ],
+                  "key": "c",
+                  "task_id": "task:dependent"
+                }
+              ],
+              "wait_complete": true
+            },
+            "is_error": false
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 0,
+                "completed": 3,
+                "failed": 0,
+                "pending": 0,
+                "running": 0,
+                "total": 3,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:root"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:root"
+                  ],
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:isolated"
+                },
+                {
+                  "agent": "slow",
+                  "depends_on": [
+                    "task:isolated"
+                  ],
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:dependent"
+                }
+              ]
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [],
+        "name": "dag_sync_isolation",
+        "steps": [
+          {
+            "args": {
+              "tasks": [
+                {
+                  "key": "a",
+                  "message": "root"
+                },
+                {
+                  "agent_name": "fast",
+                  "depends_on": [
+                    "a"
+                  ],
+                  "include_dependency_results": false,
+                  "key": "b",
+                  "message": "isolated",
+                  "tool_access": "full"
+                },
+                {
+                  "agent_name": "slow",
+                  "depends_on": [
+                    "b"
+                  ],
+                  "key": "c",
+                  "message": "dependent"
+                }
+              ],
+              "tool_access": "read-only"
+            },
+            "name": "spawn",
+            "tool": "subagent"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    },
+    {
+      "expected": {
+        "model_calls": {
+          "fail": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ],
+          "fast": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ]
+        },
+        "scheduler": {
+          "blocked": {
+            "agent": "worker",
+            "depends_on": [
+              "task:failure"
+            ],
+            "has_error": true,
+            "result": "",
+            "status": "failed"
+          },
+          "failure": {
+            "agent": "fail",
+            "depends_on": [],
+            "has_error": true,
+            "result": "",
+            "status": "failed"
+          },
+          "survivor": {
+            "agent": "fast",
+            "depends_on": [
+              "task:failure"
+            ],
+            "has_error": false,
+            "result": "evidence:fast",
+            "status": "completed"
+          }
+        },
+        "tools": {
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": [
+                {
+                  "from": "task:failure",
+                  "to": "task:blocked"
+                },
+                {
+                  "from": "task:failure",
+                  "to": "task:survivor"
+                }
+              ],
+              "nodes": [
+                {
+                  "agent": "fail",
+                  "id": "task:failure",
+                  "status": "failed"
+                },
+                {
+                  "agent": "worker",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "id": "task:blocked",
+                  "status": "failed"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "id": "task:survivor",
+                  "status": "completed"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "fail",
+                  "duration": "<time>",
+                  "error": "agent \"fail\" failed: model call failed on turn 0: controlled failure",
+                  "status": "failed",
+                  "task": "failure",
+                  "task_id": "task:failure"
+                },
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "error": "agent \"worker\" failed before start: dependency task(s) did not complete successfully: task:failure (failed)",
+                  "status": "failed",
+                  "task": "blocked",
+                  "task_id": "task:blocked"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "survivor",
+                  "task_id": "task:survivor"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "fail",
+                  "duration": "<time>",
+                  "error": "agent \"fail\" failed: model call failed on turn 0: controlled failure",
+                  "status": "failed",
+                  "task": "failure",
+                  "task_id": "task:failure"
+                },
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "error": "agent \"worker\" failed before start: dependency task(s) did not complete successfully: task:failure (failed)",
+                  "status": "failed",
+                  "task": "blocked",
+                  "task_id": "task:blocked"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "survivor",
+                  "task_id": "task:survivor"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn": {
+            "content": {
+              "results": [
+                {
+                  "agent": "fail",
+                  "duration": "<time>",
+                  "error": "agent \"fail\" failed: model call failed on turn 0: controlled failure",
+                  "status": "failed",
+                  "task_id": "task:failure"
+                },
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "error": "agent \"worker\" failed before start: dependency task(s) did not complete successfully: task:failure (failed)",
+                  "status": "failed",
+                  "task_id": "task:blocked"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task_id": "task:survivor"
+                }
+              ],
+              "task_ids_by_key": {
+                "a": "task:failure",
+                "b": "task:blocked",
+                "c": "task:survivor"
+              },
+              "tasks": [
+                {
+                  "agent": "fail",
+                  "key": "a",
+                  "task_id": "task:failure"
+                },
+                {
+                  "agent": "worker",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "key": "b",
+                  "task_id": "task:blocked"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "key": "c",
+                  "task_id": "task:survivor"
+                }
+              ],
+              "wait_complete": true
+            },
+            "is_error": true
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 0,
+                "completed": 1,
+                "failed": 2,
+                "pending": 0,
+                "running": 0,
+                "total": 3,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "fail",
+                  "duration": "<time>",
+                  "error": "agent \"fail\" failed: model call failed on turn 0: controlled failure",
+                  "status": "failed",
+                  "task_id": "task:failure"
+                },
+                {
+                  "agent": "worker",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "duration": "<time>",
+                  "error": "agent \"worker\" failed before start: dependency task(s) did not complete successfully: task:failure (failed)",
+                  "status": "failed",
+                  "task_id": "task:blocked"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:failure"
+                  ],
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:survivor"
+                }
+              ]
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [],
+        "name": "dependency_failure",
+        "steps": [
+          {
+            "args": {
+              "tasks": [
+                {
+                  "agent_name": "fail",
+                  "key": "a",
+                  "message": "failure"
+                },
+                {
+                  "depends_on": [
+                    "a"
+                  ],
+                  "key": "b",
+                  "message": "blocked"
+                },
+                {
+                  "agent_name": "fast",
+                  "dependency_policy": "all_terminal",
+                  "depends_on": [
+                    "a"
+                  ],
+                  "key": "c",
+                  "message": "survivor"
+                }
+              ]
+            },
+            "name": "spawn",
+            "tool": "subagent"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    },
+    {
+      "expected": {
+        "model_calls": {
+          "fast": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ],
+          "slow": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ]
+        },
+        "scheduler": {
+          "long": {
+            "agent": "slow",
+            "depends_on": [],
+            "has_error": false,
+            "result": "evidence:slow",
+            "status": "completed"
+          },
+          "quick": {
+            "agent": "fast",
+            "depends_on": [],
+            "has_error": false,
+            "result": "evidence:fast",
+            "status": "completed"
+          }
+        },
+        "tools": {
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": null,
+              "nodes": [
+                {
+                  "agent": "fast",
+                  "id": "task:quick",
+                  "status": "completed"
+                },
+                {
+                  "agent": "slow",
+                  "id": "task:long",
+                  "status": "completed"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "quick",
+                  "task_id": "task:quick"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task": "long",
+                  "task_id": "task:long"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "quick",
+                  "task_id": "task:quick"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task": "long",
+                  "task_id": "task:long"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn_fast": {
+            "content": {
+              "agent": "fast",
+              "status": "pending",
+              "task_id": "task:quick"
+            },
+            "is_error": false
+          },
+          "spawn_slow": {
+            "content": {
+              "agent": "slow",
+              "status": "pending",
+              "task_id": "task:long"
+            },
+            "is_error": false
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 0,
+                "completed": 2,
+                "failed": 0,
+                "pending": 0,
+                "running": 0,
+                "total": 2,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:quick"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:long"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "wait_again": {
+            "content": {
+              "note": "previously_delivered results were already returned earlier and are omitted here — re-read them any time with subagent_status detail=\"results\"",
+              "previously_delivered": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "status": "completed",
+                  "task_id": "task:quick"
+                },
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "status": "completed",
+                  "task_id": "task:long"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "any"
+            },
+            "is_error": false
+          },
+          "wait_all": {
+            "content": {
+              "finished": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "result": "evidence:slow",
+                  "status": "completed",
+                  "task_id": "task:long"
+                }
+              ],
+              "note": "previously_delivered results were already returned earlier and are omitted here — re-read them any time with subagent_status detail=\"results\"",
+              "previously_delivered": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "status": "completed",
+                  "task_id": "task:quick"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "wait_any": {
+            "content": {
+              "finished": [
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task_id": "task:quick"
+                }
+              ],
+              "still_active": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "status": "running",
+                  "task_id": "task:long"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "any"
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [
+          "fast",
+          "slow"
+        ],
+        "name": "background_wait_any",
+        "steps": [
+          {
+            "args": {
+              "agent_name": "fast",
+              "message": "quick",
+              "mode": "background"
+            },
+            "name": "spawn_fast",
+            "tool": "subagent"
+          },
+          {
+            "args": null,
+            "name": "fast_started",
+            "started": "fast"
+          },
+          {
+            "args": {
+              "agent_name": "slow",
+              "message": "long",
+              "mode": "background"
+            },
+            "name": "spawn_slow",
+            "tool": "subagent"
+          },
+          {
+            "args": null,
+            "name": "slow_started",
+            "started": "slow"
+          },
+          {
+            "args": null,
+            "name": "release_fast",
+            "release": "fast"
+          },
+          {
+            "args": null,
+            "name": "settle_fast",
+            "settle": [
+              "quick"
+            ]
+          },
+          {
+            "args": {
+              "task_ids": [
+                "$quick",
+                "$long"
+              ],
+              "wait_for": "any"
+            },
+            "name": "wait_any",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": null,
+            "name": "release_slow",
+            "release": "slow"
+          },
+          {
+            "args": null,
+            "name": "settle_slow",
+            "settle": [
+              "long"
+            ]
+          },
+          {
+            "args": {
+              "task_ids": [
+                "$quick",
+                "$long"
+              ]
+            },
+            "name": "wait_all",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": {
+              "task_ids": [
+                "$quick",
+                "$long"
+              ],
+              "wait_for": "any"
+            },
+            "name": "wait_again",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    },
+    {
+      "expected": {
+        "model_calls": {
+          "slow": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ]
+        },
+        "scheduler": {
+          "cancelled": {
+            "agent": "slow",
+            "depends_on": [],
+            "has_error": true,
+            "result": "",
+            "status": "cancelled"
+          }
+        },
+        "tools": {
+          "cancel": {
+            "content": {
+              "status": "cancellation_requested",
+              "task_id": "task:cancelled"
+            },
+            "is_error": false
+          },
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": null,
+              "nodes": [
+                {
+                  "agent": "slow",
+                  "id": "task:cancelled",
+                  "status": "cancelled"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "error": "cancellation requested",
+                  "status": "cancelled",
+                  "task": "cancelled",
+                  "task_id": "task:cancelled"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "error": "cancellation requested",
+                  "status": "cancelled",
+                  "task": "cancelled",
+                  "task_id": "task:cancelled"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn": {
+            "content": {
+              "agent": "slow",
+              "status": "pending",
+              "task_id": "task:cancelled"
+            },
+            "is_error": false
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 1,
+                "completed": 0,
+                "failed": 0,
+                "pending": 0,
+                "running": 0,
+                "total": 1,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "error": "cancellation requested",
+                  "status": "cancelled",
+                  "task_id": "task:cancelled"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "wait": {
+            "content": {
+              "finished": [
+                {
+                  "agent": "slow",
+                  "duration": "<time>",
+                  "error": "cancellation requested",
+                  "status": "cancelled",
+                  "task_id": "task:cancelled"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [
+          "slow"
+        ],
+        "name": "cancel",
+        "steps": [
+          {
+            "args": {
+              "agent_name": "slow",
+              "message": "cancelled",
+              "mode": "background"
+            },
+            "name": "spawn",
+            "tool": "subagent"
+          },
+          {
+            "args": null,
+            "name": "started",
+            "started": "slow"
+          },
+          {
+            "args": {
+              "action": "cancel",
+              "task_id": "$cancelled"
+            },
+            "name": "cancel",
+            "tool": "subagent_control"
+          },
+          {
+            "args": null,
+            "name": "settle",
+            "settle": [
+              "cancelled"
+            ]
+          },
+          {
+            "args": {
+              "task_ids": [
+                "$cancelled"
+              ]
+            },
+            "name": "wait",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    },
+    {
+      "expected": {
+        "model_calls": {
+          "fast": [
+            {
+              "dependency_evidence": true,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ],
+          "worker": [
+            {
+              "dependency_evidence": false,
+              "parent_secret": false,
+              "tools": [
+                "mutate"
+              ]
+            }
+          ]
+        },
+        "scheduler": {
+          "first": {
+            "agent": "worker",
+            "depends_on": [],
+            "has_error": false,
+            "result": "evidence:worker",
+            "status": "completed"
+          },
+          "second": {
+            "agent": "fast",
+            "depends_on": [
+              "task:first"
+            ],
+            "has_error": false,
+            "result": "evidence:fast",
+            "status": "completed"
+          }
+        },
+        "tools": {
+          "empty_wait": {
+            "content": {
+              "note": "no active sub-agent tasks and no undelivered results",
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          },
+          "graph": {
+            "content": {
+              "edges": [
+                {
+                  "from": "task:first",
+                  "to": "task:second"
+                }
+              ],
+              "nodes": [
+                {
+                  "agent": "worker",
+                  "id": "task:first",
+                  "status": "completed"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:first"
+                  ],
+                  "id": "task:second",
+                  "status": "completed"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "reread": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "first",
+                  "task_id": "task:first"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "second",
+                  "task_id": "task:second"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "results": {
+            "content": {
+              "results": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task": "first",
+                  "task_id": "task:first"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task": "second",
+                  "task_id": "task:second"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "spawn": {
+            "content": {
+              "task_ids_by_key": {
+                "a": "task:first",
+                "b": "task:second"
+              },
+              "tasks": [
+                {
+                  "agent": "worker",
+                  "key": "a",
+                  "task_id": "task:first"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:first"
+                  ],
+                  "key": "b",
+                  "task_id": "task:second"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "summary": {
+            "content": {
+              "summary": {
+                "active": 0,
+                "cancelled": 0,
+                "completed": 2,
+                "failed": 0,
+                "pending": 0,
+                "running": 0,
+                "total": 2,
+                "waiting": 0
+              },
+              "tasks": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:first"
+                },
+                {
+                  "agent": "fast",
+                  "depends_on": [
+                    "task:first"
+                  ],
+                  "duration": "<time>",
+                  "result_available": true,
+                  "status": "completed",
+                  "task_id": "task:second"
+                }
+              ]
+            },
+            "is_error": false
+          },
+          "wait": {
+            "content": {
+              "finished": [
+                {
+                  "agent": "worker",
+                  "duration": "<time>",
+                  "result": "evidence:worker",
+                  "status": "completed",
+                  "task_id": "task:first"
+                },
+                {
+                  "agent": "fast",
+                  "duration": "<time>",
+                  "result": "evidence:fast",
+                  "status": "completed",
+                  "task_id": "task:second"
+                }
+              ],
+              "wait_complete": true,
+              "wait_for": "all"
+            },
+            "is_error": false
+          }
+        }
+      },
+      "input": {
+        "gates": [
+          "worker",
+          "fast"
+        ],
+        "name": "dag_background",
+        "steps": [
+          {
+            "args": {
+              "mode": "background",
+              "tasks": [
+                {
+                  "key": "a",
+                  "message": "first"
+                },
+                {
+                  "agent_name": "fast",
+                  "depends_on": [
+                    "a"
+                  ],
+                  "key": "b",
+                  "message": "second"
+                }
+              ]
+            },
+            "name": "spawn",
+            "tool": "subagent"
+          },
+          {
+            "args": null,
+            "name": "started",
+            "started": "worker"
+          },
+          {
+            "args": null,
+            "name": "release_root",
+            "release": "worker"
+          },
+          {
+            "args": null,
+            "name": "settle_root",
+            "settle": [
+              "first"
+            ]
+          },
+          {
+            "args": null,
+            "name": "child_started",
+            "started": "fast"
+          },
+          {
+            "args": null,
+            "name": "release_child",
+            "release": "fast"
+          },
+          {
+            "args": null,
+            "name": "settle_child",
+            "settle": [
+              "second"
+            ]
+          },
+          {
+            "args": {},
+            "name": "wait",
+            "tool": "subagent_wait"
+          },
+          {
+            "args": {},
+            "name": "summary",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "graph"
+            },
+            "name": "graph",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "results",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {
+              "detail": "results"
+            },
+            "name": "reread",
+            "tool": "subagent_status"
+          },
+          {
+            "args": {},
+            "name": "empty_wait",
+            "tool": "subagent_wait"
+          }
+        ]
+      }
+    }
+  ],
+  "provenance": {
+    "command": [
+      "go",
+      "run",
+      "-mod=readonly",
+      "../../crates/adk-runtime/tests/fixtures/subagents.go"
+    ],
+    "cwd": "repos/sdk",
+    "environment": {
+      "CGO_ENABLED": "0",
+      "GOMAXPROCS": "2",
+      "GOTELEMETRY": "off",
+      "GOTOOLCHAIN": "local",
+      "GRATEFUL_LIVE_TESTS": "skip"
+    },
+    "exporter_sha256": "6decb91342e32a29ba7c289b750d97a275f2d223a66ee533a7fcb97c48d6039f",
+    "generator": "crates/adk-runtime/tests/fixtures/subagents.go",
+    "generator_sha256": "2139eafdac29bd33d20c9b9416aa6f1da41d1ed7713124e0d1dc59e2d1be8ab0",
+    "go_version": "go version go1.26.2 linux/amd64",
+    "normalization": "Only generated task IDs (including references inside strings) and existing duration/started_at/timestamp/duration_ms values are replaced. No response fields are removed.",
+    "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "sdk_version": "v0.0.115",
+    "sources": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/subagent_registry.go": "5268a1220de5744f41a6bd30bcd46f03150e96dd716e75e0f1e4aa76c29fd712",
+      "internal/agent/subagent_run.go": "5652b1433ed2c7900dff53a6c94f784cd1a17b4d2eda4d73b8447531273ec81b",
+      "pkg/agentsdk/scheduler.go": "82f71f4774a3af71a675374b78242ead7711b3fdfe10e3c27d970f16f0e9fa7c",
+      "pkg/agentsdk/subagent_tools.go": "67bd233b459cf4884c3a10eaf95103efea1c856ce680617b19dd457c1260e022"
+    }
+  },
+  "schemas": {
+    "subagent": {
+      "description": "Delegate work to specialist sub-agents. Send one task (message) or a dependency DAG of tasks (tasks). mode=sync returns final results in this call; mode=background returns task ids immediately and results are delivered automatically as each task finishes.",
+      "input_schema": {
+        "properties": {
+          "agent_name": {
+            "description": "Specialist agent to run. With 'tasks', this is the default agent for every task that does not set its own agent_name. Defaults to the configured default agent.",
+            "type": "string"
+          },
+          "dependency_policy": {
+            "description": "all_success (default) starts only if every dependency completed; all_terminal starts once dependencies are terminal even if some failed.",
+            "enum": [
+              "all_success",
+              "all_terminal"
+            ],
+            "type": "string"
+          },
+          "depends_on": {
+            "description": "Existing task ids that must finish before this single task starts. For a new multi-task DAG use tasks with logical keys instead.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "include_dependency_results": {
+            "description": "Append completed dependency outputs to the task message before it starts. Defaults to true.",
+            "type": "boolean"
+          },
+          "message": {
+            "description": "Task packet for a single sub-agent: exact task, goal, relevant repo context, constraints/acceptance criteria, prior findings, expected output. By default this is the only context it receives; set share_parent_context to also inherit completed parent history. Exactly one of message or tasks must be set.",
+            "type": "string"
+          },
+          "mode": {
+            "description": "sync (default) blocks until the task(s) finish and returns results. background returns task ids immediately so you can keep working; results are injected automatically when each task finishes.",
+            "enum": [
+              "sync",
+              "background"
+            ],
+            "type": "string"
+          },
+          "share_parent_context": {
+            "description": "Start the child with a copy of the parent's completed conversation history, followed by its task message. Defaults to false. This increases token usage and may expose unrelated or sensitive context to the child.",
+            "type": "boolean"
+          },
+          "tasks": {
+            "description": "DAG of tasks to spawn in one call. Exactly one of message or tasks must be set. Each depends_on entry may reference another task's key or an existing task id.",
+            "items": {
+              "properties": {
+                "agent_name": {
+                  "description": "Specialist agent. Defaults to the call-level agent_name, then the configured default agent.",
+                  "type": "string"
+                },
+                "dependency_policy": {
+                  "description": "Defaults to all_success.",
+                  "enum": [
+                    "all_success",
+                    "all_terminal"
+                  ],
+                  "type": "string"
+                },
+                "depends_on": {
+                  "description": "Keys in this batch or existing task ids that must finish first.",
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "include_dependency_results": {
+                  "description": "Defaults to true.",
+                  "type": "boolean"
+                },
+                "key": {
+                  "description": "Logical key other tasks reference in depends_on.",
+                  "type": "string"
+                },
+                "message": {
+                  "description": "Self-contained task packet for this sub-agent.",
+                  "type": "string"
+                },
+                "share_parent_context": {
+                  "description": "Override the call-level context-sharing setting for this task.",
+                  "type": "boolean"
+                },
+                "tool_access": {
+                  "description": "Optional tool access override. Cannot widen the call-level tool_access; the narrower value wins.",
+                  "enum": [
+                    "full",
+                    "read-only"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "message"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "timeout_ms": {
+            "description": "sync mode only: maximum wait before returning current state. Omit or 0 to wait until done or the run is cancelled.",
+            "type": "integer"
+          },
+          "tool_access": {
+            "description": "Optional tool access override. Use read-only for explore/analysis tasks. With 'tasks', this applies to every task in the batch, and a task cannot widen it: the narrower of the call-level and task-level value wins.",
+            "enum": [
+              "full",
+              "read-only"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "subagent_control": {
+      "description": "Steer or stop a running sub-agent task. action=message interrupts an uncommitted model attempt so the child applies the update immediately, or queues it for the next safe boundary after output has begun; action=cancel stops the task.",
+      "input_schema": {
+        "properties": {
+          "action": {
+            "description": "message: queue a steering update for the task. cancel: stop the task.",
+            "enum": [
+              "message",
+              "cancel"
+            ],
+            "type": "string"
+          },
+          "message": {
+            "description": "Required for action=message: short, specific steering update. Interrupts an in-flight model attempt only before it emits output. Do not resend the whole original task.",
+            "type": "string"
+          },
+          "task_id": {
+            "description": "Task id to control.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action",
+          "task_id"
+        ],
+        "type": "object"
+      },
+      "read_only": false,
+      "requires_approval": false
+    },
+    "subagent_status": {
+      "description": "Inspect sub-agent tasks. detail=summary (default) returns per-task status and counts; detail=activity adds files read/written and recent tool calls; detail=results returns the full result/error text of finished tasks — use it to re-read results you no longer have (e.g. after context compaction); detail=graph returns the dependency DAG as nodes and edges.",
+      "input_schema": {
+        "properties": {
+          "detail": {
+            "description": "summary (default): status snapshot. activity: per-task tool/file activity — use for evidence before steering. results: full result/error text of finished tasks, re-readable at any time (survives context compaction). graph: dependency DAG.",
+            "enum": [
+              "summary",
+              "activity",
+              "results",
+              "graph"
+            ],
+            "type": "string"
+          },
+          "task_ids": {
+            "description": "Task ids to inspect. Omit for all tasks.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "read_only": true,
+      "requires_approval": false
+    },
+    "subagent_wait": {
+      "description": "Block until sub-agent tasks finish, then return their results. Use this instead of polling subagent_status or sleeping in Bash: it wakes the moment tasks finish, so it never overshoots. wait_for=all (default) waits for every watched task; wait_for=any returns as soon as one finishes with a new result. Omit task_ids to wait on all active tasks. timeout_ms caps the wait (timing out is a normal outcome, not an error).",
+      "input_schema": {
+        "properties": {
+          "task_ids": {
+            "description": "Task ids to wait on. Omit to wait on every task whose result you have not received yet (active or just-finished).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "timeout_ms": {
+            "description": "Maximum wait before returning the current state. Omit or 0 to wait until the condition is met or the run is cancelled.",
+            "type": "integer"
+          },
+          "wait_for": {
+            "description": "all (default): return when every watched task is terminal. any: return as soon as one watched task finishes with a result not yet delivered to you.",
+            "enum": [
+              "all",
+              "any"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "read_only": false,
+      "requires_approval": false
+    }
+  }
+}

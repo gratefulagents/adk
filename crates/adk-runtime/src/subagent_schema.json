@@ -1,0 +1,185 @@
+{
+  "subagent": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string",
+        "description": "Task packet for a single sub-agent: exact task, goal, relevant repo context, constraints/acceptance criteria, prior findings, expected output. By default this is the only context it receives; set share_parent_context to also inherit completed parent history. Exactly one of message or tasks must be set."
+      },
+      "agent_name": {
+        "type": "string",
+        "description": "Specialist agent to run. With 'tasks', this is the default agent for every task that does not set its own agent_name. Defaults to the configured default agent."
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "sync",
+          "background"
+        ],
+        "description": "sync (default) blocks until the task(s) finish and returns results. background returns task ids immediately so you can keep working; results are injected automatically when each task finishes."
+      },
+      "tool_access": {
+        "type": "string",
+        "enum": [
+          "full",
+          "read-only"
+        ],
+        "description": "Optional tool access override. Use read-only for explore/analysis tasks. With 'tasks', this applies to every task in the batch, and a task cannot widen it: the narrower of the call-level and task-level value wins."
+      },
+      "depends_on": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Existing task ids that must finish before this single task starts. For a new multi-task DAG use tasks with logical keys instead."
+      },
+      "dependency_policy": {
+        "type": "string",
+        "enum": [
+          "all_success",
+          "all_terminal"
+        ],
+        "description": "all_success (default) starts only if every dependency completed; all_terminal starts once dependencies are terminal even if some failed."
+      },
+      "include_dependency_results": {
+        "type": "boolean",
+        "description": "Append completed dependency outputs to the task message before it starts. Defaults to true."
+      },
+      "share_parent_context": {
+        "type": "boolean",
+        "description": "Start the child with a copy of the parent's completed conversation history, followed by its task message. Defaults to false. This increases token usage and may expose unrelated or sensitive context to the child."
+      },
+      "timeout_ms": {
+        "type": "integer",
+        "description": "sync mode only: maximum wait before returning current state. Omit or 0 to wait until done or the run is cancelled."
+      },
+      "tasks": {
+        "type": "array",
+        "description": "DAG of tasks to spawn in one call. Exactly one of message or tasks must be set. Each depends_on entry may reference another task's key or an existing task id.",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "description": "Logical key other tasks reference in depends_on."
+            },
+            "agent_name": {
+              "type": "string",
+              "description": "Specialist agent. Defaults to the call-level agent_name, then the configured default agent."
+            },
+            "message": {
+              "type": "string",
+              "description": "Self-contained task packet for this sub-agent."
+            },
+            "tool_access": {
+              "type": "string",
+              "enum": [
+                "full",
+                "read-only"
+              ],
+              "description": "Optional tool access override. Cannot widen the call-level tool_access; the narrower value wins."
+            },
+            "depends_on": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Keys in this batch or existing task ids that must finish first."
+            },
+            "dependency_policy": {
+              "type": "string",
+              "enum": [
+                "all_success",
+                "all_terminal"
+              ],
+              "description": "Defaults to all_success."
+            },
+            "include_dependency_results": {
+              "type": "boolean",
+              "description": "Defaults to true."
+            },
+            "share_parent_context": {
+              "type": "boolean",
+              "description": "Override the call-level context-sharing setting for this task."
+            }
+          },
+          "required": [
+            "key",
+            "message"
+          ]
+        }
+      }
+    }
+  },
+  "subagent_status": {
+    "type": "object",
+    "properties": {
+      "task_ids": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Task ids to inspect. Omit for all tasks."
+      },
+      "detail": {
+        "type": "string",
+        "enum": [
+          "summary",
+          "activity",
+          "results",
+          "graph"
+        ],
+        "description": "summary (default): status snapshot. activity: per-task tool/file activity — use for evidence before steering. results: full result/error text of finished tasks, re-readable at any time (survives context compaction). graph: dependency DAG."
+      }
+    }
+  },
+  "subagent_wait": {
+    "type": "object",
+    "properties": {
+      "task_ids": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Task ids to wait on. Omit to wait on every task whose result you have not received yet (active or just-finished)."
+      },
+      "wait_for": {
+        "type": "string",
+        "enum": [
+          "all",
+          "any"
+        ],
+        "description": "all (default): return when every watched task is terminal. any: return as soon as one watched task finishes with a result not yet delivered to you."
+      },
+      "timeout_ms": {
+        "type": "integer",
+        "description": "Maximum wait before returning the current state. Omit or 0 to wait until the condition is met or the run is cancelled."
+      }
+    }
+  },
+  "subagent_control": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string",
+        "enum": [
+          "message",
+          "cancel"
+        ],
+        "description": "message: queue a steering update for the task. cancel: stop the task."
+      },
+      "task_id": {
+        "type": "string",
+        "description": "Task id to control."
+      },
+      "message": {
+        "type": "string",
+        "description": "Required for action=message: short, specific steering update. Interrupts an in-flight model attempt only before it emits output. Do not resend the whole original task."
+      }
+    },
+    "required": [
+      "action",
+      "task_id"
+    ]
+  }
+}

@@ -90,8 +90,10 @@ Rust now follows that ownership boundary through `ChildCheckpointOwner`:
   restored registry; it must never overwrite live work blindly.
 - Subsequent parent boundaries include the owner's current snapshot. The owner,
   not the parent runner, performs explicit durable child-worker/operator
-  reconciliation. This is the #4 integration interface, not a new scheduler or
-  an automatic retry mechanism.
+  reconciliation. The [managed scheduler](subagents.md) implements this interface;
+  it permits explicit resumption with never-dispatched evidence or a supported
+  safe native continuation, and treats uncertain dispatched work as operator
+  reconciliation, not an automatic retry.
 
 The lower-level `StoredCheckpointStore` continues to reject a separate stored
 cancellation/child-run ledger needing reconciliation; attaching a scheduler does

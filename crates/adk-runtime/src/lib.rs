@@ -9,7 +9,12 @@ pub mod compaction;
 pub mod compat;
 pub mod output;
 pub mod runner;
+pub mod subagent;
+pub mod subagent_tools;
 pub use runner::*;
+pub use subagent_tools::{
+    AgentAsTool, RunnerChildExecutor, SubagentSession, build_subagent_task_tools,
+};
 
 use std::future::Future;
 

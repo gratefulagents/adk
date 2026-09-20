@@ -306,6 +306,235 @@ async fn sync_timeout_keeps_child_alive_across_runs_and_status_can_reread() {
     owner.shutdown().await.unwrap();
 }
 
+#[tokio::test(start_paused = true)]
+async fn tool_policy_timeout_preserves_managed_pending_results() {
+    for name in ["subagent", "subagent_wait", "specialist"] {
+        let child = FakeModel::new(
+            vec![answer("late policy evidence")],
+            Duration::from_millis(50),
+        );
+        let (owner, session) = session(child).await;
+        let arguments = if name == "subagent_wait" {
+            owner
+                .handle()
+                .submit(Submission::new("worker", "investigate"))
+                .await
+                .unwrap();
+            json!({})
+        } else {
+            json!({"message":"investigate"})
+        };
+        let model = FakeModel::new(vec![call(name, arguments)], Duration::ZERO);
+        let mut agent = AgentConfig::new("parent", ModelBinding::complete("fake", model));
+        agent.tools = build_subagent_task_tools(session.clone(), "worker");
+        agent.tools.push(Arc::new(AgentAsTool::new(
+            "specialist",
+            "specialist",
+            "worker",
+            session.clone(),
+        )));
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                subagents: Some(session.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut req = request();
+        req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        req.policy.tools.timeout = Some(Duration::from_millis(1));
+        let result = runner
+            .run(context(), req, Arc::new(TestHost))
+            .await
+            .unwrap();
+        let output = result
+            .result
+            .history
+            .iter()
+            .find_map(|item| match item {
+                RunItem::ToolResult { output, .. } => Some(output),
+                _ => None,
+            })
+            .expect("pending tool result");
+        assert!(!output.is_error, "{name}: {output:?}");
+        let Content::Text { text } = &output.content[0] else {
+            panic!("expected JSON text")
+        };
+        let text = text
+            .strip_prefix("BEGIN UNTRUSTED TOOL OUTPUT\n")
+            .unwrap()
+            .strip_suffix("\nEND UNTRUSTED TOOL OUTPUT")
+            .unwrap();
+        let pending: Value = serde_json::from_str(text).unwrap();
+        assert_eq!(pending["timed_out"], true, "{name}: {pending}");
+        assert_eq!(pending["wait_complete"], false);
+        let task_id = if name == "subagent_wait" {
+            assert_eq!(pending["wait_for"], "all");
+            pending["still_active"][0]["task_id"].as_str().unwrap()
+        } else {
+            assert_eq!(pending["agent"], "worker");
+            pending["task_id"].as_str().unwrap()
+        };
+        assert!(
+            !owner
+                .handle()
+                .status(task_id, Detail::Full)
+                .unwrap()
+                .status
+                .is_terminal()
+        );
+        owner
+            .handle()
+            .wait(&[task_id.to_owned()], WaitMode::All, None)
+            .await
+            .unwrap();
+        let next = FakeModel::new(vec![answer("collected")], Duration::ZERO);
+        parent(next.clone(), session)
+            .run(context(), request(), Arc::new(TestHost))
+            .await
+            .unwrap();
+        assert!(
+            history_text(&next.requests.lock().unwrap()[0].input).contains("late policy evidence")
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test(start_paused = true)]
+async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
+    for max_concurrency in [1, 2] {
+        for name in ["subagent", "subagent_wait", "specialist"] {
+            let (foreign_owner, foreign_session) =
+                session(FakeModel::new(vec![], Duration::ZERO)).await;
+            let mut responses = Vec::new();
+            if name == "subagent_wait" {
+                responses.push(call(
+                    "subagent",
+                    json!({"message":"nested work", "mode":"background"}),
+                ));
+            }
+            responses.extend([
+                call(name, json!({"message":"nested work"})),
+                answer("delegated"),
+                answer("nested synthesis"),
+            ]);
+            let model = FakeModel::new(responses, Duration::ZERO);
+            let mut agent =
+                AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+            agent.tools = build_subagent_task_tools(foreign_session.clone(), "leaf");
+            agent.tools.push(Arc::new(AgentAsTool::new(
+                "specialist",
+                "specialist",
+                "leaf",
+                foreign_session.clone(),
+            )));
+            let child = Runner::new(
+                agent,
+                RunnerConfig {
+                    subagents: Some(foreign_session),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let leaf = runner(
+                "leaf",
+                FakeModel::new(
+                    vec![answer("late nested evidence")],
+                    Duration::from_millis(50),
+                ),
+            );
+            let owner = Scheduler::new(
+                context(),
+                SchedulerConfig {
+                    max_concurrency,
+                    agents: [
+                        ("worker".into(), SecurityBaseline::default()),
+                        ("leaf".into(), SecurityBaseline::default()),
+                    ]
+                    .into_iter()
+                    .collect(),
+                    ..Default::default()
+                },
+                Arc::new(RunnerChildExecutor::new(
+                    [("worker".into(), child), ("leaf".into(), leaf)]
+                        .into_iter()
+                        .collect(),
+                    Arc::new(TestHost),
+                )),
+                None,
+            )
+            .unwrap();
+            let handle = owner.handle();
+            let root_model = FakeModel::new(
+                vec![call(
+                    "subagent",
+                    json!({"message":"delegate", "mode":"background"}),
+                )],
+                Duration::ZERO,
+            );
+            let mut req = request();
+            req.policy.tools.timeout = Some(Duration::from_millis(1));
+            req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+            parent(root_model, Arc::new(SubagentSession::new(handle.clone())))
+                .run(context(), req, Arc::new(TestHost))
+                .await
+                .unwrap();
+            let worker_id = handle
+                .list()
+                .into_iter()
+                .find(|task| task.agent_name == "worker")
+                .unwrap()
+                .id;
+            tokio::time::timeout(
+                Duration::from_secs(1),
+                handle.wait(&[worker_id], WaitMode::All, None),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            let tasks = handle.list();
+            assert_eq!(tasks.len(), 2, "{name}, slots={max_concurrency}");
+            assert!(
+                tasks
+                    .iter()
+                    .all(|task| task.status == TaskStatus::Completed),
+                "{name}, slots={max_concurrency}: {tasks:?}"
+            );
+            {
+                let requests = model.requests.lock().unwrap();
+                let after_wait = &requests[if name == "subagent_wait" { 2 } else { 1 }];
+                let output = after_wait
+                    .input
+                    .iter()
+                    .find_map(|item| match item {
+                        RunItem::ToolResult {
+                            call_id, output, ..
+                        } if call_id == &format!("call-{name}") => Some(output),
+                        _ => None,
+                    })
+                    .expect("nested wait result");
+                assert!(!output.is_error, "{name}: {output:?}");
+                let text = serde_json::to_string(output).unwrap();
+                if max_concurrency == 2 {
+                    assert!(text.contains("\\\"timed_out\\\":true"), "{name}: {text}");
+                    assert!(
+                        text.contains("\\\"wait_complete\\\":false"),
+                        "{name}: {text}"
+                    );
+                    assert!(!text.contains("late nested evidence"), "{name}: {text}");
+                }
+                assert!(
+                    history_text(&requests.last().unwrap().input).contains("late nested evidence")
+                );
+            }
+            assert!(foreign_owner.handle().list().is_empty());
+            owner.shutdown().await.unwrap();
+            foreign_owner.shutdown().await.unwrap();
+        }
+    }
+}
+
 #[tokio::test]
 async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired() {
     let child = FakeModel::new(vec![answer("first"), answer("second")], Duration::ZERO);

@@ -1,0 +1,559 @@
+{
+  "schema_version": 1,
+  "source_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "source_tag": "v0.0.115",
+  "source_go_mod_sha256": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+  "source_go_sum_sha256": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+  "go_version": "go version go1.26.2 linux/amd64",
+  "command": [
+    "go",
+    "test",
+    "-count=1",
+    "-json",
+    "./internal/agent",
+    "./pkg/agentsdk",
+    "./pkg/agentsdk/runtime",
+    "-run",
+    "SubAgent|Subagent|Durable.*Child|Child.*Durable|SessionState|FailedSpawn|RestoredActiveChild|ChildRunnerCheckpoint|RestoreRequeues|ResumeRestored|CheckpointHook|ReconcileRestored|DurableResumePreserves"
+  ],
+  "working_directory": "repos/sdk",
+  "exit_code": 0,
+  "raw_log": "go-upstream-tests.jsonl.gz",
+  "uncompressed_log_sha256": "c50ec3725686b1da54f51014c9fdb9493637924cac7f980e257fb89a0fffee75",
+  "packages": [
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "outcome": "pass"
+    }
+  ],
+  "cases": [
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestAgentToolUsesNestedSubAgentMaxTurns",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestAsyncSubagentInheritsParentModelRetryAndTimeout",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestBuildSubAgentBudgetContext",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestCheckpointHookCanReenterSchedulerCheckpoint",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestChildRunnerCheckpointIsPersistedWithSecurityBaseline",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestDurableResumePreservesPriorUsage",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestEventStreamSubagentCompletionIncludesCacheUsage",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestEventStreamSubscribeReceivesChildSubagentEvents",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestFailedSpawnDoesNotExposeProvisionalSnapshot",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestProgressTracker_RecordSubagentLifecycle",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestReconcileRestoredTaskPersistsTerminalDecision",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestReconcileRestoredTaskRollsBackWhenCheckpointFails",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRestoreRequeuesInFlightSteeringBeforeQueued",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRestoredActiveChildRequiresExplicitReconciliation",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredCompletedChildDoesNotDispatch",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnreconciledOrWeakerSecurity",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnreconciledOrWeakerSecurity/approval_pending",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnreconciledOrWeakerSecurity/unknown_boundary",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnreconciledOrWeakerSecurity/unreconciled_model",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnreconciledOrWeakerSecurity/weaker_policy",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskRejectsUnsupportedSchemaWithSentinel",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestResumeRestoredTaskWithoutRunnerCheckpointRelaunchesSameID",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunConfigEffectiveSubAgentMaxTurns",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunStreamedEmitsSubAgentStreamEvents",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunSubAgentOnceFailureKeepsPartialUsage",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunSubAgentOnceForcesStableTaskPromptCacheKey",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunSubAgentOnceModelFailureSurfacesPartialProgress",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunnerAutoJoinsSubAgentResultsBeforeFinal",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunnerEmitsSpawnedSubagentLifecycleForAgentTool",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunnerExtendsFinalTurnForSubAgentJoinItems",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestRunnerWaitsForSubAgentJoinAfterTurnBudget",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_BriefStatus",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_ConcurrentAccess",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_CurrentTool",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_RecentToolsRingBuffer",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_RecordToolEnd_TracksReads",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_RecordToolEnd_TracksWrites",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_SnapshotIncludeRecent",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/Bash_git_add_.",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/Bash_git_commit_-m_fix",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/Bash_git_diff_HEAD",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/Edit_file.go",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/LSP_hover",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentActivity_StepInference/Write_file.go",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryAsyncSpawnInheritsCurrentTurnReadOnlyClamp",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryBroadcastWakesAllWaiters",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryCancelMarksTaskCancelledImmediately",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryConcurrentConfigureAndSpawn",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryConfigurePreservesTrackedTasks",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryPassesCompactionConfigToAsyncRuns",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryPassesMaxTurnsToAsyncRuns",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryRestoreSchedulerCheckpointRejectsNonFreshAndDuplicateIDs",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistrySchedulerCheckpointRestore",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistrySendMessageInterruptsInFlightModelAttempt",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistrySendMessageQueuesParentMessage",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistrySetStatusDoesNotReopenCancelledTask",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistrySpawnUsesShortTaskIDs",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryTaskInheritsToolInputGuardrails",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistryWaitsForDependenciesAndInjectsResults",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistry_H4_AllowsDowngradeOverride",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentRegistry_H4_ClampsChildAccessToParentReadOnly",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentSpawnFailsClosedWhenCheckpointFails",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubAgentTaskPanicFailsTaskInsteadOfCrashing",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubagentCompletedWithoutStartFallsBack",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestSubagentSpanPairing",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenAutoWiresCheckpointCallback",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenFailsClosedForActiveRecordsWithoutScheduler",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenIgnoresTerminalRecordsWithoutScheduler",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenKeepsHostProvidedCallback",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenPropagatesRestoreError",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenRestoresIntoEmptyScheduler",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/internal/agent",
+      "test": "TestWireDurableChildrenSkipsRestoreWhenHostAlreadyRestored",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestApprovedSubagentSharesParentContext",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentControlMessageAndCancel",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentResultsDeliveredIncrementallyAtTurnBoundary",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentStatusDetailsActivityAndGraph",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentStatusResultsListsActiveTasks",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentStatusResultsRefetchesDeliveredResults",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBackgroundModeManagedJoinProviderReturnsResultOnce",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBackgroundModeManagedJoinProviderWaitsInSDKUntilResult",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBatchInheritsCallLevelAgentName",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBatchRejectsCyclesAndUnknownDeps",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBatchSyncWaitsForWholeGraph",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBatchTimeoutMarksCompletedResultsDelivered",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolBatchWaitDeadlineLeavesTasksRunning",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolPreservesPendingResultThroughRunnerToolPolicyTimeout",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolRequiresExactlyOneOfMessageOrTasks",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolShareParentContext",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolShareParentContext/isolated_by_default",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolShareParentContext/opt_in",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentToolSyncWaitDeadlineLeavesTaskRunning",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentWaitBlocksUntilTaskFinishesAndDeliversResult",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentWaitForAnyDeliversEachResultOnce",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentWaitNoTasksInvalidInputAndUndelivered",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk",
+      "test": "TestSubagentWaitTimeoutReturnsSnapshotNotError",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime",
+      "test": "TestBuilderOwnedSessionStateIsRegisteredAsCloser",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime",
+      "test": "TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "outcome": "pass"
+    },
+    {
+      "package": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime",
+      "test": "TestSessionStateCloseCancelsActiveSubAgentTasks",
+      "outcome": "pass"
+    }
+  ],
+  "counts": {
+    "pass": 103,
+    "fail": 0,
+    "skip": 0
+  }
+}

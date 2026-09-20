@@ -58,7 +58,7 @@ impl SubagentSession {
     }
 }
 
-#[derive(Default, Deserialize, JsonSchema)]
+#[derive(Default, Deserialize)]
 struct SpawnInput {
     #[serde(default)]
     message: String,
@@ -81,7 +81,7 @@ struct SpawnInput {
     tasks: Vec<BatchInput>,
 }
 
-#[derive(Deserialize, JsonSchema)]
+#[derive(Deserialize)]
 struct BatchInput {
     key: String,
     message: String,
@@ -97,7 +97,7 @@ struct BatchInput {
     share_parent_context: Option<bool>,
 }
 
-#[derive(Default, Deserialize, JsonSchema)]
+#[derive(Default, Deserialize)]
 struct StatusInput {
     #[serde(default)]
     task_ids: Vec<String>,
@@ -105,7 +105,7 @@ struct StatusInput {
     detail: String,
 }
 
-#[derive(Default, Deserialize, JsonSchema)]
+#[derive(Default, Deserialize)]
 struct WaitInput {
     #[serde(default)]
     task_ids: Vec<String>,
@@ -115,7 +115,7 @@ struct WaitInput {
     timeout_ms: u64,
 }
 
-#[derive(Deserialize, JsonSchema)]
+#[derive(Deserialize)]
 struct ControlInput {
     action: String,
     task_id: String,
@@ -139,6 +139,105 @@ fn output(value: impl Serialize, is_error: bool) -> ToolOutput {
         is_error,
         should_pause: false,
     }
+}
+
+fn go_duration(duration: Duration) -> String {
+    let nanos = duration.as_nanos();
+    if nanos == 0 {
+        return "0s".into();
+    }
+    let (unit, scale, precision) = if nanos < 1_000 {
+        ("ns", 1, 0)
+    } else if nanos < 1_000_000 {
+        ("µs", 1_000, 3)
+    } else if nanos < 1_000_000_000 {
+        ("ms", 1_000_000, 6)
+    } else {
+        ("s", 1_000_000_000, 9)
+    };
+    let fraction = nanos % scale;
+    let fraction = if fraction == 0 {
+        String::new()
+    } else {
+        format!(".{fraction:0precision$}")
+            .trim_end_matches('0')
+            .to_owned()
+    };
+    if unit == "s" && duration.as_secs() >= 60 {
+        let seconds = duration.as_secs();
+        let hours = if seconds >= 3600 {
+            format!("{}h", seconds / 3600)
+        } else {
+            String::new()
+        };
+        format!("{hours}{}m{}{fraction}s", seconds / 60 % 60, seconds % 60)
+    } else {
+        format!("{}{fraction}{unit}", nanos / scale)
+    }
+}
+
+fn joined_task(task: &TaskSnapshot) -> Value {
+    let mut value = json!({"task_id":task.id,"agent":task.agent_name,"status":task.status});
+    if let Some(duration) = task.duration.or_else(|| {
+        if task.status.is_terminal() {
+            return None;
+        }
+        task.elapsed().map(|elapsed| {
+            Duration::from_millis(
+                ((elapsed.as_nanos() + 500_000) / 1_000_000).min(u64::MAX as u128) as u64,
+            )
+        })
+    }) {
+        value["duration"] = json!(go_duration(duration));
+    }
+    if !task.result.is_empty() {
+        value["result"] = json!(task.result);
+    }
+    if let Some(error) = task.error.as_ref().filter(|error| !error.is_empty()) {
+        value["error"] = json!(error);
+    }
+    value
+}
+
+fn progress_task(task: &TaskSnapshot) -> Value {
+    let mut value = joined_task(task);
+    value.as_object_mut().unwrap().remove("result");
+    if !task.depends_on.is_empty() {
+        value["depends_on"] = json!(task.depends_on);
+    }
+    if !task.waiting_on.is_empty() {
+        value["waiting_on"] = json!(task.waiting_on);
+    }
+    if task.messages_received != 0 {
+        value["messages_received"] = json!(task.messages_received);
+    }
+    if !task.last_parent_message.is_empty() {
+        value["last_parent_message"] = json!(task.last_parent_message);
+    }
+    if task.status.is_terminal() && !task.result.is_empty() {
+        value["result_available"] = json!(true);
+    }
+    if let Some(activity) = &task.activity {
+        if !activity.current_step.is_empty() {
+            value["current_step"] = json!(activity.current_step);
+        }
+        if !activity.last_tool.is_empty() {
+            value["last_tool"] = json!(activity.last_tool);
+        }
+        if !activity.files_written.is_empty() {
+            value["files_written"] = json!(activity.files_written.len());
+        }
+    }
+    value
+}
+
+fn unique_task_ids(ids: &[String]) -> Vec<String> {
+    let mut seen = HashSet::new();
+    ids.iter()
+        .map(|id| id.trim())
+        .filter(|id| !id.is_empty() && seen.insert(*id))
+        .map(str::to_owned)
+        .collect()
 }
 
 fn narrowed(mut policy: ToolPolicy, access: &str) -> Result<ToolPolicy, Error> {
@@ -178,18 +277,35 @@ pub fn build_subagent_task_tools(
     default_agent: impl Into<String>,
 ) -> Vec<Arc<dyn Tool>> {
     let default_agent = default_agent.into();
+    let schemas: HashMap<String, schemars::Schema> =
+        serde_json::from_str(include_str!("subagent_schema.json"))
+            .expect("pinned subagent schemas");
     [
-        (ToolKind::Spawn, "subagent", "Delegate a task or keyed DAG; sync waits, background returns task IDs. Results are delivered automatically.", schemars::schema_for!(SpawnInput)),
-        (ToolKind::Status, "subagent_status", "Inspect child summary, activity, results, or dependency graph without consuming results.", schemars::schema_for!(StatusInput)),
-        (ToolKind::Wait, "subagent_wait", "Wait for any or all children; timeout leaves children running.", schemars::schema_for!(WaitInput)),
-        (ToolKind::Control, "subagent_control", "Steer a child with action=message, or cancel it with action=cancel.", schemars::schema_for!(ControlInput)),
+        (ToolKind::Spawn, "subagent", "Delegate a task or keyed DAG; sync waits, background returns task IDs. Results are delivered automatically.", schemas["subagent"].clone()),
+        (ToolKind::Status, "subagent_status", "Inspect child summary, activity, results, or dependency graph; results can be re-read at any time.", schemas["subagent_status"].clone()),
+        (ToolKind::Wait, "subagent_wait", "Wait for any or all children; timeout leaves children running.", schemas["subagent_wait"].clone()),
+        (ToolKind::Control, "subagent_control", "Steer a child with action=message, or cancel it with action=cancel.", schemas["subagent_control"].clone()),
     ].into_iter().map(|(kind, name, description, input_schema)| Arc::new(SubagentTool {
-        definition: ToolDefinition { name: name.into(), description: description.into(), input_schema, read_only: true, requires_approval: false },
+        definition: ToolDefinition { name: name.into(), description: description.into(), input_schema, read_only: matches!(kind, ToolKind::Status), requires_approval: false },
         kind, session: session.clone(), default_agent: default_agent.clone(),
     }) as Arc<dyn Tool>).collect()
 }
 
 impl Tool for SubagentTool {
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        let mut definition = self.definition.clone();
+        definition.read_only =
+            access == AccessMode::ReadOnly || matches!(self.kind, ToolKind::Status);
+        Some(Arc::new(Self {
+            definition,
+            kind: self.kind,
+            session: self.session.clone(),
+            default_agent: self.default_agent.clone(),
+        }))
+    }
+    fn preserve_result_on_timeout(&self) -> bool {
+        matches!(self.kind, ToolKind::Spawn | ToolKind::Wait)
+    }
     fn definition(&self) -> &ToolDefinition {
         &self.definition
     }
@@ -215,10 +331,15 @@ impl Tool for SubagentTool {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
+            let mut policy = context.policy.clone();
+            if self.definition.read_only && !matches!(self.kind, ToolKind::Status) {
+                policy.access = AccessMode::ReadOnly;
+                policy.allowed_mutating_tools.clear();
+            }
             let owned_context = ToolContext {
                 operation: context.operation.clone(),
                 work_dir: context.work_dir.clone(),
-                policy: context.policy.clone(),
+                policy,
                 idempotency_key: Some(
                     context
                         .idempotency_key
@@ -251,7 +372,13 @@ impl Tool for SubagentTool {
             };
             match result {
                 Err(error) if error.info.category == ErrorCategory::InvalidInput => {
-                    Ok(output(json!({"error": error.info.message}), true))
+                    Ok(ToolOutput {
+                        content: vec![Content::Text {
+                            text: error.info.message,
+                        }],
+                        is_error: true,
+                        should_pause: false,
+                    })
                 }
                 result => result,
             }
@@ -283,7 +410,7 @@ impl AgentAsTool {
                 name: name.into(),
                 description: description.into(),
                 input_schema: schemars::schema_for!(AgentInput),
-                read_only: true,
+                read_only: false,
                 requires_approval: false,
             },
             agent: agent.into(),
@@ -292,6 +419,18 @@ impl AgentAsTool {
     }
 }
 impl Tool for AgentAsTool {
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        let mut definition = self.definition.clone();
+        definition.read_only = access == AccessMode::ReadOnly;
+        Some(Arc::new(Self {
+            definition,
+            agent: self.agent.clone(),
+            session: self.session.clone(),
+        }))
+    }
+    fn preserve_result_on_timeout(&self) -> bool {
+        true
+    }
     fn definition(&self) -> &ToolDefinition {
         &self.definition
     }
@@ -316,10 +455,15 @@ impl Tool for AgentAsTool {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
+            let mut policy = context.policy.clone();
+            if self.definition.read_only {
+                policy.access = AccessMode::ReadOnly;
+                policy.allowed_mutating_tools.clear();
+            }
             let owned_context = ToolContext {
                 operation: context.operation.clone(),
                 work_dir: context.work_dir.clone(),
-                policy: context.policy.clone(),
+                policy,
                 idempotency_key: Some(
                     context
                         .idempotency_key
@@ -467,9 +611,9 @@ impl SubagentSession {
         input: SpawnInput,
         default_agent: &str,
     ) -> Result<ToolOutput, Error> {
-        let background = match input.mode.as_str() {
+        let background = match input.mode.trim().to_ascii_lowercase().as_str() {
             "" | "sync" => false,
-            "background" => true,
+            "background" | "async" => true,
             _ => return Err(invalid("mode must be sync or background")),
         };
         let single = !input.message.trim().is_empty();
@@ -483,6 +627,7 @@ impl SubagentSession {
             &input.agent_name
         };
         let mut submissions = Vec::new();
+        let mut summaries = Vec::new();
         let tasks = if single {
             vec![BatchInput {
                 key: String::new(),
@@ -545,114 +690,255 @@ impl SubagentSession {
                 .unwrap_or(input.share_parent_context)
                 .then(|| self.parent.lock().unwrap().clone());
             submission.policy.tools = narrowed(policy.clone(), &task.tool_access)?;
+            if !single {
+                let mut summary =
+                    json!({"key":task.key,"task_id":submission.id,"agent":submission.agent_name});
+                if !submission.depends_on.is_empty() {
+                    summary["depends_on"] = json!(submission.depends_on);
+                }
+                summaries.push(summary);
+            }
             submissions.push(submission);
         }
         let ids = self.scheduler.submit_dag(submissions).await?;
         if background {
             return Ok(output(
-                json!({"task_id": single.then(|| ids[0].clone()), "task_ids": ids, "task_ids_by_key": keys, "status":"pending", "agent": agent}),
+                if single {
+                    json!({"task_id":ids[0],"status":"pending","agent":agent})
+                } else {
+                    json!({"tasks":summaries,"task_ids_by_key":keys})
+                },
                 false,
             ));
         }
-        self.wait(
-            context,
-            WaitInput {
-                task_ids: ids,
-                timeout_ms: input.timeout_ms,
-                ..Default::default()
-            },
-        )
-        .await
+        let (tasks, timed_out) = self
+            .await_tasks(context, &ids, WaitMode::All, input.timeout_ms)
+            .await?;
+        let terminal_ids = tasks
+            .iter()
+            .filter(|task| task.status.is_terminal())
+            .map(|task| task.id.clone())
+            .collect::<Vec<_>>();
+        self.stage_results(&terminal_ids);
+        let failed = tasks
+            .iter()
+            .any(|task| matches!(task.status, TaskStatus::Failed | TaskStatus::Cancelled));
+        let mut response = if single {
+            joined_task(&tasks[0])
+        } else {
+            json!({"tasks":summaries,"task_ids_by_key":keys,"results":tasks.iter().map(joined_task).collect::<Vec<_>>(),"wait_complete":!timed_out})
+        };
+        if timed_out {
+            response["wait_complete"] = json!(false);
+            response["timed_out"] = json!(true);
+            response["note"] = json!(if single {
+                "wait deadline reached; the managed task is still active and its result will be delivered when ready"
+            } else {
+                "wait deadline reached; active managed tasks continue in the background and their results will be delivered when ready"
+            });
+        }
+        Ok(output(response, failed))
     }
     async fn status(&self, input: StatusInput) -> Result<ToolOutput, Error> {
-        let detail = match input.detail.as_str() {
-            "" | "summary" | "graph" => Detail::Summary,
-            "activity" => Detail::Activity,
-            "results" => Detail::Result,
-            _ => {
-                return Err(invalid(
-                    "detail must be summary, activity, results, or graph",
-                ));
-            }
-        };
-        let ids = if input.task_ids.is_empty() {
-            self.scheduler.list().into_iter().map(|t| t.id).collect()
-        } else {
-            input.task_ids
-        };
+        let detail = input.detail.trim().to_ascii_lowercase();
+        if !matches!(
+            detail.as_str(),
+            "" | "summary" | "activity" | "results" | "graph"
+        ) {
+            return Err(invalid(
+                "detail must be summary, activity, results, or graph",
+            ));
+        }
+        let mut ids = unique_task_ids(&input.task_ids);
+        if detail == "graph"
+            || input.task_ids.is_empty()
+            || (ids.is_empty() && matches!(detail.as_str(), "results" | "activity"))
+        {
+            ids = self.scheduler.list().into_iter().map(|t| t.id).collect();
+        }
         let tasks = ids
             .iter()
-            .map(|id| self.scheduler.status(id, detail))
+            .map(|id| self.scheduler.status(id, Detail::Full))
             .collect::<Result<Vec<_>, _>>()?;
-        if input.detail == "graph" {
-            let edges: Vec<_> = tasks
-                .iter()
-                .flat_map(|task| {
-                    task.depends_on
-                        .iter()
-                        .map(|dep| json!({"from":dep,"to":task.id}))
-                })
-                .collect();
-            Ok(output(json!({"nodes":tasks,"edges":edges}), false))
-        } else {
-            Ok(output(json!({"tasks":tasks}), false))
-        }
+        let response = match detail.as_str() {
+            "graph" => {
+                let nodes: Vec<_> = tasks.iter().map(|task| {
+                    let mut node = json!({"id":task.id,"agent":task.agent_name,"status":task.status});
+                    if !task.depends_on.is_empty() { node["depends_on"] = json!(task.depends_on); }
+                    if !task.waiting_on.is_empty() { node["waiting_on"] = json!(task.waiting_on); }
+                    if task.messages_received != 0 { node["messages_received"] = json!(task.messages_received); }
+                    node
+                }).collect();
+                let edges: Vec<_> = tasks.iter().flat_map(|task| task.depends_on.iter().map(|dep| json!({"from":dep,"to":task.id}))).collect();
+                json!({"nodes":nodes,"edges":if edges.is_empty() { Value::Null } else { json!(edges) }})
+            }
+            "results" => {
+                let mut results = Vec::new();
+                let mut active = Vec::new();
+                let mut terminal_ids = Vec::new();
+                for task in &tasks {
+                    if !task.status.is_terminal() {
+                        active.push(task.id.clone());
+                        continue;
+                    }
+                    terminal_ids.push(task.id.clone());
+                    let mut entry = joined_task(task);
+                    let message = task.message.trim().replace('\n', " ");
+                    if !message.is_empty() {
+                        entry["task"] = json!(if message.chars().count() > 300 {
+                            format!("{}...", message.chars().take(297).collect::<String>())
+                        } else { message });
+                    }
+                    results.push(entry);
+                }
+                self.stage_results(&terminal_ids);
+                let mut response = json!({"results":results});
+                if !active.is_empty() {
+                    response["still_active"] = json!(active);
+                    response["note"] = json!("tasks in still_active have no result yet — use subagent_wait to wait for them");
+                }
+                response
+            }
+            "activity" => json!(tasks.iter().map(|task| {
+                let activity = task.activity.as_ref().map(|activity| {
+                    let mut value = json!({"files_read":activity.files_read,"files_written":activity.files_written});
+                    if !activity.current_step.is_empty() { value["current_step"] = json!(activity.current_step); }
+                    if !activity.current_tool.is_empty() { value["current_tool"] = json!(activity.current_tool); }
+                    if !activity.current_tool_input.is_empty() { value["current_tool_input"] = json!(activity.current_tool_input); }
+                    if !activity.recent_activity.is_empty() {
+                        value["recent_activity"] = json!(activity.recent_activity.iter().map(|entry| {
+                            let mut value = json!({"timestamp":entry.timestamp,"tool":entry.tool,"summary":entry.summary});
+                            if entry.is_error { value["is_error"] = json!(true); }
+                            if entry.duration_ms != 0 { value["duration_ms"] = json!(entry.duration_ms); }
+                            value
+                        }).collect::<Vec<_>>());
+                    }
+                    value
+                });
+                json!({"task_id":task.id,"agent":task.agent_name,"status":task.status,"duration":go_duration(task.duration.unwrap_or_default()),"activity":activity})
+            }).collect::<Vec<_>>()),
+            _ => {
+                let mut summary = json!({"total":tasks.len(),"active":0,"pending":0,"waiting":0,"running":0,"completed":0,"failed":0,"cancelled":0});
+                for task in &tasks {
+                    if !task.status.is_terminal() {
+                        summary["active"] = json!(summary["active"].as_u64().unwrap() + 1);
+                    }
+                    let status = serde_json::to_value(task.status).unwrap();
+                    if let Some(count) = summary.get_mut(status.as_str().unwrap()) {
+                        *count = json!(count.as_u64().unwrap() + 1);
+                    }
+                }
+                json!({"summary":summary,"tasks":tasks.iter().map(progress_task).collect::<Vec<_>>()})
+            }
+        };
+        Ok(output(response, false))
     }
-    async fn wait(&self, context: &ToolContext, input: WaitInput) -> Result<ToolOutput, Error> {
-        let mode = match input.wait_for.as_str() {
-            "" | "all" => WaitMode::All,
-            "any" => WaitMode::Any,
-            _ => return Err(invalid("wait_for must be all or any")),
+    async fn await_tasks(
+        &self,
+        context: &ToolContext,
+        ids: &[String],
+        mode: WaitMode,
+        timeout_ms: u64,
+    ) -> Result<(Vec<TaskSnapshot>, bool), Error> {
+        let deadline_timeout = context.operation.deadline.map(|deadline| {
+            tokio::time::Instant::from_std(deadline)
+                .saturating_duration_since(tokio::time::Instant::now())
+        });
+        let wait_timeout = timeout(timeout_ms)
+            .into_iter()
+            .chain(deadline_timeout)
+            .min();
+        // The scheduler must reacquire the child's execution slot before returning
+        // a local timeout; dropping its wait instead cancels the child subtree.
+        let result = tokio::select! {
+            biased;
+            _ = context.operation.cancellation.cancelled() => {
+                return Err(Error::new(ErrorCategory::Cancelled, "operation cancelled"));
+            }
+            result = self.scheduler.wait(ids, mode, wait_timeout) => result,
         };
-        let ids = if input.task_ids.is_empty() {
-            self.pending_ids()
-        } else {
-            input.task_ids
-        };
-        if ids.is_empty() {
-            return Ok(output(json!({"wait_complete":true,"finished":[]}), false));
-        }
-        let result = crate::runner::bounded(
-            &context.operation,
-            None,
-            self.scheduler.wait(&ids, mode, timeout(input.timeout_ms)),
-        )
-        .await;
         let timed_out = match result {
             Ok(_) => false,
             Err(error) if error.info.category == ErrorCategory::DeadlineExceeded => true,
             Err(error) => return Err(error),
         };
-        let finished = self.stage_results(&ids);
         let tasks = ids
             .iter()
             .map(|id| self.scheduler.status(id, Detail::Full))
             .collect::<Result<Vec<_>, _>>()?;
+        let timed_out = timed_out && tasks.iter().any(|task| !task.status.is_terminal());
+        Ok((tasks, timed_out))
+    }
+    async fn wait(&self, context: &ToolContext, input: WaitInput) -> Result<ToolOutput, Error> {
+        let (mode, wait_for) = match input.wait_for.trim().to_ascii_lowercase().as_str() {
+            "" | "all" => (WaitMode::All, "all"),
+            "any" => (WaitMode::Any, "any"),
+            _ => return Err(invalid("wait_for must be all or any")),
+        };
+        let mut ids = unique_task_ids(&input.task_ids);
+        if ids.is_empty() {
+            ids = self.pending_ids();
+        }
+        if ids.is_empty() {
+            return Ok(output(
+                json!({"wait_complete":true,"wait_for":wait_for,"note":"no active sub-agent tasks and no undelivered results"}),
+                false,
+            ));
+        }
+        let (tasks, timed_out) = self
+            .await_tasks(context, &ids, mode, input.timeout_ms)
+            .await?;
+        let terminal_ids = tasks
+            .iter()
+            .filter(|task| task.status.is_terminal())
+            .map(|task| task.id.clone())
+            .collect::<Vec<_>>();
+        let staged = self.stage_results(&terminal_ids);
+        let mut finished = Vec::new();
         let mut previous = Vec::new();
         let mut active = Vec::new();
-        for mut task in tasks {
+        for task in &tasks {
             if !task.status.is_terminal() {
-                active.push(task);
-            } else if !finished.iter().any(|t| t.id == task.id) {
-                task.result.clear();
-                previous.push(task);
+                active.push(progress_task(task));
+            } else if staged.iter().any(|t| t.id == task.id) {
+                finished.push(joined_task(task));
+            } else {
+                let mut entry = joined_task(task);
+                entry.as_object_mut().unwrap().remove("result");
+                previous.push(entry);
             }
         }
-        let failed = finished
-            .iter()
-            .any(|task| matches!(task.status, TaskStatus::Failed | TaskStatus::Cancelled));
-        Ok(output(
-            json!({"wait_complete":!timed_out,"timed_out":timed_out,"finished":finished,"still_active":active,"previously_delivered":previous}),
-            failed,
-        ))
+        let mut response = json!({"wait_complete":!timed_out,"wait_for":wait_for});
+        let mut notes = Vec::new();
+        if !finished.is_empty() {
+            response["finished"] = json!(finished);
+        }
+        if !previous.is_empty() {
+            response["previously_delivered"] = json!(previous);
+            notes.push("previously_delivered results were already returned earlier and are omitted here — re-read them any time with subagent_status detail=\"results\"".to_owned());
+        }
+        if !active.is_empty() {
+            response["still_active"] = json!(active);
+        }
+        if timed_out {
+            response["timed_out"] = json!(true);
+            notes.push(format!("timed out after {}ms; {} task(s) still active — call subagent_wait again to keep waiting", input.timeout_ms, active.len()));
+        }
+        if !notes.is_empty() {
+            response["note"] = json!(notes.join(". "));
+        }
+        Ok(output(response, false))
     }
     async fn control(
         &self,
         context: &ToolContext,
         input: ControlInput,
     ) -> Result<ToolOutput, Error> {
-        match input.action.as_str() {
+        match input.action.trim().to_ascii_lowercase().as_str() {
             "message" => {
+                if input.message.trim().is_empty() {
+                    return Err(invalid("message is required for action=message"));
+                }
                 let key = context
                     .idempotency_key
                     .clone()

@@ -71,7 +71,10 @@ async fn invoke(tools: &[Arc<dyn Tool>], name: &str, id: &str, arguments: Value)
     let Content::Text { text } = &output.content[0] else {
         panic!("expected JSON text")
     };
-    (serde_json::from_str(text).unwrap(), output.is_error)
+    (
+        serde_json::from_str(text).unwrap_or_else(|_| json!(text)),
+        output.is_error,
+    )
 }
 
 #[tokio::test]
@@ -84,6 +87,15 @@ async fn dag_keys_are_local_to_each_call_and_graph_retains_resolved_edges() {
     ]});
     let (first, failed) = invoke(&tools, "subagent", "batch-1", input.clone()).await;
     assert!(!failed, "{first}");
+    assert_eq!(first.as_object().unwrap().len(), 2);
+    assert_eq!(
+        first["tasks"][0],
+        json!({"key":"a","task_id":first["task_ids_by_key"]["a"],"agent":"worker"})
+    );
+    assert_eq!(
+        first["tasks"][1]["depends_on"],
+        json!([first["task_ids_by_key"]["a"]])
+    );
     let (second, failed) = invoke(&tools, "subagent", "batch-2", input).await;
     assert!(!failed, "{second}");
     assert_ne!(
@@ -113,7 +125,7 @@ async fn dag_keys_are_local_to_each_call_and_graph_retains_resolved_edges() {
     )
     .await;
     assert!(
-        results["tasks"]
+        results["results"]
             .as_array()
             .unwrap()
             .iter()
@@ -164,6 +176,12 @@ async fn batch_access_cannot_override_call_read_only_and_dependency_forwarding_c
         ]
     })).await;
     assert!(!failed, "{value}");
+    assert_eq!(value["wait_complete"], true);
+    assert!(value.get("timed_out").is_none());
+    assert_eq!(value["results"].as_array().unwrap().len(), 2);
+    assert_eq!(value["tasks"].as_array().unwrap().len(), 2);
+    assert_eq!(value["results"][0]["agent"], "worker");
+    assert!(value["results"][0].get("agent_name").is_none());
     {
         let invocations = executor.0.lock().unwrap();
         assert_eq!(invocations.len(), 2);
@@ -191,8 +209,24 @@ async fn batch_access_cannot_override_call_read_only_and_dependency_forwarding_c
 #[tokio::test(start_paused = true)]
 async fn explicit_wait_any_returns_when_every_result_was_already_delivered() {
     let (owner, tools) = session(Arc::new(Echo::default()));
-    let (_, failed) = invoke(&tools, "subagent", "sync", json!({"message":"done"})).await;
+    let (joined, failed) = invoke(&tools, "subagent", "sync", json!({"message":"done"})).await;
     assert!(!failed);
+    assert_eq!(joined["status"], "completed");
+    assert_eq!(joined["agent"], "worker");
+    assert!(joined["task_id"].is_string());
+    assert!(joined["result"].is_string());
+    assert!(joined["duration"].is_string());
+    assert_eq!(joined.as_object().unwrap().len(), 5);
+    let (summary, failed) = invoke(&tools, "subagent_status", "summary", json!({})).await;
+    assert!(!failed);
+    assert_eq!(
+        summary["summary"],
+        json!({"total":1,"active":0,"pending":0,"waiting":0,"running":0,"completed":1,"failed":0,"cancelled":0})
+    );
+    assert_eq!(
+        summary["tasks"],
+        json!([{"task_id":joined["task_id"],"agent":"worker","status":"completed","result_available":true,"duration":joined["duration"]}])
+    );
     let ids: Vec<_> = owner
         .handle()
         .list()
@@ -211,7 +245,7 @@ async fn explicit_wait_any_returns_when_every_result_was_already_delivered() {
     .await
     .expect("all-terminal explicit wait-any must not hang");
     assert!(!failed, "{value}");
-    assert_eq!(value["finished"].as_array().unwrap().len(), 0);
+    assert!(value.get("finished").is_none());
     assert_eq!(value["previously_delivered"].as_array().unwrap().len(), 1);
     owner.shutdown().await.unwrap();
 }

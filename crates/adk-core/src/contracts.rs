@@ -136,6 +136,13 @@ pub trait Tool: Send + Sync {
     fn timeout(&self) -> Option<Duration> {
         None
     }
+    /// Trusted lifecycle tools may handle their local deadline themselves and
+    /// return a structured snapshot instead of losing it to the outer timeout.
+    /// The supplied operation still carries the local deadline; implementations
+    /// must bound their waits with it. Parent cancellation/deadline remain enforced.
+    fn preserve_result_on_timeout(&self) -> bool {
+        false
+    }
     fn execute<'a>(
         &'a self,
         context: &'a ToolContext,

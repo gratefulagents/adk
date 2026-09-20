@@ -1393,9 +1393,8 @@ impl Engine {
                 .await?,
             );
         }
-        let tools = self
-            .agent
-            .tools
+        let accessible_tools = self.tools_for_access();
+        let tools = accessible_tools
             .iter()
             .map(|t| t.definition())
             .chain(self.agent.handoffs.iter().map(|h| &h.definition))
@@ -1607,8 +1606,7 @@ impl Engine {
         }
         if let Some(gate) = &self.config.stop_gate {
             let has_tools =
-                self.agent
-                    .tools
+                self.tools_for_access()
                     .iter()
                     .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
                     || self.agent.handoffs.iter().any(|handoff| {
@@ -1842,7 +1840,7 @@ impl Engine {
                             || error.info.category == ErrorCategory::Cancelled
                             || (error.info.category == ErrorCategory::DeadlineExceeded && !idle)
                         {
-                            return Err(error);
+                            return Err(self.child_model_failure(error));
                         }
                         if self.durable_state.is_some() {
                             self.checkpoint(Boundary::ModelCompleted, None).await?;
@@ -1896,7 +1894,9 @@ impl Engine {
                         if let Some(handler) = &self.config.error_handler {
                             match handler.handle(&self.agent.name, self.turns - 1, &error) {
                                 ModelErrorAction::Retry | ModelErrorAction::Continue => continue,
-                                ModelErrorAction::Abort => return Err(error),
+                                ModelErrorAction::Abort => {
+                                    return Err(self.child_model_failure(error));
+                                }
                             }
                         }
                         let policy_retry = attempt <= self.config.retry.max_retries
@@ -1908,7 +1908,7 @@ impl Engine {
                             advice.as_ref().is_some_and(|advice| advice.should_retry)
                                 && attempt <= 10;
                         if !policy_retry && !advised_retry {
-                            return Err(error);
+                            return Err(self.child_model_failure(error));
                         }
                         let policy_delay = if attempt == 1 {
                             self.config.retry.initial_delay
@@ -1964,6 +1964,16 @@ impl Engine {
             }
         }
         unreachable!("primary model is always present")
+    }
+    fn child_model_failure(&self, mut error: Error) -> Error {
+        if self.child_control.is_some() {
+            error.info.message = format!(
+                "model call failed on turn {}: {}",
+                self.turns.saturating_sub(1),
+                error.info.message
+            );
+        }
+        error
     }
     async fn model_attempt(
         &mut self,
@@ -2065,14 +2075,23 @@ impl Engine {
             }
         }
     }
+    fn tools_for_access(&self) -> Vec<Arc<dyn Tool>> {
+        self.agent
+            .tools
+            .iter()
+            .map(|tool| {
+                tool.for_access(self.policy.tools.access)
+                    .unwrap_or_else(|| tool.clone())
+            })
+            .collect()
+    }
     fn tool_decision(&self, definition: &ToolDefinition) -> ToolDecision {
         let decision = self.policy.tools.decision(definition);
         if decision == ToolDecision::Allow
             && self.config.approve_mutating_tools
             && !definition.read_only
             && self
-                .agent
-                .tools
+                .tools_for_access()
                 .iter()
                 .any(|tool| tool.definition().name == definition.name && !tool.is_control_flow())
         {
@@ -2095,10 +2114,9 @@ impl Engine {
         }
         let mut ready = VecDeque::new();
         self.result.pending_approvals.clear();
+        let accessible_tools = self.tools_for_access();
         while let Some(call) = self.calls.pop_front() {
-            let tool = self
-                .agent
-                .tools
+            let tool = accessible_tools
                 .iter()
                 .find(|tool| tool.definition().name == call.name);
             if let Some(tool) = tool {
@@ -2153,10 +2171,11 @@ impl Engine {
         Ok(())
     }
     fn parallel_batch_ready(&self) -> bool {
+        let accessible_tools = self.tools_for_access();
         self.durable_state.is_none()
             && self.calls.len() > 1
             && self.calls.iter().all(|call| {
-                self.agent.tools.iter().any(|tool| {
+                accessible_tools.iter().any(|tool| {
                     let definition = tool.definition();
                     definition.name == call.name
                         && self.tool_decision(definition) == ToolDecision::Allow
@@ -2172,10 +2191,9 @@ impl Engine {
             self.checkpoint(Boundary::ToolPrepared, Some(call)).await?;
         }
         let mutation_lock = tokio::sync::RwLock::new(());
+        let accessible_tools = self.tools_for_access();
         let outputs = futures_util::future::join_all(calls.iter().map(|call| async {
-            let tool = self
-                .agent
-                .tools
+            let tool = accessible_tools
                 .iter()
                 .find(|tool| tool.definition().name == call.name)
                 .unwrap();
@@ -2210,8 +2228,8 @@ impl Engine {
     }
     async fn tool(&mut self, call: ToolCall) -> Result<bool, Error> {
         let agent = self.agent.clone();
-        let tool = agent
-            .tools
+        let accessible_tools = self.tools_for_access();
+        let tool = accessible_tools
             .iter()
             .find(|t| t.definition().name == call.name);
         let handoff = agent
@@ -2376,15 +2394,6 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
-        if let Some(control) = &self.child_control {
-            control
-                .activity(crate::subagent::Activity {
-                    current_step: "tool".into(),
-                    last_tool: call.name.clone(),
-                    ..Default::default()
-                })
-                .await?;
-        }
         self.observe(Observation::ToolStarted {
             agent: self.agent.name.clone(),
             call: call.clone(),
@@ -2421,13 +2430,50 @@ impl Engine {
                 })
                 .await?;
         }
-        let raw = match bounded(
-            &context.operation,
-            timeout,
+        // Managed delegation waits handle their own local deadline so they can
+        // return the still-owned task snapshot. Keep the enclosing run bounded;
+        // ordinary tools retain the existing executor-enforced local timeout.
+        let (outer_context, outer_timeout) = if tool.preserve_result_on_timeout() {
+            (&self.context, None)
+        } else {
+            (&context.operation, timeout)
+        };
+        let path_key = match call.name.as_str() {
+            "Write" | "Edit" => Some("file_path"),
+            "read_file" | "list_files" | "glob" | "grep" => Some("path"),
+            "LSP" => Some("filePath"),
+            _ => None,
+        };
+        let summary = path_key
+            .and_then(|key| call.arguments.get(key))
+            .and_then(serde_json::Value::as_str)
+            .filter(|path| path.len() <= 4096 && !path.chars().any(char::is_control))
+            .unwrap_or_default();
+        if let Some(control) = &self.child_control {
+            control
+                .record_tool_start(&call.id, &call.name, summary)
+                .await?;
+        }
+        let started = Instant::now();
+        let result = bounded(
+            outer_context,
+            outer_timeout,
             tool.execute(&context, call.clone()),
         )
-        .await
-        {
+        .await;
+        let duration = started.elapsed();
+        if let Some(control) = &self.child_control {
+            control
+                .record_tool_end(
+                    &call.id,
+                    &call.name,
+                    summary,
+                    result.as_ref().map_or(true, |output| output.is_error),
+                    duration,
+                )
+                .await?;
+        }
+        let raw = match result {
             Ok(output) => output,
             Err(error) => {
                 if self.durable_state.is_some() {
@@ -2669,6 +2715,7 @@ impl Runner {
         host: Arc<dyn Host>,
     ) -> Result<crate::subagent::ChildOutcome, Error> {
         use crate::subagent::{ChildOutcome, TaskStatus};
+        let child_agent_name = invocation.agent_name.clone();
         let session = Arc::new(crate::subagent_tools::SubagentSession::for_child(&control));
         fn bind_agent(
             agent: &Arc<AgentConfig>,
@@ -2763,7 +2810,15 @@ impl Runner {
                 let Some(snapshot) = error.partial else {
                     return Err(error.error);
                 };
-                (*snapshot, status, Some(error.error.info.message))
+                let message = if status == TaskStatus::Failed {
+                    format!(
+                        "agent {child_agent_name:?} failed: {}",
+                        error.error.info.message
+                    )
+                } else {
+                    error.error.info.message
+                };
+                (*snapshot, status, Some(message))
             }
         };
         Ok(ChildOutcome {

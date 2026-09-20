@@ -1369,3 +1369,152 @@ async fn scoped_wait_timeout_reacquires_slot_without_cancelling_parent() {
     wait(&handle, &["a", "b", "c"]).await;
     owner.shutdown().await.unwrap();
 }
+
+#[tokio::test]
+async fn recorded_timing_and_steering_survive_checkpoints() {
+    let (owner, handle, mut starts, _) = rig(config(), None);
+    let before = chrono::Utc::now();
+    handle.submit(request("timed")).await.unwrap();
+    let child = next(&mut starts).await;
+    let running = handle.status("timed", Detail::Full).unwrap();
+    assert!(running.started_at.unwrap() >= before);
+    assert!(running.started_at.unwrap() <= chrono::Utc::now());
+    assert!(running.duration.is_none());
+    assert!(running.elapsed().is_some());
+    handle
+        .steer("timed", "one", "  real\nmessage  ")
+        .await
+        .unwrap();
+    handle
+        .steer("timed", "two", &"é".repeat(170))
+        .await
+        .unwrap();
+    handle
+        .steer("timed", "one", "  real\nmessage  ")
+        .await
+        .unwrap();
+    let pending = handle.status("timed", Detail::Full).unwrap();
+    assert_eq!(pending.messages_received, 2);
+    assert_eq!(
+        pending.last_parent_message,
+        format!("{}...", "é".repeat(157))
+    );
+    let messages = child.control.take_messages().await.unwrap();
+    child
+        .control
+        .acknowledge_messages(&messages.iter().map(|m| m.id.clone()).collect::<Vec<_>>())
+        .await
+        .unwrap();
+    child.done.send(ChildOutcome::completed("done")).unwrap();
+    let completed = wait(&handle, &["timed"]).await.remove(0);
+    let duration = completed.duration.unwrap();
+    assert!(duration > Duration::ZERO);
+    assert!(
+        duration
+            <= chrono::Utc::now()
+                .signed_duration_since(before)
+                .to_std()
+                .unwrap()
+    );
+    tokio::time::sleep(Duration::from_millis(2)).await;
+    assert_eq!(
+        handle.status("timed", Detail::Full).unwrap().elapsed(),
+        Some(duration)
+    );
+    let encoded = serde_json::to_value(handle.snapshot()).unwrap();
+    let decoded: SchedulerCheckpoint = serde_json::from_value(encoded.clone()).unwrap();
+    assert_eq!(decoded.records[0].task.duration, Some(duration));
+    assert_eq!(decoded.records[0].task.started_at, running.started_at);
+    let mut old = encoded;
+    let task = old["records"][0]["task"].as_object_mut().unwrap();
+    for field in ["started_at", "duration", "last_parent_message"] {
+        task.remove(field);
+    }
+    let activity = task["activity"].as_object_mut().unwrap();
+    for field in ["current_tool", "current_tool_input", "recent_activity"] {
+        activity.remove(field);
+    }
+    let decoded: SchedulerCheckpoint = serde_json::from_value(old).unwrap();
+    assert!(decoded.records[0].task.started_at.is_none());
+    assert!(decoded.records[0].task.duration.is_none());
+    assert!(decoded.records[0].task.last_parent_message.is_empty());
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn cancellation_and_failed_dependencies_record_terminal_metadata() {
+    let (owner, handle, mut starts, _) = rig(config(), None);
+    let mut dependent = request("dependent");
+    dependent.depends_on = vec!["cancelled".into()];
+    handle
+        .submit_dag(vec![request("cancelled"), dependent])
+        .await
+        .unwrap();
+    let _child = next(&mut starts).await;
+    handle.cancel("cancelled").await.unwrap();
+    let tasks = wait(&handle, &["cancelled", "dependent"]).await;
+    assert_eq!(tasks[0].error.as_deref(), Some("cancellation requested"));
+    assert_eq!(
+        tasks[1].error.as_deref(),
+        Some(
+            "agent \"worker\" failed before start: dependency task(s) did not complete successfully: cancelled (cancelled)"
+        )
+    );
+    assert!(tasks.iter().all(|t| t.duration.is_some()));
+    handle.cancel("cancelled").await.unwrap();
+    assert_eq!(
+        handle.status("cancelled", Detail::Full).unwrap().duration,
+        tasks[0].duration
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn structured_activity_records_observed_tool_lifecycle() {
+    let (owner, handle, mut starts, _) = rig(config(), None);
+    handle.submit(request("activity")).await.unwrap();
+    let child = next(&mut starts).await;
+    let mut activity = Activity::default();
+    activity.record_tool_start("Write", "actual.rs");
+    child.control.activity(activity.clone()).await.unwrap();
+    let snapshot = handle
+        .status("activity", Detail::Activity)
+        .unwrap()
+        .activity
+        .unwrap();
+    assert_eq!(snapshot.current_tool, "Write");
+    assert_eq!(snapshot.current_tool_input, "actual.rs");
+    assert_eq!(snapshot.current_step, "implementing");
+    assert!(snapshot.recent_activity.is_empty());
+    let before = chrono::Utc::now();
+    let start = std::time::Instant::now();
+    tokio::time::sleep(Duration::from_millis(2)).await;
+    let elapsed = start.elapsed();
+    activity.record_tool_end("Write", "actual.rs", false, elapsed);
+    assert_eq!(
+        activity.recent_activity[0].duration_ms,
+        elapsed.as_millis() as u64
+    );
+    assert!(activity.recent_activity[0].timestamp >= before);
+    assert!(activity.recent_activity[0].timestamp <= chrono::Utc::now());
+    assert!(activity.current_tool.is_empty());
+    assert!(activity.files_written.contains("actual.rs"));
+    for _ in 0..35 {
+        let start = std::time::Instant::now();
+        activity.record_tool_start("read_file", "failed.rs");
+        activity.record_tool_end("read_file", "failed.rs", true, start.elapsed());
+    }
+    child.control.activity(activity).await.unwrap();
+    let activity = handle
+        .status("activity", Detail::Full)
+        .unwrap()
+        .activity
+        .unwrap();
+    assert_eq!(activity.recent_activity.len(), 30);
+    assert!(activity.files_read.is_empty());
+    assert_eq!(activity.last_tool, "read_file");
+    assert!(activity.recent_activity.iter().all(|entry| entry.is_error));
+    child.done.send(ChildOutcome::completed("done")).unwrap();
+    wait(&handle, &["activity"]).await;
+    owner.shutdown().await.unwrap();
+}

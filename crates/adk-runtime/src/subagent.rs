@@ -35,6 +35,7 @@ use adk_core::{
     AccessMode, ApprovalPolicy, BoxFuture, Content, Context, Error, ErrorCategory, Message, Role,
     RunItem, RunPolicy, RunRequest, ToolPolicy,
 };
+use chrono::{DateTime, Utc};
 use futures_util::FutureExt;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -292,6 +293,71 @@ pub struct Activity {
     pub files_read: BTreeSet<String>,
     pub files_written: BTreeSet<String>,
     pub recent: Vec<String>,
+    #[serde(default)]
+    pub current_tool: String,
+    #[serde(default)]
+    pub current_tool_input: String,
+    #[serde(default)]
+    pub recent_activity: Vec<ActivityEntry>,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ActivityEntry {
+    pub timestamp: DateTime<Utc>,
+    pub tool: String,
+    pub summary: String,
+    pub is_error: bool,
+    pub duration_ms: u64,
+}
+impl Activity {
+    pub fn record_tool_start(&mut self, tool: &str, summary: &str) {
+        self.current_tool = tool.into();
+        self.current_tool_input = summary.into();
+        self.last_tool = tool.into();
+        match tool {
+            "LSP" | "read_file" | "list_files" | "glob" | "grep" => {
+                self.current_step = "exploring".into()
+            }
+            "Edit" | "Write" => self.current_step = "implementing".into(),
+            "Bash" if summary.contains("git commit") || summary.contains("git add") => {
+                self.current_step = "committing".into()
+            }
+            "Bash" if summary.contains("git diff") => self.current_step = "reviewing".into(),
+            _ => {}
+        }
+    }
+    pub fn record_tool_end(
+        &mut self,
+        tool: &str,
+        summary: &str,
+        is_error: bool,
+        duration: Duration,
+    ) {
+        self.current_tool.clear();
+        self.current_tool_input.clear();
+        self.last_tool = tool.into();
+        if !is_error && !summary.is_empty() {
+            match tool {
+                "Write" | "Edit" => {
+                    self.files_written.insert(summary.into());
+                }
+                "read_file" => {
+                    self.files_read.insert(summary.into());
+                }
+                _ => {}
+            }
+        }
+        self.recent_activity.push(ActivityEntry {
+            timestamp: Utc::now(),
+            tool: tool.into(),
+            summary: summary.into(),
+            is_error,
+            duration_ms: duration.as_millis().min(u64::MAX as u128) as u64,
+        });
+        if self.recent_activity.len() > 30 {
+            self.recent_activity
+                .drain(..self.recent_activity.len() - 30);
+        }
+    }
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TaskSnapshot {
@@ -306,6 +372,27 @@ pub struct TaskSnapshot {
     pub usage: BudgetUsage,
     pub activity: Option<Activity>,
     pub messages_received: usize,
+    #[serde(default)]
+    pub started_at: Option<DateTime<Utc>>,
+    #[serde(default)]
+    pub duration: Option<Duration>,
+    #[serde(default)]
+    pub last_parent_message: String,
+}
+impl TaskSnapshot {
+    pub fn elapsed(&self) -> Option<Duration> {
+        self.duration.or_else(|| {
+            self.started_at.map(|start| {
+                Utc::now()
+                    .signed_duration_since(start)
+                    .to_std()
+                    .unwrap_or_default()
+            })
+        })
+    }
+    fn freeze_duration(&mut self) {
+        self.duration = self.elapsed();
+    }
 }
 #[derive(Debug, Clone, Copy, Default)]
 pub enum Detail {
@@ -349,7 +436,7 @@ impl ChildOutcome {
     fn cancelled() -> Self {
         Self {
             status: TaskStatus::Cancelled,
-            ..Self::failed("child cancelled")
+            ..Self::failed("cancellation requested")
         }
     }
 }
@@ -775,6 +862,9 @@ impl SchedulerHandle {
                     usage: BudgetUsage::default(),
                     activity: Some(Activity::default()),
                     messages_received: 0,
+                    started_at: Some(Utc::now()),
+                    duration: None,
+                    last_parent_message: String::new(),
                 };
                 ids.push(task.id.clone());
                 state.records.push(CheckpointRecord {
@@ -970,6 +1060,12 @@ impl SchedulerHandle {
                 text: text.into(),
             });
             record.task.messages_received += 1;
+            let text = text.trim().replace('\n', " ");
+            record.task.last_parent_message = if text.chars().count() > 160 {
+                format!("{}...", text.chars().take(157).collect::<String>())
+            } else {
+                text
+            };
             Ok(())
         })
         .await
@@ -985,8 +1081,9 @@ impl SchedulerHandle {
             let record = record_mut(state, id)?;
             if !record.task.status.is_terminal() {
                 record.task.status = TaskStatus::Cancelled;
+                record.task.freeze_duration();
                 record.accepting_messages = false;
-                record.task.error = Some("child cancelled".into());
+                record.task.error = Some("cancellation requested".into());
                 record.task.waiting_on.clear();
             }
             Ok(())
@@ -1087,6 +1184,7 @@ impl SchedulerHandle {
             let delta = record.task.usage.remaining_delta(&outcome.usage);
             record.task.usage.add(&delta)?;
             record.task.status = outcome.status;
+            record.task.freeze_duration();
             record.task.result = outcome.result;
             record.task.error = outcome.error;
             record.task.waiting_on.clear();
@@ -1171,6 +1269,9 @@ fn apply_outcome(
         };
         record.task.waiting_on.clear();
     }
+    if record.task.status.is_terminal() {
+        record.task.freeze_duration();
+    }
     state.usage.add(&delta)
 }
 
@@ -1240,6 +1341,7 @@ pub struct ChildControl {
     handle: SchedulerHandle,
     id: String,
     slot: Arc<ExecutionSlot>,
+    active_tools: Arc<AsyncMutex<Vec<(String, String, String)>>>,
 }
 impl ChildControl {
     pub fn task_id(&self) -> &str {
@@ -1437,9 +1539,61 @@ impl ChildControl {
             Ok(())
         }
     }
+    pub async fn record_tool_start(
+        &self,
+        call_id: &str,
+        tool: &str,
+        summary: &str,
+    ) -> Result<(), Error> {
+        let mut active = self.active_tools.lock().await;
+        self.handle
+            .transact(|state| {
+                record_mut(state, &self.id)?
+                    .task
+                    .activity
+                    .get_or_insert_with(Activity::default)
+                    .record_tool_start(tool, summary);
+                Ok(())
+            })
+            .await?;
+        active.push((call_id.into(), tool.into(), summary.into()));
+        Ok(())
+    }
+    pub async fn record_tool_end(
+        &self,
+        call_id: &str,
+        tool: &str,
+        summary: &str,
+        is_error: bool,
+        duration: Duration,
+    ) -> Result<(), Error> {
+        let mut active = self.active_tools.lock().await;
+        self.handle
+            .transact(|state| {
+                let activity = record_mut(state, &self.id)?
+                    .task
+                    .activity
+                    .get_or_insert_with(Activity::default);
+                activity.record_tool_end(tool, summary, is_error, duration);
+                if let Some((_, name, input)) = active.iter().rev().find(|(id, _, _)| id != call_id)
+                {
+                    activity.record_tool_start(name, input);
+                    activity.last_tool = tool.into();
+                }
+                Ok(())
+            })
+            .await?;
+        active.retain(|(id, _, _)| id != call_id);
+        Ok(())
+    }
     pub async fn activity(&self, mut activity: Activity) -> Result<(), Error> {
         if activity.recent.len() > 30 {
             activity.recent.drain(..activity.recent.len() - 30);
+        }
+        if activity.recent_activity.len() > 30 {
+            activity
+                .recent_activity
+                .drain(..activity.recent_activity.len() - 30);
         }
         self.handle
             .transact(|state| {
@@ -1464,7 +1618,7 @@ async fn execute_once(
     record: CheckpointRecord,
     token: CancellationToken,
     slot: Arc<ExecutionSlot>,
-) -> (String, ChildOutcome) {
+) -> (String, ChildOutcome, Duration) {
     let _release = ReleaseSlot {
         slot: slot.clone(),
         handle: handle.clone(),
@@ -1517,6 +1671,7 @@ async fn execute_once(
         handle: handle.clone(),
         id: id.clone(),
         slot,
+        active_tools: Arc::new(AsyncMutex::new(Vec::new())),
     };
     let work = std::panic::AssertUnwindSafe(async {
         handle.inner.executor.execute(invocation, control).await
@@ -1528,6 +1683,7 @@ async fn execute_once(
             None => std::future::pending::<()>().await,
         }
     };
+    let started = std::time::Instant::now();
     let outcome = tokio::select! {
         biased;
         _ = token.cancelled() => ChildOutcome::cancelled(),
@@ -1540,7 +1696,7 @@ async fn execute_once(
             Err(_) => ChildOutcome::failed("child executor panicked"),
         }
     };
-    (id, outcome)
+    (id, outcome, started.elapsed())
 }
 
 impl SchedulerHandle {
@@ -1580,15 +1736,15 @@ impl SchedulerHandle {
                     .filter(|r| !r.task.status.is_terminal())
                     .map(|r| r.task.id.clone())
                     .collect();
-                let failed = record.submission.dependency_policy == DependencyPolicy::AllSuccess
-                    && dependencies.iter().any(|r| {
-                        r.task.status.is_terminal() && r.task.status != TaskStatus::Completed
-                    });
-                if failed {
+                let failed: Vec<_> = dependencies.iter().filter(|r| {
+                    r.task.status.is_terminal() && r.task.status != TaskStatus::Completed
+                }).map(|r| format!("{} ({})", r.task.id, serde_json::to_value(r.task.status).unwrap().as_str().unwrap())).collect();
+                if record.submission.dependency_policy == DependencyPolicy::AllSuccess && !failed.is_empty() {
+                    let error = format!("agent {:?} failed before start: dependency task(s) did not complete successfully: {}", record.task.agent_name, failed.join(", "));
                     apply_outcome(
                         state,
                         &id,
-                        ChildOutcome::failed("child dependency did not succeed"),
+                        ChildOutcome::failed(error),
                     )?;
                     continue;
                 }
@@ -1654,8 +1810,14 @@ async fn drive(handle: SchedulerHandle) -> Result<(), Error> {
             _ = handle.inner.context.cancellation.cancelled() => break,
             _ = deadline => break,
             result = children.join_next(), if !children.is_empty() => {
-                if let Some(Ok((id, outcome))) = result {
-                    let _ = handle.transact(|state| apply_outcome(state, &id, outcome)).await;
+                if let Some(Ok((id, outcome, elapsed))) = result {
+                    let _ = handle.transact(|state| {
+                        let task = &mut record_mut(state, &id)?.task;
+                        if !task.status.is_terminal() && outcome.status != TaskStatus::Cancelled {
+                            task.duration = Some(elapsed);
+                        }
+                        apply_outcome(state, &id, outcome)
+                    }).await;
                 }
             }
             _ = handle.inner.wake.notified() => {}
@@ -1675,6 +1837,7 @@ async fn drive(handle: SchedulerHandle) -> Result<(), Error> {
         if !record.task.status.is_terminal() && record.task.status != TaskStatus::Reconciling {
             record.task.status = TaskStatus::Cancelled;
             record.accepting_messages = false;
+            record.task.freeze_duration();
             record.task.error = Some("scheduler shut down".into());
             record.task.waiting_on.clear();
         }

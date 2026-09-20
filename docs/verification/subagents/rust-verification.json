@@ -1,0 +1,22 @@
+{
+  "toolchain": "Rust 1.88.0",
+  "command": "cargo test --locked --workspace --all-features",
+  "exit_code": 0,
+  "passed": 748,
+  "failed": 0,
+  "ignored": 30,
+  "subagent_tests": 68,
+  "subagent_ignored": 0,
+  "raw_log": "rust-workspace-tests.log.gz",
+  "uncompressed_log_sha256": "54a400be5a257ba7518224fc1294de72f8d3fa7d7ab26a662ac78f00928e810f",
+  "additional_passed_checks": [
+    "Go exporter --check (6 scenarios unchanged)",
+    "strict Clippy via RUSTC_WORKSPACE_WRAPPER=clippy-driver and RUSTFLAGS=-D warnings, cargo check --locked --workspace --all-features --all-targets",
+    "cargo fmt --all -- --check",
+    "cargo doc --locked --workspace --all-features --no-deps with RUSTDOCFLAGS=-D warnings",
+    "scripts/check-purity.py",
+    "Python unittest discover: 4 passed",
+    "git diff --check"
+  ],
+  "environment_limitation": "Default rustup and cargo-clippy launcher cannot resolve /proc/self/exe; used installed exact Rust 1.88.0 and direct clippy-driver wrapper."
+}

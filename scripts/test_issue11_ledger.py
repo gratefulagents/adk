@@ -63,6 +63,13 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_unexecuted_or_wrong_pin_fixture_evidence_is_rejected(self):
+        for value in ("", "trace-store reference verified at wrong"):
+            with self.subTest(value=value):
+                self.evidence["reference_fixture_check"] = value
+                with self.assertRaises(SystemExit):
+                    self.apply()
+
     def test_excluded_entry_cannot_be_verified(self):
         self.entries[next(iter(self.entries))]["scope"] = "out_of_scope"
         with self.assertRaises(SystemExit):
@@ -78,6 +85,12 @@ class EvidenceTests(unittest.TestCase):
                 self.claims["claims"][key][field] = "nonexistent"
                 with self.assertRaises(SystemExit):
                     self.apply()
+
+    def test_unbound_implementation_source_is_rejected(self):
+        claim = next(iter(self.claims["claims"].values()))
+        claim["implementation_symbols"] = ["crates/missing.rs::missing"]
+        with self.assertRaises(SystemExit):
+            self.apply()
 
     def test_snapshot_write_is_rejected(self):
         with self.assertRaises(SystemExit):

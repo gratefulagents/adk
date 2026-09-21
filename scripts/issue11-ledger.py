@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 from collections import Counter
 from pathlib import Path
 
@@ -33,6 +34,14 @@ RUST_INPUTS = ["Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore
                "crates/adk/tests/telemetry.rs", "crates/adk/tests/telemetry_spans.rs",
                "fixtures/tracestore/sdk-otel.json", "scripts/trace-reference/otel.go",
                "scripts/trace-reference/go.mod", "scripts/trace-reference/go.sum",
+               "crates/adk-codec/Cargo.toml", "crates/adk-codec/src/snapshots.rs",
+               "crates/adk-codec/src/dto.rs", "crates/adk-codec/src/lib.rs",
+               "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
+               "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
+               "crates/adk-core/src/contracts.rs", "crates/adk-runtime/Cargo.toml",
+               "fixtures/tracestore/sdk-writer.json", "scripts/trace-reference/writer.go",
+               "fixtures/tracestore/sdk-store.json", "scripts/trace-reference/main.go",
+               "scripts/trace-reference/check.py",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -105,8 +114,11 @@ def module_reference_map() -> dict[str, dict[str, object]]:
 
 def verify_rust() -> None:
     claims = read_json(RUST_CLAIMS)
-    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk",
-               "--features", "otel", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans"]
+    fixture_check = subprocess.run([sys.executable, str(ROOT / "scripts/trace-reference/check.py")],
+                                   cwd=ROOT, text=True, capture_output=True, check=True)
+    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec",
+               "--features", "otel", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
+               "--test", "tracewriter", "--test", "request_snapshot"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
     print(result.stdout, end="")
     print(result.stderr, end="")
@@ -126,6 +138,7 @@ def verify_rust() -> None:
         "compiler": compiler,
         "command": ["cargo", *command[1:]],
         "exit_code": result.returncode,
+        "reference_fixture_check": fixture_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -139,6 +152,8 @@ def apply_rust_evidence(entries, records, reference):
     evidence = read_json(RUST_EVIDENCE)
     if claims["baseline_revision"] != BASELINE_REVISION or evidence["baseline_revision"] != BASELINE_REVISION:
         raise SystemExit("Rust evidence must use the authoritative baseline")
+    if f"trace-store reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust evidence requires independently executed pinned trace fixtures")
     if evidence["exit_code"] != 0:
         raise SystemExit("failed Rust commands cannot verify a ledger entry")
     if set(evidence["files"]) != set(RUST_INPUTS):
@@ -159,6 +174,10 @@ def apply_rust_evidence(entries, records, reference):
             raise SystemExit(f"required pinned regression is not passing: {acceptance_id}")
         if not claim["rust_test_identifiers"] or not claim["implementation_symbols"] or not claim["rationale"]:
             raise SystemExit(f"incomplete claim: {acceptance_id}")
+        for implementation in claim["implementation_symbols"]:
+            path, separator, symbol = implementation.partition("::")
+            if not separator or not symbol or not path.endswith(".rs") or path not in evidence["files"]:
+                raise SystemExit(f"implementation must name a hash-bound Rust source: {implementation}")
         for test in claim["rust_test_identifiers"]:
             if test not in evidence["passed_tests"] or f"test {test} ... ok" not in evidence["stdout"]:
                 raise SystemExit(f"missing successful Rust regression: {test}")

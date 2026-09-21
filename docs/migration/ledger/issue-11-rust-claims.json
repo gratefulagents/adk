@@ -212,6 +212,288 @@
         "x86_64-unknown-linux-gnu",
         "otel"
       ]
+    },
+    "SDK-DBC1377A77FB06B6": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.AgentName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::agent_name"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-13FBA901C348BDA2": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.InputItems",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::input_items"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-1C68AC7BE43B86F0": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.InputTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::input_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-DAD2873FC5743ADD": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Instructions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::instructions"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-2BCBAE4C2A215DFD": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::model"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-2B990CF0EAF06AC8": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.OutputSchema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::output_schema"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-13EBC0AF4DDBE0F3": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.RequestOverheadTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::request_overhead_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-F03D707C32824A4E": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Settings",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::settings"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-46013697C58697E4": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Tools",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::tools"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-C49F52187CA38E0F": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.TotalTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::total_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-41DC0B1C66C9BF51": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-AFC6D980CC52D10F": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "NewSpan",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::new"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-63A2FA637013DDDA": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "Span.DurationMS",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-78D941E676F560BF": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "Span.Finish",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::finish"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

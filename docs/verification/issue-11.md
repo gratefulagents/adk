@@ -18,18 +18,26 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
 - Schema-2 TraceWriter produces category records, typed spans, snapshot digests,
   instruction artifacts and health. Typed OTel mapping covers all span kinds,
   final attributes, error status, trace-ID notification and ended-parent lookup.
-  These fixtures do **not** establish automatic runner generation production.
+  Automatic generation observers now publish retry/fallback decisions, resolved
+  model metadata, usage and once-estimated cost to the writer or OTel processor.
+  Drop cleanup and a returned response followed by host failure are covered.
+  Ordered request documents preserve raw JSON bytes for exact metadata digests.
+  Automatic schema-2 request/response snapshot assembly is **not** complete.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **816 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **830 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
-- The overlay now has **13 explicitly verified**, **8,878 unresolved** and
+- The overlay now has **27 explicitly verified**, **8,864 unresolved** and
   **251 excluded** IDs. Three claims cover distinguishable store quota errors;
-  ten cover specific OTel mapping/normalization regressions. Exact tests,
-  compiler and input hashes are retained in `issue-11-rust-evidence.json`.
-  Seven negative evidence-validator tests pass. No blanket closure is inferred.
+  ten cover specific OTel mapping/normalization regressions; eleven cover the
+  request snapshot representation/fields; three cover span lifecycle APIs.
+  Snapshot representation claims do not cover automatic assembly. Exact tests,
+  compiler, independently executed fixture verification and input hashes are
+  retained in `issue-11-rust-evidence.json`. Nine evidence-validator tests pass,
+  including rejection of unbound implementation files and unexecuted fixtures.
+  No blanket closure is inferred.
 
-Remaining work includes automatic generation/span assembly, full higher-level
+Remaining work includes automatic request/response snapshot assembly, full higher-level
 runtime/session/helper composition, stdout format/default parity and the
 remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
 external Postgres/pgvector and non-Linux targets remain unverified. Fresh

@@ -176,6 +176,7 @@ fn all_span_kinds_and_hook_categories_match_independent_pinned_go() {
         },
     ];
     let trace = Trace {
+        spans: vec![],
         id: "trace".into(),
         name: "fixture".into(),
         start_time: start,
@@ -331,4 +332,205 @@ fn truncation_and_store_quota_failures_are_visible_in_health() {
     assert_eq!(writer.health().events_dropped, 1);
     assert_eq!(writer.health().write_errors, 0);
     assert!(!writer.health().last_error.is_empty());
+}
+
+#[test]
+fn explicit_trace_lifecycle_retains_span_order_and_finished_duration() {
+    let mut trace = Trace::new("session");
+    assert!(uuid::Uuid::parse_str(&trace.id).is_ok());
+    assert!(trace.spans.is_empty());
+    assert_eq!(trace.end_time.to_rfc3339(), "0001-01-01T00:00:00+00:00");
+    let mut first = Span::new("first", &trace.id, None);
+    assert!(uuid::Uuid::parse_str(&first.id).is_ok());
+    assert_ne!(first.id, trace.id);
+    assert_eq!(first.parent_id, trace.id);
+    assert_eq!(first.name, "first");
+    assert!(first.data.is_none());
+    assert!(first.start_time >= trace.start_time);
+    assert!(first.duration_ms() >= 0);
+    first.finish();
+    assert!(first.end_time >= first.start_time);
+    let duration = first.duration_ms();
+    let second = Span::new("second", &first.id, None);
+    trace.add_span(first);
+    trace.add_span(second);
+    trace.finish();
+    assert!(trace.end_time >= trace.start_time);
+    assert_eq!(
+        trace
+            .spans
+            .iter()
+            .map(|span| span.name.as_str())
+            .collect::<Vec<_>>(),
+        ["first", "second"]
+    );
+    assert_eq!(trace.spans[0].duration_ms(), duration);
+    for (start, end, expected) in [
+        ("2025-01-02T03:04:05Z", "2025-01-02T03:04:06.234567Z", 1234),
+        ("2025-01-02T03:04:06.234567Z", "2025-01-02T03:04:05Z", -1234),
+        ("2025-01-02T03:04:05.000001Z", "2025-01-02T03:04:05Z", 0),
+    ] {
+        let mut span = Span::new("duration", "", None);
+        span.start_time = start.parse().unwrap();
+        span.end_time = end.parse().unwrap();
+        assert_eq!(span.duration_ms(), expected);
+    }
+}
+
+#[tokio::test]
+async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
+    use adk::core::*;
+    use adk::runtime::{
+        AgentConfig, CancellationToken, ModelBinding, RetryPolicy, Runner, RunnerConfig,
+    };
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    struct Provider(AtomicUsize);
+    impl Model for Provider {
+        fn provider(&self) -> &str {
+            "fixture"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                if self.0.fetch_add(1, Ordering::SeqCst) == 0 {
+                    return Err(Error::new(ErrorCategory::Provider, "retry"));
+                }
+                Ok(ModelResponse {
+                    items: vec![RunItem::Message {
+                        message: Message {
+                            role: Role::Assistant,
+                            content: vec![Content::Text {
+                                text: "done".into(),
+                            }],
+                        },
+                    }],
+                    usage: Usage {
+                        input_tokens: 12,
+                        output_tokens: 3,
+                        ..Default::default()
+                    },
+                    end_turn: Some(true),
+                    response_id: None,
+                    metadata: Default::default(),
+                })
+            })
+        }
+    }
+    struct NoopHost;
+    impl Host for NoopHost {
+        fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async { Ok(()) })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { panic!("unexpected approval") })
+        }
+    }
+    let root = tempfile::tempdir().unwrap();
+    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+    let writer = Arc::new(TraceWriter::new(store, "run", Options::default()));
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let runner = Runner::new(
+        AgentConfig::new(
+            "agent",
+            ModelBinding::complete("model", Arc::new(Provider(AtomicUsize::new(0)))),
+        ),
+        RunnerConfig {
+            generation_observer: Some(writer.clone()),
+            retry: RetryPolicy {
+                max_retries: 1,
+                initial_delay: std::time::Duration::ZERO,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let result = runner
+        .run(
+            Context {
+                run_id: "run".into(),
+                cancellation: Arc::new(CancellationToken::new()),
+                deadline: None,
+            },
+            RunRequest {
+                input: vec![],
+                policy: RunPolicy::default(),
+            },
+            Arc::new(NoopHost),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("done")));
+    let spans = records(&path, "spans");
+    let calls = records(&path, "llm_calls");
+    assert_eq!(spans.as_array().unwrap().len(), 4);
+    assert_eq!(calls.as_array().unwrap().len(), 4);
+    for (index, kind) in [
+        "generation_start",
+        "generation_end",
+        "generation_start",
+        "generation_end",
+    ]
+    .iter()
+    .enumerate()
+    {
+        assert_eq!(calls[index]["type"], *kind);
+    }
+    assert_eq!(calls[1]["status"], "retrying");
+    assert_eq!(calls[1]["retry_scheduled"], true);
+    assert_eq!(calls[3]["status"], "completed");
+    assert_eq!(calls[3]["input_tokens"], 12);
+    assert_eq!(calls[3]["output_tokens"], 3);
+    assert_eq!(calls[3]["total_tokens"], 15);
+    assert_eq!(writer.health().write_errors, 0);
+}
+
+#[test]
+fn typed_request_metadata_digests_match_pinned_go_serialized_bytes() {
+    use sha2::{Digest, Sha256};
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+    let writer = TraceWriter::new(store, "run", Options::default());
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let variants = fixture["request_variants"].as_array().unwrap();
+    for variant in variants {
+        let request: adk_codec::snapshots::RequestSnapshot =
+            serde_json::from_str(variant.as_str().unwrap()).unwrap();
+        let span = Span::new(
+            "generation",
+            "run",
+            Some(SpanData::Generation(Box::new(Generation {
+                request: Some(Snapshot::from_serializable(&request).unwrap()),
+                ..Default::default()
+            }))),
+        );
+        writer.span_start(&span);
+    }
+    let calls = records(&path, "llm_calls");
+    for (index, variant) in variants.iter().enumerate() {
+        let expected = variant.as_str().unwrap().as_bytes();
+        assert_eq!(
+            calls[index]["request"],
+            json!({ "captured": false, "sha256": format!("{:x}", Sha256::digest(expected)), "bytes": expected.len() })
+        );
+    }
 }

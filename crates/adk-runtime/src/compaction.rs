@@ -2,7 +2,6 @@
 //! See docs/local-compaction.md for the GPL-3.0-only source, parity boundary and runner integration.
 use crate::runner::{CompactedHistory, CompactionConfig, CompactionRequest, Compactor};
 use adk_codec::approval::{ApprovalMarker, ApprovalMarkerBoundary};
-use adk_codec::dto::RawJson;
 use adk_core::{BoxFuture, Content, Context, Error, Message, ModelRequest, Role, RunItem, Usage};
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
@@ -367,10 +366,11 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
                 estimate_string_tokens(&compaction.encrypted_content).min(20_000) + 8
             }
             HistoryItem::Approval(marker) => {
-                let input = match &marker.data.input {
-                    RawJson::Missing => String::new(),
-                    RawJson::Present(value) => value.to_string(),
-                };
+                let input = marker
+                    .data
+                    .input
+                    .value()
+                    .map_or_else(String::new, |value| value.to_string());
                 estimate_string_tokens(&marker.data.tool_name) + estimate_string_tokens(&input) + 8
             }
         })

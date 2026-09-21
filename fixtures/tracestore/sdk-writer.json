@@ -189,7 +189,20 @@
   "metrics.json": {
     "turns": 2
   },
+  "raw_input_schema": "{ \"z\": 1e+02, \"a\": { \"two\": \"\u003c\u003e\u0026\\u2028\", \"one\": \"quoted \\\" value \\\\\" }, \"duplicate\": 1, \"duplicate\": 2 }",
+  "raw_request_json": "{\"tools\":[{\"name\":\"raw\",\"input_schema\":{\"z\":1e+02,\"a\":{\"two\":\"\\u003c\\u003e\\u0026\\u2028\",\"one\":\"quoted \\\" value \\\\\"},\"duplicate\":1,\"duplicate\":2},\"read_only\":false,\"needs_approval\":false}],\"settings\":{}}",
   "request_json": "{\"agent_name\":\"agent\",\"model\":\"requested\",\"instructions\":\"system instructions\",\"settings\":{}}",
+  "request_variants": [
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":0}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":-0.25}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":1e-7}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":0.000001}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":100000000000000000000}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":1e+21}}",
+    "{\"agent_name\":\"agent\",\"instructions\":\"\\u003cinstruction\\u003e\\u0026\\u2028\\u2029\",\"settings\":{\"temperature\":0.12345678901234566}}",
+    "{\"tools\":[{\"name\":\"raw\",\"input_schema\":{\"z\":1e+02,\"a\":{\"two\":\"\\u003c\\u003e\\u0026\\u2028\",\"one\":\"quoted \\\" value \\\\\"},\"duplicate\":1,\"duplicate\":2},\"read_only\":false,\"needs_approval\":false}],\"settings\":{}}",
+    "{\"agent_name\":\"agent\",\"model\":\"model\",\"instructions\":\"instructions\",\"input_items\":[{\"type\":\"message\",\"agent_name\":\"agent\",\"message_text\":\"input\",\"message_phase\":\"commentary\"}],\"tools\":[{\"name\":\"tool\",\"description\":\"description\",\"input_schema\":{\"type\":\"object\"},\"read_only\":true,\"needs_approval\":true,\"timeout_seconds\":30}],\"settings\":{\"temperature\":0.5,\"max_tokens\":100,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":50,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"stop\"]},\"output_schema\":{\"name\":\"output\",\"schema\":{\"type\":\"object\"},\"strict\":true},\"input_token_estimate\":11,\"request_overhead_token_estimate\":22,\"total_token_estimate\":33}"
+  ],
   "resolved_instructions/turn_003_attempt_002.txt": {
     "bytes": 19,
     "captured": false,

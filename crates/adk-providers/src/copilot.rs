@@ -115,6 +115,10 @@ impl Copilot {
     }
 }
 impl Model for Copilot {
+    fn info(&self, model: &str) -> adk_core::ModelInfo {
+        let model = normalize(model);
+        self.select(model).info(model)
+    }
     fn provider(&self) -> &str {
         &self.name
     }

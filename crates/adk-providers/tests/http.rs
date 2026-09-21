@@ -1116,3 +1116,47 @@ async fn anthropic_thinking_repair_is_learned_only_for_its_model() {
         .collect();
     assert_eq!(kinds, ["enabled", "adaptive", "adaptive", "enabled"]);
 }
+
+#[test]
+fn generation_metadata_resolves_routes_aliases_and_cache_accounting_without_io() {
+    use adk_providers::{
+        factory::{Kind, RouteSpec},
+        routing::Routes,
+    };
+    for (protocol, includes_cache) in [
+        (Protocol::Responses, true),
+        (Protocol::Chat, true),
+        (Protocol::Anthropic, false),
+    ] {
+        let scope = Scope::new("wire", "http://127.0.0.1:9", None, AuthMode::ApiKey).unwrap();
+        let model = Arc::new(
+            Provider::new(
+                "wire",
+                protocol,
+                Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+            )
+            .unwrap(),
+        );
+        let mut routes = Routes::new("named");
+        routes.register_kind("named", Kind::OpenAi, model).unwrap();
+        let info = routes.info("named/gpt-5.6");
+        assert_eq!(info.provider, "wire");
+        assert_eq!(info.model, "gpt-5.6");
+        assert_eq!(info.input_tokens_include_cache, Some(includes_cache));
+    }
+    let model = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: Some("work".into()),
+        endpoint: Some("http://127.0.0.1:9".into()),
+        protocol: None,
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    }
+    .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+    .unwrap();
+    assert_eq!(
+        model.info("claude-sonnet-4.5").input_tokens_include_cache,
+        Some(false)
+    );
+    assert_eq!(model.info("gpt-5.6").input_tokens_include_cache, Some(true));
+}

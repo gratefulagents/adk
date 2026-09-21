@@ -9,6 +9,7 @@ use std::sync::{Arc, Mutex};
 
 fn trace() -> Trace {
     Trace {
+        spans: vec![],
         id: "trace".into(),
         name: "fixture".into(),
         start_time: "2025-01-02T03:04:05Z".parse().unwrap(),
@@ -261,5 +262,152 @@ fn final_attributes_replace_start_values_and_sensitive_text_is_redacted() {
         tool.status,
         opentelemetry::trace::Status::Error { .. }
     ));
+    telemetry.shutdown().unwrap();
+}
+
+#[tokio::test]
+async fn actual_runner_exports_generation_retry_usage_identity_and_single_cost_estimate() {
+    use adk_core::*;
+    use adk_runtime::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    struct ModelImpl(AtomicUsize);
+    impl Model for ModelImpl {
+        fn provider(&self) -> &str {
+            "router"
+        }
+        fn info(&self, _: &str) -> ModelInfo {
+            ModelInfo {
+                provider: "test-wire".into(),
+                model: "wire-model".into(),
+                input_tokens_include_cache: Some(true),
+            }
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                if self.0.fetch_add(1, Ordering::SeqCst) == 0 {
+                    return Err(Error::new(ErrorCategory::Provider, "retry"));
+                }
+                Ok(ModelResponse {
+                    items: vec![RunItem::Message {
+                        message: Message {
+                            role: Role::Assistant,
+                            content: vec![Content::Text {
+                                text: "done".into(),
+                            }],
+                        },
+                    }],
+                    usage: Usage {
+                        input_tokens: 12,
+                        output_tokens: 3,
+                        cache_read_tokens: 4,
+                        context_tokens: Some(12),
+                        ..Default::default()
+                    },
+                    end_turn: None,
+                    response_id: None,
+                    metadata: Default::default(),
+                })
+            })
+        }
+    }
+    struct HostImpl;
+    impl Host for HostImpl {
+        fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async { Ok(()) })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { panic!("unexpected approval") })
+        }
+    }
+    struct Cost(AtomicUsize);
+    impl CostEstimator for Cost {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            0.5
+        }
+    }
+    let exporter = InMemorySpanExporter::default();
+    let telemetry = Telemetry::with_exporter("fixture", exporter.clone());
+    let processor = telemetry.span_processor();
+    processor.on_trace_start(&trace());
+    let cost = Arc::new(Cost(AtomicUsize::new(0)));
+    let runner = Runner::new(
+        AgentConfig::new(
+            "agent",
+            ModelBinding::complete("route/alias", Arc::new(ModelImpl(AtomicUsize::new(0)))),
+        ),
+        RunnerConfig {
+            generation_observer: Some(processor.clone()),
+            cost_estimator: Some(cost.clone()),
+            retry: RetryPolicy {
+                max_retries: 1,
+                initial_delay: std::time::Duration::ZERO,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let context = Context {
+        run_id: "trace".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let result = runner
+        .run(
+            context,
+            RunRequest {
+                input: vec![],
+                policy: RunPolicy::default(),
+            },
+            Arc::new(HostImpl),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(serde_json::json!("done")));
+    assert_eq!(cost.0.load(Ordering::SeqCst), 1);
+    processor.on_trace_end(&trace());
+    telemetry.force_flush().unwrap();
+    let exported = exporter.get_finished_spans().unwrap();
+    let generations = exported
+        .iter()
+        .filter(|s| s.name == "llm.generation")
+        .collect::<Vec<_>>();
+    assert_eq!(generations.len(), 2);
+    let attrs = |span: &opentelemetry_sdk::trace::SpanData| {
+        span.attributes
+            .iter()
+            .map(|attr| (attr.key.as_str().to_owned(), attr.value.to_string()))
+            .collect::<std::collections::BTreeMap<_, _>>()
+    };
+    let failed = attrs(generations[0]);
+    assert_eq!(failed["gen.status"], "retrying");
+    assert_eq!(failed["gen.retry_scheduled"], "true");
+    let succeeded = attrs(generations[1]);
+    for (key, value) in [
+        ("gen.status", "completed"),
+        ("gen.requested_model", "route/alias"),
+        ("gen.resolved_model", "wire-model"),
+        ("gen.model_provider", "test-wire"),
+        ("gen.model_canonical", "route/alias"),
+        ("gen.scope", "top_level"),
+        ("gen.input_tokens", "12"),
+        ("gen.output_tokens", "3"),
+        ("gen.total_tokens", "15"),
+        ("gen.cost_usd", "0.5"),
+        ("gen.cost_known", "true"),
+        ("gen.input_tokens_include_cache", "true"),
+        ("gen.input_tokens_include_cache_known", "true"),
+    ] {
+        assert_eq!(succeeded[key], value, "{key}");
+    }
     telemetry.shutdown().unwrap();
 }

@@ -2,7 +2,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
-fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
+pub(crate) fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
     d: D,
 ) -> Result<T, D::Error> {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
@@ -32,15 +32,30 @@ fn is_zero<T: Default + PartialEq>(v: &T) -> bool {
 }
 
 // RawMessage distinguishes a nil slice from the explicit JSON bytes `null`.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default)]
 pub enum RawJson {
     #[default]
     Missing,
     Present(Value),
+    Encoded(Box<serde_json::value::RawValue>),
 }
 impl RawJson {
+    pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
+        match self {
+            Self::Missing => None,
+            Self::Present(value) => Some(std::borrow::Cow::Borrowed(value)),
+            Self::Encoded(raw) => Some(std::borrow::Cow::Owned(
+                serde_json::from_str(raw.get()).expect("validated JSON"),
+            )),
+        }
+    }
     pub fn is_missing(&self) -> bool {
         matches!(self, Self::Missing)
+    }
+}
+impl PartialEq for RawJson {
+    fn eq(&self, other: &Self) -> bool {
+        self.value() == other.value()
     }
 }
 impl Serialize for RawJson {
@@ -48,12 +63,13 @@ impl Serialize for RawJson {
         match self {
             Self::Missing => s.serialize_none(),
             Self::Present(v) => v.serialize(s),
+            Self::Encoded(raw) => raw.serialize(s),
         }
     }
 }
 impl<'de> Deserialize<'de> for RawJson {
     fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        Value::deserialize(d).map(Self::Present)
+        Box::<serde_json::value::RawValue>::deserialize(d).map(Self::Encoded)
     }
 }
 impl JsonSchema for RawJson {

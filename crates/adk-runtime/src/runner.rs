@@ -47,6 +47,7 @@ use crate::compaction::{
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
+use crate::tracing::{GenerationGuard, GenerationObserver, GenerationStatus};
 
 #[derive(Clone)]
 pub enum ModelBinding {
@@ -358,6 +359,7 @@ pub struct RunnerConfig {
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
     pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
+    pub generation_observer: Option<Arc<dyn GenerationObserver>>,
     pub limits: Limits,
     pub cost_estimator: Option<Arc<dyn CostEstimator>>,
     /// None disables the model inactivity timeout. Host backpressure is excluded.
@@ -396,6 +398,7 @@ impl Default for RunnerConfig {
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
             error_handler: None,
+            generation_observer: None,
             limits: Limits::default(),
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
@@ -1481,7 +1484,7 @@ impl Engine {
         };
         self.compact_local(&mut request, false).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
-        let Some((response, model, streamed)) = self.model_response(request).await? else {
+        let Some((response, model, streamed, cost)) = self.model_response(request).await? else {
             self.phase = Phase::Model;
             self.checkpoint(Boundary::ModelCompleted, None).await?;
             return Ok(());
@@ -1491,7 +1494,7 @@ impl Engine {
             response: response.clone(),
         })
         .await?;
-        self.record_response(response.clone(), &model)?;
+        self.record_response(response.clone(), &model, cost)?;
         self.charge_child_usage().await?;
         self.publish_committed().await?;
         if !streamed {
@@ -1758,16 +1761,22 @@ impl Engine {
         self.cost += cost;
         Ok(())
     }
-    fn record_response(&mut self, response: ModelResponse, model: &str) -> Result<(), Error> {
+    fn record_response(
+        &mut self,
+        response: ModelResponse,
+        model: &str,
+        known_cost: Option<f64>,
+    ) -> Result<(), Error> {
         for item in &response.items {
             self.append(item.clone());
         }
-        let cost = self
-            .config
-            .cost_estimator
-            .as_ref()
-            .map(|c| c.cost(model, &response.usage))
-            .unwrap_or(0.0);
+        let cost = known_cost.unwrap_or_else(|| {
+            self.config
+                .cost_estimator
+                .as_ref()
+                .map(|c| c.cost(model, &response.usage))
+                .unwrap_or(0.0)
+        });
         let accounting = self.account_usage(&response.usage, cost);
         self.result.responses.push(response);
         accounting
@@ -1775,7 +1784,7 @@ impl Engine {
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
-    ) -> Result<Option<(ModelResponse, String, bool)>, Error> {
+    ) -> Result<Option<(ModelResponse, String, bool, Option<f64>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
@@ -1823,6 +1832,23 @@ impl Engine {
                         .await?;
                 }
                 self.checkpoint(Boundary::ModelDispatched, None).await?;
+                let mut generation = self.config.generation_observer.as_ref().map(|observer| {
+                    let info = match binding {
+                        ModelBinding::Complete { model, .. } => model.info(&request.model),
+                        ModelBinding::Streaming { model, .. } => model.info(&request.model),
+                    };
+                    GenerationGuard::new(
+                        observer.clone(),
+                        &self.context,
+                        &self.agent.name,
+                        info,
+                        self.child_control.as_ref().map(|control| control.task_id()),
+                        self.turns,
+                        &request,
+                    )
+                });
+                let responses_before = self.result.responses.len();
+                let cost_before = self.cost;
                 let control = self.child_control.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
                 let attempt_result = {
@@ -1844,8 +1870,30 @@ impl Engine {
                         attempt.await
                     }
                 };
+                if let Some(generation) = &mut generation {
+                    generation.returned();
+                    if self.result.responses.len() > responses_before {
+                        generation.record.response = self.result.responses.last().cloned();
+                        generation.record.cost_usd = self
+                            .config
+                            .cost_estimator
+                            .as_ref()
+                            .map(|_| self.cost - cost_before);
+                    }
+                }
                 match attempt_result {
                     Ok(response) => {
+                        let cost = self
+                            .config
+                            .cost_estimator
+                            .as_ref()
+                            .map(|estimator| estimator.cost(binding.name(), &response.usage));
+                        if let Some(generation) = &mut generation {
+                            generation.record.response = Some(response.clone());
+                            generation.record.cost_usd =
+                                cost.filter(|cost| cost.is_finite() && *cost >= 0.0);
+                            generation.finish(GenerationStatus::Completed);
+                        }
                         self.calibration.observe_estimate(
                             response
                                 .usage
@@ -1863,9 +1911,13 @@ impl Engine {
                             response,
                             binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
+                            cost,
                         )));
                     }
                     Err((error, committed)) => {
+                        if let Some(generation) = &mut generation {
+                            generation.record.error = Some(error.info.clone());
+                        }
                         if self.durable_state.is_some() && self.child_control.is_none() {
                             return Err(error);
                         }
@@ -1896,6 +1948,12 @@ impl Engine {
                             ModelBinding::Complete { model, .. } => model.retry_advice(&error),
                             ModelBinding::Streaming { model, .. } => model.retry_advice(&error),
                         };
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_reason = advice
+                                .as_ref()
+                                .map(|advice| advice.reason.trim().to_owned())
+                                .filter(|reason| !reason.is_empty());
+                        }
                         if let Some(next) = candidates.get(index + 1).filter(|_| {
                             error.info.category != ErrorCategory::ModelBehavior
                                 && (idle
@@ -1921,6 +1979,10 @@ impl Engine {
                                             .any(|part| reason.contains(part)))
                                     }))
                         }) {
+                            if let Some(generation) = &mut generation {
+                                generation.record.fallback_model = Some(next.name().into());
+                                generation.finish(GenerationStatus::Fallback);
+                            }
                             self.fallbacks.insert(agent_key, (index + 1, 0));
                             self.observe(Observation::Fallback {
                                 from: binding.name().into(),
@@ -1931,7 +1993,13 @@ impl Engine {
                         }
                         if let Some(handler) = &self.config.error_handler {
                             match handler.handle(&self.agent.name, self.turns - 1, &error) {
-                                ModelErrorAction::Retry | ModelErrorAction::Continue => continue,
+                                ModelErrorAction::Retry => {
+                                    if let Some(generation) = &mut generation {
+                                        generation.finish(GenerationStatus::Retrying);
+                                    }
+                                    continue;
+                                }
+                                ModelErrorAction::Continue => continue,
                                 ModelErrorAction::Abort => {
                                     return Err(self.child_model_failure(error));
                                 }
@@ -1976,6 +2044,10 @@ impl Engine {
                                 .min(Duration::from_secs(30))
                         }
                         .min(Duration::from_secs(300));
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_after = Some(delay);
+                            generation.finish(GenerationStatus::Retrying);
+                        }
                         self.observe(Observation::Retry {
                             model: binding.name().into(),
                             delay,
@@ -2092,7 +2164,7 @@ impl Engine {
                     Ok(response) => Ok(response),
                     Err(error) => {
                         if let Some(response) = complete {
-                            let _ = self.record_response(response, binding.name());
+                            let _ = self.record_response(response, binding.name(), None);
                             let _ = self.charge_child_usage().await;
                         } else {
                             if !delta_text.is_empty() {

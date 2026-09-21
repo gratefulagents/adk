@@ -1901,3 +1901,145 @@ async fn tool_output_replacement_reaches_model_and_stop_after_tool_checks_output
         }
     }
 }
+
+#[derive(Default)]
+struct Generations {
+    records: Mutex<Vec<(bool, adk_runtime::tracing::GenerationRecord)>>,
+}
+impl adk_runtime::tracing::GenerationObserver for Generations {
+    fn start(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((false, record.clone()));
+    }
+    fn end(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((true, record.clone()));
+    }
+}
+
+#[tokio::test]
+async fn generation_records_capture_actual_requests_final_retry_decisions_and_responses() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
+    let generations = Arc::new(Generations::default());
+    let config = RunnerConfig {
+        generation_observer: Some(generations.clone()),
+        retry: RetryPolicy {
+            max_retries: 1,
+            initial_delay: Duration::ZERO,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let outcome = Runner::new(agent(model.clone()), config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 4);
+    assert_eq!(
+        records.iter().map(|(ended, _)| *ended).collect::<Vec<_>>(),
+        vec![false, true, false, true]
+    );
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_ne!(records[0].1.id, records[2].1.id);
+    assert_eq!(records[1].1.status, GenerationStatus::Retrying);
+    assert_eq!(records[1].1.retry_after, Some(Duration::ZERO));
+    assert!(records[1].1.error.is_some());
+    assert_eq!(records[3].1.status, GenerationStatus::Completed);
+    assert_eq!(
+        records[3].1.response.as_ref().unwrap().usage.input_tokens,
+        10
+    );
+    assert_eq!(records[0].1.request, model.requests.lock().unwrap()[0]);
+    assert!(records[0].1.ended_at.is_none());
+    assert!(records[1].1.ended_at.is_some());
+}
+
+#[tokio::test]
+async fn dropping_provider_future_closes_generation_once_without_detached_work() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::streaming(vec![StreamStep::Pending]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut stream = runner.stream(context(), request(3), Arc::new(TestHost::default()));
+    for _ in 0..10 {
+        if tokio::time::timeout(Duration::from_millis(5), stream.next())
+            .await
+            .is_err()
+        {
+            break;
+        }
+    }
+    drop(stream);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(records[1].1.status, GenerationStatus::Interrupted);
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn generation_retains_returned_response_when_host_rejects_stream_completion() {
+    struct RejectCompletion;
+    impl Host for RejectCompletion {
+        fn emit<'a>(&'a self, _: &'a Context, event: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(
+                    event,
+                    RunEvent::Model {
+                        event: ModelEvent::Complete { .. }
+                    }
+                ) {
+                    Err(Error::new(ErrorCategory::Host, "completion rejected"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { panic!("unexpected approval") })
+        }
+    }
+    let model = TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
+        response: answer("returned"),
+    })]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .stream(context(), request(3), Arc::new(RejectCompletion))
+        .finish()
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Host);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(
+        records[1].1.status,
+        adk_runtime::tracing::GenerationStatus::Failed
+    );
+    assert_eq!(records[1].1.response, Some(answer("returned")));
+    assert_eq!(
+        records[1].1.error.as_ref().unwrap().category,
+        ErrorCategory::Host
+    );
+}

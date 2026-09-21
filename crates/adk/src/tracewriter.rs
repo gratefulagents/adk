@@ -50,7 +50,7 @@ impl Snapshot {
         Ok(Self { bytes, value })
     }
     pub fn from_serializable(value: &impl Serialize) -> Result<Self, serde_json::Error> {
-        Self::from_json(serde_json::to_vec(value)?)
+        Self::from_json(adk_codec::snapshots::to_go_json(value)?)
     }
 }
 
@@ -191,6 +191,25 @@ pub struct Span {
     pub data: Option<SpanData>,
 }
 impl Span {
+    pub fn new(
+        name: impl Into<String>,
+        parent_id: impl Into<String>,
+        data: Option<SpanData>,
+    ) -> Self {
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            parent_id: parent_id.into(),
+            name: name.into(),
+            start_time: now(),
+            end_time: crate::tracestore::ZERO_TIME
+                .parse()
+                .expect("zero timestamp"),
+            data,
+        }
+    }
+    pub fn finish(&mut self) {
+        self.end_time = now();
+    }
     pub fn duration_ms(&self) -> i64 {
         let end = if self.end_time
             == crate::tracestore::ZERO_TIME
@@ -207,10 +226,31 @@ impl Span {
 
 #[derive(Debug, Clone)]
 pub struct Trace {
+    pub spans: Vec<Span>,
     pub id: String,
     pub name: String,
     pub start_time: Timestamp,
     pub end_time: Timestamp,
+}
+
+impl Trace {
+    pub fn new(name: impl Into<String>) -> Self {
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            name: name.into(),
+            start_time: now(),
+            end_time: crate::tracestore::ZERO_TIME
+                .parse()
+                .expect("zero timestamp"),
+            spans: vec![],
+        }
+    }
+    pub fn add_span(&mut self, span: Span) {
+        self.spans.push(span);
+    }
+    pub fn finish(&mut self) {
+        self.end_time = now();
+    }
 }
 
 struct State {
@@ -672,5 +712,163 @@ impl RunHooks for TraceWriter {
             }
             Ok(())
         })
+    }
+}
+
+impl adk_runtime::tracing::GenerationObserver for TraceWriter {
+    fn start(&self, context: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.span_start(&generation_span(context, record));
+    }
+    fn end(&self, context: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.span_end(&generation_span(context, record));
+    }
+}
+
+pub(crate) fn generation_span(
+    context: &adk_core::Context,
+    record: &adk_runtime::tracing::GenerationRecord,
+) -> Span {
+    use crate::tracewriter::Generation;
+    use adk_runtime::tracing::GenerationStatus;
+    let model = record.request.model.trim();
+    let provider = record.provider.trim().to_ascii_lowercase();
+    let canonical = if let Some((prefix, bare)) = model.split_once('/') {
+        format!("{}/{bare}", prefix.to_ascii_lowercase())
+    } else if provider.is_empty() {
+        model.into()
+    } else {
+        format!("{provider}/{model}")
+    };
+    let error = record
+        .error
+        .as_ref()
+        .map_or("", |error| error.message.as_str());
+    let failure_kind = record.retry_reason.clone().unwrap_or_else(|| {
+        record.error.as_ref().map_or_else(String::new, |error| {
+            if error
+                .message
+                .to_ascii_lowercase()
+                .contains("context_length_exceeded")
+                || error
+                    .message
+                    .to_ascii_lowercase()
+                    .contains("exceeds the context window")
+            {
+                return "context_length_exceeded".into();
+            }
+            match error.category {
+                adk_core::ErrorCategory::Cancelled => "context_canceled",
+                adk_core::ErrorCategory::DeadlineExceeded => "deadline_exceeded",
+                adk_core::ErrorCategory::ModelBehavior => "model_behavior",
+                _ => "error",
+            }
+            .into()
+        })
+    });
+    let mut generation = Generation {
+        requested_model: model.into(),
+        resolved_model: record.resolved_model.clone(),
+        input_tokens_include_cache: record.input_tokens_include_cache.unwrap_or(false),
+        input_tokens_include_cache_known: record.input_tokens_include_cache.is_some(),
+        model_provider: provider,
+        model_canonical: canonical,
+        attempt_number: i64::from(record.turn),
+        generation_turn: i64::from(record.turn),
+        scope: if record.task_id.is_some() {
+            "subagent"
+        } else {
+            "top_level"
+        }
+        .into(),
+        task_id: record.task_id.clone().unwrap_or_default(),
+        status: match record.status {
+            GenerationStatus::Started => "",
+            GenerationStatus::Completed => "completed",
+            GenerationStatus::Failed => "failed",
+            GenerationStatus::Retrying => "retrying",
+            GenerationStatus::Fallback => "fallback",
+            GenerationStatus::Interrupted => "interrupted",
+        }
+        .into(),
+        latency_ms: record.latency.as_millis().min(i64::MAX as u128) as i64,
+        success: record.status == GenerationStatus::Completed,
+        retry_scheduled: record.retry_after.is_some(),
+        retry_after_ms: record
+            .retry_after
+            .map_or(0, |delay| delay.as_millis().min(i64::MAX as u128) as i64),
+        fallback_scheduled: record.fallback_model.is_some(),
+        fallback_from_model: record
+            .fallback_model
+            .as_ref()
+            .map_or_else(String::new, |_| model.into()),
+        fallback_to_model: record.fallback_model.clone().unwrap_or_default(),
+        failure_kind: failure_kind.clone(),
+        error: error.into(),
+        tool_count: record.request.tools.len() as i64,
+        input_item_count: record.request.input.len() as i64,
+        instructions_length: record.request.instructions.len() as i64,
+        cost_usd: record.cost_usd.unwrap_or_default(),
+        cost_known: record.cost_usd.is_some(),
+        ..Default::default()
+    };
+    if record.fallback_model.is_some() {
+        let reason = record
+            .retry_reason
+            .as_deref()
+            .unwrap_or("")
+            .to_ascii_lowercase();
+        generation.fallback_reason = if reason == "429"
+            || ["rate_limit", "too_many_requests", "too many requests"]
+                .iter()
+                .any(|s| reason.contains(s))
+        {
+            "rate_limit".into()
+        } else if matches!(reason.as_str(), "503" | "529") || reason.contains("overloaded") {
+            "overloaded".into()
+        } else if reason == "402"
+            || [
+                "quota",
+                "billing",
+                "subscription",
+                "credit",
+                "limit_exceeded",
+                "exhausted",
+            ]
+            .iter()
+            .any(|s| reason.contains(s))
+        {
+            "quota".into()
+        } else {
+            failure_kind
+        };
+    }
+    if let Some(response) = &record.response {
+        generation.usage_available = true;
+        generation.prompt_tokens = response.usage.input_tokens.min(i64::MAX as u64) as i64;
+        generation.completion_tokens = response.usage.output_tokens.min(i64::MAX as u64) as i64;
+        generation.cache_read_tokens = response.usage.cache_read_tokens.min(i64::MAX as u64) as i64;
+        generation.cache_creation_tokens =
+            response.usage.cache_creation_tokens.min(i64::MAX as u64) as i64;
+        generation.total_tokens = response
+            .usage
+            .input_tokens
+            .saturating_add(response.usage.output_tokens)
+            .min(i64::MAX as u64) as i64;
+        generation.output_item_count = response.items.len() as i64;
+    }
+    Span {
+        id: record.id.clone(),
+        parent_id: context.run_id.clone(),
+        name: "generation".into(),
+        start_time: chrono::DateTime::<chrono::Utc>::from(record.started_at).fixed_offset(),
+        end_time: record
+            .ended_at
+            .map(|end| chrono::DateTime::<chrono::Utc>::from(end).fixed_offset())
+            .unwrap_or_else(|| {
+                crate::tracestore::ZERO_TIME
+                    .parse()
+                    .expect("zero timestamp")
+            }),
+        data: Some(SpanData::Generation(Box::new(generation))),
     }
 }

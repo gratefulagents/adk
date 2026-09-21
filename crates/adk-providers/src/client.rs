@@ -238,6 +238,13 @@ impl Provider {
     }
 }
 impl Model for Provider {
+    fn info(&self, model: &str) -> adk_core::ModelInfo {
+        adk_core::ModelInfo {
+            provider: self.name.clone(),
+            model: model.into(),
+            input_tokens_include_cache: Some(self.protocol != Protocol::Anthropic),
+        }
+    }
     fn provider(&self) -> &str {
         &self.name
     }

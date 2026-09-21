@@ -12,6 +12,7 @@ pub use guardrails::{
     run_guardrails, run_tool_output_guardrails,
 };
 pub mod hooks;
+pub mod tracing;
 pub use hooks::{CompositeHooks, HookErrors};
 pub mod compat;
 pub mod output;

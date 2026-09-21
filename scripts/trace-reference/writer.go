@@ -64,6 +64,33 @@ func writerFixture() {
 	path, err := store.RunDir("run")
 	must(err)
 	result := map[string]any{"request_json": string(requestBytes), "response_json": string(responseBytes)}
+	var variants []string
+	for _, temperature := range []float64{0, -0.25, 1e-7, 1e-6, 1e20, 1e21, 0.12345678901234567} {
+		snapshot := agent.LLMRequestSnapshot{AgentName: "agent", Instructions: "<instruction>&\u2028\u2029", Settings: agent.ModelSettings{Temperature: &temperature}}
+		encoded, err := json.Marshal(snapshot)
+		must(err)
+		variants = append(variants, string(encoded))
+	}
+	rawSnapshot := agent.LLMRequestSnapshot{Tools: []agent.LLMToolSnapshot{{Name: "raw", InputSchema: json.RawMessage(`{ "z": 1e+02, "a": { "two": "<>&\u2028", "one": "quoted \" value \\" }, "duplicate": 1, "duplicate": 2 }`)}}}
+	rawEncoded, err := json.Marshal(rawSnapshot)
+	must(err)
+	variants = append(variants, string(rawEncoded))
+	result["raw_input_schema"] = string(rawSnapshot.Tools[0].InputSchema)
+	result["raw_request_json"] = string(rawEncoded)
+	temperature, topP, parallel := 0.5, 0.9, true
+	completeSnapshot := agent.LLMRequestSnapshot{
+		AgentName: "agent", Model: "model", Instructions: "instructions",
+		InputItems:         []agent.LLMRunItemSnapshot{{Type: "message", AgentName: "agent", MessageText: "input", MessagePhase: "commentary"}},
+		Tools:              []agent.LLMToolSnapshot{{Name: "tool", Description: "description", InputSchema: json.RawMessage(`{"type":"object"}`), ReadOnly: true, NeedsApproval: true, TimeoutSeconds: 30}},
+		Settings:           agent.ModelSettings{Temperature: &temperature, MaxTokens: 100, TopP: &topP, ToolChoice: "auto", ParallelToolCalls: &parallel, ThinkingBudget: 50, ReasoningEffort: "high", TextVerbosity: "low", StopSequences: []string{"stop"}},
+		OutputSchema:       &agent.LLMOutputSchema{Name: "output", Schema: json.RawMessage(`{"type":"object"}`), Strict: true},
+		InputTokenEstimate: 11, RequestOverheadTokenEstimate: 22, TotalTokenEstimate: 33,
+	}
+	completeEncoded, err := json.Marshal(completeSnapshot)
+	must(err)
+	variants = append(variants, string(completeEncoded))
+	result["request_variants"] = variants
+
 	for _, category := range []string{"spans", "llm_calls", "tool_calls", "agent_transitions"} {
 		bytes, err := os.ReadFile(filepath.Join(path, category+".jsonl"))
 		must(err)

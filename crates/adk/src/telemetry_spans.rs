@@ -1,4 +1,4 @@
-use crate::tracewriter::{Span, SpanData, Trace};
+use crate::tracewriter::{Span, SpanData, Trace, generation_span};
 use opentelemetry::{
     Context, KeyValue,
     trace::{Status, TraceContextExt, Tracer},
@@ -343,4 +343,13 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
         }
     };
     (name, attrs)
+}
+
+impl adk_runtime::tracing::GenerationObserver for SpanProcessor {
+    fn start(&self, context: &adk_core::Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.on_span_start(&generation_span(context, record));
+    }
+    fn end(&self, context: &adk_core::Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.on_span_end(&generation_span(context, record));
+    }
 }

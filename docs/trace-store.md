@@ -73,9 +73,34 @@ quotas remain independent of the model-facing output cap. `init_run` and
 `finalize_run` are explicit; finalize does not close a shared store.
 
 `fixtures/tracestore/sdk-writer.json` independently checks all typed span kinds
-and hook categories against the pinned Go writer. Automatic runtime generation
-span/snapshot assembly remains a separate obligation: supplying typed spans in a
-fixture does not prove that the runner produces them automatically.
+and hook categories against the pinned Go writer. `Trace::new`, `Span::new`,
+`Trace::add_span`, and `finish` provide explicit, owned lifecycle operations.
+Span duration uses the current time until finish and the recorded interval after
+finish; owned trace collection preserves insertion order.
+
+`RunnerConfig::generation_observer` accepts either an `Arc<TraceWriter>` or
+`Telemetry::span_processor()`. The runner records the actual dispatched request,
+resolved provider/model identity, response, usage, cost, and final retry/fallback
+decision. Each started record ends once, including when the run future is dropped.
+A response already returned by a streaming provider survives a subsequent host
+completion error. Cost estimation is performed once per successful response.
+Observers are synchronous and must not panic, detach work, or change policy.
+Attach the writer separately as `RunHooks` when hook categories are also wanted;
+store/run initialization and finalization remain host-owned.
+
+The `compat::snapshots::RequestSnapshot` document serializes every pinned request
+field. `Snapshot::from_serializable` uses the Go-compatible serializer, including
+float notation, HTML escaping and compaction of raw JSON without sorting keys,
+dropping duplicate keys or rewriting raw numbers. The independent fixture and
+Rust digest tests cover these byte-level properties, not just JSON equality.
+
+Automatic generation span production is tested with a real Rust runner, including
+retry and successful usage. **Automatic schema-2 request/response snapshot
+assembly remains incomplete**: native history does not carry all SDK agent
+provenance. The generation observer does not fabricate that missing information;
+callers supplying typed spans can attach explicit `Snapshot` documents. Producing
+a span or passing its manually assembled fixture does not close this remaining
+compatibility obligation.
 
 ## Exporters
 

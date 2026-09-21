@@ -101,6 +101,7 @@ fn partial_run_retains_history_usage_and_cause() {
         },
         pending_approvals: vec![],
         last_agent: Some("assistant".into()),
+        guardrails: vec![],
     };
     let error = RunError::with_partial(
         Error::new(ErrorCategory::MaxTurns, "turn budget exhausted")

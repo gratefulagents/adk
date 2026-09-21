@@ -1765,3 +1765,139 @@ async fn error_handler_retry_and_continue_spend_attempt_turns() {
         assert_eq!(model.completes.load(Ordering::SeqCst), 2);
     }
 }
+
+struct FixedGuard {
+    trip: bool,
+    replacement: Value,
+}
+impl Guardrail for FixedGuard {
+    fn name(&self) -> &str {
+        "policy"
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        _: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            Ok(Some(GuardrailResult {
+                tripwire_triggered: self.trip,
+                replacement_content: self.replacement.as_str().map(str::to_owned),
+                output: self.replacement.clone(),
+            }))
+        })
+    }
+}
+fn fixed_guard(trip: bool, replacement: Value) -> Arc<dyn Guardrail> {
+    Arc::new(FixedGuard { trip, replacement })
+}
+
+#[tokio::test]
+async fn input_tripwire_prevents_provider_and_retains_report() {
+    let model = TestModel::with(vec![Ok(answer("never"))]);
+    let mut a = agent(model.clone());
+    a.input_guardrails.push(fixed_guard(true, json!("blocked")));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+    assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.guardrails.len(), 1);
+    assert!(partial.final_output.is_none());
+}
+
+#[tokio::test]
+async fn output_tripwire_blocks_final_answer_after_provider_usage() {
+    let model = TestModel::with(vec![Ok(answer("answer"))]);
+    let mut a = agent(model.clone());
+    a.output_guardrails.push(fixed_guard(true, Value::Null));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    let partial = error.partial.unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 1);
+    assert!(partial.final_output.is_none());
+    assert_eq!(partial.usage.input_tokens, 10);
+    assert_eq!(partial.guardrails[0].phase, GuardrailPhase::Output);
+}
+
+#[tokio::test]
+async fn tool_input_tripwire_is_model_visible_without_executing_tool() {
+    let model = TestModel::with(vec![
+        Ok(response(vec![call("1", "one")], None)),
+        Ok(answer("done")),
+    ]);
+    let tool = TestTool::new("one", false, false);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    let config = RunnerConfig {
+        tool_input_guardrails: vec![fixed_guard(true, Value::Null)],
+        ..Default::default()
+    };
+    let outcome = Runner::new(a, config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    assert!(
+        outcome
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert_eq!(
+        outcome.result.guardrails[0].phase,
+        GuardrailPhase::ToolInput
+    );
+}
+
+#[tokio::test]
+async fn tool_output_replacement_reaches_model_and_stop_after_tool_checks_output() {
+    for stop in [false, true] {
+        let model = TestModel::with(vec![
+            Ok(response(vec![call("1", "one")], None)),
+            Ok(answer("done")),
+        ]);
+        let mut a = agent(model.clone());
+        a.tools.push(TestTool::new("one", false, false));
+        if stop {
+            a.output_guardrails.push(fixed_guard(true, Value::Null));
+        }
+        let config = RunnerConfig {
+            tool_output_guardrails: vec![fixed_guard(false, json!("sanitized"))],
+            return_tool_output: true,
+            ..Default::default()
+        };
+        let mut request = request(3);
+        if stop {
+            request.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        }
+        let result = Runner::new(a, config)
+            .unwrap()
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await;
+        let snapshot = if stop {
+            result.err().unwrap().partial.unwrap()
+        } else {
+            Box::new(result.unwrap().result)
+        };
+        assert!(snapshot.history.iter().any(|item| matches!(item, RunItem::ToolResult { output, .. } if format!("{:?}", output.content).contains("sanitized"))));
+        assert!(!format!("{:?}", snapshot.history).contains("raw one"));
+        if stop {
+            assert!(snapshot.final_output.is_none());
+            assert_eq!(
+                snapshot.guardrails.last().unwrap().phase,
+                GuardrailPhase::Output
+            );
+        }
+    }
+}

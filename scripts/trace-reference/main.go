@@ -15,6 +15,14 @@ func must(err error) {
 	}
 }
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "otel" {
+		otelFixture()
+		return
+	}
+	if len(os.Args) > 1 && os.Args[1] == "writer" {
+		writerFixture()
+		return
+	}
 	root, err := os.MkdirTemp("", "adk-trace-reference-")
 	must(err)
 	defer os.RemoveAll(root)

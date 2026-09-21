@@ -1,0 +1,217 @@
+{
+  "schema_version": 1,
+  "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "claims": {
+    "SDK-32E4C5FF719DCB40": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceCategoryFull",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::CategoryFull"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRotatesAtChunkLimit",
+      "rationale": "Distinct matchable error with the reference message; exhausting the configured rotation slots returns this error and leaves the active file unchanged.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-E7AFA81BD5E91170": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceEventTooLarge",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::EventTooLarge"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRejectsOversizedEventAndFile",
+      "rationale": "Distinct matchable error with the reference message; the append check includes the added terminal newline and rejects before modifying category content.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-9492B46AC0E7F0D4": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceFileTooLarge",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::FileTooLarge"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRejectsOversizedEventAndFile",
+      "rationale": "Distinct matchable error with the reference message; oversized artifact bytes are rejected before opening or replacing the destination.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6B9B667988470CA3": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Agent",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Agent",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-C2D32265E7C17D49": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Compaction",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Compaction",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-B20217464BF43189": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Function",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Function",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-88D235430367D780": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Generation",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Generation",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-347D7DB78299B6D9": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Guardrail",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Guardrail",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-A959816B6E02F0AA": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Handoff",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Handoff",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-72C4A41E63FC0489": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Retry",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Retry",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-922748E6A42CD9FC": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Session",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Session",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-565BDE76B363533E": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Subagent",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Subagent",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-F46C63A7A2BF2AEA": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestNormalizeOTLPEndpoint",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry.rs::Destination::resolve"
+      ],
+      "rust_test_identifiers": [
+        "pinned_endpoint_normalization_cases"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestNormalizeOTLPEndpoint",
+      "rationale": "The exact pinned normalization table is checked for blank, schemeless, HTTP, HTTPS, case-insensitive scheme and path removal.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    }
+  }
+}

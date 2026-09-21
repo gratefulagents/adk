@@ -1,5 +1,9 @@
 //! Host-owned telemetry exporters with the SDK endpoint-selection defaults.
 
+#[path = "telemetry_spans.rs"]
+mod spans;
+pub use spans::SpanProcessor;
+
 use crate::observability::otel::OtelBridge;
 use adk_core::{Error, ErrorCategory};
 use opentelemetry::{Context, KeyValue, trace::TracerProvider};
@@ -46,6 +50,7 @@ pub struct Telemetry {
     provider: SdkTracerProvider,
     bridge: Arc<OtelBridge<SdkTracer>>,
     destination: Option<Destination>,
+    spans: Arc<SpanProcessor>,
 }
 impl Telemetry {
     pub fn new(service_name: &str) -> Result<Self, Error> {
@@ -112,11 +117,16 @@ impl Telemetry {
             provider.tracer("gratefulagents/agent"),
             Context::new(),
         ));
+        let spans = Arc::new(SpanProcessor::new(provider.tracer("gratefulagents/agent")));
         Self {
+            spans,
             provider,
             bridge,
             destination: None,
         }
+    }
+    pub fn span_processor(&self) -> Arc<SpanProcessor> {
+        self.spans.clone()
     }
     pub fn bridge(&self) -> Arc<OtelBridge<SdkTracer>> {
         self.bridge.clone()

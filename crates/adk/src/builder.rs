@@ -480,6 +480,8 @@ pub struct Builder {
     session: Option<SessionHandle>,
     owned_session: Option<SessionState>,
     runner: RunnerConfig,
+    input_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
+    output_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
     implementations: Vec<Arc<dyn Tool>>,
     extra_tools: Vec<Arc<dyn Tool>>,
     shell: Option<adk_sandbox::Config>,
@@ -502,6 +504,8 @@ impl Builder {
             session: None,
             owned_session: None,
             runner: RunnerConfig::default(),
+            input_guardrails: vec![],
+            output_guardrails: vec![],
             implementations: vec![],
             extra_tools: vec![],
             shell: None,
@@ -545,6 +549,20 @@ impl Builder {
     pub fn owned_session(mut self, session: SessionState) -> Self {
         self.session = Some(session.handle());
         self.owned_session = Some(session);
+        self
+    }
+    pub fn input_guardrails(
+        mut self,
+        guards: impl IntoIterator<Item = Arc<dyn adk_runtime::Guardrail>>,
+    ) -> Self {
+        self.input_guardrails.extend(guards);
+        self
+    }
+    pub fn output_guardrails(
+        mut self,
+        guards: impl IntoIterator<Item = Arc<dyn adk_runtime::Guardrail>>,
+    ) -> Self {
+        self.output_guardrails.extend(guards);
         self
     }
     pub fn runner_config(mut self, config: RunnerConfig) -> Self {
@@ -736,6 +754,8 @@ impl Builder {
             if name.is_empty() { "agent" } else { name },
             ModelBinding::streaming(model, routes.clone()),
         );
+        agent.input_guardrails = self.input_guardrails.clone();
+        agent.output_guardrails = self.output_guardrails.clone();
         agent.instructions = instructions
             .into_iter()
             .filter(|s| !s.is_empty())

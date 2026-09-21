@@ -45,6 +45,7 @@ use crate::compaction::{
     estimate_history_tokens, estimate_history_tokens_with_approvals,
     estimate_request_overhead_tokens, finalize_local_history_with_approvals, output_reserve_tokens,
 };
+use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
 
 #[derive(Clone)]
@@ -101,6 +102,8 @@ pub struct AgentConfig {
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn OutputParser>>,
+    pub input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub settings: Map<String, Value>,
     pub hooks: Option<Arc<dyn RunHooks>>,
 }
@@ -118,6 +121,8 @@ impl AgentConfig {
             output_schema_name: "final_output".into(),
             output_schema_strict: true,
             output_parser: None,
+            input_guardrails: vec![],
+            output_guardrails: vec![],
             settings: Map::new(),
             hooks: None,
         }
@@ -366,6 +371,8 @@ pub struct RunnerConfig {
     pub return_tool_output: bool,
     /// Optional native guardrail; Go leaves argument decoding/validation to each tool.
     pub validate_tool_arguments: bool,
+    pub tool_input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub tool_output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub approve_mutating_tools: bool,
     pub consecutive_tool_error_limit: Option<usize>,
     pub stop_gate: Option<Arc<dyn StopGate>>,
@@ -397,6 +404,8 @@ impl Default for RunnerConfig {
             prompt_cache_namespace: None,
             return_tool_output: false,
             validate_tool_arguments: false,
+            tool_input_guardrails: vec![],
+            tool_output_guardrails: vec![],
             approve_mutating_tools: false,
             consecutive_tool_error_limit: Some(3),
             stop_gate: None,
@@ -689,6 +698,7 @@ impl Runner {
                 usage: Usage::default(),
                 pending_approvals: vec![],
                 last_agent: Some(self.initial.name.clone()),
+                guardrails: vec![],
             },
         }
     }
@@ -704,6 +714,7 @@ enum Phase {
 }
 
 struct ExecutedTool {
+    guardrails: Vec<GuardrailReport>,
     raw: ToolOutput,
     hook_error: Option<Error>,
 }
@@ -1061,6 +1072,17 @@ impl Engine {
             match self.phase {
                 Phase::Start => {
                     validate_history_pairs(&self.result.history)?;
+                    let checked = run_guardrails(
+                        &self.agent.input_guardrails,
+                        &self.context,
+                        &self.agent.name,
+                        GuardrailInput::Input(&self.result.history),
+                    )
+                    .await;
+                    self.result.guardrails.extend(checked.reports);
+                    if let Some(error) = checked.error {
+                        return Err(error);
+                    }
                     self.checkpoint(Boundary::Started, None).await?;
                     self.emit(RunEvent::Started {
                         agent: self.agent.name.clone(),
@@ -1108,6 +1130,7 @@ impl Engine {
                                 }
                                 continue;
                             }
+                            self.check_output_guardrails(&output).await?;
                             self.result.final_output = Some(output);
                         }
                         self.phase = Phase::Finish;
@@ -1636,6 +1659,7 @@ impl Engine {
             self.phase = Phase::Model;
             return Ok(());
         }
+        self.check_output_guardrails(&output).await?;
         self.result.final_output = Some(output.clone());
         self.observe(Observation::AgentEnded {
             agent: self.agent.name.clone(),
@@ -1644,6 +1668,20 @@ impl Engine {
         .await?;
         self.phase = Phase::Finish;
         Ok(())
+    }
+    async fn check_output_guardrails(&mut self, output: &Value) -> Result<(), Error> {
+        let checked = run_guardrails(
+            &self.agent.output_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::Output(output),
+        )
+        .await;
+        self.result.guardrails.extend(checked.reports);
+        match checked.error {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
         if let Some(schema) = &self.agent.output_schema {
@@ -2252,6 +2290,7 @@ impl Engine {
             self.finish_tool(
                 call,
                 ExecutedTool {
+                    guardrails: vec![],
                     raw: output,
                     hook_error: None,
                 },
@@ -2394,6 +2433,29 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
+        let checked = run_guardrails(
+            &self.config.tool_input_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::ToolInput(call),
+        )
+        .await;
+        let tripped = checked.tripped();
+        let mut guardrails = checked.reports;
+        if let Some(error) = checked.error {
+            let raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            return Ok(ExecutedTool {
+                raw,
+                guardrails,
+                hook_error: if tripped { None } else { Some(error) },
+            });
+        }
         self.observe(Observation::ToolStarted {
             agent: self.agent.name.clone(),
             call: call.clone(),
@@ -2473,7 +2535,7 @@ impl Engine {
                 )
                 .await?;
         }
-        let raw = match result {
+        let mut raw = match result {
             Ok(output) => output,
             Err(error) => {
                 if self.durable_state.is_some() {
@@ -2502,6 +2564,28 @@ impl Engine {
                 }
             }
         };
+        let checked = run_tool_output_guardrails(
+            &self.config.tool_output_guardrails,
+            &self.context,
+            &self.agent.name,
+            call,
+            &mut raw,
+        )
+        .await;
+        let tripped = checked.tripped();
+        guardrails.extend(checked.reports);
+        let guardrail_error = if let Some(error) = checked.error {
+            raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            if tripped { None } else { Some(error) }
+        } else {
+            None
+        };
         let hook_error = self
             .observe(Observation::RawToolOutput {
                 call: call.clone(),
@@ -2509,11 +2593,16 @@ impl Engine {
             })
             .await
             .err();
-        Ok(ExecutedTool { raw, hook_error })
+        Ok(ExecutedTool {
+            raw,
+            guardrails,
+            hook_error: guardrail_error.or(hook_error),
+        })
     }
     async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
         self.calls.pop_front();
         self.approvals.remove(&call.id);
+        self.result.guardrails.extend(executed.guardrails);
         let raw = executed.raw;
         self.tool_pause |= raw.should_pause;
         if let Some(error) = executed.hook_error {

@@ -1,4 +1,41 @@
-# Issue #11 verification ledger — pre-implementation audit
+# Issue #11 verification ledger
+
+## Current continuation evidence
+
+The historical audit below is retained; its counts and implementation gaps are
+not a current completion claim. PR33 remains draft and issue #11 is incomplete.
+
+- Both attached source checkouts were restored after runtime migration. SDK HEAD
+  and fetched `v0.0.115` resolve to `1dc92b73900fac74dc357a938e4b5eee6392b418`;
+  source-lock and strict inventory checks pass without baseline edits.
+- Independent pinned public SDK tests: **729 passed test/subtest records, 5
+  skipped, 34 packages**. Store, schema-2 writer and typed OTel exporter fixtures
+  also match independently executed pinned Go output.
+- Typed guardrails now enforce input/output/tool boundaries, explicit output
+  replacement, ordered callbacks, typed tripwires, cancellation and panic
+  isolation. Durable recovery fingerprints policy keys and retains reports.
+  Composite hooks retain all failures while continuing ordered fanout.
+- Schema-2 TraceWriter produces category records, typed spans, snapshot digests,
+  instruction artifacts and health. Typed OTel mapping covers all span kinds,
+  final attributes, error status, trace-ID notification and ended-parent lookup.
+  These fixtures do **not** establish automatic runner generation production.
+- Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
+  **816 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  matrix, independent all-feature consumer, twenty offline scenarios and the
+  workspace doctest pass. The consumer remains transitively platform-free.
+- The overlay now has **13 explicitly verified**, **8,878 unresolved** and
+  **251 excluded** IDs. Three claims cover distinguishable store quota errors;
+  ten cover specific OTel mapping/normalization regressions. Exact tests,
+  compiler and input hashes are retained in `issue-11-rust-evidence.json`.
+  Seven negative evidence-validator tests pass. No blanket closure is inferred.
+
+Remaining work includes automatic generation/span assembly, full higher-level
+runtime/session/helper composition, stdout format/default parity and the
+remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
+external Postgres/pgvector and non-Linux targets remain unverified. Fresh
+independent review is still required before leaving draft status.
+
+## Historical pre-implementation audit
 
 ## Status
 

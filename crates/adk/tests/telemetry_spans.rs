@@ -1,0 +1,265 @@
+#![cfg(feature = "otel")]
+use adk::{
+    telemetry::Telemetry,
+    tracewriter::{Generation, Session, Span, SpanData, Subagent, Trace},
+};
+use opentelemetry_sdk::trace::InMemorySpanExporter;
+use serde_json::Value;
+use std::sync::{Arc, Mutex};
+
+fn trace() -> Trace {
+    Trace {
+        id: "trace".into(),
+        name: "fixture".into(),
+        start_time: "2025-01-02T03:04:05Z".parse().unwrap(),
+        end_time: "2025-01-02T03:04:06Z".parse().unwrap(),
+    }
+}
+fn span(id: &str, parent: &str, data: SpanData) -> Span {
+    let t = trace();
+    Span {
+        id: id.into(),
+        parent_id: parent.into(),
+        name: "operation".into(),
+        start_time: t.start_time,
+        end_time: t.end_time,
+        data: Some(data),
+    }
+}
+fn spans() -> Vec<SpanData> {
+    vec![
+        SpanData::Agent {
+            agent_name: "agent".into(),
+            instructions: "instruction".into(),
+        },
+        SpanData::Generation(Box::new(Generation {
+            requested_model: "requested".into(),
+            resolved_model: "resolved".into(),
+            attempt_number: 2,
+            generation_turn: 3,
+            status: "completed".into(),
+            usage_available: true,
+            prompt_tokens: 12,
+            completion_tokens: 3,
+            total_tokens: 15,
+            success: true,
+            cost_usd: 0.5,
+            input_tokens_include_cache: true,
+            input_tokens_include_cache_known: true,
+            ..Default::default()
+        })),
+        SpanData::Function {
+            tool_name: "Read".into(),
+            input: "input".into(),
+            output: "failure".into(),
+            is_error: true,
+        },
+        SpanData::Handoff {
+            from_agent: "a".into(),
+            to_agent: "b".into(),
+        },
+        SpanData::Guardrail {
+            guardrail_name: "guard".into(),
+            triggered: true,
+        },
+        SpanData::Compaction {
+            tokens_before: 100,
+            tokens_after: 50,
+        },
+        SpanData::Session(Session {
+            model: "model".into(),
+            cost_usd: 0.5,
+            num_turns: 2,
+            duration_ms: 900,
+            input_tokens: 12,
+            output_tokens: 3,
+            cache_read_input_tokens: 4,
+            cache_creation_input_tokens: 2,
+            stop_reason: "completed".into(),
+        }),
+        SpanData::Subagent(Box::new(Subagent {
+            task_id: "child".into(),
+            subagent_type: "researcher".into(),
+            description: "task description".into(),
+            model: "model".into(),
+            status: "completed".into(),
+            cost_usd: 0.5,
+            num_turns: 2,
+            total_tokens: 15,
+            input_tokens: 12,
+            output_tokens: 3,
+            cache_read_tokens: 4,
+            cache_creation_tokens: 2,
+            tool_count: 1,
+            duration_ms: 900,
+            stop_reason: "completed".into(),
+            isolation: "worktree".into(),
+            ..Default::default()
+        })),
+        SpanData::Subagent(Box::new(Subagent {
+            subagent_type: "executor".into(),
+            cache_read_tokens: 1200,
+            cache_creation_tokens: 300,
+            ..Default::default()
+        })),
+        SpanData::Retry {
+            error_code: "rate_limit".into(),
+            attempt: 2,
+            retry_after_ms: 500,
+            max_retries: 3,
+        },
+    ]
+}
+
+#[test]
+fn every_span_kind_matches_independent_pinned_go_export() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-otel.json")).unwrap();
+    let exporter = InMemorySpanExporter::default();
+    let telemetry = Telemetry::with_exporter("fixture", exporter.clone());
+    let processor = telemetry.span_processor();
+    processor.on_trace_start(&trace());
+    for data in spans() {
+        let s = span("span", "trace", data);
+        processor.on_span_start(&s);
+        processor.on_span_end(&s);
+    }
+    processor.on_trace_end(&trace());
+    telemetry.force_flush().unwrap();
+    let exported = exporter.get_finished_spans().unwrap();
+    assert_eq!(exported.len(), fixture.as_object().unwrap().len());
+    for s in exported {
+        let expected = &fixture[s.name.as_ref()];
+        let attrs = expected["attributes"].as_object().unwrap();
+        assert_eq!(s.attributes.len(), attrs.len(), "{}", s.name);
+        for attr in &s.attributes {
+            let expected = &attrs[attr.key.as_str()];
+            match &attr.value {
+                opentelemetry::Value::Bool(v) => {
+                    assert_eq!(Some(*v), expected.as_bool(), "{}", attr.key)
+                }
+                opentelemetry::Value::I64(v) => {
+                    assert_eq!(Some(*v), expected.as_i64(), "{}", attr.key)
+                }
+                opentelemetry::Value::F64(v) => {
+                    assert_eq!(Some(*v), expected.as_f64(), "{}", attr.key)
+                }
+                opentelemetry::Value::String(v) => {
+                    assert_eq!(Some(v.as_str()), expected.as_str(), "{}", attr.key)
+                }
+                _ => panic!("unexpected array"),
+            }
+        }
+        match s.status {
+            opentelemetry::trace::Status::Error { description } => {
+                assert_eq!(expected["status"]["Code"], "Error");
+                assert_eq!(expected["status"]["Description"], description.as_ref());
+            }
+            _ => assert_eq!(expected["status"]["Code"], "Unset"),
+        }
+    }
+    telemetry.shutdown().unwrap();
+}
+
+#[test]
+fn trace_id_callback_is_reentrant_once_and_ended_parents_remain_available() {
+    let exporter = InMemorySpanExporter::default();
+    let telemetry = Telemetry::with_exporter("fixture", exporter.clone());
+    let processor = telemetry.span_processor();
+    assert_eq!(processor.trace_id(), "");
+    let seen = Arc::new(Mutex::new(vec![]));
+    let weak = Arc::downgrade(&processor);
+    let seen_callback = seen.clone();
+    processor.set_on_trace_id_ready(Some(Arc::new(move |id| {
+        assert_eq!(weak.upgrade().unwrap().trace_id(), id);
+        seen_callback.lock().unwrap().push(id);
+    })));
+    processor.on_trace_start(&trace());
+    let root_id = processor.trace_id();
+    let parent = span(
+        "parent",
+        "trace",
+        SpanData::Agent {
+            agent_name: "parent".into(),
+            instructions: String::new(),
+        },
+    );
+    processor.on_span_start(&parent);
+    processor.on_span_end(&parent);
+    let child = span(
+        "child",
+        "parent",
+        SpanData::Agent {
+            agent_name: "child".into(),
+            instructions: String::new(),
+        },
+    );
+    processor.on_span_start(&child);
+    processor.on_span_end(&child);
+    processor.on_trace_end(&trace());
+    let late = span(
+        "late",
+        "unknown",
+        SpanData::Agent {
+            agent_name: "late".into(),
+            instructions: String::new(),
+        },
+    );
+    processor.on_span_start(&late);
+    processor.on_span_end(&late);
+    processor.on_trace_start(&trace());
+    processor.on_trace_end(&trace());
+    telemetry.force_flush().unwrap();
+    assert_eq!(*seen.lock().unwrap(), vec![root_id]);
+    let exported = exporter.get_finished_spans().unwrap();
+    let parent = exported.iter().find(|s| s.name == "agent.parent").unwrap();
+    let child = exported.iter().find(|s| s.name == "agent.child").unwrap();
+    let late = exported.iter().find(|s| s.name == "agent.late").unwrap();
+    assert_eq!(child.parent_span_id, parent.span_context.span_id());
+    assert_eq!(late.span_context.trace_id(), parent.span_context.trace_id());
+    telemetry.shutdown().unwrap();
+}
+
+#[test]
+fn final_attributes_replace_start_values_and_sensitive_text_is_redacted() {
+    let exporter = InMemorySpanExporter::default();
+    let telemetry = Telemetry::with_exporter("fixture", exporter.clone());
+    let processor = telemetry.span_processor();
+    processor.on_trace_start(&trace());
+    let mut s = span(
+        "tool",
+        "trace",
+        SpanData::Function {
+            tool_name: "test".into(),
+            input: "Bearer fake-token".into(),
+            output: "pending".into(),
+            is_error: false,
+        },
+    );
+    processor.on_span_start(&s);
+    s.data = Some(SpanData::Function {
+        tool_name: "test".into(),
+        input: "Bearer fake-token".into(),
+        output: "Bearer another-token".into(),
+        is_error: true,
+    });
+    processor.on_span_end(&s);
+    processor.on_span_end(&s);
+    processor.on_trace_end(&trace());
+    telemetry.force_flush().unwrap();
+    let exported = exporter.get_finished_spans().unwrap();
+    let tool = exported.iter().find(|s| s.name == "tool.test").unwrap();
+    assert_eq!(exported.len(), 2);
+    let rendered = format!("{tool:?}");
+    assert!(
+        !rendered.contains("fake-token")
+            && !rendered.contains("another-token")
+            && !rendered.contains("pending")
+    );
+    assert!(rendered.contains("[REDACTED]"));
+    assert!(matches!(
+        tool.status,
+        opentelemetry::trace::Status::Error { .. }
+    ));
+    telemetry.shutdown().unwrap();
+}

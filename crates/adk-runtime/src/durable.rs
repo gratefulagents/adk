@@ -585,7 +585,12 @@ impl Runner {
 
     fn durable_fingerprint(&self) -> Result<String, Error> {
         let config = &self.config;
-        if config.compaction.is_some()
+        if config
+            .tool_input_guardrails
+            .iter()
+            .chain(&config.tool_output_guardrails)
+            .any(|g| g.durable_key().is_none_or(str::is_empty))
+            || config.compaction.is_some()
             || config.turn_context.is_some()
             || config
                 .stop_gate
@@ -598,7 +603,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, replay-unsafe stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe guardrails, stop gates or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -610,6 +615,11 @@ impl Runner {
                 continue;
             }
             if !names.insert(agent.name.clone())
+                || agent
+                    .input_guardrails
+                    .iter()
+                    .chain(&agent.output_guardrails)
+                    .any(|g| g.durable_key().is_none_or(str::is_empty))
                 || agent.output_parser.is_some()
                 || agent
                     .hooks
@@ -617,17 +627,21 @@ impl Runner {
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names and no custom parsers or hooks",
+                    "durable agents require unique names, no custom parsers, and replay-safe guardrails and hooks",
                 ));
             }
-            catalog.push(serde_json::json!({
+            let mut entry = serde_json::json!({
                 "name": agent.name, "instructions": agent.instructions, "model": agent.model.name(),
                 "fallbacks": agent.fallbacks.iter().map(ModelBinding::name).collect::<Vec<_>>(),
                 "settings": agent.settings, "schema": agent.output_schema,
                 "schema_name": agent.output_schema_name, "strict": agent.output_schema_strict,
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
-            }));
+            });
+            if !agent.input_guardrails.is_empty() || !agent.output_guardrails.is_empty() {
+                entry["guardrails"] = serde_json::json!({"input": agent.input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": agent.output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
+            }
+            catalog.push(entry);
             agents.extend(agent.handoffs.iter().map(|h| h.target.clone()));
         }
         let mut baseline = serde_json::json!({
@@ -638,6 +652,9 @@ impl Runner {
             "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
             "tool_error_limit": config.consecutive_tool_error_limit,
         });
+        if !config.tool_input_guardrails.is_empty() || !config.tool_output_guardrails.is_empty() {
+            baseline["tool_guardrails"] = serde_json::json!({"input": config.tool_input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": config.tool_output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
+        }
         if config.subagents.is_some() {
             baseline["subagents"] = serde_json::json!({"version": 1});
         }
@@ -1087,6 +1104,7 @@ impl Runner {
                 usage: recovery.usage,
                 pending_approvals: vec![],
                 last_agent: Some(checkpoint.agent_name.clone()),
+                guardrails: vec![],
             },
             base_turn_limit: Some(base_turn_limit),
             stop_gate_blocks,

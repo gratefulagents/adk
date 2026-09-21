@@ -203,6 +203,7 @@ fn quotas_rotate_oldest_to_numbered_file_and_preserve_active() {
         store.write_file("run", "artifact", b"12345"),
         Err(StoreError::FileTooLarge)
     ));
+    assert!(!run.join("artifact").exists());
     assert_eq!(fs::read(run.join("calls.jsonl")).unwrap(), b"two\n");
 }
 

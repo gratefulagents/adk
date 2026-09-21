@@ -1,0 +1,45 @@
+{
+  "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "-p",
+    "adk",
+    "--features",
+    "otel",
+    "--test",
+    "tracestore",
+    "--test",
+    "telemetry",
+    "--test",
+    "telemetry_spans"
+  ],
+  "compiler": "rustc 1.88.0 (6b00bc388 2025-06-23)\nbinary: rustc\ncommit-hash: 6b00bc3880198600130e1cf62b8f8a93494488cc\ncommit-date: 2025-06-23\nhost: x86_64-unknown-linux-gnu\nrelease: 1.88.0\nLLVM version: 20.1.5\n",
+  "exit_code": 0,
+  "files": {
+    "Cargo.lock": "82748933da59457ac32dd77e5b0d75b01fe3485b578a23dae57f01f91b836c99",
+    "crates/adk/Cargo.toml": "8875f2e81305f5f0879c9ccde1f2a1d036b803011a6b5b60f1764881689049b5",
+    "crates/adk/src/telemetry.rs": "48539a77e6785d042a94d0c53b7f057ec4bf07c6b3bbaa12fcb7073ce65392ad",
+    "crates/adk/src/telemetry_spans.rs": "b731d316dc6c594fc21f8ca07c806ee996308760bf7962971cfee12cfe31d44b",
+    "crates/adk/src/tracestore.rs": "d572fe07cfa6bf2e4a27e7db16fdb199c840662cb1b552e139d4f09de1c12ecd",
+    "crates/adk/src/tracewriter.rs": "c0bbe6c296576339f1f0642b467fa26d4ced72c17906dfd07f94cd305c5bd4dd",
+    "crates/adk/tests/telemetry.rs": "2cbc1a8f8e187fb5d0c62036ecfbdd8064dfbc0f74f94468573c02a1df5a0e00",
+    "crates/adk/tests/telemetry_spans.rs": "0f1672cc0e53a7cd3d35d0520fbe7b5ddbc856aa4143832f8f973e2be0aa92d3",
+    "crates/adk/tests/tracestore.rs": "8cce8bdc128eaa4ac385d1303d7cd56fa9cf2d4cbe908cd3ce646d3e7b6d184a",
+    "docs/migration/ledger/issue-11-rust-claims.json": "e23f793cd0bc1453345b43df3d7d508f47e3b65302c2496b7e0f44f596358288",
+    "fixtures/tracestore/sdk-otel.json": "114609a525c91a854d6928246bdb26674968e10c804daf81dae55de3e5bcb7f6",
+    "scripts/trace-reference/go.mod": "10a955ce9c539a3297cdf0a7d52f68ea721cdfea08196d47a64c19e1a74fbc26",
+    "scripts/trace-reference/go.sum": "cc65cc6854f6fbb9ee7d74ec7c47d6cb3c007ffc83557bfaf1962f08eb458a64",
+    "scripts/trace-reference/otel.go": "abc300c44c98fb49083a8c56a538ea882aeacadb5a99f5bb99f05481139cc2f9"
+  },
+  "passed_tests": [
+    "defaults_errors_and_store_trait_are_explicit",
+    "every_span_kind_matches_independent_pinned_go_export",
+    "pinned_endpoint_normalization_cases",
+    "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+  ],
+  "schema_version": 1,
+  "stderr": "   Compiling tokio v1.53.1\n   Compiling serde v1.0.229\n   Compiling sync_wrapper v1.0.2\n   Compiling schemars v1.2.2\n   Compiling chrono v0.4.45\n   Compiling ahash v0.8.12\n   Compiling fluent-uri v0.3.2\n   Compiling email_address v0.2.9\n   Compiling referencing v0.33.0\n   Compiling adk-core v0.1.0 (/workspace/repo/crates/adk-core)\n   Compiling jsonschema v0.33.0\n   Compiling adk-durable v0.1.0 (/workspace/repo/crates/adk-durable)\n   Compiling adk-codec v0.1.0 (/workspace/repo/crates/adk-codec)\n   Compiling tokio-util v0.7.19\n   Compiling tokio-stream v0.1.19\n   Compiling tokio-rustls v0.26.5\n   Compiling adk-security v0.1.0 (/workspace/repo/crates/adk-security)\n   Compiling opentelemetry_sdk v0.31.0\n   Compiling h2 v0.4.19\n   Compiling tower v0.5.3\n   Compiling opentelemetry-stdout v0.31.0\n   Compiling adk-runtime v0.1.0 (/workspace/repo/crates/adk-runtime)\n   Compiling hyper v1.11.1\n   Compiling hyper-util v0.1.20\n   Compiling hyper-timeout v0.5.2\n   Compiling tonic v0.14.6\n   Compiling tonic-prost v0.14.6\n   Compiling opentelemetry-proto v0.31.0\n   Compiling opentelemetry-otlp v0.31.1\n   Compiling adk v0.1.0 (/workspace/repo/crates/adk)\n    Finished `test` profile [unoptimized + debuginfo] target(s) in 8.15s\n     Running tests/telemetry.rs (/workspace/scratch/target/debug/deps/telemetry-5742ff981a16ea80)\n     Running tests/telemetry_spans.rs (/workspace/scratch/target/debug/deps/telemetry_spans-02fd776952d57593)\n     Running tests/tracestore.rs (/workspace/scratch/target/debug/deps/tracestore-99da4364bd2f0cdc)\n",
+  "stdout": "\nrunning 4 tests\ntest pinned_endpoint_normalization_cases ... ok\ntest otlp_without_runtime_returns_error_instead_of_panicking ... ok\ntest exporter_resource_instrumentation_flush_and_shutdown ... ok\ntest explicit_otlp_constructs_without_collector ... ok\n\ntest result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n\nrunning 3 tests\ntest trace_id_callback_is_reentrant_once_and_ended_parents_remain_available ... ok\ntest final_attributes_replace_start_values_and_sensitive_text_is_redacted ... ok\ntest every_span_kind_matches_independent_pinned_go_export ... ok\n\ntest result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s\n\n\nrunning 5 tests\ntest quotas_rotate_oldest_to_numbered_file_and_preserve_active ... ok\ntest defaults_errors_and_store_trait_are_explicit ... ok\ntest confinement_symlinks_hardlinks_and_root_replacement ... ok\ntest list_ignores_corrupt_and_symlink_runs_and_metadata_updates_are_atomic ... ok\ntest pinned_go_store_fixture_and_reopen ... ok\n\ntest result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s\n\n"
+}

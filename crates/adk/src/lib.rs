@@ -44,6 +44,10 @@ pub mod observability;
 #[cfg(feature = "observability")]
 pub mod tracestore;
 
+/// SDK schema-2 trace writer and host-published span records.
+#[cfg(feature = "observability")]
+pub mod tracewriter;
+
 /// Explicitly owned stdout/OTLP exporters and SDK endpoint defaults.
 #[cfg(feature = "otel")]
 pub mod telemetry;

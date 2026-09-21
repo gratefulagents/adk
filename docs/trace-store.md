@@ -64,9 +64,18 @@ strict immutable-baseline validator. The Rust regression compares metadata,
 score, category bytes and artifact bytes independently; JSON object order and
 numeric spelling are not significant for document comparisons.
 
-This does **not** yet implement the Go `TraceWriter` hook/span conversion,
-schema-2 generation snapshots, instruction artifacts or writer health. A schema
-constant and compatible store are not evidence that those producers exist.
+`adk::tracewriter::TraceWriter` now writes schema-2 category records, typed
+spans, generation snapshots, resolved-instruction artifacts and writer health.
+`Options` defaults to metadata digests; full capture applies diagnostic secret
+redaction and host redactors. `Snapshot::from_json` preserves original serialized
+bytes for SDK-compatible digests. Tool hooks see the uncapped output; store
+quotas remain independent of the model-facing output cap. `init_run` and
+`finalize_run` are explicit; finalize does not close a shared store.
+
+`fixtures/tracestore/sdk-writer.json` independently checks all typed span kinds
+and hook categories against the pinned Go writer. Automatic runtime generation
+span/snapshot assembly remains a separate obligation: supplying typed spans in a
+fixture does not prove that the runner produces them automatically.
 
 ## Exporters
 
@@ -89,8 +98,8 @@ exporting; on a single-thread runtime, perform blocking flush/shutdown from
 `spawn_blocking` so the transport can make progress. End run pipelines before
 shutting down the provider. Offline construction is not collector-delivery
 verification. Stdout uses the maintained Rust exporter's human-readable format,
-not Go's pretty-printed JSON. Automatic global installation, complete Go span
-attributes and trace-ID callbacks remain unimplemented compatibility obligations.
+not Go's pretty-printed JSON. Automatic global installation and Go
+stdout format parity remain unimplemented compatibility obligations.
 
 Dependency research: `opentelemetry-otlp` **0.31.1** and
 `opentelemetry-stdout` **0.31.0** declare **Apache-2.0**, Rust **1.75.0** in the
@@ -104,3 +113,22 @@ Sources/API references:
 Adopted: real SDK batch processors and gRPC transport/TLS. Rejected: handwritten
 OTLP transport, implicit global ownership, and treating exporter construction as
 proof that credentials, certificates, network routing or a collector work.
+
+
+### Typed SDK span processor
+
+`Telemetry::span_processor()` accepts `tracewriter::{Trace, Span, SpanData}`.
+It maps every SDK span kind to the pinned attribute names, reapplies final data,
+marks failed function/generation/subagent spans, and retains ended parent
+contexts until trace end. Unknown parents attach to the latest trace root,
+including late children after trace end. Trace-ID callbacks run once, outside
+the state lock; `trace_id()` is empty until a root starts. Registration is
+explicit, and ending a span twice is harmless.
+
+The independent `sdk-otel.json` fixture comes from the pinned Go stdout exporter,
+not a second Rust implementation. `telemetry_spans` compares all attribute keys,
+values and error statuses. It also checks reentrant notification, late parenting,
+final-value replacement and secret redaction. Unlike the Go processor, diagnostic
+generation errors and error-status descriptions are redacted before export;
+UTF-8 truncation preserves character boundaries. No collector delivery or live
+credential claims follow from these offline checks.

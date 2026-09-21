@@ -17,11 +17,11 @@ def main():
     if subprocess.check_output(["git", "-C", str(SDK), "status", "--porcelain"], text=True).strip():
         sys.exit("reference checkout must be clean")
     subprocess.run([sys.executable, str(ROOT / "scripts/inventory/validate.py")], check=True)
-    result = subprocess.check_output([os.environ.get("GO", "go"), "run", "-mod=readonly", "."], cwd=Path(__file__).parent)
-    expected = json.loads((ROOT / "fixtures/tracestore/sdk-store.json").read_text())
-    actual = json.loads(result)
-    if actual != expected:
-        sys.exit("pinned reference trace fixture mismatch")
+    for fixture, arguments in [("sdk-store.json", []), ("sdk-writer.json", ["writer"]), ("sdk-otel.json", ["otel"])]:
+        result = subprocess.check_output([os.environ.get("GO", "go"), "run", "-mod=readonly", ".", *arguments], cwd=Path(__file__).parent)
+        expected = json.loads((ROOT / "fixtures/tracestore" / fixture).read_text())
+        if json.loads(result) != expected:
+            sys.exit(f"pinned reference trace fixture mismatch: {fixture}")
     print(f"trace-store reference verified at {revision}")
 
 if __name__ == "__main__":

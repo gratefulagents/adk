@@ -200,6 +200,24 @@ pub struct ApprovalRequest {
     pub reason: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum GuardrailPhase {
+    Input,
+    Output,
+    ToolInput,
+    ToolOutput,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct GuardrailReport {
+    pub phase: GuardrailPhase,
+    pub guardrail_name: String,
+    pub tool_name: Option<String>,
+    pub output: Value,
+    pub tripwire_triggered: bool,
+}
+
 /// A successful or partial invocation snapshot, not a durable checkpoint.
 /// Resume from `history`, not `input + new_items`: compaction may rewrite history.
 /// Pending approvals must be resolved before replaying their calls.
@@ -213,6 +231,8 @@ pub struct RunResult {
     pub usage: Usage,
     pub pending_approvals: Vec<ApprovalRequest>,
     pub last_agent: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub guardrails: Vec<GuardrailReport>,
 }
 
 /// Events delivered to a host in emission order. The sink provides backpressure.

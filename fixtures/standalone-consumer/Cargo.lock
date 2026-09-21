@@ -21,6 +21,7 @@ dependencies = [
  "opentelemetry-otlp",
  "opentelemetry-stdout",
  "opentelemetry_sdk",
+ "regex",
  "rustix",
  "serde",
  "serde_json",

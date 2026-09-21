@@ -1539,3 +1539,71 @@ fn actual_go_stop_gate_fixture_is_current() {
             .unwrap()
     );
 }
+
+struct DurableGuard {
+    key: Option<&'static str>,
+    calls: Arc<AtomicUsize>,
+}
+impl Guardrail for DurableGuard {
+    fn name(&self) -> &str {
+        "policy"
+    }
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        _: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(None)
+        })
+    }
+}
+
+#[tokio::test]
+async fn durable_guardrails_require_stable_keys_and_completed_recovery_preserves_reports() {
+    let calls = Arc::new(AtomicUsize::new(0));
+    let make_runner = |key| {
+        let model = Arc::new(ModelImpl {
+            responses: Mutex::new(VecDeque::from([response(vec![message(
+                Role::Assistant,
+                "done",
+            )])])),
+            calls: AtomicUsize::new(0),
+            fail: false,
+        });
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+        agent.input_guardrails.push(Arc::new(DurableGuard {
+            key,
+            calls: calls.clone(),
+        }));
+        Runner::new(agent, RunnerConfig::default()).unwrap()
+    };
+    let store = Arc::new(Store::default());
+    let error = run(&make_runner(None), store.clone(), None)
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+    assert_eq!(calls.load(Ordering::SeqCst), 0);
+    assert!(store.checkpoints.lock().unwrap().is_empty());
+    let runner = make_runner(Some("v1"));
+    let first = run(&runner, store.clone(), None).await.unwrap();
+    assert_eq!(first.result.guardrails.len(), 1);
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    let checkpoint = store.latest();
+    let recovered = run(&runner, store.clone(), Some(checkpoint.clone()))
+        .await
+        .unwrap();
+    assert_eq!(recovered.result.guardrails, first.result.guardrails);
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    assert!(
+        run(&make_runner(Some("v2")), store, Some(checkpoint))
+            .await
+            .is_err()
+    );
+}

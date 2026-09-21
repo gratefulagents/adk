@@ -67,6 +67,7 @@ jobs:
         run: sh scripts/check-feature-examples.sh
       - run: python3 scripts/tool-manifest.py --check
       - run: python3 scripts/issue11-ledger.py check
+      - run: python3 -m unittest discover -s scripts -p 'test_issue11_ledger.py' -v
       - run: python3 -m unittest discover -s scripts -p 'test_purity.py' -v
       - run: python3 -m unittest discover -s scripts/replay -p 'test_*.py' -v
       - name: Compare Rust against pinned Go outputs

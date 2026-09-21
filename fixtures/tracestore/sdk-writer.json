@@ -45,6 +45,23 @@
       "type": "session_end"
     }
   ],
+  "duration_cases": [
+    {
+      "duration_ms": 9223372036854,
+      "end": "9999-01-01T00:00:00Z",
+      "start": "0001-01-01T00:00:00Z"
+    },
+    {
+      "duration_ms": -9223372036854,
+      "end": "0002-01-01T00:00:00Z",
+      "start": "9999-01-01T00:00:00Z"
+    },
+    {
+      "duration_ms": 9223372036854,
+      "end": "0001-01-01T00:00:00Z",
+      "start": "0001-01-01T00:00:00Z"
+    }
+  ],
   "llm_calls": [
     {
       "attempt_number": 2,
@@ -189,6 +206,89 @@
   "metrics.json": {
     "turns": 2
   },
+  "model_identities": [
+    {
+      "identity": {
+        "Raw": "Model",
+        "Provider": "openai",
+        "Canonical": "openai/Model"
+      },
+      "provider": " OpenAI ",
+      "raw": " Model "
+    },
+    {
+      "identity": {
+        "Raw": "ROUTE/Model",
+        "Provider": "openai",
+        "Canonical": "route/Model"
+      },
+      "provider": " OpenAI ",
+      "raw": " ROUTE/Model "
+    },
+    {
+      "identity": {
+        "Raw": "ROUTE/Model",
+        "Provider": "route",
+        "Canonical": "route/Model"
+      },
+      "provider": "",
+      "raw": "ROUTE/Model"
+    },
+    {
+      "identity": {
+        "Raw": "ROUTE/",
+        "Provider": "",
+        "Canonical": "ROUTE/"
+      },
+      "provider": "",
+      "raw": "ROUTE/"
+    },
+    {
+      "identity": {
+        "Raw": "/Model",
+        "Provider": "openai",
+        "Canonical": "openai/Model"
+      },
+      "provider": " OpenAI ",
+      "raw": "/Model"
+    },
+    {
+      "identity": {
+        "Raw": "/Model",
+        "Provider": "",
+        "Canonical": "/Model"
+      },
+      "provider": "",
+      "raw": "/Model"
+    },
+    {
+      "identity": {
+        "Raw": "",
+        "Provider": "openai",
+        "Canonical": ""
+      },
+      "provider": "OpenAI",
+      "raw": ""
+    },
+    {
+      "identity": {
+        "Raw": "Model",
+        "Provider": "",
+        "Canonical": "Model"
+      },
+      "provider": "",
+      "raw": "Model"
+    },
+    {
+      "identity": {
+        "Raw": "ROUTE/Model/version",
+        "Provider": "openai",
+        "Canonical": "route/Model/version"
+      },
+      "provider": "OpenAI",
+      "raw": "ROUTE/Model/version"
+    }
+  ],
   "raw_input_schema": "{ \"z\": 1e+02, \"a\": { \"two\": \"\u003c\u003e\u0026\\u2028\", \"one\": \"quoted \\\" value \\\\\" }, \"duplicate\": 1, \"duplicate\": 2 }",
   "raw_request_json": "{\"tools\":[{\"name\":\"raw\",\"input_schema\":{\"z\":1e+02,\"a\":{\"two\":\"\\u003c\\u003e\\u0026\\u2028\",\"one\":\"quoted \\\" value \\\\\"},\"duplicate\":1,\"duplicate\":2},\"read_only\":false,\"needs_approval\":false}],\"settings\":{}}",
   "request_json": "{\"agent_name\":\"agent\",\"model\":\"requested\",\"instructions\":\"system instructions\",\"settings\":{}}",

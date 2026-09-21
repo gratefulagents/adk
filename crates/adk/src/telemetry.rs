@@ -3,6 +3,8 @@
 #[path = "telemetry_spans.rs"]
 mod spans;
 pub use spans::SpanProcessor;
+#[path = "telemetry_stdout.rs"]
+mod stdout;
 
 use crate::observability::otel::OtelBridge;
 use adk_core::{Error, ErrorCategory};
@@ -45,7 +47,7 @@ impl Destination {
 }
 
 /// Shutdown must occur after all attached observation pipelines have finished.
-/// Global provider installation is explicit rather than a constructor side effect.
+/// SDK endpoint constructors install globally; host-supplied exporters remain scoped.
 pub struct Telemetry {
     provider: SdkTracerProvider,
     bridge: Arc<OtelBridge<SdkTracer>>,
@@ -57,6 +59,7 @@ impl Telemetry {
         Self::with_endpoint(service_name, "")
     }
 
+    /// Application-level SDK constructor: replaces the global tracer provider.
     /// OTLP construction requires an entered Tokio runtime; network delivery is asynchronous.
     pub fn with_endpoint(service_name: &str, endpoint: &str) -> Result<Self, Error> {
         let destination = Destination::resolve(
@@ -64,9 +67,7 @@ impl Telemetry {
             std::env::var("OTEL_EXPORTER_OTLP_ENDPOINT").ok().as_deref(),
         );
         let mut telemetry = match &destination {
-            Destination::Stdout => {
-                Self::with_exporter(service_name, opentelemetry_stdout::SpanExporter::default())
-            }
+            Destination::Stdout => Self::with_stdout_writer(service_name, std::io::stdout()),
             Destination::Grpc { authority, secure } => {
                 if tokio::runtime::Handle::try_current().is_err() {
                     return Err(Error::new(
@@ -93,6 +94,7 @@ impl Telemetry {
             }
         };
         telemetry.destination = Some(destination);
+        telemetry.install_global();
         Ok(telemetry)
     }
     pub fn with_exporter(service_name: &str, exporter: impl SpanExporter + 'static) -> Self {
@@ -103,6 +105,21 @@ impl Telemetry {
                     .build(),
             )
             .build();
+        Self::with_processor(service_name, processor)
+    }
+    pub fn with_stdout_writer(
+        service_name: &str,
+        writer: impl std::io::Write + Send + 'static,
+    ) -> Self {
+        let mut telemetry =
+            Self::with_processor(service_name, stdout::JsonStdoutProcessor::new(writer));
+        telemetry.destination = Some(Destination::Stdout);
+        telemetry
+    }
+    fn with_processor(
+        service_name: &str,
+        processor: impl opentelemetry_sdk::trace::SpanProcessor + 'static,
+    ) -> Self {
         let resource = Resource::builder_empty()
             .with_schema_url(
                 [KeyValue::new("service.name", service_name.to_owned())],

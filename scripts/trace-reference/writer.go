@@ -90,6 +90,21 @@ func writerFixture() {
 	must(err)
 	variants = append(variants, string(completeEncoded))
 	result["request_variants"] = variants
+	var durations []any
+	for _, pair := range [][2]string{{"0001-01-01T00:00:00Z", "9999-01-01T00:00:00Z"}, {"9999-01-01T00:00:00Z", "0002-01-01T00:00:00Z"}, {"0001-01-01T00:00:00Z", "0001-01-01T00:00:00Z"}} {
+		begin, err := time.Parse(time.RFC3339Nano, pair[0])
+		must(err)
+		finish, err := time.Parse(time.RFC3339Nano, pair[1])
+		must(err)
+		span := &agent.Span{StartTime: begin, EndTime: finish}
+		durations = append(durations, map[string]any{"start": pair[0], "end": pair[1], "duration_ms": span.DurationMS()})
+	}
+	result["duration_cases"] = durations
+	var identities []any
+	for _, pair := range [][2]string{{" Model ", " OpenAI "}, {" ROUTE/Model ", " OpenAI "}, {"ROUTE/Model", ""}, {"ROUTE/", ""}, {"/Model", " OpenAI "}, {"/Model", ""}, {"", "OpenAI"}, {"Model", ""}, {"ROUTE/Model/version", "OpenAI"}} {
+		identities = append(identities, map[string]any{"raw": pair[0], "provider": pair[1], "identity": agent.NormalizeModelIdentity(pair[0], pair[1])})
+	}
+	result["model_identities"] = identities
 
 	for _, category := range []string{"spans", "llm_calls", "tool_calls", "agent_transitions"} {
 		bytes, err := os.ReadFile(filepath.Join(path, category+".jsonl"))

@@ -10,7 +10,9 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   source-lock and strict inventory checks pass without baseline edits.
 - Independent pinned public SDK tests: **729 passed test/subtest records, 5
   skipped, 34 packages**. Store, schema-2 writer and typed OTel exporter fixtures
-  also match independently executed pinned Go output.
+  also match independently executed pinned Go output. A fourth fixture checks
+  full stdout documents and exact tab-indented bytes against the SDK-pinned Go
+  OpenTelemetry exporter.
 - Typed guardrails now enforce input/output/tool boundaries, explicit output
   replacement, ordered callbacks, typed tripwires, cancellation and panic
   isolation. Durable recovery fingerprints policy keys and retains reports.
@@ -23,8 +25,15 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   Drop cleanup and a returned response followed by host failure are covered.
   Ordered request documents preserve raw JSON bytes for exact metadata digests.
   Automatic schema-2 request/response snapshot assembly is **not** complete.
+- Stdout now emits Go-compatible JSON via the maintained Rust SDK batcher,
+  preserving full parent context and child counts. Actual-provider tests verify
+  ordering, late children, envelope-key collisions and flush errors. SDK endpoint
+  constructors install globally; host-supplied exporters remain scoped.
+  Pinned duration cases also verify Go's signed-duration saturation. Runtime
+  generation model identities now match the pinned SDK for routing prefixes,
+  empty providers/models, whitespace and nested model names.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **830 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **836 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **27 explicitly verified**, **8,864 unresolved** and
@@ -38,8 +47,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   No blanket closure is inferred.
 
 Remaining work includes automatic request/response snapshot assembly, full higher-level
-runtime/session/helper composition, stdout format/default parity and the
-remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
+runtime/session/helper composition and the remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
 external Postgres/pgvector and non-Linux targets remain unverified. Fresh
 independent review is still required before leaving draft status.
 

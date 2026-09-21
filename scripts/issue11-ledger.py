@@ -42,6 +42,9 @@ RUST_INPUTS = ["Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore
                "fixtures/tracestore/sdk-writer.json", "scripts/trace-reference/writer.go",
                "fixtures/tracestore/sdk-store.json", "scripts/trace-reference/main.go",
                "scripts/trace-reference/check.py",
+               "crates/adk/src/telemetry_stdout.rs", "crates/adk/tests/telemetry_stdout.rs",
+               "crates/adk/tests/telemetry_defaults.rs", "scripts/trace-reference/stdout.go",
+               "fixtures/tracestore/sdk-stdout.json",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -118,7 +121,8 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec",
                "--features", "otel", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
-               "--test", "tracewriter", "--test", "request_snapshot"]
+               "--test", "tracewriter", "--test", "request_snapshot", "--lib",
+               "--test", "telemetry_stdout", "--test", "telemetry_defaults"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
     print(result.stdout, end="")
     print(result.stderr, end="")

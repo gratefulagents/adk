@@ -76,7 +76,8 @@ quotas remain independent of the model-facing output cap. `init_run` and
 and hook categories against the pinned Go writer. `Trace::new`, `Span::new`,
 `Trace::add_span`, and `finish` provide explicit, owned lifecycle operations.
 Span duration uses the current time until finish and the recorded interval after
-finish; owned trace collection preserves insertion order.
+finish, saturating at Go's signed-duration bounds before converting to milliseconds;
+owned trace collection preserves insertion order.
 
 `RunnerConfig::generation_observer` accepts either an `Arc<TraceWriter>` or
 `Telemetry::span_processor()`. The runner records the actual dispatched request,
@@ -88,7 +89,7 @@ Observers are synchronous and must not panic, detach work, or change policy.
 Attach the writer separately as `RunHooks` when hook categories are also wanted;
 store/run initialization and finalization remain host-owned.
 
-The `compat::snapshots::RequestSnapshot` document serializes every pinned request
+The `adk::codec::snapshots::RequestSnapshot` document (`compat` feature) serializes every pinned request
 field. `Snapshot::from_serializable` uses the Go-compatible serializer, including
 float notation, HTML escaping and compaction of raw JSON without sorting keys,
 dropping duplicate keys or rewriting raw numbers. The independent fixture and
@@ -115,29 +116,52 @@ compatibility obligation.
   `gratefulagents/agent`, and sets the service resource with schema URL 1.26.0.
 - `with_exporter` accepts host-supplied exporters; `bridge` connects existing
   observation pipelines, and `force_flush`/`shutdown` expose delivery errors.
-- `install_global` is explicit. Construction does not replace a process-wide
-  provider behind an embedding host's back.
+- `new` and `with_endpoint` install the provider globally, matching the SDK
+  constructors. This replaces the process-global provider for subsequently
+  acquired Rust tracers; already acquired tracers are not rebound. Construct
+  telemetry before acquiring global tracers and shut down the owned provider
+  explicitly when finished.
+- Embedding hosts that already own telemetry should use `with_exporter` or
+  `with_stdout_writer`; these constructors stay scoped. `install_global` remains
+  available as an explicit opt-in for these host-owned instances.
 
 Create an OTLP exporter inside a Tokio runtime. Keep that runtime alive while
 exporting; on a single-thread runtime, perform blocking flush/shutdown from
 `spawn_blocking` so the transport can make progress. End run pipelines before
 shutting down the provider. Offline construction is not collector-delivery
-verification. Stdout uses the maintained Rust exporter's human-readable format,
-not Go's pretty-printed JSON. Automatic global installation and Go
-stdout format parity remain unimplemented compatibility obligations.
+verification. Stdout emits the pinned Go exporter's tab-indented JSON documents,
+including typed scalar/array attributes, full parent context, child counts,
+links/events, drop counters, resource and both instrumentation-scope fields.
+A processor captures parent/child information before it is lost from Rust's
+exportable `SpanData`; metadata travels in the owned batch and is removed before
+output. User attributes with the same internal envelope key remain intact.
+An independently executed Go fixture checks both complete documents and exact
+pretty-printed bytes. Timestamps use UTC RFC3339 with Go's trimmed nanosecond
+precision; Rust OTel stores instants rather than local timezone identities.
+Writer errors propagate through the batcher's flush path.
 
-Dependency research: `opentelemetry-otlp` **0.31.1** and
-`opentelemetry-stdout` **0.31.0** declare **Apache-2.0**, Rust **1.75.0** in the
-retrieved crate manifests. Exact registry checksums are retained in Cargo.lock.
+Dependency research: `opentelemetry-otlp` **0.31.1** declares **Apache-2.0**, Rust
+**1.75.0** in the retrieved manifest. The previously considered Rust
+`opentelemetry-stdout` **0.31.0** also declares Apache-2.0, but its human-readable
+format is not the SDK's JSON format; it is no longer a dependency. The pinned Go
+SDK uses `stdouttrace` **v1.42.0**. Its downloaded LICENSE and versioned pkg.go.dev
+page identify **Apache-2.0 and BSD-3-Clause**; the complete license is retained in
+`docs/migration/licenses/opentelemetry-go-stdout-v1.42.0-LICENSE`. Rust checksums
+remain in Cargo.lock; Go reference checksums remain in the harness's go.sum.
 Sources/API references:
 
 - <https://docs.rs/opentelemetry-otlp/0.31.1/opentelemetry_otlp/>
 - <https://docs.rs/opentelemetry-stdout/0.31.0/opentelemetry_stdout/>
+- <https://pkg.go.dev/go.opentelemetry.io/otel/exporters/stdout/stdouttrace@v1.42.0>
+- <https://github.com/open-telemetry/opentelemetry-go/tree/exporters/stdout/stdouttrace/v1.42.0/exporters/stdout/stdouttrace>
 - <https://github.com/open-telemetry/opentelemetry-rust>
 
-Adopted: real SDK batch processors and gRPC transport/TLS. Rejected: handwritten
-OTLP transport, implicit global ownership, and treating exporter construction as
-proof that credentials, certificates, network routing or a collector work.
+Adopted: maintained SDK batch processors, gRPC transport/TLS, and a tested JSON
+adapter for the pinned stdout format. Retained the SDK constructor's global
+registration while providing scoped host-exporter constructors for embedding.
+Rejected: handwritten OTLP transport, silently substituting Rust stdout text for
+SDK JSON, and treating exporter construction as proof that credentials,
+certificates, network routing or a collector work.
 
 
 ### Typed SDK span processor

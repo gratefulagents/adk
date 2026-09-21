@@ -17,7 +17,7 @@ def main():
     if subprocess.check_output(["git", "-C", str(SDK), "status", "--porcelain"], text=True).strip():
         sys.exit("reference checkout must be clean")
     subprocess.run([sys.executable, str(ROOT / "scripts/inventory/validate.py")], check=True)
-    for fixture, arguments in [("sdk-store.json", []), ("sdk-writer.json", ["writer"]), ("sdk-otel.json", ["otel"])]:
+    for fixture, arguments in [("sdk-store.json", []), ("sdk-writer.json", ["writer"]), ("sdk-otel.json", ["otel"]), ("sdk-stdout.json", ["stdout"])]:
         result = subprocess.check_output([os.environ.get("GO", "go"), "run", "-mod=readonly", ".", *arguments], cwd=Path(__file__).parent)
         expected = json.loads((ROOT / "fixtures/tracestore" / fixture).read_text())
         if json.loads(result) != expected:

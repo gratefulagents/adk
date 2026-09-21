@@ -220,7 +220,14 @@ impl Span {
         } else {
             self.end_time
         };
-        (end - self.start_time).num_milliseconds()
+        (end - self.start_time)
+            .num_nanoseconds()
+            .unwrap_or(if end < self.start_time {
+                i64::MIN
+            } else {
+                i64::MAX
+            })
+            / 1_000_000
     }
 }
 
@@ -731,13 +738,20 @@ pub(crate) fn generation_span(
     use crate::tracewriter::Generation;
     use adk_runtime::tracing::GenerationStatus;
     let model = record.request.model.trim();
-    let provider = record.provider.trim().to_ascii_lowercase();
-    let canonical = if let Some((prefix, bare)) = model.split_once('/') {
-        format!("{}/{bare}", prefix.to_ascii_lowercase())
-    } else if provider.is_empty() {
+    let mut provider = record.provider.trim().to_ascii_lowercase();
+    let (prefix, bare) = model.split_once('/').unwrap_or(("", model));
+    let canonical = if bare.is_empty() {
         model.into()
+    } else if !prefix.is_empty() {
+        let prefix = prefix.to_ascii_lowercase();
+        if provider.is_empty() {
+            provider.clone_from(&prefix);
+        }
+        format!("{prefix}/{bare}")
+    } else if !provider.is_empty() {
+        format!("{provider}/{bare}")
     } else {
-        format!("{provider}/{model}")
+        model.into()
     };
     let error = record
         .error

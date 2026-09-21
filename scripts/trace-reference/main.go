@@ -15,6 +15,10 @@ func must(err error) {
 	}
 }
 func main() {
+	if len(os.Args) > 1 && os.Args[1] == "stdout" {
+		stdoutFixture()
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "otel" {
 		otelFixture()
 		return

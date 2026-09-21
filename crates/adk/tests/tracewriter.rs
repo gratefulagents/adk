@@ -375,6 +375,14 @@ fn explicit_trace_lifecycle_retains_span_order_and_finished_duration() {
         span.end_time = end.parse().unwrap();
         assert_eq!(span.duration_ms(), expected);
     }
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["duration_cases"].as_array().unwrap() {
+        let mut span = Span::new("duration", "", None);
+        span.start_time = case["start"].as_str().unwrap().parse().unwrap();
+        span.end_time = case["end"].as_str().unwrap().parse().unwrap();
+        assert_eq!(span.duration_ms(), case["duration_ms"].as_i64().unwrap());
+    }
 }
 
 #[tokio::test]
@@ -513,7 +521,7 @@ fn typed_request_metadata_digests_match_pinned_go_serialized_bytes() {
         .unwrap();
     let variants = fixture["request_variants"].as_array().unwrap();
     for variant in variants {
-        let request: adk_codec::snapshots::RequestSnapshot =
+        let request: adk::codec::snapshots::RequestSnapshot =
             serde_json::from_str(variant.as_str().unwrap()).unwrap();
         let span = Span::new(
             "generation",
@@ -531,6 +539,80 @@ fn typed_request_metadata_digests_match_pinned_go_serialized_bytes() {
         assert_eq!(
             calls[index]["request"],
             json!({ "captured": false, "sha256": format!("{:x}", Sha256::digest(expected)), "bytes": expected.len() })
+        );
+    }
+}
+
+#[test]
+fn runtime_generation_identity_matches_pinned_go_normalization() {
+    use adk::core::{Context, ModelRequest};
+    use adk::runtime::{
+        CancellationToken,
+        tracing::{GenerationObserver, GenerationRecord, GenerationStatus},
+    };
+    use std::time::{Duration, SystemTime};
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+    let writer = TraceWriter::new(store, "run", Options::default());
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let context = Context {
+        run_id: "run".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let cases = fixture["model_identities"].as_array().unwrap();
+    for case in cases {
+        writer.start(
+            &context,
+            &GenerationRecord {
+                id: "generation".into(),
+                agent: "agent".into(),
+                provider: case["provider"].as_str().unwrap().into(),
+                resolved_model: "".into(),
+                input_tokens_include_cache: None,
+                task_id: None,
+                cost_usd: None,
+                turn: 1,
+                request: ModelRequest {
+                    model: case["raw"].as_str().unwrap().into(),
+                    instructions: "".into(),
+                    input: vec![],
+                    tools: vec![],
+                    output_schema: None,
+                    output_schema_name: "".into(),
+                    output_schema_strict: false,
+                    settings: Default::default(),
+                },
+                response: None,
+                error: None,
+                retry_reason: None,
+                status: GenerationStatus::Started,
+                retry_after: None,
+                fallback_model: None,
+                started_at: SystemTime::now(),
+                ended_at: None,
+                latency: Duration::ZERO,
+            },
+        );
+    }
+    let calls = records(&path, "llm_calls");
+    assert_eq!(calls.as_array().unwrap().len(), cases.len());
+    for (call, case) in calls.as_array().unwrap().iter().zip(cases) {
+        assert_eq!(call["requested_model"], case["identity"]["Raw"], "{case}");
+        assert_eq!(
+            call["model_provider"], case["identity"]["Provider"],
+            "{case}"
+        );
+        assert_eq!(
+            call["model_canonical"], case["identity"]["Canonical"],
+            "{case}"
         );
     }
 }

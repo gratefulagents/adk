@@ -243,5 +243,39 @@ capture/health behavior. The observer owns a root reference: release the Runner
 and all observer clones when finished. `TraceSession::finish()` releases only its
 own reference, not another run's shared trace. Explicitly flush/shut down telemetry
 and finalize/close stores separately; a trace scope never assumes that ownership.
-These scopes do not yet synthesize all agent/tool/session spans or assemble request
-history provenance automatically.
+Bare scopes do not synthesize runtime spans; the adapter below provides observed
+agent/tool/generation/handoff/compaction spans. Session summary metrics and request
+history provenance are not inferred.
+
+### Runtime span adapter
+
+Create one `tracing_runtime::RunTrace` per invocation, transferring a `TraceSession`
+into it. Install the same `observer()` Arc into both `RunnerConfig::hooks` and
+`RunnerConfig::generation_observer`. Use `owner.run(runner.run(...))` to own the run
+future: the wrapper always drops that future before closing spans and the root,
+on success, error or cancellation. It does not detach work. The `features`
+example's `tracestore` scenario demonstrates this standalone composition.
+
+The adapter creates agent spans across repeated attempts, parents generations and
+functions to their actual active agent, and closes agents on handoff/end. Function
+output is observed after tool guardrails but before native truncation/wrapping;
+blocked output is never copied into function spans. Incomplete functions receive
+an explicit interrupted error on cleanup. Model response snapshots precede tool
+guardrail evaluation, so guardrails do not replace capture/redaction policy for
+those snapshots. Automatic request snapshot assembly remains open.
+
+Handoffs are point observations, not measured transfer durations. Compaction counts
+are populated only from observed success. A new compaction start replaces an
+unterminated no-op attempt rather than inheriting stale counts or parentage.
+Failed, skipped or dropped compactions carry no fabricated measurements. Agent
+instructions are unavailable in current observations and remain empty; session
+metrics and historical attribution are not synthesized. Text/reasoning tool blocks
+are joined with newlines; media are not converted into invented text.
+
+Manual owners remain available: finish/drop the run future **before** finishing
+or dropping `RunTrace`. Once finished, retained Runner observer Arcs ignore further
+callbacks and no longer retain the root. Independent session clones or manual
+child spans still retain shared root ownership. Reentrant/concurrent observations
+queue in arrival order; callbacks run without adapter locks, and a reentrant
+finish takes effect after the active callback returns. Use a new adapter for each
+run, including a resumed invocation; this is not an exactly-once durable exporter.

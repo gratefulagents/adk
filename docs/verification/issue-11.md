@@ -52,10 +52,18 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   Explicit composed flush now reaches host-owned telemetry, attempts every sink
   and aggregates all failures. Span-only processors reject unsupported flush
   rather than silently claiming exporter delivery. Two more regressions verify
-  these boundaries. Scopes do not yet synthesize all agent/tool/session spans
-  or request provenance.
+  these boundaries.
+- The explicit per-run adapter now produces observed agent, function, generation,
+  handoff and compaction spans. Nine new tests exercise actual runner tools,
+  guardrail privacy before output caps, handoffs, compaction, late generations,
+  reentrant callbacks and cancellation. An owned future wrapper guarantees that
+  the run future is dropped before trace cleanup; incomplete functions are marked
+  interrupted. Independent review found stale no-op compaction state; an actual
+  runner regression reproduced it, and superseded attempts now close without
+  borrowing a later attempt's counts or parent. Scoped re-review found it fixed.
+  Agent instructions, automatic session metrics and request provenance remain open.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **852 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **861 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **34 explicitly verified**, **8,857 unresolved** and

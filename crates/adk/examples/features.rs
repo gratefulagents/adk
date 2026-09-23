@@ -930,6 +930,7 @@ async fn tracestore() {
             tracestore::{FilesystemTraceStore as SdkStore, RunMetadata},
             tracewriter::{Options, TraceWriter},
             tracing::TraceSession,
+            tracing_runtime::RunTrace,
         };
         let store = Arc::new(SdkStore::new(root.join("sdk")).unwrap());
         let writer = Arc::new(TraceWriter::new(
@@ -943,21 +944,22 @@ async fn tracestore() {
                 ..Default::default()
             })
             .unwrap();
-        let trace = TraceSession::new("standalone", writer.clone());
+        let trace = RunTrace::new(TraceSession::new("standalone", writer.clone()));
+        let observer = trace.observer();
         let runner = Runner::new(
             agent(Scripted::results(vec![Ok(answer("traced"))])),
             RunnerConfig {
-                generation_observer: Some(trace.generation_observer()),
+                hooks: Some(observer.clone()),
+                generation_observer: Some(observer),
                 ..Default::default()
             },
         )
         .unwrap();
-        trace.finish(); // The runner's observer still owns this root.
-        runner
-            .run(context(), request(), Arc::new(RecordingHost::default()))
+        trace
+            .run(runner.run(context(), request(), Arc::new(RecordingHost::default())))
             .await
-            .unwrap();
-        drop(runner); // Ends the root after the generation's end record.
+            .unwrap(); // The owned wrapper ends spans/root even on cancellation.
+        drop(runner); // Retained observer Arcs no longer keep the root open.
         writer.finalize_run("completed").unwrap();
         let records: Vec<serde_json::Value> = std::fs::read_to_string(path.join("spans.jsonl"))
             .unwrap()

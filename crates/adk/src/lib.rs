@@ -59,3 +59,7 @@ pub mod builder;
 /// Shared trace ownership, scoped spans and ordered processor composition.
 #[cfg(feature = "observability")]
 pub mod tracing;
+
+/// Explicit runtime hook and generation integration for owned trace scopes.
+#[cfg(feature = "observability")]
+pub mod tracing_runtime;

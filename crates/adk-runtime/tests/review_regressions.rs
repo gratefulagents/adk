@@ -23,6 +23,8 @@ fn text(value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(true),
@@ -46,6 +48,7 @@ fn policy() -> RunPolicy {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: policy(),
     }

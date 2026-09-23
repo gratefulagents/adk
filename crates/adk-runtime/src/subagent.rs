@@ -267,6 +267,8 @@ pub struct Submission {
     pub include_dependency_results: bool,
     /// Explicitly copied history. None means a fresh conversation, never ambient history.
     pub parent_history: Option<Vec<RunItem>>,
+    #[serde(default)]
+    pub parent_history_provenance: Vec<adk_core::ItemProvenance>,
     pub security: Option<SecurityBaseline>,
     pub policy: RunPolicy,
 }
@@ -280,6 +282,7 @@ impl Submission {
             dependency_policy: DependencyPolicy::AllSuccess,
             include_dependency_results: true,
             parent_history: None,
+            parent_history_provenance: Vec::new(),
             security: None,
             policy: RunPolicy::default(),
         }
@@ -821,6 +824,10 @@ impl SchedulerHandle {
             }
             let mut ids = Vec::new();
             for mut submission in requests {
+                submission.parent_history_provenance = adk_core::normalize_provenance(
+                    submission.parent_history.as_ref().map_or(0, Vec::len),
+                    &submission.parent_history_provenance,
+                )?;
                 if submission.message.trim().is_empty() {
                     return Err(invalid("empty child message"));
                 }
@@ -1197,6 +1204,14 @@ impl SchedulerHandle {
 fn validate_graph(records: &[CheckpointRecord]) -> Result<(), Error> {
     let mut remaining = BTreeMap::new();
     for record in records {
+        adk_core::normalize_provenance(
+            record
+                .submission
+                .parent_history
+                .as_ref()
+                .map_or(0, Vec::len),
+            &record.submission.parent_history_provenance,
+        )?;
         let id = &record.task.id;
         if id.is_empty()
             || remaining
@@ -1638,6 +1653,9 @@ async fn execute_once(
         })
         .collect();
     let mut input = record.submission.parent_history.clone().unwrap_or_default();
+    let mut input_provenance =
+        adk_core::normalize_provenance(input.len(), &record.submission.parent_history_provenance)
+            .expect("validated submission provenance");
     if record.submission.include_dependency_results && !dependencies.is_empty() {
         let context =
             serde_json::to_string(&dependencies).expect("serializable dependency results");
@@ -1646,6 +1664,7 @@ async fn execute_once(
         )));
     }
     input.push(user_message(record.submission.message.clone()));
+    input_provenance.resize(input.len(), adk_core::ItemProvenance::Unattributed);
     let context = Context {
         run_id: format!("{}/{}", handle.inner.context.run_id, id),
         cancellation: Arc::new(token.clone()),
@@ -1656,6 +1675,7 @@ async fn execute_once(
         agent_name: record.task.agent_name,
         context,
         request: RunRequest {
+            input_provenance,
             input,
             policy: RunPolicy {
                 tools: record.security_baseline.tools.clone(),

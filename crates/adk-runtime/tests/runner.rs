@@ -21,6 +21,8 @@ fn message(role: Role, value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>, end_turn: Option<bool>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 10,
@@ -54,6 +56,7 @@ fn policy(turns: u32) -> RunPolicy {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "go")],
         policy: policy(turns),
     }
@@ -281,6 +284,8 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .unwrap();
     assert_eq!(paused.result.status, RunStatus::Paused);
     assert_eq!(paused.result.pending_approvals[0].call.id, "2");
+    let paused_metrics = paused.result.metrics.clone().unwrap();
+    assert_eq!(paused_metrics.turns, 1);
     assert_eq!(one.calls.load(Ordering::SeqCst), 1);
     assert_eq!(two.calls.load(Ordering::SeqCst), 0);
     assert_eq!(three.calls.load(Ordering::SeqCst), 1);
@@ -291,6 +296,9 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .await
         .unwrap();
     assert_eq!(done.result.final_output, Some(json!("done")));
+    let completed_metrics = done.result.metrics.as_ref().unwrap();
+    assert_eq!(completed_metrics.turns, 2);
+    assert!(completed_metrics.elapsed_ms >= paused_metrics.elapsed_ms);
     for t in [one, two, three] {
         assert_eq!(t.calls.load(Ordering::SeqCst), 1);
     }
@@ -480,6 +488,9 @@ async fn fallback_precedes_policy_retries_and_each_attempt_spends_a_turn() {
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("fallback")));
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.turns, 3);
+    assert_eq!(metrics.model.as_deref(), Some("backup"));
     assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
     assert_eq!(fallback.completes.load(Ordering::SeqCst), 2);
     assert_eq!(fallback.requests.lock().unwrap()[0].model, "backup");
@@ -698,13 +709,52 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
         definition,
         target: Arc::new(target),
     }];
-    let result = runner(a)
-        .run(context(), request(3), Arc::new(TestHost::default()))
-        .await
-        .unwrap();
+    let hooks = Arc::new(Observations::default());
+    let result = Runner::new(
+        a,
+        RunnerConfig {
+            hooks: Some(hooks.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .run(context(), request(3), Arc::new(TestHost::default()))
+    .await
+    .unwrap();
     assert_eq!(result.result.last_agent.as_deref(), Some("target"));
     assert_eq!(effect.calls.load(Ordering::SeqCst), 0);
-    let history = &target_model.requests.lock().unwrap()[0].input;
+    let expected = vec![
+        ItemProvenance::Agent {
+            name: "test".into()
+        };
+        6
+    ];
+    assert_eq!(&result.result.new_items_provenance[..6], expected);
+    assert_eq!(
+        result.result.new_items_provenance[6],
+        ItemProvenance::Agent {
+            name: "target".into()
+        }
+    );
+    let requests = target_model.requests.lock().unwrap();
+    assert_eq!(requests[0].input_provenance[0], ItemProvenance::Unknown);
+    assert_eq!(&requests[0].input_provenance[1..], expected);
+    let committed: Vec<_> = hooks
+        .seen
+        .lock()
+        .unwrap()
+        .iter()
+        .flat_map(|event| match event {
+            Observation::CommittedItems { agents, .. } => agents
+                .iter()
+                .map(|a| a.as_ref().map(|a| a.name.clone()))
+                .collect::<Vec<_>>(),
+            _ => vec![],
+        })
+        .collect();
+    assert_eq!(&committed[..6], vec![Some("test".into()); 6]);
+    assert_eq!(committed[6], Some("target".into()));
+    let history = &requests[0].input;
     for id in ["1", "3"] {
         assert!(history.iter().any(|i| matches!(i, RunItem::ToolResult { call_id, output } if call_id == id && output.is_error)));
     }
@@ -786,6 +836,7 @@ impl Compactor for Compact {
                     .contains(&message(Role::Developer, "dynamic"))
             );
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage::default(),
@@ -858,6 +909,23 @@ async fn compaction_replaces_history_and_hints_cache_prefix_are_request_only() {
     );
     assert_eq!(result.result.new_items.len(), 2);
     let requests = model.requests.lock().unwrap();
+    assert_eq!(
+        requests[0].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(
+        requests[1].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(result.result.history_provenance[0], ItemProvenance::Unknown);
     assert_eq!(
         requests[0].settings["prompt_cache_key"],
         requests[1].settings["prompt_cache_key"]
@@ -1157,6 +1225,7 @@ impl Compactor for BilledCompaction {
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
         Box::pin(async {
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage {
@@ -1206,6 +1275,9 @@ async fn provider_compaction_is_charged_before_the_next_model_turn() {
         let partial = error.partial.unwrap();
         assert_eq!(partial.usage.input_tokens, 30);
         assert_eq!(partial.usage.output_tokens, 7);
+        let metrics = partial.metrics.as_ref().unwrap();
+        assert_eq!(metrics.turns, 1);
+        assert_eq!(metrics.cost_usd, 3.0);
         assert_eq!(partial.history, vec![message(Role::User, "summary")]);
     }
 }
@@ -1268,6 +1340,22 @@ async fn conversation_keeps_failed_spill_history_alive_after_error_is_dropped() 
         .await
         .err()
         .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        error.partial.as_ref().unwrap().history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Agent {
+                name: "test".into()
+            },
+            ItemProvenance::Agent {
+                name: "test".into()
+            }
+        ]
+    );
     let serialized = serde_json::to_string(&conversation.history).unwrap();
     assert!(serialized.contains("full output saved to"));
     drop(error);
@@ -1763,5 +1851,551 @@ async fn error_handler_retry_and_continue_spend_attempt_turns() {
         assert_eq!(result.result.final_output, Some(json!("done")));
         assert_eq!(result.result.responses.len(), 1);
         assert_eq!(model.completes.load(Ordering::SeqCst), 2);
+    }
+}
+
+struct FixedGuard {
+    trip: bool,
+    replacement: Value,
+}
+impl Guardrail for FixedGuard {
+    fn name(&self) -> &str {
+        "policy"
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        _: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            Ok(Some(GuardrailResult {
+                tripwire_triggered: self.trip,
+                replacement_content: self.replacement.as_str().map(str::to_owned),
+                output: self.replacement.clone(),
+            }))
+        })
+    }
+}
+fn fixed_guard(trip: bool, replacement: Value) -> Arc<dyn Guardrail> {
+    Arc::new(FixedGuard { trip, replacement })
+}
+
+#[tokio::test]
+async fn input_tripwire_prevents_provider_and_retains_report() {
+    let model = TestModel::with(vec![Ok(answer("never"))]);
+    let mut a = agent(model.clone());
+    a.input_guardrails.push(fixed_guard(true, json!("blocked")));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+    assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.guardrails.len(), 1);
+    assert!(partial.guardrails[0].tripwire_triggered);
+    assert_eq!(partial.guardrails[0].output, json!("blocked"));
+    let cause = error
+        .error
+        .source
+        .unwrap()
+        .downcast::<GuardrailTripwire>()
+        .unwrap();
+    assert_eq!(cause.phase, GuardrailPhase::Input);
+    assert_eq!(cause.output, json!("blocked"));
+    assert!(partial.final_output.is_none());
+}
+
+#[tokio::test]
+async fn output_tripwire_blocks_final_answer_after_provider_usage() {
+    let model = TestModel::with(vec![Ok(answer("answer"))]);
+    let mut a = agent(model.clone());
+    a.output_guardrails.push(fixed_guard(true, Value::Null));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    let partial = error.partial.unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 1);
+    assert!(partial.final_output.is_none());
+    assert_eq!(partial.usage.input_tokens, 10);
+    assert_eq!(partial.guardrails[0].phase, GuardrailPhase::Output);
+}
+
+#[tokio::test]
+async fn tool_input_tripwire_is_model_visible_without_executing_tool() {
+    let model = TestModel::with(vec![
+        Ok(response(vec![call("1", "one")], None)),
+        Ok(answer("done")),
+    ]);
+    let tool = TestTool::new("one", false, false);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    let config = RunnerConfig {
+        tool_input_guardrails: vec![fixed_guard(true, Value::Null)],
+        ..Default::default()
+    };
+    let outcome = Runner::new(a, config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    assert!(
+        outcome
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert_eq!(
+        outcome.result.guardrails[0].phase,
+        GuardrailPhase::ToolInput
+    );
+    assert!(outcome.result.guardrails[0].tripwire_triggered);
+    assert_eq!(
+        outcome.result.guardrails[0].tool_name.as_deref(),
+        Some("one")
+    );
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert!(requests[1].input.iter().any(|item| matches!(item,
+        RunItem::ToolResult { output, .. } if output.is_error
+    )));
+}
+
+#[tokio::test]
+async fn tool_output_replacement_reaches_model_and_stop_after_tool_checks_output() {
+    for stop in [false, true] {
+        let model = TestModel::with(vec![
+            Ok(response(vec![call("1", "one")], None)),
+            Ok(answer("done")),
+        ]);
+        let mut a = agent(model.clone());
+        a.tools.push(TestTool::new("one", false, false));
+        if stop {
+            a.output_guardrails.push(fixed_guard(true, Value::Null));
+        }
+        let config = RunnerConfig {
+            tool_output_guardrails: vec![fixed_guard(false, json!("sanitized"))],
+            return_tool_output: true,
+            ..Default::default()
+        };
+        let mut request = request(3);
+        if stop {
+            request.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        }
+        let result = Runner::new(a, config)
+            .unwrap()
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await;
+        let snapshot = if stop {
+            result.err().unwrap().partial.unwrap()
+        } else {
+            Box::new(result.unwrap().result)
+        };
+        assert!(snapshot.history.iter().any(|item| matches!(item, RunItem::ToolResult { output, .. } if format!("{:?}", output.content).contains("sanitized"))));
+        assert!(!format!("{:?}", snapshot.history).contains("raw one"));
+        if !stop {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(format!("{:?}", requests[1].input).contains("sanitized"));
+            assert!(!format!("{:?}", requests[1].input).contains("raw one"));
+        }
+        if stop {
+            assert!(snapshot.final_output.is_none());
+            assert_eq!(
+                snapshot.guardrails.last().unwrap().phase,
+                GuardrailPhase::Output
+            );
+        }
+    }
+}
+
+#[derive(Default)]
+struct Generations {
+    records: Mutex<Vec<(bool, adk_runtime::tracing::GenerationRecord)>>,
+}
+impl adk_runtime::tracing::GenerationObserver for Generations {
+    fn start(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((false, record.clone()));
+    }
+    fn end(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((true, record.clone()));
+    }
+}
+
+#[tokio::test]
+async fn generation_records_capture_actual_requests_final_retry_decisions_and_responses() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
+    let generations = Arc::new(Generations::default());
+    let config = RunnerConfig {
+        generation_observer: Some(generations.clone()),
+        retry: RetryPolicy {
+            max_retries: 1,
+            initial_delay: Duration::ZERO,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let outcome = Runner::new(agent(model.clone()), config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 4);
+    assert_eq!(
+        records.iter().map(|(ended, _)| *ended).collect::<Vec<_>>(),
+        vec![false, true, false, true]
+    );
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_ne!(records[0].1.id, records[2].1.id);
+    assert_eq!(records[1].1.status, GenerationStatus::Retrying);
+    assert_eq!(records[1].1.retry_after, Some(Duration::ZERO));
+    assert!(records[1].1.error.is_some());
+    assert_eq!(records[3].1.status, GenerationStatus::Completed);
+    assert_eq!(
+        records[3].1.response.as_ref().unwrap().usage.input_tokens,
+        10
+    );
+    assert_eq!(records[0].1.request, model.requests.lock().unwrap()[0]);
+    assert!(records[0].1.ended_at.is_none());
+    assert!(records[1].1.ended_at.is_some());
+}
+
+#[tokio::test]
+async fn dropping_provider_future_closes_generation_once_without_detached_work() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::streaming(vec![StreamStep::Pending]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut stream = runner.stream(context(), request(3), Arc::new(TestHost::default()));
+    for _ in 0..10 {
+        if tokio::time::timeout(Duration::from_millis(5), stream.next())
+            .await
+            .is_err()
+        {
+            break;
+        }
+    }
+    drop(stream);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(records[1].1.status, GenerationStatus::Interrupted);
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn generation_retains_returned_response_when_host_rejects_stream_completion() {
+    struct RejectCompletion;
+    impl Host for RejectCompletion {
+        fn emit<'a>(&'a self, _: &'a Context, event: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(
+                    event,
+                    RunEvent::Model {
+                        event: ModelEvent::Complete { .. }
+                    }
+                ) {
+                    Err(Error::new(ErrorCategory::Host, "completion rejected"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { panic!("unexpected approval") })
+        }
+    }
+    let model = TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
+        response: answer("returned"),
+    })]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .stream(context(), request(3), Arc::new(RejectCompletion))
+        .finish()
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Host);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(
+        records[1].1.status,
+        adk_runtime::tracing::GenerationStatus::Failed
+    );
+    assert_eq!(records[1].1.response, Some(answer("returned")));
+    assert_eq!(
+        records[1].1.error.as_ref().unwrap().category,
+        ErrorCategory::Host
+    );
+}
+
+#[tokio::test]
+async fn reported_request_counts_accumulate_without_inference_or_overflow() {
+    for (first, second, total) in [(2, 3, 5), (0, 0, 0), (u64::MAX, 1, u64::MAX)] {
+        let mut continuing = response(vec![message(Role::Assistant, "working")], Some(false));
+        continuing.usage.requests = first;
+        let mut final_response = answer("done");
+        final_response.usage.requests = second;
+        let model = TestModel::with(vec![Ok(continuing), Ok(final_response)]);
+        let result = runner(agent(model.clone()))
+            .run(context(), request(3), Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(model.completes.load(Ordering::SeqCst), 2);
+        assert_eq!(result.result.usage.requests, total);
+    }
+}
+
+#[tokio::test]
+async fn conversation_retains_provenance_across_success_pause_and_resume() {
+    let mut a = agent(TestModel::with(vec![
+        Ok(answer("first")),
+        Ok(response(vec![call("1", "pause")], None)),
+        Ok(answer("resumed")),
+    ]));
+    let mut tool = TestTool::new("pause", true, false);
+    Arc::get_mut(&mut tool).unwrap().output.should_pause = true;
+    a.tools = vec![tool];
+    let runner = runner(a);
+    let mut conversation = Conversation::default();
+    let host = Arc::new(TestHost::default());
+    let first = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "external")],
+            policy(5),
+            host.clone(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        first.result.history_provenance
+    );
+    assert_eq!(conversation.history_provenance[0], ItemProvenance::Unknown);
+    let mut paused = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "again")],
+            policy(5),
+            host,
+        )
+        .await
+        .unwrap();
+    assert_eq!(paused.result.status, RunStatus::Paused);
+    assert_eq!(
+        conversation.history_provenance,
+        paused.result.history_provenance
+    );
+    let prior = conversation.history_provenance.clone();
+    let mut resumed = paused
+        .continuation
+        .take()
+        .unwrap()
+        .resume(None)
+        .await
+        .unwrap();
+    conversation.accept(&mut resumed);
+    assert_eq!(&conversation.history_provenance[..prior.len()], prior);
+    assert_eq!(
+        conversation.history_provenance,
+        resumed.result.history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance.last(),
+        Some(&ItemProvenance::Agent {
+            name: "test".into()
+        })
+    );
+}
+
+#[tokio::test]
+async fn custom_compaction_without_provenance_does_not_guess_retained_authorship() {
+    struct Retain;
+    impl Compactor for Retain {
+        fn compact<'a>(
+            &'a self,
+            _: &'a Context,
+            request: CompactionRequest,
+        ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+            Box::pin(async move {
+                Ok(CompactedHistory {
+                    history: request.history,
+                    history_provenance: vec![],
+                    context_tokens: 4,
+                    usage: Usage::default(),
+                    cost: 0.0,
+                })
+            })
+        }
+    }
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![message(Role::Assistant, "identical")],
+            Some(false),
+        )),
+        Ok(answer("done")),
+    ]);
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            compaction: Some(CompactionConfig {
+                trigger_tokens: 10,
+                target_tokens: 5,
+                compactor: Arc::new(Retain),
+            }),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request(3);
+    req.input = vec![message(Role::Assistant, "identical")];
+    req.input_provenance = vec![ItemProvenance::Agent {
+        name: "prior".into(),
+    }];
+    let result = runner
+        .run(context(), req, Arc::new(TestHost::default()))
+        .await
+        .unwrap()
+        .result;
+    assert_eq!(
+        model.requests.lock().unwrap()[1].input_provenance,
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert_eq!(
+        &result.history_provenance[..2],
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert!(result.new_items_provenance.iter().all(|source| source
+        == &ItemProvenance::Agent {
+            name: "test".into()
+        }));
+}
+
+#[tokio::test]
+async fn generation_snapshots_use_actual_attempts_and_declared_timeouts_without_guessing() {
+    struct TimedTool(Arc<TestTool>);
+    impl Tool for TimedTool {
+        fn definition(&self) -> &ToolDefinition {
+            self.0.definition()
+        }
+        fn timeout(&self) -> Option<Duration> {
+            Some(Duration::from_secs(7))
+        }
+        fn execute<'a>(
+            &'a self,
+            context: &'a ToolContext,
+            call: ToolCall,
+        ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+            self.0.execute(context, call)
+        }
+    }
+    for known in [true, false] {
+        let primary = TestModel::with(vec![Err(provider_error())]);
+        let backup = TestModel::with(vec![Ok(answer("done"))]);
+        let mut a = AgentConfig::new(
+            "test",
+            ModelBinding::complete(
+                "primary",
+                Arc::new(AdvisedModel {
+                    model: primary,
+                    advice: Some(ModelRetryAdvice {
+                        should_retry: true,
+                        retry_after: Duration::ZERO,
+                        reason: "quota".into(),
+                    }),
+                }),
+            ),
+        );
+        a.fallbacks.push(ModelBinding::complete("backup", backup));
+        a.tools
+            .push(Arc::new(TimedTool(TestTool::new("timed", false, false))));
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut request = request(3);
+        request.policy.tools.timeout = Some(Duration::from_secs(99));
+        if known {
+            request.input_provenance = vec![ItemProvenance::Unattributed];
+        }
+        runner
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        let records = generations.records.lock().unwrap();
+        assert_eq!(records.len(), 4);
+        for (index, (_, record)) in records.iter().enumerate() {
+            assert_eq!(
+                record.declared_tool_timeouts,
+                vec![Some(Duration::from_secs(7))]
+            );
+            if known {
+                let snapshot = record.request_snapshot.as_ref().unwrap();
+                assert_eq!(snapshot.model, if index < 2 { "primary" } else { "backup" });
+                assert_eq!(snapshot.tools[0].timeout_seconds, 7);
+                assert_eq!(
+                    snapshot.total_token_estimate,
+                    snapshot.input_token_estimate + snapshot.request_overhead_token_estimate
+                );
+                assert!(snapshot.input_token_estimate > 0);
+                assert!(snapshot.input_items[0].agent_name.is_empty());
+                assert_eq!(
+                    snapshot,
+                    &adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                        "test",
+                        &record.request,
+                        &record.declared_tool_timeouts,
+                        &[]
+                    )
+                    .unwrap()
+                );
+            } else {
+                assert!(
+                    record
+                        .request_snapshot
+                        .as_ref()
+                        .unwrap_err()
+                        .0
+                        .contains("provenance is unknown")
+                );
+            }
+        }
     }
 }

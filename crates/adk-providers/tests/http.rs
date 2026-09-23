@@ -54,6 +54,7 @@ fn context() -> Context {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "test-model".into(),
         instructions: "test".into(),
         input: vec![],
@@ -153,6 +154,15 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     let response = provider.complete(&ctx, input).await.unwrap();
     assert_eq!(response.usage.context_tokens, Some(12));
     assert_eq!(response.usage.cache_read_tokens, 4);
+    let raw = response.raw.as_ref().unwrap();
+    assert_eq!(raw["id"], "c");
+    assert_eq!(raw["choices"][0]["message"]["content"], "hello");
+    assert_eq!(raw["usage"]["prompt_tokens_details"]["cached_tokens"], 4);
+    assert_eq!(
+        response.snapshot_raw.as_ref().unwrap().as_str(),
+        r#"{"id":"c","type":"message","role":"assistant","content":[{"type":"text","text":"hello"}],"model":"","stop_reason":"end_turn","usage":{"input_tokens":12,"output_tokens":2,"cache_read_input_tokens":4}}"#
+    );
+    assert!(response.metadata.is_empty());
     let request = server.join().unwrap();
     assert!(request.starts_with("POST /v1/chat/completions HTTP/1.1"));
     assert!(
@@ -233,7 +243,10 @@ async fn chunked_stream_emits_incremental_text_and_exactly_one_complete() {
     );
     let mut completes = 0;
     while let Some(event) = stream.next().await.unwrap() {
-        if matches!(event, ModelEvent::Complete { .. }) {
+        if let ModelEvent::Complete { response } = event {
+            let raw = response.raw.as_ref().unwrap();
+            assert_eq!(raw["choices"][0]["message"]["content"], "hé🙂");
+            assert_eq!(raw["choices"][0]["finish_reason"], "stop");
             completes += 1;
         }
     }
@@ -320,6 +333,7 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
                     agent: "fixture".into(),
                     model: "test-model".into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -431,6 +445,9 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
                             }],
                         },
                     }],
+                    history_provenance: vec![adk_core::ItemProvenance::Agent {
+                        name: "original".into(),
+                    }],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -438,6 +455,15 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
             .await
             .unwrap();
         assert_eq!(result.cost, 0.25);
+        assert!(
+            result.history_provenance.is_empty(),
+            "replacement history has no proven attribution correspondence"
+        );
+        assert_eq!(
+            adk_core::normalize_provenance(result.history.len(), &result.history_provenance)
+                .unwrap(),
+            vec![adk_core::ItemProvenance::Unknown]
+        );
         assert!(
             matches!(&result.history[0], adk_core::RunItem::Compaction { compaction } if compaction.encrypted_content == "opaque")
         );
@@ -504,6 +530,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                     agent: "fixture".into(),
                     model: binding.into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -528,6 +555,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                 agent: "fixture".into(),
                 model: "chat/small".into(),
                 history: vec![],
+                history_provenance: vec![],
                 context_tokens: 20,
                 target_tokens: 5,
             },
@@ -1045,6 +1073,7 @@ async fn runner_consumes_http_phase_and_false_end_turn_before_final_answer() {
         .run(
             context(),
             RunRequest {
+                input_provenance: Vec::new(),
                 input: vec![],
                 policy: RunPolicy {
                     max_turns: 2.try_into().unwrap(),
@@ -1115,4 +1144,48 @@ async fn anthropic_thinking_repair_is_learned_only_for_its_model() {
         .map(|body| body["thinking"]["type"].as_str().unwrap())
         .collect();
     assert_eq!(kinds, ["enabled", "adaptive", "adaptive", "enabled"]);
+}
+
+#[test]
+fn generation_metadata_resolves_routes_aliases_and_cache_accounting_without_io() {
+    use adk_providers::{
+        factory::{Kind, RouteSpec},
+        routing::Routes,
+    };
+    for (protocol, includes_cache) in [
+        (Protocol::Responses, true),
+        (Protocol::Chat, true),
+        (Protocol::Anthropic, false),
+    ] {
+        let scope = Scope::new("wire", "http://127.0.0.1:9", None, AuthMode::ApiKey).unwrap();
+        let model = Arc::new(
+            Provider::new(
+                "wire",
+                protocol,
+                Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+            )
+            .unwrap(),
+        );
+        let mut routes = Routes::new("named");
+        routes.register_kind("named", Kind::OpenAi, model).unwrap();
+        let info = routes.info("named/gpt-5.6");
+        assert_eq!(info.provider, "wire");
+        assert_eq!(info.model, "gpt-5.6");
+        assert_eq!(info.input_tokens_include_cache, Some(includes_cache));
+    }
+    let model = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: Some("work".into()),
+        endpoint: Some("http://127.0.0.1:9".into()),
+        protocol: None,
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    }
+    .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+    .unwrap();
+    assert_eq!(
+        model.info("claude-sonnet-4.5").input_tokens_include_cache,
+        Some(false)
+    );
+    assert_eq!(model.info("gpt-5.6").input_tokens_include_cache, Some(true));
 }

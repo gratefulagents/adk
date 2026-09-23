@@ -1,0 +1,10 @@
+[package]
+name = "adk-standalone-consumer"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+adk = { path = "../../crates/adk", default-features = false, features = ["compat", "builder", "execution", "durable", "project-state", "tools", "mcp", "otel"] }

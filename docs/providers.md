@@ -152,3 +152,34 @@ image requests and routing fallback. Record provider/model/API mode, test timest
 status and normalized usage only; never record authorization, refresh bodies,
 account identifiers, raw prompts or unredacted server errors. Do not run this matrix
 in ordinary CI or silently substitute API keys for an unavailable OAuth account.
+
+### Ordered diagnostic snapshots
+
+`ModelResponse::raw` still contains native provider data. The independent optional
+`snapshot_raw: Option<adk_core::JsonDocument>` carries an ordered, normalized raw
+response for compatibility trace snapshots. `JsonDocument::new` validates JSON
+without rewriting member order, number spellings or duplicate keys. Its native
+serde representation is a string, so a checkpoint round-trip through
+`serde_json::Value` does not silently reorder it. The codec embeds its content as
+JSON when producing a compatibility snapshot; custom models may leave it `None`
+and retain the existing native-raw fallback (including explicit JSON null).
+Neither field authorizes disclosure: full trace capture is still opt-in.
+
+The pinned Go fixture executes real public providers against local HTTP servers.
+Two Chat completion and seven public streaming raw documents now have exact-byte
+Rust checks, including raw tool-argument order/numbers, SDK omission/default rules,
+SSE-only Type/stop-reason behavior, and Anthropic block-start versus delta content.
+The native response remains separate: for example, the SDK's streamed Responses
+raw document omits unclosed compaction blocks, without deleting native compaction
+items or the original provider payload. An id-less Anthropic start still counts
+as a start for duplicate/ordering validation; Responses tool-argument events may
+identify an existing item by their explicit output index.
+
+This is **not complete provider snapshot parity**. The fixture also records
+`GetResponse` separately from `StreamResponse`: both may use SSE internally but
+produce different documents. In particular, complete-method Anthropic SDK
+accumulation canonicalizes tool arguments and has a distinct compaction-content
+representation; standard Responses completion drains fields differently. Those
+complete-method profiles and full response-snapshot item/EndTurn parity remain
+implementation blockers, not verified capabilities. The fixture's `streaming`
+flag describes transport; `method` identifies the public SDK call.

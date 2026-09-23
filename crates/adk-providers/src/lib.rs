@@ -32,6 +32,7 @@ mod openai;
 pub mod routing;
 #[cfg(feature = "runtime")]
 pub mod runtime;
+mod snapshot;
 pub mod sse;
 pub mod wire;
 

@@ -125,6 +125,16 @@ impl Routes {
     }
 }
 impl Model for Routes {
+    fn info(&self, name: &str) -> adk_core::ModelInfo {
+        match self.select(name) {
+            Ok((route, model)) => route.model.info(&model),
+            Err(_) => adk_core::ModelInfo {
+                provider: self.provider().into(),
+                model: name.into(),
+                input_tokens_include_cache: None,
+            },
+        }
+    }
     fn provider(&self) -> &str {
         "multi"
     }

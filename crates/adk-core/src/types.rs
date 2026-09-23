@@ -2,6 +2,31 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// Validated JSON text retaining member order, number spellings and duplicate keys.
+/// Native serde encodes this as a string so checkpoints that pass through `Value`
+/// do not reorder the document. Consumers explicitly choose when to embed its JSON.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(transparent)]
+pub struct JsonDocument(String);
+
+impl JsonDocument {
+    pub fn new(text: String) -> Result<Self, serde_json::Error> {
+        serde_json::from_str::<Value>(&text)?;
+        Ok(Self(text))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl<'de> Deserialize<'de> for JsonDocument {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let text = String::deserialize(deserializer)?;
+        Self::new(text).map_err(serde::de::Error::custom)
+    }
+}
+
 /// The author of a conversational message. Tool responses are separate run items.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -100,6 +125,45 @@ pub enum RunItem {
     },
 }
 
+/// Attribution independent of an item's role or the currently executing agent.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ItemProvenance {
+    #[default]
+    Unknown,
+    Unattributed,
+    Agent {
+        name: String,
+    },
+}
+
+/// Expand absent attribution without inferring authorship, and validate supplied entries.
+pub fn normalize_provenance(
+    item_count: usize,
+    entries: &[ItemProvenance],
+) -> Result<Vec<ItemProvenance>, crate::Error> {
+    if entries.is_empty() {
+        return Ok(vec![ItemProvenance::Unknown; item_count]);
+    }
+    if entries.len() != item_count {
+        return Err(crate::Error::new(
+            crate::ErrorCategory::InvalidInput,
+            "provenance length must match item count",
+        ));
+    }
+    for entry in entries {
+        if let ItemProvenance::Agent { name } = entry {
+            if name.trim().is_empty() {
+                return Err(crate::Error::new(
+                    crate::ErrorCategory::InvalidInput,
+                    "provenance agent name must not be empty or whitespace",
+                ));
+            }
+        }
+    }
+    Ok(entries.to_vec())
+}
+
 /// Lossless reasoning continuation. Opaque fields are forwarded only by adapters
 /// supporting their encoding; they must not be substituted with display text.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -120,15 +184,22 @@ pub struct Compaction {
     pub created_by: String,
 }
 
-/// Provider token counters. Cache counters may be subsets of input tokens;
-/// adapters must supply normalized `context_tokens` rather than consumers summing.
+/// Provider-reported request and token counters. Cache counters may be subsets of
+/// input tokens; adapters supply normalized `context_tokens` rather than consumers summing.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Usage {
+    // Keep zero-usage schema-1 events byte-stable while retaining reported counts.
+    #[serde(default, skip_serializing_if = "zero_requests")]
+    pub requests: u64,
     pub input_tokens: u64,
     pub output_tokens: u64,
     pub cache_read_tokens: u64,
     pub cache_creation_tokens: u64,
     pub context_tokens: Option<u64>,
+}
+
+fn zero_requests(value: &u64) -> bool {
+    *value == 0
 }
 
 /// A portable tool declaration, without an executable or an authorization grant.
@@ -147,6 +218,8 @@ pub struct ModelRequest {
     pub model: String,
     pub instructions: String,
     pub input: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_provenance: Vec<ItemProvenance>,
     pub tools: Vec<ToolDefinition>,
     pub output_schema: Option<schemars::Schema>,
     pub output_schema_name: String,
@@ -162,6 +235,24 @@ pub struct ModelResponse {
     pub end_turn: Option<bool>,
     pub response_id: Option<String>,
     pub metadata: serde_json::Map<String, Value>,
+    /// Provider response data, distinct from provider metadata. None means unavailable.
+    #[serde(
+        default,
+        deserialize_with = "present_raw_response",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub raw: Option<Value>,
+    /// Optional ordered provider-neutral raw document for compatibility snapshots.
+    /// This does not replace native diagnostics in `raw` or grant permission to
+    /// disclose either payload; the trace sink still applies its capture policy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub snapshot_raw: Option<JsonDocument>,
+}
+
+fn present_raw_response<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<Value>, D::Error> {
+    Value::deserialize(deserializer).map(Some)
 }
 
 /// Ordered model stream events. Exactly one `Complete` must precede clean EOF.
@@ -190,6 +281,8 @@ pub enum RunStatus {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunRequest {
     pub input: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_provenance: Vec<ItemProvenance>,
     pub policy: crate::RunPolicy,
 }
 
@@ -200,19 +293,54 @@ pub struct ApprovalRequest {
     pub reason: String,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum GuardrailPhase {
+    Input,
+    Output,
+    ToolInput,
+    ToolOutput,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct GuardrailReport {
+    pub phase: GuardrailPhase,
+    pub guardrail_name: String,
+    pub tool_name: Option<String>,
+    pub output: Value,
+    pub tripwire_triggered: bool,
+}
+
+/// Cumulative engine accounting, including retries and provider compaction.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct RunMetrics {
+    pub model: Option<String>,
+    pub turns: u32,
+    pub cost_usd: f64,
+    pub elapsed_ms: u64,
+}
+
 /// A successful or partial invocation snapshot, not a durable checkpoint.
 /// Resume from `history`, not `input + new_items`: compaction may rewrite history.
 /// Pending approvals must be resolved before replaying their calls.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunResult {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metrics: Option<RunMetrics>,
     pub status: RunStatus,
     pub final_output: Option<Value>,
     pub new_items: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub new_items_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub history_provenance: Vec<ItemProvenance>,
     pub responses: Vec<ModelResponse>,
     pub usage: Usage,
     pub pending_approvals: Vec<ApprovalRequest>,
     pub last_agent: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub guardrails: Vec<GuardrailReport>,
 }
 
 /// Events delivered to a host in emission order. The sink provides backpressure.

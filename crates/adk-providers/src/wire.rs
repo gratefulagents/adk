@@ -420,6 +420,12 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {
+        if key == "text_verbosity" && protocol == Protocol::Anthropic {
+            if !value.is_string() {
+                return Err(crate::invalid("text verbosity must be a string"));
+            }
+            continue;
+        }
         if matches!(
             key.as_str(),
             "model_fallbacks" | "text_verbosity" | "compaction_threshold"
@@ -496,6 +502,7 @@ pub fn usage(value: &Value, protocol: Protocol) -> Usage {
         ),
     };
     Usage {
+        requests: 1,
         input_tokens: input,
         output_tokens: output,
         cache_read_tokens: read,
@@ -580,7 +587,24 @@ fn call(
         },
     })
 }
+/// Decode an HTTP body while retaining ordered RawMessage fragments for tracing.
+pub fn response_json(source: &[u8], protocol: Protocol) -> Result<ModelResponse, Error> {
+    let body: Value = serde_json::from_slice(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    let source = std::str::from_utf8(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    response_inner(&body, protocol, Some(source))
+}
+
 pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error> {
+    response_inner(body, protocol, None)
+}
+
+fn response_inner(
+    body: &Value,
+    protocol: Protocol,
+    source: Option<&str>,
+) -> Result<ModelResponse, Error> {
     if let Some(error) = crate::error::provider_error(body) {
         return Err(error);
     }
@@ -844,6 +868,8 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
         }
     }
     Ok(ModelResponse {
+        snapshot_raw: Some(crate::snapshot::document(body, protocol, source)?),
+        raw: Some(body.clone()),
         items,
         usage: usage(&body["usage"], protocol),
         end_turn,

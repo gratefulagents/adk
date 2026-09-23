@@ -16,7 +16,7 @@ use std::{
 /// the host explicitly closes the session with `Scheduler::shutdown`.
 pub struct SubagentSession {
     pub scheduler: SchedulerHandle,
-    parent: Mutex<Vec<RunItem>>,
+    parent: Mutex<(Vec<RunItem>, Vec<ItemProvenance>)>,
     staged_delivery: Mutex<HashSet<String>>,
     parent_task: Option<String>,
 }
@@ -25,7 +25,7 @@ impl SubagentSession {
     pub fn new(scheduler: SchedulerHandle) -> Self {
         Self {
             scheduler,
-            parent: Mutex::new(Vec::new()),
+            parent: Mutex::new((Vec::new(), Vec::new())),
             staged_delivery: Mutex::new(HashSet::new()),
             parent_task: None,
         }
@@ -37,7 +37,7 @@ impl SubagentSession {
         session
     }
 
-    pub(crate) fn update_parent(&self, history: &[RunItem]) {
+    pub(crate) fn update_parent(&self, history: &[RunItem], provenance: &[ItemProvenance]) {
         let completed: HashSet<_> = history
             .iter()
             .filter_map(|item| match item {
@@ -49,12 +49,13 @@ impl SubagentSession {
             .collect();
         *self.parent.lock().unwrap() = history
             .iter()
-            .filter(|item| match item {
+            .zip(provenance)
+            .filter(|(item, _)| match item {
                 RunItem::ToolCall { call } => completed.contains(call.id.as_str()),
                 _ => true,
             })
-            .cloned()
-            .collect();
+            .map(|(item, source)| (item.clone(), source.clone()))
+            .unzip();
     }
 }
 
@@ -685,10 +686,14 @@ impl SubagentSession {
                 }
             };
             submission.include_dependency_results = task.include_dependency_results.unwrap_or(true);
-            submission.parent_history = task
+            if task
                 .share_parent_context
                 .unwrap_or(input.share_parent_context)
-                .then(|| self.parent.lock().unwrap().clone());
+            {
+                let (history, provenance) = self.parent.lock().unwrap().clone();
+                submission.parent_history = Some(history);
+                submission.parent_history_provenance = provenance;
+            }
             submission.policy.tools = narrowed(policy.clone(), &task.tool_access)?;
             if !single {
                 let mut summary =

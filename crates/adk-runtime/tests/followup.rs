@@ -22,6 +22,8 @@ fn message(role: Role, text: impl Into<String>) -> RunItem {
 }
 fn response(items: Vec<RunItem>, end: bool) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(end),
@@ -41,6 +43,7 @@ fn context() -> Context {
 }
 fn request(input: Vec<RunItem>, turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input,
         policy: RunPolicy {
             max_turns: NonZeroU32::new(turns).unwrap(),
@@ -788,7 +791,9 @@ impl Compactor for ReplaceOld {
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
         Box::pin(async move {
             req.history[2] = message(Role::Assistant, "summary");
+            req.history_provenance[2] = ItemProvenance::Unattributed;
             Ok(CompactedHistory {
+                history_provenance: req.history_provenance,
                 history: req.history,
                 context_tokens: 10,
                 usage: Usage::default(),

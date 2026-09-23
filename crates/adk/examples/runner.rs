@@ -9,6 +9,8 @@ struct Echo;
 
 fn response() -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        raw: None,
         items: vec![RunItem::Message {
             message: Message {
                 role: Role::Assistant,
@@ -97,6 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         deadline: None,
     };
     let request = RunRequest {
+        input_provenance: Vec::new(),
         input: vec![RunItem::Message {
             message: Message {
                 role: Role::User,

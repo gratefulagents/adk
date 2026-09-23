@@ -47,7 +47,7 @@ impl RunHooks for GoCallbackAdapter {
     ) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
             let _ = catch_unwind(AssertUnwindSafe(|| match &observation {
-                Observation::AgentStarted { agent } => {
+                Observation::AgentStarted { agent, .. } => {
                     self.callbacks.on_agent_start(context, agent)
                 }
                 Observation::ModelAttempt {

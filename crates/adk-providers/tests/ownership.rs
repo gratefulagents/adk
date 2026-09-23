@@ -45,6 +45,7 @@ impl Refresh for Credentials {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "test".into(),
         instructions: String::new(),
         input: vec![],

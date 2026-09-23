@@ -73,6 +73,54 @@ pub fn check_secrets(text: &str) -> Result<(), Error> {
     Ok(())
 }
 
+/// SDK-compatible diagnostic redaction, not permission to publish an otherwise
+/// blocked tool result. Companion credentials may remain outside matched spans.
+pub fn redact_secrets(text: &str) -> (String, Vec<SecretKind>, usize) {
+    static PEM_END: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"-----END (?:RSA |EC |DSA |OPENSSH |PGP |ENCRYPTED )?PRIVATE KEY-----")
+            .expect("static PEM end pattern")
+    });
+    let mut content = text.to_owned();
+    let mut kinds = Vec::new();
+    let mut total = 0;
+    for (name, pattern) in PATTERNS.iter() {
+        let marker = format!("[REDACTED:{name}]");
+        let count;
+        if *name == "private key" {
+            let mut remaining = content.as_str();
+            let mut result = String::new();
+            let mut matches = 0;
+            while let Some(begin) = pattern.find(remaining) {
+                matches += 1;
+                result.push_str(&remaining[..begin.start()]);
+                result.push_str(&marker);
+                remaining = &remaining[begin.end()..];
+                if let Some(end) = PEM_END.find(remaining) {
+                    remaining = &remaining[end.end()..];
+                } else {
+                    remaining = "";
+                    break;
+                }
+            }
+            result.push_str(remaining);
+            content = result;
+            count = matches;
+        } else {
+            count = pattern.find_iter(&content).count();
+            if count != 0 {
+                content = pattern
+                    .replace_all(&content, regex::NoExpand(&marker))
+                    .into_owned();
+            }
+        }
+        if count != 0 {
+            kinds.push(SecretKind(name));
+            total += count;
+        }
+    }
+    (content, kinds, total)
+}
+
 pub fn detect_secret(text: &str) -> Option<SecretKind> {
     // Scan both views so control-sequence removal cannot hide a raw credential.
     let normalized = normalize(text);

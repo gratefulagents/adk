@@ -62,6 +62,9 @@ cargo deny --locked check
 | Minimal | `cargo test --locked -p adk --no-default-features --all-targets` | Native contracts only |
 | Default | `cargo test --locked --all-targets` | Default workspace members: facade, core, SDK codecs |
 | Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add standalone runner and Tokio ownership |
+| Builder | `cargo test --locked -p adk --no-default-features --features builder --all-targets` | Add host configuration and provider/tool/session composition |
+| Observability | `cargo test --locked -p adk --no-default-features --features observability --all-targets` | Ordered hooks/events and private local traces |
+| OpenTelemetry | `cargo test --locked -p adk --no-default-features --features otel --all-targets` | Host-owned tracer bridge, no implicit exporter |
 | Execution | `cargo test --locked -p adk --no-default-features --features execution --all-targets` | Add opt-in sandbox, process ownership and security |
 | All | `cargo test --locked --workspace --all-features --all-targets` | Include codecs, runtime, execution, platform boundary and binaries |
 
@@ -77,6 +80,38 @@ See [managed subagents](docs/subagents.md) for session ownership, DAG tools,
 security narrowing, steering and conservative scheduler recovery. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect
 platform/Kubernetes dependencies.
+
+## Embedding and composition
+
+The public [runtime builder](docs/runtime-builder.md) composes host-supplied
+models, tools, configuration and explicit bundle/session ownership via the
+`builder` feature (which enables `providers-runtime` and `tools`). It does not
+discover credentials or start platform services. [Observability](docs/observability.md)
+adds ordered event/progress delivery, private trace persistence and an optional
+OpenTelemetry bridge. The `observability` feature enables the local adapters;
+`otel` additionally accepts a host-owned OpenTelemetry tracer. Exporter configuration,
+flush and shutdown remain the embedding application's responsibility.
+
+See the [20 offline feature examples](docs/feature-examples.md),
+[Rust API research](docs/research/facade.md), and
+[issue #11 verification and remaining blockers](docs/verification/issue-11.md).
+Example coverage is not a declaration of full SDK behavioral parity.
+The [CLI scope](docs/sdk-cli.md) explicitly excludes porting `grateful-agent-run`
+and evaluation/Terminal-Bench adapters.
+
+An independent workspace consumer builds every reusable facade feature without
+depending on either development binary or `adk-platform`:
+
+```sh
+cargo run --locked --manifest-path fixtures/standalone-consumer/Cargo.toml
+sh scripts/check-feature-examples.sh
+```
+
+CI checks each named facade feature independently, the runtime/tools/providers
+composition, and the all-feature workspace. For a prepared dependency cache, use
+`--offline`; the example script makes no live provider calls. Live provider,
+OAuth and remote-service verification must be reported separately from offline
+tests, and absent credentials mean **unverified**, not passed.
 
 ```sh
 cargo run --locked -p adk --example standalone --no-default-features

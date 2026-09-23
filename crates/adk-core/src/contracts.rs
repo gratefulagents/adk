@@ -79,9 +79,23 @@ pub struct ModelRetryAdvice {
     pub reason: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelInfo {
+    pub provider: String,
+    pub model: String,
+    pub input_tokens_include_cache: Option<bool>,
+}
+
 /// Provider-neutral completion boundary. Streaming is a separate capability;
 /// implementations must not simulate it by silently buffering a complete call.
 pub trait Model: Send + Sync {
+    fn info(&self, model: &str) -> ModelInfo {
+        ModelInfo {
+            provider: self.provider().into(),
+            model: model.into(),
+            input_tokens_include_cache: None,
+        }
+    }
     fn retry_advice(&self, _error: &Error) -> Option<ModelRetryAdvice> {
         None
     }

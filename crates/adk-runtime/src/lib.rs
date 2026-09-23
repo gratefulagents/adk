@@ -6,9 +6,18 @@
 //! shutdown; blocking processes/threads need their own owner and termination API.
 
 pub mod compaction;
+pub mod guardrails;
+pub use guardrails::{
+    Guardrail, GuardrailInput, GuardrailOutcome, GuardrailResult, GuardrailTripwire,
+    run_guardrails, run_tool_output_guardrails,
+};
+pub mod hooks;
+pub mod tracing;
+pub use hooks::{CompositeHooks, HookErrors};
 pub mod compat;
 pub mod output;
 pub mod runner;
+pub mod settings;
 pub mod subagent;
 pub mod subagent_tools;
 pub use runner::*;

@@ -169,6 +169,7 @@ mod tests {
     use crate::wire::{self, Protocol};
     fn request(model: &str, effort: &str) -> ModelRequest {
         ModelRequest {
+            input_provenance: Vec::new(),
             model: model.into(),
             instructions: "host instructions".into(),
             input: vec![],

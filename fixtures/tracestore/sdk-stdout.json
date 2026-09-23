@@ -1,0 +1,229 @@
+{
+  "json": "{\n\t\"Name\": \"complete\",\n\t\"SpanContext\": {\n\t\t\"TraceID\": \"0102030405060708090a0b0c0d0e0f10\",\n\t\t\"SpanID\": \"0102030405060708\",\n\t\t\"TraceFlags\": \"01\",\n\t\t\"TraceState\": \"vendor=opaque\",\n\t\t\"Remote\": false\n\t},\n\t\"Parent\": {\n\t\t\"TraceID\": \"0102030405060708090a0b0c0d0e0f10\",\n\t\t\"SpanID\": \"0807060504030201\",\n\t\t\"TraceFlags\": \"01\",\n\t\t\"TraceState\": \"vendor=opaque\",\n\t\t\"Remote\": true\n\t},\n\t\"SpanKind\": 3,\n\t\"StartTime\": \"2025-01-02T03:04:05.123456Z\",\n\t\"EndTime\": \"2025-01-02T03:04:06.123456Z\",\n\t\"Attributes\": [\n\t\t{\n\t\t\t\"Key\": \"bool\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"BOOL\",\n\t\t\t\t\"Value\": true\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"int\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"INT64\",\n\t\t\t\t\"Value\": -3\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"float\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"FLOAT64\",\n\t\t\t\t\"Value\": 0.5\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"string\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\"Value\": \"\\u003cvalue\\u003e\\u0026\\u2028\"\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"bools\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"BOOLSLICE\",\n\t\t\t\t\"Value\": [\n\t\t\t\t\ttrue,\n\t\t\t\t\tfalse\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"ints\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"INT64SLICE\",\n\t\t\t\t\"Value\": [\n\t\t\t\t\t1,\n\t\t\t\t\t2\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"floats\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"FLOAT64SLICE\",\n\t\t\t\t\"Value\": [\n\t\t\t\t\t0.25,\n\t\t\t\t\t0.5\n\t\t\t\t]\n\t\t\t}\n\t\t},\n\t\t{\n\t\t\t\"Key\": \"strings\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"STRINGSLICE\",\n\t\t\t\t\"Value\": [\n\t\t\t\t\t\"a\",\n\t\t\t\t\t\"b\"\n\t\t\t\t]\n\t\t\t}\n\t\t}\n\t],\n\t\"Events\": [\n\t\t{\n\t\t\t\"Name\": \"event\",\n\t\t\t\"Attributes\": [\n\t\t\t\t{\n\t\t\t\t\t\"Key\": \"event.attr\",\n\t\t\t\t\t\"Value\": {\n\t\t\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\t\t\"Value\": \"value\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"DroppedAttributeCount\": 1,\n\t\t\t\"Time\": \"2025-01-02T03:04:05.123456Z\"\n\t\t}\n\t],\n\t\"Links\": [\n\t\t{\n\t\t\t\"SpanContext\": {\n\t\t\t\t\"TraceID\": \"0102030405060708090a0b0c0d0e0f10\",\n\t\t\t\t\"SpanID\": \"0807060504030201\",\n\t\t\t\t\"TraceFlags\": \"01\",\n\t\t\t\t\"TraceState\": \"vendor=opaque\",\n\t\t\t\t\"Remote\": true\n\t\t\t},\n\t\t\t\"Attributes\": [\n\t\t\t\t{\n\t\t\t\t\t\"Key\": \"link.attr\",\n\t\t\t\t\t\"Value\": {\n\t\t\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\t\t\"Value\": \"value\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t],\n\t\t\t\"DroppedAttributeCount\": 2\n\t\t}\n\t],\n\t\"Status\": {\n\t\t\"Code\": \"Error\",\n\t\t\"Description\": \"failure\"\n\t},\n\t\"DroppedAttributes\": 3,\n\t\"DroppedEvents\": 4,\n\t\"DroppedLinks\": 5,\n\t\"ChildSpanCount\": 2,\n\t\"Resource\": [\n\t\t{\n\t\t\t\"Key\": \"service.name\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\"Value\": \"fixture\"\n\t\t\t}\n\t\t}\n\t],\n\t\"InstrumentationScope\": {\n\t\t\"Name\": \"gratefulagents/agent\",\n\t\t\"Version\": \"test\",\n\t\t\"SchemaURL\": \"scope/schema\",\n\t\t\"Attributes\": [\n\t\t\t{\n\t\t\t\t\"Key\": \"scope.attr\",\n\t\t\t\t\"Value\": {\n\t\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\t\"Value\": \"value\"\n\t\t\t\t}\n\t\t\t}\n\t\t]\n\t},\n\t\"InstrumentationLibrary\": {\n\t\t\"Name\": \"gratefulagents/agent\",\n\t\t\"Version\": \"test\",\n\t\t\"SchemaURL\": \"scope/schema\",\n\t\t\"Attributes\": [\n\t\t\t{\n\t\t\t\t\"Key\": \"scope.attr\",\n\t\t\t\t\"Value\": {\n\t\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\t\"Value\": \"value\"\n\t\t\t\t}\n\t\t\t}\n\t\t]\n\t}\n}\n{\n\t\"Name\": \"root\",\n\t\"SpanContext\": {\n\t\t\"TraceID\": \"0102030405060708090a0b0c0d0e0f10\",\n\t\t\"SpanID\": \"0102030405060708\",\n\t\t\"TraceFlags\": \"01\",\n\t\t\"TraceState\": \"vendor=opaque\",\n\t\t\"Remote\": false\n\t},\n\t\"Parent\": {\n\t\t\"TraceID\": \"00000000000000000000000000000000\",\n\t\t\"SpanID\": \"0000000000000000\",\n\t\t\"TraceFlags\": \"00\",\n\t\t\"TraceState\": \"\",\n\t\t\"Remote\": false\n\t},\n\t\"SpanKind\": 1,\n\t\"StartTime\": \"2025-01-02T03:04:05.123456Z\",\n\t\"EndTime\": \"2025-01-02T03:04:05.123456Z\",\n\t\"Attributes\": null,\n\t\"Events\": null,\n\t\"Links\": null,\n\t\"Status\": {\n\t\t\"Code\": \"Unset\",\n\t\t\"Description\": \"\"\n\t},\n\t\"DroppedAttributes\": 0,\n\t\"DroppedEvents\": 0,\n\t\"DroppedLinks\": 0,\n\t\"ChildSpanCount\": 0,\n\t\"Resource\": [\n\t\t{\n\t\t\t\"Key\": \"service.name\",\n\t\t\t\"Value\": {\n\t\t\t\t\"Type\": \"STRING\",\n\t\t\t\t\"Value\": \"fixture\"\n\t\t\t}\n\t\t}\n\t],\n\t\"InstrumentationScope\": {\n\t\t\"Name\": \"gratefulagents/agent\",\n\t\t\"Version\": \"\",\n\t\t\"SchemaURL\": \"\",\n\t\t\"Attributes\": null\n\t},\n\t\"InstrumentationLibrary\": {\n\t\t\"Name\": \"gratefulagents/agent\",\n\t\t\"Version\": \"\",\n\t\t\"SchemaURL\": \"\",\n\t\t\"Attributes\": null\n\t}\n}\n",
+  "records": [
+    {
+      "Attributes": [
+        {
+          "Key": "bool",
+          "Value": {
+            "Type": "BOOL",
+            "Value": true
+          }
+        },
+        {
+          "Key": "int",
+          "Value": {
+            "Type": "INT64",
+            "Value": -3
+          }
+        },
+        {
+          "Key": "float",
+          "Value": {
+            "Type": "FLOAT64",
+            "Value": 0.5
+          }
+        },
+        {
+          "Key": "string",
+          "Value": {
+            "Type": "STRING",
+            "Value": "\u003cvalue\u003e\u0026\u2028"
+          }
+        },
+        {
+          "Key": "bools",
+          "Value": {
+            "Type": "BOOLSLICE",
+            "Value": [
+              true,
+              false
+            ]
+          }
+        },
+        {
+          "Key": "ints",
+          "Value": {
+            "Type": "INT64SLICE",
+            "Value": [
+              1,
+              2
+            ]
+          }
+        },
+        {
+          "Key": "floats",
+          "Value": {
+            "Type": "FLOAT64SLICE",
+            "Value": [
+              0.25,
+              0.5
+            ]
+          }
+        },
+        {
+          "Key": "strings",
+          "Value": {
+            "Type": "STRINGSLICE",
+            "Value": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      ],
+      "ChildSpanCount": 2,
+      "DroppedAttributes": 3,
+      "DroppedEvents": 4,
+      "DroppedLinks": 5,
+      "EndTime": "2025-01-02T03:04:06.123456Z",
+      "Events": [
+        {
+          "Attributes": [
+            {
+              "Key": "event.attr",
+              "Value": {
+                "Type": "STRING",
+                "Value": "value"
+              }
+            }
+          ],
+          "DroppedAttributeCount": 1,
+          "Name": "event",
+          "Time": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "InstrumentationLibrary": {
+        "Attributes": [
+          {
+            "Key": "scope.attr",
+            "Value": {
+              "Type": "STRING",
+              "Value": "value"
+            }
+          }
+        ],
+        "Name": "gratefulagents/agent",
+        "SchemaURL": "scope/schema",
+        "Version": "test"
+      },
+      "InstrumentationScope": {
+        "Attributes": [
+          {
+            "Key": "scope.attr",
+            "Value": {
+              "Type": "STRING",
+              "Value": "value"
+            }
+          }
+        ],
+        "Name": "gratefulagents/agent",
+        "SchemaURL": "scope/schema",
+        "Version": "test"
+      },
+      "Links": [
+        {
+          "Attributes": [
+            {
+              "Key": "link.attr",
+              "Value": {
+                "Type": "STRING",
+                "Value": "value"
+              }
+            }
+          ],
+          "DroppedAttributeCount": 2,
+          "SpanContext": {
+            "Remote": true,
+            "SpanID": "0807060504030201",
+            "TraceFlags": "01",
+            "TraceID": "0102030405060708090a0b0c0d0e0f10",
+            "TraceState": "vendor=opaque"
+          }
+        }
+      ],
+      "Name": "complete",
+      "Parent": {
+        "Remote": true,
+        "SpanID": "0807060504030201",
+        "TraceFlags": "01",
+        "TraceID": "0102030405060708090a0b0c0d0e0f10",
+        "TraceState": "vendor=opaque"
+      },
+      "Resource": [
+        {
+          "Key": "service.name",
+          "Value": {
+            "Type": "STRING",
+            "Value": "fixture"
+          }
+        }
+      ],
+      "SpanContext": {
+        "Remote": false,
+        "SpanID": "0102030405060708",
+        "TraceFlags": "01",
+        "TraceID": "0102030405060708090a0b0c0d0e0f10",
+        "TraceState": "vendor=opaque"
+      },
+      "SpanKind": 3,
+      "StartTime": "2025-01-02T03:04:05.123456Z",
+      "Status": {
+        "Code": "Error",
+        "Description": "failure"
+      }
+    },
+    {
+      "Attributes": null,
+      "ChildSpanCount": 0,
+      "DroppedAttributes": 0,
+      "DroppedEvents": 0,
+      "DroppedLinks": 0,
+      "EndTime": "2025-01-02T03:04:05.123456Z",
+      "Events": null,
+      "InstrumentationLibrary": {
+        "Attributes": null,
+        "Name": "gratefulagents/agent",
+        "SchemaURL": "",
+        "Version": ""
+      },
+      "InstrumentationScope": {
+        "Attributes": null,
+        "Name": "gratefulagents/agent",
+        "SchemaURL": "",
+        "Version": ""
+      },
+      "Links": null,
+      "Name": "root",
+      "Parent": {
+        "Remote": false,
+        "SpanID": "0000000000000000",
+        "TraceFlags": "00",
+        "TraceID": "00000000000000000000000000000000",
+        "TraceState": ""
+      },
+      "Resource": [
+        {
+          "Key": "service.name",
+          "Value": {
+            "Type": "STRING",
+            "Value": "fixture"
+          }
+        }
+      ],
+      "SpanContext": {
+        "Remote": false,
+        "SpanID": "0102030405060708",
+        "TraceFlags": "01",
+        "TraceID": "0102030405060708090a0b0c0d0e0f10",
+        "TraceState": "vendor=opaque"
+      },
+      "SpanKind": 1,
+      "StartTime": "2025-01-02T03:04:05.123456Z",
+      "Status": {
+        "Code": "Unset",
+        "Description": ""
+      }
+    }
+  ]
+}

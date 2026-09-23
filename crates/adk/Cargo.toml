@@ -9,7 +9,8 @@ publish.workspace = true
 [features]
 default = []
 compat = ["dep:adk-codec"]
-runtime = ["dep:adk-runtime"]
+runtime = ["dep:adk-runtime", "dep:serde", "dep:serde_json", "dep:tokio"]
+builder = ["providers-runtime", "tools", "dep:serde_yaml", "dep:adk-sandbox"]
 providers = ["dep:adk-providers"]
 providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 execution = ["dep:adk-security", "dep:adk-sandbox"]
@@ -17,8 +18,21 @@ durable = ["dep:adk-durable"]
 project-state = ["dep:adk-project-state"]
 tools = ["dep:adk-tools"]
 mcp = ["dep:adk-mcp"]
+observability = ["runtime", "compat", "dep:adk-security", "dep:sha2", "dep:rustix", "dep:chrono", "dep:regex", "dep:uuid"]
+otel = ["observability", "dep:opentelemetry", "dep:opentelemetry_sdk", "dep:opentelemetry-otlp"]
 
 [dependencies]
+serde = { workspace = true, optional = true }
+serde_json = { workspace = true, optional = true }
+serde_yaml = { package = "serde_yaml_ng", version = "0.10", optional = true }
+tokio = { workspace = true, optional = true }
+sha2 = { version = "0.10", optional = true }
+regex = { version = "1", optional = true }
+uuid = { version = "1", features = ["v4"], optional = true }
+chrono = { version = "0.4", default-features = false, features = ["std", "serde"], optional = true }
+opentelemetry = { version = "0.31", default-features = false, features = ["trace"], optional = true }
+opentelemetry_sdk = { version = "0.31", default-features = false, features = ["trace"], optional = true }
+opentelemetry-otlp = { version = "0.31", default-features = false, features = ["trace", "grpc-tonic", "tls-roots"], optional = true }
 adk-core.workspace = true
 adk-mcp = { version = "0.1.0", path = "../adk-mcp", optional = true }
 adk-tools = { version = "0.1.0", path = "../adk-tools", optional = true }
@@ -33,7 +47,17 @@ adk-project-state = { version = "0.1.0", path = "../adk-project-state", optional
 
 [dev-dependencies]
 tokio.workspace = true
+tempfile = "3"
+uuid = "1"
+opentelemetry_sdk = { version = "0.31", default-features = false, features = ["trace", "testing"] }
+
+[target.'cfg(unix)'.dependencies]
+rustix = { version = "1", features = ["fs"], optional = true }
 
 [[example]]
 name = "runner"
 required-features = ["runtime"]
+
+[[example]]
+name = "features"
+required-features = ["builder", "execution", "mcp", "project-state", "observability"]

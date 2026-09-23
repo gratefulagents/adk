@@ -23,6 +23,7 @@ fn context() -> Context {
 }
 fn request(model: &str) -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: model.into(),
         instructions: String::new(),
         input: vec![],
@@ -35,6 +36,7 @@ fn request(model: &str) -> ModelRequest {
 }
 fn usage() -> Usage {
     Usage {
+        requests: 1,
         input_tokens: 1000,
         output_tokens: 100,
         cache_read_tokens: 200,
@@ -44,6 +46,8 @@ fn usage() -> Usage {
 }
 fn answer() -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        raw: None,
         items: vec![RunItem::Message {
             message: Message {
                 role: Role::Assistant,
@@ -612,6 +616,7 @@ async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_mod
         };
         let runner = Runner::new(agent, config).unwrap();
         let request = RunRequest {
+            input_provenance: Vec::new(),
             input: vec![],
             policy: RunPolicy {
                 max_turns: 2.try_into().unwrap(),

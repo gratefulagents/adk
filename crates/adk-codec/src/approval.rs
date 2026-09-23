@@ -65,12 +65,11 @@ pub fn approval_call(data: &dto::ToolApprovalData) -> Result<ToolCall, BridgeErr
     Ok(ToolCall {
         id: data.call_id.clone(),
         name: data.tool_name.clone(),
-        arguments: match &data.input {
-            dto::RawJson::Present(value) => value.clone(),
-            dto::RawJson::Missing => {
-                return Err(BridgeError("missing approval input is not JSON null"));
-            }
-        },
+        arguments: data
+            .input
+            .value()
+            .ok_or(BridgeError("missing approval input is not JSON null"))?
+            .into_owned(),
     })
 }
 
@@ -90,7 +89,9 @@ pub struct NativeHistory {
     pub markers: Vec<ApprovalMarkerBoundary>,
 }
 
-fn encode_content(content: &[Content]) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
+pub(crate) fn encode_content(
+    content: &[Content],
+) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
     let (text, attachments) = match content.split_first() {
         Some((Content::Text { text }, rest)) => (text.clone(), rest),
         _ => (String::new(), content),
@@ -235,14 +236,14 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                 .tool_call
                 .as_ref()
                 .ok_or(BridgeError("missing ToolCall"))?;
-            let dto::RawJson::Present(arguments) = &call.input else {
+            let Some(arguments) = call.input.value() else {
                 return Err(BridgeError("missing tool input is not JSON null"));
             };
             RunItem::ToolCall {
                 call: ToolCall {
                     id: call.id.clone(),
                     name: call.name.clone(),
-                    arguments: arguments.clone(),
+                    arguments: arguments.into_owned(),
                 },
             }
         }

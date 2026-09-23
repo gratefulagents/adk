@@ -64,6 +64,8 @@ impl Model for ToolModel {
                     .collect()
             };
             Ok(ModelResponse {
+                snapshot_raw: None,
+                raw: None,
                 items,
                 usage: Default::default(),
                 end_turn: None,

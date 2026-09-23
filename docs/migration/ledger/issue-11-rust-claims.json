@@ -1,0 +1,954 @@
+{
+  "schema_version": 1,
+  "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "claims": {
+    "SDK-32E4C5FF719DCB40": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceCategoryFull",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::CategoryFull"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRotatesAtChunkLimit",
+      "rationale": "Distinct matchable error with the reference message; exhausting the configured rotation slots returns this error and leaves the active file unchanged.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-E7AFA81BD5E91170": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceEventTooLarge",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::EventTooLarge"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRejectsOversizedEventAndFile",
+      "rationale": "Distinct matchable error with the reference message; the append check includes the added terminal newline and rejects before modifying category content.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-9492B46AC0E7F0D4": {
+      "source": "pkg/agentsdk/tracestore/trace_store.go",
+      "source_name": "ErrTraceFileTooLarge",
+      "implementation_symbols": [
+        "crates/adk/src/tracestore.rs::StoreError::FileTooLarge"
+      ],
+      "rust_test_identifiers": [
+        "defaults_errors_and_store_trait_are_explicit",
+        "quotas_rotate_oldest_to_numbered_file_and_preserve_active"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestFilesystemTraceStoreRejectsOversizedEventAndFile",
+      "rationale": "Distinct matchable error with the reference message; oversized artifact bytes are rejected before opening or replacing the destination.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6B9B667988470CA3": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Agent",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Agent",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-C2D32265E7C17D49": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Compaction",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Compaction",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-B20217464BF43189": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Function",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Function",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-88D235430367D780": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Generation",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Generation",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-347D7DB78299B6D9": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Guardrail",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Guardrail",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-A959816B6E02F0AA": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Handoff",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Handoff",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-72C4A41E63FC0489": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Retry",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Retry",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-922748E6A42CD9FC": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Session",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Session",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-565BDE76B363533E": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestMapSpanData_Subagent",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Subagent",
+      "rationale": "The independently executed pinned Go exporter fixture and Rust SDK exporter compare all final mapped keys, scalar values and status for this span kind. This verifies the mapping regression only, not automatic runtime production or whole exporter parity. Generation covers both enabled cache flags; subagent covers present/absent isolation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-F46C63A7A2BF2AEA": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestNormalizeOTLPEndpoint",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry.rs::Destination::resolve"
+      ],
+      "rust_test_identifiers": [
+        "pinned_endpoint_normalization_cases"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestNormalizeOTLPEndpoint",
+      "rationale": "The exact pinned normalization table is checked for blank, schemeless, HTTP, HTTPS, case-insensitive scheme and path removal.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-DBC1377A77FB06B6": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.AgentName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::agent_name"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-13FBA901C348BDA2": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.InputItems",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::input_items"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-1C68AC7BE43B86F0": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.InputTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::input_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-DAD2873FC5743ADD": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Instructions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::instructions"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-2BCBAE4C2A215DFD": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::model"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-2B990CF0EAF06AC8": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.OutputSchema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::output_schema"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-13EBC0AF4DDBE0F3": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.RequestOverheadTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::request_overhead_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-F03D707C32824A4E": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Settings",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::settings"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-46013697C58697E4": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.Tools",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::tools"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-C49F52187CA38E0F": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot.TotalTokenEstimate",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot::total_token_estimate"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-41DC0B1C66C9BF51": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
+        "json_null_scalars_and_collections_follow_go_zero_values",
+        "raw_json_null_remains_distinct_from_missing_schema",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-AFC6D980CC52D10F": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "NewSpan",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::new"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-63A2FA637013DDDA": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "Span.DurationMS",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-78D941E676F560BF": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "Span.Finish",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Span::finish"
+      ],
+      "rust_test_identifiers": [
+        "explicit_trace_lifecycle_retains_span_order_and_finished_duration",
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Explicit span creation supplies a fresh UUID, caller name/parent/data, current start and zero end; finish stamps the end; duration uses current time while unfinished and the recorded interval afterwards. Rust lifecycle assertions and pinned writer fixtures exercise creation, completion and millisecond duration without implying automatic request snapshot production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-9924B722AB237F80": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.EndTurn",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::end_turn",
+        "crates/adk-codec/src/snapshots.rs::TryFrom<&adk_core::ModelResponse>",
+        "crates/adk/src/tracewriter.rs::GenerationObserver::end"
+      ],
+      "rust_test_identifiers": [
+        "native_response_snapshot_bytes_match_independent_pinned_go",
+        "actual_runner_writes_ordered_generation_attempts_without_otel"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "This optional boolean field preserves absent, explicit false and explicit true. Independently executed BuildLLMResponseSnapshot fixtures compare exact serialized bytes for absent/false, and the actual Rust runner writes the true response snapshot in full and metadata modes with matching JSON and digest bytes. This closes only EndTurn field representation and transport, not full automatic snapshot assembly, provider raw normalization or agent provenance.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
+    },
+    "SDK-C1CAC73D33C2BD90": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.Output",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::output",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire::output"
+      ],
+      "rust_test_identifiers": [
+        "sequential_nil_and_tripwire_preserve_typed_results_and_stop_callbacks",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "Serializable diagnostic output remains in reports and typed tripwire causes; a nil callback result yields null. Diagnostic strings do not rewrite tool content.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1E00129C0812E950": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.TripwireTriggered",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::tripwire_triggered",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "sequential_nil_and_tripwire_preserve_typed_results_and_stop_callbacks",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "Tripwire results terminate sequential evaluation and preserve typed diagnostic reports. Tool-output tripwires take precedence over replacement; input tripwires prevent provider dispatch.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7265E17F3E2FE578": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.ReplacementContent",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::replacement_content",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_output_replacement_precedes_next_guard_and_preserves_flags",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "tool_output_replacement_reaches_model_and_stop_after_tool_checks_output"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+      "rationale": "Explicit successful replacement rewrites only tool content, including to the empty string; the next guard and subsequent model input see the replacement. Other output flags survive. This is not a claim for automatic function-span production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3B14BC5EA25B2ABD": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.ContentReplaced",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::replacement_content",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_output_replacement_precedes_next_guard_and_preserves_flags",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+      "rationale": "Rust Option<String> combines the replacement discriminator and payload: None does not replace; Some, including an empty string, explicitly replaces. Diagnostic Output alone does not replace, and a tripwire suppresses replacement. No redundant Go boolean is required.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E7536E28DBF7A586": {
+      "source": "internal/agent/runner_test.go",
+      "source_name": "TestRunnerInputGuardrailTripwire",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Engine",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "A top-level input tripwire returns a typed input-phase cause, retains its report and diagnostic output, leaves final output unset, and never dispatches the provider.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4FE13C59011B0798": {
+      "source": "internal/agent/runner_test.go",
+      "source_name": "TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Engine",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_input_tripwire_is_model_visible_without_executing_tool"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+      "rationale": "A tool-input tripwire prevents tool invocation, retains a named triggered report, supplies a model-visible error tool result on the second request, and lets the model produce its final answer.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-CAE6296F65D71C27": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CacheCreationInputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cache_creation_input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: CacheCreationInputTokens maps to Session.cache_creation_input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-834DEE445E06CAB1": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CacheReadInputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cache_read_input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: CacheReadInputTokens maps to Session.cache_read_input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-E0231D6672FB3B9E": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.DurationMS",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::duration_ms",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: DurationMS maps to Session.duration_ms with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-EDB8AC47A3B083C2": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.InputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: InputTokens maps to Session.input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-B48094438EC05137": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.Model",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::model",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: Model maps to Session.model with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-262E9849321A9A57": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.NumTurns",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::num_turns",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: NumTurns maps to Session.num_turns with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-23E95B8347D5FAF4": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::output_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: OutputTokens maps to Session.output_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-22E9E485975B9A0D": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.StopReason",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::stop_reason",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: StopReason maps to Session.stop_reason with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-31E31FC44CD652FC": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CostUSD",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cost_usd",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "The native f64 field preserves IEEE values in OTel Float64 attributes, including signed zero and non-finite values. Finite schema-2 records match the independent pinned fixture; NaN/+Inf/-Inf reject filesystem records with the exact pinned marshal health error rather than becoming null."
+    },
+    "SDK-DD19405C46836F6E": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "All nine source fields map to the native typed Session record with corresponding string, f64 and Linux x86_64 signed integer ranges. Independent writer and OTel fixtures verify all field names and values, including the duration override. This is DTO/API representation closure, not ProgressTracker producer or billing parity."
+    },
+    "SDK-ACF7B29E9209E103": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "SessionSpanData",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "The facade exposes the complete typed record as adk::tracewriter::Session under observability, instead of replicating a Go alias. Both independent Go fixtures construct the public agentsdk.SessionSpanData alias and Rust tests construct the public facade record. This closes the alias API only, not all session lifecycle producers."
+    },
+    "SDK-07693223E35FE12C": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeReasoningSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-BB9BF16EBF838012": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-FD68CDED9ED601E0": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeTextVerbositySettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-B442347DCC5E56A7": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeReasoningSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-91FFC30DBF2144D2": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeRoutingSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7788F6344AA7D4A3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeTextVerbositySettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    }
+  }
+}

@@ -90,6 +90,9 @@ fn partial_run_retains_history_usage_and_cause() {
         },
     };
     let partial = RunResult {
+        metrics: None,
+        history_provenance: Vec::new(),
+        new_items_provenance: Vec::new(),
         status: RunStatus::Incomplete,
         final_output: None,
         new_items: vec![item.clone()],
@@ -101,6 +104,7 @@ fn partial_run_retains_history_usage_and_cause() {
         },
         pending_approvals: vec![],
         last_agent: Some("assistant".into()),
+        guardrails: vec![],
     };
     let error = RunError::with_partial(
         Error::new(ErrorCategory::MaxTurns, "turn budget exhausted")
@@ -156,6 +160,8 @@ fn native_items_preserve_order_ids_and_arbitrary_precision() {
 fn model_end_turn_preserves_absent_false_and_true() {
     for end_turn in [None, Some(false), Some(true)] {
         let response = ModelResponse {
+            snapshot_raw: None,
+            raw: None,
             items: vec![],
             usage: Usage::default(),
             end_turn,
@@ -192,4 +198,259 @@ fn default_run_policy_preserves_baseline_hundred_turn_budget() {
     assert_eq!(policy.max_turns.get(), 100);
     assert_eq!(policy.tools, ToolPolicy::default());
     assert_eq!(policy.tool_use, ToolUseBehavior::Continue);
+}
+
+#[test]
+fn provenance_fields_preserve_legacy_json_and_explicit_attribution() {
+    let items = json!([{
+        "type": "message",
+        "message": {"role": "assistant", "content": [{"type": "text", "text": "answer"}]}
+    }]);
+    let run_json = json!({"input": items, "policy": RunPolicy::default()});
+    let model_json = json!({
+        "model": "test", "instructions": "", "input": items, "tools": [],
+        "output_schema": null, "output_schema_name": "", "output_schema_strict": false,
+        "settings": {}
+    });
+    let result_json = json!({
+        "status": "completed", "final_output": null, "new_items": items, "history": items,
+        "responses": [], "usage": Usage::default(), "pending_approvals": [],
+        "last_agent": "current-agent"
+    });
+    let mut run: RunRequest = serde_json::from_value(run_json.clone()).unwrap();
+    let mut model: ModelRequest = serde_json::from_value(model_json.clone()).unwrap();
+    let mut result: RunResult = serde_json::from_value(result_json.clone()).unwrap();
+    assert!(run.input_provenance.is_empty());
+    assert!(model.input_provenance.is_empty());
+    assert!(result.history_provenance.is_empty());
+    assert!(result.new_items_provenance.is_empty());
+    assert_eq!(serde_json::to_value(&run).unwrap(), run_json);
+    assert_eq!(serde_json::to_value(&model).unwrap(), model_json);
+    assert_eq!(serde_json::to_value(&result).unwrap(), result_json);
+    assert_eq!(
+        normalize_provenance(run.input.len(), &run.input_provenance).unwrap(),
+        vec![ItemProvenance::Unknown]
+    );
+    assert_eq!(
+        normalize_provenance(result.history.len(), &result.history_provenance).unwrap(),
+        vec![ItemProvenance::Unknown]
+    );
+    for entry in [
+        ItemProvenance::Unknown,
+        ItemProvenance::Unattributed,
+        ItemProvenance::Agent {
+            name: " original-agent ".into(),
+        },
+    ] {
+        run.input_provenance = vec![entry.clone()];
+        model.input_provenance = vec![entry.clone()];
+        result.history_provenance = vec![entry.clone()];
+        result.new_items_provenance = vec![entry];
+        assert_eq!(
+            serde_json::from_value::<RunRequest>(serde_json::to_value(&run).unwrap()).unwrap(),
+            run
+        );
+        assert_eq!(
+            serde_json::from_value::<ModelRequest>(serde_json::to_value(&model).unwrap()).unwrap(),
+            model
+        );
+        assert_eq!(
+            serde_json::from_value::<RunResult>(serde_json::to_value(&result).unwrap()).unwrap(),
+            result
+        );
+    }
+}
+
+#[test]
+fn provenance_states_have_distinct_tagged_json() {
+    assert_eq!(ItemProvenance::default(), ItemProvenance::Unknown);
+    for (entry, encoded) in [
+        (ItemProvenance::Unknown, json!({"kind": "unknown"})),
+        (
+            ItemProvenance::Unattributed,
+            json!({"kind": "unattributed"}),
+        ),
+        (
+            ItemProvenance::Agent { name: "a".into() },
+            json!({"kind": "agent", "name": "a"}),
+        ),
+    ] {
+        assert_eq!(serde_json::to_value(&entry).unwrap(), encoded);
+        assert_eq!(
+            serde_json::from_value::<ItemProvenance>(encoded).unwrap(),
+            entry
+        );
+    }
+    let schema = serde_json::to_value(schemars::schema_for!(ItemProvenance)).unwrap();
+    assert_eq!(schema["oneOf"].as_array().unwrap().len(), 3);
+}
+
+#[test]
+fn provenance_normalization_preserves_empty_and_known_data() {
+    assert!(normalize_provenance(0, &[]).unwrap().is_empty());
+    assert_eq!(
+        normalize_provenance(3, &[]).unwrap(),
+        vec![ItemProvenance::Unknown; 3]
+    );
+    let entries = vec![
+        ItemProvenance::Unknown,
+        ItemProvenance::Unattributed,
+        ItemProvenance::Agent {
+            name: " \t named agent\n".into(),
+        },
+    ];
+    assert_eq!(
+        normalize_provenance(entries.len(), &entries).unwrap(),
+        entries
+    );
+}
+
+#[test]
+fn provenance_normalization_rejects_nonempty_length_mismatches() {
+    for (count, entries) in [
+        (0, vec![ItemProvenance::Unknown]),
+        (2, vec![ItemProvenance::Unattributed]),
+        (1, vec![ItemProvenance::Unknown; 2]),
+    ] {
+        assert_eq!(
+            normalize_provenance(count, &entries)
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+    }
+}
+
+#[test]
+fn provenance_normalization_rejects_blank_agent_names() {
+    for name in ["", " ", "\t\r\n", "\u{2003}\u{00a0}"] {
+        let entries = [
+            ItemProvenance::Unknown,
+            ItemProvenance::Agent { name: name.into() },
+        ];
+        assert_eq!(
+            normalize_provenance(entries.len(), &entries)
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+    }
+}
+
+#[test]
+fn raw_response_preserves_missing_null_and_provider_data() {
+    for raw in [
+        None,
+        Some(serde_json::Value::Null),
+        Some(json!({"content": "answer", "unknown": [1, false]})),
+    ] {
+        let response = ModelResponse {
+            snapshot_raw: None,
+            raw: raw.clone(),
+            items: vec![],
+            usage: Usage::default(),
+            end_turn: None,
+            response_id: None,
+            metadata: Default::default(),
+        };
+        let encoded = serde_json::to_value(&response).unwrap();
+        assert_eq!(encoded.get("raw"), raw.as_ref());
+        assert!(encoded.get("snapshot_raw").is_none());
+        assert_eq!(
+            serde_json::from_value::<ModelResponse>(encoded).unwrap(),
+            response
+        );
+    }
+}
+
+#[test]
+fn json_document_validates_construction_and_deserialization() {
+    for invalid in ["", "{", "null true", "{\"a\":}", "[1,]", "\"\\uD800\""] {
+        assert!(JsonDocument::new(invalid.into()).is_err(), "{invalid}");
+        assert!(serde_json::from_value::<JsonDocument>(json!(invalid)).is_err());
+        assert!(
+            serde_json::from_str::<JsonDocument>(&serde_json::to_string(invalid).unwrap()).is_err()
+        );
+    }
+    assert!(serde_json::from_value::<JsonDocument>(json!({"a": 1})).is_err());
+}
+
+#[test]
+fn json_document_preserves_exact_text_through_json_and_value() {
+    for text in [
+        " \n{\"z\":1e+02, \"a\":{\"y\":2,\"b\":\"\\u0061\"},\"z\":0}\t",
+        "null",
+        "[true, false, 1.00]",
+        "\"text\"",
+    ] {
+        let document = JsonDocument::new(text.into()).unwrap();
+        assert_eq!(document.as_str(), text);
+        let encoded = serde_json::to_string(&document).unwrap();
+        assert_eq!(encoded, serde_json::to_string(text).unwrap());
+        assert_eq!(
+            serde_json::from_str::<JsonDocument>(&encoded).unwrap(),
+            document
+        );
+        let value = serde_json::to_value(&document).unwrap();
+        assert_eq!(value, json!(text));
+        assert_eq!(
+            serde_json::from_value::<JsonDocument>(value).unwrap(),
+            document
+        );
+    }
+    assert_ne!(
+        JsonDocument::new("{\"z\":1,\"a\":2}".into()).unwrap(),
+        JsonDocument::new("{\"a\":2,\"z\":1}".into()).unwrap()
+    );
+}
+
+#[test]
+fn model_response_persists_ordered_snapshot_raw() {
+    let text = " {\"z\":1.00,\"a\":{\"y\":2,\"b\":3}}\n";
+    let response = ModelResponse {
+        snapshot_raw: Some(JsonDocument::new(text.into()).unwrap()),
+        raw: Some(json!({"native": "distinct"})),
+        items: vec![],
+        usage: Usage::default(),
+        end_turn: None,
+        response_id: None,
+        metadata: Default::default(),
+    };
+    let encoded = serde_json::to_string(&response).unwrap();
+    assert_eq!(
+        serde_json::from_str::<ModelResponse>(&encoded).unwrap(),
+        response
+    );
+    let mut value = serde_json::to_value(&response).unwrap();
+    assert_eq!(value["snapshot_raw"], text);
+    assert_eq!(
+        serde_json::from_value::<ModelResponse>(value.clone()).unwrap(),
+        response
+    );
+    value["snapshot_raw"] = json!("invalid");
+    assert!(serde_json::from_value::<ModelResponse>(value).is_err());
+}
+
+#[test]
+fn usage_preserves_reported_request_count_and_defaults_missing_count_to_zero() {
+    let usage = Usage {
+        requests: 7,
+        ..Default::default()
+    };
+    assert!(
+        serde_json::to_value(Usage::default())
+            .unwrap()
+            .get("requests")
+            .is_none()
+    );
+    let mut value = serde_json::to_value(&usage).unwrap();
+    assert_eq!(value["requests"], 7);
+    assert_eq!(
+        serde_json::from_value::<Usage>(value.clone()).unwrap(),
+        usage
+    );
+    value.as_object_mut().unwrap().remove("requests");
+    assert_eq!(serde_json::from_value::<Usage>(value).unwrap().requests, 0);
 }

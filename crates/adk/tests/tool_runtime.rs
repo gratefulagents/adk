@@ -76,6 +76,8 @@ impl Model for TestModel {
                 vec![]
             };
             Ok(ModelResponse {
+                snapshot_raw: None,
+                raw: None,
                 items,
                 usage: Usage::default(),
                 end_turn: Some(requests.len() > 1),
@@ -107,6 +109,7 @@ fn context() -> Context {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: RunPolicy::default(),
     }

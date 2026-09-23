@@ -2044,3 +2044,20 @@ async fn generation_retains_returned_response_when_host_rejects_stream_completio
         ErrorCategory::Host
     );
 }
+
+#[tokio::test]
+async fn reported_request_counts_accumulate_without_inference_or_overflow() {
+    for (first, second, total) in [(2, 3, 5), (0, 0, 0), (u64::MAX, 1, u64::MAX)] {
+        let mut continuing = response(vec![message(Role::Assistant, "working")], Some(false));
+        continuing.usage.requests = first;
+        let mut final_response = answer("done");
+        final_response.usage.requests = second;
+        let model = TestModel::with(vec![Ok(continuing), Ok(final_response)]);
+        let result = runner(agent(model.clone()))
+            .run(context(), request(3), Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(model.completes.load(Ordering::SeqCst), 2);
+        assert_eq!(result.result.usage.requests, total);
+    }
+}

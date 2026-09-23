@@ -24,7 +24,10 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   model metadata, usage and once-estimated cost to the writer or OTel processor.
   Drop cleanup and a returned response followed by host failure are covered.
   Ordered request documents preserve raw JSON bytes for exact metadata digests.
-  Automatic schema-2 request/response snapshot assembly is **not** complete.
+  Representable native response snapshots are now assembled automatically and
+  verified against pinned SDK bytes in full and metadata capture modes. Exact
+  automatic SDK snapshot parity is **not** complete: request assembly, history
+  provenance and normalized provider raw data remain unresolved.
 - Stdout now emits Go-compatible JSON via the maintained Rust SDK batcher,
   preserving full parent context and child counts. Actual-provider tests verify
   ordering, late children, envelope-key collisions and flush errors. SDK endpoint
@@ -36,16 +39,21 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
 - Native model responses now retain optional provider data separately from metadata,
   with absent/null JSON round trips and HTTP/streaming regressions for retained
   payloads. Go's normalized internal raw response shape is different; this change
-  does **not** close automatic SDK response snapshot assembly or provider raw parity.
+  does **not** close exact SDK provider raw parity. Request counts are now retained
+  through providers, aggregation, observability, checkpoint export and Go recovery
+  rather than inferred from attempts. Zero counters preserve native schema-1 bytes.
+  Snapshot conversion errors remain observable in persisted writer health.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **838 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **843 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
-- The overlay now has **27 explicitly verified**, **8,864 unresolved** and
+- The overlay now has **28 explicitly verified**, **8,863 unresolved** and
   **251 excluded** IDs. Three claims cover distinguishable store quota errors;
   ten cover specific OTel mapping/normalization regressions; eleven cover the
-  request snapshot representation/fields; three cover span lifecycle APIs.
-  Snapshot representation claims do not cover automatic assembly. Exact tests,
+  request snapshot representation/fields; three cover span lifecycle APIs; one
+  covers response EndTurn's absent/false/true representation and transport.
+  Request representation claims do not cover automatic assembly; the EndTurn claim
+  does not cover the whole response builder or provider raw normalization. Exact tests,
   compiler, independently executed fixture verification and input hashes are
   retained in `issue-11-rust-evidence.json`. Nine evidence-validator tests pass,
   including rejection of unbound implementation files and unexecuted fixtures.

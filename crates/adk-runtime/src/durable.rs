@@ -847,7 +847,7 @@ impl Engine {
             interruptions: None,
             children: state.child_checkpoint.clone(),
             usage: adk_codec::dto::Usage {
-                requests: i64::from(self.turns),
+                requests: count(self.result.usage.requests)?,
                 input_tokens: count(self.result.usage.input_tokens)?,
                 output_tokens: count(self.result.usage.output_tokens)?,
                 cache_read_tokens: count(self.result.usage.cache_read_tokens)?,
@@ -953,6 +953,7 @@ impl Runner {
         }
         let count = |n: i64| u64::try_from(n).map_err(invalid);
         if u64::from(recovery.turns) < count(checkpoint.usage.requests)?
+            || recovery.usage.requests < count(checkpoint.usage.requests)?
             || recovery.usage.input_tokens < count(checkpoint.usage.input_tokens)?
             || recovery.usage.output_tokens < count(checkpoint.usage.output_tokens)?
             || recovery.usage.cache_read_tokens < count(checkpoint.usage.cache_read_tokens)?

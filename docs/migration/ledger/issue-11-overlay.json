@@ -18,8 +18,8 @@
     "by_category": {
       "apis": {
         "excluded": 81,
-        "unresolved": 5761,
-        "verified": 17
+        "unresolved": 5760,
+        "verified": 18
       },
       "artifacts": {
         "excluded": 16,
@@ -89,8 +89,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8864,
-    "verified": 27
+    "unresolved": 8863,
+    "verified": 28
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -191,7 +191,7 @@
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "181e820fb010ccf295909b3a4b7258c607eb95c6a6292d2619598b9068f92042",
+    "evidence_sha256": "9a4108abbdf3c364ec1f1591040b32828eef57fdc1d8a301c9fdf9dcada0f1ed",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -14129,7 +14129,7 @@
     "SDK-990F133E5FDAF10E": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/openai.chatChunkDelta.ReasoningContent@internal/openai/chat_stream.go", "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/openai/chat_stream.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "not_run"},
     "SDK-991BC3EE8F8D9783": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/lsp.Config.AllowUnsafeUnconfined@pkg/agentsdk/tools/lsp/manager.go", "proposed_rust_module": "sdk::tools::lsp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/lsp/manager.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::lsp", "verification_status": "not_run"},
     "SDK-991D159E14ECC496": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/anthropic.RequestError.StatusCode@internal/anthropic/client.go", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/client.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
-    "SDK-9924B722AB237F80": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.LLMResponseSnapshot.EndTurn@internal/agent/llm_snapshot.go", "proposed_rust_module": "sdk::model", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/llm_snapshot.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::model", "verification_status": "not_run"},
+    "SDK-9924B722AB237F80": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "This optional boolean field preserves absent, explicit false and explicit true. Independently executed BuildLLMResponseSnapshot fixtures compare exact serialized bytes for absent/false, and the actual Rust runner writes the true response snapshot in full and metadata modes with matching JSON and digest bytes. This closes only EndTurn field representation and transport, not full automatic snapshot assembly, provider raw normalization or agent provenance.", "implementation_symbols": ["crates/adk-codec/src/dto.rs::ResponseSnapshot::end_turn", "crates/adk-codec/src/snapshots.rs::TryFrom<&adk_core::ModelResponse>", "crates/adk/src/tracewriter.rs::GenerationObserver::end"], "ledger_record_id": "apis:internal/agent.LLMResponseSnapshot.EndTurn@internal/agent/llm_snapshot.go", "proposed_rust_module": "sdk::model", "rust_test_identifiers": ["native_response_snapshot_bytes_match_independent_pinned_go", "actual_runner_writes_ordered_generation_attempts_without_otel"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/agent/llm_snapshot.go", "target_features": ["x86_64-unknown-linux-gnu", "compat", "observability"], "upstream_regression_reference_group": "verification_groups:sdk::model", "verification_status": "passed"},
     "SDK-992B907406889A06": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.RunItemHandoffCall@internal/agent/items.go", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/items.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
     "SDK-9935A3A787CFE708": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/mcp.TransportLegacySSE@pkg/agentsdk/mcp/config.go", "proposed_rust_module": "sdk::mcp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/mcp/config.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::mcp", "verification_status": "not_run"},
     "SDK-993955389F758731": {"approved_divergence_reference": null, "category": "configuration", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "configuration:pkg/agentsdk/tools/lsp/manager.go:Config.normalized", "proposed_rust_module": "sdk::tools::lsp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/lsp/manager.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::lsp", "verification_status": "not_run"},

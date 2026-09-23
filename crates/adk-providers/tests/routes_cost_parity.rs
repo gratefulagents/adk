@@ -35,6 +35,7 @@ fn request(model: &str) -> ModelRequest {
 }
 fn usage() -> Usage {
     Usage {
+        requests: 1,
         input_tokens: 1000,
         output_tokens: 100,
         cache_read_tokens: 200,

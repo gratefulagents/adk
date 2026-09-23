@@ -148,7 +148,7 @@ fn full_capture_redacts_nested_keys_json_strings_credentials_and_custom_content(
 
 #[tokio::test]
 async fn progress_uses_cumulative_usage_and_bounded_recent_events() {
-    let (pipeline, _) = pipeline(CaptureMode::Metadata);
+    let (pipeline, records) = pipeline(CaptureMode::Metadata);
     let context = context();
     pipeline
         .observe(
@@ -180,6 +180,7 @@ async fn progress_uses_cumulative_usage_and_bounded_recent_events() {
         .await
         .unwrap();
     let usage = Usage {
+        requests: 3,
         input_tokens: 10,
         output_tokens: 2,
         ..Usage::default()
@@ -211,6 +212,19 @@ async fn progress_uses_cumulative_usage_and_bounded_recent_events() {
     let snapshot = pipeline.snapshot().await;
     assert_eq!(snapshot.sequence, 30);
     assert_eq!(snapshot.usage, usage);
+    {
+        let records = records.0.lock().unwrap();
+        assert_eq!(
+            records
+                .iter()
+                .filter(|record| record.kind == "usage")
+                .count(),
+            2
+        );
+        for record in records.iter().filter(|record| record.kind == "usage") {
+            assert_eq!(record.data["usage"]["requests"], 3);
+        }
+    }
     assert_eq!(snapshot.cost, 0.1);
     assert_eq!(
         (

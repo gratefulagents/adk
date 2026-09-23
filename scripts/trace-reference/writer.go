@@ -105,6 +105,39 @@ func writerFixture() {
 		identities = append(identities, map[string]any{"raw": pair[0], "provider": pair[1], "identity": agent.NormalizeModelIdentity(pair[0], pair[1])})
 	}
 	result["model_identities"] = identities
+	endTurn := false
+	nativeResponse := &agent.ModelResponse{
+		Items: []agent.RunItem{
+			{Type: agent.RunItemMessage, Message: &agent.MessageOutput{Text: "answer <>&", Phase: "commentary", Images: []agent.ImageAttachment{{MediaType: "image/png", Data: "AA==", Detail: "low"}}}},
+			{Type: agent.RunItemReasoning, Reasoning: &agent.ReasoningData{ID: "r", Text: "reason", Signature: "signature", RedactedData: "redacted", EncryptedContent: "opaque"}},
+			{Type: agent.RunItemToolCall, ToolCall: &agent.ToolCallData{ID: "call", Name: "lookup", Input: json.RawMessage(`{"q":1}`)}},
+			{Type: agent.RunItemToolOutput, ToolOutput: &agent.ToolOutputData{CallID: "call", Content: "result", IsError: true}},
+			{Type: agent.RunItemCompaction, Compaction: &agent.CompactionData{ID: "c", Content: "summary", EncryptedContent: "compact", CreatedBy: "provider"}},
+		},
+		Usage:   agent.Usage{Requests: 3, InputTokens: 12, OutputTokens: 4, CacheReadTokens: 2, CacheCreateTokens: 1},
+		EndTurn: &endTurn,
+		Raw:     map[string]any{"answer": "<>&", "extra": []any{nil, false, 1}},
+	}
+	var responseVariants []string
+	for _, raw := range []any{nativeResponse.Raw, json.RawMessage(`null`), nil} {
+		nativeResponse.Raw = raw
+		encoded, err := json.Marshal(agent.BuildLLMResponseSnapshot(nativeResponse))
+		must(err)
+		responseVariants = append(responseVariants, string(encoded))
+	}
+	emptyResponse, err := json.Marshal(agent.BuildLLMResponseSnapshot(&agent.ModelResponse{}))
+	must(err)
+	responseVariants = append(responseVariants, string(emptyResponse))
+	result["native_response_variants"] = responseVariants
+	finished := true
+	automaticResponse, err := json.Marshal(agent.BuildLLMResponseSnapshot(&agent.ModelResponse{
+		Items:   []agent.RunItem{{Type: agent.RunItemMessage, Message: &agent.MessageOutput{Text: "done"}}},
+		Usage:   agent.Usage{Requests: 1, InputTokens: 12, OutputTokens: 3},
+		EndTurn: &finished,
+		Raw:     map[string]any{"provider_extra": "retained"},
+	}))
+	must(err)
+	result["automatic_response_json"] = string(automaticResponse)
 
 	for _, category := range []string{"spans", "llm_calls", "tool_calls", "agent_transitions"} {
 		bytes, err := os.ReadFile(filepath.Join(path, category+".jsonl"))

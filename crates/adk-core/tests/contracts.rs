@@ -219,3 +219,25 @@ fn raw_response_preserves_missing_null_and_provider_data() {
         );
     }
 }
+
+#[test]
+fn usage_preserves_reported_request_count_and_defaults_missing_count_to_zero() {
+    let usage = Usage {
+        requests: 7,
+        ..Default::default()
+    };
+    assert!(
+        serde_json::to_value(Usage::default())
+            .unwrap()
+            .get("requests")
+            .is_none()
+    );
+    let mut value = serde_json::to_value(&usage).unwrap();
+    assert_eq!(value["requests"], 7);
+    assert_eq!(
+        serde_json::from_value::<Usage>(value.clone()).unwrap(),
+        usage
+    );
+    value.as_object_mut().unwrap().remove("requests");
+    assert_eq!(serde_json::from_value::<Usage>(value).unwrap().requests, 0);
+}

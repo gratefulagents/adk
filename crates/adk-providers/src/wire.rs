@@ -496,6 +496,7 @@ pub fn usage(value: &Value, protocol: Protocol) -> Usage {
         ),
     };
     Usage {
+        requests: 1,
         input_tokens: input,
         output_tokens: output,
         cache_read_tokens: read,

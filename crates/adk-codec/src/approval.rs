@@ -89,7 +89,9 @@ pub struct NativeHistory {
     pub markers: Vec<ApprovalMarkerBoundary>,
 }
 
-fn encode_content(content: &[Content]) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
+pub(crate) fn encode_content(
+    content: &[Content],
+) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
     let (text, attachments) = match content.split_first() {
         Some((Content::Text { text }, rest)) => (text.clone(), rest),
         _ => (String::new(), content),

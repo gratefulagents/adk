@@ -1743,6 +1743,7 @@ impl Engine {
     }
     fn account_usage(&mut self, used: &Usage, cost: f64) -> Result<(), Error> {
         let usage = &mut self.result.usage;
+        usage.requests = usage.requests.saturating_add(used.requests);
         usage.input_tokens = usage.input_tokens.saturating_add(used.input_tokens);
         usage.output_tokens = usage.output_tokens.saturating_add(used.output_tokens);
         usage.cache_read_tokens = usage

@@ -274,13 +274,16 @@ fn full_capture_preserves_large_raw_output_and_recursively_redacts_credentials()
         &serde_json::to_vec(&input).unwrap(),
         "parent",
     );
-    let output = "uncapped-output ".repeat(30000);
+    let output = format!("<>&\u{2028}\u{2029}{}", "uncapped-output ".repeat(30000));
     writer.tool_end("agent", "tool", "call", &output, false, "parent");
     let events = records(&path, "tool_calls");
     assert_eq!(events[0]["input"]["nested"]["password"], "[REDACTED]");
     assert_eq!(events[0]["input"]["nested"]["instruction"], "[OPERATOR]");
     assert_eq!(events[0]["parent_call_id"], "parent");
     assert_eq!(events[1]["output"], output);
+    let encoded = fs::read_to_string(path.join("tool_calls.jsonl")).unwrap();
+    assert!(encoded.contains(r"\u003c\u003e\u0026\u2028\u2029"));
+    assert!(!encoded.contains("<>&"));
     assert_eq!(events[1]["parent_call_id"], "parent");
     assert_eq!(writer.health().events_written, 2);
 }
@@ -393,7 +396,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
         AgentConfig, CancellationToken, ModelBinding, RetryPolicy, Runner, RunnerConfig,
     };
     use std::sync::atomic::{AtomicUsize, Ordering};
-    struct Provider(AtomicUsize);
+    struct Provider(AtomicUsize, u64);
     impl Model for Provider {
         fn provider(&self) -> &str {
             "fixture"
@@ -408,7 +411,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
                     return Err(Error::new(ErrorCategory::Provider, "retry"));
                 }
                 Ok(ModelResponse {
-                    raw: None,
+                    raw: Some(json!({"provider_extra": "retained"})),
                     items: vec![RunItem::Message {
                         message: Message {
                             role: Role::Assistant,
@@ -418,6 +421,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
                         },
                     }],
                     usage: Usage {
+                        requests: self.1,
                         input_tokens: 12,
                         output_tokens: 3,
                         ..Default::default()
@@ -442,69 +446,117 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
             Box::pin(async { panic!("unexpected approval") })
         }
     }
-    let root = tempfile::tempdir().unwrap();
-    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
-    let writer = Arc::new(TraceWriter::new(store, "run", Options::default()));
-    let path = writer
-        .init_run(&RunMetadata {
-            run_id: "run".into(),
-            ..Default::default()
-        })
-        .unwrap();
-    let runner = Runner::new(
-        AgentConfig::new(
-            "agent",
-            ModelBinding::complete("model", Arc::new(Provider(AtomicUsize::new(0)))),
-        ),
-        RunnerConfig {
-            generation_observer: Some(writer.clone()),
-            retry: RetryPolicy {
-                max_retries: 1,
-                initial_delay: std::time::Duration::ZERO,
+    for (capture, requests) in [
+        (CaptureMode::Metadata, 1),
+        (CaptureMode::Full, 1),
+        (CaptureMode::Full, u64::MAX),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+        let writer = Arc::new(TraceWriter::new(
+            store,
+            "run",
+            Options {
+                capture,
                 ..Default::default()
             },
-            ..Default::default()
-        },
-    )
-    .unwrap();
-    let result = runner
-        .run(
-            Context {
+        ));
+        let path = writer
+            .init_run(&RunMetadata {
                 run_id: "run".into(),
-                cancellation: Arc::new(CancellationToken::new()),
-                deadline: None,
+                ..Default::default()
+            })
+            .unwrap();
+        let runner = Runner::new(
+            AgentConfig::new(
+                "agent",
+                ModelBinding::complete("model", Arc::new(Provider(AtomicUsize::new(0), requests))),
+            ),
+            RunnerConfig {
+                generation_observer: Some(writer.clone()),
+                retry: RetryPolicy {
+                    max_retries: 1,
+                    initial_delay: std::time::Duration::ZERO,
+                    ..Default::default()
+                },
+                ..Default::default()
             },
-            RunRequest {
-                input: vec![],
-                policy: RunPolicy::default(),
-            },
-            Arc::new(NoopHost),
         )
-        .await
         .unwrap();
-    assert_eq!(result.result.final_output, Some(json!("done")));
-    let spans = records(&path, "spans");
-    let calls = records(&path, "llm_calls");
-    assert_eq!(spans.as_array().unwrap().len(), 4);
-    assert_eq!(calls.as_array().unwrap().len(), 4);
-    for (index, kind) in [
-        "generation_start",
-        "generation_end",
-        "generation_start",
-        "generation_end",
-    ]
-    .iter()
-    .enumerate()
-    {
-        assert_eq!(calls[index]["type"], *kind);
+        let result = runner
+            .run(
+                Context {
+                    run_id: "run".into(),
+                    cancellation: Arc::new(CancellationToken::new()),
+                    deadline: None,
+                },
+                RunRequest {
+                    input: vec![],
+                    policy: RunPolicy::default(),
+                },
+                Arc::new(NoopHost),
+            )
+            .await
+            .unwrap();
+        assert_eq!(result.result.final_output, Some(json!("done")));
+        let spans = records(&path, "spans");
+        let calls = records(&path, "llm_calls");
+        assert_eq!(spans.as_array().unwrap().len(), 4);
+        assert_eq!(calls.as_array().unwrap().len(), 4);
+        for (index, kind) in [
+            "generation_start",
+            "generation_end",
+            "generation_start",
+            "generation_end",
+        ]
+        .iter()
+        .enumerate()
+        {
+            assert_eq!(calls[index]["type"], *kind);
+        }
+        assert_eq!(calls[1]["status"], "retrying");
+        assert_eq!(calls[1]["retry_scheduled"], true);
+        assert_eq!(calls[3]["status"], "completed");
+        assert_eq!(calls[3]["input_tokens"], 12);
+        assert_eq!(calls[3]["output_tokens"], 3);
+        assert_eq!(calls[3]["total_tokens"], 15);
+        use sha2::{Digest, Sha256};
+        let fixture: Value =
+            serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json"))
+                .unwrap();
+        let bytes = fixture["automatic_response_json"]
+            .as_str()
+            .unwrap()
+            .as_bytes();
+        if requests == u64::MAX {
+            assert!(calls[3].get("response").is_none());
+            assert!(
+                writer
+                    .health()
+                    .last_error
+                    .contains("usage counter exceeds SDK signed range")
+            );
+            writer.finalize_run("completed").unwrap();
+            let health: Value =
+                serde_json::from_slice(&fs::read(path.join("trace_health.json")).unwrap()).unwrap();
+            assert_eq!(health["last_error"], writer.health().last_error);
+        } else if capture == CaptureMode::Metadata {
+            assert_eq!(
+                calls[3]["response"],
+                json!({"captured": false, "sha256": format!("{:x}", Sha256::digest(bytes)), "bytes": bytes.len()})
+            );
+        } else {
+            assert_eq!(
+                calls[3]["response"],
+                serde_json::from_slice::<Value>(bytes).unwrap()
+            );
+        }
+        assert!(calls[1].get("response").is_none());
+        assert_eq!(writer.health().write_errors, 0);
+        if requests != u64::MAX {
+            assert!(writer.health().last_error.is_empty());
+        }
     }
-    assert_eq!(calls[1]["status"], "retrying");
-    assert_eq!(calls[1]["retry_scheduled"], true);
-    assert_eq!(calls[3]["status"], "completed");
-    assert_eq!(calls[3]["input_tokens"], 12);
-    assert_eq!(calls[3]["output_tokens"], 3);
-    assert_eq!(calls[3]["total_tokens"], 15);
-    assert_eq!(writer.health().write_errors, 0);
 }
 
 #[test]

@@ -1247,6 +1247,7 @@ fn provider_response_retains_whole_body_not_just_metadata() {
         body["metadata"] = json!({"key": "value"});
         body["provider_extension"] = json!({"nested": [null, false, "extra"]});
         let response = wire::response(&body, protocol).unwrap();
+        assert_eq!(response.usage.requests, 1);
         assert_eq!(response.raw.as_ref(), Some(&body));
         assert_eq!(
             response.metadata,

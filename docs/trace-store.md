@@ -106,13 +106,31 @@ float notation, HTML escaping and compaction of raw JSON without sorting keys,
 dropping duplicate keys or rewriting raw numbers. The independent fixture and
 Rust digest tests cover these byte-level properties, not just JSON equality.
 
-Automatic generation span production is tested with a real Rust runner, including
-retry and successful usage. **Automatic schema-2 request/response snapshot
-assembly remains incomplete**: native history does not carry all SDK agent
-provenance. The generation observer does not fabricate that missing information;
-callers supplying typed spans can attach explicit `Snapshot` documents. Producing
-a span or passing its manually assembled fixture does not close this remaining
-compatibility obligation.
+`adk::codec::dto::ResponseSnapshot::try_from(&response)` converts representable
+native responses without inventing agent attribution. It preserves phases, inline
+attachments, reasoning/compaction state, tool calls/results, optional end-turn,
+provider-reported usage and the distinction between unavailable raw data and JSON
+null. URI media, native handoffs, paused tool outputs and counters exceeding the
+SDK's signed range return a bridge error rather than dropping information.
+
+The writer's generation observer now automatically attaches these response
+documents. Actual-runner tests compare full capture and metadata digest bytes with
+independently executed SDK snapshots, including a failed attempt followed by
+success. Conversion failures leave the run outcome unchanged but are exposed in
+`health().last_error` and persisted by `finalize_run`; they do not produce a
+misleading partial response document.
+
+`Usage::requests` is provider-reported, not inferred from runtime attempts. Built-in
+providers report one for a completed response; accumulation and durable recovery
+retain the counter independently of the turn count. Native JSON omits zero counts
+to preserve schema-1 fixture bytes; the SDK snapshot's usage document still emits
+its required `requests` field.
+
+**Exact automatic SDK snapshot parity remains incomplete**: request assembly and
+history agent provenance are missing, and the native raw provider shape differs
+from the SDK adapter's normalized raw representation. Callers supplying typed
+spans can attach explicit `Snapshot` documents with that provenance and shape.
+The response conversion and its fixtures do not close those remaining obligations.
 
 ## Exporters
 

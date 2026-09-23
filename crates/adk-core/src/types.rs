@@ -120,15 +120,22 @@ pub struct Compaction {
     pub created_by: String,
 }
 
-/// Provider token counters. Cache counters may be subsets of input tokens;
-/// adapters must supply normalized `context_tokens` rather than consumers summing.
+/// Provider-reported request and token counters. Cache counters may be subsets of
+/// input tokens; adapters supply normalized `context_tokens` rather than consumers summing.
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 pub struct Usage {
+    // Keep zero-usage schema-1 events byte-stable while retaining reported counts.
+    #[serde(default, skip_serializing_if = "zero_requests")]
+    pub requests: u64,
     pub input_tokens: u64,
     pub output_tokens: u64,
     pub cache_read_tokens: u64,
     pub cache_creation_tokens: u64,
     pub context_tokens: Option<u64>,
+}
+
+fn zero_requests(value: &u64) -> bool {
+    *value == 0
 }
 
 /// A portable tool declaration, without an executable or an authorization grant.

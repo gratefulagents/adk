@@ -314,7 +314,7 @@ impl State {
         } else if let Value::String(text) = value {
             digest(text.as_bytes())
         } else {
-            digest(&serde_json::to_vec(value).expect("serializable content"))
+            digest(&adk_codec::snapshots::to_go_json(value).expect("serializable content"))
         }
     }
     fn raw_content(&self, bytes: &[u8]) -> Value {
@@ -332,7 +332,7 @@ impl State {
         }
         data["schema_version"] = json!(TRACE_SCHEMA_VERSION);
         data["run_id"] = json!(self.run_id);
-        let bytes = serde_json::to_vec(&data).expect("serializable trace record");
+        let bytes = adk_codec::snapshots::to_go_json(&data).expect("serializable trace record");
         let mut bytes = self
             .redact(std::str::from_utf8(&bytes).expect("JSON is UTF-8"))
             .into_bytes();
@@ -340,7 +340,8 @@ impl State {
             let marker = json!({"schema_version":TRACE_SCHEMA_VERSION, "run_id":self.run_id,
                 "type":"event_truncated", "original_type":data["type"], "category":category,
                 "sha256":format!("{:x}", Sha256::digest(&bytes)), "original_bytes":bytes.len(), "timestamp":now()});
-            bytes = serde_json::to_vec(&marker).expect("serializable truncation marker");
+            bytes =
+                adk_codec::snapshots::to_go_json(&marker).expect("serializable truncation marker");
             self.health.events_truncated += 1;
         }
         match self.store.append_trace(&self.run_id, category, &bytes) {
@@ -727,7 +728,27 @@ impl adk_runtime::tracing::GenerationObserver for TraceWriter {
         self.span_start(&generation_span(context, record));
     }
     fn end(&self, context: &Context, record: &adk_runtime::tracing::GenerationRecord) {
-        self.span_end(&generation_span(context, record));
+        let mut span = generation_span(context, record);
+        if let (Some(response), Some(SpanData::Generation(data))) =
+            (&record.response, &mut span.data)
+        {
+            let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response)
+                .map_err(|error| error.to_string())
+                .and_then(|snapshot| {
+                    Snapshot::from_serializable(&snapshot).map_err(|error| error.to_string())
+                });
+            match snapshot {
+                Ok(snapshot) => data.response = Some(snapshot),
+                Err(error) => {
+                    self.state
+                        .lock()
+                        .expect("trace writer poisoned")
+                        .health
+                        .last_error = format!("snapshot response: {error}");
+                }
+            }
+        }
+        self.span_end(&span);
     }
 }
 

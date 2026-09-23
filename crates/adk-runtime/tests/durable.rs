@@ -146,6 +146,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
         raw: None,
         items,
         usage: Usage {
+            requests: 1,
             input_tokens: 10,
             output_tokens: 2,
             ..Default::default()
@@ -308,7 +309,9 @@ async fn completed_model_and_tool_boundaries_resume_remaining_work_once() {
         assert_eq!(tool.keys.lock().unwrap().len(), tools_left);
         assert_eq!(model.calls.load(Ordering::SeqCst), 1);
         assert_eq!(result.result.usage.input_tokens, 20);
+        assert_eq!(result.result.usage.requests, 2);
         let saved = resumed_store.latest();
+        assert_eq!(saved.usage.requests, 2);
         assert_eq!(saved.runtime.as_ref().unwrap().turns(), 2);
         assert_eq!(saved.runtime.as_ref().unwrap().tool_calls(), 2);
         assert_eq!(
@@ -407,6 +410,7 @@ fn verified() -> GoRecovery {
         effective_max_turns: None,
         turns: 2,
         usage: Usage {
+            requests: 2,
             input_tokens: 11,
             output_tokens: 7,
             ..Default::default()
@@ -428,11 +432,16 @@ async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() 
         .err()
         .unwrap();
     assert!(error.error.info.message.contains("requires migration"));
+    let mut reset = verified();
+    reset.usage.requests = 1;
+    assert!(runner.migrate_go_checkpoint(cp.clone(), reset).is_err());
     let migrated = runner
         .migrate_go_checkpoint(cp.clone(), verified())
         .unwrap();
     let result = run(&runner, store.clone(), Some(migrated)).await.unwrap();
     assert_eq!(result.result.usage.input_tokens, 21);
+    assert_eq!(result.result.usage.requests, 3);
+    assert_eq!(store.latest().usage.requests, 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().cost(), 0.25);
     assert_eq!(store.latest().runtime.as_ref().unwrap().tool_calls(), 1);
@@ -1607,4 +1616,18 @@ async fn durable_guardrails_require_stable_keys_and_completed_recovery_preserves
             .await
             .is_err()
     );
+}
+
+#[tokio::test]
+async fn checkpoint_requests_do_not_substitute_attempt_count() {
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut recovery = verified();
+    recovery.turns = 4;
+    let migrated = runner.migrate_go_checkpoint(cp, recovery).unwrap();
+    let store = Arc::new(Store::default());
+    let result = run(&runner, store.clone(), Some(migrated)).await.unwrap();
+    assert_eq!(result.result.usage.requests, 3);
+    assert_eq!(store.latest().usage.requests, 3);
+    assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 5);
 }

@@ -494,6 +494,26 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-9924B722AB237F80": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.EndTurn",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::end_turn",
+        "crates/adk-codec/src/snapshots.rs::TryFrom<&adk_core::ModelResponse>",
+        "crates/adk/src/tracewriter.rs::GenerationObserver::end"
+      ],
+      "rust_test_identifiers": [
+        "native_response_snapshot_bytes_match_independent_pinned_go",
+        "actual_runner_writes_ordered_generation_attempts_without_otel"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "This optional boolean field preserves absent, explicit false and explicit true. Independently executed BuildLLMResponseSnapshot fixtures compare exact serialized bytes for absent/false, and the actual Rust runner writes the true response snapshot in full and metadata modes with matching JSON and digest bytes. This closes only EndTurn field representation and transport, not full automatic snapshot assembly, provider raw normalization or agent provenance.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "observability"
+      ]
     }
   }
 }

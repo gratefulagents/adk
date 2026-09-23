@@ -216,6 +216,7 @@ impl CapturePolicy {
         let metric = matches!(
             key,
             "usage"
+                | "requests"
                 | "input_tokens"
                 | "output_tokens"
                 | "cache_read_tokens"

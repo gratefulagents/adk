@@ -587,7 +587,24 @@ fn call(
         },
     })
 }
+/// Decode an HTTP body while retaining ordered RawMessage fragments for tracing.
+pub fn response_json(source: &[u8], protocol: Protocol) -> Result<ModelResponse, Error> {
+    let body: Value = serde_json::from_slice(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    let source = std::str::from_utf8(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    response_inner(&body, protocol, Some(source))
+}
+
 pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error> {
+    response_inner(body, protocol, None)
+}
+
+fn response_inner(
+    body: &Value,
+    protocol: Protocol,
+    source: Option<&str>,
+) -> Result<ModelResponse, Error> {
     if let Some(error) = crate::error::provider_error(body) {
         return Err(error);
     }
@@ -851,6 +868,7 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
         }
     }
     Ok(ModelResponse {
+        snapshot_raw: Some(crate::snapshot::document(body, protocol, source)?),
         raw: Some(body.clone()),
         items,
         usage: usage(&body["usage"], protocol),

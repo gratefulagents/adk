@@ -76,6 +76,7 @@ impl Model for TestModel {
                 vec![]
             };
             Ok(ModelResponse {
+                snapshot_raw: None,
                 raw: None,
                 items,
                 usage: Usage::default(),

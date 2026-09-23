@@ -483,6 +483,7 @@ async fn real_runner_hooks_and_host_events_produce_ordered_progress() {
         ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
             Box::pin(async {
                 Ok(ModelResponse {
+                    snapshot_raw: None,
                     raw: None,
                     items: vec![RunItem::Message {
                         message: Message {
@@ -589,6 +590,7 @@ async fn real_two_turn_tool_run_preserves_pause_continuation_and_success_spans()
             Box::pin(async move {
                 let first = self.0.fetch_add(1, Ordering::SeqCst) == 0;
                 Ok(ModelResponse {
+                    snapshot_raw: None,
                     raw: None,
                     items: if first {
                         vec![RunItem::ToolCall { call: call("t") }]
@@ -969,6 +971,7 @@ mod telemetry {
                 Observation::ModelAccepted {
                     agent: "a".into(),
                     response: ModelResponse {
+                        snapshot_raw: None,
                         raw: None,
                         items: vec![],
                         usage: Usage {

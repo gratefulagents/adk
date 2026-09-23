@@ -45,10 +45,18 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   generation model identities now match the pinned SDK for routing prefixes,
   empty providers/models, whitespace, nested model names and simple Unicode
   lowercasing (including dotted-I and non-contextual sigma).
-- Native model responses now retain optional provider data separately from metadata,
+- Native model responses retain optional provider data separately from metadata,
   with absent/null JSON round trips and HTTP/streaming regressions for retained
-  payloads. Go's normalized internal raw response shape is different; this change
-  does **not** close exact SDK provider raw parity. Request counts are now retained
+  payloads. An independent ordered `snapshot_raw` document now persists through
+  native JSON/Value checkpoints and takes precedence in compatibility snapshots.
+  Nine public-provider Go fixtures distinguish complete calls from streamed calls;
+  two Chat completion and seven public streaming raw documents match exact bytes.
+  Full complete-method profiles and response item/EndTurn parity remain open;
+  these tests do **not** close complete SDK provider snapshot parity. Scoped review
+  found unfinished Anthropic blocks could be accepted and malformed arguments
+  could fail only during snapshot assembly. Both have executable regressions and
+  fixes; source re-review found the two findings addressed, without independent
+  test execution or an issue-wide approval. Request counts are now retained
   through providers, aggregation, observability, checkpoint export and Go recovery
   rather than inferred from attempts. Zero counters preserve native schema-1 bytes.
   Snapshot conversion errors remain observable in persisted writer health.
@@ -83,7 +91,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   persisted session fields. This does not establish complete ProgressTracker
   parity or exactly-once replay/billing semantics.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **889 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **901 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The field audit exposed non-finite span costs becoming JSON null. Nine

@@ -42,6 +42,9 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
                "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
                "scripts/trace-reference/request.go", "scripts/trace-reference/nonfinite.go",
+               "scripts/trace-reference/provider.go", "crates/adk-providers/src/snapshot.rs",
+               "crates/adk-providers/src/client.rs", "crates/adk-providers/src/lib.rs",
+               "crates/adk-providers/Cargo.toml", "crates/adk-providers/tests/snapshots.rs",
                "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/src/approval.rs",
                "crates/adk-runtime/src/durable.rs", "crates/adk-runtime/tests/durable.rs",
                "crates/adk-runtime/tests/runner.rs", "crates/adk/src/observability.rs",
@@ -135,6 +138,7 @@ def verify_rust() -> None:
     fixture_check = subprocess.run([sys.executable, str(ROOT / "scripts/trace-reference/check.py")],
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
+               "-p", "adk-providers", "--test", "snapshots",
                "--features", "otel,builder", "--test", "settings", "--test", "builder",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",

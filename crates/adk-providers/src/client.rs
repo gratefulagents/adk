@@ -268,10 +268,18 @@ impl Model for Provider {
                         complete = Some(response);
                     }
                 }
-                return complete.ok_or_else(|| protocol_error("stream ended without completion"));
+                let mut response =
+                    complete.ok_or_else(|| protocol_error("stream ended without completion"))?;
+                if let Some(raw) = &response.raw {
+                    // SDK non-stream calls drain the transport stream into a message,
+                    // rather than exposing StreamAssembler's empty Type field.
+                    response.snapshot_raw =
+                        Some(crate::snapshot::document(raw, self.protocol, None)?);
+                }
+                return Ok(response);
             }
             let response = self.send(context, &request, false).await?;
-            wire::response(&read_json(context, response).await?, self.protocol)
+            wire::response_json(&read_bytes(context, response).await?, self.protocol)
         })
     }
 }
@@ -452,6 +460,10 @@ pub struct StreamState {
     body: Value,
     tools: BTreeMap<u64, Value>,
     argument_buffers: BTreeMap<u64, String>,
+    snapshot_inputs: BTreeMap<u64, String>,
+    snapshot_starts: BTreeMap<u64, Value>,
+    snapshot_stop_reason: Option<&'static str>,
+    message_started: bool,
     text: String,
     reasoning: String,
     complete: bool,
@@ -471,6 +483,10 @@ impl StreamState {
             body: json!({}),
             tools: BTreeMap::new(),
             argument_buffers: BTreeMap::new(),
+            snapshot_inputs: BTreeMap::new(),
+            snapshot_starts: BTreeMap::new(),
+            snapshot_stop_reason: None,
+            message_started: false,
             text: String::new(),
             reasoning: String::new(),
             complete: false,
@@ -582,7 +598,17 @@ impl StreamState {
                 if kind.ends_with(".done") && self.response_deltas.contains(&delta_key) {
                     return Ok(Vec::new());
                 }
-                let id = required(&event, "item_id")?;
+                let id = event["item_id"]
+                    .as_str()
+                    .map(str::to_owned)
+                    .or_else(|| {
+                        event["output_index"]
+                            .as_u64()
+                            .and_then(|index| self.response_items.get(&index))
+                            .and_then(|item| item["id"].as_str())
+                            .map(str::to_owned)
+                    })
+                    .ok_or_else(|| protocol_error("tool arguments missing item identifier"))?;
                 let call_id = self
                     .response_call_ids
                     .get(&id)
@@ -632,6 +658,24 @@ impl StreamState {
                 }])
             }
             "response.completed" | "response.incomplete" => {
+                let raw = &event["response"];
+                self.snapshot_stop_reason = Some(
+                    if raw["incomplete_details"]["reason"]
+                        .as_str()
+                        .is_some_and(|s| s.eq_ignore_ascii_case("max_output_tokens"))
+                    {
+                        "max_tokens"
+                    } else if raw["output"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .any(|item| item["type"] == "function_call")
+                    {
+                        "tool_use"
+                    } else {
+                        "end_turn"
+                    },
+                );
                 let terminal = event["response"]
                     .as_object()
                     .ok_or_else(|| protocol_error("invalid response terminal event"))?;
@@ -696,7 +740,23 @@ impl StreamState {
         }
     }
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
-        let response = wire::response(&self.body, self.protocol)?;
+        let mut response = wire::response(&self.body, self.protocol)?;
+        if let Some(document) = &response.snapshot_raw {
+            response.snapshot_raw = Some(crate::snapshot::stream_document(
+                document,
+                self.protocol,
+                self.snapshot_stop_reason,
+                self.tools.keys().enumerate().filter_map(|(index, key)| {
+                    self.snapshot_starts.get(key).map(|start| {
+                        (
+                            index,
+                            start,
+                            self.snapshot_inputs.get(key).map(String::as_str),
+                        )
+                    })
+                }),
+            )?);
+        }
         self.complete = true;
         let mut events: Vec<_> = response
             .items
@@ -817,16 +877,18 @@ impl StreamState {
             Some("message_start") => {
                 let message = &event["message"];
                 if !message.is_object()
-                    || !message["id"].is_string()
-                    || message.get("usage").is_some_and(|usage| !usage.is_object())
-                    || self.body.get("id").is_some()
+                    || message
+                        .get("usage")
+                        .is_some_and(|usage| !usage.is_null() && !usage.is_object())
+                    || self.message_started
                 {
                     return Err(protocol_error("invalid or repeated message start"));
                 }
+                self.message_started = true;
                 self.body = message.clone();
             }
             Some("content_block_start") => {
-                if !event["content_block"].is_object() || self.body.get("id").is_none() {
+                if !event["content_block"].is_object() || !self.message_started {
                     return Err(protocol_error("invalid content block start"));
                 }
                 let index = event["index"]
@@ -839,6 +901,8 @@ impl StreamState {
                 {
                     return Err(protocol_error("duplicate content block"));
                 }
+                self.snapshot_starts
+                    .insert(index, event["content_block"].clone());
             }
             Some("content_block_delta") => {
                 let index = event["index"]
@@ -922,6 +986,7 @@ impl StreamState {
                         .ok_or_else(|| protocol_error("content stop before start"))?["input"] =
                         serde_json::from_str(&args)
                             .map_err(|_| protocol_error("invalid streamed tool arguments"))?;
+                    self.snapshot_inputs.insert(index, args);
                 }
             }
             Some("message_delta") => {
@@ -936,8 +1001,15 @@ impl StreamState {
                 }
             }
             Some("message_stop") => {
-                if !self.body["id"].is_string() || !self.body["stop_reason"].is_string() {
+                if !self.message_started {
                     return Err(protocol_error("premature Anthropic terminal event"));
+                }
+                if self
+                    .tools
+                    .keys()
+                    .any(|index| !self.stopped_blocks.contains(index))
+                {
+                    return Err(protocol_error("unfinished content block"));
                 }
                 if !self.argument_buffers.is_empty() {
                     return Err(protocol_error("unfinished tool arguments"));

@@ -84,6 +84,7 @@ impl ScriptModel {
             return Err(Error::new(ErrorCategory::Provider, error));
         }
         let response = ModelResponse {
+            snapshot_raw: None,
             raw: None,
             items: input_items(&script["items"], Role::Assistant),
             usage: Usage {

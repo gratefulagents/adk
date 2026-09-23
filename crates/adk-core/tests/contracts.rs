@@ -160,6 +160,7 @@ fn native_items_preserve_order_ids_and_arbitrary_precision() {
 fn model_end_turn_preserves_absent_false_and_true() {
     for end_turn in [None, Some(false), Some(true)] {
         let response = ModelResponse {
+            snapshot_raw: None,
             raw: None,
             items: vec![],
             usage: Usage::default(),
@@ -346,6 +347,7 @@ fn raw_response_preserves_missing_null_and_provider_data() {
         Some(json!({"content": "answer", "unknown": [1, false]})),
     ] {
         let response = ModelResponse {
+            snapshot_raw: None,
             raw: raw.clone(),
             items: vec![],
             usage: Usage::default(),
@@ -355,11 +357,80 @@ fn raw_response_preserves_missing_null_and_provider_data() {
         };
         let encoded = serde_json::to_value(&response).unwrap();
         assert_eq!(encoded.get("raw"), raw.as_ref());
+        assert!(encoded.get("snapshot_raw").is_none());
         assert_eq!(
             serde_json::from_value::<ModelResponse>(encoded).unwrap(),
             response
         );
     }
+}
+
+#[test]
+fn json_document_validates_construction_and_deserialization() {
+    for invalid in ["", "{", "null true", "{\"a\":}", "[1,]", "\"\\uD800\""] {
+        assert!(JsonDocument::new(invalid.into()).is_err(), "{invalid}");
+        assert!(serde_json::from_value::<JsonDocument>(json!(invalid)).is_err());
+        assert!(
+            serde_json::from_str::<JsonDocument>(&serde_json::to_string(invalid).unwrap()).is_err()
+        );
+    }
+    assert!(serde_json::from_value::<JsonDocument>(json!({"a": 1})).is_err());
+}
+
+#[test]
+fn json_document_preserves_exact_text_through_json_and_value() {
+    for text in [
+        " \n{\"z\":1e+02, \"a\":{\"y\":2,\"b\":\"\\u0061\"},\"z\":0}\t",
+        "null",
+        "[true, false, 1.00]",
+        "\"text\"",
+    ] {
+        let document = JsonDocument::new(text.into()).unwrap();
+        assert_eq!(document.as_str(), text);
+        let encoded = serde_json::to_string(&document).unwrap();
+        assert_eq!(encoded, serde_json::to_string(text).unwrap());
+        assert_eq!(
+            serde_json::from_str::<JsonDocument>(&encoded).unwrap(),
+            document
+        );
+        let value = serde_json::to_value(&document).unwrap();
+        assert_eq!(value, json!(text));
+        assert_eq!(
+            serde_json::from_value::<JsonDocument>(value).unwrap(),
+            document
+        );
+    }
+    assert_ne!(
+        JsonDocument::new("{\"z\":1,\"a\":2}".into()).unwrap(),
+        JsonDocument::new("{\"a\":2,\"z\":1}".into()).unwrap()
+    );
+}
+
+#[test]
+fn model_response_persists_ordered_snapshot_raw() {
+    let text = " {\"z\":1.00,\"a\":{\"y\":2,\"b\":3}}\n";
+    let response = ModelResponse {
+        snapshot_raw: Some(JsonDocument::new(text.into()).unwrap()),
+        raw: Some(json!({"native": "distinct"})),
+        items: vec![],
+        usage: Usage::default(),
+        end_turn: None,
+        response_id: None,
+        metadata: Default::default(),
+    };
+    let encoded = serde_json::to_string(&response).unwrap();
+    assert_eq!(
+        serde_json::from_str::<ModelResponse>(&encoded).unwrap(),
+        response
+    );
+    let mut value = serde_json::to_value(&response).unwrap();
+    assert_eq!(value["snapshot_raw"], text);
+    assert_eq!(
+        serde_json::from_value::<ModelResponse>(value.clone()).unwrap(),
+        response
+    );
+    value["snapshot_raw"] = json!("invalid");
+    assert!(serde_json::from_value::<ModelResponse>(value).is_err());
 }
 
 #[test]

@@ -2,6 +2,31 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// Validated JSON text retaining member order, number spellings and duplicate keys.
+/// Native serde encodes this as a string so checkpoints that pass through `Value`
+/// do not reorder the document. Consumers explicitly choose when to embed its JSON.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(transparent)]
+pub struct JsonDocument(String);
+
+impl JsonDocument {
+    pub fn new(text: String) -> Result<Self, serde_json::Error> {
+        serde_json::from_str::<Value>(&text)?;
+        Ok(Self(text))
+    }
+
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+impl<'de> Deserialize<'de> for JsonDocument {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let text = String::deserialize(deserializer)?;
+        Self::new(text).map_err(serde::de::Error::custom)
+    }
+}
+
 /// The author of a conversational message. Tool responses are separate run items.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(rename_all = "snake_case")]
@@ -217,6 +242,11 @@ pub struct ModelResponse {
         skip_serializing_if = "Option::is_none"
     )]
     pub raw: Option<Value>,
+    /// Optional ordered provider-neutral raw document for compatibility snapshots.
+    /// This does not replace native diagnostics in `raw` or grant permission to
+    /// disclose either payload; the trace sink still applies its capture policy.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub snapshot_raw: Option<JsonDocument>,
 }
 
 fn present_raw_response<'de, D: serde::Deserializer<'de>>(

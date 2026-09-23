@@ -1,4 +1,7 @@
-use adk_codec::{dto::ResponseSnapshot, snapshots::to_go_json};
+use adk_codec::{
+    dto::{RawJson, ResponseSnapshot},
+    snapshots::to_go_json,
+};
 use adk_core::*;
 use serde_json::{Value, json};
 
@@ -67,6 +70,7 @@ fn response() -> ModelResponse {
         end_turn: Some(false),
         response_id: Some("native-id".into()),
         metadata: Default::default(),
+        snapshot_raw: None,
         raw: Some(json!({"answer": "<>&", "extra": [null, false, 1]})),
     }
 }
@@ -94,6 +98,45 @@ fn native_response_snapshot_bytes_match_independent_pinned_go() {
         to_go_json(&ResponseSnapshot::try_from(&response).unwrap()).unwrap(),
         variants[3].as_str().unwrap().as_bytes()
     );
+}
+
+#[test]
+fn ordered_snapshot_raw_takes_precedence_after_native_roundtrips() {
+    for text in ["{\"z\":1.00,\"a\":{\"y\":2,\"b\":3}}", "null"] {
+        for raw in [Some(json!({"native": "distinct"})), Some(Value::Null), None] {
+            let mut response = response();
+            response.raw = raw;
+            response.snapshot_raw = Some(JsonDocument::new(text.into()).unwrap());
+            let encoded = serde_json::to_string(&response).unwrap();
+            let value = serde_json::to_value(&response).unwrap();
+            for response in [
+                response,
+                serde_json::from_str(&encoded).unwrap(),
+                serde_json::from_value(value).unwrap(),
+            ] {
+                let snapshot = ResponseSnapshot::try_from(&response).unwrap();
+                assert!(snapshot.raw_available);
+                let RawJson::Encoded(raw) = &snapshot.raw else {
+                    panic!("ordered snapshot raw must remain encoded");
+                };
+                assert_eq!(raw.get(), text);
+                assert_eq!(serde_json::to_string(&snapshot.raw).unwrap(), text);
+                assert_eq!(to_go_json(&snapshot.raw).unwrap(), text.as_bytes());
+            }
+        }
+    }
+}
+
+#[test]
+fn absent_snapshot_raw_preserves_native_raw_availability() {
+    for raw in [None, Some(Value::Null), Some(json!({"native": "data"}))] {
+        let mut response = response();
+        response.raw = raw.clone();
+        let snapshot = ResponseSnapshot::try_from(&response).unwrap();
+        assert_eq!(snapshot.raw_available, raw.is_some());
+        assert_eq!(snapshot.raw.is_missing(), raw.is_none());
+        assert_eq!(snapshot.raw.value().as_deref(), raw.as_ref());
+    }
 }
 
 #[test]

@@ -452,6 +452,7 @@ fn msg(role: Role, text: impl Into<String>) -> RunItem {
 }
 fn reply(items: Vec<RunItem>, end: bool, context_tokens: Option<u64>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
         raw: None,
         items,
         usage: Usage {

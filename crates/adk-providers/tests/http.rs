@@ -158,6 +158,10 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     assert_eq!(raw["id"], "c");
     assert_eq!(raw["choices"][0]["message"]["content"], "hello");
     assert_eq!(raw["usage"]["prompt_tokens_details"]["cached_tokens"], 4);
+    assert_eq!(
+        response.snapshot_raw.as_ref().unwrap().as_str(),
+        r#"{"id":"c","type":"message","role":"assistant","content":[{"type":"text","text":"hello"}],"model":"","stop_reason":"end_turn","usage":{"input_tokens":12,"output_tokens":2,"cache_read_input_tokens":4}}"#
+    );
     assert!(response.metadata.is_empty());
     let request = server.join().unwrap();
     assert!(request.starts_with("POST /v1/chat/completions HTTP/1.1"));

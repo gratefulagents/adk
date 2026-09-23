@@ -269,7 +269,13 @@ impl TryFrom<&adk_core::ModelResponse> for crate::dto::ResponseSnapshot {
             ..Default::default()
         };
         let mut snapshot = crate::response_snapshot(&wire);
-        if response
+        if let Some(raw) = &response.snapshot_raw {
+            snapshot.raw_available = true;
+            snapshot.raw = RawJson::Encoded(
+                serde_json::value::RawValue::from_string(raw.as_str().to_owned())
+                    .expect("validated JSON document"),
+            );
+        } else if response
             .raw
             .as_ref()
             .is_some_and(serde_json::Value::is_null)

@@ -18,6 +18,7 @@ struct RecordingModel {
 }
 fn response() -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
         raw: None,
         items: vec![RunItem::Message {
             message: Message {

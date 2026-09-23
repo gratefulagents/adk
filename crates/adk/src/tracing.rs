@@ -183,6 +183,9 @@ impl TraceSession {
     pub fn finish(self) {
         drop(self);
     }
+    pub(crate) fn report_error(&self, message: &str) {
+        self.0.processor.error(message);
+    }
     pub fn span(&self, name: impl Into<String>, data: Option<SpanData>) -> SpanGuard {
         self.start(Span::new(name, self.id(), data))
     }

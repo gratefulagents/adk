@@ -1632,6 +1632,24 @@ async fn checkpoint_requests_do_not_substitute_attempt_count() {
     assert_eq!(result.result.usage.requests, 3);
     assert_eq!(store.latest().usage.requests, 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 5);
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.turns, 5);
+    assert!(metrics.model.is_some());
+    assert_eq!(
+        store
+            .latest()
+            .runtime
+            .as_ref()
+            .unwrap()
+            .result()
+            .metrics
+            .as_ref(),
+        Some(metrics)
+    );
+    let restored = run(&runner, store.clone(), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(restored.result.metrics, result.result.metrics);
 }
 
 #[tokio::test]

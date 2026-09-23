@@ -958,7 +958,7 @@ async fn tracestore() {
         )
         .unwrap();
         trace
-            .run(runner.run(context(), request(), Arc::new(RecordingHost::default())))
+            .run_session(runner.run(context(), request(), Arc::new(RecordingHost::default())))
             .await
             .unwrap(); // The owned wrapper ends spans/root even on cancellation.
         drop(runner); // Retained observer Arcs no longer keep the root open.
@@ -970,6 +970,12 @@ async fn tracestore() {
             .collect();
         assert_eq!(records.first().unwrap()["type"], "trace_start");
         assert_eq!(records.last().unwrap()["type"], "trace_end");
+        let session = records
+            .iter()
+            .find(|record| record["type"] == "span_end" && record["name"] == "session")
+            .unwrap();
+        assert_eq!(session["num_turns"], 1);
+        assert_eq!(session["stop_reason"], "completed");
         assert_eq!(writer.health().write_errors, 0);
         store.close();
     }

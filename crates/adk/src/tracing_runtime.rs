@@ -26,6 +26,29 @@ use adk_runtime::{Observation, RunHooks};
 use std::collections::{HashMap, VecDeque};
 use std::sync::{Arc, Mutex};
 
+fn session_summary(
+    result: &adk_core::RunResult,
+    reason: &str,
+) -> Result<crate::tracewriter::Session, &'static str> {
+    let metrics = result
+        .metrics
+        .as_ref()
+        .ok_or("session metrics unavailable")?;
+    let count =
+        |value| i64::try_from(value).map_err(|_| "session counter exceeds SDK signed range");
+    Ok(crate::tracewriter::Session {
+        model: metrics.model.clone().unwrap_or_default(),
+        cost_usd: metrics.cost_usd,
+        num_turns: i64::from(metrics.turns),
+        duration_ms: count(metrics.elapsed_ms)?,
+        input_tokens: count(result.usage.input_tokens)?,
+        output_tokens: count(result.usage.output_tokens)?,
+        cache_read_input_tokens: count(result.usage.cache_read_tokens)?,
+        cache_creation_input_tokens: count(result.usage.cache_creation_tokens)?,
+        stop_reason: reason.into(),
+    })
+}
+
 /// Per-run cleanup authority, independent of observer Arcs retained by a Runner.
 #[must_use = "keep the owner until the run future has completed or been dropped"]
 pub struct RunTrace {
@@ -56,6 +79,44 @@ impl RunTrace {
             future: Some(Box::pin(future)),
             owner: Some(self),
         }
+    }
+    /// Emit a point session span from authoritative cumulative runner metrics.
+    /// Pauses are boundaries, not final completion. Dropping a pending future
+    /// emits no fabricated session summary. Missing legacy metrics or counters
+    /// outside the SDK signed range are reported to the processor's error sink.
+    pub fn run_session<F>(
+        self,
+        future: F,
+    ) -> TracedRun<
+        impl std::future::Future<Output = Result<adk_runtime::RunOutcome, adk_core::RunError>>,
+    >
+    where
+        F: std::future::Future<Output = Result<adk_runtime::RunOutcome, adk_core::RunError>>,
+    {
+        let observer = self.observer.clone();
+        self.run(async move {
+            let outcome = future.await;
+            let result = match &outcome {
+                Ok(outcome) => Some(&outcome.result),
+                Err(error) => error.partial.as_deref(),
+            };
+            if let Some(result) = result {
+                let reason = match &outcome {
+                    Ok(_) => serde_json::to_value(result.status).expect("serializable status"),
+                    Err(error) => serde_json::to_value(error.error.info.category)
+                        .expect("serializable category"),
+                };
+                observer.dispatch(Event::SessionComplete(session_summary(
+                    result,
+                    reason.as_str().expect("string enum"),
+                )));
+            } else {
+                observer.dispatch(Event::SessionComplete(Err(
+                    "session metrics unavailable: no runner result",
+                )));
+            }
+            outcome
+        })
     }
     pub fn observer(&self) -> Arc<RuntimeTracing> {
         self.observer.clone()
@@ -126,6 +187,7 @@ struct Queue {
     events: VecDeque<Event>,
 }
 enum Event {
+    SessionComplete(Result<crate::tracewriter::Session, &'static str>),
     Observation(Observation),
     Start(Context, Box<GenerationRecord>),
     End(Context, Box<GenerationRecord>),
@@ -199,6 +261,17 @@ impl State {
             return;
         }
         match event {
+            Event::SessionComplete(summary) => {
+                let session = self.session.as_ref().expect("open trace");
+                match summary {
+                    Ok(summary) => {
+                        session
+                            .span("session", Some(SpanData::Session(summary)))
+                            .finish();
+                    }
+                    Err(error) => session.report_error(error),
+                }
+            }
             Event::Finish => {
                 self.generations.clear();
                 for (_, mut span) in self.tools.drain() {

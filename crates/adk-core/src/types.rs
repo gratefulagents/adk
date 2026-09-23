@@ -281,11 +281,22 @@ pub struct GuardrailReport {
     pub tripwire_triggered: bool,
 }
 
+/// Cumulative engine accounting, including retries and provider compaction.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct RunMetrics {
+    pub model: Option<String>,
+    pub turns: u32,
+    pub cost_usd: f64,
+    pub elapsed_ms: u64,
+}
+
 /// A successful or partial invocation snapshot, not a durable checkpoint.
 /// Resume from `history`, not `input + new_items`: compaction may rewrite history.
 /// Pending approvals must be resolved before replaying their calls.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunResult {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub metrics: Option<RunMetrics>,
     pub status: RunStatus,
     pub final_output: Option<Value>,
     pub new_items: Vec<RunItem>,

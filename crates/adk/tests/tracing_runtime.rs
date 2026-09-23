@@ -13,11 +13,15 @@ use std::time::{Duration, SystemTime};
 
 #[derive(Default)]
 struct Recorder {
+    errors: Mutex<Vec<String>>,
     events: Mutex<Vec<(String, String)>>,
     starts: Mutex<Vec<Span>>,
     traces: Mutex<Vec<Trace>>,
 }
 impl TraceProcessor for Recorder {
+    fn error(&self, message: &str) {
+        self.errors.lock().unwrap().push(message.into());
+    }
     fn trace_start(&self, trace: &Trace) {
         self.events
             .lock()
@@ -228,6 +232,127 @@ fn request() -> RunRequest {
         input: vec![],
         policy: RunPolicy::default(),
     }
+}
+
+#[tokio::test]
+async fn session_wrapper_uses_authoritative_totals_on_success_and_partial_failure() {
+    struct Cost;
+    impl CostEstimator for Cost {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            0.125
+        }
+    }
+    for fails in [false, true] {
+        let (sink, owner, observer) = setup();
+        let mut first = if fails {
+            response(vec![RunItem::ToolCall { call: call() }])
+        } else {
+            done()
+        };
+        if let Step::Response(response) = &mut first {
+            response.usage = Usage {
+                requests: 7,
+                input_tokens: 20,
+                output_tokens: 3,
+                cache_read_tokens: 4,
+                cache_creation_tokens: 5,
+                ..Default::default()
+            };
+        }
+        let steps = if fails {
+            vec![first, Step::Error]
+        } else {
+            vec![first]
+        };
+        let mut agent = agent("agent", steps);
+        agent.tools.push(Arc::new(MockTool {
+            definition: definition("tool"),
+            pending: false,
+            fail: false,
+        }));
+        let mut config = config(observer);
+        config.cost_estimator = Some(Arc::new(Cost));
+        let runner = Runner::new(agent, config).unwrap();
+        let outcome = owner
+            .run_session(runner.run(context(), request(), Arc::new(HostSink)))
+            .await;
+        assert_eq!(outcome.is_err(), fails);
+        let result = match &outcome {
+            Ok(outcome) => &outcome.result,
+            Err(error) => error.partial.as_deref().unwrap(),
+        };
+        let metrics = result.metrics.as_ref().unwrap();
+        assert_eq!(metrics.turns, if fails { 2 } else { 1 });
+        assert_eq!(metrics.cost_usd, 0.125);
+        assert_eq!(metrics.model.as_deref(), Some("fixture"));
+        let trace = assert_closed(&sink);
+        let sessions: Vec<_> = trace
+            .spans
+            .iter()
+            .filter(|span| span.name == "session")
+            .collect();
+        assert_eq!(sessions.len(), 1);
+        assert_eq!(sessions[0].parent_id, trace.id);
+        let Some(SpanData::Session(summary)) = &sessions[0].data else {
+            panic!("session summary missing")
+        };
+        assert_eq!(summary.num_turns, i64::from(metrics.turns));
+        assert_eq!(summary.cost_usd, metrics.cost_usd);
+        assert_eq!(summary.duration_ms, metrics.elapsed_ms as i64);
+        assert_eq!(summary.input_tokens, 20);
+        assert_eq!(summary.output_tokens, 3);
+        assert_eq!(summary.cache_read_input_tokens, 4);
+        assert_eq!(summary.cache_creation_input_tokens, 5);
+        assert_eq!(
+            summary.stop_reason,
+            if fails { "invalid_input" } else { "completed" }
+        );
+    }
+}
+
+#[tokio::test]
+async fn unavailable_or_unrepresentable_session_metrics_report_health_without_changing_outcome() {
+    for missing in [true, false] {
+        let (sink, owner, _) = setup();
+        let runner = Runner::new(agent("agent", vec![done()]), RunnerConfig::default()).unwrap();
+        let mut outcome = runner
+            .run(context(), request(), Arc::new(HostSink))
+            .await
+            .unwrap();
+        if missing {
+            outcome.result.metrics = None;
+        } else {
+            outcome.result.usage.input_tokens = u64::MAX;
+        }
+        let outcome = owner.run_session(async { Ok(outcome) }).await.unwrap();
+        assert_eq!(outcome.result.status, RunStatus::Completed);
+        let trace = assert_closed(&sink);
+        assert!(!trace.spans.iter().any(|span| span.name == "session"));
+        let errors = sink.errors.lock().unwrap();
+        assert_eq!(errors.len(), 1);
+        assert!(errors[0].contains(if missing {
+            "unavailable"
+        } else {
+            "signed range"
+        }));
+    }
+}
+
+#[tokio::test]
+async fn dropped_session_future_has_no_fabricated_completion_summary() {
+    let (sink, owner, observer) = setup();
+    let runner = Runner::new(agent("agent", vec![Step::Pending]), config(observer)).unwrap();
+    let mut future =
+        Box::pin(owner.run_session(runner.run(context(), request(), Arc::new(HostSink))));
+    assert!(
+        tokio::time::timeout(Duration::from_millis(5), &mut future)
+            .await
+            .is_err()
+    );
+    drop(future);
+    let trace = assert_closed(&sink);
+    assert!(!trace.spans.iter().any(|span| span.name == "session"));
+    assert!(trace.spans.iter().any(|span| span.name == "generation"));
 }
 
 #[tokio::test]

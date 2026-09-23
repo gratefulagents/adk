@@ -74,9 +74,16 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   agent spans, with actual runner and handoff assertions. Resolved generation
   instructions remain separate. Schema-1 agent-start events and compatibility
   callbacks still omit instruction content; both capture modes have a regression.
-  Automatic session metrics remain open.
+  `RunTrace::run_session` now emits root-parented session summaries from native
+  authoritative `RunResult::metrics`, including retry turns, compaction cost,
+  partial failures and cumulative continuation accounting. Completed durable
+  restore retains the saved metrics. Dropped futures fabricate no summary;
+  missing legacy metrics and unrepresentable counters report processor health
+  errors without changing execution. The offline trace-store example verifies
+  persisted session fields. This does not establish complete ProgressTracker
+  parity or exactly-once replay/billing semantics.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **881 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **884 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **34 explicitly verified**, **8,857 unresolved** and

@@ -251,10 +251,31 @@ history provenance are not inferred.
 
 Create one `tracing_runtime::RunTrace` per invocation, transferring a `TraceSession`
 into it. Install the same `observer()` Arc into both `RunnerConfig::hooks` and
-`RunnerConfig::generation_observer`. Use `owner.run(runner.run(...))` to own the run
-future: the wrapper always drops that future before closing spans and the root,
-on success, error or cancellation. It does not detach work. The `features`
+`RunnerConfig::generation_observer`. Use `owner.run_session(runner.run(...))` to
+own the run future and emit a point session span from its authoritative result.
+The wrapper always drops that future before closing spans and the root, on
+success, error or cancellation. It does not detach work. `owner.run(...)` remains
+available for generic futures without automatic session metrics. The `features`
 example's `tracestore` scenario demonstrates this standalone composition.
+
+`RunResult::metrics` carries cumulative engine attempt turns, cost, elapsed
+milliseconds and the last dispatched binding. Turns include failed/retried
+attempts and are not `Usage::requests`; cost includes provider compaction. Costs
+use the host estimator's units (the standard provider estimator uses USD).
+Elapsed time includes in-process pauses; durable execution uses its persisted
+wall-clock start, including recovery downtime. Completed durable recovery retains
+the saved metrics rather than adding replay time. Imported/legacy results may
+lack metrics or the actual model binding; neither is inferred from agent names.
+The result usage is used verbatim, not re-summed from callbacks or child events.
+
+A session span is a completion-point observation, like the pinned SDK's
+`RecordSessionComplete`, not a second timed root. Its duration field comes from
+engine metrics. Stop reasons are native status/error-category names; a pause is
+`paused`, not `completed`. Partial errors retain actual counters; dropping an
+unfinished future creates no fabricated summary. Missing legacy metrics and
+unsigned counters outside the SDK signed range go to `TraceProcessor::error`
+without changing the run result. Observational replay can emit the same saved
+summary again; it must not be used as exactly-once billing.
 
 The adapter creates agent spans across repeated attempts, parents generations and
 functions to their actual active agent, and closes agents on handoff/end. Function

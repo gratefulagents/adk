@@ -663,6 +663,8 @@ impl Runner {
             session.begin_run();
         }
         Engine {
+            started: Instant::now(),
+            last_model: None,
             durable_state: None,
             child_control: None,
             applied_child_messages: HashSet::new(),
@@ -696,6 +698,7 @@ impl Runner {
             sender: None,
             spills: vec![],
             result: RunResult {
+                metrics: None,
                 history_provenance: if request.input_provenance.is_empty() {
                     vec![ItemProvenance::Unknown; request.input.len()]
                 } else {
@@ -732,6 +735,8 @@ struct ExecutedTool {
 }
 
 struct Engine {
+    started: Instant,
+    last_model: Option<String>,
     child_control: Option<crate::subagent::ChildControl>,
     applied_child_messages: HashSet<String>,
     durable_state: Option<durable::DurableState>,
@@ -1025,6 +1030,18 @@ impl Engine {
         self.committed_markers = entries.len();
         Ok(())
     }
+    fn record_metrics(&mut self) {
+        let elapsed = self
+            .durable_state
+            .as_ref()
+            .map_or_else(|| self.started.elapsed(), |state| state.elapsed());
+        self.result.metrics = Some(RunMetrics {
+            model: self.last_model.clone(),
+            turns: self.turns,
+            cost_usd: self.cost,
+            elapsed_ms: elapsed.as_millis().min(u64::MAX as u128) as u64,
+        });
+    }
     async fn drive(mut self) -> Result<RunOutcome, RunError> {
         self.result.history_provenance =
             normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
@@ -1032,6 +1049,7 @@ impl Engine {
             let status = self.advance().await?;
             self.publish_committed().await?;
             self.result.status = status;
+            self.record_metrics();
             self.checkpoint(
                 if status == RunStatus::Paused {
                     Boundary::Paused
@@ -1066,6 +1084,7 @@ impl Engine {
         }
     }
     async fn fail(mut self, mut error: Error) -> RunError {
+        self.record_metrics();
         self.result.status = RunStatus::Incomplete;
         self.result.final_output = None;
         // Preserve the original failure even when the failed-event sink fails.
@@ -1862,6 +1881,7 @@ impl Engine {
                         })
                         .await?;
                 }
+                self.last_model = Some(request.model.clone());
                 self.checkpoint(Boundary::ModelDispatched, None).await?;
                 let mut generation = self.config.generation_observer.as_ref().map(|observer| {
                     let info = match binding {

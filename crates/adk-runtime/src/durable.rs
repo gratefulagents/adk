@@ -76,6 +76,8 @@ pub struct RuntimeCheckpoint {
     phase: Phase,
     calls: VecDeque<ToolCall>,
     turns: u32,
+    #[serde(default)]
+    last_model: Option<String>,
     cost: f64,
     tool_calls: u64,
     tool_pause: bool,
@@ -194,6 +196,12 @@ pub(super) struct DurableState {
     fingerprint: String,
     pub(super) effect: Option<Effect>,
     tool_calls: u64,
+}
+
+impl DurableState {
+    pub(super) fn elapsed(&self) -> Duration {
+        (Utc::now() - self.started_at).to_std().unwrap_or_default()
+    }
 }
 
 fn invalid(error: impl std::fmt::Display) -> Error {
@@ -544,6 +552,7 @@ impl Runner {
             engine.base_turn_limit = original_policy.max_turns;
             engine.stop_gate_blocks = saved.stop_gate_blocks;
             engine.turns = saved.turns;
+            engine.last_model = saved.last_model;
             engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
@@ -913,6 +922,7 @@ impl Engine {
                 phase: self.phase,
                 calls: self.calls.clone(),
                 turns: self.turns,
+                last_model: self.last_model.clone(),
                 cost: self.cost,
                 tool_calls: state.tool_calls,
                 tool_pause: self.tool_pause,
@@ -1146,6 +1156,7 @@ impl Runner {
             started_at: recovery.started_at,
             deadline_at: recovery.deadline_at,
             result: RunResult {
+                metrics: None,
                 history_provenance,
                 new_items_provenance: Vec::new(),
                 status: if completed {
@@ -1172,6 +1183,7 @@ impl Runner {
             },
             calls: VecDeque::new(),
             turns: recovery.turns,
+            last_model: None,
             cost: recovery.cost,
             tool_calls: recovery.tool_calls,
             tool_pause: false,

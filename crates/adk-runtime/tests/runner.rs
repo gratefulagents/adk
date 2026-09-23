@@ -283,6 +283,8 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .unwrap();
     assert_eq!(paused.result.status, RunStatus::Paused);
     assert_eq!(paused.result.pending_approvals[0].call.id, "2");
+    let paused_metrics = paused.result.metrics.clone().unwrap();
+    assert_eq!(paused_metrics.turns, 1);
     assert_eq!(one.calls.load(Ordering::SeqCst), 1);
     assert_eq!(two.calls.load(Ordering::SeqCst), 0);
     assert_eq!(three.calls.load(Ordering::SeqCst), 1);
@@ -293,6 +295,9 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .await
         .unwrap();
     assert_eq!(done.result.final_output, Some(json!("done")));
+    let completed_metrics = done.result.metrics.as_ref().unwrap();
+    assert_eq!(completed_metrics.turns, 2);
+    assert!(completed_metrics.elapsed_ms >= paused_metrics.elapsed_ms);
     for t in [one, two, three] {
         assert_eq!(t.calls.load(Ordering::SeqCst), 1);
     }
@@ -482,6 +487,9 @@ async fn fallback_precedes_policy_retries_and_each_attempt_spends_a_turn() {
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("fallback")));
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.turns, 3);
+    assert_eq!(metrics.model.as_deref(), Some("backup"));
     assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
     assert_eq!(fallback.completes.load(Ordering::SeqCst), 2);
     assert_eq!(fallback.requests.lock().unwrap()[0].model, "backup");
@@ -1266,6 +1274,9 @@ async fn provider_compaction_is_charged_before_the_next_model_turn() {
         let partial = error.partial.unwrap();
         assert_eq!(partial.usage.input_tokens, 30);
         assert_eq!(partial.usage.output_tokens, 7);
+        let metrics = partial.metrics.as_ref().unwrap();
+        assert_eq!(metrics.turns, 1);
+        assert_eq!(metrics.cost_usd, 3.0);
         assert_eq!(partial.history, vec![message(Role::User, "summary")]);
     }
 }

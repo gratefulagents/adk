@@ -84,6 +84,7 @@ impl ScriptModel {
             return Err(Error::new(ErrorCategory::Provider, error));
         }
         let response = ModelResponse {
+            raw: None,
             items: input_items(&script["items"], Role::Assistant),
             usage: Usage {
                 input_tokens: script["input_tokens"].as_u64().unwrap(),

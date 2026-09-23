@@ -201,6 +201,7 @@ fn all_span_kinds_and_hook_categories_match_independent_pinned_go() {
     writer.llm_end(
         "agent",
         &ModelResponse {
+            raw: None,
             items: vec![RunItem::Message {
                 message: Message {
                     role: Role::Assistant,
@@ -407,6 +408,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
                     return Err(Error::new(ErrorCategory::Provider, "retry"));
                 }
                 Ok(ModelResponse {
+                    raw: None,
                     items: vec![RunItem::Message {
                         message: Message {
                             role: Role::Assistant,

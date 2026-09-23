@@ -292,6 +292,7 @@ async fn actual_runner_exports_generation_retry_usage_identity_and_single_cost_e
                     return Err(Error::new(ErrorCategory::Provider, "retry"));
                 }
                 Ok(ModelResponse {
+                    raw: None,
                     items: vec![RunItem::Message {
                         message: Message {
                             role: Role::Assistant,

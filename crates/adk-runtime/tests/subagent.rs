@@ -922,6 +922,7 @@ impl adk_core::Model for Model {
         Box::pin(async move {
             self.0.fetch_add(1, Ordering::SeqCst);
             Ok(adk_core::ModelResponse {
+                raw: None,
                 items: vec![RunItem::Message {
                     message: Message {
                         role: Role::Assistant,
@@ -1212,6 +1213,7 @@ impl adk_core::Model for ToolModel {
                 }]
             };
             Ok(adk_core::ModelResponse {
+                raw: None,
                 items,
                 usage: Default::default(),
                 end_turn: None,

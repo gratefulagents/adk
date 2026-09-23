@@ -844,6 +844,7 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
         }
     }
     Ok(ModelResponse {
+        raw: Some(body.clone()),
         items,
         usage: usage(&body["usage"], protocol),
         end_turn,

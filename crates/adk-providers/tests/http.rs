@@ -153,6 +153,11 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     let response = provider.complete(&ctx, input).await.unwrap();
     assert_eq!(response.usage.context_tokens, Some(12));
     assert_eq!(response.usage.cache_read_tokens, 4);
+    let raw = response.raw.as_ref().unwrap();
+    assert_eq!(raw["id"], "c");
+    assert_eq!(raw["choices"][0]["message"]["content"], "hello");
+    assert_eq!(raw["usage"]["prompt_tokens_details"]["cached_tokens"], 4);
+    assert!(response.metadata.is_empty());
     let request = server.join().unwrap();
     assert!(request.starts_with("POST /v1/chat/completions HTTP/1.1"));
     assert!(
@@ -233,7 +238,10 @@ async fn chunked_stream_emits_incremental_text_and_exactly_one_complete() {
     );
     let mut completes = 0;
     while let Some(event) = stream.next().await.unwrap() {
-        if matches!(event, ModelEvent::Complete { .. }) {
+        if let ModelEvent::Complete { response } = event {
+            let raw = response.raw.as_ref().unwrap();
+            assert_eq!(raw["choices"][0]["message"]["content"], "hé🙂");
+            assert_eq!(raw["choices"][0]["finish_reason"], "stop");
             completes += 1;
         }
     }

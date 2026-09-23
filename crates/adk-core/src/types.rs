@@ -162,6 +162,19 @@ pub struct ModelResponse {
     pub end_turn: Option<bool>,
     pub response_id: Option<String>,
     pub metadata: serde_json::Map<String, Value>,
+    /// Provider response data, distinct from provider metadata. None means unavailable.
+    #[serde(
+        default,
+        deserialize_with = "present_raw_response",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub raw: Option<Value>,
+}
+
+fn present_raw_response<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<Value>, D::Error> {
+    Value::deserialize(deserializer).map(Some)
 }
 
 /// Ordered model stream events. Exactly one `Complete` must precede clean EOF.

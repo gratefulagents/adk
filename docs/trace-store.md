@@ -89,6 +89,17 @@ Observers are synchronous and must not panic, detach work, or change policy.
 Attach the writer separately as `RunHooks` when hook categories are also wanted;
 store/run initialization and finalization remain host-owned.
 
+`ModelResponse::raw` retains optional provider data separately from `metadata`.
+Built-in HTTP providers retain the parsed response body; streaming providers retain
+their assembled protocol response, not a transcript of SSE events. Custom models
+set `raw: None` when unavailable. JSON serialization round trips distinguish an
+absent raw value from `Some(serde_json::Value::Null)`. This field
+is sensitive response content, not a diagnostic or a redacted logging surface.
+It is not yet the pinned SDK's raw snapshot representation: the Go OpenAI adapter
+stores its normalized internal Anthropic-shaped response. Exact SDK response
+snapshot assembly must account for that difference rather than relabel native
+provider JSON as Go-equivalent.
+
 The `adk::codec::snapshots::RequestSnapshot` document (`compat` feature) serializes every pinned request
 field. `Snapshot::from_serializable` uses the Go-compatible serializer, including
 float notation, HTML escaping and compaction of raw JSON without sorting keys,

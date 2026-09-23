@@ -23,6 +23,7 @@ fn text(value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(true),

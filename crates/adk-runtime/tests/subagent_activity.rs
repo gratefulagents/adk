@@ -64,6 +64,7 @@ impl Model for ToolModel {
                     .collect()
             };
             Ok(ModelResponse {
+                raw: None,
                 items,
                 usage: Default::default(),
                 end_turn: None,

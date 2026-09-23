@@ -944,6 +944,17 @@ fn executed_go_chat_stream_matches_at_every_chunk_boundary() {
     let source = golden["chat_sse"].as_str().unwrap().as_bytes();
     let mut expected = wire::response(&golden["chat_sse_response"], Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The Go client fixture is Anthropic-shaped; native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "chat-fixture",
+        "choices": [{"finish_reason": "tool_calls", "message": {
+            "content": "héllo", "reasoning_content": "why ", "reasoning_details": null,
+            "reasoning_opaque": null, "tool_calls": [{"id": "call-fixture", "type": "function",
+                "function": {"name": "lookup", "arguments": "{\"q\":1}"}}]
+        }}],
+        "usage": {"prompt_tokens": 100, "completion_tokens": 20,
+            "prompt_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     for split in 0..=source.len() {
         let mut decoder = Decoder::default();
         let mut stream = StreamState::new(Protocol::Chat);
@@ -1049,6 +1060,18 @@ fn executed_go_sparse_responses_stream_retains_deltas_at_every_boundary() {
     let reference = &golden["responses_sparse_sse_response"];
     let mut expected = wire::response(reference, Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The Go client fixture is Anthropic-shaped; native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "responses-fixture", "model": "gpt-5.6", "end_turn": false, "status": "completed",
+        "output": [
+            {"type": "reasoning", "id": "reasoning-fixture", "encrypted_content": "opaque",
+                "summary": [{"type": "summary_text", "text": "why"}]},
+            {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "héllo"}]},
+            {"type": "function_call", "id": "item-fixture", "call_id": "call-fixture", "name": "lookup", "arguments": "{\"q\":1}"}
+        ],
+        "usage": {"input_tokens": 100, "output_tokens": 20,
+            "input_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     let adk_core::RunItem::Reasoning { reasoning } = &mut expected.items[0] else {
         panic!()
     };
@@ -1202,5 +1225,39 @@ fn compatible_chat_multipart_narration_and_truncated_tool_arguments_match_refere
         };
         assert_eq!(call.id, "call_0");
         assert_eq!(call.arguments, json!({}));
+    }
+}
+
+#[test]
+fn provider_response_retains_whole_body_not_just_metadata() {
+    for (protocol, mut body) in [
+        (
+            Protocol::Chat,
+            json!({"choices": [{"message": {"content": "answer"}, "finish_reason": "stop"}]}),
+        ),
+        (
+            Protocol::Responses,
+            json!({"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": "answer"}]}]}),
+        ),
+        (
+            Protocol::Anthropic,
+            json!({"content": [{"type": "text", "text": "answer"}], "stop_reason": "end_turn"}),
+        ),
+    ] {
+        body["metadata"] = json!({"key": "value"});
+        body["provider_extension"] = json!({"nested": [null, false, "extra"]});
+        let response = wire::response(&body, protocol).unwrap();
+        assert_eq!(response.raw.as_ref(), Some(&body));
+        assert_eq!(
+            response.metadata,
+            body["metadata"].as_object().unwrap().clone()
+        );
+        assert_eq!(
+            serde_json::from_value::<adk_core::ModelResponse>(
+                serde_json::to_value(&response).unwrap()
+            )
+            .unwrap(),
+            response
+        );
     }
 }

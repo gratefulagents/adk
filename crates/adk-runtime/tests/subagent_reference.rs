@@ -86,6 +86,7 @@ impl Model for ControlledModel {
                 return Err(Error::new(ErrorCategory::Provider, "controlled failure"));
             }
             Ok(ModelResponse {
+                raw: None,
                 items: vec![RunItem::Message {
                     message: Message {
                         role: Role::Assistant,

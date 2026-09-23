@@ -20,6 +20,7 @@ fn answer(text: &str) -> ModelResponse {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: None,

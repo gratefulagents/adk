@@ -31,9 +31,14 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   constructors install globally; host-supplied exporters remain scoped.
   Pinned duration cases also verify Go's signed-duration saturation. Runtime
   generation model identities now match the pinned SDK for routing prefixes,
-  empty providers/models, whitespace and nested model names.
+  empty providers/models, whitespace, nested model names and simple Unicode
+  lowercasing (including dotted-I and non-contextual sigma).
+- Native model responses now retain optional provider data separately from metadata,
+  with absent/null JSON round trips and HTTP/streaming regressions for retained
+  payloads. Go's normalized internal raw response shape is different; this change
+  does **not** close automatic SDK response snapshot assembly or provider raw parity.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **836 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **838 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **27 explicitly verified**, **8,864 unresolved** and

@@ -738,12 +738,21 @@ pub(crate) fn generation_span(
     use crate::tracewriter::Generation;
     use adk_runtime::tracing::GenerationStatus;
     let model = record.request.model.trim();
-    let mut provider = record.provider.trim().to_ascii_lowercase();
+    // Go lowercases one rune at a time, without expansion or final-sigma context.
+    let mut provider: String = record
+        .provider
+        .trim()
+        .chars()
+        .map(|c| c.to_lowercase().next().unwrap())
+        .collect();
     let (prefix, bare) = model.split_once('/').unwrap_or(("", model));
     let canonical = if bare.is_empty() {
         model.into()
     } else if !prefix.is_empty() {
-        let prefix = prefix.to_ascii_lowercase();
+        let prefix: String = prefix
+            .chars()
+            .map(|c| c.to_lowercase().next().unwrap())
+            .collect();
         if provider.is_empty() {
             provider.clone_from(&prefix);
         }

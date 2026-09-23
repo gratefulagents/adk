@@ -22,6 +22,7 @@ fn message(role: Role, text: impl Into<String>) -> RunItem {
 }
 fn response(items: Vec<RunItem>, end: bool) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(end),

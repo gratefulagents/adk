@@ -9,6 +9,7 @@ struct Echo;
 
 fn response() -> ModelResponse {
     ModelResponse {
+        raw: None,
         items: vec![RunItem::Message {
             message: Message {
                 role: Role::Assistant,

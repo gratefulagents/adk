@@ -30,6 +30,7 @@ fn call() -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 3,

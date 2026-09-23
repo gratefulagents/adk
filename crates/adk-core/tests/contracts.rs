@@ -157,6 +157,7 @@ fn native_items_preserve_order_ids_and_arbitrary_precision() {
 fn model_end_turn_preserves_absent_false_and_true() {
     for end_turn in [None, Some(false), Some(true)] {
         let response = ModelResponse {
+            raw: None,
             items: vec![],
             usage: Usage::default(),
             end_turn,
@@ -193,4 +194,28 @@ fn default_run_policy_preserves_baseline_hundred_turn_budget() {
     assert_eq!(policy.max_turns.get(), 100);
     assert_eq!(policy.tools, ToolPolicy::default());
     assert_eq!(policy.tool_use, ToolUseBehavior::Continue);
+}
+
+#[test]
+fn raw_response_preserves_missing_null_and_provider_data() {
+    for raw in [
+        None,
+        Some(serde_json::Value::Null),
+        Some(json!({"content": "answer", "unknown": [1, false]})),
+    ] {
+        let response = ModelResponse {
+            raw: raw.clone(),
+            items: vec![],
+            usage: Usage::default(),
+            end_turn: None,
+            response_id: None,
+            metadata: Default::default(),
+        };
+        let encoded = serde_json::to_value(&response).unwrap();
+        assert_eq!(encoded.get("raw"), raw.as_ref());
+        assert_eq!(
+            serde_json::from_value::<ModelResponse>(encoded).unwrap(),
+            response
+        );
+    }
 }

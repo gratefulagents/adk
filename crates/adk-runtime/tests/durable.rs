@@ -143,6 +143,7 @@ fn message(role: Role, text: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 10,

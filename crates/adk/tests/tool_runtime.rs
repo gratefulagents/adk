@@ -76,6 +76,7 @@ impl Model for TestModel {
                 vec![]
             };
             Ok(ModelResponse {
+                raw: None,
                 items,
                 usage: Usage::default(),
                 end_turn: Some(requests.len() > 1),

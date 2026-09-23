@@ -101,7 +101,7 @@ func writerFixture() {
 	}
 	result["duration_cases"] = durations
 	var identities []any
-	for _, pair := range [][2]string{{" Model ", " OpenAI "}, {" ROUTE/Model ", " OpenAI "}, {"ROUTE/Model", ""}, {"ROUTE/", ""}, {"/Model", " OpenAI "}, {"/Model", ""}, {"", "OpenAI"}, {"Model", ""}, {"ROUTE/Model/version", "OpenAI"}} {
+	for _, pair := range [][2]string{{" Model ", " OpenAI "}, {" ROUTE/Model ", " OpenAI "}, {"ROUTE/Model", ""}, {"ROUTE/", ""}, {"/Model", " OpenAI "}, {"/Model", ""}, {"", "OpenAI"}, {"Model", ""}, {"ROUTE/Model/version", "OpenAI"}, {"ÜBER/Model", ""}, {"Model", " İΟΣ "}, {"İΟΣ/Model", ""}} {
 		identities = append(identities, map[string]any{"raw": pair[0], "provider": pair[1], "identity": agent.NormalizeModelIdentity(pair[0], pair[1])})
 	}
 	result["model_identities"] = identities

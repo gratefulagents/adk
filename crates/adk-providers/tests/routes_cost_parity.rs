@@ -44,6 +44,7 @@ fn usage() -> Usage {
 }
 fn answer() -> ModelResponse {
     ModelResponse {
+        raw: None,
         items: vec![RunItem::Message {
             message: Message {
                 role: Role::Assistant,

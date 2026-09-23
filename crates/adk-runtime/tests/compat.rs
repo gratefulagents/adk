@@ -54,6 +54,7 @@ fn result_item(id: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: None,

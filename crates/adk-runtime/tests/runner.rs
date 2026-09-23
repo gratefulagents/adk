@@ -21,6 +21,7 @@ fn message(role: Role, value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>, end_turn: Option<bool>) -> ModelResponse {
     ModelResponse {
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 10,

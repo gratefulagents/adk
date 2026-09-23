@@ -331,9 +331,11 @@ async fn delta_or_complete_then_error_is_diagnostic_not_model_acceptance() {
         let mut cfg = config(&recorder);
         cfg.retry = retry();
         let runner = Runner::new(agent(model.clone()), cfg).unwrap();
+        let mut input = request(3);
+        input.input_provenance = vec![ItemProvenance::Unattributed];
         let snapshot = partial(
             runner
-                .stream(context(), request(3), recorder.clone())
+                .stream(context(), input, recorder.clone())
                 .finish()
                 .await
                 .err()
@@ -342,6 +344,14 @@ async fn delta_or_complete_then_error_is_diagnostic_not_model_acceptance() {
         );
         assert_eq!(snapshot.new_items, vec![item.clone()]);
         assert_eq!(snapshot.history, vec![message(Role::User, "go"), item]);
+        let generated = ItemProvenance::Agent {
+            name: "contract".into(),
+        };
+        assert_eq!(snapshot.new_items_provenance, vec![generated.clone()]);
+        assert_eq!(
+            snapshot.history_provenance,
+            vec![ItemProvenance::Unattributed, generated]
+        );
         assert_eq!(snapshot.responses.len(), usize::from(completed));
         assert_eq!(snapshot.usage.input_tokens, if completed { 3 } else { 0 });
         assert_eq!(model.calls.load(Ordering::SeqCst), 1);

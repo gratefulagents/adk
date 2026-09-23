@@ -441,7 +441,9 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
                             }],
                         },
                     }],
-                    history_provenance: vec![],
+                    history_provenance: vec![adk_core::ItemProvenance::Agent {
+                        name: "original".into(),
+                    }],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -449,6 +451,15 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
             .await
             .unwrap();
         assert_eq!(result.cost, 0.25);
+        assert!(
+            result.history_provenance.is_empty(),
+            "replacement history has no proven attribution correspondence"
+        );
+        assert_eq!(
+            adk_core::normalize_provenance(result.history.len(), &result.history_provenance)
+                .unwrap(),
+            vec![adk_core::ItemProvenance::Unknown]
+        );
         assert!(
             matches!(&result.history[0], adk_core::RunItem::Compaction { compaction } if compaction.encrypted_content == "opaque")
         );

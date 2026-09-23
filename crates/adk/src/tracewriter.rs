@@ -415,6 +415,25 @@ impl State {
         value.as_object().expect("span data object").clone()
     }
     fn span(&mut self, span: &Span, ending: bool) {
+        if self.run_id.is_empty() {
+            return;
+        }
+        let cost = match &span.data {
+            Some(SpanData::Generation(data)) => Some(data.cost_usd),
+            Some(SpanData::Session(data)) => Some(data.cost_usd),
+            Some(SpanData::Subagent(data)) => Some(data.cost_usd),
+            _ => None,
+        };
+        // serde_json replaces non-finite floats with null; Go rejects the record.
+        let invalid_cost = cost.filter(|cost| !cost.is_finite()).map(|cost| {
+            if cost.is_nan() {
+                "NaN"
+            } else if cost.is_sign_positive() {
+                "+Inf"
+            } else {
+                "-Inf"
+            }
+        });
         let mut entry = json!({"type":if ending {"span_end"} else {"span_start"}, "span_id":span.id, "parent_id":span.parent_id, "name":span.name});
         if ending {
             entry["start_time"] = json!(span.start_time);
@@ -426,7 +445,12 @@ impl State {
         if let Some(data) = &span.data {
             entry.as_object_mut().unwrap().extend(self.span_data(data));
         }
-        self.append("spans", entry.clone());
+        if let Some(value) = invalid_cost {
+            self.health.last_error =
+                format!("marshal spans entry: json: unsupported value: {value}");
+        } else {
+            self.append("spans", entry.clone());
+        }
         if let Some(SpanData::Generation(generation)) = &span.data {
             entry["type"] = json!(if ending {
                 "generation_end"
@@ -438,7 +462,12 @@ impl State {
             } else {
                 span.start_time
             });
-            self.append("llm_calls", entry);
+            if let Some(value) = invalid_cost {
+                self.health.last_error =
+                    format!("marshal llm_calls entry: json: unsupported value: {value}");
+            } else {
+                self.append("llm_calls", entry);
+            }
             if !ending {
                 if let Some(instructions) = generation
                     .request

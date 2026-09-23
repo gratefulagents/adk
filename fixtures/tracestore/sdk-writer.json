@@ -330,6 +330,71 @@
     "{\"items\":[{\"type\":\"message\",\"message_text\":\"answer \\u003c\\u003e\\u0026\",\"message_phase\":\"commentary\",\"message_images\":[{\"media_type\":\"image/png\",\"data\":\"AA==\",\"detail\":\"low\"}]},{\"type\":\"reasoning\",\"reasoning\":{\"id\":\"r\",\"text\":\"reason\",\"thinking\":\"reason\",\"signature\":\"signature\",\"redacted_data\":\"redacted\",\"encrypted_content\":\"opaque\"},\"reasoning_text\":\"reason\",\"thinking_text\":\"reason\"},{\"type\":\"tool_call\",\"tool_call\":{\"id\":\"call\",\"name\":\"lookup\",\"input\":{\"q\":1}}},{\"type\":\"tool_output\",\"tool_output\":{\"call_id\":\"call\",\"content\":\"result\",\"is_error\":true}},{\"type\":\"compaction\",\"compaction\":{\"id\":\"c\",\"content\":\"summary\",\"encrypted_content\":\"compact\",\"created_by\":\"provider\"}}],\"usage\":{\"requests\":3,\"input_tokens\":12,\"output_tokens\":4,\"cache_read_tokens\":2,\"cache_create_tokens\":1},\"end_turn\":false,\"texts\":[\"answer \\u003c\\u003e\\u0026\"],\"reasoning\":[{\"id\":\"r\",\"text\":\"reason\",\"thinking\":\"reason\",\"signature\":\"signature\",\"redacted_data\":\"redacted\",\"encrypted_content\":\"opaque\"}],\"reasoning_texts\":[\"reason\"],\"thinking_texts\":[\"reason\"],\"tool_calls\":[{\"id\":\"call\",\"name\":\"lookup\",\"input\":{\"q\":1}}],\"raw_available\":false}",
     "{\"usage\":{\"requests\":0,\"input_tokens\":0,\"output_tokens\":0},\"raw_available\":false}"
   ],
+  "nonfinite_span_cases": {
+    "nan-generation": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal llm_calls entry: json: unsupported value: NaN",
+      "write_errors": 0
+    },
+    "nan-session": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: NaN",
+      "write_errors": 0
+    },
+    "nan-subagent": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: NaN",
+      "write_errors": 0
+    },
+    "negative-generation": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal llm_calls entry: json: unsupported value: -Inf",
+      "write_errors": 0
+    },
+    "negative-session": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: -Inf",
+      "write_errors": 0
+    },
+    "negative-subagent": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: -Inf",
+      "write_errors": 0
+    },
+    "positive-generation": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal llm_calls entry: json: unsupported value: +Inf",
+      "write_errors": 0
+    },
+    "positive-session": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: +Inf",
+      "write_errors": 0
+    },
+    "positive-subagent": {
+      "events_dropped": 0,
+      "events_truncated": 0,
+      "events_written": 0,
+      "last_error": "marshal spans entry: json: unsupported value: +Inf",
+      "write_errors": 0
+    }
+  },
   "raw_input_schema": "{ \"z\": 1e+02, \"a\": { \"two\": \"\u003c\u003e\u0026\\u2028\", \"one\": \"quoted \\\" value \\\\\" }, \"duplicate\": 1, \"duplicate\": 2 }",
   "raw_request_json": "{\"tools\":[{\"name\":\"raw\",\"input_schema\":{\"z\":1e+02,\"a\":{\"two\":\"\\u003c\\u003e\\u0026\\u2028\",\"one\":\"quoted \\\" value \\\\\"},\"duplicate\":1,\"duplicate\":2},\"read_only\":false,\"needs_approval\":false}],\"settings\":{}}",
   "request_json": "{\"agent_name\":\"agent\",\"model\":\"requested\",\"instructions\":\"system instructions\",\"settings\":{}}",

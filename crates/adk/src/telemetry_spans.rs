@@ -250,7 +250,6 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
                         "input_tokens_include_cache_known",
                     ),
                     ("total_tokens", "total_tokens"),
-                    ("cost_usd", "cost_usd"),
                     ("cost_known", "cost_known"),
                     ("latency_ms", "latency_ms"),
                     ("success", "success"),
@@ -267,6 +266,7 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
                     ("instructions_length", "instructions_length"),
                 ],
             );
+            attrs.push(KeyValue::new("gen.cost_usd", g.cost_usd));
             attrs.push(KeyValue::new("gen.error", redact(&g.error)));
             "llm.generation".into()
         }
@@ -291,12 +291,11 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
             );
             "compaction".into()
         }
-        SpanData::Session(_) => {
+        SpanData::Session(d) => {
             fields(
                 "session",
                 &[
                     ("model", "model"),
-                    ("cost_usd", "cost_usd"),
                     ("num_turns", "num_turns"),
                     ("duration_ms", "duration_ms"),
                     ("input_tokens", "input_tokens"),
@@ -306,6 +305,7 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
                     ("stop_reason", "stop_reason"),
                 ],
             );
+            attrs.push(KeyValue::new("session.cost_usd", d.cost_usd));
             "session".into()
         }
         SpanData::Subagent(d) => {
@@ -316,7 +316,6 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
                     ("type", "subagent_type"),
                     ("model", "model"),
                     ("status", "status"),
-                    ("cost_usd", "cost_usd"),
                     ("num_turns", "num_turns"),
                     ("total_tokens", "total_tokens"),
                     ("input_tokens", "input_tokens"),
@@ -329,6 +328,7 @@ fn map_span(span: &Span) -> (String, Vec<KeyValue>) {
                     ("isolation", "isolation"),
                 ],
             );
+            attrs.push(KeyValue::new("subagent.cost_usd", d.cost_usd));
             attrs.push(KeyValue::new(
                 "subagent.description",
                 redact(&truncate(&d.description, 200)),

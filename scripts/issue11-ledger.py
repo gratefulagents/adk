@@ -41,7 +41,7 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-codec/src/dto.rs", "crates/adk-codec/src/lib.rs",
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
                "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
-               "scripts/trace-reference/request.go",
+               "scripts/trace-reference/request.go", "scripts/trace-reference/nonfinite.go",
                "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/src/approval.rs",
                "crates/adk-runtime/src/durable.rs", "crates/adk-runtime/tests/durable.rs",
                "crates/adk-runtime/tests/runner.rs", "crates/adk/src/observability.rs",

@@ -624,6 +624,229 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-CAE6296F65D71C27": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CacheCreationInputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cache_creation_input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: CacheCreationInputTokens maps to Session.cache_creation_input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-834DEE445E06CAB1": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CacheReadInputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cache_read_input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: CacheReadInputTokens maps to Session.cache_read_input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-E0231D6672FB3B9E": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.DurationMS",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::duration_ms",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: DurationMS maps to Session.duration_ms with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-EDB8AC47A3B083C2": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.InputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::input_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: InputTokens maps to Session.input_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-B48094438EC05137": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.Model",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::model",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: Model maps to Session.model with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-262E9849321A9A57": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.NumTurns",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::num_turns",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: NumTurns maps to Session.num_turns with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-23E95B8347D5FAF4": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::output_tokens",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: OutputTokens maps to Session.output_tokens with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-22E9E485975B9A0D": {
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.StopReason",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::stop_reason",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "session_wrapper_uses_authoritative_totals_on_success_and_partial_failure"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "rationale": "Field-level representation and transport only: StopReason maps to Session.stop_reason with the source string/signed integer type on Linux x86_64. Independently executed pinned fixtures verify its exact schema-2 key/value and OTel attribute; native session regression checks authoritative result transport. This does not close ProgressTracker aggregation, stdout export, or the overall SessionSpanData type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ]
+    },
+    "SDK-31E31FC44CD652FC": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData.CostUSD",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session::cost_usd",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "The native f64 field preserves IEEE values in OTel Float64 attributes, including signed zero and non-finite values. Finite schema-2 records match the independent pinned fixture; NaN/+Inf/-Inf reject filesystem records with the exact pinned marshal health error rather than becoming null."
+    },
+    "SDK-DD19405C46836F6E": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "internal/agent/tracing.go",
+      "source_name": "SessionSpanData",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "All nine source fields map to the native typed Session record with corresponding string, f64 and Linux x86_64 signed integer ranges. Independent writer and OTel fixtures verify all field names and values, including the duration override. This is DTO/API representation closure, not ProgressTracker producer or billing parity."
+    },
+    "SDK-ACF7B29E9209E103": {
+      "rust_test_identifiers": [
+        "all_span_kinds_and_hook_categories_match_independent_pinned_go",
+        "every_span_kind_matches_independent_pinned_go_export",
+        "nonfinite_span_costs_match_pinned_marshal_errors_without_null_records",
+        "cost_attributes_preserve_ieee_floats_without_json_conversion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestAddSpanDataSessionHandlesValueSpanData",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability",
+        "otel"
+      ],
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "SessionSpanData",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::Session",
+        "crates/adk/src/telemetry_spans.rs::map_span"
+      ],
+      "rationale": "The facade exposes the complete typed record as adk::tracewriter::Session under observability, instead of replicating a Go alias. Both independent Go fixtures construct the public agentsdk.SessionSpanData alias and Rust tests construct the public facade record. This closes the alias API only, not all session lifecycle producers."
     }
   }
 }

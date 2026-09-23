@@ -50,6 +50,62 @@ fn records(path: &std::path::Path, category: &str) -> Value {
     )
 }
 #[test]
+fn nonfinite_span_costs_match_pinned_marshal_errors_without_null_records() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+    for (label, cost) in [
+        ("nan", f64::NAN),
+        ("positive", f64::INFINITY),
+        ("negative", f64::NEG_INFINITY),
+    ] {
+        for (kind, data) in [
+            (
+                "session",
+                SpanData::Session(Session {
+                    cost_usd: cost,
+                    ..Default::default()
+                }),
+            ),
+            (
+                "generation",
+                SpanData::Generation(Box::new(Generation {
+                    cost_usd: cost,
+                    ..Default::default()
+                })),
+            ),
+            (
+                "subagent",
+                SpanData::Subagent(Box::new(Subagent {
+                    cost_usd: cost,
+                    ..Default::default()
+                })),
+            ),
+        ] {
+            let name = format!("{label}-{kind}");
+            let writer = TraceWriter::new(store.clone(), &name, Options::default());
+            let path = writer
+                .init_run(&RunMetadata {
+                    run_id: name.clone(),
+                    ..Default::default()
+                })
+                .unwrap();
+            let mut span = Span::new(kind, "", Some(data));
+            writer.span_start(&span);
+            span.finish();
+            writer.span_end(&span);
+            assert_eq!(
+                serde_json::to_value(writer.health()).unwrap(),
+                fixture["nonfinite_span_cases"][&name]
+            );
+            assert!(!path.join("spans.jsonl").exists());
+            assert!(!path.join("llm_calls.jsonl").exists());
+        }
+    }
+}
+
+#[test]
 fn all_span_kinds_and_hook_categories_match_independent_pinned_go() {
     let expected: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

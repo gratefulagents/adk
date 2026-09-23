@@ -113,6 +113,70 @@ fn spans() -> Vec<SpanData> {
 }
 
 #[test]
+fn cost_attributes_preserve_ieee_floats_without_json_conversion() {
+    let exporter = InMemorySpanExporter::default();
+    let telemetry = Telemetry::with_exporter("fixture", exporter.clone());
+    let processor = telemetry.span_processor();
+    processor.on_trace_start(&trace());
+    let values = [f64::NAN, f64::INFINITY, f64::NEG_INFINITY, -0.0, f64::MAX];
+    for cost in values {
+        for data in [
+            SpanData::Session(Session {
+                cost_usd: cost,
+                ..Default::default()
+            }),
+            SpanData::Generation(Box::new(Generation {
+                cost_usd: cost,
+                ..Default::default()
+            })),
+            SpanData::Subagent(Box::new(Subagent {
+                cost_usd: cost,
+                ..Default::default()
+            })),
+        ] {
+            let span = span("span", "trace", data);
+            processor.on_span_start(&span);
+            processor.on_span_end(&span);
+        }
+    }
+    processor.on_trace_end(&trace());
+    telemetry.force_flush().unwrap();
+    let exported = exporter.get_finished_spans().unwrap();
+    assert_eq!(exported.len(), values.len() * 3 + 1);
+    let spans: Vec<_> = exported
+        .iter()
+        .filter(|span| {
+            span.attributes
+                .iter()
+                .any(|attr| attr.key.as_str().ends_with(".cost_usd"))
+        })
+        .collect();
+    assert_eq!(spans.len(), values.len() * 3);
+    for (chunk, expected) in spans.chunks(3).zip(values) {
+        for (span, key) in
+            chunk
+                .iter()
+                .zip(["session.cost_usd", "gen.cost_usd", "subagent.cost_usd"])
+        {
+            let value = &span
+                .attributes
+                .iter()
+                .find(|attr| attr.key.as_str() == key)
+                .unwrap()
+                .value;
+            let opentelemetry::Value::F64(actual) = value else {
+                panic!("not an f64: {value:?}")
+            };
+            if expected.is_nan() {
+                assert!(actual.is_nan());
+            } else {
+                assert_eq!(actual.to_bits(), expected.to_bits());
+            }
+        }
+    }
+}
+
+#[test]
 fn every_span_kind_matches_independent_pinned_go_export() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-otel.json")).unwrap();

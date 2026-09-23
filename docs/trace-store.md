@@ -210,3 +210,30 @@ final-value replacement and secret redaction. Unlike the Go processor, diagnosti
 generation errors and error-status descriptions are redacted before export;
 UTF-8 truncation preserves character boundaries. No collector delivery or live
 credential claims follow from these offline checks.
+
+### Owned trace scopes and composition
+
+With `observability`, `tracing::TraceSession` owns a schema-2 trace root. Clone it
+for a shared trace rather than starting another root. `span()` returns a guard;
+`finish()` or Drop ends that span exactly once. `child()` preserves parent IDs,
+including when a child outlives its parent. All guards and generation observers
+retain the root: dropping the last owner ends it after its spans. `snapshot()`
+returns the current trace document without transferring ownership.
+
+`CompositeTraceProcessor` delivers each lifecycle event synchronously in configured
+order. It accepts a `TraceWriter`, and with `otel`, `Telemetry::span_processor()`.
+Callbacks must not panic. No state lock is held while calling processors. Concurrent
+independent spans may interleave, but each start precedes its end and the root ends
+last. Sharing an OTel processor between overlapping roots retains each root's own
+parent contexts; ending one root cannot evict another's parents.
+
+To attach a runner, set `RunnerConfig::generation_observer` to the scope's (or an
+agent span's) `generation_observer()`. Successful responses, retry/failure status
+and dropped-future interruption flow through the same writer/OTel composition.
+Representable response snapshots and conversion errors retain the direct writer's
+capture/health behavior. The observer owns a root reference: release the Runner
+and all observer clones when finished. `TraceSession::finish()` releases only its
+own reference, not another run's shared trace. Explicitly flush/shut down telemetry
+and finalize/close stores separately; a trace scope never assumes that ownership.
+These scopes do not yet synthesize all agent/tool/session spans or assemble request
+history provenance automatically.

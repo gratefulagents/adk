@@ -922,6 +922,53 @@ async fn tracestore() {
     assert!(
         FilesystemTraceStore::create(&root, "offline-feature", TraceLimits::default()).is_err()
     );
+
+    // The compatible schema-2 path has distinct storage and explicit ownership.
+    #[cfg(target_os = "linux")]
+    {
+        use adk::{
+            tracestore::{FilesystemTraceStore as SdkStore, RunMetadata},
+            tracewriter::{Options, TraceWriter},
+            tracing::TraceSession,
+        };
+        let store = Arc::new(SdkStore::new(root.join("sdk")).unwrap());
+        let writer = Arc::new(TraceWriter::new(
+            store.clone(),
+            "sdk-run",
+            Options::default(),
+        ));
+        let path = writer
+            .init_run(&RunMetadata {
+                run_id: "sdk-run".into(),
+                ..Default::default()
+            })
+            .unwrap();
+        let trace = TraceSession::new("standalone", writer.clone());
+        let runner = Runner::new(
+            agent(Scripted::results(vec![Ok(answer("traced"))])),
+            RunnerConfig {
+                generation_observer: Some(trace.generation_observer()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        trace.finish(); // The runner's observer still owns this root.
+        runner
+            .run(context(), request(), Arc::new(RecordingHost::default()))
+            .await
+            .unwrap();
+        drop(runner); // Ends the root after the generation's end record.
+        writer.finalize_run("completed").unwrap();
+        let records: Vec<serde_json::Value> = std::fs::read_to_string(path.join("spans.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(records.first().unwrap()["type"], "trace_start");
+        assert_eq!(records.last().unwrap()["type"], "trace_end");
+        assert_eq!(writer.health().write_errors, 0);
+        store.close();
+    }
 }
 async fn errors_retries() {
     let model = Scripted::results(vec![

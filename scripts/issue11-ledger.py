@@ -28,7 +28,8 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore.rs",
+RUST_INPUTS = ["crates/adk/src/tracing.rs", "crates/adk/tests/tracing.rs",
+               "crates/adk/tests/tracing_sinks.rs", "crates/adk/src/lib.rs", "Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore.rs",
                "crates/adk/tests/tracestore.rs", "crates/adk/src/telemetry.rs",
                "crates/adk/src/telemetry_spans.rs", "crates/adk/src/tracewriter.rs",
                "crates/adk/tests/telemetry.rs", "crates/adk/tests/telemetry_spans.rs",
@@ -129,7 +130,8 @@ def verify_rust() -> None:
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec",
                "--features", "otel", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
-               "--test", "telemetry_stdout", "--test", "telemetry_defaults"]
+               "--test", "telemetry_stdout", "--test", "telemetry_defaults",
+               "--test", "tracing", "--test", "tracing_sinks"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
     print(result.stdout, end="")
     print(result.stderr, end="")

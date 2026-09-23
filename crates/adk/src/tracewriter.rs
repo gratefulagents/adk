@@ -728,28 +728,42 @@ impl adk_runtime::tracing::GenerationObserver for TraceWriter {
         self.span_start(&generation_span(context, record));
     }
     fn end(&self, context: &Context, record: &adk_runtime::tracing::GenerationRecord) {
-        let mut span = generation_span(context, record);
-        if let (Some(response), Some(SpanData::Generation(data))) =
-            (&record.response, &mut span.data)
-        {
-            let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response)
-                .map_err(|error| error.to_string())
-                .and_then(|snapshot| {
-                    Snapshot::from_serializable(&snapshot).map_err(|error| error.to_string())
-                });
-            match snapshot {
-                Ok(snapshot) => data.response = Some(snapshot),
-                Err(error) => {
-                    self.state
-                        .lock()
-                        .expect("trace writer poisoned")
-                        .health
-                        .last_error = format!("snapshot response: {error}");
-                }
-            }
+        let (span, error) = generation_end_span(context, record);
+        if let Some(error) = error {
+            self.record_error(&error);
         }
         self.span_end(&span);
     }
+}
+
+impl TraceWriter {
+    pub(crate) fn record_error(&self, message: &str) {
+        self.state
+            .lock()
+            .expect("trace writer poisoned")
+            .health
+            .last_error = message.into();
+    }
+}
+
+pub(crate) fn generation_end_span(
+    context: &Context,
+    record: &adk_runtime::tracing::GenerationRecord,
+) -> (Span, Option<String>) {
+    let mut span = generation_span(context, record);
+    let mut error = None;
+    if let (Some(response), Some(SpanData::Generation(data))) = (&record.response, &mut span.data) {
+        let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response)
+            .map_err(|error| error.to_string())
+            .and_then(|snapshot| {
+                Snapshot::from_serializable(&snapshot).map_err(|error| error.to_string())
+            });
+        match snapshot {
+            Ok(snapshot) => data.response = Some(snapshot),
+            Err(cause) => error = Some(format!("snapshot response: {cause}")),
+        }
+    }
+    (span, error)
 }
 
 pub(crate) fn generation_span(

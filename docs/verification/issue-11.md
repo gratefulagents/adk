@@ -43,8 +43,15 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   through providers, aggregation, observability, checkpoint export and Go recovery
   rather than inferred from attempts. Zero counters preserve native schema-1 bytes.
   Snapshot conversion errors remain observable in persisted writer health.
+- Shared trace scopes now compose the schema-2 writer and OTel processor with
+  ordered fanout, explicit root ownership, child guards and runner generation
+  observers. Seven new regressions cover shared roots, late children, concurrent
+  spans, actual run-future cancellation, exporter ownership and overlapping OTel
+  roots. Independent scoped review found cross-root parent eviction; the fix
+  retains each live root's parent contexts and has an exporter regression.
+  Scopes do not yet synthesize all agent/tool/session spans or request provenance.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **843 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **850 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **28 explicitly verified**, **8,863 unresolved** and

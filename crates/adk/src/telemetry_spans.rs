@@ -72,8 +72,16 @@ impl SpanProcessor {
     pub fn on_trace_end(&self, trace: &Trace) {
         let context = {
             let mut state = self.state.lock().expect("span processor poisoned");
-            state.parents.clear();
-            state.active.remove(&trace.id)
+            let context = state.active.remove(&trace.id);
+            if let Some(context) = &context {
+                let trace_id = context.span().span_context().trace_id();
+                // A host may share this processor across overlapping trace scopes.
+                // Retire only this root's parents, not another live trace's contexts.
+                state
+                    .parents
+                    .retain(|_, parent| parent.span().span_context().trace_id() != trace_id);
+            }
+            context
         };
         if let Some(context) = context {
             context.span().end();

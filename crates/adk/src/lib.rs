@@ -55,3 +55,7 @@ pub mod telemetry;
 /// Host configuration, provider/tool composition and explicit bundle/session ownership.
 #[cfg(feature = "builder")]
 pub mod builder;
+
+/// Shared trace ownership, scoped spans and ordered processor composition.
+#[cfg(feature = "observability")]
+pub mod tracing;

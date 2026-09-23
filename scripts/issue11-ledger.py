@@ -40,6 +40,8 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-codec/Cargo.toml", "crates/adk-codec/src/snapshots.rs",
                "crates/adk-codec/src/dto.rs", "crates/adk-codec/src/lib.rs",
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
+               "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
+               "scripts/trace-reference/request.go",
                "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/src/approval.rs",
                "crates/adk-runtime/src/durable.rs", "crates/adk-runtime/tests/durable.rs",
                "crates/adk-runtime/tests/runner.rs", "crates/adk/src/observability.rs",
@@ -132,6 +134,7 @@ def verify_rust() -> None:
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
                "--features", "otel", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
+               "--test", "native_request_snapshot",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
                "--test", "guardrails", "--test", "runner", "--test", "tracing_runtime"]

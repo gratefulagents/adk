@@ -55,6 +55,7 @@ fn policy(turns: u32) -> RunPolicy {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "go")],
         policy: policy(turns),
     }
@@ -699,13 +700,52 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
         definition,
         target: Arc::new(target),
     }];
-    let result = runner(a)
-        .run(context(), request(3), Arc::new(TestHost::default()))
-        .await
-        .unwrap();
+    let hooks = Arc::new(Observations::default());
+    let result = Runner::new(
+        a,
+        RunnerConfig {
+            hooks: Some(hooks.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .run(context(), request(3), Arc::new(TestHost::default()))
+    .await
+    .unwrap();
     assert_eq!(result.result.last_agent.as_deref(), Some("target"));
     assert_eq!(effect.calls.load(Ordering::SeqCst), 0);
-    let history = &target_model.requests.lock().unwrap()[0].input;
+    let expected = vec![
+        ItemProvenance::Agent {
+            name: "test".into()
+        };
+        6
+    ];
+    assert_eq!(&result.result.new_items_provenance[..6], expected);
+    assert_eq!(
+        result.result.new_items_provenance[6],
+        ItemProvenance::Agent {
+            name: "target".into()
+        }
+    );
+    let requests = target_model.requests.lock().unwrap();
+    assert_eq!(requests[0].input_provenance[0], ItemProvenance::Unknown);
+    assert_eq!(&requests[0].input_provenance[1..], expected);
+    let committed: Vec<_> = hooks
+        .seen
+        .lock()
+        .unwrap()
+        .iter()
+        .flat_map(|event| match event {
+            Observation::CommittedItems { agents, .. } => agents
+                .iter()
+                .map(|a| a.as_ref().map(|a| a.name.clone()))
+                .collect::<Vec<_>>(),
+            _ => vec![],
+        })
+        .collect();
+    assert_eq!(&committed[..6], vec![Some("test".into()); 6]);
+    assert_eq!(committed[6], Some("target".into()));
+    let history = &requests[0].input;
     for id in ["1", "3"] {
         assert!(history.iter().any(|i| matches!(i, RunItem::ToolResult { call_id, output } if call_id == id && output.is_error)));
     }
@@ -787,6 +827,7 @@ impl Compactor for Compact {
                     .contains(&message(Role::Developer, "dynamic"))
             );
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage::default(),
@@ -859,6 +900,23 @@ async fn compaction_replaces_history_and_hints_cache_prefix_are_request_only() {
     );
     assert_eq!(result.result.new_items.len(), 2);
     let requests = model.requests.lock().unwrap();
+    assert_eq!(
+        requests[0].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(
+        requests[1].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(result.result.history_provenance[0], ItemProvenance::Unknown);
     assert_eq!(
         requests[0].settings["prompt_cache_key"],
         requests[1].settings["prompt_cache_key"]
@@ -1158,6 +1216,7 @@ impl Compactor for BilledCompaction {
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
         Box::pin(async {
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage {
@@ -1269,6 +1328,22 @@ async fn conversation_keeps_failed_spill_history_alive_after_error_is_dropped() 
         .await
         .err()
         .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        error.partial.as_ref().unwrap().history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Agent {
+                name: "test".into()
+            },
+            ItemProvenance::Agent {
+                name: "test".into()
+            }
+        ]
+    );
     let serialized = serde_json::to_string(&conversation.history).unwrap();
     assert!(serialized.contains("full output saved to"));
     drop(error);
@@ -2085,5 +2160,230 @@ async fn reported_request_counts_accumulate_without_inference_or_overflow() {
             .unwrap();
         assert_eq!(model.completes.load(Ordering::SeqCst), 2);
         assert_eq!(result.result.usage.requests, total);
+    }
+}
+
+#[tokio::test]
+async fn conversation_retains_provenance_across_success_pause_and_resume() {
+    let mut a = agent(TestModel::with(vec![
+        Ok(answer("first")),
+        Ok(response(vec![call("1", "pause")], None)),
+        Ok(answer("resumed")),
+    ]));
+    let mut tool = TestTool::new("pause", true, false);
+    Arc::get_mut(&mut tool).unwrap().output.should_pause = true;
+    a.tools = vec![tool];
+    let runner = runner(a);
+    let mut conversation = Conversation::default();
+    let host = Arc::new(TestHost::default());
+    let first = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "external")],
+            policy(5),
+            host.clone(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        first.result.history_provenance
+    );
+    assert_eq!(conversation.history_provenance[0], ItemProvenance::Unknown);
+    let mut paused = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "again")],
+            policy(5),
+            host,
+        )
+        .await
+        .unwrap();
+    assert_eq!(paused.result.status, RunStatus::Paused);
+    assert_eq!(
+        conversation.history_provenance,
+        paused.result.history_provenance
+    );
+    let prior = conversation.history_provenance.clone();
+    let mut resumed = paused
+        .continuation
+        .take()
+        .unwrap()
+        .resume(None)
+        .await
+        .unwrap();
+    conversation.accept(&mut resumed);
+    assert_eq!(&conversation.history_provenance[..prior.len()], prior);
+    assert_eq!(
+        conversation.history_provenance,
+        resumed.result.history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance.last(),
+        Some(&ItemProvenance::Agent {
+            name: "test".into()
+        })
+    );
+}
+
+#[tokio::test]
+async fn custom_compaction_without_provenance_does_not_guess_retained_authorship() {
+    struct Retain;
+    impl Compactor for Retain {
+        fn compact<'a>(
+            &'a self,
+            _: &'a Context,
+            request: CompactionRequest,
+        ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+            Box::pin(async move {
+                Ok(CompactedHistory {
+                    history: request.history,
+                    history_provenance: vec![],
+                    context_tokens: 4,
+                    usage: Usage::default(),
+                    cost: 0.0,
+                })
+            })
+        }
+    }
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![message(Role::Assistant, "identical")],
+            Some(false),
+        )),
+        Ok(answer("done")),
+    ]);
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            compaction: Some(CompactionConfig {
+                trigger_tokens: 10,
+                target_tokens: 5,
+                compactor: Arc::new(Retain),
+            }),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request(3);
+    req.input = vec![message(Role::Assistant, "identical")];
+    req.input_provenance = vec![ItemProvenance::Agent {
+        name: "prior".into(),
+    }];
+    let result = runner
+        .run(context(), req, Arc::new(TestHost::default()))
+        .await
+        .unwrap()
+        .result;
+    assert_eq!(
+        model.requests.lock().unwrap()[1].input_provenance,
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert_eq!(
+        &result.history_provenance[..2],
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert!(result.new_items_provenance.iter().all(|source| source
+        == &ItemProvenance::Agent {
+            name: "test".into()
+        }));
+}
+
+#[tokio::test]
+async fn generation_snapshots_use_actual_attempts_and_declared_timeouts_without_guessing() {
+    struct TimedTool(Arc<TestTool>);
+    impl Tool for TimedTool {
+        fn definition(&self) -> &ToolDefinition {
+            self.0.definition()
+        }
+        fn timeout(&self) -> Option<Duration> {
+            Some(Duration::from_secs(7))
+        }
+        fn execute<'a>(
+            &'a self,
+            context: &'a ToolContext,
+            call: ToolCall,
+        ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+            self.0.execute(context, call)
+        }
+    }
+    for known in [true, false] {
+        let primary = TestModel::with(vec![Err(provider_error())]);
+        let backup = TestModel::with(vec![Ok(answer("done"))]);
+        let mut a = AgentConfig::new(
+            "test",
+            ModelBinding::complete(
+                "primary",
+                Arc::new(AdvisedModel {
+                    model: primary,
+                    advice: Some(ModelRetryAdvice {
+                        should_retry: true,
+                        retry_after: Duration::ZERO,
+                        reason: "quota".into(),
+                    }),
+                }),
+            ),
+        );
+        a.fallbacks.push(ModelBinding::complete("backup", backup));
+        a.tools
+            .push(Arc::new(TimedTool(TestTool::new("timed", false, false))));
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut request = request(3);
+        request.policy.tools.timeout = Some(Duration::from_secs(99));
+        if known {
+            request.input_provenance = vec![ItemProvenance::Unattributed];
+        }
+        runner
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        let records = generations.records.lock().unwrap();
+        assert_eq!(records.len(), 4);
+        for (index, (_, record)) in records.iter().enumerate() {
+            assert_eq!(
+                record.declared_tool_timeouts,
+                vec![Some(Duration::from_secs(7))]
+            );
+            if known {
+                let snapshot = record.request_snapshot.as_ref().unwrap();
+                assert_eq!(snapshot.model, if index < 2 { "primary" } else { "backup" });
+                assert_eq!(snapshot.tools[0].timeout_seconds, 7);
+                assert_eq!(
+                    snapshot.total_token_estimate,
+                    snapshot.input_token_estimate + snapshot.request_overhead_token_estimate
+                );
+                assert!(snapshot.input_token_estimate > 0);
+                assert!(snapshot.input_items[0].agent_name.is_empty());
+                assert_eq!(
+                    snapshot,
+                    &adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                        "test",
+                        &record.request,
+                        &record.declared_tool_timeouts,
+                        &[]
+                    )
+                    .unwrap()
+                );
+            } else {
+                assert!(
+                    record
+                        .request_snapshot
+                        .as_ref()
+                        .unwrap_err()
+                        .0
+                        .contains("provenance is unknown")
+                );
+            }
+        }
     }
 }

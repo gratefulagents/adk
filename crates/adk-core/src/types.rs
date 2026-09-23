@@ -100,6 +100,45 @@ pub enum RunItem {
     },
 }
 
+/// Attribution independent of an item's role or the currently executing agent.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum ItemProvenance {
+    #[default]
+    Unknown,
+    Unattributed,
+    Agent {
+        name: String,
+    },
+}
+
+/// Expand absent attribution without inferring authorship, and validate supplied entries.
+pub fn normalize_provenance(
+    item_count: usize,
+    entries: &[ItemProvenance],
+) -> Result<Vec<ItemProvenance>, crate::Error> {
+    if entries.is_empty() {
+        return Ok(vec![ItemProvenance::Unknown; item_count]);
+    }
+    if entries.len() != item_count {
+        return Err(crate::Error::new(
+            crate::ErrorCategory::InvalidInput,
+            "provenance length must match item count",
+        ));
+    }
+    for entry in entries {
+        if let ItemProvenance::Agent { name } = entry {
+            if name.trim().is_empty() {
+                return Err(crate::Error::new(
+                    crate::ErrorCategory::InvalidInput,
+                    "provenance agent name must not be empty or whitespace",
+                ));
+            }
+        }
+    }
+    Ok(entries.to_vec())
+}
+
 /// Lossless reasoning continuation. Opaque fields are forwarded only by adapters
 /// supporting their encoding; they must not be substituted with display text.
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -154,6 +193,8 @@ pub struct ModelRequest {
     pub model: String,
     pub instructions: String,
     pub input: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_provenance: Vec<ItemProvenance>,
     pub tools: Vec<ToolDefinition>,
     pub output_schema: Option<schemars::Schema>,
     pub output_schema_name: String,
@@ -210,6 +251,8 @@ pub enum RunStatus {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunRequest {
     pub input: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub input_provenance: Vec<ItemProvenance>,
     pub policy: crate::RunPolicy,
 }
 
@@ -246,7 +289,11 @@ pub struct RunResult {
     pub status: RunStatus,
     pub final_output: Option<Value>,
     pub new_items: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub new_items_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub history_provenance: Vec<ItemProvenance>,
     pub responses: Vec<ModelResponse>,
     pub usage: Usage,
     pub pending_approvals: Vec<ApprovalRequest>,

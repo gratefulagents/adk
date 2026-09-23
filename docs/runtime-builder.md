@@ -238,6 +238,26 @@ Only scheduler state survives automatically. Conversation history, continuation
 ownership, tool spill owners, durable checkpoints, and external host stores are
 not secretly copied into session state. A host retains those explicitly.
 
+## History attribution and trace snapshots
+
+`Bundle::run_with_provenance` and `stream_with_provenance` accept a parallel
+`Vec<ItemProvenance>` without changing the bundle's configured execution policy.
+Use `Unattributed` for known host/user additions and `Agent { name }` for known
+agent-authored history. Preserve `RunResult::history_provenance` when reusing
+`history`; attribution is independent of message role and the current agent.
+An empty sidecar means `Unknown`, not the current agent. Nonempty sidecars must
+match the input length and agent names must be nonblank; invalid input fails
+before model dispatch. The existing `run` and `stream` helpers use `Unknown`.
+
+Generation observers assemble pinned-SDK request snapshots only when all fields
+are representable. Unknown attribution, adapter-only settings and fractional
+SDK tool timeouts are explicit snapshot errors; they do not fail the run or
+fabricate metadata. TraceWriter records conversion errors in its health state.
+Full capture persists request content, while metadata capture retains only the
+snapshot's size and digest. Host redaction/capture policy remains necessary.
+Native durable payload v2 preserves attribution; v1 payloads resume with unknown
+attribution because their historical agent names were not reliable.
+
 ## Source mapping and explicit gaps
 
 Reviewed mappings are `repos/sdk/pkg/agentsdk/runtime/{builder,features}.go` and

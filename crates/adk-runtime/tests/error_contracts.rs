@@ -52,6 +52,7 @@ fn answer() -> Step {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "go")],
         policy: RunPolicy {
             max_turns: NonZeroU32::new(turns).unwrap(),

@@ -17,6 +17,9 @@ pub struct GenerationRecord {
     pub cost_usd: Option<f64>,
     pub turn: u32,
     pub request: ModelRequest,
+    pub declared_tool_timeouts: Vec<Option<Duration>>,
+    pub request_snapshot:
+        Result<adk_codec::snapshots::RequestSnapshot, adk_codec::approval::BridgeError>,
     pub response: Option<ModelResponse>,
     pub error: Option<ErrorInfo>,
     pub retry_reason: Option<String>,
@@ -53,6 +56,7 @@ pub(crate) struct GenerationGuard {
     finished: bool,
 }
 impl GenerationGuard {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         observer: Arc<dyn GenerationObserver>,
         context: &Context,
@@ -61,6 +65,11 @@ impl GenerationGuard {
         task_id: Option<&str>,
         turn: u32,
         request: &ModelRequest,
+        declared_tool_timeouts: Vec<Option<Duration>>,
+        request_snapshot: Result<
+            adk_codec::snapshots::RequestSnapshot,
+            adk_codec::approval::BridgeError,
+        >,
     ) -> Self {
         let guard = Self {
             observer,
@@ -75,6 +84,8 @@ impl GenerationGuard {
                 cost_usd: None,
                 turn,
                 request: request.clone(),
+                declared_tool_timeouts,
+                request_snapshot,
                 response: None,
                 error: None,
                 retry_reason: None,

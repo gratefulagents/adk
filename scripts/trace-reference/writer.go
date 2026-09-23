@@ -63,7 +63,7 @@ func writerFixture() {
 	writer.FinalizeRun("completed")
 	path, err := store.RunDir("run")
 	must(err)
-	result := map[string]any{"request_json": string(requestBytes), "response_json": string(responseBytes)}
+	result := map[string]any{"request_json": string(requestBytes), "response_json": string(responseBytes), "native_request_cases": nativeRequestCases()}
 	var variants []string
 	for _, temperature := range []float64{0, -0.25, 1e-7, 1e-6, 1e20, 1e21, 0.12345678901234567} {
 		snapshot := agent.LLMRequestSnapshot{AgentName: "agent", Instructions: "<instruction>&\u2028\u2029", Settings: agent.ModelSettings{Temperature: &temperature}}

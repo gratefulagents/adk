@@ -54,6 +54,7 @@ fn context() -> Context {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "test-model".into(),
         instructions: "test".into(),
         input: vec![],
@@ -328,6 +329,7 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
                     agent: "fixture".into(),
                     model: "test-model".into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -439,6 +441,7 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
                             }],
                         },
                     }],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -512,6 +515,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                     agent: "fixture".into(),
                     model: binding.into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -536,6 +540,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                 agent: "fixture".into(),
                 model: "chat/small".into(),
                 history: vec![],
+                history_provenance: vec![],
                 context_tokens: 20,
                 target_tokens: 5,
             },
@@ -1053,6 +1058,7 @@ async fn runner_consumes_http_phase_and_false_end_turn_before_final_answer() {
         .run(
             context(),
             RunRequest {
+                input_provenance: Vec::new(),
                 input: vec![],
                 policy: RunPolicy {
                     max_turns: 2.try_into().unwrap(),

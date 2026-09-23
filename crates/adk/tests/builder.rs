@@ -96,6 +96,90 @@ fn category<T>(result: Result<T, Error>) -> ErrorCategory {
 }
 
 #[tokio::test]
+async fn bundle_preserves_explicit_history_authorship_and_rejects_invalid_sidecars() {
+    let model = Arc::new(RecordingModel::default());
+    let mut bundle = builder(Config::default(), &model)
+        .build(&context())
+        .await
+        .unwrap();
+    let input = vec![RunItem::Message {
+        message: Message {
+            role: Role::Assistant,
+            content: vec![Content::Text {
+                text: "prior".into(),
+            }],
+        },
+    }];
+    let provenance = vec![ItemProvenance::Agent {
+        name: "previous".into(),
+    }];
+    for streaming in [false, true] {
+        let result = if streaming {
+            bundle
+                .stream_with_provenance(
+                    context(),
+                    input.clone(),
+                    provenance.clone(),
+                    Arc::new(TestHost),
+                )
+                .finish()
+                .await
+        } else {
+            bundle
+                .run_with_provenance(
+                    context(),
+                    input.clone(),
+                    provenance.clone(),
+                    Arc::new(TestHost),
+                )
+                .await
+        }
+        .unwrap();
+        assert_eq!(result.result.history_provenance[0], provenance[0]);
+        assert_eq!(
+            result.result.history_provenance[1],
+            ItemProvenance::Agent {
+                name: "agent".into()
+            }
+        );
+        assert_eq!(
+            model
+                .requests
+                .lock()
+                .unwrap()
+                .last()
+                .unwrap()
+                .input_provenance,
+            provenance
+        );
+        let invalid = vec![ItemProvenance::Unattributed; 2];
+        let error = if streaming {
+            bundle
+                .stream_with_provenance(context(), input.clone(), invalid, Arc::new(TestHost))
+                .finish()
+                .await
+        } else {
+            bundle
+                .run_with_provenance(context(), input.clone(), invalid, Arc::new(TestHost))
+                .await
+        }
+        .err()
+        .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+    }
+    assert_eq!(model.requests.lock().unwrap().len(), 2);
+    let unknown = bundle
+        .run(context(), input, Arc::new(TestHost))
+        .await
+        .unwrap();
+    assert_eq!(
+        unknown.result.history_provenance[0],
+        ItemProvenance::Unknown
+    );
+    bundle.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn defaults_build_and_run_offline_without_ambient_credentials_or_tools() {
     let model = Arc::new(RecordingModel::default());
     let mut bundle = builder(Config::default(), &model)

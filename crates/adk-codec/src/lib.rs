@@ -2,6 +2,7 @@
 pub mod approval;
 pub mod config;
 pub mod dto;
+pub mod request_native;
 pub mod snapshots;
 mod state;
 pub mod timestamp;

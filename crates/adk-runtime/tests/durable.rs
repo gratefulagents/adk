@@ -174,6 +174,7 @@ fn context() -> Context {
 }
 fn request(resume: bool) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: if resume {
             vec![]
         } else {
@@ -480,7 +481,7 @@ async fn future_schemas_and_changed_policy_fail_closed_and_go_reader_is_gated() 
     value["schema_version"] = json!(2);
     assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
     value["schema_version"] = json!(1);
-    value["runtime"]["version"] = json!(2);
+    value["runtime"]["version"] = json!(3);
     assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
     let cp = store.at("model_prepared");
     let mut req = request(true);
@@ -622,6 +623,7 @@ async fn cumulative_turn_token_and_cost_limits_remain_exhausted_after_go_migrati
             .run_durable(
                 context(),
                 RunRequest {
+                    input_provenance: Vec::new(),
                     input: vec![],
                     policy,
                 },
@@ -1630,4 +1632,178 @@ async fn checkpoint_requests_do_not_substitute_attempt_count() {
     assert_eq!(result.result.usage.requests, 3);
     assert_eq!(store.latest().usage.requests, 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 5);
+}
+
+#[tokio::test]
+async fn native_provenance_v1_unknown_v2_exact_and_unknown_go_projection() {
+    for version in [1, 2] {
+        let (runner, _, _) = setup(vec![call("1")], false, false);
+        let store = Arc::new(Store::default());
+        let mut req = request(false);
+        req.input = vec![message(Role::Assistant, "past")];
+        req.input_provenance = vec![ItemProvenance::Agent {
+            name: "historical".into(),
+        }];
+        runner
+            .run_durable(
+                context(),
+                req,
+                Arc::new(HostImpl),
+                durable(store.clone(), None),
+            )
+            .await
+            .unwrap();
+        let checkpoint = store.at("tool_completed");
+        assert_eq!(checkpoint.schema_version, 1);
+        assert_eq!(checkpoint.history[0].agent_name, "historical");
+        assert_eq!(checkpoint.history[1].agent_name, "agent");
+        assert_eq!(checkpoint.history[2].agent_name, "agent");
+        let mut value = serde_json::to_value(checkpoint).unwrap();
+        assert_eq!(value["runtime"]["version"], 2);
+        value["runtime"]["version"] = json!(version);
+        if version == 1 {
+            value["runtime"]["result"]
+                .as_object_mut()
+                .unwrap()
+                .remove("history_provenance");
+            value["runtime"]["result"]
+                .as_object_mut()
+                .unwrap()
+                .remove("new_items_provenance");
+            for item in value["history"].as_array_mut().unwrap() {
+                item["agent_name"] = json!("fabricated-current-agent");
+            }
+        }
+        let checkpoint = RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).unwrap();
+        let expected = if version == 1 {
+            vec![ItemProvenance::Unknown; 3]
+        } else {
+            vec![
+                ItemProvenance::Agent {
+                    name: "historical".into(),
+                },
+                ItemProvenance::Agent {
+                    name: "agent".into(),
+                },
+                ItemProvenance::Agent {
+                    name: "agent".into(),
+                },
+            ]
+        };
+        assert_eq!(
+            checkpoint
+                .runtime
+                .as_ref()
+                .unwrap()
+                .result()
+                .history_provenance,
+            expected
+        );
+        let (resumer, _, tool) = setup(vec![message(Role::Assistant, "continued")], false, false);
+        let resumed_store = Arc::new(Store::default());
+        let outcome = run(&resumer, resumed_store.clone(), Some(checkpoint))
+            .await
+            .unwrap();
+        assert!(tool.keys.lock().unwrap().is_empty());
+        assert_eq!(&outcome.result.history_provenance[..3], expected);
+        assert_eq!(
+            outcome.result.history_provenance[3],
+            ItemProvenance::Agent {
+                name: "agent".into()
+            }
+        );
+        if version == 1 {
+            let mut exported = resumed_store.latest();
+            assert!(
+                exported.history[..3]
+                    .iter()
+                    .all(|item| item.kind == adk_codec::dto::SnapshotType::Unknown)
+            );
+            assert!(
+                exported.history[..3]
+                    .iter()
+                    .all(|item| item.agent_name.is_empty())
+            );
+            exported.runtime = None;
+            let mut recovery = verified();
+            recovery.final_output = Some(json!("continued"));
+            assert!(resumer.migrate_go_checkpoint(exported, recovery).is_err());
+        }
+    }
+}
+
+#[tokio::test]
+async fn native_v2_rejects_missing_or_misaligned_sidecars() {
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let store = Arc::new(Store::default());
+    run(&runner, store.clone(), None).await.unwrap();
+    let checkpoint = store.latest();
+    assert_eq!(
+        checkpoint.history[0].kind,
+        adk_codec::dto::SnapshotType::Unknown
+    );
+    for field in ["history_provenance", "new_items_provenance"] {
+        let mut value = serde_json::to_value(&checkpoint).unwrap();
+        value["runtime"]["result"][field] = json!([]);
+        assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
+        let malformed: RunnerCheckpoint = serde_json::from_value(value).unwrap();
+        let error = run(&runner, Arc::new(Store::default()), Some(malformed))
+            .await
+            .err()
+            .unwrap();
+        assert!(error.error.info.message.contains("provenance length"));
+    }
+}
+
+#[tokio::test]
+async fn go_import_preserves_explicit_names_and_known_nil() {
+    let mut checkpoint =
+        RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    for (index, item) in checkpoint.history.iter_mut().enumerate() {
+        item.agent_name = if index == 0 {
+            String::new()
+        } else {
+            format!("producer-{index}")
+        };
+    }
+    let expected: Vec<_> = checkpoint
+        .history
+        .iter()
+        .map(|item| {
+            if item.agent_name.is_empty() {
+                ItemProvenance::Unattributed
+            } else {
+                ItemProvenance::Agent {
+                    name: item.agent_name.clone(),
+                }
+            }
+        })
+        .collect();
+    let migrated = runner
+        .migrate_go_checkpoint(checkpoint, verified())
+        .unwrap();
+    assert_eq!(
+        migrated
+            .runtime
+            .as_ref()
+            .unwrap()
+            .result()
+            .history_provenance,
+        expected
+    );
+    let store = Arc::new(Store::default());
+    let outcome = run(&runner, store.clone(), Some(migrated)).await.unwrap();
+    assert_eq!(
+        &outcome.result.history_provenance[..expected.len()],
+        expected
+    );
+    for (snapshot, provenance) in store.latest().history.iter().zip(expected) {
+        let name = match provenance {
+            ItemProvenance::Agent { name } => name,
+            _ => String::new(),
+        };
+        assert_eq!(snapshot.agent_name, name);
+        assert_ne!(snapshot.kind, adk_codec::dto::SnapshotType::Unknown);
+    }
 }

@@ -751,7 +751,16 @@ pub(crate) fn generation_end_span(
     record: &adk_runtime::tracing::GenerationRecord,
 ) -> (Span, Option<String>) {
     let mut span = generation_span(context, record);
-    let mut error = None;
+    let mut errors = Vec::new();
+    if let Some(SpanData::Generation(data)) = &mut span.data {
+        match &record.request_snapshot {
+            Ok(snapshot) => match Snapshot::from_serializable(snapshot) {
+                Ok(snapshot) => data.request = Some(snapshot),
+                Err(cause) => errors.push(format!("snapshot request: {cause}")),
+            },
+            Err(cause) => errors.push(format!("snapshot request: {cause}")),
+        }
+    }
     if let (Some(response), Some(SpanData::Generation(data))) = (&record.response, &mut span.data) {
         let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response)
             .map_err(|error| error.to_string())
@@ -760,9 +769,10 @@ pub(crate) fn generation_end_span(
             });
         match snapshot {
             Ok(snapshot) => data.response = Some(snapshot),
-            Err(cause) => error = Some(format!("snapshot response: {cause}")),
+            Err(cause) => errors.push(format!("snapshot response: {cause}")),
         }
     }
+    let error = (!errors.is_empty()).then(|| errors.join("; "));
     (span, error)
 }
 
@@ -869,6 +879,12 @@ pub(crate) fn generation_span(
         cost_known: record.cost_usd.is_some(),
         ..Default::default()
     };
+    if let Ok(snapshot) = &record.request_snapshot {
+        generation.input_token_estimate = snapshot.input_token_estimate;
+        generation.request_overhead_token_estimate = snapshot.request_overhead_token_estimate;
+        generation.total_request_token_estimate = snapshot.total_token_estimate;
+        generation.input_item_count = snapshot.input_items.len() as i64;
+    }
     if record.fallback_model.is_some() {
         let reason = record
             .retry_reason

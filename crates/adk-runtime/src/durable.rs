@@ -52,13 +52,9 @@ impl RunnerCheckpoint {
         if value.get("schema_version").and_then(Value::as_u64) != Some(1) {
             return Err(unsupported("unknown runner checkpoint schema"));
         }
-        let checkpoint: Self = serde_json::from_value(value).map_err(invalid)?;
-        if checkpoint
-            .runtime
-            .as_ref()
-            .is_some_and(|state| state.version != 1)
-        {
-            return Err(unsupported("unknown runtime continuation schema"));
+        let mut checkpoint: Self = serde_json::from_value(value).map_err(invalid)?;
+        if let Some(state) = &mut checkpoint.runtime {
+            state.restore_provenance()?;
         }
         Ok(checkpoint)
     }
@@ -96,6 +92,32 @@ pub struct RuntimeCheckpoint {
     approval_journal: Vec<crate::compat::ApprovalJournalEntry>,
 }
 impl RuntimeCheckpoint {
+    fn restore_provenance(&mut self) -> Result<(), Error> {
+        match self.version {
+            1 => {
+                // V1 exported fabricated current-agent names; only native data is trusted.
+                self.result.history_provenance =
+                    vec![ItemProvenance::Unknown; self.result.history.len()];
+                self.result.new_items_provenance =
+                    vec![ItemProvenance::Unknown; self.result.new_items.len()];
+            }
+            2 => {
+                if self.result.history.len() != self.result.history_provenance.len()
+                    || self.result.new_items.len() != self.result.new_items_provenance.len()
+                {
+                    return Err(invalid("native provenance length mismatch"));
+                }
+                normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
+                normalize_provenance(
+                    self.result.new_items.len(),
+                    &self.result.new_items_provenance,
+                )?;
+            }
+            _ => return Err(unsupported("unknown runtime continuation schema")),
+        }
+        Ok(())
+    }
+
     pub fn wall_time_ms(&self, now: DateTime<Utc>) -> i64 {
         (now - self.started_at).num_milliseconds().max(0)
     }
@@ -300,6 +322,10 @@ impl Runner {
         }
         let fingerprint = self.durable_fingerprint()?;
         let mut engine = self.engine(context, request, host);
+        engine.result.history_provenance = normalize_provenance(
+            engine.result.history.len(),
+            &engine.result.history_provenance,
+        )?;
         engine.streaming = sender.is_some() || child_control.is_some();
         engine.child_control = child_control;
         engine.sender = sender;
@@ -364,9 +390,7 @@ impl Runner {
             let execution_boundary = checkpoint.execution_boundary().to_owned();
             let mut saved = checkpoint.runtime.ok_or_else(|| unsupported(
                 "Go checkpoint requires migration: missing policy, cumulative turns/cost and exact continuation"))?;
-            if saved.version != 1 {
-                return Err(unsupported("unknown runtime continuation schema").into());
-            }
+            saved.restore_provenance()?;
             if engine.child_control.is_some() {
                 let previous = crate::subagent::SecurityBaseline {
                     tools: saved.policy.tools.clone(),
@@ -764,21 +788,37 @@ impl Engine {
                 }
             }
         }
-        let agent = adk_codec::dto::AgentRef {
-            name: self.agent.name.clone(),
-        };
         let mut history = self
             .result
             .history
             .iter()
-            .map(|item| {
-                let provenance = match item {
-                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. }
-                        if message.role == Role::User =>
-                    {
-                        None
+            .zip(&self.result.history_provenance)
+            .map(|(item, source)| {
+                // SDK 1dc92b7 RestoreRunItems rejects Unknown. Missing native authorship
+                // must not be exported as executable Go history with a known nil agent.
+                let incompatible_role = match item {
+                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                        !matches!(
+                            (message.role, source),
+                            (Role::User, ItemProvenance::Unattributed)
+                                | (Role::Assistant, ItemProvenance::Agent { .. })
+                        )
                     }
-                    _ => Some(&agent),
+                    _ => false,
+                };
+                // Go also infers message role from nil/non-nil agent. Keep native-only
+                // summaries and other incompatible role/provenance pairs behind this gate.
+                if matches!(source, ItemProvenance::Unknown) || incompatible_role {
+                    return Ok(adk_codec::dto::RunItemSnapshot {
+                        kind: adk_codec::dto::SnapshotType::Unknown,
+                        ..Default::default()
+                    });
+                }
+                let agent = match source {
+                    ItemProvenance::Agent { name } => {
+                        Some(adk_codec::dto::AgentRef { name: name.clone() })
+                    }
+                    _ => None,
                 };
                 let projected;
                 let item = match item {
@@ -806,7 +846,9 @@ impl Engine {
                     }
                     _ => item,
                 };
-                adk_codec::approval::encode_item(item, provenance).map_err(invalid)
+                adk_codec::approval::encode_item(item, agent.as_ref())
+                    .map(|wire| adk_codec::snapshot_items(&[wire]).remove(0))
+                    .map_err(invalid)
             })
             .collect::<Result<Vec<_>, _>>()?;
         for (offset, marker) in self
@@ -821,7 +863,10 @@ impl Engine {
                 .checked_add(offset)
                 .filter(|i| *i <= history.len())
                 .ok_or_else(|| invalid("approval marker outside history"))?;
-            history.insert(index, marker.marker.to_wire().map_err(invalid)?);
+            history.insert(
+                index,
+                adk_codec::snapshot_items(&[marker.marker.to_wire().map_err(invalid)?]).remove(0),
+            );
         }
         let count = |n: u64| i64::try_from(n).map_err(invalid);
         let sequence = state
@@ -843,7 +888,7 @@ impl Engine {
             }
             .into(),
             agent_name: self.agent.name.clone(),
-            history: adk_codec::snapshot_items(&history),
+            history,
             interruptions: None,
             children: state.child_checkpoint.clone(),
             usage: adk_codec::dto::Usage {
@@ -856,7 +901,7 @@ impl Engine {
             created_at: Utc::now(),
             effect: state.effect.clone(),
             runtime: Some(RuntimeCheckpoint {
-                version: 1,
+                version: 2,
                 boundary: name.into(),
                 started_at: state.started_at,
                 deadline_at: state.deadline_at,
@@ -966,6 +1011,7 @@ impl Runner {
             ));
         }
         let mut history = vec![];
+        let mut history_provenance = vec![];
         let mut approval_journal = vec![];
         for item in &checkpoint.history {
             use adk_codec::dto::{RunItemType, SnapshotType};
@@ -1062,6 +1108,13 @@ impl Runner {
                 }
             }
             history.push(adk_codec::approval::decode_item(&wire).map_err(invalid)?);
+            history_provenance.push(if item.agent_name.is_empty() {
+                ItemProvenance::Unattributed
+            } else {
+                ItemProvenance::Agent {
+                    name: item.agent_name.clone(),
+                }
+            });
         }
         validate_history_pairs(&history)?;
         let completed = checkpoint.boundary == "run_completed";
@@ -1087,12 +1140,14 @@ impl Runner {
             0
         };
         checkpoint.runtime = Some(RuntimeCheckpoint {
-            version: 1,
+            version: 2,
             boundary: checkpoint.boundary.clone(),
             fingerprint: self.durable_fingerprint()?,
             started_at: recovery.started_at,
             deadline_at: recovery.deadline_at,
             result: RunResult {
+                history_provenance,
+                new_items_provenance: Vec::new(),
                 status: if completed {
                     RunStatus::Completed
                 } else {

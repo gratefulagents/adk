@@ -79,6 +79,7 @@ fn context() -> Context {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "Exercise this feature")],
         policy: RunPolicy {
             max_turns: 5.try_into().unwrap(),
@@ -298,6 +299,7 @@ async fn providers() {
             .is_err()
     );
     let request = ModelRequest {
+        input_provenance: Vec::new(),
         model: "vendor/model".into(),
         instructions: "Be concise".into(),
         input: vec![message(Role::User, "hello")],

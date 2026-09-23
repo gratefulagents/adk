@@ -408,6 +408,7 @@ async fn replay(script: &Value) -> Value {
         deadline: None,
     };
     let request = RunRequest {
+        input_provenance: Vec::new(),
         input: input_items(&script["input"], Role::User),
         policy: RunPolicy {
             max_turns: match script["max_turns"].as_i64().unwrap() {

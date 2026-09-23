@@ -224,6 +224,7 @@ fn config(observer: Arc<RuntimeTracing>) -> RunnerConfig {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: RunPolicy::default(),
     }
@@ -431,7 +432,12 @@ fn generation() -> GenerationRecord {
         task_id: None,
         cost_usd: None,
         turn: 1,
+        declared_tool_timeouts: Vec::new(),
+        request_snapshot: Err(adk_codec::approval::BridgeError(
+            "synthetic record without capture",
+        )),
         request: ModelRequest {
+            input_provenance: Vec::new(),
             model: "model".into(),
             instructions: String::new(),
             input: vec![],
@@ -675,6 +681,7 @@ async fn runner_compaction_counts_are_child_of_active_agent() {
             Box::pin(async move {
                 assert_eq!(request.context_tokens, 100);
                 Ok(CompactedHistory {
+                    history_provenance: request.history_provenance,
                     history: request.history,
                     context_tokens: 30,
                     usage: Usage::default(),

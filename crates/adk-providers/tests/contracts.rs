@@ -48,6 +48,7 @@ fn scope(mode: AuthMode) -> Scope {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "fixture-model".into(),
         instructions: "Be precise".into(),
         input: Vec::new(),

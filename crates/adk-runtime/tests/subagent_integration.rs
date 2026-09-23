@@ -46,6 +46,7 @@ fn context() -> Context {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "delegate")],
         policy: RunPolicy::default(),
     }
@@ -578,6 +579,12 @@ async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired
     );
     let mut req = request();
     req.input.push(message(Role::User, "parent context marker"));
+    req.input_provenance = vec![
+        ItemProvenance::Unknown,
+        ItemProvenance::Agent {
+            name: "original-parent".into(),
+        },
+    ];
     parent(model, session)
         .run(context(), req, Arc::new(TestHost))
         .await
@@ -586,6 +593,16 @@ async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired
         let requests = child.requests.lock().unwrap();
         assert!(!history_text(&requests[0].input).contains("delegate"));
         assert!(history_text(&requests[1].input).contains("parent context marker"));
+        assert_eq!(
+            requests[1].input_provenance,
+            vec![
+                ItemProvenance::Unknown,
+                ItemProvenance::Agent {
+                    name: "original-parent".into()
+                },
+                ItemProvenance::Unattributed
+            ]
+        );
         assert!(
             !requests[1]
                 .input

@@ -151,6 +151,7 @@ mod tests {
     #[test]
     fn chat_history_keeps_only_copilot_reasoning_fields() {
         let request = ModelRequest {
+            input_provenance: Vec::new(),
             model: "claude-opus-4.8".into(),
             instructions: String::new(),
             input: vec![],

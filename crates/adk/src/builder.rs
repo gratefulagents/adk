@@ -1,7 +1,7 @@
 //! Host-neutral composition of native providers, tools and owned runtime lifetimes.
 use adk_core::{
-    AccessMode, BoxFuture, Cancellation, Context, Error, ErrorCategory, Host, RunError, RunItem,
-    RunPolicy, RunRequest, StreamingModel, Tool, ToolPolicy,
+    AccessMode, BoxFuture, Cancellation, Context, Error, ErrorCategory, Host, ItemProvenance,
+    RunError, RunItem, RunPolicy, RunRequest, StreamingModel, Tool, ToolPolicy,
 };
 use adk_providers::{
     auth::{CredentialStore, Refresh},
@@ -919,10 +919,23 @@ impl Bundle {
         input: Vec<RunItem>,
         host: Arc<dyn Host>,
     ) -> Result<RunOutcome, RunError> {
+        self.run_with_provenance(context, input, Vec::new(), host)
+            .await
+    }
+    /// Preserve explicit historical authorship. An empty sidecar means Unknown;
+    /// otherwise provide one entry per item, independent of message role.
+    pub async fn run_with_provenance(
+        &self,
+        context: Context,
+        input: Vec<RunItem>,
+        input_provenance: Vec<ItemProvenance>,
+        host: Arc<dyn Host>,
+    ) -> Result<RunOutcome, RunError> {
         self.runner
             .run(
                 self.tools.context(&self.session.context(&context)),
                 RunRequest {
+                    input_provenance,
                     input,
                     policy: self.policy.clone(),
                 },
@@ -931,9 +944,20 @@ impl Bundle {
             .await
     }
     pub fn stream(&self, context: Context, input: Vec<RunItem>, host: Arc<dyn Host>) -> RunStream {
+        self.stream_with_provenance(context, input, Vec::new(), host)
+    }
+    /// Streaming counterpart of [`Self::run_with_provenance`].
+    pub fn stream_with_provenance(
+        &self,
+        context: Context,
+        input: Vec<RunItem>,
+        input_provenance: Vec<ItemProvenance>,
+        host: Arc<dyn Host>,
+    ) -> RunStream {
         self.runner.stream(
             self.tools.context(&self.session.context(&context)),
             RunRequest {
+                input_provenance,
                 input,
                 policy: self.policy.clone(),
             },

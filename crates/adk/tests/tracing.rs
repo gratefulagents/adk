@@ -214,6 +214,7 @@ async fn runner_case(pending: bool) {
     let mut run = Box::pin(runner.run(
         context,
         RunRequest {
+            input_provenance: Vec::new(),
             input: vec![],
             policy: RunPolicy::default(),
         },

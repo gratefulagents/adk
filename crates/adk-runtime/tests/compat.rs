@@ -64,6 +64,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: RunPolicy {
             max_turns: NonZeroU32::new(turns).unwrap(),

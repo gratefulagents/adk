@@ -491,6 +491,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
                     deadline: None,
                 },
                 RunRequest {
+                    input_provenance: Vec::new(),
                     input: vec![],
                     policy: RunPolicy::default(),
                 },
@@ -634,7 +635,12 @@ fn runtime_generation_identity_matches_pinned_go_normalization() {
                 task_id: None,
                 cost_usd: None,
                 turn: 1,
+                declared_tool_timeouts: Vec::new(),
+                request_snapshot: Err(adk_codec::approval::BridgeError(
+                    "synthetic identity-only record",
+                )),
                 request: ModelRequest {
+                    input_provenance: Vec::new(),
                     model: case["raw"].as_str().unwrap().into(),
                     instructions: "".into(),
                     input: vec![],
@@ -669,4 +675,96 @@ fn runtime_generation_identity_matches_pinned_go_normalization() {
             "{case}"
         );
     }
+}
+
+#[test]
+fn captured_attempt_request_and_conversion_errors_reach_writer() {
+    use adk::core::{Context, ModelRequest};
+    use adk::runtime::{
+        CancellationToken,
+        tracing::{GenerationObserver, GenerationRecord, GenerationStatus},
+    };
+    use adk_codec::snapshots::RequestSnapshot;
+    use std::time::{Duration, SystemTime};
+    let root = tempfile::tempdir().unwrap();
+    let writer = TraceWriter::new(
+        Arc::new(FilesystemTraceStore::new(root.path()).unwrap()),
+        "run",
+        Options {
+            capture: CaptureMode::Full,
+            ..Default::default()
+        },
+    );
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let context = Context {
+        run_id: "run".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let request = ModelRequest {
+        model: "model".into(),
+        instructions: "instruction".into(),
+        input: vec![],
+        input_provenance: vec![],
+        tools: vec![],
+        settings: Default::default(),
+        output_schema: None,
+        output_schema_name: String::new(),
+        output_schema_strict: false,
+    };
+    let snapshot = RequestSnapshot::from_native("agent", &request, &[]).unwrap();
+    let mut record = GenerationRecord {
+        id: "attempt".into(),
+        agent: "agent".into(),
+        provider: "fixture".into(),
+        resolved_model: "model".into(),
+        input_tokens_include_cache: None,
+        task_id: None,
+        cost_usd: None,
+        turn: 1,
+        request,
+        declared_tool_timeouts: Vec::new(),
+        request_snapshot: Ok(snapshot.clone()),
+        response: None,
+        error: None,
+        retry_reason: None,
+        status: GenerationStatus::Completed,
+        retry_after: None,
+        fallback_model: None,
+        started_at: SystemTime::now(),
+        ended_at: Some(SystemTime::now()),
+        latency: Duration::ZERO,
+    };
+    writer.end(&context, &record);
+    let calls = records(&path, "llm_calls");
+    assert_eq!(
+        calls[0]["request"],
+        serde_json::to_value(&snapshot).unwrap()
+    );
+    assert_eq!(
+        calls[0]["input_token_estimate"],
+        snapshot.input_token_estimate
+    );
+    assert_eq!(
+        calls[0]["request_overhead_token_estimate"],
+        snapshot.request_overhead_token_estimate
+    );
+    assert_eq!(
+        calls[0]["total_request_token_estimate"],
+        snapshot.total_token_estimate
+    );
+    record.request_snapshot = Err(adk_codec::approval::BridgeError(
+        "unknown historical author",
+    ));
+    writer.end(&context, &record);
+    assert!(writer.health().last_error.contains(
+        "snapshot request: unsupported approval/history conversion: unknown historical author"
+    ));
+    let calls = records(&path, "llm_calls");
+    assert!(calls[1].get("request").is_none());
 }

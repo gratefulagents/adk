@@ -366,6 +366,7 @@ async fn actual_runner_exports_generation_retry_usage_identity_and_single_cost_e
         .run(
             context,
             RunRequest {
+                input_provenance: Vec::new(),
                 input: vec![],
                 policy: RunPolicy::default(),
             },

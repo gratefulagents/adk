@@ -41,9 +41,9 @@ use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_approvals,
+    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_provenance,
     estimate_history_tokens, estimate_history_tokens_with_approvals,
-    estimate_request_overhead_tokens, finalize_local_history_with_approvals, output_reserve_tokens,
+    estimate_request_overhead_tokens, finalize_with_provenance, output_reserve_tokens,
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
@@ -272,6 +272,7 @@ pub trait RunHooks: Send + Sync {
 }
 
 pub struct CompactionRequest {
+    pub history_provenance: Vec<ItemProvenance>,
     pub agent: String,
     pub model: String,
     pub history: Vec<RunItem>,
@@ -280,6 +281,7 @@ pub struct CompactionRequest {
 }
 
 pub struct CompactedHistory {
+    pub history_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
     pub context_tokens: u64,
     /// Report provider compaction usage; local compaction uses zero counters.
@@ -693,6 +695,12 @@ impl Runner {
             sender: None,
             spills: vec![],
             result: RunResult {
+                history_provenance: if request.input_provenance.is_empty() {
+                    vec![ItemProvenance::Unknown; request.input.len()]
+                } else {
+                    request.input_provenance
+                },
+                new_items_provenance: Vec::new(),
                 status: RunStatus::Incomplete,
                 final_output: None,
                 new_items: vec![],
@@ -954,8 +962,21 @@ impl Engine {
         Ok(())
     }
     fn append(&mut self, item: RunItem) {
+        self.append_with_provenance(
+            item,
+            ItemProvenance::Agent {
+                name: self.agent.name.clone(),
+            },
+        );
+    }
+    fn append_unattributed(&mut self, item: RunItem) {
+        self.append_with_provenance(item, ItemProvenance::Unattributed);
+    }
+    fn append_with_provenance(&mut self, item: RunItem, provenance: ItemProvenance) {
         self.result.history.push(item.clone());
+        self.result.history_provenance.push(provenance.clone());
         self.result.new_items.push(item);
+        self.result.new_items_provenance.push(provenance);
     }
     async fn publish_committed(&mut self) -> Result<(), Error> {
         let entries = self.approval_journal.entries();
@@ -965,23 +986,13 @@ impl Engine {
             return Ok(());
         }
         let items = self.result.new_items[self.committed_cursor..].to_vec();
-        let agents = items
+        let agents = self.result.new_items_provenance[self.committed_cursor..]
             .iter()
-            .map(|item| {
-                let no_agent = match item {
-                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
-                        message.role == Role::User
-                    }
-                    RunItem::ToolResult { call_id, .. } => entries.iter().any(|entry| {
-                        entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
-                            && entry.marker.agent.is_none()
-                            && entry.marker.data.call_id == *call_id
-                    }),
-                    _ => false,
-                };
-                (!no_agent).then(|| adk_codec::dto::AgentRef {
-                    name: self.agent.name.clone(),
-                })
+            .map(|provenance| match provenance {
+                ItemProvenance::Agent { name } => {
+                    Some(adk_codec::dto::AgentRef { name: name.clone() })
+                }
+                ItemProvenance::Unknown | ItemProvenance::Unattributed => None,
             })
             .collect();
         let mut markers = entries[self.committed_markers..]
@@ -1014,6 +1025,8 @@ impl Engine {
         Ok(())
     }
     async fn drive(mut self) -> Result<RunOutcome, RunError> {
+        self.result.history_provenance =
+            normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
         let execution = async {
             let status = self.advance().await?;
             self.publish_committed().await?;
@@ -1211,6 +1224,7 @@ impl Engine {
                 )
                 .into(),
             history: self.result.history.clone(),
+            history_provenance: self.result.history_provenance.clone(),
             context_tokens: tokens,
             target_tokens: config.target_tokens,
         };
@@ -1255,11 +1269,14 @@ impl Engine {
         })
         .await?;
         validate_history_pairs(&compacted.history)?;
+        let history_provenance =
+            normalize_provenance(compacted.history.len(), &compacted.history_provenance)?;
         self.observe(Observation::HistoryReplaced {
             before: self.result.history.clone(),
             after: compacted.history.clone(),
         })
         .await?;
+        self.result.history_provenance = history_provenance;
         self.result.history = compacted.history;
         self.result.usage.context_tokens = Some(compacted.context_tokens);
         self.observe(Observation::Compacted {
@@ -1301,9 +1318,10 @@ impl Engine {
             target_tokens: policy.target_tokens,
         })
         .await?;
-        let outcome = compact_with_approvals(
+        let outcome = compact_with_provenance(
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
             policy,
             if forced {
                 0
@@ -1323,17 +1341,20 @@ impl Engine {
             }
             return Ok(false);
         }
-        let (history, markers) = finalize_local_history_with_approvals(
-            &outcome.history,
-            &outcome.markers,
+        let (history, markers, history_provenance) = finalize_with_provenance(
+            &outcome,
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
         );
         validate_history_pairs(&history)?;
         let before_items = self.result.history.len();
         let context_tokens = estimate_history_tokens_with_approvals(&history, &markers) + overhead;
         let mut input = history.clone();
         input.extend_from_slice(transient);
+        let mut input_provenance = history_provenance.clone();
+        input_provenance.extend_from_slice(&request.input_provenance[self.result.history.len()..]);
+        request.input_provenance = input_provenance;
         request.input = input;
         self.observe(Observation::ApprovalHistoryReplaced {
             before: self.result.history.clone(),
@@ -1342,6 +1363,7 @@ impl Engine {
         })
         .await?;
         self.result.history = history;
+        self.result.history_provenance = history_provenance;
         self.result.usage.context_tokens = Some(context_tokens);
         self.observe(Observation::Compacted {
             before_items,
@@ -1380,7 +1402,7 @@ impl Engine {
         }
         if self.consecutive_tool_errors >= limit && !self.tool_error_escalated {
             self.tool_error_escalated = true;
-            self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
+            self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
         }
     }
     async fn model_turn(&mut self) -> Result<(), Error> {
@@ -1393,9 +1415,9 @@ impl Engine {
         }
         if let Some(session) = self.config.subagents.clone() {
             for item in session.collect(&self.context).await? {
-                self.append(item);
+                self.append_unattributed(item);
             }
-            session.update_parent(&self.result.history);
+            session.update_parent(&self.result.history, &self.result.history_provenance);
         }
         self.publish_committed().await?;
         if self.turns >= self.policy.max_turns.get() {
@@ -1420,13 +1442,13 @@ impl Engine {
             );
         }
         let accessible_tools = self.tools_for_access();
-        let tools = accessible_tools
+        let (tools, declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
-            .map(|t| t.definition())
-            .chain(self.agent.handoffs.iter().map(|h| &h.definition))
-            .filter(|d| self.policy.tools.decision(d) != ToolDecision::Deny)
-            .cloned()
-            .collect();
+            .map(|tool| (tool.definition(), tool.timeout()))
+            .chain(self.agent.handoffs.iter().map(|h| (&h.definition, None)))
+            .filter(|(definition, _)| self.policy.tools.decision(definition) != ToolDecision::Deny)
+            .map(|(definition, timeout)| (definition.clone(), timeout))
+            .unzip();
         let mut instructions = if self.config.cache_prefix.is_empty() {
             self.agent.instructions.clone()
         } else {
@@ -1465,7 +1487,10 @@ impl Engine {
                 Value::String(format!("{:x}", hash.finalize())),
             );
         }
+        let mut input_provenance = self.result.history_provenance.clone();
+        input_provenance.resize(input.len(), ItemProvenance::Unattributed);
         let mut request = ModelRequest {
+            input_provenance,
             model: self
                 .fallbacks
                 .get(&(Arc::as_ptr(&self.agent) as usize))
@@ -1484,7 +1509,9 @@ impl Engine {
         };
         self.compact_local(&mut request, false).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
-        let Some((response, model, streamed, cost)) = self.model_response(request).await? else {
+        let Some((response, model, streamed, cost)) =
+            self.model_response(request, declared_tool_timeouts).await?
+        else {
             self.phase = Phase::Model;
             self.checkpoint(Boundary::ModelCompleted, None).await?;
             return Ok(());
@@ -1597,7 +1624,7 @@ impl Engine {
             .collect();
         let ids: Vec<_> = messages.iter().map(|message| message.id.clone()).collect();
         for message in messages {
-            self.append(RunItem::Message {
+            self.append_unattributed(RunItem::Message {
                 message: Message {
                     role: Role::User,
                     content: vec![Content::Text { text: message.text }],
@@ -1621,7 +1648,7 @@ impl Engine {
             let items = session.join(&self.context).await?;
             if !items.is_empty() {
                 for item in items {
-                    self.append(item);
+                    self.append_unattributed(item);
                 }
                 if self.turns >= self.policy.max_turns.get() {
                     self.policy.max_turns = self.policy.max_turns.saturating_add(1);
@@ -1648,7 +1675,7 @@ impl Engine {
                             "the finalization check failed; continue working until it passes"
                                 .into();
                     }
-                    self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                    self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
                     if self.turns >= self.policy.max_turns.get() {
                         self.policy.max_turns = self.policy.max_turns.saturating_add(1);
                     }
@@ -1785,6 +1812,7 @@ impl Engine {
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
+        declared_tool_timeouts: Vec<Option<Duration>>,
     ) -> Result<Option<(ModelResponse, String, bool, Option<f64>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
@@ -1846,6 +1874,13 @@ impl Engine {
                         self.child_control.as_ref().map(|control| control.task_id()),
                         self.turns,
                         &request,
+                        declared_tool_timeouts.clone(),
+                        adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                            &self.agent.name,
+                            &request,
+                            &declared_tool_timeouts,
+                            &markers,
+                        ),
                     )
                 });
                 let responses_before = self.result.responses.len();
@@ -2434,7 +2469,7 @@ impl Engine {
                         is_error: true,
                         should_pause: false,
                     };
-                    self.append(RunItem::ToolResult {
+                    self.append_unattributed(RunItem::ToolResult {
                         call_id: call.id.clone(),
                         output: output.clone(),
                     });
@@ -2704,6 +2739,11 @@ impl Engine {
         if self.tool_final.is_none() {
             self.tool_final = Some(text(&processed.item_output.content));
         }
+        let provenance = ItemProvenance::Agent {
+            name: self.agent.name.clone(),
+        };
+        self.result.history_provenance.push(provenance.clone());
+        self.result.new_items_provenance.push(provenance);
         self.result.history.push(RunItem::ToolResult {
             call_id: call.id.clone(),
             output: processed.output,
@@ -2788,6 +2828,7 @@ impl std::error::Error for FailedSpills {
 #[derive(Default)]
 pub struct Conversation {
     pub history: Vec<RunItem>,
+    pub history_provenance: Vec<ItemProvenance>,
     spills: Vec<Arc<SpillFile>>,
     paused: bool,
 }
@@ -2803,11 +2844,16 @@ impl Conversation {
         if self.paused {
             return Err(Error::new(ErrorCategory::InvalidInput, "resume the continuation and accept its outcome before running the conversation again").into());
         }
+        self.history_provenance =
+            normalize_provenance(self.history.len(), &self.history_provenance)?;
         self.history.extend(input);
+        self.history_provenance
+            .resize(self.history.len(), ItemProvenance::Unknown);
         let result = runner
             .run(
                 context,
                 RunRequest {
+                    input_provenance: self.history_provenance.clone(),
                     input: self.history.clone(),
                     policy,
                 },
@@ -2817,6 +2863,7 @@ impl Conversation {
         match result {
             Ok(outcome) => {
                 self.history = outcome.result.history.clone();
+                self.history_provenance = outcome.result.history_provenance.clone();
                 self.paused = outcome.result.status == RunStatus::Paused;
                 self.spills.extend(outcome.spills.iter().cloned());
                 Ok(outcome)
@@ -2832,6 +2879,7 @@ impl Conversation {
     pub fn accept_error(&mut self, error: &RunError) {
         if let Some(partial) = &error.partial {
             self.history = partial.history.clone();
+            self.history_provenance = partial.history_provenance.clone();
         }
         if let Some(spills) = error
             .error
@@ -2846,6 +2894,7 @@ impl Conversation {
     /// Use after resuming an owned continuation to update conversation history.
     pub fn accept(&mut self, outcome: &mut RunOutcome) {
         self.history = outcome.result.history.clone();
+        self.history_provenance = outcome.result.history_provenance.clone();
         self.paused = outcome.result.status == RunStatus::Paused;
         self.spills.extend(outcome.spills.iter().cloned());
     }
@@ -2935,6 +2984,7 @@ impl Runner {
             durable.resume = invocation.resume;
             if durable.resume.is_some() {
                 invocation.request.input.clear();
+                invocation.request.input_provenance.clear();
             }
             scoped
                 .drive_durable(

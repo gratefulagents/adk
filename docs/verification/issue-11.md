@@ -26,8 +26,17 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   Ordered request documents preserve raw JSON bytes for exact metadata digests.
   Representable native response snapshots are now assembled automatically and
   verified against pinned SDK bytes in full and metadata capture modes. Exact
-  automatic SDK snapshot parity is **not** complete: request assembly, history
-  provenance and normalized provider raw data remain unresolved.
+  automatic SDK snapshot parity is **not** complete: normalized provider raw
+  data remains unresolved. Representable requests now assemble automatically
+  with actual attempt bindings, declared tool timeouts, approval-marker order,
+  pinned token estimates and explicit historical authorship. Non-finite float
+  settings (including parsed `1e309`/`-1e309`) fail at snapshot construction.
+  Runtime sidecars retain attribution across retries, handoffs, local/custom
+  compaction, child context, conversation ownership and native durable v2.
+  Legacy native v1 restores Unknown, never fabricated current-agent names.
+  Bundle run/stream variants accept explicit sidecars; malformed input fails
+  before dispatch. Unknown attribution is a snapshot error, not a run failure.
+  Full/metadata request capture, health reporting and digest tests pass.
 - Stdout now emits Go-compatible JSON via the maintained Rust SDK batcher,
   preserving full parent context and child counts. Actual-provider tests verify
   ordering, late children, envelope-key collisions and flush errors. SDK endpoint
@@ -61,9 +70,9 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   interrupted. Independent review found stale no-op compaction state; an actual
   runner regression reproduced it, and superseded attempts now close without
   borrowing a later attempt's counts or parent. Scoped re-review found it fixed.
-  Agent instructions, automatic session metrics and request provenance remain open.
+  Agent instructions and automatic session metrics remain open.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **861 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **880 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **34 explicitly verified**, **8,857 unresolved** and
@@ -81,7 +90,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   including rejection of unbound implementation files and unexecuted fixtures.
   No blanket closure is inferred.
 
-Remaining work includes automatic request/response snapshot assembly, full higher-level
+Remaining work includes normalized provider raw response snapshot parity, full higher-level
 runtime/session/helper composition and the remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
 external Postgres/pgvector and non-Linux targets remain unverified. Fresh
 independent review is still required before leaving draft status.

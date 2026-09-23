@@ -494,6 +494,7 @@ async fn real_runner_hooks_and_host_events_produce_ordered_progress() {
         .run(
             context(),
             RunRequest {
+                input_provenance: Vec::new(),
                 input: vec![],
                 policy: RunPolicy::default(),
             },
@@ -654,6 +655,7 @@ async fn real_two_turn_tool_run_preserves_pause_continuation_and_success_spans()
             .run(
                 context(),
                 RunRequest {
+                    input_provenance: Vec::new(),
                     input: vec![],
                     policy: RunPolicy::default(),
                 },

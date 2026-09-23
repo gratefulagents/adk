@@ -90,6 +90,8 @@ fn partial_run_retains_history_usage_and_cause() {
         },
     };
     let partial = RunResult {
+        history_provenance: Vec::new(),
+        new_items_provenance: Vec::new(),
         status: RunStatus::Incomplete,
         final_output: None,
         new_items: vec![item.clone()],
@@ -194,6 +196,145 @@ fn default_run_policy_preserves_baseline_hundred_turn_budget() {
     assert_eq!(policy.max_turns.get(), 100);
     assert_eq!(policy.tools, ToolPolicy::default());
     assert_eq!(policy.tool_use, ToolUseBehavior::Continue);
+}
+
+#[test]
+fn provenance_fields_preserve_legacy_json_and_explicit_attribution() {
+    let items = json!([{
+        "type": "message",
+        "message": {"role": "assistant", "content": [{"type": "text", "text": "answer"}]}
+    }]);
+    let run_json = json!({"input": items, "policy": RunPolicy::default()});
+    let model_json = json!({
+        "model": "test", "instructions": "", "input": items, "tools": [],
+        "output_schema": null, "output_schema_name": "", "output_schema_strict": false,
+        "settings": {}
+    });
+    let result_json = json!({
+        "status": "completed", "final_output": null, "new_items": items, "history": items,
+        "responses": [], "usage": Usage::default(), "pending_approvals": [],
+        "last_agent": "current-agent"
+    });
+    let mut run: RunRequest = serde_json::from_value(run_json.clone()).unwrap();
+    let mut model: ModelRequest = serde_json::from_value(model_json.clone()).unwrap();
+    let mut result: RunResult = serde_json::from_value(result_json.clone()).unwrap();
+    assert!(run.input_provenance.is_empty());
+    assert!(model.input_provenance.is_empty());
+    assert!(result.history_provenance.is_empty());
+    assert!(result.new_items_provenance.is_empty());
+    assert_eq!(serde_json::to_value(&run).unwrap(), run_json);
+    assert_eq!(serde_json::to_value(&model).unwrap(), model_json);
+    assert_eq!(serde_json::to_value(&result).unwrap(), result_json);
+    assert_eq!(
+        normalize_provenance(run.input.len(), &run.input_provenance).unwrap(),
+        vec![ItemProvenance::Unknown]
+    );
+    assert_eq!(
+        normalize_provenance(result.history.len(), &result.history_provenance).unwrap(),
+        vec![ItemProvenance::Unknown]
+    );
+    for entry in [
+        ItemProvenance::Unknown,
+        ItemProvenance::Unattributed,
+        ItemProvenance::Agent {
+            name: " original-agent ".into(),
+        },
+    ] {
+        run.input_provenance = vec![entry.clone()];
+        model.input_provenance = vec![entry.clone()];
+        result.history_provenance = vec![entry.clone()];
+        result.new_items_provenance = vec![entry];
+        assert_eq!(
+            serde_json::from_value::<RunRequest>(serde_json::to_value(&run).unwrap()).unwrap(),
+            run
+        );
+        assert_eq!(
+            serde_json::from_value::<ModelRequest>(serde_json::to_value(&model).unwrap()).unwrap(),
+            model
+        );
+        assert_eq!(
+            serde_json::from_value::<RunResult>(serde_json::to_value(&result).unwrap()).unwrap(),
+            result
+        );
+    }
+}
+
+#[test]
+fn provenance_states_have_distinct_tagged_json() {
+    assert_eq!(ItemProvenance::default(), ItemProvenance::Unknown);
+    for (entry, encoded) in [
+        (ItemProvenance::Unknown, json!({"kind": "unknown"})),
+        (
+            ItemProvenance::Unattributed,
+            json!({"kind": "unattributed"}),
+        ),
+        (
+            ItemProvenance::Agent { name: "a".into() },
+            json!({"kind": "agent", "name": "a"}),
+        ),
+    ] {
+        assert_eq!(serde_json::to_value(&entry).unwrap(), encoded);
+        assert_eq!(
+            serde_json::from_value::<ItemProvenance>(encoded).unwrap(),
+            entry
+        );
+    }
+    let schema = serde_json::to_value(schemars::schema_for!(ItemProvenance)).unwrap();
+    assert_eq!(schema["oneOf"].as_array().unwrap().len(), 3);
+}
+
+#[test]
+fn provenance_normalization_preserves_empty_and_known_data() {
+    assert!(normalize_provenance(0, &[]).unwrap().is_empty());
+    assert_eq!(
+        normalize_provenance(3, &[]).unwrap(),
+        vec![ItemProvenance::Unknown; 3]
+    );
+    let entries = vec![
+        ItemProvenance::Unknown,
+        ItemProvenance::Unattributed,
+        ItemProvenance::Agent {
+            name: " \t named agent\n".into(),
+        },
+    ];
+    assert_eq!(
+        normalize_provenance(entries.len(), &entries).unwrap(),
+        entries
+    );
+}
+
+#[test]
+fn provenance_normalization_rejects_nonempty_length_mismatches() {
+    for (count, entries) in [
+        (0, vec![ItemProvenance::Unknown]),
+        (2, vec![ItemProvenance::Unattributed]),
+        (1, vec![ItemProvenance::Unknown; 2]),
+    ] {
+        assert_eq!(
+            normalize_provenance(count, &entries)
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+    }
+}
+
+#[test]
+fn provenance_normalization_rejects_blank_agent_names() {
+    for name in ["", " ", "\t\r\n", "\u{2003}\u{00a0}"] {
+        let entries = [
+            ItemProvenance::Unknown,
+            ItemProvenance::Agent { name: name.into() },
+        ];
+        assert_eq!(
+            normalize_provenance(entries.len(), &entries)
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+    }
 }
 
 #[test]

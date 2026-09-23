@@ -17,6 +17,7 @@ pub use hooks::{CompositeHooks, HookErrors};
 pub mod compat;
 pub mod output;
 pub mod runner;
+pub mod settings;
 pub mod subagent;
 pub mod subagent_tools;
 pub use runner::*;

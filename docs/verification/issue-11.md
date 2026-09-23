@@ -8,7 +8,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
 - Both attached source checkouts were restored after runtime migration. SDK HEAD
   and fetched `v0.0.115` resolve to `1dc92b73900fac74dc357a938e4b5eee6392b418`;
   source-lock and strict inventory checks pass without baseline edits.
-- Independent pinned public SDK plus five selected internal guardrail tests: **734 passed test/subtest records, 5
+- Independent pinned public SDK plus selected internal guardrail and routing tests: **743 passed test/subtest records, 5
   skipped, 35 packages**. Store, schema-2 writer and typed OTel exporter fixtures
   also match independently executed pinned Go output. A fourth fixture checks
   full stdout documents and exact tab-indented bytes against the SDK-pinned Go
@@ -83,7 +83,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   persisted session fields. This does not establish complete ProgressTracker
   parity or exactly-once replay/billing semantics.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **886 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **889 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The field audit exposed non-finite span costs becoming JSON null. Nine
@@ -91,8 +91,14 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   NaN/+Inf/-Inf across session, generation and subagent records. The OTel bridge
   preserves the original Float64 attributes (including signed zero) without
   routing through JSON. Five-value actual exporter tests cover this distinction.
-- The overlay now has **45 explicitly verified**, **8,846 unresolved** and
-  **251 excluded** IDs. Eleven additional claims close the nine SessionSpanData
+- Routing helpers now preserve normalized effort/verbosity labels and exact SDK
+  budgets. Seventy-two independent Go combinations and five builder cases cover
+  Unicode/whitespace, invalid labels, medium defaults and none/max overrides.
+  Anthropic ignores string verbosity rather than rejecting a default-built agent.
+  Mode/role composition and the offline routing example assert effective budgets.
+- The overlay now has **51 explicitly verified**, **8,840 unresolved** and
+  **251 excluded** IDs. Six routing helper/API alias claims are backed by these
+  executed fixtures. Eleven session claims close the nine SessionSpanData
   fields, its typed record and public alias mapping to `adk::tracewriter::Session`.
   They do not close ProgressTracker aggregation or its session producers. Three claims cover distinguishable store quota errors;
   ten cover specific OTel mapping/normalization regressions; eleven cover the

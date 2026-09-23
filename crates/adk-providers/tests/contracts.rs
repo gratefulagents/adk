@@ -898,6 +898,31 @@ fn executed_go_cost_catalog_and_retry_goldens_match() {
 }
 
 #[test]
+fn anthropic_ignores_sdk_verbosity_without_losing_reasoning_budget() {
+    let mut input = request();
+    input.model = "claude-sonnet-4-6".into();
+    input.settings = adk_runtime::settings::routing_settings("medium", "medium");
+    let body = wire::request(&input, Protocol::Anthropic, false).unwrap();
+    assert!(body.get("text_verbosity").is_none());
+    assert!(body.get("text").is_none());
+    assert_eq!(
+        body["thinking"],
+        json!({"type":"enabled", "budget_tokens":4096})
+    );
+    input.settings.insert("text_verbosity".into(), json!(7));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_err());
+    input
+        .settings
+        .insert("text_verbosity".into(), json!("invalid"));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_ok());
+    for key in ["model_fallbacks", "compaction_threshold"] {
+        let mut invalid = input.clone();
+        invalid.settings.insert(key.into(), json!(1));
+        assert!(wire::request(&invalid, Protocol::Anthropic, false).is_err());
+    }
+}
+
+#[test]
 fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     let mut input = request();
     input.settings.insert(

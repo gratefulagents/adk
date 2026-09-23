@@ -847,6 +847,108 @@
         "crates/adk/src/telemetry_spans.rs::map_span"
       ],
       "rationale": "The facade exposes the complete typed record as adk::tracewriter::Session under observability, instead of replicating a Go alias. Both independent Go fixtures construct the public agentsdk.SessionSpanData alias and Rust tests construct the public facade record. This closes the alias API only, not all session lifecycle producers."
+    },
+    "SDK-07693223E35FE12C": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeReasoningSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-BB9BF16EBF838012": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-FD68CDED9ED601E0": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeTextVerbositySettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-B442347DCC5E56A7": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeReasoningSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-91FFC30DBF2144D2": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeRoutingSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7788F6344AA7D4A3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeTextVerbositySettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "builder_settings_defaults_match_pinned_agent_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Native string-label helpers preserve normalized reasoning/verbosity labels, exact thinking budgets and omission of unknown labels. Independently executed public SDK helpers cover 72 combinations including whitespace and Unicode simple lowercase; builder fixtures verify medium defaults and blank/none/max/invalid inputs. No claim is made for arbitrary ModelSettings merge or provider-specific clamping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

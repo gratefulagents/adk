@@ -15,11 +15,11 @@
       "-json",
       "./internal/agent",
       "-run",
-      "^(TestRunnerInputGuardrailTripwire|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerRecoversFromPanickingInputGuardrail)$"
+      "^(TestRunnerInputGuardrailTripwire|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerRecoversFromPanickingInputGuardrail|TestModeReasoningSettings|TestResolveRoleModeRouting)$"
     ]
   ],
   "counts": {
-    "pass": 734,
+    "pass": 743,
     "skip": 5
   },
   "exit_code": 0,
@@ -65,6 +65,15 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n",
   "tests": {
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/high": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/low": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/max": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/medium": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/minimal": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/none": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/xhigh": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerRecoversFromPanickingInputGuardrail": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues": "pass",

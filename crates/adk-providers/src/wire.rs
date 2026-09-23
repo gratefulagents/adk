@@ -420,6 +420,12 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {
+        if key == "text_verbosity" && protocol == Protocol::Anthropic {
+            if !value.is_string() {
+                return Err(crate::invalid("text verbosity must be a string"));
+            }
+            continue;
+        }
         if matches!(
             key.as_str(),
             "model_fallbacks" | "text_verbosity" | "compaction_threshold"

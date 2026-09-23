@@ -77,6 +77,19 @@ settings. It installs baseline provider cost accounting unless the host supplies
 an estimator. Unknown prices retain the existing baseline zero-cost behavior;
 they are not a reliable hard budget boundary.
 
+## Model-routing helpers
+
+The `runtime` feature alone exposes `adk::runtime::settings::{reasoning_settings,
+verbosity_settings, routing_settings}`. They return native settings maps, normalize
+labels with the SDK's whitespace/simple-case rules, and leave unknown labels out.
+Reasoning budgets are minimal=1024, low=2048, medium=4096, high=8192,
+xhigh=16384 and max=24576; provider adapters apply model-specific clamping.
+`none` emits only `reasoning_effort=none`, not a zero-budget override. Extending an
+existing map with it preserves a prior budget, matching the SDK's nonzero merge.
+Use `Config::reasoning = "none"` to construct base settings with no thinking budget.
+The builder's free-form `settings` map remains an explicit native override, not a
+Go `ModelSettings::Merge` codec.
+
 ## Strict selection versus legacy defaults
 
 * `Config::features = None` uses `legacy_tools` and the three
@@ -267,7 +280,7 @@ Go `Config` wire codec or a claim of full Go runtime parity.
 | Area | Preserved or deliberately different |
 | --- | --- |
 | Defaults | Agent `agent`, OpenAI default routing, factory model aliases, 100 turns, workspace-write permission, tools off, retry/approval/compaction off, legacy mode routing/instructions and parallel/untrusted flags on. |
-| Model settings | Native base settings are empty except `parallel_tool_calls`; Go's automatic medium reasoning/verbosity are not injected. Explicit routing settings map `reasoningLevel` to `reasoning_effort` and `textVerbosity` to `text_verbosity`. Provider adapters own supported-setting validation; do not apply OpenAI-only verbosity to Anthropic routes. |
+| Model settings | Default (and blank) `Config::reasoning`/`verbosity` are medium: effort `medium`, thinking budget 4096, verbosity `medium`, plus selected parallel-call behavior. Explicit settings override base settings. Mode/role labels use `runtime::settings` helpers with the SDK's normalized efforts/budgets; unknown labels contribute no override. Providers clamp thinking budgets to model/output limits. Anthropic accepts but does not transmit string verbosity, matching the SDK. |
 | Retry | Enabled default is 3 retries with 250–2000 ms backoff; host runner policy can supply delays, predicate, and count. Native runner owns retry advice/fallback behavior. |
 | Compaction | Explicitly gated; otherwise retains native runner policy/custom compactor. No Go provider metadata discovery or synthesized handoff-history policy. |
 | Files | YAML/YML/JSON mode specs and CRD-shaped envelopes; Markdown/YAML role frontmatter; built-in chat/plan and deterministic overrides. Unsupported fields and invalid/zero turn limits fail rather than silently falling back. |

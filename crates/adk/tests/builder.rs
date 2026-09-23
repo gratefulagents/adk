@@ -207,6 +207,46 @@ async fn defaults_build_and_run_offline_without_ambient_credentials_or_tools() {
 }
 
 #[tokio::test]
+async fn builder_settings_defaults_match_pinned_agent_builder() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for (name, reasoning, verbosity) in [
+        ("default", "medium", "medium"),
+        ("blank", "  ", "  "),
+        ("none", "none", "low"),
+        ("max", "max", "high"),
+        ("invalid", "invalid", "invalid"),
+    ] {
+        let model = Arc::new(RecordingModel::default());
+        let mut bundle = builder(
+            Config {
+                reasoning: reasoning.into(),
+                verbosity: verbosity.into(),
+                ..Default::default()
+            },
+            &model,
+        )
+        .build(&context())
+        .await
+        .unwrap();
+        assert_eq!(
+            serde_json::Value::Object(bundle.agent().settings.clone()),
+            fixture["routing_settings"]["builder_defaults"][name],
+            "{name}"
+        );
+        bundle
+            .run(context(), vec![], Arc::new(TestHost))
+            .await
+            .unwrap();
+        assert_eq!(
+            model.requests.lock().unwrap()[0].settings,
+            bundle.agent().settings
+        );
+        bundle.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn strict_empty_overrides_legacy_tools_and_mode_instructions_not_access() {
     let model = Arc::new(RecordingModel::default());
     let mut config = Config {
@@ -318,6 +358,7 @@ async fn mode_and_role_overrides_apply_in_order_and_only_narrow_access_and_turns
     assert!(bundle.agent().fallbacks.is_empty());
     assert_eq!(bundle.agent().settings["temperature"], 0.2);
     assert_eq!(bundle.agent().settings["reasoning_effort"], "high");
+    assert_eq!(bundle.agent().settings["thinking_budget"], 8192);
     assert_eq!(bundle.agent().settings["text_verbosity"], "low");
     assert_eq!(bundle.policy().max_turns.get(), 5);
     assert_eq!(bundle.policy().tools.access, AccessMode::ReadOnly);

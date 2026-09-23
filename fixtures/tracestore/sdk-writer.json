@@ -420,6 +420,614 @@
     "sha256": "0d8c54f6295cf386670714cc1719d33aecfa6970acdc7fd30adb811f2965ed5f"
   },
   "response_json": "{\"usage\":{\"requests\":0,\"input_tokens\":12,\"output_tokens\":3},\"texts\":[\"answer\"],\"raw_available\":false}",
+  "routing_settings": {
+    "builder_defaults": {
+      "blank": {
+        "parallel_tool_calls": true,
+        "reasoning_effort": "medium",
+        "text_verbosity": "medium",
+        "thinking_budget": 4096
+      },
+      "default": {
+        "parallel_tool_calls": true,
+        "reasoning_effort": "medium",
+        "text_verbosity": "medium",
+        "thinking_budget": 4096
+      },
+      "invalid": {
+        "parallel_tool_calls": true
+      },
+      "max": {
+        "parallel_tool_calls": true,
+        "reasoning_effort": "max",
+        "text_verbosity": "high",
+        "thinking_budget": 24576
+      },
+      "none": {
+        "parallel_tool_calls": true,
+        "reasoning_effort": "none",
+        "text_verbosity": "low"
+      }
+    },
+    "labels": [
+      {
+        "reasoning": "",
+        "settings": {},
+        "verbosity": ""
+      },
+      {
+        "reasoning": "",
+        "settings": {
+          "text_verbosity": "low"
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "",
+        "settings": {
+          "text_verbosity": "medium"
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "",
+        "settings": {},
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none"
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none",
+          "text_verbosity": "low"
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none",
+          "text_verbosity": "medium"
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none",
+          "text_verbosity": "high"
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none",
+          "text_verbosity": "high"
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "none",
+        "settings": {
+          "reasoning_effort": "none"
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "thinking_budget": 1024
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "text_verbosity": "low",
+          "thinking_budget": 1024
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "text_verbosity": "medium",
+          "thinking_budget": 1024
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "text_verbosity": "high",
+          "thinking_budget": 1024
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "text_verbosity": "high",
+          "thinking_budget": 1024
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "minimal",
+        "settings": {
+          "reasoning_effort": "minimal",
+          "thinking_budget": 1024
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "thinking_budget": 2048
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "text_verbosity": "low",
+          "thinking_budget": 2048
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "text_verbosity": "medium",
+          "thinking_budget": 2048
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "text_verbosity": "high",
+          "thinking_budget": 2048
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "text_verbosity": "high",
+          "thinking_budget": 2048
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "low",
+        "settings": {
+          "reasoning_effort": "low",
+          "thinking_budget": 2048
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "low",
+          "thinking_budget": 4096
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "high",
+          "thinking_budget": 4096
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "high",
+          "thinking_budget": 4096
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "medium",
+        "settings": {
+          "reasoning_effort": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "low",
+          "thinking_budget": 8192
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "medium",
+          "thinking_budget": 8192
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "high",
+        "settings": {
+          "reasoning_effort": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "thinking_budget": 16384
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "text_verbosity": "low",
+          "thinking_budget": 16384
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "text_verbosity": "medium",
+          "thinking_budget": 16384
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "text_verbosity": "high",
+          "thinking_budget": 16384
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "text_verbosity": "high",
+          "thinking_budget": 16384
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "xhigh",
+        "settings": {
+          "reasoning_effort": "xhigh",
+          "thinking_budget": 16384
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "thinking_budget": 24576
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "text_verbosity": "low",
+          "thinking_budget": 24576
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "text_verbosity": "medium",
+          "thinking_budget": 24576
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "text_verbosity": "high",
+          "thinking_budget": 24576
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "text_verbosity": "high",
+          "thinking_budget": 24576
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "max",
+        "settings": {
+          "reasoning_effort": "max",
+          "thinking_budget": 24576
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "low",
+          "thinking_budget": 8192
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "medium",
+          "thinking_budget": 8192
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "text_verbosity": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": " H\u0130GH ",
+        "settings": {
+          "reasoning_effort": "high",
+          "thinking_budget": 8192
+        },
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {},
+        "verbosity": ""
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {
+          "text_verbosity": "low"
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {
+          "text_verbosity": "medium"
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "hi\u0307gh",
+        "settings": {},
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {},
+        "verbosity": ""
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {
+          "text_verbosity": "low"
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {
+          "text_verbosity": "medium"
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {
+          "text_verbosity": "high"
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "invalid",
+        "settings": {},
+        "verbosity": "invalid"
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": ""
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "low",
+          "thinking_budget": 4096
+        },
+        "verbosity": "low"
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": "medium"
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "high",
+          "thinking_budget": 4096
+        },
+        "verbosity": "high"
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "text_verbosity": "high",
+          "thinking_budget": 4096
+        },
+        "verbosity": " H\u0130GH "
+      },
+      {
+        "reasoning": "\u00a0MEDIUM\u0085",
+        "settings": {
+          "reasoning_effort": "medium",
+          "thinking_budget": 4096
+        },
+        "verbosity": "invalid"
+      }
+    ]
+  },
   "spans": [
     {
       "run_id": "run",

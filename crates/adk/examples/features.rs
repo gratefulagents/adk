@@ -784,9 +784,13 @@ async fn settings_routing() {
             );
             assert_eq!(requests[0].settings["temperature"], json!(0.2));
             assert_eq!(requests[0].settings["reasoning_effort"], "high");
+            assert_eq!(requests[0].settings["thinking_budget"], 8192);
+            assert_eq!(
+                requests[0].settings["text_verbosity"],
+                if role.is_some() { "low" } else { "medium" }
+            );
             assert!(requests[0].instructions.contains("Inspect first"));
             if role.is_some() {
-                assert_eq!(requests[0].settings["text_verbosity"], "low");
                 assert!(requests[0].instructions.contains("Write clearly"));
             }
         }

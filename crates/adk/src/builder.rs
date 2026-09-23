@@ -52,6 +52,8 @@ pub struct Config {
     pub fallback_models: Vec<String>,
     pub agent_name: String,
     pub instructions: String,
+    pub reasoning: String,
+    pub verbosity: String,
     pub settings: Map<String, Value>,
     pub work_dir: PathBuf,
     pub policy: RunPolicy,
@@ -76,6 +78,8 @@ impl Default for Config {
             fallback_models: vec![],
             agent_name: "agent".into(),
             instructions: String::new(),
+            reasoning: "medium".into(),
+            verbosity: "medium".into(),
             settings: Map::new(),
             work_dir: PathBuf::from("."),
             policy: RunPolicy {
@@ -661,7 +665,19 @@ impl Builder {
             .transpose()?;
         let mut model = self.config.model.trim().to_owned();
         let mut fallbacks = self.config.fallback_models.clone();
-        let mut settings = self.config.settings.clone();
+        let mut settings = adk_runtime::settings::routing_settings(
+            if self.config.reasoning.trim().is_empty() {
+                "medium"
+            } else {
+                &self.config.reasoning
+            },
+            if self.config.verbosity.trim().is_empty() {
+                "medium"
+            } else {
+                &self.config.verbosity
+            },
+        );
+        settings.extend(self.config.settings.clone());
         let mut policy = self.config.policy.clone();
         let mut instructions = vec![self.config.instructions.trim().to_owned()];
         if let Some(mode) = &mode {
@@ -885,12 +901,9 @@ fn apply_routing(
             .filter(|s| !s.is_empty())
             .collect();
     }
-    if !reasoning.trim().is_empty() {
-        settings.insert("reasoning_effort".into(), reasoning.trim().into());
-    }
-    if !verbosity.trim().is_empty() {
-        settings.insert("text_verbosity".into(), verbosity.trim().into());
-    }
+    settings.extend(adk_runtime::settings::routing_settings(
+        reasoning, verbosity,
+    ));
     settings.extend(overrides.clone());
 }
 

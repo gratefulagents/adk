@@ -5,7 +5,7 @@
 //! and generation observers retain the root, including during cancellation cleanup.
 
 use crate::tracewriter::{Span, SpanData, Trace, TraceWriter, generation_span};
-use adk_core::Context;
+use adk_core::{Context, Error, ErrorCategory};
 use adk_runtime::tracing::{GenerationObserver, GenerationRecord};
 use std::sync::{Arc, Mutex};
 
@@ -17,6 +17,10 @@ pub trait TraceProcessor: Send + Sync {
     fn span_end(&self, _span: &Span) {}
     /// Observational conversion failures do not change the run outcome.
     fn error(&self, _message: &str) {}
+    /// Explicit blocking flush; never ends traces or shuts down host resources.
+    fn flush(&self) -> Result<(), Error> {
+        Ok(())
+    }
 }
 
 impl TraceProcessor for TraceWriter {
@@ -51,12 +55,68 @@ impl TraceProcessor for crate::telemetry::SpanProcessor {
     fn span_end(&self, span: &Span) {
         self.on_span_end(span);
     }
+    fn flush(&self) -> Result<(), Error> {
+        Err(Error::new(
+            ErrorCategory::Host,
+            "span-only processor cannot flush its exporter; compose Telemetry or flush it explicitly",
+        ))
+    }
+}
+
+/// Compose the telemetry owner when flush must include its exporter. Finishing
+/// a trace still does not call shutdown; the host retains that responsibility.
+#[cfg(feature = "otel")]
+impl TraceProcessor for crate::telemetry::Telemetry {
+    fn trace_start(&self, trace: &Trace) {
+        self.span_processor().on_trace_start(trace);
+    }
+    fn trace_end(&self, trace: &Trace) {
+        self.span_processor().on_trace_end(trace);
+    }
+    fn span_start(&self, span: &Span) {
+        self.span_processor().on_span_start(span);
+    }
+    fn span_end(&self, span: &Span) {
+        self.span_processor().on_span_end(span);
+    }
+    fn flush(&self) -> Result<(), Error> {
+        self.force_flush()
+    }
+}
+
+/// All flush failures in processor registration order, not just the first one.
+#[derive(Debug)]
+pub struct FlushErrors {
+    pub errors: Vec<Error>,
+}
+impl std::fmt::Display for FlushErrors {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{} trace processors failed to flush", self.errors.len())
+    }
+}
+impl std::error::Error for FlushErrors {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        self.errors
+            .first()
+            .map(|error| error as &dyn std::error::Error)
+    }
 }
 
 /// Ordered fanout; processors and their storage/exporter lifetimes remain host-owned.
 #[derive(Default)]
 pub struct CompositeTraceProcessor(pub Vec<Arc<dyn TraceProcessor>>);
 impl TraceProcessor for CompositeTraceProcessor {
+    fn flush(&self) -> Result<(), Error> {
+        let errors: Vec<_> = self.0.iter().filter_map(|p| p.flush().err()).collect();
+        if errors.is_empty() {
+            Ok(())
+        } else {
+            Err(
+                Error::new(ErrorCategory::Host, "trace processor flush failed")
+                    .with_source(FlushErrors { errors }),
+            )
+        }
+    }
     fn trace_start(&self, trace: &Trace) {
         for p in &self.0 {
             p.trace_start(trace);

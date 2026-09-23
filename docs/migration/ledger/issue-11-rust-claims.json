@@ -514,6 +514,116 @@
         "compat",
         "observability"
       ]
+    },
+    "SDK-C1CAC73D33C2BD90": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.Output",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::output",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire::output"
+      ],
+      "rust_test_identifiers": [
+        "sequential_nil_and_tripwire_preserve_typed_results_and_stop_callbacks",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "Serializable diagnostic output remains in reports and typed tripwire causes; a nil callback result yields null. Diagnostic strings do not rewrite tool content.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1E00129C0812E950": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.TripwireTriggered",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::tripwire_triggered",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "sequential_nil_and_tripwire_preserve_typed_results_and_stop_callbacks",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "Tripwire results terminate sequential evaluation and preserve typed diagnostic reports. Tool-output tripwires take precedence over replacement; input tripwires prevent provider dispatch.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7265E17F3E2FE578": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.ReplacementContent",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::replacement_content",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_output_replacement_precedes_next_guard_and_preserves_flags",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement",
+        "tool_output_replacement_reaches_model_and_stop_after_tool_checks_output"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+      "rationale": "Explicit successful replacement rewrites only tool content, including to the empty string; the next guard and subsequent model input see the replacement. Other output flags survive. This is not a claim for automatic function-span production.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3B14BC5EA25B2ABD": {
+      "source": "internal/agent/guardrail.go",
+      "source_name": "GuardrailResult.ContentReplaced",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailResult::replacement_content",
+        "crates/adk-runtime/src/guardrails.rs::run_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_output_replacement_precedes_next_guard_and_preserves_flags",
+        "diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+      "rationale": "Rust Option<String> combines the replacement discriminator and payload: None does not replace; Some, including an empty string, explicitly replaces. Diagnostic Output alone does not replace, and a tripwire suppresses replacement. No redundant Go boolean is required.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E7536E28DBF7A586": {
+      "source": "internal/agent/runner_test.go",
+      "source_name": "TestRunnerInputGuardrailTripwire",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Engine",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "input_tripwire_prevents_provider_and_retains_report"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire",
+      "rationale": "A top-level input tripwire returns a typed input-phase cause, retains its report and diagnostic output, leaves final output unset, and never dispatches the provider.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4FE13C59011B0798": {
+      "source": "internal/agent/runner_test.go",
+      "source_name": "TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Engine",
+        "crates/adk-runtime/src/guardrails.rs::run_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tool_input_tripwire_is_model_visible_without_executing_tool"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+      "rationale": "A tool-input tripwire prevents tool invocation, retains a named triggered report, supplies a model-visible error tool result on the second request, and lets the model produce its final answer.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

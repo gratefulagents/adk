@@ -8,8 +8,8 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
 - Both attached source checkouts were restored after runtime migration. SDK HEAD
   and fetched `v0.0.115` resolve to `1dc92b73900fac74dc357a938e4b5eee6392b418`;
   source-lock and strict inventory checks pass without baseline edits.
-- Independent pinned public SDK tests: **729 passed test/subtest records, 5
-  skipped, 34 packages**. Store, schema-2 writer and typed OTel exporter fixtures
+- Independent pinned public SDK plus five selected internal guardrail tests: **734 passed test/subtest records, 5
+  skipped, 35 packages**. Store, schema-2 writer and typed OTel exporter fixtures
   also match independently executed pinned Go output. A fourth fixture checks
   full stdout documents and exact tab-indented bytes against the SDK-pinned Go
   OpenTelemetry exporter.
@@ -49,16 +49,23 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   spans, actual run-future cancellation, exporter ownership and overlapping OTel
   roots. Independent scoped review found cross-root parent eviction; the fix
   retains each live root's parent contexts and has an exporter regression.
-  Scopes do not yet synthesize all agent/tool/session spans or request provenance.
+  Explicit composed flush now reaches host-owned telemetry, attempts every sink
+  and aggregates all failures. Span-only processors reject unsupported flush
+  rather than silently claiming exporter delivery. Two more regressions verify
+  these boundaries. Scopes do not yet synthesize all agent/tool/session spans
+  or request provenance.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **850 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **852 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
-- The overlay now has **28 explicitly verified**, **8,863 unresolved** and
+- The overlay now has **34 explicitly verified**, **8,857 unresolved** and
   **251 excluded** IDs. Three claims cover distinguishable store quota errors;
   ten cover specific OTel mapping/normalization regressions; eleven cover the
   request snapshot representation/fields; three cover span lifecycle APIs; one
-  covers response EndTurn's absent/false/true representation and transport.
+  covers response EndTurn's absent/false/true representation and transport. Four
+  cover guardrail diagnostic/tripwire/replacement fields and two cover exact
+  input/tool-input runner regression obligations, with individually executed
+  upstream counterparts and strengthened model-input/typed-cause assertions.
   Request representation claims do not cover automatic assembly; the EndTurn claim
   does not cover the whole response builder or provider raw normalization. Exact tests,
   compiler, independently executed fixture verification and input hashes are

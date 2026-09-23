@@ -1,13 +1,31 @@
 {
   "baseline_inventory_sha256": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98",
-  "command": "go test -count=1 -json ./pkg/agentsdk/...",
+  "commands": [
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./pkg/agentsdk/..."
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./internal/agent",
+      "-run",
+      "^(TestRunnerInputGuardrailTripwire|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerRecoversFromPanickingInputGuardrail)$"
+    ]
+  ],
   "counts": {
-    "pass": 729,
+    "pass": 734,
     "skip": 5
   },
   "exit_code": 0,
   "go_version": "go version go1.26.8 linux/amd64",
   "packages": {
+    "github.com/gratefulagents/sdk/internal/agent": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/durable": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/events": "pass",
@@ -45,8 +63,13 @@
   },
   "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
-  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\ngo: downloading github.com/anthropics/anthropic-sdk-go v1.38.0\ngo: downloading github.com/openai/openai-go/v3 v3.33.0\ngo: downloading golang.org/x/sync v0.20.0\ngo: downloading gopkg.in/yaml.v3 v3.0.1\ngo: downloading github.com/modelcontextprotocol/go-sdk v1.4.1\ngo: downloading modernc.org/sqlite v1.51.0\ngo: downloading github.com/yosida95/uritemplate/v3 v3.0.2\ngo: downloading github.com/segmentio/encoding v0.5.4\ngo: downloading github.com/google/jsonschema-go v0.4.2\ngo: downloading golang.org/x/oauth2 v0.34.0\ngo: downloading github.com/invopop/jsonschema v0.13.0\ngo: downloading github.com/tidwall/gjson v1.18.0\ngo: downloading github.com/wk8/go-ordered-map/v2 v2.1.8\ngo: downloading github.com/tidwall/sjson v1.2.5\ngo: downloading github.com/tidwall/match v1.1.1\ngo: downloading github.com/tidwall/pretty v1.2.1\ngo: downloading github.com/bahlo/generic-list-go v0.2.0\ngo: downloading github.com/mailru/easyjson v0.7.7\ngo: downloading github.com/buger/jsonparser v1.1.2\ngo: downloading github.com/segmentio/asm v1.1.3\ngo: downloading modernc.org/libc v1.72.3\ngo: downloading github.com/dustin/go-humanize v1.0.1\ngo: downloading modernc.org/mathutil v1.7.1\ngo: downloading modernc.org/memory v1.11.0\ngo: downloading github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec\n",
+  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n",
   "tests": {
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerRecoversFromPanickingInputGuardrail": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestApprovedSubagentSharesParentContext": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsIdenticalCallLoop": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall": "pass",

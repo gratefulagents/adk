@@ -1808,6 +1808,16 @@ async fn input_tripwire_prevents_provider_and_retains_report() {
     assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
     let partial = error.partial.unwrap();
     assert_eq!(partial.guardrails.len(), 1);
+    assert!(partial.guardrails[0].tripwire_triggered);
+    assert_eq!(partial.guardrails[0].output, json!("blocked"));
+    let cause = error
+        .error
+        .source
+        .unwrap()
+        .downcast::<GuardrailTripwire>()
+        .unwrap();
+    assert_eq!(cause.phase, GuardrailPhase::Input);
+    assert_eq!(cause.output, json!("blocked"));
     assert!(partial.final_output.is_none());
 }
 
@@ -1859,6 +1869,16 @@ async fn tool_input_tripwire_is_model_visible_without_executing_tool() {
         outcome.result.guardrails[0].phase,
         GuardrailPhase::ToolInput
     );
+    assert!(outcome.result.guardrails[0].tripwire_triggered);
+    assert_eq!(
+        outcome.result.guardrails[0].tool_name.as_deref(),
+        Some("one")
+    );
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert!(requests[1].input.iter().any(|item| matches!(item,
+        RunItem::ToolResult { output, .. } if output.is_error
+    )));
 }
 
 #[tokio::test]
@@ -1893,6 +1913,12 @@ async fn tool_output_replacement_reaches_model_and_stop_after_tool_checks_output
         };
         assert!(snapshot.history.iter().any(|item| matches!(item, RunItem::ToolResult { output, .. } if format!("{:?}", output.content).contains("sanitized"))));
         assert!(!format!("{:?}", snapshot.history).contains("raw one"));
+        if !stop {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(format!("{:?}", requests[1].input).contains("sanitized"));
+            assert!(!format!("{:?}", requests[1].input).contains("raw one"));
+        }
         if stop {
             assert!(snapshot.final_output.is_none());
             assert_eq!(

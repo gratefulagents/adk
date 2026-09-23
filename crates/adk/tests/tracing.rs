@@ -248,3 +248,42 @@ async fn runner_case(pending: bool) {
         );
     }
 }
+
+#[test]
+fn flush_visits_every_processor_and_retains_all_failures_in_order() {
+    use adk::core::{Error, ErrorCategory};
+    use std::error::Error as _;
+    struct Sink(usize, bool, Arc<Mutex<Vec<usize>>>);
+    impl TraceProcessor for Sink {
+        fn flush(&self) -> Result<(), Error> {
+            self.2.lock().unwrap().push(self.0);
+            if self.1 {
+                Err(Error::new(ErrorCategory::Host, self.0.to_string()))
+            } else {
+                Ok(())
+            }
+        }
+    }
+    let calls = Arc::new(Mutex::new(vec![]));
+    let composite = CompositeTraceProcessor(vec![
+        Arc::new(Sink(1, true, calls.clone())),
+        Arc::new(Sink(2, false, calls.clone())),
+        Arc::new(Sink(3, true, calls.clone())),
+    ]);
+    let error = composite.flush().unwrap_err();
+    assert_eq!(*calls.lock().unwrap(), [1, 2, 3]);
+    let failures = error
+        .source()
+        .unwrap()
+        .downcast_ref::<FlushErrors>()
+        .unwrap();
+    assert_eq!(
+        failures
+            .errors
+            .iter()
+            .map(|e| e.info.message.as_str())
+            .collect::<Vec<_>>(),
+        ["1", "3"]
+    );
+    CompositeTraceProcessor::default().flush().unwrap();
+}

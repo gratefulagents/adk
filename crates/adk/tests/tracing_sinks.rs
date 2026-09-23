@@ -3,7 +3,7 @@ use adk::{
     telemetry::Telemetry,
     tracestore::{FilesystemTraceStore, RunMetadata},
     tracewriter::{Options, TraceWriter},
-    tracing::{CompositeTraceProcessor, TraceSession},
+    tracing::{CompositeTraceProcessor, TraceProcessor, TraceSession},
 };
 use opentelemetry_sdk::trace::InMemorySpanExporter;
 use std::sync::Arc;
@@ -20,18 +20,18 @@ fn scoped_writer_and_otel_share_parentage_and_leave_exporter_host_owned() {
         })
         .unwrap();
     let exporter = InMemorySpanExporter::default();
-    let telemetry = Telemetry::with_exporter("scope", exporter.clone());
+    let telemetry = Arc::new(Telemetry::with_exporter("scope", exporter.clone()));
     let processor = Arc::new(CompositeTraceProcessor(vec![
         writer.clone(),
-        telemetry.span_processor(),
+        telemetry.clone(),
     ]));
-    let trace = TraceSession::new("root", processor);
+    let trace = TraceSession::new("root", processor.clone());
     let parent = trace.span("parent", None);
     let child = parent.child("child", None);
     trace.finish();
     parent.finish();
     child.finish();
-    telemetry.force_flush().unwrap();
+    processor.flush().unwrap();
     let spans = exporter.get_finished_spans().unwrap();
     assert_eq!(spans.len(), 3);
     let root = spans.iter().find(|s| s.name == "root").unwrap();
@@ -92,5 +92,14 @@ fn ending_overlapping_root_does_not_remove_other_roots_parent_contexts() {
         find("B-child").span_context.trace_id(),
         b.span_context.trace_id()
     );
+    telemetry.shutdown().unwrap();
+}
+
+#[test]
+fn span_only_flush_does_not_claim_to_flush_a_host_exporter() {
+    let telemetry = Telemetry::with_exporter("explicit", InMemorySpanExporter::default());
+    let error = telemetry.span_processor().flush().unwrap_err();
+    assert!(error.info.message.contains("compose Telemetry"));
+    TraceProcessor::flush(&telemetry).unwrap();
     telemetry.shutdown().unwrap();
 }

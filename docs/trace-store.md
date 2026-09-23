@@ -221,7 +221,15 @@ retain the root: dropping the last owner ends it after its spans. `snapshot()`
 returns the current trace document without transferring ownership.
 
 `CompositeTraceProcessor` delivers each lifecycle event synchronously in configured
-order. It accepts a `TraceWriter`, and with `otel`, `Telemetry::span_processor()`.
+order. It accepts a `TraceWriter`, and with `otel`, either `Telemetry` or its
+span-only `Telemetry::span_processor()`. Compose `Arc<Telemetry>` when calling
+`TraceProcessor::flush()`: it flushes the exporter without shutting it down.
+Composite flush visits every sink even after failures, returning all errors in
+registration order through `FlushErrors`. The synchronous writer has nothing
+buffered to flush. A span-only processor returns an explicit error rather than
+claiming to flush an exporter it does not own; the host can flush its `Telemetry`
+separately. As with direct telemetry flush, avoid blocking the single-thread Tokio
+runtime that an OTLP transport needs; use `spawn_blocking` there.
 Callbacks must not panic. No state lock is held while calling processors. Concurrent
 independent spans may interleave, but each start precedes its end and the root ends
 last. Sharing an OTel processor between overlapping roots retains each root's own

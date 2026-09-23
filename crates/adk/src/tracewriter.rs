@@ -690,7 +690,7 @@ impl RunHooks for TraceWriter {
     ) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
             match observation {
-                Observation::AgentStarted { agent } => self.agent_start(&agent),
+                Observation::AgentStarted { agent, .. } => self.agent_start(&agent),
                 Observation::AgentEnded { agent, .. } => self.agent_end(&agent),
                 Observation::Handoff { from, to } => self.handoff(&from, &to),
                 Observation::ToolStarted { agent, call } => self.tool_start(

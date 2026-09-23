@@ -498,7 +498,7 @@ impl RunHooks for Observability {
                     "approval_history_replaced",
                     json!({"before":before,"after":after,"markers":markers.iter().map(|m| json!({"before_item":m.before_item,"marker":m.marker})).collect::<Vec<_>>()}),
                 ),
-                Observation::AgentStarted { agent } => ("agent_start", json!({"agent":agent})),
+                Observation::AgentStarted { agent, .. } => ("agent_start", json!({"agent":agent})),
                 Observation::AgentEnded { agent, output } => {
                     ("agent_end", json!({"agent":agent,"output":output}))
                 }

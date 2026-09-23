@@ -70,9 +70,13 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   interrupted. Independent review found stale no-op compaction state; an actual
   runner regression reproduced it, and superseded attempts now close without
   borrowing a later attempt's counts or parent. Scoped re-review found it fixed.
-  Agent instructions and automatic session metrics remain open.
+  Configured agent instructions now flow through the start observation into
+  agent spans, with actual runner and handoff assertions. Resolved generation
+  instructions remain separate. Schema-1 agent-start events and compatibility
+  callbacks still omit instruction content; both capture modes have a regression.
+  Automatic session metrics remain open.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **880 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **881 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The overlay now has **34 explicitly verified**, **8,857 unresolved** and

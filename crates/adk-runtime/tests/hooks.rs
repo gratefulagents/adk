@@ -47,6 +47,7 @@ async fn all_sinks_receive_ordered_events_and_failures_are_aggregated() {
             &context,
             Observation::AgentStarted {
                 agent: "agent".into(),
+                instructions: String::new(),
             },
         )
         .await

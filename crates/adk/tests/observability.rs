@@ -147,6 +147,32 @@ fn full_capture_redacts_nested_keys_json_strings_credentials_and_custom_content(
 }
 
 #[tokio::test]
+async fn agent_start_events_do_not_expand_capture_to_instructions() {
+    for mode in [CaptureMode::Metadata, CaptureMode::Full] {
+        let (pipeline, records) = pipeline(mode);
+        pipeline
+            .observe(
+                &context(),
+                Observation::AgentStarted {
+                    agent: "agent".into(),
+                    instructions: "private configured instructions".into(),
+                },
+            )
+            .await
+            .unwrap();
+        let records = records.0.lock().unwrap();
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].kind, "agent_start");
+        assert_eq!(records[0].data, json!({"agent":"agent"}));
+        assert!(
+            !String::from_utf8(records[0].to_json_line().unwrap())
+                .unwrap()
+                .contains("private configured")
+        );
+    }
+}
+
+#[tokio::test]
 async fn progress_uses_cumulative_usage_and_bounded_recent_events() {
     let (pipeline, records) = pipeline(CaptureMode::Metadata);
     let context = context();
@@ -155,6 +181,7 @@ async fn progress_uses_cumulative_usage_and_bounded_recent_events() {
             &context,
             Observation::AgentStarted {
                 agent: "agent".into(),
+                instructions: String::new(),
             },
         )
         .await
@@ -916,7 +943,13 @@ mod telemetry {
         .unwrap();
         let context = context();
         pipeline
-            .observe(&context, Observation::AgentStarted { agent: "a".into() })
+            .observe(
+                &context,
+                Observation::AgentStarted {
+                    agent: "a".into(),
+                    instructions: String::new(),
+                },
+            )
             .await
             .unwrap();
         pipeline

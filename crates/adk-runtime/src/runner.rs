@@ -201,6 +201,7 @@ pub enum Observation {
     },
     AgentStarted {
         agent: String,
+        instructions: String,
     },
     ModelAccepted {
         agent: String,
@@ -1831,6 +1832,7 @@ impl Engine {
                 self.turns += 1;
                 self.observe(Observation::AgentStarted {
                     agent: self.agent.name.clone(),
+                    instructions: self.agent.instructions.clone(),
                 })
                 .await?;
                 self.observe(Observation::ModelAttempt {

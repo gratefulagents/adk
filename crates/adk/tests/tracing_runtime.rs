@@ -238,6 +238,7 @@ async fn runner_tool_spans_use_guarded_output_before_caps_and_repeated_agent_sta
             "agent",
             vec![response(vec![RunItem::ToolCall { call: call() }]), done()],
         );
+        agent.instructions = "configured agent instructions".into();
         agent.tools.push(Arc::new(MockTool {
             definition: definition("tool"),
             pending: false,
@@ -267,9 +268,8 @@ async fn runner_tool_spans_use_guarded_output_before_caps_and_repeated_agent_sta
             .filter(|span| span.name == "agent")
             .collect();
         assert_eq!(agents.len(), 1);
-        if let Some(SpanData::Agent { instructions, .. }) = &agents[0].data {
-            assert!(instructions.is_empty());
-        }
+        assert!(matches!(&agents[0].data,
+            Some(SpanData::Agent { instructions, .. }) if instructions == "configured agent instructions"));
         let functions: Vec<_> = trace
             .spans
             .iter()
@@ -381,10 +381,13 @@ async fn runner_errors_and_dropped_model_or_tool_futures_close_on_owner_drop() {
 #[tokio::test]
 async fn runner_handoff_switches_generation_parent_on_shared_root() {
     let (sink, owner, observer) = setup();
-    let target = Arc::new(agent("target", vec![done()]));
+    let mut target = agent("target", vec![done()]);
+    target.instructions = "target instructions".into();
+    let target = Arc::new(target);
     let mut call = call();
     call.name = "transfer".into();
     let mut source = agent("source", vec![response(vec![RunItem::ToolCall { call }])]);
+    source.instructions = "source instructions".into();
     source.handoffs.push(Handoff {
         definition: definition("transfer"),
         target,
@@ -402,6 +405,14 @@ async fn runner_handoff_switches_generation_parent_on_shared_root() {
         .filter(|span| span.name == "agent")
         .collect();
     assert_eq!(agents.len(), 2);
+    for (span, expected) in agents
+        .iter()
+        .zip(["source instructions", "target instructions"])
+    {
+        assert!(
+            matches!(&span.data, Some(SpanData::Agent { instructions, .. }) if instructions == expected)
+        );
+    }
     assert!(agents.iter().all(|span| span.parent_id == trace.id));
     let generations: Vec<_> = trace
         .spans
@@ -464,6 +475,7 @@ async fn late_generation_keeps_parent_and_repeated_starts_are_safe() {
     let context = context();
     let started = Observation::AgentStarted {
         agent: "source".into(),
+        instructions: String::new(),
     };
     observer.observe(&context, started.clone()).await.unwrap();
     observer.observe(&context, started).await.unwrap();
@@ -505,6 +517,7 @@ async fn late_generation_keeps_parent_and_repeated_starts_are_safe() {
             &context,
             Observation::AgentStarted {
                 agent: "target".into(),
+                instructions: String::new(),
             },
         )
         .await
@@ -533,6 +546,7 @@ async fn late_generation_keeps_parent_and_repeated_starts_are_safe() {
             &context,
             Observation::AgentStarted {
                 agent: "ignored".into(),
+                instructions: String::new(),
             },
         )
         .await
@@ -661,6 +675,7 @@ async fn processors_can_reenter_without_locks_and_owner_finish_is_queued() {
             &context(),
             Observation::AgentStarted {
                 agent: "agent".into(),
+                instructions: String::new(),
             },
         )
         .await
@@ -760,6 +775,7 @@ async fn external_child_retains_shared_root_after_owner_finish() {
             &context(),
             Observation::AgentStarted {
                 agent: "agent".into(),
+                instructions: String::new(),
             },
         )
         .await

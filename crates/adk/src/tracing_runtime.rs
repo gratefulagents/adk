@@ -12,8 +12,8 @@
 //! sensitive: processor capture/redaction policy remains the host's responsibility.
 //! Generation snapshots precede tool guardrails and may contain rejected calls;
 //! tool guardrails are not a blanket redaction policy for model snapshots.
-//! No instructions, provenance or session metrics are inferred from observations.
-//! The required Agent data instructions string stays empty (unavailable).
+//! Agent spans carry configured instructions; resolved per-attempt instructions
+//! stay in generation snapshots. Neither provenance nor session metrics is inferred.
 //! Concurrent/reentrant delivery is queued; the active caller drains callbacks
 //! in queue order without holding a lock while invoking processors. Finish during
 //! a callback is likewise queued and takes effect when that callback returns.
@@ -236,7 +236,10 @@ impl State {
                 }
             }
             Event::Observation(observation) => match observation {
-                Observation::AgentStarted { agent } => {
+                Observation::AgentStarted {
+                    agent,
+                    instructions,
+                } => {
                     if self.agent.as_ref().is_some_and(|(name, _)| name == &agent) {
                         return;
                     }
@@ -245,7 +248,7 @@ impl State {
                         "agent",
                         Some(SpanData::Agent {
                             agent_name: agent.clone(),
-                            instructions: String::new(),
+                            instructions,
                         }),
                     );
                     self.agent = Some((agent, span));

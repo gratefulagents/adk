@@ -262,14 +262,19 @@ output is observed after tool guardrails but before native truncation/wrapping;
 blocked output is never copied into function spans. Incomplete functions receive
 an explicit interrupted error on cleanup. Model response snapshots precede tool
 guardrail evaluation, so guardrails do not replace capture/redaction policy for
-those snapshots. Automatic request snapshot assembly remains open.
+those snapshots. Request snapshots now assemble from explicit attribution and
+representable request settings; unknown attribution records a snapshot error
+rather than fabricating agent names. See the runtime builder's attribution API.
 
 Handoffs are point observations, not measured transfer durations. Compaction counts
 are populated only from observed success. A new compaction start replaces an
 unterminated no-op attempt rather than inheriting stale counts or parentage.
 Failed, skipped or dropped compactions carry no fabricated measurements. Agent
-instructions are unavailable in current observations and remain empty; session
-metrics and historical attribution are not synthesized. Text/reasoning tool blocks
+spans carry configured agent instructions, distinct from resolved generation
+instructions (which can include cache prefixes and output-schema directives).
+These remain sensitive and use the processor's existing capture/redaction policy.
+The schema-1 agent-start event and Go lifecycle callback do not acquire instruction
+content. Session metrics and historical attribution are not synthesized. Text/reasoning tool blocks
 are joined with newlines; media are not converted into invented text.
 
 Manual owners remain available: finish/drop the run future **before** finishing

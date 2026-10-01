@@ -39,6 +39,22 @@ func TestOracle(t *testing.T) {
 	if len(modes) != 2 || modes[0].Name != "chat" || modes[1].Name != "plan" {
 		t.Fatalf("builtins: %+v", modes)
 	}
+	for i, obs := range byName["pure-helpers-ignore-files-and-cancellation"].Output {
+		if obs.Error != nil {
+			t.Fatalf("pure helper %d: %+v", i, obs.Error)
+		}
+		if i%3 == 0 {
+			var builtins []sdkmode.TemplateSpec
+			result("pure-helpers-ignore-files-and-cancellation", i, &builtins)
+			a, _ := json.Marshal(modes)
+			b, _ := json.Marshal(builtins)
+			if string(a) != string(b) {
+				t.Fatalf("standalone builtins differ from empty source: %s != %s", a, b)
+			}
+		} else if string(obs.Result) != "null" {
+			t.Fatalf("no-op helper %d must return nil: %s", i, obs.Result)
+		}
+	}
 	var plain, crd sdkmode.TemplateSpec
 	result("plain-full-schema", 2, &plain)
 	result("crd-spec-precedes-top-level", 2, &crd)

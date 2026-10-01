@@ -185,6 +185,17 @@ async fn execute(case: &Case, root: &Path) -> Vec<Value> {
             deadline: None,
         };
         let result = match query.operation.as_str() {
+            "BuiltinModes" => Ok(Value::Array(
+                adk::builder::builtin_modes().iter().map(mode_value).collect(),
+            )),
+            "GuardrailRules" => source.guardrail_rules(&context).await.map(|rules| {
+                assert!(rules.is_empty(), "fileconfig must not supply guardrail rules");
+                Value::Null
+            }),
+            "HandoffHistory" => source.handoff_history(&context).await.map(|history| {
+                assert_eq!(history, adk::host::RunBatch::default());
+                Value::Null
+            }),
             "ListModes" => source
                 .list_modes(&context)
                 .map(|modes| Value::Array(modes.iter().map(mode_value).collect())),
@@ -261,14 +272,14 @@ fn differences(path: &str, actual: &Value, expected: &Value, out: &mut Vec<Strin
 fn assert_inventory(fixture: &Fixture) {
     assert_eq!(fixture.schema_version, 1);
     assert_eq!(fixture.sdk_revision, PIN);
-    assert_eq!(fixture.cases.len(), 50);
+    assert_eq!(fixture.cases.len(), 51);
     assert_eq!(
         fixture
             .cases
             .iter()
             .map(|c| c.input.queries.len())
             .sum::<usize>(),
-        184
+        190
     );
     let exclusions = BTreeMap::from([
         ("duplicate-declared-mode-names", "duplicate-name-policy"),
@@ -312,6 +323,9 @@ fn assert_inventory(fixture: &Fixture) {
     assert_eq!(
         operations,
         BTreeMap::from([
+            ("BuiltinModes", 2),
+            ("GuardrailRules", 2),
+            ("HandoffHistory", 2),
             ("ListModes", 13),
             ("GetMode", 53),
             ("RoleCatalog", 21),
@@ -445,10 +459,10 @@ async fn matches_every_unexcluded_pinned_go_query() {
         }
     }
     eprintln!(
-        "Go fileconfig oracle: {passed}/{checked} queries passed; {checked_cases}/41 cases executed; 9 cases / 19 queries EXCLUDED (not passes); {} mismatches/infrastructure failures",
+        "Go fileconfig oracle: {passed}/{checked} queries passed; {checked_cases}/42 cases executed; 9 cases / 19 queries EXCLUDED (not passes); {} mismatches/infrastructure failures",
         failures.len()
     );
-    assert_eq!(checked_cases, 41);
+    assert_eq!(checked_cases, 42);
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-    assert_eq!(checked, 165, "all non-source-only queries must execute");
+    assert_eq!(checked, 171, "all non-source-only queries must execute");
 }

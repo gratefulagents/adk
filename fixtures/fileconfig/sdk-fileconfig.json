@@ -120,6 +120,133 @@
       ]
     },
     {
+      "name": "pure-helpers-ignore-files-and-cancellation",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/bad.md": "---\nname: role\n",
+          "modes/bad.yaml": "broken: ["
+        },
+        "active_mode": "missing",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "BuiltinModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GuardrailRules",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "HandoffHistory",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "BuiltinModes",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GuardrailRules",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "HandoffHistory",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        }
+      ]
+    },
+    {
       "name": "builtin-chat",
       "source_only": [],
       "input": {

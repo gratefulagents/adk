@@ -3239,6 +3239,54 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-96794A9C85D4258E": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig.go",
+      "source_name": "BuiltinModes",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::builtin_modes"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestBuiltinChatAndPlanModes",
+      "rationale": "Direct pinned BuiltinModes calls compare complete ordered templates with the native pure function, including names, versions, labels, descriptions, category, autonomy, access, instructions and absent routing/constraints. Fresh vectors are Rust-owned. Malformed configuration and cancelled contexts do not affect this pure helper.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-C283FC8051EE6B1A": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig.go",
+      "source_name": "Source.GuardrailRules",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ConfigSource::guardrail_rules"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestBuiltinChatAndPlanModes",
+      "rationale": "FileConfigSource uses the native ConfigSource empty-rule default. Direct pinned GuardrailRules calls return a nil slice without inspecting malformed files, nonexistent active modes or cancelled contexts; the native comparator asserts an empty Vec before representing it as the Go null slice. This covers only the fileconfig no-op, not general guardrail compilation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-FAAE73E57E2D0471": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig.go",
+      "source_name": "Source.HandoffHistory",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ConfigSource::handoff_history"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestBuiltinChatAndPlanModes",
+      "rationale": "FileConfigSource uses the native ConfigSource empty-history default. Direct pinned HandoffHistory calls return a nil slice despite malformed files, nonexistent active modes and cancelled contexts. The comparator asserts the complete default native RunBatch (items, provenance and markers empty) before representing the Go null slice. No populated history/replay semantics are claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

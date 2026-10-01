@@ -7,8 +7,14 @@ configuration records for the pure directive formatter, plus the pinned builtin,
 builtin-override and traversal-rejection regressions. Exact formatter bytes and
 complete builtin objects are compared against independently executed Go output.
 File parsing APIs remain unresolved where strict native policies differ; the
-nine source-only oracle cases are not parity passes. The ledger now has **193
-verified, 8,698 unresolved and 251 excluded** entries. Fresh claim verification
+nine source-only oracle cases are not parity passes. A subsequent direct-helper
+fixture closes three more entries: standalone builtin templates and the
+fileconfig guardrail/history no-ops. Those calls are verified with malformed
+files, nonexistent active modes and cancelled contexts. The differential now
+passes **171/171 eligible queries across 42 cases**; nine cases / 19 queries remain
+explicitly excluded. Go test/vet/build and strict Rust comparator Clippy pass.
+The ledger now has **196 verified, 8,695 unresolved and 251 excluded** entries.
+Fresh claim verification
 ran **400 Rust tests, 0 failed**, regenerated the Go fixtures twice, and passed
 **11 evidence-validator tests**. The validator now requires a fileconfig-specific
 pinned-oracle success marker, so unrelated host fixture evidence cannot satisfy

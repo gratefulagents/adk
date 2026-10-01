@@ -15,6 +15,11 @@ func scenarios() []testCase {
 	modeQueries := []query{q("ListModes"), get("custom"), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"), q("RoleCatalog")}
 	sourceOnly := func(reasons ...string) { cases[len(cases)-1].SourceOnly = reasons }
 	add("missing-directories", nil, "", q("dirs"), q("ListModes"), q("RoleCatalog"), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"), get("unknown"))
+	add("pure-helpers-ignore-files-and-cancellation", map[string]string{"modes/bad.yaml": "broken: [", "agents/bad.md": "---\nname: role\n"}, "missing",
+		q("BuiltinModes"), q("GuardrailRules"), q("HandoffHistory"),
+		query{Operation: "BuiltinModes", Cancelled: true},
+		query{Operation: "GuardrailRules", Cancelled: true},
+		query{Operation: "HandoffHistory", Cancelled: true})
 	add("builtin-chat", nil, "chat", get("chat"), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"))
 	add("builtin-plan", nil, " \tplan\n", get(" PLAN "), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"))
 	add("plain-full-schema", map[string]string{"modes/custom.yaml": `name: " custom "

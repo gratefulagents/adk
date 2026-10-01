@@ -50,7 +50,7 @@ Files:
 
 ## Counts
 
-50 cases, 184 queries, including 9 source-only cases:
+51 cases, 190 queries, including 9 source-only cases:
 
 | Operation | Queries |
 | --- | ---: |
@@ -62,6 +62,9 @@ Files:
 | `ModeDirective` | 25 |
 | `dirs` | 8 |
 | `BuildModeDirective` | 10 |
+| `BuiltinModes` | 2 |
+| `GuardrailRules` | 2 |
+| `HandoffHistory` | 2 |
 
 ## Schema and Rust comparator contract
 
@@ -174,13 +177,20 @@ Rust expected result**. The 9 marked cases must be reported separately:
 Rust keeps its strict duplicate, unknown-field, access, zero-limit, frontmatter
 and HOME policies. This oracle does not fabricate their expected errors or
 assert parity for marked cases. `crates/adk/tests/fileconfig_oracle.rs` compares
-all 165 eligible queries across 41 cases, including complete mode/role DTOs,
+all 171 eligible queries across 42 cases, including complete mode/role DTOs,
 errors, independent loading, root styles and isolated-process HOME behavior.
 The nine source-only cases contain 19 queries, explicitly excluded rather than
 counted as passes. Run `cargo test -p adk --all-features --test fileconfig_oracle`
 for the Rust comparison.
 
+The standalone `BuiltinModes` and no-op `GuardrailRules`/`HandoffHistory`
+queries run with malformed mode/role files, a nonexistent active mode, and both
+active and cancelled contexts. The no-op observations are actual SDK null
+slices, compared to asserted-empty native values (including empty history
+sidecars), not fabricated populated results. Pure builtin results are compared
+field-for-field independently of Source loading.
+
 Not covered: filesystem permission denial, symlink security, races or concurrent
-mutation, Windows path behavior, GuardrailRules/HandoffHistory no-op methods,
-standalone LoadRoleCatalog/BuiltinModes calls (their behavior is observed through
-Source), or SDK internals. These are not implied by the counts above.
+mutation, Windows path behavior, standalone LoadRoleCatalog calls (their behavior
+is observed through Source), or SDK internals. These are not implied by the
+counts above.

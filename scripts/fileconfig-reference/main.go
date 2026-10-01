@@ -111,6 +111,12 @@ func execute(in input) ([]observation, error) {
 		var result any
 		var callErr error
 		switch q.Operation {
+		case "BuiltinModes":
+			result = fileconfig.BuiltinModes()
+		case "GuardrailRules":
+			result, callErr = src.GuardrailRules(ctx)
+		case "HandoffHistory":
+			result, callErr = src.HandoffHistory(ctx)
 		case "ListModes":
 			result, callErr = src.ListModes(ctx)
 		case "GetMode":

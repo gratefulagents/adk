@@ -86,6 +86,9 @@ impl Model for ControlledModel {
                 return Err(Error::new(ErrorCategory::Provider, "controlled failure"));
             }
             Ok(ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items: vec![RunItem::Message {
                     message: Message {
                         role: Role::Assistant,

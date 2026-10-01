@@ -25,7 +25,8 @@ class PurityTests(unittest.TestCase):
         self.assertTrue(purity.violations(self.metadata("k8s-openapi")))
 
     def test_optional_crates_are_checked_independently(self):
-        for name in ("adk-security", "adk-sandbox", "adk-durable", "adk-project-state"):
+        for name in ("adk-security", "adk-sandbox", "adk-durable", "adk-project-state",
+                     "adk-mcp", "adk-providers", "adk-tools"):
             with self.subTest(name=name):
                 metadata = self.metadata("adk-platform")
                 metadata["packages"][0]["name"] = name

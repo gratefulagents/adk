@@ -1,0 +1,25 @@
+{
+  "artifacts/result.txt": "result\n",
+  "metadata.json": {
+    "candidate_id": "candidate",
+    "finished_at": "2025-01-02T03:04:06.123Z",
+    "mode": "plan",
+    "run_id": "run",
+    "started_at": "2025-01-02T03:04:05.123Z"
+  },
+  "score.json": {
+    "candidate_id": "candidate",
+    "metrics": {
+      "accuracy": 1,
+      "compaction_hits": 0,
+      "cost_usd": 0,
+      "duration_sec": 0,
+      "tokens_used": 42,
+      "tool_calls": 0,
+      "turns_used": 0
+    },
+    "success": true,
+    "task_id": "task"
+  },
+  "tool_calls.jsonl": "{\"schema_version\":2,\"run_id\":\"run\",\"type\":\"tool_start\"}\n"
+}

@@ -47,15 +47,19 @@ fn migrate_v1(data: &[u8]) -> Result<Document> {
         #[serde(default)]
         budget_tokens: i64,
         #[serde(default = "zero_time")]
-        created_at: chrono::DateTime<chrono::Utc>,
+        created_at: chrono::DateTime<chrono::FixedOffset>,
         #[serde(default = "zero_time")]
-        updated_at: chrono::DateTime<chrono::Utc>,
+        updated_at: chrono::DateTime<chrono::FixedOffset>,
         #[serde(default, deserialize_with = "crate::types::null_vec")]
         events: Vec<Event>,
     }
     let mut old: V1 = serde_json::from_slice(data)?;
-    let mut snapshot = RunSnapshot::new(old.tenant_id, old.run_id, old.created_at);
-    snapshot.updated_at = old.updated_at;
+    let mut snapshot = RunSnapshot::new(
+        old.tenant_id,
+        old.run_id,
+        old.created_at.with_timezone(&chrono::Utc),
+    );
+    snapshot.updated_at = old.updated_at.with_timezone(&chrono::Utc).fixed_offset();
     snapshot.revision = old.revision;
     snapshot.event_sequence = if old.event_sequence == 0 {
         old.events.len() as u64
@@ -68,7 +72,7 @@ fn migrate_v1(data: &[u8]) -> Result<Document> {
     snapshot.cumulative_budget.input_tokens = old.budget_tokens;
     if old.cancelled {
         snapshot.cancellation = Some(Cancellation {
-            requested_at: old.updated_at,
+            requested_at: snapshot.updated_at,
             ..Cancellation::default()
         });
     }

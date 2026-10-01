@@ -1,0 +1,4239 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "name": "missing-directories",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "unknown",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "\u003croot\u003e/agents",
+            "DefaultRootDir": "\u003croot\u003e/home/.gratefulagents",
+            "ModeDir": "\u003croot\u003e/modes",
+            "RootDir": "\u003croot\u003e"
+          },
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "",
+          "error": null
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode \"unknown\" not found in \u003croot\u003e/modes",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "pure-helpers-ignore-files-and-cancellation",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/bad.md": "---\nname: role\n",
+          "modes/bad.yaml": "broken: ["
+        },
+        "active_mode": "missing",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "BuiltinModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GuardrailRules",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "HandoffHistory",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "BuiltinModes",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GuardrailRules",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "HandoffHistory",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "builtin-chat",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "chat",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "chat",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "chat",
+            "Version": "v1",
+            "DisplayName": "Chat",
+            "Description": "Interactive chat and coding. Default mode.",
+            "Category": "direct",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "chat",
+            "Version": "v1",
+            "DisplayName": "Chat",
+            "Description": "Interactive chat and coding. Default mode.",
+            "Category": "direct",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: Chat\n\nMode description: Interactive chat and coding. Default mode.",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "builtin-plan",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": " \tplan\n",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": " PLAN ",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "plan",
+            "Version": "v1",
+            "DisplayName": "Plan",
+            "Description": "Read-only planning session.",
+            "Category": "direct",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "plan",
+            "Version": "v1",
+            "DisplayName": "Plan",
+            "Description": "Read-only planning session.",
+            "Category": "direct",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: Plan\n\nMode description: Read-only planning session.\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nPLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "plain-full-schema",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/planner.md": "Plan carefully.\n",
+          "modes/custom.yaml": "name: \" custom \"\nversion: \" v2 \"\ndisplayName: \" Display Custom \"\ndescription: \" Description  with  gaps \"\ncategory: \" direct \"\nautonomous: true\ntoolAccess: \" analysis \"\ninstructions: \" \\nFirst  line\\n  Indented line\\n \"\nmodelRouting:\n  defaultModel: \" provider/model \"\n  fallbackModels: [\" fallback/a \", \"\", \"  \", \"fallback/a\", \"fallback/b\"]\n  reasoningLevel: \" high \"\n  textVerbosity: \" low \"\n  roleOverrides:\n    \" planner \":\n      model: \" provider/planner \"\n      fallbackModels: [\" child/a \", \" \", \"child/a\"]\n      reasoningLevel: \" xhigh \"\n      textVerbosity: \" medium \"\n    empty: {}\nconstraints:\n  maxTurns: 21\n  subAgentMaxTurns: 8\n  maxConcurrentSubAgents: 3\n  maxRetries: 4\n  maxRuntimeMinutes: 12\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v2",
+              "DisplayName": "Display Custom",
+              "Description": "Description  with  gaps",
+              "Category": "direct",
+              "Autonomous": true,
+              "ToolAccess": "read-only",
+              "Instructions": "First  line\n  Indented line",
+              "ModelRouting": {
+                "DefaultModel": "provider/model",
+                "FallbackModels": [
+                  "fallback/a",
+                  "fallback/a",
+                  "fallback/b"
+                ],
+                "ReasoningLevel": "high",
+                "TextVerbosity": "low",
+                "RoleOverrides": {
+                  " planner ": {
+                    "Model": "provider/planner",
+                    "FallbackModels": [
+                      "child/a",
+                      "child/a"
+                    ],
+                    "ReasoningLevel": "xhigh",
+                    "TextVerbosity": "medium"
+                  },
+                  "empty": {
+                    "Model": "",
+                    "FallbackModels": [],
+                    "ReasoningLevel": "",
+                    "TextVerbosity": ""
+                  }
+                }
+              },
+              "Constraints": {
+                "MaxTurns": 21,
+                "SubAgentMaxTurns": 8,
+                "MaxConcurrentSubAgents": 3,
+                "MaxRetries": 4,
+                "MaxRuntimeMinutes": 12
+              }
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v2",
+            "DisplayName": "Display Custom",
+            "Description": "Description  with  gaps",
+            "Category": "direct",
+            "Autonomous": true,
+            "ToolAccess": "read-only",
+            "Instructions": "First  line\n  Indented line",
+            "ModelRouting": {
+              "DefaultModel": "provider/model",
+              "FallbackModels": [
+                "fallback/a",
+                "fallback/a",
+                "fallback/b"
+              ],
+              "ReasoningLevel": "high",
+              "TextVerbosity": "low",
+              "RoleOverrides": {
+                " planner ": {
+                  "Model": "provider/planner",
+                  "FallbackModels": [
+                    "child/a",
+                    "child/a"
+                  ],
+                  "ReasoningLevel": "xhigh",
+                  "TextVerbosity": "medium"
+                },
+                "empty": {
+                  "Model": "",
+                  "FallbackModels": [],
+                  "ReasoningLevel": "",
+                  "TextVerbosity": ""
+                }
+              }
+            },
+            "Constraints": {
+              "MaxTurns": 21,
+              "SubAgentMaxTurns": 8,
+              "MaxConcurrentSubAgents": 3,
+              "MaxRetries": 4,
+              "MaxRuntimeMinutes": 12
+            }
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v2",
+            "DisplayName": "Display Custom",
+            "Description": "Description  with  gaps",
+            "Category": "direct",
+            "Autonomous": true,
+            "ToolAccess": "read-only",
+            "Instructions": "First  line\n  Indented line",
+            "ModelRouting": {
+              "DefaultModel": "provider/model",
+              "FallbackModels": [
+                "fallback/a",
+                "fallback/a",
+                "fallback/b"
+              ],
+              "ReasoningLevel": "high",
+              "TextVerbosity": "low",
+              "RoleOverrides": {
+                " planner ": {
+                  "Model": "provider/planner",
+                  "FallbackModels": [
+                    "child/a",
+                    "child/a"
+                  ],
+                  "ReasoningLevel": "xhigh",
+                  "TextVerbosity": "medium"
+                },
+                "empty": {
+                  "Model": "",
+                  "FallbackModels": [],
+                  "ReasoningLevel": "",
+                  "TextVerbosity": ""
+                }
+              }
+            },
+            "Constraints": {
+              "MaxTurns": 21,
+              "SubAgentMaxTurns": 8,
+              "MaxConcurrentSubAgents": 3,
+              "MaxRetries": 4,
+              "MaxRuntimeMinutes": 12
+            }
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: Display Custom\n\nMode description: Description  with  gaps\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nFirst  line\n  Indented line",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "planner",
+              "Description": "",
+              "Instructions": "Plan carefully.",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "crd-spec-precedes-top-level",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "apiVersion: agents.example/v1\nkind: ModeTemplate\nmetadata:\n  name: metadata-name\nname: ignored-top-level\ninstructions: ignored-top-level\nspec:\n  name: custom\n  displayName: CRD Custom\n  instructions: Use the spec.\n  constraints:\n    maxTurns: 19\n    subAgentMaxTurns: 7\n    maxConcurrentSubAgents: 2\n    maxRetries: 5\n    maxRuntimeMinutes: 13\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "CRD Custom",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "Use the spec.",
+              "ModelRouting": null,
+              "Constraints": {
+                "MaxTurns": 19,
+                "SubAgentMaxTurns": 7,
+                "MaxConcurrentSubAgents": 2,
+                "MaxRetries": 5,
+                "MaxRuntimeMinutes": 13
+              }
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "CRD Custom",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "Use the spec.",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 19,
+              "SubAgentMaxTurns": 7,
+              "MaxConcurrentSubAgents": 2,
+              "MaxRetries": 5,
+              "MaxRuntimeMinutes": 13
+            }
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "CRD Custom",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "Use the spec.",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 19,
+              "SubAgentMaxTurns": 7,
+              "MaxConcurrentSubAgents": 2,
+              "MaxRetries": 5,
+              "MaxRuntimeMinutes": 13
+            }
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: CRD Custom\n\nUse the spec.",
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "metadata-name-fallback",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "metadata:\n  name: ' metadata-name '\nspec:\n  instructions: from-spec\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "metadata-name",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "metadata-name",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "from-spec",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "metadata-name",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "from-spec",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "metadata-name",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "from-spec",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "filename-name-version-fallback",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: '  '\nversion: ' '\ninstructions: from-file\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "from-file",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "from-file",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "zero-spec-falls-back-to-plain",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: plain-name\ninstructions: plain\nspec: {}\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "plain-name",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "plain",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "filename-versus-declared-name",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: declared-name\ndisplayName: Friendly Display\ninstructions: yes\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "declared-name",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "DECLARED-NAME",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "friendly display",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "  FRIENDLY DISPLAY  ",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "declared-name",
+            "Version": "v1",
+            "DisplayName": "Friendly Display",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "yes",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "declared-name",
+            "Version": "v1",
+            "DisplayName": "Friendly Display",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "yes",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "declared-name",
+            "Version": "v1",
+            "DisplayName": "Friendly Display",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "yes",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "declared-name",
+            "Version": "v1",
+            "DisplayName": "Friendly Display",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "yes",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "declared-name",
+            "Version": "v1",
+            "DisplayName": "Friendly Display",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "yes",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "yaml-before-yml",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: yaml-name\n",
+          "modes/custom.yml": "name: yml-name\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "yaml-name",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "yaml-name",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "yml-name",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "malformed-yaml-does-not-fall-through-to-yml",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: [\n",
+          "modes/custom.yml": "name: good\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "direct-lookup-isolates-unrelated-malformed-mode",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/broken.yaml": "name: [\n",
+          "modes/custom.yaml": "name: custom\ndisplayName: Friendly\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "CUSTOM",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "Friendly",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "plan",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "Friendly",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "Friendly",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: Friendly",
+          "error": null
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/broken.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/broken.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/broken.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/broken.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "malformed-role-isolated-from-mode",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/bad.md": "---\nname: [\n---\nbody\n",
+          "modes/custom.yaml": "name: custom\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/agents/bad.md frontmatter: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "malformed-mode-isolated-from-roles",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/good.md": "role body\n",
+          "modes/custom.yaml": "name: [\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: line 1: did not find expected node content",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": [
+            {
+              "Name": "good",
+              "Description": "",
+              "Instructions": "role body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "mode-type-error",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "constraints:\n  maxTurns: nope\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: unmarshal errors:\n  line 2: cannot unmarshal !!str `nope` into int",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: unmarshal errors:\n  line 2: cannot unmarshal !!str `nope` into int",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "builtin-override-by-declared-name",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: CHAT\ndisplayName: Replacement\ninstructions: custom-chat\n"
+        },
+        "active_mode": "chat",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "chat",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "CHAT",
+              "Version": "v1",
+              "DisplayName": "Replacement",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "custom-chat",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "CHAT",
+            "Version": "v1",
+            "DisplayName": "Replacement",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "custom-chat",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "CHAT",
+            "Version": "v1",
+            "DisplayName": "Replacement",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "custom-chat",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "CHAT",
+            "Version": "v1",
+            "DisplayName": "Replacement",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "custom-chat",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "extensions-and-nested-files",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/UPPER.MD": "upper body\n",
+          "agents/ignore.txt": "",
+          "agents/nested/bad.md": "",
+          "modes/custom.YAML": "name: custom\n",
+          "modes/ignored.txt": "bad: [\n",
+          "modes/nested/bad.yaml": "bad: [\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "UPPER",
+              "Description": "",
+              "Instructions": "upper body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "blank-traversal-and-absent-names",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": " \t\n",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": ".",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "..",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "../secret",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "a/b",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "a\\b",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "/absolute",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "unknown",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "mode name is required",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name is required",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \".\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"..\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"../secret\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"a/b\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"a\\\\b\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"/absolute\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode \"unknown\" not found in \u003croot\u003e/modes",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancelled-with-active-mode",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "plan",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "chat",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "../secret",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name is required",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"../secret\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancelled-without-active-mode",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": " \t",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "chat",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "../secret",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": true,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "context canceled",
+            "category": "cancelled"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name is required",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "mode name \"../secret\" must be a single file name, not a path",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "unknown-active-mode",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "missing",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "mode \"missing\" not found in \u003croot\u003e/modes",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "mode \"missing\" not found in \u003croot\u003e/modes",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "mode \"missing\" not found in \u003croot\u003e/modes",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "directory-read-errors",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents": "not a directory",
+          "modes": "not a directory"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "read modes dir \u003croot\u003e/modes: open \u003croot\u003e/modes: not a directory",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "read modes dir \u003croot\u003e/modes: open \u003croot\u003e/modes: not a directory",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "read modes dir \u003croot\u003e/modes: open \u003croot\u003e/modes: not a directory",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "read modes dir \u003croot\u003e/modes: open \u003croot\u003e/modes: not a directory",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": "",
+          "error": {
+            "message": "read modes dir \u003croot\u003e/modes: open \u003croot\u003e/modes: not a directory",
+            "category": "fileconfig"
+          }
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "read agents dir \u003croot\u003e/agents: open \u003croot\u003e/agents: not a directory",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "role-frontmatter-alias-precedence",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\nname: \" declared-role \"\ndescription: \"  preserved description  \"\ntool_access: \" analysis \"\ntoolAccess: full\nmodel_override: \" provider/override \"\nmodel: provider/ignored\n---\n  Role body  with  gaps.\n    next line\n",
+          "agents/fallback.md": "---\nname: \" \"\ntool_access: \" \"\ntoolAccess: execution\nmodel_override: \" \"\nmodel: \" provider/fallback \"\n---\nFallback body\n",
+          "agents/plain.md": " \n Plain body\n "
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "declared-role",
+              "Description": "  preserved description  ",
+              "Instructions": "Role body  with  gaps.\n    next line",
+              "ToolAccess": "read-only",
+              "ModelOverride": "provider/override",
+              "FallbackModels": null
+            },
+            {
+              "Name": "fallback",
+              "Description": "",
+              "Instructions": "Fallback body",
+              "ToolAccess": "full",
+              "ModelOverride": "provider/fallback",
+              "FallbackModels": null
+            },
+            {
+              "Name": "plain",
+              "Description": "",
+              "Instructions": "Plain body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "role-empty-instructions",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\nname: custom\n---\n \n"
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/agents/custom.md: role \"custom\" has empty instructions",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "role-unclosed-frontmatter",
+      "source_only": [
+        "unterminated-frontmatter-policy"
+      ],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\nname: custom\nbody without closing delimiter\n"
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "---\nname: custom\nbody without closing delimiter",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "role-frontmatter-crlf",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\r\nname: custom\r\ntool_access: readonly\r\n---\r\n body\r\n"
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "read-only",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "duplicate-declared-mode-names",
+      "source_only": [
+        "duplicate-name-policy"
+      ],
+      "input": {
+        "files": {
+          "modes/a.yaml": "name: custom\ninstructions: first\n",
+          "modes/b.yaml": "name: custom\ninstructions: second\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "first",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "second",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "first",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "duplicate-declared-role-names",
+      "source_only": [
+        "duplicate-name-policy"
+      ],
+      "input": {
+        "files": {
+          "agents/a.md": "---\nname: custom\n---\nfirst\n",
+          "agents/b.md": "---\nname: custom\n---\nsecond\n"
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "first",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "unknown-yaml-fields",
+      "source_only": [
+        "unknown-field-policy"
+      ],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\nunknownField: ignored\n---\nbody\n",
+          "modes/custom.yaml": "name: custom\nunknownField: ignored\nconstraints:\n  maxTurns: 3\n  unknownField: ignored\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "ListModes",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "chat",
+              "Version": "v1",
+              "DisplayName": "Chat",
+              "Description": "Interactive chat and coding. Default mode.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            },
+            {
+              "Name": "custom",
+              "Version": "v1",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": {
+                "MaxTurns": 3,
+                "SubAgentMaxTurns": 0,
+                "MaxConcurrentSubAgents": 0,
+                "MaxRetries": 0,
+                "MaxRuntimeMinutes": 0
+              }
+            },
+            {
+              "Name": "plan",
+              "Version": "v1",
+              "DisplayName": "Plan",
+              "Description": "Read-only planning session.",
+              "Category": "direct",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": "PLAN MODE — Read-Only Planning\n\nFocus on understanding the problem, exploring the code, weighing tradeoffs,\nand producing a concrete plan. Use read-only inspection tools freely, but do\nnot modify files, run mutating commands, or take externally visible actions.\nWhen the plan is ready, present it and wait for the user to switch modes\nbefore implementing.",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 3,
+              "SubAgentMaxTurns": 0,
+              "MaxConcurrentSubAgents": 0,
+              "MaxRetries": 0,
+              "MaxRuntimeMinutes": 0
+            }
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 3,
+              "SubAgentMaxTurns": 0,
+              "MaxConcurrentSubAgents": 0,
+              "MaxRetries": 0,
+              "MaxRuntimeMinutes": 0
+            }
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "duplicate-yaml-key-rejection",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "name: first\nname: second\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": null,
+          "error": {
+            "message": "\u003croot\u003e/modes/custom.yaml: yaml: unmarshal errors:\n  line 2: mapping key \"name\" already defined at line 1",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
+      "name": "zero-and-negative-constraints",
+      "source_only": [
+        "zero-negative-limit-policy"
+      ],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "constraints:\n  maxTurns: 0\n  subAgentMaxTurns: -2\n  maxConcurrentSubAgents: 0\n  maxRetries: -4\n  maxRuntimeMinutes: 0\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeSnapshot",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 0,
+              "SubAgentMaxTurns": -2,
+              "MaxConcurrentSubAgents": 0,
+              "MaxRetries": -4,
+              "MaxRuntimeMinutes": 0
+            }
+          },
+          "error": null
+        },
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": {
+              "MaxTurns": 0,
+              "SubAgentMaxTurns": -2,
+              "MaxConcurrentSubAgents": 0,
+              "MaxRetries": -4,
+              "MaxRuntimeMinutes": 0
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "empty-routing-and-constraints",
+      "source_only": [],
+      "input": {
+        "files": {
+          "modes/custom.yaml": "modelRouting: {}\nconstraints: {}\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": {
+              "DefaultModel": "",
+              "FallbackModels": [],
+              "ReasoningLevel": "",
+              "TextVerbosity": "",
+              "RoleOverrides": null
+            },
+            "Constraints": {
+              "MaxTurns": 0,
+              "SubAgentMaxTurns": 0,
+              "MaxConcurrentSubAgents": 0,
+              "MaxRetries": 0,
+              "MaxRuntimeMinutes": 0
+            }
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-inherit",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: ''\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: ''\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-read-only",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'read-only'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'read-only'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: custom\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "read-only",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-read_only",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'read_only'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'read_only'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: custom\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "read-only",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-readonly",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'readonly'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'readonly'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: custom\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "read-only",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-analysis",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'analysis'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'analysis'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "read-only",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "read-only",
+          "error": null
+        },
+        {
+          "result": "Mode: custom\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "read-only",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-full",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'full'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'full'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "full",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-execution",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'execution'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'execution'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "full",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-write",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'write'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'write'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "full",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access-workspace-write",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: 'workspace-write'\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: 'workspace-write'\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "full",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "access- MYSTERY ",
+      "source_only": [
+        "unknown-access-policy"
+      ],
+      "input": {
+        "files": {
+          "agents/custom.md": "---\ntool_access: ' MYSTERY '\n---\nbody\n",
+          "modes/custom.yaml": "toolAccess: ' MYSTERY '\n"
+        },
+        "active_mode": "custom",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "GetMode",
+            "lookup": "custom",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "PermissionMode",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "ModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "RoleCatalog",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "Name": "custom",
+            "Version": "v1",
+            "DisplayName": "",
+            "Description": "",
+            "Category": "",
+            "Autonomous": false,
+            "ToolAccess": "MYSTERY",
+            "Instructions": "",
+            "ModelRouting": null,
+            "Constraints": null
+          },
+          "error": null
+        },
+        {
+          "result": "workspace-write",
+          "error": null
+        },
+        {
+          "result": "Mode: custom",
+          "error": null
+        },
+        {
+          "result": [
+            {
+              "Name": "custom",
+              "Description": "",
+              "Instructions": "body",
+              "ToolAccess": "MYSTERY",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "direct-formatter",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": "",
+              "Version": "",
+              "DisplayName": "",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "read-only",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "read_only",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "readonly",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "analysis",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": " ANALYSIS ",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "full",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " Display ",
+              "Description": " \nDescription  exact\n ",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "mystery",
+              "Instructions": " \nBody\n  indent\n ",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          },
+          {
+            "operation": "BuildModeDirective",
+            "lookup": "",
+            "cancelled": false,
+            "template": {
+              "Name": " fallback ",
+              "Version": "",
+              "DisplayName": " \t",
+              "Description": "",
+              "Category": "",
+              "Autonomous": false,
+              "ToolAccess": "",
+              "Instructions": "only body",
+              "ModelRouting": null,
+              "Constraints": null
+            }
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": "",
+          "error": null
+        },
+        {
+          "result": "",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nTool access: read-only. Do not modify files or run mutating commands. Bash is restricted to statically-authorized commands: no command substitution $(...) or backticks, no heredocs, no VAR=value prefixes, no eval/source, no function definitions, no git-mutating subcommands (commit/add/push/merge/rebase/branch/tag/stash/remote), and no gh CLI — use plain literal read commands and the dedicated read tools (read_file, grep, glob, list_files) instead.\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: Display\n\nMode description: Description  exact\n\nBody\n  indent",
+          "error": null
+        },
+        {
+          "result": "Mode: fallback\n\nonly body",
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-padded",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "padded",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "\u003croot\u003e/agents",
+            "DefaultRootDir": "\u003croot\u003e/home/.gratefulagents",
+            "ModeDir": "\u003croot\u003e/modes",
+            "RootDir": "\u003croot\u003e"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-default",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "default",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "\u003croot\u003e/home/.gratefulagents/agents",
+            "DefaultRootDir": "\u003croot\u003e/home/.gratefulagents",
+            "ModeDir": "\u003croot\u003e/home/.gratefulagents/modes",
+            "RootDir": "\u003croot\u003e/home/.gratefulagents"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-tilde",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "tilde",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "\u003croot\u003e/home/agents",
+            "DefaultRootDir": "\u003croot\u003e/home/.gratefulagents",
+            "ModeDir": "\u003croot\u003e/home/modes",
+            "RootDir": "\u003croot\u003e/home"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-tilde-child",
+      "source_only": [],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "tilde-child",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "\u003croot\u003e/home/config/agents",
+            "DefaultRootDir": "\u003croot\u003e/home/.gratefulagents",
+            "ModeDir": "\u003croot\u003e/home/config/modes",
+            "RootDir": "\u003croot\u003e/home/config"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-home-unset-default",
+      "source_only": [
+        "home-policy"
+      ],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "default",
+        "home_unset": true,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": ".gratefulagents/agents",
+            "DefaultRootDir": ".gratefulagents",
+            "ModeDir": ".gratefulagents/modes",
+            "RootDir": ".gratefulagents"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-home-unset-tilde",
+      "source_only": [
+        "home-policy"
+      ],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "tilde",
+        "home_unset": true,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "~/agents",
+            "DefaultRootDir": ".gratefulagents",
+            "ModeDir": "~/modes",
+            "RootDir": "~"
+          },
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "dirs-home-unset-tilde-child",
+      "source_only": [
+        "home-policy"
+      ],
+      "input": {
+        "files": {},
+        "active_mode": "",
+        "root_style": "tilde-child",
+        "home_unset": true,
+        "queries": [
+          {
+            "operation": "dirs",
+            "lookup": "",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": {
+            "AgentDir": "~/config/agents",
+            "DefaultRootDir": ".gratefulagents",
+            "ModeDir": "~/config/modes",
+            "RootDir": "~/config"
+          },
+          "error": null
+        }
+      ]
+    }
+  ]
+}

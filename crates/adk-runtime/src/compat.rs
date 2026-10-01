@@ -47,7 +47,7 @@ impl RunHooks for GoCallbackAdapter {
     ) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
             let _ = catch_unwind(AssertUnwindSafe(|| match &observation {
-                Observation::AgentStarted { agent } => {
+                Observation::AgentStarted { agent, .. } => {
                     self.callbacks.on_agent_start(context, agent)
                 }
                 Observation::ModelAttempt {
@@ -78,8 +78,7 @@ impl RunHooks for GoCallbackAdapter {
 }
 
 /// Applies representable scalar settings atomically, retaining native authorization.
-/// Subagent, consecutive-error and stop-gate limits in the returned value remain
-/// the caller's responsibility. Mutation-only approval never relaxes authorization.
+/// Mutation-only approval never relaxes authorization.
 pub fn apply_go_config(
     sentinels: &RunConfigSentinels,
     config: &mut RunnerConfig,
@@ -92,6 +91,7 @@ pub fn apply_go_config(
         .is_some_and(|p| p.approval_required);
     config.consecutive_tool_error_limit = effective.consecutive_tool_error_limit;
     config.stop_gate_max_blocks = effective.stop_gate_max_blocks;
+    config.subagent_max_turns = Some(effective.sub_agent_max_turns);
     policy.max_turns = effective.max_turns;
     config.output.max_bytes = effective.max_tool_output_bytes;
     config.output.untrusted = effective.untrusted_tool_outputs;
@@ -110,6 +110,8 @@ pub fn apply_go_config(
 pub struct ApprovalJournalEntry {
     pub marker: ApprovalMarker,
     pub new_items_before: usize,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub historical_only: bool,
     /// None when compaction removed the corresponding call and output.
     pub history_before: Option<usize>,
     pub reason: Option<String>,
@@ -138,6 +140,32 @@ pub struct ApprovalJournal {
 }
 
 impl ApprovalJournal {
+    pub(crate) fn from_history(
+        markers: Vec<ApprovalMarkerBoundary>,
+        history_len: usize,
+    ) -> Result<Self, BridgeError> {
+        let mut previous = 0;
+        let mut entries = Vec::with_capacity(markers.len());
+        for boundary in markers {
+            if boundary.before_item < previous || boundary.before_item > history_len {
+                return Err(BridgeError(
+                    "marker boundaries must be ordered and inside history",
+                ));
+            }
+            boundary.marker.validate()?;
+            approval::approval_call(&boundary.marker.data)?;
+            previous = boundary.before_item;
+            entries.push(ApprovalJournalEntry {
+                marker: boundary.marker,
+                new_items_before: 0,
+                historical_only: true,
+                history_before: Some(boundary.before_item),
+                reason: None,
+            });
+        }
+        Self::restore(entries, history_len, 0)
+    }
+
     pub(crate) fn restore(
         entries: Vec<ApprovalJournalEntry>,
         history_len: usize,
@@ -145,6 +173,7 @@ impl ApprovalJournal {
     ) -> Result<Self, BridgeError> {
         for entry in &entries {
             entry.marker.validate()?;
+            approval::approval_call(&entry.marker.data)?;
             if entry.history_before.is_some_and(|n| n > history_len)
                 || entry.new_items_before > new_items_len
             {
@@ -218,7 +247,13 @@ impl ApprovalJournal {
         let mut entries: Vec<_> = state
             .entries
             .iter()
-            .filter(|entry| !history || entry.history_before.is_some())
+            .filter(|entry| {
+                if history {
+                    entry.history_before.is_some()
+                } else {
+                    !entry.historical_only
+                }
+            })
             .collect();
         let position = |entry: &&ApprovalJournalEntry| {
             if history {
@@ -293,6 +328,7 @@ impl RunHooks for ApprovalJournal {
                             agent.map(|name| dto::AgentRef { name }),
                         ),
                         new_items_before,
+                        historical_only: false,
                         history_before: Some(history_before),
                         reason,
                     });
@@ -378,6 +414,16 @@ pub trait GoApprovalGate: Send + Sync {
         context: &'a Context,
         request: &'a ApprovalRequest,
     ) -> BoxFuture<'a, Result<GoApprovalDecision, Error>>;
+}
+
+/// Awaited persistence after approval records have been published to hooks.
+/// A failure prevents the next model invocation, including after partial resolution.
+pub trait GoApprovalBoundary: Send + Sync {
+    fn commit<'a>(
+        &'a self,
+        context: &'a Context,
+        result: &'a RunResult,
+    ) -> BoxFuture<'a, Result<(), Error>>;
 }
 
 struct DeferredHost(Arc<dyn Host>);
@@ -539,5 +585,133 @@ impl RunHooks for GoEventAdapter {
             }
             Ok(())
         })
+    }
+}
+
+#[cfg(test)]
+mod history_seed_tests {
+    use super::*;
+
+    #[tokio::test]
+    async fn seeded_journal_encodes_only_history_and_rebases_after_restore() {
+        let call = ToolCall {
+            id: "old".into(),
+            name: "write".into(),
+            arguments: serde_json::json!({}),
+        };
+        let markers: Vec<_> = [ApprovalPhase::Pending, ApprovalPhase::Denied]
+            .into_iter()
+            .map(|phase| ApprovalMarkerBoundary {
+                before_item: 2,
+                marker: ApprovalMarker::from_call(
+                    &call,
+                    phase,
+                    Some(dto::AgentRef {
+                        name: "old-agent".into(),
+                    }),
+                ),
+            })
+            .collect();
+        let before = vec![
+            RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![],
+                },
+            },
+            RunItem::ToolCall { call: call.clone() },
+            RunItem::ToolResult {
+                call_id: call.id.clone(),
+                output: ToolOutput {
+                    content: vec![],
+                    is_error: true,
+                    should_pause: false,
+                },
+            },
+        ];
+        let journal = ApprovalJournal::from_history(markers.clone(), before.len()).unwrap();
+        let serialized = serde_json::to_vec(&journal.entries()).unwrap();
+        let journal = ApprovalJournal::restore(
+            serde_json::from_slice(&serialized).unwrap(),
+            before.len(),
+            0,
+        )
+        .unwrap();
+        assert!(journal.encode_new_items(&[], &[]).unwrap().items.is_empty());
+        let agents = vec![
+            None,
+            Some(dto::AgentRef {
+                name: "old-agent".into(),
+            }),
+            None,
+        ];
+        let encoded = journal.encode_history(&before, &agents).unwrap();
+        assert_eq!(
+            encoded.items,
+            approval::encode_history(&before, &agents, &markers).unwrap()
+        );
+        assert_eq!(
+            encoded.phases,
+            vec![ApprovalPhase::Pending, ApprovalPhase::Denied]
+        );
+        let context = Context {
+            run_id: "journal".into(),
+            cancellation: Arc::new(crate::CancellationToken::new()),
+            deadline: None,
+        };
+        journal
+            .observe(
+                &context,
+                Observation::HistoryReplaced {
+                    before: before.clone(),
+                    after: before[1..].to_vec(),
+                },
+            )
+            .await
+            .unwrap();
+        let rebased = journal.history_markers().unwrap();
+        assert_eq!(
+            rebased.iter().map(|m| m.before_item).collect::<Vec<_>>(),
+            vec![1, 1]
+        );
+        assert_eq!(rebased[0].marker, markers[0].marker);
+        assert_eq!(rebased[1].marker, markers[1].marker);
+        journal
+            .observe(
+                &context,
+                Observation::ApprovalMarker {
+                    agent: Some("agent".into()),
+                    call,
+                    decision: ApprovalDecision::Approve,
+                    new_items_before: 0,
+                    history_before: 2,
+                    reason: Some("new decision".into()),
+                },
+            )
+            .await
+            .unwrap();
+        let new = journal.encode_new_items(&[], &[]).unwrap();
+        assert_eq!(new.phases, vec![ApprovalPhase::Approved]);
+        assert_eq!(new.reasons, vec![Some("new decision".into())]);
+        assert_eq!(new.items.len(), 1);
+        let entry = serde_json::to_value(journal.entries().last().unwrap()).unwrap();
+        assert!(entry.get("historical_only").is_none());
+        let old: ApprovalJournalEntry = serde_json::from_value(entry).unwrap();
+        assert!(!old.historical_only);
+        journal
+            .observe(
+                &context,
+                Observation::HistoryReplaced {
+                    before: before[1..].to_vec(),
+                    after: vec![],
+                },
+            )
+            .await
+            .unwrap();
+        assert!(journal.history_markers().unwrap().is_empty());
+        assert_eq!(
+            journal.encode_new_items(&[], &[]).unwrap().phases,
+            vec![ApprovalPhase::Approved]
+        );
     }
 }

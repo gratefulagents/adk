@@ -116,3 +116,36 @@ Limits requiring future owned acceptance work: type-checked external/dependency 
 ## Attribution and licensing
 
 Declarations, comments, schemas, docs, tests and the full-source archive derive from **Grateful Agents SDK v0.0.115** at the commit above. Upstream ships the GNU GPL version 3 license in `LICENSE`; that exact text is itself included in `sources.json`. These are attributed source-derived inventory artifacts, not a relicensing of upstream work. The repository's root license/notice copies are maintained by the coordinating migration work. Generator files carry `SPDX-License-Identifier: GPL-3.0-only`. Preserve source attribution and applicable GPL obligations when redistributing the excerpts or generated archive.
+
+## Issue #11 audit overlay (append-only note)
+
+[`issue-11-overlay.json`](issue-11-overlay.json) is an acceptance-ID-keyed,
+post-generation audit overlay for the public-facade issue. It is **not** a
+replacement for the generated `sdk-v0.0.115/` baseline and must never be used to
+edit its `implementation_status` or `verification_status` fields. The overlay
+records a pre-implementation snapshot: all 9,142 baseline IDs are either
+`excluded` (251) or `unresolved` (8,891), with `verification_status: not_run`.
+It contains no auto-verified record.
+
+The overlay excludes `sdk_cli`, `sdk_evals`/`sdk_evals::*`, and the three
+Terminal-Bench workflow records routed to `sdk::ci`. Its module API/test
+reference map is a navigation aid only; it is explicitly separate from
+per-record semantic closure. A future completion claim needs the acceptance
+ID's implementation symbol, executable Rust test or reviewed artifact,
+command/log, target/features, source-regression reference, and approved
+divergence where applicable.
+
+Use the deterministic helper without regenerating or mutating snapshots:
+
+```sh
+python3 scripts/issue11-ledger.py generate
+python3 scripts/issue11-ledger.py check
+```
+
+The helper writes only `issue-11-overlay.json` and refuses paths under the
+generated snapshot directory. The audit also observed source-pin drift: the
+local `repos/sdk` checkout was v0.0.116 (`63afe2ed8cc5f13ca7469054f2c1cb812fcac801`),
+whereas this ledger remains pinned to v0.0.115
+(`1dc92b73900fac74dc357a938e4b5eee6392b418`). See
+[`docs/verification/issue-11.md`](../../verification/issue-11.md) for evidence
+limits and the parent-owned final-validation section.

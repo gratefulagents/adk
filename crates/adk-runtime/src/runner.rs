@@ -41,11 +41,13 @@ use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_approvals,
+    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_provenance,
     estimate_history_tokens, estimate_history_tokens_with_approvals,
-    estimate_request_overhead_tokens, finalize_local_history_with_approvals, output_reserve_tokens,
+    estimate_request_overhead_tokens, finalize_with_provenance, output_reserve_tokens,
 };
+use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
+use crate::tracing::{GenerationGuard, GenerationObserver, GenerationStatus};
 
 #[derive(Clone)]
 pub enum ModelBinding {
@@ -101,6 +103,8 @@ pub struct AgentConfig {
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn OutputParser>>,
+    pub input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub settings: Map<String, Value>,
     pub hooks: Option<Arc<dyn RunHooks>>,
 }
@@ -118,6 +122,8 @@ impl AgentConfig {
             output_schema_name: "final_output".into(),
             output_schema_strict: true,
             output_parser: None,
+            input_guardrails: vec![],
+            output_guardrails: vec![],
             settings: Map::new(),
             hooks: None,
         }
@@ -195,6 +201,7 @@ pub enum Observation {
     },
     AgentStarted {
         agent: String,
+        instructions: String,
     },
     ModelAccepted {
         agent: String,
@@ -266,6 +273,7 @@ pub trait RunHooks: Send + Sync {
 }
 
 pub struct CompactionRequest {
+    pub history_provenance: Vec<ItemProvenance>,
     pub agent: String,
     pub model: String,
     pub history: Vec<RunItem>,
@@ -274,6 +282,7 @@ pub struct CompactionRequest {
 }
 
 pub struct CompactedHistory {
+    pub history_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
     pub context_tokens: u64,
     /// Report provider compaction usage; local compaction uses zero counters.
@@ -347,12 +356,22 @@ pub trait StopGate: Send + Sync {
         output: &'a Value,
     ) -> BoxFuture<'a, Result<Option<String>, Error>>;
 }
+/// Host-maintained state consulted only after compaction. A nonblank result
+/// supersedes the static working-state context; blank results fall back to it.
+pub trait CompactionCarryForward: Send + Sync {
+    fn context<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, Result<String, Error>>;
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+}
+
 #[derive(Clone)]
 pub struct RunnerConfig {
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
     pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
+    pub generation_observer: Option<Arc<dyn GenerationObserver>>,
     pub limits: Limits,
     pub cost_estimator: Option<Arc<dyn CostEstimator>>,
     /// None disables the model inactivity timeout. Host backpressure is excluded.
@@ -366,6 +385,8 @@ pub struct RunnerConfig {
     pub return_tool_output: bool,
     /// Optional native guardrail; Go leaves argument decoding/validation to each tool.
     pub validate_tool_arguments: bool,
+    pub tool_input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub tool_output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub approve_mutating_tools: bool,
     pub consecutive_tool_error_limit: Option<usize>,
     pub stop_gate: Option<Arc<dyn StopGate>>,
@@ -373,6 +394,11 @@ pub struct RunnerConfig {
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Session-owned children survive individual runs; the scheduler owner closes them.
     pub subagents: Option<Arc<crate::subagent_tools::SubagentSession>>,
+    /// Optional per-invocation ceiling inherited by submitted children.
+    pub subagent_max_turns: Option<std::num::NonZeroU32>,
+    /// Static host context injected after compaction, never into the initial prompt.
+    pub working_state_context: String,
+    pub compaction_carry_forward: Option<Arc<dyn CompactionCarryForward>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
     pub hooks: Option<Arc<dyn RunHooks>>,
@@ -389,6 +415,7 @@ impl Default for RunnerConfig {
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
             error_handler: None,
+            generation_observer: None,
             limits: Limits::default(),
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
@@ -397,12 +424,17 @@ impl Default for RunnerConfig {
             prompt_cache_namespace: None,
             return_tool_output: false,
             validate_tool_arguments: false,
+            tool_input_guardrails: vec![],
+            tool_output_guardrails: vec![],
             approve_mutating_tools: false,
             consecutive_tool_error_limit: Some(3),
             stop_gate: None,
             stop_gate_max_blocks: 8,
             turn_context: None,
             subagents: None,
+            subagent_max_turns: None,
+            working_state_context: String::new(),
+            compaction_carry_forward: None,
             transient_context: vec![],
             hooks: None,
             durable: None,
@@ -449,54 +481,96 @@ impl Continuation {
     /// Go ChatLoop boundary: resolve and execute each pending call before asking
     /// the next gate, then start a fresh invocation budget without replaying effects.
     pub async fn resume_go_gate(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+    ) -> Result<RunOutcome, RunError> {
+        self.resume_go_gate_inner(gate, None).await
+    }
+    /// Publish resolved approval records and await persistence before advancing.
+    /// Completed partial work is committed even when a later gate or tool fails;
+    /// persistence failures take precedence over publication or resolution failures.
+    /// Durable continuations are rejected until append reconciliation is supported.
+    pub async fn resume_go_gate_with_boundary(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+        boundary: &dyn crate::compat::GoApprovalBoundary,
+    ) -> Result<RunOutcome, RunError> {
+        if self.engine.durable_state.is_some() {
+            return Err(RunError::with_partial(
+                Error::new(
+                    ErrorCategory::Unsupported,
+                    "durable approval boundaries require append reconciliation",
+                ),
+                self.engine.result,
+            ));
+        }
+        self.resume_go_gate_inner(gate, Some(boundary)).await
+    }
+    async fn resume_go_gate_inner(
         mut self,
         gate: &dyn crate::compat::GoApprovalGate,
+        boundary: Option<&dyn crate::compat::GoApprovalBoundary>,
     ) -> Result<RunOutcome, RunError> {
         self.engine.result.status = RunStatus::Incomplete;
         self.engine.tools_prepared = true;
         self.engine.streaming = false;
         self.engine.sender.take();
-        while let Some(call) = self.engine.calls.front().cloned() {
-            let Some(request) = self
-                .engine
-                .result
-                .pending_approvals
-                .iter()
-                .find(|r| r.call.id == call.id)
-                .cloned()
-            else {
-                return Err(self
+        let initial_items = self.engine.result.new_items.len();
+        let initial_markers = self.engine.approval_journal.entries().len();
+        let resolution = async {
+            while let Some(call) = self.engine.calls.front().cloned() {
+                let Some(request) = self
                     .engine
-                    .fail(Error::new(
+                    .result
+                    .pending_approvals
+                    .iter()
+                    .find(|r| r.call.id == call.id)
+                    .cloned()
+                else {
+                    return Err(Error::new(
                         ErrorCategory::InvalidInput,
                         "Go gate resume requires pending approval calls",
-                    ))
-                    .await);
-            };
-            let decision = match bounded(
-                &self.engine.context,
-                None,
-                gate.approve(&self.engine.context, &request),
-            )
-            .await
-            {
-                Ok(decision) => decision,
-                Err(error) => return Err(self.engine.fail(error).await),
-            };
-            let approval = if decision.approved {
-                ApprovalDecision::Approve
-            } else {
-                ApprovalDecision::Deny
-            };
-            if !decision.approved && !decision.reason.trim().is_empty() {
-                self.engine
-                    .denial_reasons
-                    .insert(call.id.clone(), decision.reason.trim().into());
+                    ));
+                };
+                let decision = bounded(
+                    &self.engine.context,
+                    None,
+                    gate.approve(&self.engine.context, &request),
+                )
+                .await?;
+                let approval = if decision.approved {
+                    ApprovalDecision::Approve
+                } else {
+                    ApprovalDecision::Deny
+                };
+                if !decision.approved && !decision.reason.trim().is_empty() {
+                    self.engine
+                        .denial_reasons
+                        .insert(call.id.clone(), decision.reason.trim().into());
+                }
+                self.engine.approvals.insert(call.id.clone(), approval);
+                self.engine.tool(call).await?;
             }
-            self.engine.approvals.insert(call.id.clone(), approval);
-            if let Err(error) = self.engine.tool(call).await {
+            Ok::<_, Error>(())
+        }
+        .await;
+        if let Some(boundary) = boundary
+            && (self.engine.result.new_items.len() != initial_items
+                || self.engine.approval_journal.entries().len() != initial_markers)
+        {
+            let publication = self.engine.publish_committed().await;
+            if let Err(error) = boundary
+                .commit(&self.engine.context, &self.engine.result)
+                .await
+            {
                 return Err(self.engine.fail(error).await);
             }
+            if let Err(error) = publication {
+                return Err(self.engine.fail(error).await);
+            }
+        }
+        if let Err(error) = resolution {
+            return Err(self.engine.fail(error).await);
         }
         if self.engine.durable_state.is_none() {
             self.engine.turns = 0;
@@ -640,14 +714,40 @@ impl Runner {
     ) -> Result<RunOutcome, RunError> {
         self.engine(context, request, host).drive().await
     }
+    /// Seeds ordered approval sidecars for input history without replaying or republishing them.
+    pub async fn run_with_approval_history(
+        &self,
+        context: Context,
+        request: RunRequest,
+        host: Arc<dyn Host>,
+        markers: Vec<ApprovalMarkerBoundary>,
+    ) -> Result<RunOutcome, RunError> {
+        let journal = crate::compat::ApprovalJournal::from_history(markers, request.input.len())
+            .map_err(|error| Error::new(ErrorCategory::InvalidInput, error.to_string()))?;
+        let mut engine = self.engine(context, request, host);
+        engine.committed_markers = journal.entries().len();
+        engine.approval_journal = journal;
+        engine.drive().await
+    }
     pub fn stream(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> RunStream {
         RunStream::new(self.engine(context, request, host))
     }
-    fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
+    fn engine(&self, context: Context, mut request: RunRequest, host: Arc<dyn Host>) -> Engine {
+        if let Some(limit) = self.config.subagent_max_turns {
+            request.policy.tools.max_child_turns = Some(
+                request
+                    .policy
+                    .tools
+                    .max_child_turns
+                    .map_or(limit, |requested| requested.min(limit)),
+            );
+        }
         if let Some(session) = &self.config.subagents {
             session.begin_run();
         }
         Engine {
+            started: Instant::now(),
+            last_model: None,
             durable_state: None,
             child_control: None,
             applied_child_messages: HashSet::new(),
@@ -681,6 +781,13 @@ impl Runner {
             sender: None,
             spills: vec![],
             result: RunResult {
+                metrics: None,
+                history_provenance: if request.input_provenance.is_empty() {
+                    vec![ItemProvenance::Unknown; request.input.len()]
+                } else {
+                    request.input_provenance
+                },
+                new_items_provenance: Vec::new(),
                 status: RunStatus::Incomplete,
                 final_output: None,
                 new_items: vec![],
@@ -689,6 +796,7 @@ impl Runner {
                 usage: Usage::default(),
                 pending_approvals: vec![],
                 last_agent: Some(self.initial.name.clone()),
+                guardrails: vec![],
             },
         }
     }
@@ -704,11 +812,14 @@ enum Phase {
 }
 
 struct ExecutedTool {
+    guardrails: Vec<GuardrailReport>,
     raw: ToolOutput,
     hook_error: Option<Error>,
 }
 
 struct Engine {
+    started: Instant,
+    last_model: Option<String>,
     child_control: Option<crate::subagent::ChildControl>,
     applied_child_messages: HashSet<String>,
     durable_state: Option<durable::DurableState>,
@@ -940,8 +1051,21 @@ impl Engine {
         Ok(())
     }
     fn append(&mut self, item: RunItem) {
+        self.append_with_provenance(
+            item,
+            ItemProvenance::Agent {
+                name: self.agent.name.clone(),
+            },
+        );
+    }
+    fn append_unattributed(&mut self, item: RunItem) {
+        self.append_with_provenance(item, ItemProvenance::Unattributed);
+    }
+    fn append_with_provenance(&mut self, item: RunItem, provenance: ItemProvenance) {
         self.result.history.push(item.clone());
+        self.result.history_provenance.push(provenance.clone());
         self.result.new_items.push(item);
+        self.result.new_items_provenance.push(provenance);
     }
     async fn publish_committed(&mut self) -> Result<(), Error> {
         let entries = self.approval_journal.entries();
@@ -951,27 +1075,18 @@ impl Engine {
             return Ok(());
         }
         let items = self.result.new_items[self.committed_cursor..].to_vec();
-        let agents = items
+        let agents = self.result.new_items_provenance[self.committed_cursor..]
             .iter()
-            .map(|item| {
-                let no_agent = match item {
-                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
-                        message.role == Role::User
-                    }
-                    RunItem::ToolResult { call_id, .. } => entries.iter().any(|entry| {
-                        entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
-                            && entry.marker.agent.is_none()
-                            && entry.marker.data.call_id == *call_id
-                    }),
-                    _ => false,
-                };
-                (!no_agent).then(|| adk_codec::dto::AgentRef {
-                    name: self.agent.name.clone(),
-                })
+            .map(|provenance| match provenance {
+                ItemProvenance::Agent { name } => {
+                    Some(adk_codec::dto::AgentRef { name: name.clone() })
+                }
+                ItemProvenance::Unknown | ItemProvenance::Unattributed => None,
             })
             .collect();
         let mut markers = entries[self.committed_markers..]
             .iter()
+            .filter(|entry| !entry.historical_only)
             .map(|entry| {
                 let before_item = entry
                     .new_items_before
@@ -999,11 +1114,26 @@ impl Engine {
         self.committed_markers = entries.len();
         Ok(())
     }
+    fn record_metrics(&mut self) {
+        let elapsed = self
+            .durable_state
+            .as_ref()
+            .map_or_else(|| self.started.elapsed(), |state| state.elapsed());
+        self.result.metrics = Some(RunMetrics {
+            model: self.last_model.clone(),
+            turns: self.turns,
+            cost_usd: self.cost,
+            elapsed_ms: elapsed.as_millis().min(u64::MAX as u128) as u64,
+        });
+    }
     async fn drive(mut self) -> Result<RunOutcome, RunError> {
+        self.result.history_provenance =
+            normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
         let execution = async {
             let status = self.advance().await?;
             self.publish_committed().await?;
             self.result.status = status;
+            self.record_metrics();
             self.checkpoint(
                 if status == RunStatus::Paused {
                     Boundary::Paused
@@ -1038,6 +1168,7 @@ impl Engine {
         }
     }
     async fn fail(mut self, mut error: Error) -> RunError {
+        self.record_metrics();
         self.result.status = RunStatus::Incomplete;
         self.result.final_output = None;
         // Preserve the original failure even when the failed-event sink fails.
@@ -1061,6 +1192,17 @@ impl Engine {
             match self.phase {
                 Phase::Start => {
                     validate_history_pairs(&self.result.history)?;
+                    let checked = run_guardrails(
+                        &self.agent.input_guardrails,
+                        &self.context,
+                        &self.agent.name,
+                        GuardrailInput::Input(&self.result.history),
+                    )
+                    .await;
+                    self.result.guardrails.extend(checked.reports);
+                    if let Some(error) = checked.error {
+                        return Err(error);
+                    }
                     self.checkpoint(Boundary::Started, None).await?;
                     self.emit(RunEvent::Started {
                         agent: self.agent.name.clone(),
@@ -1108,6 +1250,7 @@ impl Engine {
                                 }
                                 continue;
                             }
+                            self.check_output_guardrails(&output).await?;
                             self.result.final_output = Some(output);
                         }
                         self.phase = Phase::Finish;
@@ -1163,6 +1306,98 @@ impl Engine {
         }
         Ok(())
     }
+    async fn apply_compaction_carry_forward(
+        &mut self,
+        history: &mut Vec<RunItem>,
+        provenance: &mut Vec<ItemProvenance>,
+        markers: &mut [ApprovalMarkerBoundary],
+    ) -> Result<(), Error> {
+        let dynamic = if let Some(callback) = &self.config.compaction_carry_forward {
+            bounded(
+                &self.context,
+                self.config.model_idle_timeout,
+                callback.context(&self.context),
+            )
+            .await?
+        } else {
+            String::new()
+        };
+        let section = if dynamic.trim().is_empty() {
+            self.config.working_state_context.trim()
+        } else {
+            dynamic.trim()
+        };
+        let carry = if section.is_empty() {
+            None
+        } else {
+            Some(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: format!(
+                            "{}\nThis live runtime state was injected after context compaction. Treat it as current and higher priority than older compacted history.\n\n{section}",
+                            crate::compaction::CARRY_FORWARD_MARKER
+                        ),
+                    }],
+                },
+            })
+        };
+        if let Some(item) = &carry {
+            let checked = run_guardrails(
+                &self.agent.input_guardrails,
+                &self.context,
+                &self.agent.name,
+                GuardrailInput::Input(std::slice::from_ref(item)),
+            )
+            .await;
+            self.result.guardrails.extend(checked.reports);
+            if let Some(error) = checked.error {
+                return Err(error);
+            }
+        }
+        let mut boundaries = Vec::with_capacity(history.len() + 1);
+        let mut retained = 0;
+        let mut sources = Vec::with_capacity(provenance.len() + 1);
+        for (item, source) in history.iter().zip(provenance.iter()) {
+            boundaries.push(retained);
+            let stale = match item {
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                    let text = message
+                        .content
+                        .iter()
+                        .filter_map(|part| match part {
+                            Content::Text { text } => Some(text.as_str()),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    text.trim()
+                        .starts_with(crate::compaction::CARRY_FORWARD_MARKER)
+                }
+                _ => false,
+            };
+            if !stale {
+                retained += 1;
+                sources.push(source.clone());
+            }
+        }
+        boundaries.push(retained);
+        let mut index = 0;
+        history.retain(|_| {
+            let keep = boundaries[index + 1] > boundaries[index];
+            index += 1;
+            keep
+        });
+        for marker in markers {
+            marker.before_item = boundaries[marker.before_item];
+        }
+        *provenance = sources;
+        if let Some(item) = carry {
+            history.push(item);
+            provenance.push(ItemProvenance::Unattributed);
+        }
+        Ok(())
+    }
     async fn compact(&mut self) -> Result<(), Error> {
         let Some(config) = &self.config.compaction else {
             return Ok(());
@@ -1185,6 +1420,7 @@ impl Engine {
                 )
                 .into(),
             history: self.result.history.clone(),
+            history_provenance: self.result.history_provenance.clone(),
             context_tokens: tokens,
             target_tokens: config.target_tokens,
         };
@@ -1193,7 +1429,7 @@ impl Engine {
             target_tokens: config.target_tokens,
         })
         .await?;
-        let compacted = match bounded(
+        let mut compacted = match bounded(
             &self.context,
             self.config.model_idle_timeout,
             config.compactor.compact(&self.context, request),
@@ -1229,11 +1465,20 @@ impl Engine {
         })
         .await?;
         validate_history_pairs(&compacted.history)?;
+        let mut history_provenance =
+            normalize_provenance(compacted.history.len(), &compacted.history_provenance)?;
+        self.apply_compaction_carry_forward(
+            &mut compacted.history,
+            &mut history_provenance,
+            &mut [],
+        )
+        .await?;
         self.observe(Observation::HistoryReplaced {
             before: self.result.history.clone(),
             after: compacted.history.clone(),
         })
         .await?;
+        self.result.history_provenance = history_provenance;
         self.result.history = compacted.history;
         self.result.usage.context_tokens = Some(compacted.context_tokens);
         self.observe(Observation::Compacted {
@@ -1275,9 +1520,10 @@ impl Engine {
             target_tokens: policy.target_tokens,
         })
         .await?;
-        let outcome = compact_with_approvals(
+        let outcome = compact_with_provenance(
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
             policy,
             if forced {
                 0
@@ -1297,17 +1543,22 @@ impl Engine {
             }
             return Ok(false);
         }
-        let (history, markers) = finalize_local_history_with_approvals(
-            &outcome.history,
-            &outcome.markers,
+        let (mut history, mut markers, mut history_provenance) = finalize_with_provenance(
+            &outcome,
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
         );
+        self.apply_compaction_carry_forward(&mut history, &mut history_provenance, &mut markers)
+            .await?;
         validate_history_pairs(&history)?;
         let before_items = self.result.history.len();
         let context_tokens = estimate_history_tokens_with_approvals(&history, &markers) + overhead;
         let mut input = history.clone();
         input.extend_from_slice(transient);
+        let mut input_provenance = history_provenance.clone();
+        input_provenance.extend_from_slice(&request.input_provenance[self.result.history.len()..]);
+        request.input_provenance = input_provenance;
         request.input = input;
         self.observe(Observation::ApprovalHistoryReplaced {
             before: self.result.history.clone(),
@@ -1316,6 +1567,7 @@ impl Engine {
         })
         .await?;
         self.result.history = history;
+        self.result.history_provenance = history_provenance;
         self.result.usage.context_tokens = Some(context_tokens);
         self.observe(Observation::Compacted {
             before_items,
@@ -1354,7 +1606,7 @@ impl Engine {
         }
         if self.consecutive_tool_errors >= limit && !self.tool_error_escalated {
             self.tool_error_escalated = true;
-            self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
+            self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
         }
     }
     async fn model_turn(&mut self) -> Result<(), Error> {
@@ -1367,9 +1619,9 @@ impl Engine {
         }
         if let Some(session) = self.config.subagents.clone() {
             for item in session.collect(&self.context).await? {
-                self.append(item);
+                self.append_unattributed(item);
             }
-            session.update_parent(&self.result.history);
+            session.update_parent(&self.result.history, &self.result.history_provenance);
         }
         self.publish_committed().await?;
         if self.turns >= self.policy.max_turns.get() {
@@ -1394,13 +1646,13 @@ impl Engine {
             );
         }
         let accessible_tools = self.tools_for_access();
-        let tools = accessible_tools
+        let (tools, declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
-            .map(|t| t.definition())
-            .chain(self.agent.handoffs.iter().map(|h| &h.definition))
-            .filter(|d| self.policy.tools.decision(d) != ToolDecision::Deny)
-            .cloned()
-            .collect();
+            .map(|tool| (tool.definition(), tool.timeout()))
+            .chain(self.agent.handoffs.iter().map(|h| (&h.definition, None)))
+            .filter(|(definition, _)| self.policy.tools.decision(definition) != ToolDecision::Deny)
+            .map(|(definition, timeout)| (definition.clone(), timeout))
+            .unzip();
         let mut instructions = if self.config.cache_prefix.is_empty() {
             self.agent.instructions.clone()
         } else {
@@ -1439,7 +1691,10 @@ impl Engine {
                 Value::String(format!("{:x}", hash.finalize())),
             );
         }
+        let mut input_provenance = self.result.history_provenance.clone();
+        input_provenance.resize(input.len(), ItemProvenance::Unattributed);
         let mut request = ModelRequest {
+            input_provenance,
             model: self
                 .fallbacks
                 .get(&(Arc::as_ptr(&self.agent) as usize))
@@ -1458,7 +1713,9 @@ impl Engine {
         };
         self.compact_local(&mut request, false).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
-        let Some((response, model, streamed)) = self.model_response(request).await? else {
+        let Some((response, model, streamed, cost)) =
+            self.model_response(request, declared_tool_timeouts).await?
+        else {
             self.phase = Phase::Model;
             self.checkpoint(Boundary::ModelCompleted, None).await?;
             return Ok(());
@@ -1468,7 +1725,7 @@ impl Engine {
             response: response.clone(),
         })
         .await?;
-        self.record_response(response.clone(), &model)?;
+        self.record_response(response.clone(), &model, cost)?;
         self.charge_child_usage().await?;
         self.publish_committed().await?;
         if !streamed {
@@ -1571,7 +1828,7 @@ impl Engine {
             .collect();
         let ids: Vec<_> = messages.iter().map(|message| message.id.clone()).collect();
         for message in messages {
-            self.append(RunItem::Message {
+            self.append_unattributed(RunItem::Message {
                 message: Message {
                     role: Role::User,
                     content: vec![Content::Text { text: message.text }],
@@ -1595,7 +1852,7 @@ impl Engine {
             let items = session.join(&self.context).await?;
             if !items.is_empty() {
                 for item in items {
-                    self.append(item);
+                    self.append_unattributed(item);
                 }
                 if self.turns >= self.policy.max_turns.get() {
                     self.policy.max_turns = self.policy.max_turns.saturating_add(1);
@@ -1622,7 +1879,7 @@ impl Engine {
                             "the finalization check failed; continue working until it passes"
                                 .into();
                     }
-                    self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                    self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
                     if self.turns >= self.policy.max_turns.get() {
                         self.policy.max_turns = self.policy.max_turns.saturating_add(1);
                     }
@@ -1636,6 +1893,7 @@ impl Engine {
             self.phase = Phase::Model;
             return Ok(());
         }
+        self.check_output_guardrails(&output).await?;
         self.result.final_output = Some(output.clone());
         self.observe(Observation::AgentEnded {
             agent: self.agent.name.clone(),
@@ -1644,6 +1902,20 @@ impl Engine {
         .await?;
         self.phase = Phase::Finish;
         Ok(())
+    }
+    async fn check_output_guardrails(&mut self, output: &Value) -> Result<(), Error> {
+        let checked = run_guardrails(
+            &self.agent.output_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::Output(output),
+        )
+        .await;
+        self.result.guardrails.extend(checked.reports);
+        match checked.error {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
         if let Some(schema) = &self.agent.output_schema {
@@ -1702,6 +1974,7 @@ impl Engine {
     }
     fn account_usage(&mut self, used: &Usage, cost: f64) -> Result<(), Error> {
         let usage = &mut self.result.usage;
+        usage.requests = usage.requests.saturating_add(used.requests);
         usage.input_tokens = usage.input_tokens.saturating_add(used.input_tokens);
         usage.output_tokens = usage.output_tokens.saturating_add(used.output_tokens);
         usage.cache_read_tokens = usage
@@ -1720,16 +1993,22 @@ impl Engine {
         self.cost += cost;
         Ok(())
     }
-    fn record_response(&mut self, response: ModelResponse, model: &str) -> Result<(), Error> {
+    fn record_response(
+        &mut self,
+        response: ModelResponse,
+        model: &str,
+        known_cost: Option<f64>,
+    ) -> Result<(), Error> {
         for item in &response.items {
             self.append(item.clone());
         }
-        let cost = self
-            .config
-            .cost_estimator
-            .as_ref()
-            .map(|c| c.cost(model, &response.usage))
-            .unwrap_or(0.0);
+        let cost = known_cost.unwrap_or_else(|| {
+            self.config
+                .cost_estimator
+                .as_ref()
+                .map(|c| c.cost(model, &response.usage))
+                .unwrap_or(0.0)
+        });
         let accounting = self.account_usage(&response.usage, cost);
         self.result.responses.push(response);
         accounting
@@ -1737,7 +2016,8 @@ impl Engine {
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
-    ) -> Result<Option<(ModelResponse, String, bool)>, Error> {
+        declared_tool_timeouts: Vec<Option<Duration>>,
+    ) -> Result<Option<(ModelResponse, String, bool, Option<f64>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
@@ -1755,6 +2035,7 @@ impl Engine {
                 self.turns += 1;
                 self.observe(Observation::AgentStarted {
                     agent: self.agent.name.clone(),
+                    instructions: self.agent.instructions.clone(),
                 })
                 .await?;
                 self.observe(Observation::ModelAttempt {
@@ -1784,7 +2065,32 @@ impl Engine {
                         })
                         .await?;
                 }
+                self.last_model = Some(request.model.clone());
                 self.checkpoint(Boundary::ModelDispatched, None).await?;
+                let mut generation = self.config.generation_observer.as_ref().map(|observer| {
+                    let info = match binding {
+                        ModelBinding::Complete { model, .. } => model.info(&request.model),
+                        ModelBinding::Streaming { model, .. } => model.info(&request.model),
+                    };
+                    GenerationGuard::new(
+                        observer.clone(),
+                        &self.context,
+                        &self.agent.name,
+                        info,
+                        self.child_control.as_ref().map(|control| control.task_id()),
+                        self.turns,
+                        &request,
+                        declared_tool_timeouts.clone(),
+                        adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                            &self.agent.name,
+                            &request,
+                            &declared_tool_timeouts,
+                            &markers,
+                        ),
+                    )
+                });
+                let responses_before = self.result.responses.len();
+                let cost_before = self.cost;
                 let control = self.child_control.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
                 let attempt_result = {
@@ -1806,8 +2112,30 @@ impl Engine {
                         attempt.await
                     }
                 };
+                if let Some(generation) = &mut generation {
+                    generation.returned();
+                    if self.result.responses.len() > responses_before {
+                        generation.record.response = self.result.responses.last().cloned();
+                        generation.record.cost_usd = self
+                            .config
+                            .cost_estimator
+                            .as_ref()
+                            .map(|_| self.cost - cost_before);
+                    }
+                }
                 match attempt_result {
                     Ok(response) => {
+                        let cost = self
+                            .config
+                            .cost_estimator
+                            .as_ref()
+                            .map(|estimator| estimator.cost(binding.name(), &response.usage));
+                        if let Some(generation) = &mut generation {
+                            generation.record.response = Some(response.clone());
+                            generation.record.cost_usd =
+                                cost.filter(|cost| cost.is_finite() && *cost >= 0.0);
+                            generation.finish(GenerationStatus::Completed);
+                        }
                         self.calibration.observe_estimate(
                             response
                                 .usage
@@ -1825,9 +2153,13 @@ impl Engine {
                             response,
                             binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
+                            cost,
                         )));
                     }
                     Err((error, committed)) => {
+                        if let Some(generation) = &mut generation {
+                            generation.record.error = Some(error.info.clone());
+                        }
                         if self.durable_state.is_some() && self.child_control.is_none() {
                             return Err(error);
                         }
@@ -1858,6 +2190,12 @@ impl Engine {
                             ModelBinding::Complete { model, .. } => model.retry_advice(&error),
                             ModelBinding::Streaming { model, .. } => model.retry_advice(&error),
                         };
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_reason = advice
+                                .as_ref()
+                                .map(|advice| advice.reason.trim().to_owned())
+                                .filter(|reason| !reason.is_empty());
+                        }
                         if let Some(next) = candidates.get(index + 1).filter(|_| {
                             error.info.category != ErrorCategory::ModelBehavior
                                 && (idle
@@ -1883,6 +2221,10 @@ impl Engine {
                                             .any(|part| reason.contains(part)))
                                     }))
                         }) {
+                            if let Some(generation) = &mut generation {
+                                generation.record.fallback_model = Some(next.name().into());
+                                generation.finish(GenerationStatus::Fallback);
+                            }
                             self.fallbacks.insert(agent_key, (index + 1, 0));
                             self.observe(Observation::Fallback {
                                 from: binding.name().into(),
@@ -1893,7 +2235,13 @@ impl Engine {
                         }
                         if let Some(handler) = &self.config.error_handler {
                             match handler.handle(&self.agent.name, self.turns - 1, &error) {
-                                ModelErrorAction::Retry | ModelErrorAction::Continue => continue,
+                                ModelErrorAction::Retry => {
+                                    if let Some(generation) = &mut generation {
+                                        generation.finish(GenerationStatus::Retrying);
+                                    }
+                                    continue;
+                                }
+                                ModelErrorAction::Continue => continue,
                                 ModelErrorAction::Abort => {
                                     return Err(self.child_model_failure(error));
                                 }
@@ -1938,6 +2286,10 @@ impl Engine {
                                 .min(Duration::from_secs(30))
                         }
                         .min(Duration::from_secs(300));
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_after = Some(delay);
+                            generation.finish(GenerationStatus::Retrying);
+                        }
                         self.observe(Observation::Retry {
                             model: binding.name().into(),
                             delay,
@@ -2054,7 +2406,7 @@ impl Engine {
                     Ok(response) => Ok(response),
                     Err(error) => {
                         if let Some(response) = complete {
-                            let _ = self.record_response(response, binding.name());
+                            let _ = self.record_response(response, binding.name(), None);
                             let _ = self.charge_child_usage().await;
                         } else {
                             if !delta_text.is_empty() {
@@ -2252,6 +2604,7 @@ impl Engine {
             self.finish_tool(
                 call,
                 ExecutedTool {
+                    guardrails: vec![],
                     raw: output,
                     hook_error: None,
                 },
@@ -2322,7 +2675,7 @@ impl Engine {
                         is_error: true,
                         should_pause: false,
                     };
-                    self.append(RunItem::ToolResult {
+                    self.append_unattributed(RunItem::ToolResult {
                         call_id: call.id.clone(),
                         output: output.clone(),
                     });
@@ -2394,6 +2747,29 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
+        let checked = run_guardrails(
+            &self.config.tool_input_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::ToolInput(call),
+        )
+        .await;
+        let tripped = checked.tripped();
+        let mut guardrails = checked.reports;
+        if let Some(error) = checked.error {
+            let raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            return Ok(ExecutedTool {
+                raw,
+                guardrails,
+                hook_error: if tripped { None } else { Some(error) },
+            });
+        }
         self.observe(Observation::ToolStarted {
             agent: self.agent.name.clone(),
             call: call.clone(),
@@ -2473,7 +2849,7 @@ impl Engine {
                 )
                 .await?;
         }
-        let raw = match result {
+        let mut raw = match result {
             Ok(output) => output,
             Err(error) => {
                 if self.durable_state.is_some() {
@@ -2502,6 +2878,28 @@ impl Engine {
                 }
             }
         };
+        let checked = run_tool_output_guardrails(
+            &self.config.tool_output_guardrails,
+            &self.context,
+            &self.agent.name,
+            call,
+            &mut raw,
+        )
+        .await;
+        let tripped = checked.tripped();
+        guardrails.extend(checked.reports);
+        let guardrail_error = if let Some(error) = checked.error {
+            raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            if tripped { None } else { Some(error) }
+        } else {
+            None
+        };
         let hook_error = self
             .observe(Observation::RawToolOutput {
                 call: call.clone(),
@@ -2509,11 +2907,16 @@ impl Engine {
             })
             .await
             .err();
-        Ok(ExecutedTool { raw, hook_error })
+        Ok(ExecutedTool {
+            raw,
+            guardrails,
+            hook_error: guardrail_error.or(hook_error),
+        })
     }
     async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
         self.calls.pop_front();
         self.approvals.remove(&call.id);
+        self.result.guardrails.extend(executed.guardrails);
         let raw = executed.raw;
         self.tool_pause |= raw.should_pause;
         if let Some(error) = executed.hook_error {
@@ -2542,6 +2945,11 @@ impl Engine {
         if self.tool_final.is_none() {
             self.tool_final = Some(text(&processed.item_output.content));
         }
+        let provenance = ItemProvenance::Agent {
+            name: self.agent.name.clone(),
+        };
+        self.result.history_provenance.push(provenance.clone());
+        self.result.new_items_provenance.push(provenance);
         self.result.history.push(RunItem::ToolResult {
             call_id: call.id.clone(),
             output: processed.output,
@@ -2626,6 +3034,7 @@ impl std::error::Error for FailedSpills {
 #[derive(Default)]
 pub struct Conversation {
     pub history: Vec<RunItem>,
+    pub history_provenance: Vec<ItemProvenance>,
     spills: Vec<Arc<SpillFile>>,
     paused: bool,
 }
@@ -2641,11 +3050,16 @@ impl Conversation {
         if self.paused {
             return Err(Error::new(ErrorCategory::InvalidInput, "resume the continuation and accept its outcome before running the conversation again").into());
         }
+        self.history_provenance =
+            normalize_provenance(self.history.len(), &self.history_provenance)?;
         self.history.extend(input);
+        self.history_provenance
+            .resize(self.history.len(), ItemProvenance::Unknown);
         let result = runner
             .run(
                 context,
                 RunRequest {
+                    input_provenance: self.history_provenance.clone(),
                     input: self.history.clone(),
                     policy,
                 },
@@ -2655,6 +3069,7 @@ impl Conversation {
         match result {
             Ok(outcome) => {
                 self.history = outcome.result.history.clone();
+                self.history_provenance = outcome.result.history_provenance.clone();
                 self.paused = outcome.result.status == RunStatus::Paused;
                 self.spills.extend(outcome.spills.iter().cloned());
                 Ok(outcome)
@@ -2670,6 +3085,7 @@ impl Conversation {
     pub fn accept_error(&mut self, error: &RunError) {
         if let Some(partial) = &error.partial {
             self.history = partial.history.clone();
+            self.history_provenance = partial.history_provenance.clone();
         }
         if let Some(spills) = error
             .error
@@ -2684,6 +3100,7 @@ impl Conversation {
     /// Use after resuming an owned continuation to update conversation history.
     pub fn accept(&mut self, outcome: &mut RunOutcome) {
         self.history = outcome.result.history.clone();
+        self.history_provenance = outcome.result.history_provenance.clone();
         self.paused = outcome.result.status == RunStatus::Paused;
         self.spills.extend(outcome.spills.iter().cloned());
     }
@@ -2773,6 +3190,7 @@ impl Runner {
             durable.resume = invocation.resume;
             if durable.resume.is_some() {
                 invocation.request.input.clear();
+                invocation.request.input_provenance.clear();
             }
             scoped
                 .drive_durable(

@@ -6,7 +6,7 @@ mod secrets;
 mod shell;
 
 pub use policy::{SecurityPolicy, clamp_access, normalize_access};
-pub use secrets::{SecretKind, check_secrets};
+pub use secrets::{SecretKind, check_secrets, redact_secrets};
 pub use shell::{CommandClass, classify_command, inspect_literal_commands, validate_git_push};
 
 use adk_core::{

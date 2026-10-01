@@ -75,7 +75,7 @@ pub(crate) fn prepare_create(
     validate_snapshot(&snapshot)?;
     snapshot.schema_version = SCHEMA_VERSION;
     if snapshot.created_at == zero_time() {
-        snapshot.created_at = Utc::now();
+        snapshot.created_at = Utc::now().fixed_offset();
     }
     if snapshot.updated_at == zero_time() {
         snapshot.updated_at = snapshot.created_at;
@@ -114,17 +114,17 @@ pub(crate) fn prepare_append(
             event.id = EventId::new();
         }
         if event.at == zero_time() {
-            event.at = snapshot.updated_at;
+            event.at = snapshot.updated_at.with_timezone(&Utc).fixed_offset();
         }
         event.tenant_id = lease.tenant_id.clone();
         event.run_id = lease.run_id.clone();
         event.sequence = sequence + i as u64 + 1;
-        redact_value(&mut event.payload, event.classification, options)?;
+        redact_value(&mut event.payload, event.classification.clone(), options)?;
     }
     snapshot.schema_version = SCHEMA_VERSION;
     snapshot.event_sequence = end_sequence;
     if snapshot.updated_at == zero_time() {
-        snapshot.updated_at = Utc::now();
+        snapshot.updated_at = Utc::now().fixed_offset();
     }
     redact_snapshot(&mut snapshot, options)?;
     Ok((snapshot, events))
@@ -145,24 +145,28 @@ fn redact_snapshot(snapshot: &mut RunSnapshot, options: &StoreOptions) -> Result
     if options.redactor.is_none() {
         return Ok(());
     }
-    redact_value(&mut snapshot.state, snapshot.classification, options)?;
+    redact_value(
+        &mut snapshot.state,
+        snapshot.classification.clone(),
+        options,
+    )?;
     for step in &mut snapshot.steps {
-        redact_value(&mut step.data, snapshot.classification, options)?;
+        redact_value(&mut step.data, snapshot.classification.clone(), options)?;
     }
     for tool in &mut snapshot.tool_calls {
         let classification = if tool.classification.is_unspecified() {
-            snapshot.classification
+            snapshot.classification.clone()
         } else {
-            tool.classification
+            tool.classification.clone()
         };
-        redact_value(&mut tool.input, classification, options)?;
+        redact_value(&mut tool.input, classification.clone(), options)?;
         redact_value(&mut tool.output, classification, options)?;
     }
     for effect in &mut snapshot.effects {
         let classification = if effect.data_classification.is_unspecified() {
-            snapshot.classification
+            snapshot.classification.clone()
         } else {
-            effect.data_classification
+            effect.data_classification.clone()
         };
         redact_value(&mut effect.outcome, classification, options)?;
     }

@@ -258,6 +258,7 @@ fn all_span_kinds_and_hook_categories_match_independent_pinned_go() {
         "agent",
         &ModelResponse {
             snapshot_raw: None,
+            snapshot_projection: None,
             raw: None,
             items: vec![RunItem::Message {
                 message: Message {
@@ -469,6 +470,7 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
                 }
                 Ok(ModelResponse {
                     snapshot_raw: None,
+                    snapshot_projection: None,
                     raw: Some(json!({"provider_extra": "retained"})),
                     items: vec![RunItem::Message {
                         message: Message {

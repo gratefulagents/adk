@@ -85,6 +85,7 @@ impl ScriptModel {
         }
         let response = ModelResponse {
             snapshot_raw: None,
+            snapshot_projection: None,
             raw: None,
             items: input_items(&script["items"], Role::Assistant),
             usage: Usage {

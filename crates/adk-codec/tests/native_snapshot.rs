@@ -71,6 +71,7 @@ fn response() -> ModelResponse {
         response_id: Some("native-id".into()),
         metadata: Default::default(),
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: Some(json!({"answer": "<>&", "extra": [null, false, 1]})),
     }
 }

@@ -81,7 +81,7 @@ func (n *normalizer) walk(v any) any {
 			return out
 		}
 		for _, prefix := range []string{"task_", "mem_", "session_", "comment_", "evt_"} {
-			if strings.HasPrefix(x, prefix) {
+			if strings.HasPrefix(x, prefix) && len(x) == len(prefix)+12 {
 				if out, ok := n.ids[x]; ok {
 					return out
 				}

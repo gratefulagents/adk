@@ -970,7 +970,9 @@ fn executed_go_chat_stream_matches_at_every_chunk_boundary() {
     let source = golden["chat_sse"].as_str().unwrap().as_bytes();
     let mut expected = wire::response(&golden["chat_sse_response"], Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
-    // The Go client fixture is Anthropic-shaped; native raw data retains its protocol shape.
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
     expected.raw = Some(json!({
         "id": "chat-fixture",
         "choices": [{"finish_reason": "tool_calls", "message": {
@@ -1086,7 +1088,9 @@ fn executed_go_sparse_responses_stream_retains_deltas_at_every_boundary() {
     let reference = &golden["responses_sparse_sse_response"];
     let mut expected = wire::response(reference, Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
-    // The Go client fixture is Anthropic-shaped; native raw data retains its protocol shape.
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
     expected.raw = Some(json!({
         "id": "responses-fixture", "model": "gpt-5.6", "end_turn": false, "status": "completed",
         "output": [

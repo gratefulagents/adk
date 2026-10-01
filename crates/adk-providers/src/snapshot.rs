@@ -1,9 +1,18 @@
 //! Ordered provider-neutral diagnostic documents used by compatibility traces.
 //! Native provider payloads remain separately available on `ModelResponse::raw`.
+mod completion;
 use crate::wire::Protocol;
 use adk_core::{Error, ErrorCategory, JsonDocument};
+pub(crate) use completion::document as complete_document;
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, value::RawValue};
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Profile {
+    Stream,
+    Complete,
+    Collected,
+}
 
 #[derive(Default, Serialize, Deserialize)]
 #[serde(default)]
@@ -487,6 +496,10 @@ pub(crate) fn stream_document<'a>(
 
 fn encode(response: &Response) -> Result<JsonDocument, Error> {
     let encoded = serde_json::to_string(response).map_err(|_| invalid())?;
+    JsonDocument::new(compact_go_json(&encoded)).map_err(|_| invalid())
+}
+
+fn compact_go_json(encoded: &str) -> String {
     // Go compacts RawMessage fragments and HTML-escapes string content while
     // preserving number spellings, duplicate keys and typed member order.
     let mut compact = String::with_capacity(encoded.len());
@@ -512,5 +525,5 @@ fn encode(response: &Response) -> Result<JsonDocument, Error> {
             quoted = !quoted;
         }
     }
-    JsonDocument::new(compact).map_err(|_| invalid())
+    compact
 }

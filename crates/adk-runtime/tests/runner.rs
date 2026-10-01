@@ -22,6 +22,7 @@ fn message(role: Role, value: &str) -> RunItem {
 fn response(items: Vec<RunItem>, end_turn: Option<bool>) -> ModelResponse {
     ModelResponse {
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: None,
         items,
         usage: Usage {

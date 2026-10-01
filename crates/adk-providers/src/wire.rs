@@ -869,6 +869,10 @@ fn response_inner(
     }
     Ok(ModelResponse {
         snapshot_raw: Some(crate::snapshot::document(body, protocol, source)?),
+        snapshot_projection: Some(match protocol {
+            Protocol::Anthropic => adk_core::SnapshotProjection::GoAnthropicMessage,
+            Protocol::Chat | Protocol::Responses => adk_core::SnapshotProjection::GoOpenAiMessage,
+        }),
         raw: Some(body.clone()),
         items,
         usage: usage(&body["usage"], protocol),

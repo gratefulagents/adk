@@ -523,7 +523,7 @@ impl Transaction for SqlTransaction<'_> {
                 project_id: self.project_id.into(),
                 run_id: row.get::<_, Option<String>>(2)?.unwrap_or_default(),
                 actor: row.get::<_, Option<String>>(3)?.unwrap_or_default(),
-                time: DateTime::from_timestamp_nanos(ns),
+                time: DateTime::from_timestamp_nanos(ns).fixed_offset(),
                 event_type: row.get(5)?,
                 payload: serde_json::from_slice(&data)?,
             });

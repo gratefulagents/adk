@@ -192,7 +192,7 @@ impl RunStore for FilesystemStore {
             run_id: run.clone(),
             owner: owner.into(),
             token: LeaseToken::new(),
-            expires_at: expiry(now, ttl)?,
+            expires_at: expiry(now, ttl)?.fixed_offset(),
         };
         self.write(&document, Some(lease.clone()))?;
         Ok(lease)
@@ -203,7 +203,7 @@ impl RunStore for FilesystemStore {
         let (document, stored) = self.read(&lease.tenant_id, &lease.run_id)?;
         check_lease(stored.as_ref(), lease, true)?;
         let mut renewed = stored.unwrap();
-        renewed.expires_at = expiry(Utc::now(), ttl)?;
+        renewed.expires_at = expiry(Utc::now(), ttl)?.fixed_offset();
         self.write(&document, Some(renewed.clone()))?;
         Ok(renewed)
     }

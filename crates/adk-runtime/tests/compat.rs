@@ -55,6 +55,7 @@ fn result_item(id: &str) -> RunItem {
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: None,
         items,
         usage: Usage::default(),

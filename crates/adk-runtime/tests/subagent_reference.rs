@@ -87,6 +87,7 @@ impl Model for ControlledModel {
             }
             Ok(ModelResponse {
                 snapshot_raw: None,
+                snapshot_projection: None,
                 raw: None,
                 items: vec![RunItem::Message {
                     message: Message {

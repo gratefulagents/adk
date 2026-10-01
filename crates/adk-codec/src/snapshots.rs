@@ -219,6 +219,142 @@ fn finite_optional<S: serde::Serializer>(
     value.serialize(serializer)
 }
 
+#[derive(Deserialize)]
+struct NormalizedMessage {
+    #[serde(rename = "id")]
+    _id: String,
+    #[serde(rename = "type")]
+    _kind: String,
+    #[serde(rename = "role")]
+    _role: String,
+    #[serde(deserialize_with = "Option::deserialize")]
+    content: Option<Vec<NormalizedBlock>>,
+    #[serde(rename = "model")]
+    _model: String,
+    #[serde(rename = "stop_reason")]
+    _stop_reason: String,
+    usage: NormalizedUsage,
+    end_turn: Option<bool>,
+}
+
+#[derive(Deserialize)]
+struct NormalizedUsage {
+    input_tokens: i64,
+    output_tokens: i64,
+    #[serde(default)]
+    cache_read_input_tokens: i64,
+    #[serde(default)]
+    cache_creation_input_tokens: i64,
+}
+
+#[derive(Deserialize)]
+struct NormalizedBlock {
+    #[serde(rename = "type")]
+    kind: String,
+    #[serde(default)]
+    text: String,
+    #[serde(default)]
+    phase: String,
+    #[serde(default)]
+    id: String,
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    input: RawJson,
+    #[serde(default)]
+    thinking: String,
+    #[serde(default)]
+    signature: String,
+    #[serde(default)]
+    data: String,
+    #[serde(default)]
+    encrypted_content: String,
+    #[serde(default)]
+    content: String,
+    #[serde(default)]
+    created_by: String,
+}
+
+fn projected_snapshot(
+    raw: &adk_core::JsonDocument,
+    projection: adk_core::SnapshotProjection,
+) -> Result<crate::dto::ResponseSnapshot, crate::approval::BridgeError> {
+    use crate::{approval::BridgeError, dto};
+    let message: NormalizedMessage = serde_json::from_str(raw.as_str())
+        .map_err(|_| BridgeError("invalid normalized provider snapshot"))?;
+    let openai = matches!(projection, adk_core::SnapshotProjection::GoOpenAiMessage);
+    let items = message
+        .content
+        .unwrap_or_default()
+        .into_iter()
+        .filter_map(|block| {
+            let mut item = dto::RunItem::default();
+            match block.kind.as_str() {
+                "text" => {
+                    item.message = Some(dto::MessageOutput {
+                        text: block.text,
+                        phase: if openai { block.phase } else { String::new() },
+                        ..Default::default()
+                    });
+                }
+                "tool_use" => {
+                    item.kind = dto::RunItemType(1);
+                    item.tool_call = Some(dto::ToolCallData {
+                        id: block.id,
+                        name: block.name,
+                        input: block.input,
+                    });
+                }
+                "thinking" | "redacted_thinking" => {
+                    item.kind = dto::RunItemType(5);
+                    let mut reasoning = dto::ReasoningData {
+                        id: block.id,
+                        encrypted_content: block.encrypted_content,
+                        ..Default::default()
+                    };
+                    if block.kind == "thinking" {
+                        reasoning.text = block.thinking;
+                        reasoning.signature = block.signature;
+                    } else {
+                        reasoning.redacted_data = block.data;
+                    }
+                    item.reasoning = Some(reasoning);
+                }
+                "compaction" => {
+                    item.kind = dto::RunItemType(7);
+                    item.compaction = Some(dto::CompactionData {
+                        id: block.id,
+                        content: block.content,
+                        encrypted_content: block.encrypted_content,
+                        created_by: block.created_by,
+                    });
+                }
+                _ => return None,
+            }
+            Some(item)
+        })
+        .collect();
+    let wire = dto::ModelResponse {
+        items: Some(items),
+        usage: dto::Usage {
+            requests: 1,
+            input_tokens: message.usage.input_tokens,
+            output_tokens: message.usage.output_tokens,
+            cache_read_tokens: message.usage.cache_read_input_tokens,
+            cache_create_tokens: message.usage.cache_creation_input_tokens,
+        },
+        end_turn: if openai { message.end_turn } else { None },
+        ..Default::default()
+    };
+    let mut snapshot = crate::response_snapshot(&wire);
+    snapshot.raw_available = true;
+    snapshot.raw = RawJson::Encoded(
+        serde_json::value::RawValue::from_string(raw.as_str().to_owned())
+            .expect("validated JSON document"),
+    );
+    Ok(snapshot)
+}
+
 /// Converts representable native response items without inventing agent attribution.
 /// Raw data retains its native shape. URI media, native handoffs, paused tool outputs
 /// and usage counters above the SDK signed range return a bridge error.
@@ -230,6 +366,13 @@ impl TryFrom<&adk_core::ModelResponse> for crate::dto::ResponseSnapshot {
             approval::{BridgeError, encode_content, encode_item},
             dto,
         };
+        if let Some(projection) = response.snapshot_projection {
+            let raw = response
+                .snapshot_raw
+                .as_ref()
+                .ok_or(BridgeError("missing normalized provider snapshot"))?;
+            return projected_snapshot(raw, projection);
+        }
         let count = |value: u64| {
             i64::try_from(value).map_err(|_| BridgeError("usage counter exceeds SDK signed range"))
         };

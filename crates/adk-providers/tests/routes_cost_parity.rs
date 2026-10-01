@@ -47,6 +47,7 @@ fn usage() -> Usage {
 fn answer() -> ModelResponse {
     ModelResponse {
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: None,
         items: vec![RunItem::Message {
             message: Message {

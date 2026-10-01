@@ -66,7 +66,22 @@ fn streamed_normalized_raw_matches_independently_executed_public_sdk() {
         decoder.finish().unwrap();
         let response = complete.unwrap_or_else(|| panic!("{name}: no completion"));
         assert!(response.raw.is_some());
-        assert_eq!(response.snapshot_raw.unwrap().as_str(), expected, "{name}");
+        let snapshot_expected = case["stream_snapshot_json"]
+            .as_str()
+            .unwrap_or_else(|| case["snapshot_json"].as_str().unwrap());
+        for response in [
+            response.clone(),
+            serde_json::from_value(serde_json::to_value(&response).unwrap()).unwrap(),
+            serde_json::from_str(&serde_json::to_string(&response).unwrap()).unwrap(),
+        ] {
+            let snapshot = adk_codec::dto::ResponseSnapshot::try_from(&response).unwrap();
+            assert_eq!(
+                adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                snapshot_expected.as_bytes(),
+                "snapshot {name}"
+            );
+            assert_eq!(response.snapshot_raw.unwrap().as_str(), expected, "{name}");
+        }
         count += 1;
     }
     assert_eq!(count, 7);

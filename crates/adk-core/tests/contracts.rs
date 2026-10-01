@@ -161,6 +161,7 @@ fn model_end_turn_preserves_absent_false_and_true() {
     for end_turn in [None, Some(false), Some(true)] {
         let response = ModelResponse {
             snapshot_raw: None,
+            snapshot_projection: None,
             raw: None,
             items: vec![],
             usage: Usage::default(),
@@ -348,6 +349,7 @@ fn raw_response_preserves_missing_null_and_provider_data() {
     ] {
         let response = ModelResponse {
             snapshot_raw: None,
+            snapshot_projection: None,
             raw: raw.clone(),
             items: vec![],
             usage: Usage::default(),
@@ -411,6 +413,7 @@ fn model_response_persists_ordered_snapshot_raw() {
     let text = " {\"z\":1.00,\"a\":{\"y\":2,\"b\":3}}\n";
     let response = ModelResponse {
         snapshot_raw: Some(JsonDocument::new(text.into()).unwrap()),
+        snapshot_projection: None,
         raw: Some(json!({"native": "distinct"})),
         items: vec![],
         usage: Usage::default(),

@@ -6,7 +6,7 @@
       "id": "session_000000000001",
       "run_id": "fixture-run",
       "summary": "Foundation delivered",
-      "task_000000000003": [
+      "task_ids": [
         "task_000000000001",
         "task_000000000002"
       ],

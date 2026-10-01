@@ -70,6 +70,20 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_record_oracle_and_live_go_execution_are_required(self):
+        original = copy.deepcopy(self.evidence)
+        for change in ("missing_oracle", "wrong_pin", "disabled_go"):
+            with self.subTest(change=change):
+                self.evidence = copy.deepcopy(original)
+                if change == "disabled_go":
+                    self.evidence["environment"]["ADK_TEST_GO"] = "0"
+                else:
+                    self.evidence["reference_fixture_check"] = self.evidence["reference_fixture_check"].replace(
+                        f"typed-record reference fixtures verified at {ledger.BASELINE_REVISION}",
+                        "" if change == "missing_oracle" else "typed-record reference fixtures verified at wrong")
+                with self.assertRaises(SystemExit):
+                    self.apply()
+
     def test_excluded_entry_cannot_be_verified(self):
         self.entries[next(iter(self.entries))]["scope"] = "out_of_scope"
         with self.assertRaises(SystemExit):

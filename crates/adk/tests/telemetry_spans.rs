@@ -357,6 +357,7 @@ async fn actual_runner_exports_generation_retry_usage_identity_and_single_cost_e
                 }
                 Ok(ModelResponse {
                     snapshot_raw: None,
+                    snapshot_projection: None,
                     raw: None,
                     items: vec![RunItem::Message {
                         message: Message {

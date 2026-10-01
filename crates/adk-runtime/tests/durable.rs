@@ -1,6 +1,6 @@
 use adk_core::*;
 use adk_runtime::*;
-use serde_json::json;
+use serde_json::{Value, json};
 use std::{
     collections::VecDeque,
     sync::{
@@ -144,6 +144,7 @@ fn message(role: Role, text: &str) -> RunItem {
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: None,
         items,
         usage: Usage {
@@ -348,6 +349,155 @@ async fn prepared_recovery_keeps_effect_key_step_id_and_advances_sequence() {
     );
     assert!(dispatch.sequence > prepared.sequence);
     assert_ne!(dispatch.attempt_id, prepared.attempt_id);
+}
+
+#[tokio::test]
+async fn unknown_effect_metadata_blocks_native_resume_and_stored_adapter() {
+    use adk_durable::{FilesystemStore, RunId, RunSnapshot, RunStore, TenantId};
+
+    let (runner, _, _) = setup(vec![call("one")], false, false);
+    let original = Arc::new(Store::default());
+    run(&runner, original.clone(), None).await.unwrap();
+    for boundary in [
+        "model_prepared",
+        "model_completed",
+        "tool_prepared",
+        "tool_completed",
+    ] {
+        for field in ["state", "classification"] {
+            for wire in [
+                Some(json!("future_value")),
+                Some(json!("")),
+                Some(Value::Null),
+                None,
+            ] {
+                let checkpoint = original.at(boundary);
+                let mut value = serde_json::to_value(&checkpoint).unwrap();
+                match &wire {
+                    Some(wire) => value["effect"][field] = wire.clone(),
+                    None => {
+                        value["effect"].as_object_mut().unwrap().remove(field);
+                    }
+                }
+                let decoded =
+                    RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).unwrap();
+                let expected = wire.as_ref().and_then(Value::as_str).unwrap_or("");
+                match field {
+                    "state" => assert_eq!(
+                        decoded.effect.as_ref().unwrap().state,
+                        adk_durable::EffectState::Unknown(expected.into())
+                    ),
+                    _ => assert_eq!(
+                        decoded.effect.as_ref().unwrap().classification,
+                        adk_durable::EffectClassification::Unknown(expected.into())
+                    ),
+                }
+                assert_eq!(
+                    serde_json::to_value(&decoded).unwrap()["effect"][field],
+                    json!(expected)
+                );
+
+                let (resumer, model, tool) =
+                    setup(vec![message(Role::Assistant, "resumed")], false, false);
+                let resumed = Arc::new(Store::default());
+                let error = run(&resumer, resumed.clone(), Some(decoded.clone()))
+                    .await
+                    .err()
+                    .unwrap();
+                assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+                assert!(error.error.info.message.contains("operator_resolution"));
+                assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+                assert!(tool.keys.lock().unwrap().is_empty());
+                assert!(resumed.checkpoints.lock().unwrap().is_empty());
+
+                for in_ledger in [true, false] {
+                    let directory = tempfile::tempdir().unwrap();
+                    let fs = Arc::new(
+                        FilesystemStore::new(directory.path(), Default::default()).unwrap(),
+                    );
+                    let tenant = TenantId::from("tenant");
+                    let run_id = RunId::from("run-1");
+                    let mut snapshot =
+                        RunSnapshot::new(tenant.clone(), run_id.clone(), chrono::Utc::now());
+                    snapshot.state = Some(
+                        serde_json::to_value(if in_ledger { &checkpoint } else { &decoded })
+                            .unwrap(),
+                    );
+                    snapshot.effects.push(checkpoint.effect.clone().unwrap());
+                    if in_ledger {
+                        snapshot.effects.push(decoded.effect.clone().unwrap());
+                    }
+                    fs.create(snapshot).unwrap();
+                    let lease = fs
+                        .acquire_lease(&tenant, &run_id, "worker", Duration::from_secs(60))
+                        .unwrap();
+                    let before = fs.load(&tenant, &run_id).unwrap();
+                    let error = StoredCheckpointStore::open(fs.clone(), lease)
+                        .err()
+                        .expect("unknown effect must block adapter entry");
+                    assert_eq!(error.info.category, ErrorCategory::Unsupported);
+                    assert!(error.info.message.contains("operator_resolution"));
+                    assert_eq!(fs.load(&tenant, &run_id).unwrap(), before);
+                    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+                    assert!(tool.keys.lock().unwrap().is_empty());
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn unknown_stored_run_status_blocks_adapter_before_execution() {
+    use adk_durable::{FilesystemStore, RunId, RunSnapshot, RunStore, TenantId};
+
+    for status in ["future_status", "RUNNING"] {
+        let directory = tempfile::tempdir().unwrap();
+        let fs = Arc::new(FilesystemStore::new(directory.path(), Default::default()).unwrap());
+        let tenant = TenantId::from("tenant");
+        let run_id = RunId::from("run-1");
+        let mut value = serde_json::to_value(RunSnapshot::new(
+            tenant.clone(),
+            run_id.clone(),
+            chrono::Utc::now(),
+        ))
+        .unwrap();
+        value["status"] = json!(status);
+        let snapshot: RunSnapshot = serde_json::from_value(value).unwrap();
+        assert_eq!(
+            snapshot.status,
+            adk_durable::RunStatus::Unknown(status.into())
+        );
+        assert_eq!(
+            serde_json::to_value(&snapshot).unwrap()["status"],
+            json!(status)
+        );
+        fs.create(snapshot).unwrap();
+        let lease = fs
+            .acquire_lease(&tenant, &run_id, "worker", Duration::from_secs(60))
+            .unwrap();
+        let before = fs.load(&tenant, &run_id).unwrap();
+        let (runner, model, tool) = setup(vec![call("one")], false, false);
+        let error = match StoredCheckpointStore::open(fs.clone(), lease) {
+            Err(error) => error,
+            Ok(adapter) => {
+                runner
+                    .run_durable(
+                        context(),
+                        request(false),
+                        Arc::new(HostImpl),
+                        DurableRun::new(Arc::new(adapter)),
+                    )
+                    .await
+                    .unwrap();
+                panic!("unknown stored status allowed execution");
+            }
+        };
+        assert_eq!(error.info.category, ErrorCategory::Unsupported);
+        assert!(error.info.message.contains("unknown stored run status"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        assert!(tool.keys.lock().unwrap().is_empty());
+        assert_eq!(fs.load(&tenant, &run_id).unwrap(), before);
+    }
 }
 
 #[tokio::test]
@@ -1191,19 +1341,22 @@ async fn actual_go_reader_accepts_rust_approval_history_and_refuses_nonterminal_
     if std::env::var_os("ADK_TEST_GO").is_none() {
         return;
     }
-    let (runner, _, _) = setup(vec![call("one")], false, false);
     let store = Arc::new(Store::default());
-    let mut req = request(false);
-    req.policy.tools.approval = ApprovalPolicy::All;
-    runner
-        .run_durable(
-            context(),
-            req,
-            Arc::new(HostImpl),
-            DurableRun::new(store.clone()),
-        )
-        .await
-        .unwrap();
+    for provenance in [ItemProvenance::Unknown, ItemProvenance::Unattributed] {
+        let (runner, _, _) = setup(vec![call("one")], false, false);
+        let mut req = request(false);
+        req.input_provenance = vec![provenance];
+        req.policy.tools.approval = ApprovalPolicy::All;
+        runner
+            .run_durable(
+                context(),
+                req,
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone()),
+            )
+            .await
+            .unwrap();
+    }
     assert!(
         store
             .latest()
@@ -1825,4 +1978,62 @@ async fn go_import_preserves_explicit_names_and_known_nil() {
         assert_eq!(snapshot.agent_name, name);
         assert_ne!(snapshot.kind, adk_codec::dto::SnapshotType::Unknown);
     }
+}
+
+#[tokio::test]
+async fn compatibility_projection_survives_actual_checkpoint_and_completed_resume() {
+    let fixtures: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let mut count = 0;
+    for (name, case) in fixtures["provider_response_cases"].as_object().unwrap() {
+        let projection = match case["protocol"].as_str().unwrap() {
+            "anthropic" => SnapshotProjection::GoAnthropicMessage,
+            _ => SnapshotProjection::GoOpenAiMessage,
+        };
+        for (raw_key, snapshot_key) in [
+            ("raw_json", "snapshot_json"),
+            ("stream_raw_json", "stream_snapshot_json"),
+        ] {
+            let Some(raw) = case[raw_key].as_str() else {
+                continue;
+            };
+            let expected = case[snapshot_key].as_str().unwrap();
+            let (runner, model, _) = setup(
+                vec![message(Role::Assistant, "native preserved")],
+                false,
+                false,
+            );
+            {
+                let mut responses = model.responses.lock().unwrap();
+                let response = responses.front_mut().unwrap();
+                response.snapshot_raw = Some(JsonDocument::new(raw.into()).unwrap());
+                response.snapshot_projection = Some(projection);
+            }
+            let store = Arc::new(Store::default());
+            let original = run(&runner, store.clone(), None).await.unwrap();
+            let checkpoint =
+                RunnerCheckpoint::decode(&serde_json::to_vec(&store.latest()).unwrap()).unwrap();
+            let restored = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+                .await
+                .unwrap();
+            assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+            for result in [original, restored] {
+                let response = &result.result.responses[0];
+                assert_eq!(
+                    response.items,
+                    vec![message(Role::Assistant, "native preserved")]
+                );
+                assert_eq!(response.snapshot_projection, Some(projection));
+                assert_eq!(response.snapshot_raw.as_ref().unwrap().as_str(), raw);
+                let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response).unwrap();
+                assert_eq!(
+                    adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                    expected.as_bytes(),
+                    "{name}/{raw_key}"
+                );
+            }
+            count += 1;
+        }
+    }
+    assert_eq!(count, 15);
 }

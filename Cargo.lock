@@ -142,6 +142,7 @@ dependencies = [
 name = "adk-providers"
 version = "0.1.0"
 dependencies = [
+ "adk-codec",
  "adk-core",
  "adk-runtime",
  "base64",

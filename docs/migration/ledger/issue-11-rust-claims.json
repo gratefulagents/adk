@@ -949,6 +949,2022 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-6396BBE7A925A0B4": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.Actor",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::actor"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/actor.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-BAE515A1F6A18DC4": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.EventID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::event_id"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/event_id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-D8B154F141A66338": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.Payload",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::payload"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/payload.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-7E53349E5DE47649": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.ProjectID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::project_id"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/project_id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-089A0C518E5206BB": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.RunID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::run_id"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/run_id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-8788937B2076945B": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.Seq",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::seq"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/seq.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-D20A1492D51821A4": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.Time",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::time"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/time.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-42C941783A75E82B": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Event.Type",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Event::event_type"
+      ],
+      "rust_test_identifiers": [
+        "go_event_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Event/nondefault/expected/type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-B58CFB713281DDE5": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.Content",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::content"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/content.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-7226EFFEFC8AFB5E": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.CreatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::created_at"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/created_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-3DDBABA38139AF93": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.FilePaths",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::file_paths"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/file_paths.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-6EE5835AEFB817EE": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.ID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::id"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-388ACD150693D533": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.Kind",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::kind"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/kind.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-4E0355E04C6BB042": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.LastReadAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::last_read_at"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/last_read_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-4E35F81F30F76ABC": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.Metadata",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::metadata"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/metadata.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-5BD024DC782785C0": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.Scope",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::scope"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/scope.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-2643CE3FF456EFE8": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.SourceRun",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::source_run"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/source_run.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-FA3954363239567D": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.Tags",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::tags"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/tags.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-B10FA43A588D8A39": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.TaskIDs",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::task_ids"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/task_ids.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-38638FBF34487A28": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Memory.UpdatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Memory::updated_at"
+      ],
+      "rust_test_identifiers": [
+        "go_memory_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Memory/nondefault/expected/updated_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-DCCEDA8D4308F62F": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.CreatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::created_at"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/created_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-93684FE07A6C5235": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.ID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::id"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-A06F0E283E40C18F": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.RunID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::run_id"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/run_id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-001153C51DDFE204": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.Summary",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::summary"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/summary.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-0C2F5C21D560C288": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.TaskIDs",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::task_ids"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/task_ids.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-3598C768C40D7059": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "SessionSummary.UpdatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::SessionSummary::updated_at"
+      ],
+      "rust_test_identifiers": [
+        "go_session_summary_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreMemoriesAndPrime",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/SessionSummary/nondefault/expected/updated_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-BBB472350B9D2D99": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Assignee",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::assignee"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/assignee.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-3FD1BDFD3D4D096B": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Blocks",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::blocks"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/blocks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-428D87225C63A3A9": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.ClosedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::closed_at"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/closed_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-563D626584AF00C4": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Comments",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::comments"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/comments.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-390F90BBC25090F0": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.CreatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::created_at"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/created_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-3AFD0E04F7911246": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.DependsOn",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::depends_on"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/depends_on.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-C7C5735E663FC993": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Description",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::description"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/description.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-14ABA48943E07CF6": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.ID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::id"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-8986E085B25CBE5F": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Labels",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::labels"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/labels.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-4F7F4F866961A827": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Metadata",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::metadata"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/metadata.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-C7ED7B94A3AED388": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Priority",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::priority"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/priority.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-BEDAABF6C293FFD6": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.SourceRun",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::source_run"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/source_run.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-9453ACFE0EFD1B65": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Status",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::status"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/status.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-2E94F960FBE80DD4": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Title",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::title"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/title.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-99E93611C3449F29": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.Type",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::task_type"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-B7532526ACB391FF": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "Task.UpdatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::Task::updated_at"
+      ],
+      "rust_test_identifiers": [
+        "go_task_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, metadata_empty, metadata_false, metadata_null, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted, wide_priority. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/Task/nondefault/expected/updated_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-36B0F237DF024EF1": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "TaskComment.Actor",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::TaskComment::actor"
+      ],
+      "rust_test_identifiers": [
+        "go_task_comment_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/TaskComment/nondefault/expected/actor.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-3EF9FD241BEC804F": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "TaskComment.Body",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::TaskComment::body"
+      ],
+      "rust_test_identifiers": [
+        "go_task_comment_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/TaskComment/nondefault/expected/body.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-98AC086A106A8D00": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "TaskComment.CreatedAt",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::TaskComment::created_at"
+      ],
+      "rust_test_identifiers": [
+        "go_task_comment_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/TaskComment/nondefault/expected/created_at.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-C2FBF7ABF92D5AF6": {
+      "source": "pkg/agentsdk/projectstate/types.go",
+      "source_name": "TaskComment.ID",
+      "implementation_symbols": [
+        "crates/adk-project-state/src/types.rs::TaskComment::id"
+      ],
+      "rust_test_identifiers": [
+        "go_task_comment_record_decode_encode_matches_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/projectstate/TestFilesystemStoreTaskLifecycleAndIndexes",
+      "rationale": "Persisted record field verified by fresh decode/encode against actual pinned Go types, whole-object JSON equality including key presence. Required cases: empty, nondefault, null, offset, offset_integral, offset_negative, offset_zero, omitted. Fixed offsets, zero/nanosecond time and explicit metadata null are preserved. This is field-level wire proof, not input-option or store/backend closure; fixture fixtures/project-state/records.json#/TaskComment/nondefault/expected/id.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "project-state"
+      ]
+    },
+    "SDK-14B557B50B8753D8": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.SchemaVersion",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::schema_version"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_schema_version"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.schema_version. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-8123E3663E5A6B3D": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.TenantID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::tenant_id"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_tenant_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.tenant_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-5EAE8CCA60B01B14": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.RunID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::run_id"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_run_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.run_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-129EE3451642C93B": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Revision",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::revision"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_revision"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.revision. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-D16611759C822DC6": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.EventSequence",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::event_sequence"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_event_sequence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.event_sequence. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-559F356BBE207D70": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Status",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::status"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_status"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.status. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-D35CEBC91498576B": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Classification",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::classification"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_classification"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.classification. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-D3038C3E3C1A33FA": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.State",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::state"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.state. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-7EA5C47259AF194F": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Attempts",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::attempts"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_attempts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.attempts. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-9C36C65CC43DA63A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Steps",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::steps"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_steps"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.steps. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-E7A3560E935603A4": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.ToolCalls",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_tool_calls"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.tool_calls. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-6367687A5F1C7A3A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Approvals",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::approvals"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_approvals"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.approvals. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-71E060FB94BFE1AF": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.ChildRuns",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::child_runs"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_child_runs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.child_runs. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-1F12E4E9A9058F29": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Effects",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::effects"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_effects"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.effects. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-17FEFBC09F24B512": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.Cancellation",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::cancellation"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_cancellation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.cancellation. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-03DAFC2AD6ABEE9A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.CumulativeBudget",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::cumulative_budget"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_cumulative_budget"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.cumulative_budget. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-30BB3C6BB416E79A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.CreatedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::created_at"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_created_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.created_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-6F26B3B3A2E43B0C": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.UpdatedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::updated_at"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_updated_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.updated_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-95F6EE29046D00A2": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RunSnapshot.RetainUntil",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RunSnapshot::retain_until"
+      ],
+      "rust_test_identifiers": [
+        "record_runsnapshot_retain_until"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[0].expected.retain_until. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-15E27CB550C0E5F9": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::id"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-E86BF033A46494A7": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.Classification",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::classification"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_classification"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.classification. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-D82C9C424FD1C733": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.DataClassification",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::data_classification"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_data_classification"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.data_classification. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-8CA8C120FC5F189F": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.State",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::state"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.state. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-57C67232BE2D561E": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.IdempotencyKey",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::idempotency_key"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_idempotency_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.idempotency_key. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-16F67737E7980A75": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.PreparedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::prepared_at"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_prepared_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.prepared_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-C274C87AE85F5C26": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.UpdatedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::updated_at"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_updated_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.updated_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-B069524723C7F23B": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Effect.Outcome",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Effect::outcome"
+      ],
+      "rust_test_identifiers": [
+        "record_effect_outcome"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[4].expected.outcome. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-683DB8C064B3A179": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::id"
+      ],
+      "rust_test_identifiers": [
+        "record_event_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-32AD63943369DA92": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.TenantID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::tenant_id"
+      ],
+      "rust_test_identifiers": [
+        "record_event_tenant_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.tenant_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-1D64EA475C2088E0": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.RunID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::run_id"
+      ],
+      "rust_test_identifiers": [
+        "record_event_run_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.run_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-FA957101273928BD": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.Sequence",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::sequence"
+      ],
+      "rust_test_identifiers": [
+        "record_event_sequence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.sequence. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-0B9666A920421293": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.At",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::at"
+      ],
+      "rust_test_identifiers": [
+        "record_event_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-70C0865DA541A4F9": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.Type",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::event_type"
+      ],
+      "rust_test_identifiers": [
+        "record_event_event_type"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.type. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-2B23190A6636E691": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.Classification",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::classification"
+      ],
+      "rust_test_identifiers": [
+        "record_event_classification"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.classification. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-AA41F1A49BBACA5D": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Event.Payload",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Event::payload"
+      ],
+      "rust_test_identifiers": [
+        "record_event_payload"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[8].expected.payload. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-4DA8312E87E351D5": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::id"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-037A24E10248EC72": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.Name",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::name"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_name"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.name. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-457BD989E617EAC4": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.Status",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::status"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_status"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.status. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-3FE51B6137AAE4E2": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.Classification",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::classification"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_classification"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.classification. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-A604022262154FCA": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.Input",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::input"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_input"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.input. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-2F09802BBBAACC91": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.Output",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::output"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_output"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.output. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-7CEAAF83D1F1E6F8": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.StartedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::started_at"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_started_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.started_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-F4DBF9C6D49E1733": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ToolCall.EndedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ToolCall::ended_at"
+      ],
+      "rust_test_identifiers": [
+        "record_toolcall_ended_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[12].expected.ended_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-C15BCE4F7E23B417": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::id"
+      ],
+      "rust_test_identifiers": [
+        "record_step_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-9D62C34B1B692770": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.Kind",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::kind"
+      ],
+      "rust_test_identifiers": [
+        "record_step_kind"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.kind. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-A47AB64465E18C45": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.Status",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::status"
+      ],
+      "rust_test_identifiers": [
+        "record_step_status"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.status. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-741C1CD701CC5D2C": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.Data",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::data"
+      ],
+      "rust_test_identifiers": [
+        "record_step_data"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.data. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-9B7FB68E160A9F5F": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.StartedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::started_at"
+      ],
+      "rust_test_identifiers": [
+        "record_step_started_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.started_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-F79DEAE6F3E03786": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Step.EndedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Step::ended_at"
+      ],
+      "rust_test_identifiers": [
+        "record_step_ended_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[16].expected.ended_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-3EF90FF8894CEAB5": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Approval.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Approval::id"
+      ],
+      "rust_test_identifiers": [
+        "record_approval_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[19].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-23DF19B33E4E1CB3": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Approval.Status",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Approval::status"
+      ],
+      "rust_test_identifiers": [
+        "record_approval_status"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[19].expected.status. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-F1F60073ED0B69FB": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Approval.RequestedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Approval::requested_at"
+      ],
+      "rust_test_identifiers": [
+        "record_approval_requested_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[19].expected.requested_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-205D7E6F7393DCF2": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Approval.ResolvedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Approval::resolved_at"
+      ],
+      "rust_test_identifiers": [
+        "record_approval_resolved_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[19].expected.resolved_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-6E84C2F00724F334": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Approval.ResolvedBy",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Approval::resolved_by"
+      ],
+      "rust_test_identifiers": [
+        "record_approval_resolved_by"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[19].expected.resolved_by. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-657B776E74A89E5E": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "BudgetCounters.InputTokens",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::BudgetCounters::input_tokens"
+      ],
+      "rust_test_identifiers": [
+        "record_budgetcounters_input_tokens"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[22].expected.input_tokens. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-028415C38DC716A8": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "BudgetCounters.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::BudgetCounters::output_tokens"
+      ],
+      "rust_test_identifiers": [
+        "record_budgetcounters_output_tokens"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[22].expected.output_tokens. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-EEE6615006C14574": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "BudgetCounters.ToolCalls",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::BudgetCounters::tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "record_budgetcounters_tool_calls"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[22].expected.tool_calls. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-DA786A5D0ED9B94A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "BudgetCounters.CostMicros",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::BudgetCounters::cost_micros"
+      ],
+      "rust_test_identifiers": [
+        "record_budgetcounters_cost_micros"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[22].expected.cost_micros. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-6D665218AF8726F8": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "BudgetCounters.WallTimeMS",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::BudgetCounters::wall_time_ms"
+      ],
+      "rust_test_identifiers": [
+        "record_budgetcounters_wall_time_ms"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[22].expected.wall_time_ms. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-5B494B8E9E252000": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ChildRun.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ChildRun::id"
+      ],
+      "rust_test_identifiers": [
+        "record_childrun_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[25].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-85DC830CF4B32806": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ChildRun.RunID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ChildRun::run_id"
+      ],
+      "rust_test_identifiers": [
+        "record_childrun_run_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[25].expected.run_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-FCA4493D7729A043": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ChildRun.Status",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ChildRun::status"
+      ],
+      "rust_test_identifiers": [
+        "record_childrun_status"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[25].expected.status. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-4F5B72C354A8FDBD": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ChildRun.StartedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ChildRun::started_at"
+      ],
+      "rust_test_identifiers": [
+        "record_childrun_started_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[25].expected.started_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-5B6B8BA974D0C9E0": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "ChildRun.EndedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::ChildRun::ended_at"
+      ],
+      "rust_test_identifiers": [
+        "record_childrun_ended_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[25].expected.ended_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-149EBF34A80AD247": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Lease.TenantID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Lease::tenant_id"
+      ],
+      "rust_test_identifiers": [
+        "record_lease_tenant_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[29].expected.tenant_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-FC48FC9F96A0445B": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Lease.RunID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Lease::run_id"
+      ],
+      "rust_test_identifiers": [
+        "record_lease_run_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[29].expected.run_id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-9EEED5718B3104CB": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Lease.Owner",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Lease::owner"
+      ],
+      "rust_test_identifiers": [
+        "record_lease_owner"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[29].expected.owner. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-77A1B446F3B3E1A0": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Lease.Token",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Lease::token"
+      ],
+      "rust_test_identifiers": [
+        "record_lease_token"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[29].expected.token. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-A254013842C94B2F": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Lease.ExpiresAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Lease::expires_at"
+      ],
+      "rust_test_identifiers": [
+        "record_lease_expires_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[29].expected.expires_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-837D5D398134C0D2": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Attempt.ID",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Attempt::id"
+      ],
+      "rust_test_identifiers": [
+        "record_attempt_id"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[32].expected.id. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-73EEEED9652F9E9B": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Attempt.StartedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Attempt::started_at"
+      ],
+      "rust_test_identifiers": [
+        "record_attempt_started_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[32].expected.started_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-BF0C8A6AC0E45436": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Attempt.EndedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Attempt::ended_at"
+      ],
+      "rust_test_identifiers": [
+        "record_attempt_ended_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[32].expected.ended_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-CC48F92241013FD7": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Attempt.Outcome",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Attempt::outcome"
+      ],
+      "rust_test_identifiers": [
+        "record_attempt_outcome"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[32].expected.outcome. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-05C3E48D57E82D82": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Cancellation.RequestedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Cancellation::requested_at"
+      ],
+      "rust_test_identifiers": [
+        "record_cancellation_requested_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[35].expected.requested_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-11977E8766A9A71A": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Cancellation.RequestedBy",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Cancellation::requested_by"
+      ],
+      "rust_test_identifiers": [
+        "record_cancellation_requested_by"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[35].expected.requested_by. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-D69BCC311B785352": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Cancellation.Reason",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Cancellation::reason"
+      ],
+      "rust_test_identifiers": [
+        "record_cancellation_reason"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[35].expected.reason. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-42D5079DDD9FF282": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "Cancellation.AcknowledgedAt",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::Cancellation::acknowledged_at"
+      ],
+      "rust_test_identifiers": [
+        "record_cancellation_acknowledged_at"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[35].expected.acknowledged_at. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-36248A3E322F5EC3": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RecoveryDecision.Action",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RecoveryDecision::action"
+      ],
+      "rust_test_identifiers": [
+        "record_recoverydecision_action"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[38].expected.action. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-CA9B3DEE50D4707F": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RecoveryDecision.Automatic",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RecoveryDecision::automatic"
+      ],
+      "rust_test_identifiers": [
+        "record_recoverydecision_automatic"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestEffectRecoveryAndTransitions",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[38].expected.automatic. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
+    },
+    "SDK-891A7E668DD7AFD8": {
+      "source": "pkg/agentsdk/durable/types.go",
+      "source_name": "RecoveryDecision.IdempotencyKey",
+      "implementation_symbols": [
+        "crates/adk-durable/src/types.rs::RecoveryDecision::idempotency_key"
+      ],
+      "rust_test_identifiers": [
+        "record_recoverydecision_idempotency_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/durable/TestDecodeDocumentMigratesV1",
+      "rationale": "Typed persisted field matches independently generated pinned Go record expectations for populated, omitted, null and applicable unknown-string/timestamp cases. Exact structural JSON comparison retains fixed offsets, fractional time, explicit raw null and wide integers; fixtures/durable/records.json::$[38].expected.idempotency_key. The upstream regression is a package/migration context anchor, not independent field proof; the regenerated Go oracle and named direct-field Rust assertion supply that proof. No recovery-helper, backend or exactly-once closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "durable"
+      ]
     }
   }
 }

@@ -65,6 +65,7 @@ impl Model for ToolModel {
             };
             Ok(ModelResponse {
                 snapshot_raw: None,
+                snapshot_projection: None,
                 raw: None,
                 items,
                 usage: Default::default(),

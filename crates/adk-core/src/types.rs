@@ -227,6 +227,17 @@ pub struct ModelRequest {
     pub settings: serde_json::Map<String, Value>,
 }
 
+/// Explicit interpretation of an ordered compatibility response document.
+/// Untagged documents are opaque; codecs must not infer a format from their shape.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum SnapshotProjection {
+    /// Pinned OpenAI adapter's normalized message (Chat or Responses transport).
+    GoOpenAiMessage,
+    /// Pinned Anthropic adapter's normalized message.
+    GoAnthropicMessage,
+}
+
 /// A complete model response. `end_turn: None` is distinct from `Some(false)`.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct ModelResponse {
@@ -247,6 +258,10 @@ pub struct ModelResponse {
     /// disclose either payload; the trace sink still applies its capture policy.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub snapshot_raw: Option<JsonDocument>,
+    /// Opt-in compatibility projection of items, usage and end-turn from
+    /// `snapshot_raw`. Never changes native response data or capture permission.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub snapshot_projection: Option<SnapshotProjection>,
 }
 
 fn present_raw_response<'de, D: serde::Deserializer<'de>>(

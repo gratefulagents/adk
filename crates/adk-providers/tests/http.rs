@@ -1189,3 +1189,77 @@ fn generation_metadata_resolves_routes_aliases_and_cache_accounting_without_io()
     );
     assert_eq!(model.info("gpt-5.6").input_tokens_include_cache, Some(true));
 }
+
+#[tokio::test]
+async fn complete_profiles_match_executed_public_sdk_over_http() {
+    let fixtures: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let mut count = 0;
+    for (name, case) in fixtures["provider_response_cases"].as_object().unwrap() {
+        if case["method"] != "complete" {
+            continue;
+        }
+        let protocol = match case["protocol"].as_str().unwrap() {
+            "chat" => Protocol::Chat,
+            "responses" => Protocol::Responses,
+            "anthropic" => Protocol::Anthropic,
+            _ => unreachable!(),
+        };
+        let body = case["body"].as_str().unwrap().to_owned();
+        let streaming = case["streaming"].as_bool().unwrap_or(false);
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let request = read_request(&mut socket);
+            let kind = if streaming {
+                "text/event-stream"
+            } else {
+                "application/json"
+            };
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: {kind}\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            request
+        });
+        let endpoint = format!("http://{addr}/v1");
+        let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+        let provider = Provider::new(
+            "fixture",
+            protocol,
+            Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+        )
+        .unwrap();
+        let response = provider
+            .complete(&context(), request())
+            .await
+            .unwrap_or_else(|e| panic!("{name}: {e:?}"));
+        if name == "anthropic_compaction_cache" {
+            assert!(response.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if compaction.content == "summary <>&" && compaction.id == "ignored-id" && compaction.created_by == "ignored-origin")));
+            assert_eq!(response.end_turn, Some(true));
+        }
+        for projected in [
+            response.clone(),
+            serde_json::from_value(serde_json::to_value(&response).unwrap()).unwrap(),
+            serde_json::from_str(&serde_json::to_string(&response).unwrap()).unwrap(),
+        ] {
+            let snapshot = adk_codec::dto::ResponseSnapshot::try_from(&projected).unwrap();
+            assert_eq!(
+                adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                case["snapshot_json"].as_str().unwrap().as_bytes(),
+                "snapshot {name}"
+            );
+            assert_eq!(projected, response);
+        }
+        assert_eq!(
+            response.snapshot_raw.unwrap().as_str(),
+            case["raw_json"].as_str().unwrap(),
+            "{name}"
+        );
+        assert!(response.raw.is_some());
+        let request = server.join().unwrap();
+        let request: serde_json::Value =
+            serde_json::from_str(request.split_once("\r\n\r\n").unwrap().1).unwrap();
+        assert_eq!(request["stream"], streaming, "{name}");
+        count += 1;
+    }
+    assert_eq!(count, 8);
+}

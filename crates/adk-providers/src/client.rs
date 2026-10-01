@@ -257,29 +257,64 @@ impl Model for Provider {
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
-            if self.session.scope().mode == AuthMode::OpenAiOAuth
-                || (self.session.scope().mode == AuthMode::CopilotOAuth
-                    && self.protocol == Protocol::Chat)
-            {
-                let mut stream = self.stream(context, request).await?;
-                let mut complete = None;
-                while let Some(event) = stream.next().await? {
+            let mode = self.session.scope().mode;
+            let streaming = match mode {
+                AuthMode::CopilotOAuth => self.protocol == Protocol::Chat,
+                AuthMode::OpenAiOAuth => true,
+                _ => self.protocol != Protocol::Chat,
+            };
+            let response = self.send(context, &request, streaming).await?;
+            let event_stream = response
+                .headers()
+                .get(reqwest::header::CONTENT_TYPE)
+                .and_then(|value| value.to_str().ok())
+                .is_some_and(|value| value.starts_with("text/event-stream"));
+            let profile = if mode == AuthMode::OpenAiOAuth {
+                crate::snapshot::Profile::Collected
+            } else {
+                crate::snapshot::Profile::Complete
+            };
+            if event_stream {
+                let mut state = StreamState::new(self.protocol);
+                state.snapshot_profile = profile;
+                let mut stream = HttpStream {
+                    context: context.clone(),
+                    response: Some(response),
+                    decoder: Decoder::default(),
+                    state,
+                    queue: VecDeque::new(),
+                    closed: false,
+                };
+                while let Some(event) = stream.read().await? {
+                    if let ModelEvent::Complete { response } = event {
+                        return Ok(response);
+                    }
+                }
+                return Err(protocol_error("stream ended without completion"));
+            }
+            let bytes = read_bytes(context, response).await?;
+            // Some compatible gateways return a JSON document even when streaming
+            // was requested. Keep that existing native transport extension.
+            let json_document = bytes
+                .iter()
+                .find(|byte| !byte.is_ascii_whitespace())
+                .is_some_and(|byte| matches!(byte, b'{' | b'['));
+            if !event_stream && (!streaming || json_document) {
+                return wire::response_json(&bytes, self.protocol);
+            }
+            let mut decoder = Decoder::default();
+            let mut state = StreamState::new(self.protocol);
+            state.snapshot_profile = profile;
+            let mut complete = None;
+            for event in decoder.feed(&bytes)? {
+                for event in state.event(&event.data)? {
                     if let ModelEvent::Complete { response } = event {
                         complete = Some(response);
                     }
                 }
-                let mut response =
-                    complete.ok_or_else(|| protocol_error("stream ended without completion"))?;
-                if let Some(raw) = &response.raw {
-                    // SDK non-stream calls drain the transport stream into a message,
-                    // rather than exposing StreamAssembler's empty Type field.
-                    response.snapshot_raw =
-                        Some(crate::snapshot::document(raw, self.protocol, None)?);
-                }
-                return Ok(response);
             }
-            let response = self.send(context, &request, false).await?;
-            wire::response_json(&read_bytes(context, response).await?, self.protocol)
+            decoder.finish()?;
+            complete.ok_or_else(|| protocol_error("stream ended without completion"))
         })
     }
 }
@@ -457,6 +492,9 @@ impl ModelStream for HttpStream {
 /// here, rather than inferred from transport EOF.
 pub struct StreamState {
     protocol: Protocol,
+    snapshot_profile: crate::snapshot::Profile,
+    snapshot_completion_usage: Option<Value>,
+    snapshot_compaction_content: BTreeMap<u64, String>,
     body: Value,
     tools: BTreeMap<u64, Value>,
     argument_buffers: BTreeMap<u64, String>,
@@ -480,6 +518,9 @@ impl StreamState {
     pub fn new(protocol: Protocol) -> Self {
         Self {
             protocol,
+            snapshot_profile: crate::snapshot::Profile::Stream,
+            snapshot_completion_usage: None,
+            snapshot_compaction_content: BTreeMap::new(),
             body: json!({}),
             tools: BTreeMap::new(),
             argument_buffers: BTreeMap::new(),
@@ -742,20 +783,39 @@ impl StreamState {
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
         let mut response = wire::response(&self.body, self.protocol)?;
         if let Some(document) = &response.snapshot_raw {
-            response.snapshot_raw = Some(crate::snapshot::stream_document(
-                document,
-                self.protocol,
-                self.snapshot_stop_reason,
-                self.tools.keys().enumerate().filter_map(|(index, key)| {
-                    self.snapshot_starts.get(key).map(|start| {
-                        (
-                            index,
-                            start,
-                            self.snapshot_inputs.get(key).map(String::as_str),
-                        )
-                    })
-                }),
-            )?);
+            response.snapshot_raw = Some(match self.snapshot_profile {
+                crate::snapshot::Profile::Collected => document.clone(),
+                crate::snapshot::Profile::Complete => crate::snapshot::complete_document(
+                    document,
+                    self.protocol,
+                    self.snapshot_stop_reason,
+                    self.snapshot_completion_usage.as_ref(),
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_compaction_content
+                            .get(key)
+                            .map(|text| (index, text.as_str()))
+                    }),
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_inputs
+                            .get(key)
+                            .map(|text| (index, text.as_str()))
+                    }),
+                )?,
+                crate::snapshot::Profile::Stream => crate::snapshot::stream_document(
+                    document,
+                    self.protocol,
+                    self.snapshot_stop_reason,
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_starts.get(key).map(|start| {
+                            (
+                                index,
+                                start,
+                                self.snapshot_inputs.get(key).map(String::as_str),
+                            )
+                        })
+                    }),
+                )?,
+            });
         }
         self.complete = true;
         let mut events: Vec<_> = response
@@ -885,6 +945,13 @@ impl StreamState {
                     return Err(protocol_error("invalid or repeated message start"));
                 }
                 self.message_started = true;
+                self.snapshot_completion_usage = Some(
+                    message
+                        .get("usage")
+                        .filter(|value| value.is_object())
+                        .cloned()
+                        .unwrap_or_else(|| json!({})),
+                );
                 self.body = message.clone();
             }
             Some("content_block_start") => {
@@ -940,6 +1007,8 @@ impl StreamState {
                         .into()
                     }
                     Some("compaction_delta") => {
+                        self.snapshot_compaction_content
+                            .insert(index, delta["content"].as_str().unwrap_or_default().into());
                         if block["type"] != "compaction" {
                             return Err(protocol_error("compaction delta has wrong block type"));
                         }
@@ -990,6 +1059,9 @@ impl StreamState {
                 }
             }
             Some("message_delta") => {
+                if let Some(usage) = &mut self.snapshot_completion_usage {
+                    usage["output_tokens"] = event["usage"]["output_tokens"].clone();
+                }
                 if let Some(usage) = event["usage"].as_object() {
                     for (key, value) in usage {
                         self.body["usage"][key] = value.clone();

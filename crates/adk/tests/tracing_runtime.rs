@@ -141,6 +141,7 @@ fn response(items: Vec<RunItem>) -> Step {
         end_turn: None,
         metadata: Default::default(),
         snapshot_raw: None,
+        snapshot_projection: None,
         raw: None,
     })
 }

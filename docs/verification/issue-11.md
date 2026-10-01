@@ -91,7 +91,7 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   persisted session fields. This does not establish complete ProgressTracker
   parity or exactly-once replay/billing semantics.
 - Fresh Rust **1.88.0 / Linux x86_64** full workspace/all-features/all-targets:
-  **901 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
+  **1,004 passed, 0 failed, 30 ignored**. Strict Clippy and rustdoc pass. Facade
   matrix, independent all-feature consumer, twenty offline scenarios and the
   workspace doctest pass. The consumer remains transitively platform-free.
 - The field audit exposed non-finite span costs becoming JSON null. Nine
@@ -104,7 +104,22 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   Unicode/whitespace, invalid labels, medium defaults and none/max overrides.
   Anthropic ignores string verbosity rather than rejecting a default-built agent.
   Mode/role composition and the offline routing example assert effective budgets.
-- The overlay now has **51 explicitly verified**, **8,840 unresolved** and
+- Complete and public-stream provider calls now have separate normalized snapshot
+  profiles. Eight complete and seven stream cases compare full snapshot bytes,
+  including items/aggregates, usage, end-turn and raw JSON. Explicit projection
+  tags preserve native data and survive serialization and completed checkpoint
+  recovery; untagged custom documents remain opaque. These are fixture-backed
+  cases, not blanket provider parity.
+- Independent record oracles verify **182 durable and 47 project-state cases**.
+  Fixed-offset timestamps, fractional spelling, wide integers, unknown enum strings
+  and omitted versus explicit-null metadata are preserved. The baseline generator
+  no longer corrupts literal `task_ids` keys. The 80 durable and 46 project-state
+  field claims do not close recovery helpers, input options or backend semantics.
+  Review caught an execution-boundary bypass introduced by open enums; native and
+  stored resume now reject unknown effect state/classification and stored run status
+  before execution. Re-review found the safety finding fixed. Live Go checks cover
+  record decoding plus 24 checkpoint restores/refusals with no unintended execution.
+- The overlay now has **177 explicitly verified**, **8,714 unresolved** and
   **251 excluded** IDs. Six routing helper/API alias claims are backed by these
   executed fixtures. Eleven session claims close the nine SessionSpanData
   fields, its typed record and public alias mapping to `adk::tracewriter::Session`.
@@ -118,12 +133,12 @@ not a current completion claim. PR33 remains draft and issue #11 is incomplete.
   Request representation claims do not cover automatic assembly; the EndTurn claim
   does not cover the whole response builder or provider raw normalization. Exact tests,
   compiler, independently executed fixture verification and input hashes are
-  retained in `issue-11-rust-evidence.json`. Nine evidence-validator tests pass,
+  retained in `issue-11-rust-evidence.json`. Ten evidence-validator tests pass,
   including rejection of unbound implementation files and unexecuted fixtures.
   No blanket closure is inferred.
 
-Remaining work includes normalized provider raw response snapshot parity, full higher-level
-runtime/session/helper composition and the remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
+Remaining work includes provider cases outside the executed snapshot fixtures, full higher-level
+host-session/runtime/helper composition, builder-managed scheduler configuration and the remaining acceptance-ID audit. Live providers/OAuth, collector delivery,
 external Postgres/pgvector and non-Linux targets remain unverified. Fresh
 independent review is still required before leaving draft status.
 

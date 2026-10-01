@@ -211,6 +211,19 @@ fn unsupported(message: &str) -> Error {
     Error::new(ErrorCategory::Unsupported, message)
 }
 
+fn validate_resume_effect(effect: &Effect) -> Result<(), Error> {
+    if matches!(
+        effect.state,
+        EffectState::Dispatched | EffectState::OutcomeUnknown | EffectState::Unknown(_)
+    ) || matches!(effect.classification, EffectClassification::Unknown(_))
+    {
+        return Err(unsupported(
+            "operator_resolution: effect state or classification requires explicit reconciliation; never replayed",
+        ));
+    }
+    Ok(())
+}
+
 fn reconcile_children(mut children: Value) -> Result<Value, Error> {
     if children.is_null() {
         return Ok(children);
@@ -367,6 +380,9 @@ impl Runner {
             if checkpoint.schema_version != 1 {
                 return Err(unsupported("unknown runner checkpoint schema").into());
             }
+            if let Some(effect) = &checkpoint.effect {
+                validate_resume_effect(effect)?;
+            }
             if checkpoint.run_id != engine.context.run_id
                 || checkpoint.attempt_id == state.attempt_id
             {
@@ -465,17 +481,6 @@ impl Runner {
             }
             if !saved.cost.is_finite() || saved.cost < 0.0 {
                 return Err(invalid("invalid durable cost counter").into());
-            }
-            if checkpoint.effect.as_ref().is_some_and(|effect| {
-                matches!(
-                    effect.state,
-                    EffectState::Dispatched | EffectState::OutcomeUnknown
-                )
-            }) {
-                return Err(unsupported(
-                    "operator_resolution: dispatched effect has an unknown outcome; never replayed",
-                )
-                .into());
             }
             if !matches!(
                 execution_boundary.as_str(),
@@ -1226,27 +1231,29 @@ impl StoredCheckpointStore {
         let (snapshot, _) = store
             .load(&lease.tenant_id, &lease.run_id)
             .map_err(persistence_error)?;
+        if matches!(snapshot.status, adk_durable::RunStatus::Unknown(_)) {
+            return Err(unsupported(
+                "operator_resolution: unknown stored run status requires explicit reconciliation",
+            ));
+        }
         if snapshot.cancellation.is_some() || !snapshot.child_runs.is_empty() {
             return Err(unsupported(
                 "stored cancellation/child runs require reconciliation",
             ));
         }
-        if snapshot.effects.iter().any(|e| {
-            matches!(
-                e.state,
-                EffectState::Dispatched | EffectState::OutcomeUnknown
-            )
-        }) {
-            return Err(unsupported(
-                "operator_resolution: stored effect outcome is unknown",
-            ));
+        for effect in &snapshot.effects {
+            validate_resume_effect(effect)?;
         }
         let sequence = snapshot
             .state
             .as_ref()
             .map(|value| {
-                RunnerCheckpoint::decode(&serde_json::to_vec(value).map_err(invalid)?)
-                    .map(|checkpoint| checkpoint.sequence)
+                let checkpoint =
+                    RunnerCheckpoint::decode(&serde_json::to_vec(value).map_err(invalid)?)?;
+                if let Some(effect) = &checkpoint.effect {
+                    validate_resume_effect(effect)?;
+                }
+                Ok::<_, Error>(checkpoint.sequence)
             })
             .transpose()?
             .unwrap_or(0);
@@ -1316,7 +1323,7 @@ impl CheckpointStore for StoredCheckpointStore {
                 .revision
                 .checked_add(1)
                 .ok_or_else(|| invalid("revision overflow"))?;
-            next.updated_at = checkpoint.created_at;
+            next.updated_at = checkpoint.created_at.fixed_offset();
             next.state = Some(serde_json::to_value(checkpoint).map_err(invalid)?);
             next.status = if checkpoint.execution_boundary() == "run_completed" {
                 adk_durable::RunStatus::Succeeded
@@ -1355,7 +1362,7 @@ impl CheckpointStore for StoredCheckpointStore {
             next.cumulative_budget = budget;
             let event = adk_durable::Event {
                 event_type: checkpoint.execution_boundary().into(),
-                classification: next.classification,
+                classification: next.classification.clone(),
                 payload: next.state.clone(),
                 ..Default::default()
             };

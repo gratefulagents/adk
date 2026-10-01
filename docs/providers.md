@@ -165,6 +165,16 @@ JSON when producing a compatibility snapshot; custom models may leave it `None`
 and retain the existing native-raw fallback (including explicit JSON null).
 Neither field authorizes disclosure: full trace capture is still opt-in.
 
+Providers additionally set `snapshot_projection: Option<SnapshotProjection>` to
+explicitly identify the pinned OpenAI or Anthropic normalized-message format.
+When tagged, the compatibility codec derives items, usage and end-turn from that
+ordered document, not from native execution fields. This preserves the SDK's
+omitted end-turn, canonical compaction content and raw tool-argument spelling
+without discarding native information. Missing or malformed tagged documents
+produce a bridge error. Untagged custom documents retain the previous fallback;
+the codec never guesses a format from JSON shape. Both the tag and ordered JSON
+survive checkpoints, including `serde_json::Value` serialization.
+
 The pinned Go fixture executes real public providers against local HTTP servers.
 Two Chat completion and seven public streaming raw documents now have exact-byte
 Rust checks, including raw tool-argument order/numbers, SDK omission/default rules,
@@ -179,7 +189,14 @@ This is **not complete provider snapshot parity**. The fixture also records
 `GetResponse` separately from `StreamResponse`: both may use SSE internally but
 produce different documents. In particular, complete-method Anthropic SDK
 accumulation canonicalizes tool arguments and has a distinct compaction-content
-representation; standard Responses completion drains fields differently. Those
-complete-method profiles and full response-snapshot item/EndTurn parity remain
-implementation blockers, not verified capabilities. The fixture's `streaming`
-flag describes transport; `method` identifies the public SDK call.
+representation; standard Responses completion drains fields differently. All eight recorded complete-method profiles now have exact-byte checks through
+Rust's actual HTTP provider, in addition to the public streaming checks. Standard
+Anthropic/Responses complete calls consume SSE incrementally, while Copilot keeps
+its protocol-specific transport choice. Complete Anthropic arguments preserve Go's
+Float64 canonicalization (including negative zero), and its compatibility-only
+compaction union encoding does not replace the native summary. The eight complete
+and seven public-stream cases also compare full response snapshots, including
+items, aggregates, usage and end-turn, through serialization and completed-run
+checkpoint recovery. Unrepresented provider cases remain unverified; these
+fixtures do not close entire provider capabilities. The fixture's
+`streaming` flag describes transport; `method` identifies the public SDK call.

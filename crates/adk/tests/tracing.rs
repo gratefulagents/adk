@@ -184,6 +184,7 @@ async fn runner_case(pending: bool) {
                     end_turn: Some(true),
                     metadata: Default::default(),
                     snapshot_raw: None,
+                    snapshot_projection: None,
                     raw: None,
                 })
             })

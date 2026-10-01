@@ -43,10 +43,17 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
                "scripts/trace-reference/request.go", "scripts/trace-reference/nonfinite.go",
                "scripts/trace-reference/provider.go", "crates/adk-providers/src/snapshot.rs",
+               "crates/adk-providers/src/snapshot/completion.rs",
+               "crates/adk-providers/src/anthropic_compaction_union.json",
                "crates/adk-providers/src/client.rs", "crates/adk-providers/src/lib.rs",
                "crates/adk-providers/Cargo.toml", "crates/adk-providers/tests/snapshots.rs",
-               "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/src/approval.rs",
+               "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/tests/projected_snapshot.rs",
+               "crates/adk-codec/src/approval.rs",
                "crates/adk-runtime/src/durable.rs", "crates/adk-runtime/tests/durable.rs",
+               "crates/adk-runtime/tests/fixtures/verify.go",
+               "crates/adk-runtime/tests/fixtures/checkpoint.go",
+               "crates/adk-runtime/tests/fixtures/go-checkpoint.json",
+               "crates/adk-runtime/tests/fixtures/go-stop-gate.json",
                "crates/adk-runtime/tests/runner.rs", "crates/adk/src/observability.rs",
                "crates/adk/tests/observability.rs",
                "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
@@ -63,6 +70,28 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk/src/telemetry_stdout.rs", "crates/adk/tests/telemetry_stdout.rs",
                "crates/adk/tests/telemetry_defaults.rs", "scripts/trace-reference/stdout.go",
                "fixtures/tracestore/sdk-stdout.json",
+               "scripts/check-record-fixtures.py",
+               "fixtures/project-state/records/main.go",
+               "fixtures/project-state/records.json",
+               "fixtures/project-state/record-proof-map.json",
+               "fixtures/durable/generate.go",
+               "fixtures/durable/records.json",
+               "crates/adk-durable/src/codec.rs",
+               "crates/adk-durable/src/filesystem.rs",
+               "crates/adk-durable/src/lib.rs",
+               "crates/adk-durable/src/pg.rs",
+               "crates/adk-durable/src/store.rs",
+               "crates/adk-durable/src/types.rs",
+               "crates/adk-project-state/src/contracts.rs",
+               "crates/adk-project-state/src/engine.rs",
+               "crates/adk-project-state/src/lib.rs",
+               "crates/adk-project-state/src/memory.rs",
+               "crates/adk-project-state/src/recall.rs",
+               "crates/adk-project-state/src/storage.rs",
+               "crates/adk-project-state/src/tools.rs",
+               "crates/adk-project-state/src/types.rs",
+               "crates/adk-durable/tests/record_codecs.rs",
+               "crates/adk-project-state/tests/record_codecs.rs",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -137,16 +166,20 @@ def verify_rust() -> None:
     claims = read_json(RUST_CLAIMS)
     fixture_check = subprocess.run([sys.executable, str(ROOT / "scripts/trace-reference/check.py")],
                                    cwd=ROOT, text=True, capture_output=True, check=True)
+    record_check = subprocess.run([sys.executable, str(ROOT / "scripts/check-record-fixtures.py")],
+                                  cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
-               "-p", "adk-providers", "--test", "snapshots",
+               "-p", "adk-providers", "--test", "snapshots", "--test", "http",
+               "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder", "--test", "settings", "--test", "builder",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
-               "--test", "native_request_snapshot",
+               "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
                "--test", "guardrails", "--test", "runner", "--test", "tracing_runtime"]
-    result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True)
+    result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
+                            env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")
     print(result.stderr, end="")
     if result.returncode:
@@ -164,8 +197,9 @@ def verify_rust() -> None:
         "baseline_revision": BASELINE_REVISION,
         "compiler": compiler,
         "command": ["cargo", *command[1:]],
+        "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -181,6 +215,10 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust evidence must use the authoritative baseline")
     if f"trace-store reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust evidence requires independently executed pinned trace fixtures")
+    if f"typed-record reference fixtures verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust evidence requires independently executed pinned record fixtures")
+    if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
+        raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:
         raise SystemExit("failed Rust commands cannot verify a ledger entry")
     if set(evidence["files"]) != set(RUST_INPUTS):

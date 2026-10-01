@@ -1,0 +1,6722 @@
+[
+  {
+    "record": "RunSnapshot",
+    "case": "populated",
+    "input": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+          "resolved_at": "2026-01-02T02:04:07.123456796Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+          "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2026-01-02T02:04:05.123456789Z",
+      "updated_at": "2026-01-02T02:04:05.123456789Z",
+      "retain_until": "2026-01-02T04:04:05.123456789+01:00"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+          "resolved_at": "2026-01-02T02:04:07.123456796Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+          "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2026-01-02T02:04:05.123456789Z",
+      "updated_at": "2026-01-02T02:04:05.123456789Z",
+      "retain_until": "2026-01-02T04:04:05.123456789+01:00"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "schema_version": 0,
+      "tenant_id": "",
+      "run_id": "",
+      "revision": 0,
+      "event_sequence": 0,
+      "status": "",
+      "cumulative_budget": {},
+      "created_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "null",
+    "input": {
+      "approvals": null,
+      "attempts": null,
+      "cancellation": null,
+      "child_runs": null,
+      "classification": null,
+      "created_at": null,
+      "cumulative_budget": null,
+      "effects": null,
+      "event_sequence": null,
+      "retain_until": null,
+      "revision": null,
+      "run_id": null,
+      "schema_version": null,
+      "state": null,
+      "status": null,
+      "steps": null,
+      "tenant_id": null,
+      "tool_calls": null,
+      "updated_at": null
+    },
+    "expected": {
+      "schema_version": 0,
+      "tenant_id": "",
+      "run_id": "",
+      "revision": 0,
+      "event_sequence": 0,
+      "status": "",
+      "state": null,
+      "cumulative_budget": {},
+      "created_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "unknown",
+    "input": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "Future / 世界 \u003cv3\u003e\nRunStatus",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+          "resolved_at": "2026-01-02T02:04:07.123456796Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+          "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2026-01-02T02:04:05.123456789Z",
+      "updated_at": "2026-01-02T02:04:05.123456789Z",
+      "retain_until": "2026-01-02T04:04:05.123456789+01:00"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "Future / 世界 \u003cv3\u003e\nRunStatus",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+          "resolved_at": "2026-01-02T02:04:07.123456796Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2026-01-02T03:04:05.123456789+01:00",
+          "ended_at": "2026-01-02T02:04:07.123456796Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+          "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2026-01-02T02:04:05.123456789Z",
+      "updated_at": "2026-01-02T02:04:05.123456789Z",
+      "retain_until": "2026-01-02T04:04:05.123456789+01:00"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "populated",
+    "input": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+      "outcome": {
+        "uncertain": true
+      }
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "classification": "",
+      "state": "",
+      "prepared_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "null",
+    "input": {
+      "classification": null,
+      "data_classification": null,
+      "id": null,
+      "idempotency_key": null,
+      "outcome": null,
+      "prepared_at": null,
+      "state": null,
+      "updated_at": null
+    },
+    "expected": {
+      "id": "",
+      "classification": "",
+      "state": "",
+      "prepared_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z",
+      "outcome": null
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "unknown",
+    "input": {
+      "id": "effect_go",
+      "classification": "Future / 世界 \u003cv3\u003e\nEffectClassification",
+      "data_classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "state": "Future / 世界 \u003cv3\u003e\nEffectState",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+      "outcome": {
+        "uncertain": true
+      }
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "Future / 世界 \u003cv3\u003e\nEffectClassification",
+      "data_classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "state": "Future / 世界 \u003cv3\u003e\nEffectState",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2026-01-02T03:04:05.123456789+01:00",
+      "updated_at": "2026-01-02T03:04:05.123456789+01:00",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "populated",
+    "input": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2026-01-02T03:04:05.123456789+01:00",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "n": 9007199254740993,
+        "at": "2025-01-02T03:04:05.123456789+02:00"
+      }
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2026-01-02T03:04:05.123456789+01:00",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "n": 9007199254740993,
+        "at": "2025-01-02T03:04:05.123456789+02:00"
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "tenant_id": "",
+      "run_id": "",
+      "sequence": 0,
+      "at": "0001-01-01T00:00:00Z",
+      "type": ""
+    }
+  },
+  {
+    "record": "Event",
+    "case": "null",
+    "input": {
+      "at": null,
+      "classification": null,
+      "id": null,
+      "payload": null,
+      "run_id": null,
+      "sequence": null,
+      "tenant_id": null,
+      "type": null
+    },
+    "expected": {
+      "id": "",
+      "tenant_id": "",
+      "run_id": "",
+      "sequence": 0,
+      "at": "0001-01-01T00:00:00Z",
+      "type": "",
+      "payload": null
+    }
+  },
+  {
+    "record": "Event",
+    "case": "unknown",
+    "input": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2026-01-02T03:04:05.123456789+01:00",
+      "type": "tool.prepared",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "payload": {
+        "n": 9007199254740993,
+        "at": "2025-01-02T03:04:05.123456789+02:00"
+      }
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2026-01-02T03:04:05.123456789+01:00",
+      "type": "tool.prepared",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "payload": {
+        "n": 9007199254740993,
+        "at": "2025-01-02T03:04:05.123456789+02:00"
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "populated",
+    "input": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "name": "",
+      "status": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "null",
+    "input": {
+      "classification": null,
+      "ended_at": null,
+      "id": null,
+      "input": null,
+      "name": null,
+      "output": null,
+      "started_at": null,
+      "status": null
+    },
+    "expected": {
+      "id": "",
+      "name": "",
+      "status": "",
+      "input": null,
+      "output": null,
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "unknown",
+    "input": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "Future / 世界 \u003cv3\u003e\nDataClassification",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "populated",
+    "input": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "kind": "",
+      "status": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "null",
+    "input": {
+      "data": null,
+      "ended_at": null,
+      "id": null,
+      "kind": null,
+      "started_at": null,
+      "status": null
+    },
+    "expected": {
+      "id": "",
+      "kind": "",
+      "status": "",
+      "data": null,
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "populated",
+    "input": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+      "resolved_at": "2026-01-02T02:04:07.123456796Z",
+      "resolved_by": "reviewer"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+      "resolved_at": "2026-01-02T02:04:07.123456796Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "status": "",
+      "requested_at": "0001-01-01T00:00:00Z",
+      "resolved_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "null",
+    "input": {
+      "id": null,
+      "requested_at": null,
+      "resolved_at": null,
+      "resolved_by": null,
+      "status": null
+    },
+    "expected": {
+      "id": "",
+      "status": "",
+      "requested_at": "0001-01-01T00:00:00Z",
+      "resolved_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "BudgetCounters",
+    "case": "populated",
+    "input": {
+      "input_tokens": 9007199254740993,
+      "output_tokens": 12,
+      "tool_calls": 2,
+      "cost_micros": 42,
+      "wall_time_ms": 99
+    },
+    "expected": {
+      "input_tokens": 9007199254740993,
+      "output_tokens": 12,
+      "tool_calls": 2,
+      "cost_micros": 42,
+      "wall_time_ms": 99
+    }
+  },
+  {
+    "record": "BudgetCounters",
+    "case": "omitted",
+    "input": {},
+    "expected": {}
+  },
+  {
+    "record": "BudgetCounters",
+    "case": "null",
+    "input": {
+      "cost_micros": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "tool_calls": null,
+      "wall_time_ms": null
+    },
+    "expected": {}
+  },
+  {
+    "record": "ChildRun",
+    "case": "populated",
+    "input": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "run_id": "",
+      "status": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "null",
+    "input": {
+      "ended_at": null,
+      "id": null,
+      "run_id": null,
+      "started_at": null,
+      "status": null
+    },
+    "expected": {
+      "id": "",
+      "run_id": "",
+      "status": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "unknown",
+    "input": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "Future / 世界 \u003cv3\u003e\nRunStatus",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "Future / 世界 \u003cv3\u003e\nRunStatus",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "populated",
+    "input": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "tenant_id": "",
+      "run_id": "",
+      "owner": "",
+      "token": "",
+      "expires_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "null",
+    "input": {
+      "expires_at": null,
+      "owner": null,
+      "run_id": null,
+      "tenant_id": null,
+      "token": null
+    },
+    "expected": {
+      "tenant_id": "",
+      "run_id": "",
+      "owner": "",
+      "token": "",
+      "expires_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "populated",
+    "input": {
+      "id": "att_go",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z",
+      "outcome": "completed"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2026-01-02T03:04:05.123456789+01:00",
+      "ended_at": "2026-01-02T02:04:07.123456796Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "id": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "null",
+    "input": {
+      "ended_at": null,
+      "id": null,
+      "outcome": null,
+      "started_at": null
+    },
+    "expected": {
+      "id": "",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "populated",
+    "input": {
+      "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+    },
+    "expected": {
+      "requested_at": "2026-01-02T03:04:05.123456789+01:00",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2026-01-02T02:04:07.123456796Z"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "requested_at": "0001-01-01T00:00:00Z",
+      "acknowledged_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "null",
+    "input": {
+      "acknowledged_at": null,
+      "reason": null,
+      "requested_at": null,
+      "requested_by": null
+    },
+    "expected": {
+      "requested_at": "0001-01-01T00:00:00Z",
+      "acknowledged_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "RecoveryDecision",
+    "case": "populated",
+    "input": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "record-key"
+    },
+    "expected": {
+      "action": "retry",
+      "automatic": true,
+      "idempotency_key": "record-key"
+    }
+  },
+  {
+    "record": "RecoveryDecision",
+    "case": "omitted",
+    "input": {},
+    "expected": {
+      "action": "",
+      "automatic": false
+    }
+  },
+  {
+    "record": "RecoveryDecision",
+    "case": "null",
+    "input": {
+      "action": null,
+      "automatic": null,
+      "idempotency_key": null
+    },
+    "expected": {
+      "action": "",
+      "automatic": false
+    }
+  },
+  {
+    "record": "RecoveryDecision",
+    "case": "unknown",
+    "input": {
+      "action": "Future / 世界 \u003cv3\u003e\nRecoveryAction",
+      "automatic": true,
+      "idempotency_key": "record-key"
+    },
+    "expected": {
+      "action": "Future / 世界 \u003cv3\u003e\nRecoveryAction",
+      "automatic": true,
+      "idempotency_key": "record-key"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_00",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05Z",
+          "resolved_at": "2025-01-02T03:04:05Z",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05Z",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05Z",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05Z",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05Z",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05Z",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05Z",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05Z",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05Z",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05Z",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05Z",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05Z",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05Z",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05Z"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05Z",
+          "resolved_at": "2025-01-02T03:04:05Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05Z",
+          "updated_at": "2025-01-02T03:04:05Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05Z",
+      "updated_at": "2025-01-02T03:04:05Z",
+      "retain_until": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_00",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05Z",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05Z"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05Z",
+      "updated_at": "2025-01-02T03:04:05Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_00",
+    "input": {
+      "at": "2025-01-02T03:04:05Z",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_00",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05Z",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05Z",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_00",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05Z",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05Z",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_00",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05Z",
+      "resolved_at": "2025-01-02T03:04:05Z",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05Z",
+      "resolved_at": "2025-01-02T03:04:05Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_00",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05Z",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05Z",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_00",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05Z",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_00",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05Z",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05Z"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_00",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05Z",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05Z",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_01",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.1+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1+05:45",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1+05:45",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.1+05:45"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.1+05:45",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.1+05:45",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1+05:45",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.1+05:45",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.1+05:45",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.1+05:45"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.1+05:45",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.1+05:45",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.1+05:45",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.1+05:45"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "ended_at": "2025-01-02T03:04:05.1+05:45",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "ended_at": "2025-01-02T03:04:05.1+05:45"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "ended_at": "2025-01-02T03:04:05.1+05:45"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.1+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1+05:45",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.1+05:45",
+          "ended_at": "2025-01-02T03:04:05.1+05:45"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.1+05:45",
+          "updated_at": "2025-01-02T03:04:05.1+05:45",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.1+05:45",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.1+05:45"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.1+05:45",
+      "updated_at": "2025-01-02T03:04:05.1+05:45",
+      "retain_until": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_01",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.1+05:45",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.1+05:45"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.1+05:45",
+      "updated_at": "2025-01-02T03:04:05.1+05:45",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_01",
+    "input": {
+      "at": "2025-01-02T03:04:05.1+05:45",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.1+05:45",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_01",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.1+05:45",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "ended_at": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_01",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.1+05:45",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "ended_at": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_01",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.1+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1+05:45",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.1+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1+05:45",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_01",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1+05:45",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "ended_at": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_01",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.1+05:45",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_01",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1+05:45",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.1+05:45"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.1+05:45",
+      "ended_at": "2025-01-02T03:04:05.1+05:45",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_01",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.1+05:45",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.1+05:45",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.1+05:45",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.1+05:45"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_02",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.12-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12-03:30",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12-03:30",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.12-03:30"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.12-03:30",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.12-03:30",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12-03:30",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.12-03:30",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.12-03:30",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.12-03:30"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.12-03:30",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.12-03:30",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.12-03:30",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.12-03:30"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "ended_at": "2025-01-02T03:04:05.12-03:30",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "ended_at": "2025-01-02T03:04:05.12-03:30"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "ended_at": "2025-01-02T03:04:05.12-03:30"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.12-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12-03:30",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.12-03:30",
+          "ended_at": "2025-01-02T03:04:05.12-03:30"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.12-03:30",
+          "updated_at": "2025-01-02T03:04:05.12-03:30",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.12-03:30",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.12-03:30"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.12-03:30",
+      "updated_at": "2025-01-02T03:04:05.12-03:30",
+      "retain_until": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_02",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.12-03:30",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.12-03:30"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.12-03:30",
+      "updated_at": "2025-01-02T03:04:05.12-03:30",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_02",
+    "input": {
+      "at": "2025-01-02T03:04:05.12-03:30",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.12-03:30",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_02",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.12-03:30",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "ended_at": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_02",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.12-03:30",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "ended_at": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_02",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.12-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12-03:30",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.12-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12-03:30",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_02",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12-03:30",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "ended_at": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_02",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.12-03:30",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_02",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12-03:30",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.12-03:30"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.12-03:30",
+      "ended_at": "2025-01-02T03:04:05.12-03:30",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_02",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.12-03:30",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.12-03:30",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.12-03:30",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.12-03:30"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_03",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.123Z",
+          "resolved_at": "2025-01-02T03:04:05.123Z",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123Z",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.123Z"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.123Z",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.123Z",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123Z",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.123Z",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.123Z",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.123Z"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.123Z",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.123Z",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.123Z",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.123Z"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "ended_at": "2025-01-02T03:04:05.123Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "ended_at": "2025-01-02T03:04:05.123Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "ended_at": "2025-01-02T03:04:05.123Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.123Z",
+          "resolved_at": "2025-01-02T03:04:05.123Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.123Z",
+          "ended_at": "2025-01-02T03:04:05.123Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.123Z",
+          "updated_at": "2025-01-02T03:04:05.123Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.123Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.123Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.123Z",
+      "updated_at": "2025-01-02T03:04:05.123Z",
+      "retain_until": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_03",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.123Z",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.123Z"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.123Z",
+      "updated_at": "2025-01-02T03:04:05.123Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_03",
+    "input": {
+      "at": "2025-01-02T03:04:05.123Z",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.123Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_03",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.123Z",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "ended_at": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_03",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.123Z",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "ended_at": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_03",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.123Z",
+      "resolved_at": "2025-01-02T03:04:05.123Z",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.123Z",
+      "resolved_at": "2025-01-02T03:04:05.123Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_03",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123Z",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "ended_at": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_03",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.123Z",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_03",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123Z",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.123Z"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.123Z",
+      "ended_at": "2025-01-02T03:04:05.123Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_03",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.123Z",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.123Z",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.123Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.123Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_04",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.1234+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1234+05:45",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1234+05:45",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.1234+05:45"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.1234+05:45",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.1234+05:45",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1234+05:45",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.1234+05:45",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.1234+05:45",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.1234+05:45"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.1234+05:45",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.1234+05:45",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.1234+05:45",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.1234+05:45"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234+05:45",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234+05:45"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234+05:45"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.1234+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1234+05:45",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.1234+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234+05:45"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.1234+05:45",
+          "updated_at": "2025-01-02T03:04:05.1234+05:45",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.1234+05:45",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.1234+05:45"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.1234+05:45",
+      "updated_at": "2025-01-02T03:04:05.1234+05:45",
+      "retain_until": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_04",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.1234+05:45",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.1234+05:45"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.1234+05:45",
+      "updated_at": "2025-01-02T03:04:05.1234+05:45",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_04",
+    "input": {
+      "at": "2025-01-02T03:04:05.1234+05:45",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.1234+05:45",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_04",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.1234+05:45",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_04",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.1234+05:45",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_04",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.1234+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1234+05:45",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.1234+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1234+05:45",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_04",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1234+05:45",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_04",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.1234+05:45",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_04",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1234+05:45",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.1234+05:45"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.1234+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234+05:45",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_04",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.1234+05:45",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.1234+05:45",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.1234+05:45",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.1234+05:45"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_05",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.12345-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12345-03:30",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12345-03:30",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.12345-03:30"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.12345-03:30",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.12345-03:30",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12345-03:30",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.12345-03:30",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.12345-03:30",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.12345-03:30"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.12345-03:30",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.12345-03:30",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.12345-03:30",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.12345-03:30"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345-03:30",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345-03:30"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345-03:30"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.12345-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12345-03:30",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.12345-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345-03:30"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.12345-03:30",
+          "updated_at": "2025-01-02T03:04:05.12345-03:30",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.12345-03:30",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.12345-03:30"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.12345-03:30",
+      "updated_at": "2025-01-02T03:04:05.12345-03:30",
+      "retain_until": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_05",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.12345-03:30",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.12345-03:30"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.12345-03:30",
+      "updated_at": "2025-01-02T03:04:05.12345-03:30",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_05",
+    "input": {
+      "at": "2025-01-02T03:04:05.12345-03:30",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.12345-03:30",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_05",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.12345-03:30",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_05",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.12345-03:30",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_05",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.12345-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12345-03:30",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.12345-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12345-03:30",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_05",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12345-03:30",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_05",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.12345-03:30",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_05",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12345-03:30",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.12345-03:30"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.12345-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345-03:30",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_05",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.12345-03:30",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.12345-03:30",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.12345-03:30",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.12345-03:30"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_06",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.123456Z",
+          "resolved_at": "2025-01-02T03:04:05.123456Z",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123456Z",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.123456Z",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.123456Z",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123456Z",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.123456Z",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.123456Z",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.123456Z",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.123456Z",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.123456Z",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.123456Z"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "ended_at": "2025-01-02T03:04:05.123456Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "ended_at": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "ended_at": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.123456Z",
+          "resolved_at": "2025-01-02T03:04:05.123456Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.123456Z",
+          "ended_at": "2025-01-02T03:04:05.123456Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.123456Z",
+          "updated_at": "2025-01-02T03:04:05.123456Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.123456Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.123456Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.123456Z",
+      "updated_at": "2025-01-02T03:04:05.123456Z",
+      "retain_until": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_06",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.123456Z",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.123456Z"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.123456Z",
+      "updated_at": "2025-01-02T03:04:05.123456Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_06",
+    "input": {
+      "at": "2025-01-02T03:04:05.123456Z",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.123456Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_06",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.123456Z",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "ended_at": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_06",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.123456Z",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "ended_at": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_06",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.123456Z",
+      "resolved_at": "2025-01-02T03:04:05.123456Z",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.123456Z",
+      "resolved_at": "2025-01-02T03:04:05.123456Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_06",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123456Z",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "ended_at": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_06",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.123456Z",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_06",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123456Z",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.123456Z"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.123456Z",
+      "ended_at": "2025-01-02T03:04:05.123456Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_06",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.123456Z",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.123456Z",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.123456Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.123456Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_07",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1234567+05:45",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.1234567+05:45"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.1234567+05:45",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.1234567+05:45",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.1234567+05:45",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.1234567+05:45"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.1234567+05:45",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.1234567+05:45"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+          "resolved_at": "2025-01-02T03:04:05.1234567+05:45",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.1234567+05:45",
+          "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.1234567+05:45",
+          "updated_at": "2025-01-02T03:04:05.1234567+05:45",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.1234567+05:45"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.1234567+05:45",
+      "updated_at": "2025-01-02T03:04:05.1234567+05:45",
+      "retain_until": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_07",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.1234567+05:45",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.1234567+05:45"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.1234567+05:45",
+      "updated_at": "2025-01-02T03:04:05.1234567+05:45",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_07",
+    "input": {
+      "at": "2025-01-02T03:04:05.1234567+05:45",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.1234567+05:45",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_07",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_07",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_07",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1234567+05:45",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+      "resolved_at": "2025-01-02T03:04:05.1234567+05:45",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_07",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_07",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.1234567+05:45",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_07",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.1234567+05:45"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.1234567+05:45",
+      "ended_at": "2025-01-02T03:04:05.1234567+05:45",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_07",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.1234567+05:45",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.1234567+05:45",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.1234567+05:45"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_08",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12345678-03:30",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.12345678-03:30"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.12345678-03:30",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.12345678-03:30",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.12345678-03:30",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.12345678-03:30"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.12345678-03:30",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.12345678-03:30"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+          "resolved_at": "2025-01-02T03:04:05.12345678-03:30",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.12345678-03:30",
+          "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.12345678-03:30",
+          "updated_at": "2025-01-02T03:04:05.12345678-03:30",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.12345678-03:30"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.12345678-03:30",
+      "updated_at": "2025-01-02T03:04:05.12345678-03:30",
+      "retain_until": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_08",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.12345678-03:30",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.12345678-03:30"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.12345678-03:30",
+      "updated_at": "2025-01-02T03:04:05.12345678-03:30",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_08",
+    "input": {
+      "at": "2025-01-02T03:04:05.12345678-03:30",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.12345678-03:30",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_08",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_08",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_08",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12345678-03:30",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+      "resolved_at": "2025-01-02T03:04:05.12345678-03:30",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_08",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_08",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.12345678-03:30",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_08",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.12345678-03:30"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.12345678-03:30",
+      "ended_at": "2025-01-02T03:04:05.12345678-03:30",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_08",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.12345678-03:30",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.12345678-03:30",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.12345678-03:30"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_09",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.123456789Z",
+          "resolved_at": "2025-01-02T03:04:05.123456789Z",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123456789Z",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.123456789Z"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.123456789Z",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.123456789Z",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.123456789Z",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.123456789Z",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.123456789Z",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.123456789Z"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.123456789Z",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.123456789Z",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.123456789Z",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.123456789Z"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "ended_at": "2025-01-02T03:04:05.123456789Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "ended_at": "2025-01-02T03:04:05.123456789Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "ended_at": "2025-01-02T03:04:05.123456789Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.123456789Z",
+          "resolved_at": "2025-01-02T03:04:05.123456789Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.123456789Z",
+          "ended_at": "2025-01-02T03:04:05.123456789Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.123456789Z",
+          "updated_at": "2025-01-02T03:04:05.123456789Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.123456789Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.123456789Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.123456789Z",
+      "updated_at": "2025-01-02T03:04:05.123456789Z",
+      "retain_until": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_09",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.123456789Z",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.123456789Z"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.123456789Z",
+      "updated_at": "2025-01-02T03:04:05.123456789Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_09",
+    "input": {
+      "at": "2025-01-02T03:04:05.123456789Z",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.123456789Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_09",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.123456789Z",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "ended_at": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_09",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.123456789Z",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "ended_at": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_09",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.123456789Z",
+      "resolved_at": "2025-01-02T03:04:05.123456789Z",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.123456789Z",
+      "resolved_at": "2025-01-02T03:04:05.123456789Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_09",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123456789Z",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "ended_at": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_09",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.123456789Z",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_09",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.123456789Z",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.123456789Z"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.123456789Z",
+      "ended_at": "2025-01-02T03:04:05.123456789Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_09",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.123456789Z",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.123456789Z",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.123456789Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.123456789Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_10",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+          "resolved_at": "2025-01-02T03:04:05.000000001-03:30",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.000000001-03:30"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.000000001-03:30",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.000000001-03:30",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.000000001-03:30",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.000000001-03:30"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.000000001-03:30",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.000000001-03:30"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+          "resolved_at": "2025-01-02T03:04:05.000000001-03:30",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.000000001-03:30",
+          "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.000000001-03:30",
+          "updated_at": "2025-01-02T03:04:05.000000001-03:30",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.000000001-03:30"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.000000001-03:30",
+      "updated_at": "2025-01-02T03:04:05.000000001-03:30",
+      "retain_until": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_10",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.000000001-03:30",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.000000001-03:30"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.000000001-03:30",
+      "updated_at": "2025-01-02T03:04:05.000000001-03:30",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_10",
+    "input": {
+      "at": "2025-01-02T03:04:05.000000001-03:30",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.000000001-03:30",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_10",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_10",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_10",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+      "resolved_at": "2025-01-02T03:04:05.000000001-03:30",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+      "resolved_at": "2025-01-02T03:04:05.000000001-03:30",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_10",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_10",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.000000001-03:30",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_10",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.000000001-03:30"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.000000001-03:30",
+      "ended_at": "2025-01-02T03:04:05.000000001-03:30",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_10",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.000000001-03:30",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.000000001-03:30",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.000000001-03:30"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_11",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.100000000+00:00",
+          "resolved_at": "2025-01-02T03:04:05.100000000+00:00",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.100000000+00:00"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.100000000+00:00",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.100000000+00:00",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.100000000+00:00",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.100000000+00:00",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.100000000+00:00",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.100000000+00:00"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.100000000+00:00",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.100000000+00:00",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.100000000+00:00",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.100000000+00:00"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05.1Z",
+          "ended_at": "2025-01-02T03:04:05.1Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05.1Z",
+          "ended_at": "2025-01-02T03:04:05.1Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.1Z",
+          "ended_at": "2025-01-02T03:04:05.1Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05.1Z",
+          "resolved_at": "2025-01-02T03:04:05.1Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05.1Z",
+          "ended_at": "2025-01-02T03:04:05.1Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05.1Z",
+          "updated_at": "2025-01-02T03:04:05.1Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05.1Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05.1Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05.1Z",
+      "updated_at": "2025-01-02T03:04:05.1Z",
+      "retain_until": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_11",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.100000000+00:00",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.100000000+00:00"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05.1Z",
+      "updated_at": "2025-01-02T03:04:05.1Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_11",
+    "input": {
+      "at": "2025-01-02T03:04:05.100000000+00:00",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05.1Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_11",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.100000000+00:00",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.1Z",
+      "ended_at": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_11",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.100000000+00:00",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05.1Z",
+      "ended_at": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_11",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.100000000+00:00",
+      "resolved_at": "2025-01-02T03:04:05.100000000+00:00",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05.1Z",
+      "resolved_at": "2025-01-02T03:04:05.1Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_11",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.100000000+00:00",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05.1Z",
+      "ended_at": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_11",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.100000000+00:00",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_11",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.100000000+00:00",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.100000000+00:00"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05.1Z",
+      "ended_at": "2025-01-02T03:04:05.1Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_11",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.100000000+00:00",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.100000000+00:00",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05.1Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05.1Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_12",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "2025-01-02T03:04:05.000000000-00:00",
+          "resolved_at": "2025-01-02T03:04:05.000000000-00:00",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "2025-01-02T03:04:05.000000000-00:00"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "2025-01-02T03:04:05.000000000-00:00",
+        "reason": "stop",
+        "requested_at": "2025-01-02T03:04:05.000000000-00:00",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "2025-01-02T03:04:05.000000000-00:00",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "2025-01-02T03:04:05.000000000-00:00",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "2025-01-02T03:04:05.000000000-00:00",
+          "state": "outcome_unknown",
+          "updated_at": "2025-01-02T03:04:05.000000000-00:00"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "2025-01-02T03:04:05.000000000-00:00",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "2025-01-02T03:04:05.000000000-00:00",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05.000000000-00:00",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "2025-01-02T03:04:05.000000000-00:00"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "2025-01-02T03:04:05Z",
+          "resolved_at": "2025-01-02T03:04:05Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "2025-01-02T03:04:05Z",
+          "ended_at": "2025-01-02T03:04:05Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "2025-01-02T03:04:05Z",
+          "updated_at": "2025-01-02T03:04:05Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "2025-01-02T03:04:05Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "2025-01-02T03:04:05Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "2025-01-02T03:04:05Z",
+      "updated_at": "2025-01-02T03:04:05Z",
+      "retain_until": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_12",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "2025-01-02T03:04:05.000000000-00:00",
+      "state": "outcome_unknown",
+      "updated_at": "2025-01-02T03:04:05.000000000-00:00"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "2025-01-02T03:04:05Z",
+      "updated_at": "2025-01-02T03:04:05Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_12",
+    "input": {
+      "at": "2025-01-02T03:04:05.000000000-00:00",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "2025-01-02T03:04:05Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_12",
+    "input": {
+      "classification": "secret",
+      "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05.000000000-00:00",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_12",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "2025-01-02T03:04:05.000000000-00:00",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_12",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "2025-01-02T03:04:05.000000000-00:00",
+      "resolved_at": "2025-01-02T03:04:05.000000000-00:00",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "2025-01-02T03:04:05Z",
+      "resolved_at": "2025-01-02T03:04:05Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_12",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "2025-01-02T03:04:05.000000000-00:00",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_12",
+    "input": {
+      "expires_at": "2025-01-02T03:04:05.000000000-00:00",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_12",
+    "input": {
+      "ended_at": "2025-01-02T03:04:05.000000000-00:00",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "2025-01-02T03:04:05.000000000-00:00"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "2025-01-02T03:04:05Z",
+      "ended_at": "2025-01-02T03:04:05Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_12",
+    "input": {
+      "acknowledged_at": "2025-01-02T03:04:05.000000000-00:00",
+      "reason": "stop",
+      "requested_at": "2025-01-02T03:04:05.000000000-00:00",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "2025-01-02T03:04:05Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "2025-01-02T03:04:05Z"
+    }
+  },
+  {
+    "record": "RunSnapshot",
+    "case": "timestamp_13",
+    "input": {
+      "approvals": [
+        {
+          "id": "approval_go",
+          "requested_at": "0001-01-01T00:00:00Z",
+          "resolved_at": "0001-01-01T00:00:00Z",
+          "resolved_by": "reviewer",
+          "status": "pending"
+        }
+      ],
+      "attempts": [
+        {
+          "ended_at": "0001-01-01T00:00:00Z",
+          "id": "att_go",
+          "outcome": "completed",
+          "started_at": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "cancellation": {
+        "acknowledged_at": "0001-01-01T00:00:00Z",
+        "reason": "stop",
+        "requested_at": "0001-01-01T00:00:00Z",
+        "requested_by": "operator"
+      },
+      "child_runs": [
+        {
+          "ended_at": "0001-01-01T00:00:00Z",
+          "id": "child_go",
+          "run_id": "run_child",
+          "started_at": "0001-01-01T00:00:00Z",
+          "status": "running"
+        }
+      ],
+      "classification": "sensitive",
+      "created_at": "0001-01-01T00:00:00Z",
+      "cumulative_budget": {
+        "cost_micros": 42,
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "wall_time_ms": 99
+      },
+      "effects": [
+        {
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "id": "effect_go",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "outcome": {
+            "uncertain": true
+          },
+          "prepared_at": "0001-01-01T00:00:00Z",
+          "state": "outcome_unknown",
+          "updated_at": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "event_sequence": 9007199254740993,
+      "retain_until": "0001-01-01T00:00:00Z",
+      "revision": 9007199254740993,
+      "run_id": "run_go",
+      "schema_version": 2,
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "status": "running",
+      "steps": [
+        {
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "ended_at": "0001-01-01T00:00:00Z",
+          "id": "step_go",
+          "kind": "tool",
+          "started_at": "0001-01-01T00:00:00Z",
+          "status": "2025-01-02T03:04:05.123456789+02:00"
+        }
+      ],
+      "tenant_id": "tenant_go",
+      "tool_calls": [
+        {
+          "classification": "secret",
+          "ended_at": "0001-01-01T00:00:00Z",
+          "id": "tool_go",
+          "input": {
+            "key": "secret"
+          },
+          "name": "write",
+          "output": {
+            "ok": true
+          },
+          "started_at": "0001-01-01T00:00:00Z",
+          "status": "prepared"
+        }
+      ],
+      "updated_at": "0001-01-01T00:00:00Z"
+    },
+    "expected": {
+      "schema_version": 2,
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "revision": 9007199254740993,
+      "event_sequence": 9007199254740993,
+      "status": "running",
+      "classification": "sensitive",
+      "state": {
+        "checkpoint": "tool_prepared",
+        "large": 18446744073709551615,
+        "text": "\u003chello\u003e\u0026世界"
+      },
+      "attempts": [
+        {
+          "id": "att_go",
+          "started_at": "0001-01-01T00:00:00Z",
+          "ended_at": "0001-01-01T00:00:00Z",
+          "outcome": "completed"
+        }
+      ],
+      "steps": [
+        {
+          "id": "step_go",
+          "kind": "tool",
+          "status": "2025-01-02T03:04:05.123456789+02:00",
+          "data": {
+            "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+          },
+          "started_at": "0001-01-01T00:00:00Z",
+          "ended_at": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "tool_calls": [
+        {
+          "id": "tool_go",
+          "name": "write",
+          "status": "prepared",
+          "classification": "secret",
+          "input": {
+            "key": "secret"
+          },
+          "output": {
+            "ok": true
+          },
+          "started_at": "0001-01-01T00:00:00Z",
+          "ended_at": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "approvals": [
+        {
+          "id": "approval_go",
+          "status": "pending",
+          "requested_at": "0001-01-01T00:00:00Z",
+          "resolved_at": "0001-01-01T00:00:00Z",
+          "resolved_by": "reviewer"
+        }
+      ],
+      "child_runs": [
+        {
+          "id": "child_go",
+          "run_id": "run_child",
+          "status": "running",
+          "started_at": "0001-01-01T00:00:00Z",
+          "ended_at": "0001-01-01T00:00:00Z"
+        }
+      ],
+      "effects": [
+        {
+          "id": "effect_go",
+          "classification": "non_replayable",
+          "data_classification": "secret",
+          "state": "outcome_unknown",
+          "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+          "prepared_at": "0001-01-01T00:00:00Z",
+          "updated_at": "0001-01-01T00:00:00Z",
+          "outcome": {
+            "uncertain": true
+          }
+        }
+      ],
+      "cancellation": {
+        "requested_at": "0001-01-01T00:00:00Z",
+        "requested_by": "operator",
+        "reason": "stop",
+        "acknowledged_at": "0001-01-01T00:00:00Z"
+      },
+      "cumulative_budget": {
+        "input_tokens": 9007199254740993,
+        "output_tokens": 12,
+        "tool_calls": 2,
+        "cost_micros": 42,
+        "wall_time_ms": 99
+      },
+      "created_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z",
+      "retain_until": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Effect",
+    "case": "timestamp_13",
+    "input": {
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "id": "effect_go",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "outcome": {
+        "uncertain": true
+      },
+      "prepared_at": "0001-01-01T00:00:00Z",
+      "state": "outcome_unknown",
+      "updated_at": "0001-01-01T00:00:00Z"
+    },
+    "expected": {
+      "id": "effect_go",
+      "classification": "non_replayable",
+      "data_classification": "secret",
+      "state": "outcome_unknown",
+      "idempotency_key": "ga_e400d12e0586b2cd1785a69ee7260fc60c6a66506cc07bb95ca1a39ae7c6fd7e",
+      "prepared_at": "0001-01-01T00:00:00Z",
+      "updated_at": "0001-01-01T00:00:00Z",
+      "outcome": {
+        "uncertain": true
+      }
+    }
+  },
+  {
+    "record": "Event",
+    "case": "timestamp_13",
+    "input": {
+      "at": "0001-01-01T00:00:00Z",
+      "classification": "sensitive",
+      "id": "event_go",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      },
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "tenant_id": "tenant_go",
+      "type": "tool.prepared"
+    },
+    "expected": {
+      "id": "event_go",
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "sequence": 9007199254740993,
+      "at": "0001-01-01T00:00:00Z",
+      "type": "tool.prepared",
+      "classification": "sensitive",
+      "payload": {
+        "at": "2025-01-02T03:04:05.123456789+02:00",
+        "n": 9007199254740993
+      }
+    }
+  },
+  {
+    "record": "ToolCall",
+    "case": "timestamp_13",
+    "input": {
+      "classification": "secret",
+      "ended_at": "0001-01-01T00:00:00Z",
+      "id": "tool_go",
+      "input": {
+        "key": "secret"
+      },
+      "name": "write",
+      "output": {
+        "ok": true
+      },
+      "started_at": "0001-01-01T00:00:00Z",
+      "status": "prepared"
+    },
+    "expected": {
+      "id": "tool_go",
+      "name": "write",
+      "status": "prepared",
+      "classification": "secret",
+      "input": {
+        "key": "secret"
+      },
+      "output": {
+        "ok": true
+      },
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Step",
+    "case": "timestamp_13",
+    "input": {
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "ended_at": "0001-01-01T00:00:00Z",
+      "id": "step_go",
+      "kind": "tool",
+      "started_at": "0001-01-01T00:00:00Z",
+      "status": "2025-01-02T03:04:05.123456789+02:00"
+    },
+    "expected": {
+      "id": "step_go",
+      "kind": "tool",
+      "status": "2025-01-02T03:04:05.123456789+02:00",
+      "data": {
+        "ended_at": "2025-01-02T03:04:05.123456789+02:00"
+      },
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Approval",
+    "case": "timestamp_13",
+    "input": {
+      "id": "approval_go",
+      "requested_at": "0001-01-01T00:00:00Z",
+      "resolved_at": "0001-01-01T00:00:00Z",
+      "resolved_by": "reviewer",
+      "status": "pending"
+    },
+    "expected": {
+      "id": "approval_go",
+      "status": "pending",
+      "requested_at": "0001-01-01T00:00:00Z",
+      "resolved_at": "0001-01-01T00:00:00Z",
+      "resolved_by": "reviewer"
+    }
+  },
+  {
+    "record": "ChildRun",
+    "case": "timestamp_13",
+    "input": {
+      "ended_at": "0001-01-01T00:00:00Z",
+      "id": "child_go",
+      "run_id": "run_child",
+      "started_at": "0001-01-01T00:00:00Z",
+      "status": "running"
+    },
+    "expected": {
+      "id": "child_go",
+      "run_id": "run_child",
+      "status": "running",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Lease",
+    "case": "timestamp_13",
+    "input": {
+      "expires_at": "0001-01-01T00:00:00Z",
+      "owner": "worker",
+      "run_id": "run_go",
+      "tenant_id": "tenant_go",
+      "token": "lease_go"
+    },
+    "expected": {
+      "tenant_id": "tenant_go",
+      "run_id": "run_go",
+      "owner": "worker",
+      "token": "lease_go",
+      "expires_at": "0001-01-01T00:00:00Z"
+    }
+  },
+  {
+    "record": "Attempt",
+    "case": "timestamp_13",
+    "input": {
+      "ended_at": "0001-01-01T00:00:00Z",
+      "id": "att_go",
+      "outcome": "completed",
+      "started_at": "0001-01-01T00:00:00Z"
+    },
+    "expected": {
+      "id": "att_go",
+      "started_at": "0001-01-01T00:00:00Z",
+      "ended_at": "0001-01-01T00:00:00Z",
+      "outcome": "completed"
+    }
+  },
+  {
+    "record": "Cancellation",
+    "case": "timestamp_13",
+    "input": {
+      "acknowledged_at": "0001-01-01T00:00:00Z",
+      "reason": "stop",
+      "requested_at": "0001-01-01T00:00:00Z",
+      "requested_by": "operator"
+    },
+    "expected": {
+      "requested_at": "0001-01-01T00:00:00Z",
+      "requested_by": "operator",
+      "reason": "stop",
+      "acknowledged_at": "0001-01-01T00:00:00Z"
+    }
+  }
+]

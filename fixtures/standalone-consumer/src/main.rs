@@ -16,5 +16,8 @@ fn main() {
     };
     assert_eq!(request.input.len(), 1);
     assert!(!adk::runtime::CancellationToken::new().is_cancelled());
+    let cursor = adk::host::Cursor::default();
+    assert_eq!(cursor.message_id, 0);
+    assert!(cursor.token.is_empty());
     println!("External standalone consumer: all reusable facade features compiled");
 }

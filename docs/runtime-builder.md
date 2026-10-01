@@ -6,6 +6,10 @@ require platform services, a worker CLI, or evaluation adapters. Cargo features
 make implementations available. `builder::Features` selects what a particular
 runtime is allowed to assemble.
 
+For caller-driven message ingestion and approval persistence on top of a native
+agent, enable `host` and use the [standalone host-session API](host-sessions.md).
+Its stores and lifecycle remain application-owned.
+
 ## Construction
 
 ```rust,no_run

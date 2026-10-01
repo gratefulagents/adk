@@ -140,6 +140,8 @@ pub struct ModelRouting {
 #[serde(default, rename_all = "camelCase", deny_unknown_fields)]
 pub struct Constraints {
     pub max_turns: Option<NonZeroU32>,
+    #[serde(rename = "subAgentMaxTurns")]
+    pub subagent_max_turns: Option<NonZeroU32>,
     pub max_retries: Option<u32>,
 }
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -442,7 +444,7 @@ impl SessionHandle {
     pub fn subagents(&self) -> Option<&Arc<SubagentSession>> {
         self.subagents.as_ref()
     }
-    fn context(&self, context: &Context) -> Context {
+    pub(crate) fn context(&self, context: &Context) -> Context {
         Context {
             cancellation: Arc::new(SessionCancellation {
                 caller: context.cancellation.clone(),
@@ -697,6 +699,13 @@ impl Builder {
             if let Some(constraints) = &mode.constraints {
                 if let Some(limit) = constraints.max_turns {
                     policy.max_turns = policy.max_turns.min(limit);
+                }
+                if let Some(limit) = constraints.subagent_max_turns {
+                    self.runner.subagent_max_turns = Some(
+                        self.runner
+                            .subagent_max_turns
+                            .map_or(limit, |current| current.min(limit)),
+                    );
                 }
                 if let Some(retries) = constraints.max_retries {
                     self.runner.retry.max_retries = retries;

@@ -7,4 +7,4 @@ publish = false
 [workspace]
 
 [dependencies]
-adk = { path = "../../crates/adk", default-features = false, features = ["compat", "builder", "execution", "durable", "project-state", "tools", "mcp", "otel"] }
+adk = { path = "../../crates/adk", default-features = false, features = ["compat", "builder", "host", "execution", "durable", "project-state", "tools", "mcp", "otel"] }

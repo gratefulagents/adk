@@ -56,6 +56,10 @@ pub mod telemetry;
 #[cfg(feature = "builder")]
 pub mod builder;
 
+/// Host-owned message ingestion, approvals and session persistence.
+#[cfg(feature = "host")]
+pub mod host;
+
 /// Shared trace ownership, scoped spans and ordered processor composition.
 #[cfg(feature = "observability")]
 pub mod tracing;

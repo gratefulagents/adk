@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        features: [minimal, default, compat, runtime, providers, providers-runtime, execution, durable, project-state, tools, mcp, observability, otel, builder, composition, all]
+        features: [minimal, default, compat, runtime, providers, providers-runtime, execution, durable, project-state, tools, mcp, observability, otel, builder, host, composition, all]
     steps:
       - uses: actions/checkout@v4
       - name: Install pinned compiler and components

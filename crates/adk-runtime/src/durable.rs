@@ -535,7 +535,12 @@ impl Runner {
                 saved.phase
             };
             engine.calls = saved.calls;
-            for entry in engine.approval_journal.entries() {
+            for entry in engine
+                .approval_journal
+                .entries()
+                .into_iter()
+                .filter(|entry| !entry.historical_only)
+            {
                 let call =
                     adk_codec::approval::approval_call(&entry.marker.data).map_err(invalid)?;
                 if engine.calls.iter().any(|pending| *pending == call) {
@@ -631,6 +636,10 @@ impl Runner {
             || config.compaction.is_some()
             || config.turn_context.is_some()
             || config
+                .compaction_carry_forward
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
                 .stop_gate
                 .as_ref()
                 .is_some_and(|gate| gate.durable_key().is_none_or(str::is_empty))
@@ -641,7 +650,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, or replay-unsafe guardrails, stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe carry-forward callbacks, guardrails, stop gates or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -692,6 +701,15 @@ impl Runner {
         });
         if !config.tool_input_guardrails.is_empty() || !config.tool_output_guardrails.is_empty() {
             baseline["tool_guardrails"] = serde_json::json!({"input": config.tool_input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": config.tool_output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
+        }
+        if let Some(limit) = config.subagent_max_turns {
+            baseline["subagent_max_turns"] = serde_json::json!(limit);
+        }
+        if !config.working_state_context.is_empty() {
+            baseline["working_state_context"] = serde_json::json!(config.working_state_context);
+        }
+        if let Some(callback) = &config.compaction_carry_forward {
+            baseline["compaction_carry_forward"] = serde_json::json!(callback.durable_key());
         }
         if config.subagents.is_some() {
             baseline["subagents"] = serde_json::json!({"version": 1});
@@ -1097,6 +1115,7 @@ impl Runner {
                             agent: wire.agent.clone(),
                         },
                         new_items_before: 0,
+                        historical_only: false,
                         history_before: Some(history.len()),
                         reason: None,
                     });

@@ -356,6 +356,15 @@ pub trait StopGate: Send + Sync {
         output: &'a Value,
     ) -> BoxFuture<'a, Result<Option<String>, Error>>;
 }
+/// Host-maintained state consulted only after compaction. A nonblank result
+/// supersedes the static working-state context; blank results fall back to it.
+pub trait CompactionCarryForward: Send + Sync {
+    fn context<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, Result<String, Error>>;
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+}
+
 #[derive(Clone)]
 pub struct RunnerConfig {
     pub work_dir: PathBuf,
@@ -385,6 +394,11 @@ pub struct RunnerConfig {
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Session-owned children survive individual runs; the scheduler owner closes them.
     pub subagents: Option<Arc<crate::subagent_tools::SubagentSession>>,
+    /// Optional per-invocation ceiling inherited by submitted children.
+    pub subagent_max_turns: Option<std::num::NonZeroU32>,
+    /// Static host context injected after compaction, never into the initial prompt.
+    pub working_state_context: String,
+    pub compaction_carry_forward: Option<Arc<dyn CompactionCarryForward>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
     pub hooks: Option<Arc<dyn RunHooks>>,
@@ -418,6 +432,9 @@ impl Default for RunnerConfig {
             stop_gate_max_blocks: 8,
             turn_context: None,
             subagents: None,
+            subagent_max_turns: None,
+            working_state_context: String::new(),
+            compaction_carry_forward: None,
             transient_context: vec![],
             hooks: None,
             durable: None,
@@ -464,54 +481,96 @@ impl Continuation {
     /// Go ChatLoop boundary: resolve and execute each pending call before asking
     /// the next gate, then start a fresh invocation budget without replaying effects.
     pub async fn resume_go_gate(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+    ) -> Result<RunOutcome, RunError> {
+        self.resume_go_gate_inner(gate, None).await
+    }
+    /// Publish resolved approval records and await persistence before advancing.
+    /// Completed partial work is committed even when a later gate or tool fails;
+    /// persistence failures take precedence over publication or resolution failures.
+    /// Durable continuations are rejected until append reconciliation is supported.
+    pub async fn resume_go_gate_with_boundary(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+        boundary: &dyn crate::compat::GoApprovalBoundary,
+    ) -> Result<RunOutcome, RunError> {
+        if self.engine.durable_state.is_some() {
+            return Err(RunError::with_partial(
+                Error::new(
+                    ErrorCategory::Unsupported,
+                    "durable approval boundaries require append reconciliation",
+                ),
+                self.engine.result,
+            ));
+        }
+        self.resume_go_gate_inner(gate, Some(boundary)).await
+    }
+    async fn resume_go_gate_inner(
         mut self,
         gate: &dyn crate::compat::GoApprovalGate,
+        boundary: Option<&dyn crate::compat::GoApprovalBoundary>,
     ) -> Result<RunOutcome, RunError> {
         self.engine.result.status = RunStatus::Incomplete;
         self.engine.tools_prepared = true;
         self.engine.streaming = false;
         self.engine.sender.take();
-        while let Some(call) = self.engine.calls.front().cloned() {
-            let Some(request) = self
-                .engine
-                .result
-                .pending_approvals
-                .iter()
-                .find(|r| r.call.id == call.id)
-                .cloned()
-            else {
-                return Err(self
+        let initial_items = self.engine.result.new_items.len();
+        let initial_markers = self.engine.approval_journal.entries().len();
+        let resolution = async {
+            while let Some(call) = self.engine.calls.front().cloned() {
+                let Some(request) = self
                     .engine
-                    .fail(Error::new(
+                    .result
+                    .pending_approvals
+                    .iter()
+                    .find(|r| r.call.id == call.id)
+                    .cloned()
+                else {
+                    return Err(Error::new(
                         ErrorCategory::InvalidInput,
                         "Go gate resume requires pending approval calls",
-                    ))
-                    .await);
-            };
-            let decision = match bounded(
-                &self.engine.context,
-                None,
-                gate.approve(&self.engine.context, &request),
-            )
-            .await
-            {
-                Ok(decision) => decision,
-                Err(error) => return Err(self.engine.fail(error).await),
-            };
-            let approval = if decision.approved {
-                ApprovalDecision::Approve
-            } else {
-                ApprovalDecision::Deny
-            };
-            if !decision.approved && !decision.reason.trim().is_empty() {
-                self.engine
-                    .denial_reasons
-                    .insert(call.id.clone(), decision.reason.trim().into());
+                    ));
+                };
+                let decision = bounded(
+                    &self.engine.context,
+                    None,
+                    gate.approve(&self.engine.context, &request),
+                )
+                .await?;
+                let approval = if decision.approved {
+                    ApprovalDecision::Approve
+                } else {
+                    ApprovalDecision::Deny
+                };
+                if !decision.approved && !decision.reason.trim().is_empty() {
+                    self.engine
+                        .denial_reasons
+                        .insert(call.id.clone(), decision.reason.trim().into());
+                }
+                self.engine.approvals.insert(call.id.clone(), approval);
+                self.engine.tool(call).await?;
             }
-            self.engine.approvals.insert(call.id.clone(), approval);
-            if let Err(error) = self.engine.tool(call).await {
+            Ok::<_, Error>(())
+        }
+        .await;
+        if let Some(boundary) = boundary
+            && (self.engine.result.new_items.len() != initial_items
+                || self.engine.approval_journal.entries().len() != initial_markers)
+        {
+            let publication = self.engine.publish_committed().await;
+            if let Err(error) = boundary
+                .commit(&self.engine.context, &self.engine.result)
+                .await
+            {
                 return Err(self.engine.fail(error).await);
             }
+            if let Err(error) = publication {
+                return Err(self.engine.fail(error).await);
+            }
+        }
+        if let Err(error) = resolution {
+            return Err(self.engine.fail(error).await);
         }
         if self.engine.durable_state.is_none() {
             self.engine.turns = 0;
@@ -655,10 +714,34 @@ impl Runner {
     ) -> Result<RunOutcome, RunError> {
         self.engine(context, request, host).drive().await
     }
+    /// Seeds ordered approval sidecars for input history without replaying or republishing them.
+    pub async fn run_with_approval_history(
+        &self,
+        context: Context,
+        request: RunRequest,
+        host: Arc<dyn Host>,
+        markers: Vec<ApprovalMarkerBoundary>,
+    ) -> Result<RunOutcome, RunError> {
+        let journal = crate::compat::ApprovalJournal::from_history(markers, request.input.len())
+            .map_err(|error| Error::new(ErrorCategory::InvalidInput, error.to_string()))?;
+        let mut engine = self.engine(context, request, host);
+        engine.committed_markers = journal.entries().len();
+        engine.approval_journal = journal;
+        engine.drive().await
+    }
     pub fn stream(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> RunStream {
         RunStream::new(self.engine(context, request, host))
     }
-    fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
+    fn engine(&self, context: Context, mut request: RunRequest, host: Arc<dyn Host>) -> Engine {
+        if let Some(limit) = self.config.subagent_max_turns {
+            request.policy.tools.max_child_turns = Some(
+                request
+                    .policy
+                    .tools
+                    .max_child_turns
+                    .map_or(limit, |requested| requested.min(limit)),
+            );
+        }
         if let Some(session) = &self.config.subagents {
             session.begin_run();
         }
@@ -1003,6 +1086,7 @@ impl Engine {
             .collect();
         let mut markers = entries[self.committed_markers..]
             .iter()
+            .filter(|entry| !entry.historical_only)
             .map(|entry| {
                 let before_item = entry
                     .new_items_before
@@ -1222,6 +1306,98 @@ impl Engine {
         }
         Ok(())
     }
+    async fn apply_compaction_carry_forward(
+        &mut self,
+        history: &mut Vec<RunItem>,
+        provenance: &mut Vec<ItemProvenance>,
+        markers: &mut [ApprovalMarkerBoundary],
+    ) -> Result<(), Error> {
+        let dynamic = if let Some(callback) = &self.config.compaction_carry_forward {
+            bounded(
+                &self.context,
+                self.config.model_idle_timeout,
+                callback.context(&self.context),
+            )
+            .await?
+        } else {
+            String::new()
+        };
+        let section = if dynamic.trim().is_empty() {
+            self.config.working_state_context.trim()
+        } else {
+            dynamic.trim()
+        };
+        let carry = if section.is_empty() {
+            None
+        } else {
+            Some(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: format!(
+                            "{}\nThis live runtime state was injected after context compaction. Treat it as current and higher priority than older compacted history.\n\n{section}",
+                            crate::compaction::CARRY_FORWARD_MARKER
+                        ),
+                    }],
+                },
+            })
+        };
+        if let Some(item) = &carry {
+            let checked = run_guardrails(
+                &self.agent.input_guardrails,
+                &self.context,
+                &self.agent.name,
+                GuardrailInput::Input(std::slice::from_ref(item)),
+            )
+            .await;
+            self.result.guardrails.extend(checked.reports);
+            if let Some(error) = checked.error {
+                return Err(error);
+            }
+        }
+        let mut boundaries = Vec::with_capacity(history.len() + 1);
+        let mut retained = 0;
+        let mut sources = Vec::with_capacity(provenance.len() + 1);
+        for (item, source) in history.iter().zip(provenance.iter()) {
+            boundaries.push(retained);
+            let stale = match item {
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                    let text = message
+                        .content
+                        .iter()
+                        .filter_map(|part| match part {
+                            Content::Text { text } => Some(text.as_str()),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    text.trim()
+                        .starts_with(crate::compaction::CARRY_FORWARD_MARKER)
+                }
+                _ => false,
+            };
+            if !stale {
+                retained += 1;
+                sources.push(source.clone());
+            }
+        }
+        boundaries.push(retained);
+        let mut index = 0;
+        history.retain(|_| {
+            let keep = boundaries[index + 1] > boundaries[index];
+            index += 1;
+            keep
+        });
+        for marker in markers {
+            marker.before_item = boundaries[marker.before_item];
+        }
+        *provenance = sources;
+        if let Some(item) = carry {
+            history.push(item);
+            provenance.push(ItemProvenance::Unattributed);
+        }
+        Ok(())
+    }
     async fn compact(&mut self) -> Result<(), Error> {
         let Some(config) = &self.config.compaction else {
             return Ok(());
@@ -1253,7 +1429,7 @@ impl Engine {
             target_tokens: config.target_tokens,
         })
         .await?;
-        let compacted = match bounded(
+        let mut compacted = match bounded(
             &self.context,
             self.config.model_idle_timeout,
             config.compactor.compact(&self.context, request),
@@ -1289,8 +1465,14 @@ impl Engine {
         })
         .await?;
         validate_history_pairs(&compacted.history)?;
-        let history_provenance =
+        let mut history_provenance =
             normalize_provenance(compacted.history.len(), &compacted.history_provenance)?;
+        self.apply_compaction_carry_forward(
+            &mut compacted.history,
+            &mut history_provenance,
+            &mut [],
+        )
+        .await?;
         self.observe(Observation::HistoryReplaced {
             before: self.result.history.clone(),
             after: compacted.history.clone(),
@@ -1361,12 +1543,14 @@ impl Engine {
             }
             return Ok(false);
         }
-        let (history, markers, history_provenance) = finalize_with_provenance(
+        let (mut history, mut markers, mut history_provenance) = finalize_with_provenance(
             &outcome,
             &self.result.history,
             &markers,
             &self.result.history_provenance,
         );
+        self.apply_compaction_carry_forward(&mut history, &mut history_provenance, &mut markers)
+            .await?;
         validate_history_pairs(&history)?;
         let before_items = self.result.history.len();
         let context_tokens = estimate_history_tokens_with_approvals(&history, &markers) + overhead;

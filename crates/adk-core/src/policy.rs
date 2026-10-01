@@ -41,6 +41,8 @@ pub struct ToolPolicy {
     pub allowed_mutating_tools: BTreeSet<String>,
     pub approval: ApprovalPolicy,
     pub timeout: Option<Duration>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_child_turns: Option<NonZeroU32>,
 }
 
 impl ToolPolicy {

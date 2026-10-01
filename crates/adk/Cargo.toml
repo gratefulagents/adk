@@ -11,6 +11,7 @@ default = []
 compat = ["dep:adk-codec"]
 runtime = ["dep:adk-runtime", "dep:serde", "dep:serde_json", "dep:tokio"]
 builder = ["providers-runtime", "tools", "dep:serde_yaml", "dep:adk-sandbox"]
+host = ["builder", "observability"]
 providers = ["dep:adk-providers"]
 providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 execution = ["dep:adk-security", "dep:adk-sandbox"]
@@ -53,6 +54,10 @@ opentelemetry_sdk = { version = "0.31", default-features = false, features = ["t
 
 [target.'cfg(unix)'.dependencies]
 rustix = { version = "1", features = ["fs"], optional = true }
+
+[[example]]
+name = "host_session"
+required-features = ["host"]
 
 [[example]]
 name = "runner"

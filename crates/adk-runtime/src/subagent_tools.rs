@@ -695,6 +695,9 @@ impl SubagentSession {
                 submission.parent_history_provenance = provenance;
             }
             submission.policy.tools = narrowed(policy.clone(), &task.tool_access)?;
+            if let Some(limit) = policy.max_child_turns {
+                submission.policy.max_turns = limit;
+            }
             if !single {
                 let mut summary =
                     json!({"key":task.key,"task_id":submission.id,"agent":submission.agent_name});

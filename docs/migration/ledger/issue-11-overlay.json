@@ -132,6 +132,18 @@
         "crates/adk-security/tests/security.rs"
       ]
     },
+    "host": {
+      "api_paths": [
+        "crates/adk/src/host.rs",
+        "crates/adk/src/host/rules.rs"
+      ],
+      "facade_feature": "host",
+      "test_paths": [
+        "crates/adk/tests/host.rs",
+        "crates/adk/tests/host_rules.rs",
+        "crates/adk-runtime/tests/host_history.rs"
+      ]
+    },
     "mcp": {
       "api_paths": [
         "crates/adk/src/lib.rs",

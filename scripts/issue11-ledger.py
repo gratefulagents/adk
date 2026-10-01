@@ -92,6 +92,16 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-project-state/src/types.rs",
                "crates/adk-durable/tests/record_codecs.rs",
                "crates/adk-project-state/tests/record_codecs.rs",
+               "crates/adk-core/src/policy.rs", "crates/adk-runtime/src/compat.rs",
+               "crates/adk-runtime/tests/compat.rs", "crates/adk-runtime/tests/host_config.rs",
+               "crates/adk-runtime/src/subagent.rs", "crates/adk-runtime/src/subagent_tools.rs",
+               "crates/adk/src/host.rs", "crates/adk/src/host/rules.rs", "crates/adk/tests/host.rs",
+               "fixtures/host-loop/sdk-chatloop.json", "scripts/host-reference/check.py",
+               "scripts/host-reference/main.go", "scripts/host-reference/scenarios.go",
+               "scripts/host-reference/main_test.go", "scripts/host-reference/go.mod",
+               "scripts/host-reference/go.sum", "crates/adk/examples/host_session.rs",
+               "crates/adk-runtime/tests/host_history.rs", "crates/adk-security/src/policy.rs",
+               "crates/adk-security/tests/security.rs", "crates/adk/tests/host_rules.rs",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -128,6 +138,11 @@ def module_reference_map() -> dict[str, dict[str, object]]:
             "facade_feature": "runtime",
             "api_paths": ["crates/adk/src/lib.rs", "crates/adk-runtime/src/runner.rs"],
             "test_paths": ["crates/adk-runtime/tests/runner.rs", "crates/adk/tests/tool_runtime.rs"],
+        },
+        "host": {
+            "facade_feature": "host",
+            "api_paths": ["crates/adk/src/host.rs", "crates/adk/src/host/rules.rs"],
+            "test_paths": ["crates/adk/tests/host.rs", "crates/adk/tests/host_rules.rs", "crates/adk-runtime/tests/host_history.rs"],
         },
         "tools": {
             "facade_feature": "tools",
@@ -168,10 +183,14 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     record_check = subprocess.run([sys.executable, str(ROOT / "scripts/check-record-fixtures.py")],
                                   cwd=ROOT, text=True, capture_output=True, check=True)
+    host_check = subprocess.run([sys.executable, str(ROOT / "scripts/host-reference/check.py")],
+                                cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
-               "--features", "otel,builder", "--test", "settings", "--test", "builder",
+               "--features", "otel,builder,host", "--test", "host", "--test", "host_config", "--test", "host_rules",
+               "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
+               "--test", "settings", "--test", "builder",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
@@ -199,7 +218,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},

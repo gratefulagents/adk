@@ -63,6 +63,7 @@ cargo deny --locked check
 | Default | `cargo test --locked --all-targets` | Default workspace members: facade, core, SDK codecs |
 | Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add standalone runner and Tokio ownership |
 | Builder | `cargo test --locked -p adk --no-default-features --features builder --all-targets` | Add host configuration and provider/tool/session composition |
+| Host sessions | `cargo test --locked -p adk --no-default-features --features host --all-targets` | Caller-driven message ingestion, approval persistence, and explicit session lifecycle ([guide](docs/host-sessions.md)) |
 | Observability | `cargo test --locked -p adk --no-default-features --features observability --all-targets` | Ordered hooks/events and private local traces |
 | OpenTelemetry | `cargo test --locked -p adk --no-default-features --features otel --all-targets` | Host-owned tracer bridge, no implicit exporter |
 | Execution | `cargo test --locked -p adk --no-default-features --features execution --all-targets` | Add opt-in sandbox, process ownership and security |

@@ -128,6 +128,7 @@ impl SecurityBaseline {
                     ApprovalPolicy::RequiredByTool
                 },
                 timeout: min_limit(a.timeout, b.timeout),
+                max_child_turns: min_limit(a.max_child_turns, b.max_child_turns),
             },
             input_guardrails: self
                 .input_guardrails
@@ -159,6 +160,7 @@ impl SecurityBaseline {
                 .is_subset(&a.allowed_mutating_tools)
             && (a.approval != ApprovalPolicy::All || b.approval == ApprovalPolicy::All)
             && narrower_limit(a.timeout, b.timeout)
+            && narrower_limit(a.max_child_turns, b.max_child_turns)
             && self.input_guardrails.is_subset(&current.input_guardrails)
             && self.output_guardrails.is_subset(&current.output_guardrails)
             && (!self.untrusted_tool_outputs || current.untrusted_tool_outputs)

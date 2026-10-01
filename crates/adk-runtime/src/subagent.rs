@@ -650,6 +650,12 @@ impl Drop for Scheduler {
 }
 
 impl SchedulerHandle {
+    /// The owner's immutable global concurrency ceiling, shared by all scopes.
+    /// Reading it grants no authority to resize an existing scheduler.
+    pub fn max_concurrency(&self) -> usize {
+        self.inner.config.max_concurrency
+    }
+
     fn close(&self) {
         self.inner.closed.store(true, Ordering::SeqCst);
         for token in self.inner.cancellations.lock().unwrap().values() {

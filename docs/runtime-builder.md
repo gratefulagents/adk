@@ -129,10 +129,28 @@ Hosts can implement it without platform types. `FileConfigSource` loads:
 absolute and nonempty. Loading fails if HOME is missing, empty, or relative; it
 never falls back to repository `.gratefulagents` files. `new(path)` uses the
 supplied trusted host path literally, including relative roots (no environment
-interpolation or tilde expansion). Files are trusted host
+interpolation or tilde expansion). `from_config_root(text)` trims a CLI/config
+string, uses the default for blank text, and expands `~` or `~/…` only with an
+absolute HOME. Files are trusted host
 configuration, never implicitly read from the workspace. Loading uses ordinary
 synchronous filesystem reads; use a local configuration directory, not a slow
 remote filesystem on an async executor thread.
+
+With the `host` feature, the same source implements `host::ConfigSource` and is
+reexported as `host::fileconfig::FileConfigSource`. Set an immutable active mode
+with `with_active_mode("plan")`; no active mode yields no snapshot/directive and
+workspace-write permission. Independent `list_modes`, `get_mode`, and `load_roles`
+allow callers to inspect one catalog without loading the other. Direct mode
+lookup prefers `.yaml` over `.yml`, before catalog fallback; the runtime builder
+still validates the complete snapshot before assembly. `build_mode_directive`
+is also available as a pure formatter. See the pinned Go differential coverage
+and explicit strict-parser exclusions in `scripts/fileconfig-reference/README.md`.
+
+Mode `maxConcurrentSubAgents` is checked against the injected scheduler's
+immutable concurrency ceiling. A wider scheduler fails construction rather than
+being silently resized or affecting another bundle. `maxRuntimeMinutes` is
+preserved as metadata, matching the pinned SDK; it is not a timeout. Hosts must
+set an execution deadline when they require a runtime limit.
 
 Built-in `chat` and read-only `plan` modes are always available, even without a
 source. A file may replace a built-in of the same case-insensitive name. Missing

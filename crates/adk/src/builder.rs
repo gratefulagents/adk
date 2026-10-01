@@ -142,6 +142,9 @@ pub struct Constraints {
     pub max_turns: Option<NonZeroU32>,
     #[serde(rename = "subAgentMaxTurns")]
     pub subagent_max_turns: Option<NonZeroU32>,
+    #[serde(rename = "maxConcurrentSubAgents")]
+    pub max_concurrent_subagents: Option<NonZeroU32>,
+    pub max_runtime_minutes: Option<NonZeroU32>,
     pub max_retries: Option<u32>,
 }
 #[derive(Clone, Debug, Default, Deserialize)]
@@ -201,6 +204,7 @@ pub fn builtin_modes() -> Vec<ModeSpec> {
 pub struct FileConfigSource {
     root: PathBuf,
     trusted_root: bool,
+    active_mode: Option<String>,
 }
 impl Default for FileConfigSource {
     fn default() -> Self {
@@ -208,6 +212,7 @@ impl Default for FileConfigSource {
             .map(PathBuf::from)
             .filter(|path| path.is_absolute());
         Self {
+            active_mode: None,
             trusted_root: home.is_some(),
             root: home
                 .map(|path| path.join(".gratefulagents"))
@@ -218,91 +223,232 @@ impl Default for FileConfigSource {
 impl FileConfigSource {
     pub fn new(root: impl Into<PathBuf>) -> Self {
         Self {
+            active_mode: None,
             root: root.into(),
             trusted_root: true,
         }
     }
+    /// Interpret a textual configuration root: trim whitespace, use the guarded
+    /// default for an empty value, and expand `~`/`~/...` using an absolute HOME.
+    /// `new` remains available for literal native filesystem paths.
+    pub fn from_config_root(root: &str) -> Self {
+        let root = root.trim();
+        if root.is_empty() {
+            return Self::default();
+        }
+        if root == "~" || root.starts_with("~/") {
+            let mut source = Self::default();
+            if source.trusted_root {
+                let home = source.root.parent().expect("default root has a home");
+                let suffix = root
+                    .strip_prefix("~/")
+                    .unwrap_or("")
+                    .trim_start_matches('/');
+                source.root = if suffix.is_empty() {
+                    home.to_owned()
+                } else {
+                    home.join(suffix)
+                };
+            }
+            return source;
+        }
+        Self::new(root)
+    }
     pub fn root(&self) -> &Path {
         &self.root
     }
-    pub fn load_files(&self, context: &Context) -> Result<HostConfig, Error> {
+    pub fn mode_dir(&self) -> PathBuf {
+        self.root.join("modes")
+    }
+    pub fn agent_dir(&self) -> PathBuf {
+        self.root.join("agents")
+    }
+    pub fn with_active_mode(mut self, name: impl AsRef<str>) -> Self {
+        let name = name.as_ref().trim();
+        self.active_mode = (!name.is_empty()).then(|| name.to_owned());
+        self
+    }
+    pub fn active_mode(&self) -> Option<&str> {
+        self.active_mode.as_deref()
+    }
+    fn check_root(&self, context: &Context) -> Result<(), Error> {
         context.check_active()?;
         if !self.trusted_root {
             return Err(invalid(
                 "default configuration source requires an absolute HOME",
             ));
         }
+        Ok(())
+    }
+    pub fn load_files(&self, context: &Context) -> Result<HostConfig, Error> {
+        Ok(HostConfig {
+            modes: self.list_modes(context)?,
+            roles: self.load_roles(context)?,
+        })
+    }
+    pub fn list_modes(&self, context: &Context) -> Result<Vec<ModeSpec>, Error> {
+        self.check_root(context)?;
         let mut modes: BTreeMap<String, ModeSpec> = builtin_modes()
             .into_iter()
             .map(|m| (m.name.clone(), m))
             .collect();
         let mut seen = BTreeSet::new();
-        for path in config_files(&self.root.join("modes"), &["yaml", "yml", "json"])? {
+        for path in config_files(&self.mode_dir(), &["yaml", "yml", "json"])? {
             context.check_active()?;
-            let raw = read_config(&path)?;
-            let value: serde_yaml::Value =
-                serde_yaml::from_str(&raw).map_err(|e| config_error(&path, e))?;
-            let (spec, name) = match value.get("spec") {
-                Some(spec) => (
-                    spec.clone(),
-                    value
-                        .get("metadata")
-                        .and_then(|v| v.get("name"))
-                        .and_then(|v| v.as_str())
-                        .map(str::to_owned),
-                ),
-                None => (value, None),
-            };
-            let mut mode: ModeSpec =
-                serde_yaml::from_value(spec).map_err(|e| config_error(&path, e))?;
-            if mode.name.trim().is_empty() {
-                mode.name = name.unwrap_or_else(|| file_stem(&path));
-            }
-            normalize_mode(&mut mode)?;
+            let mode = parse_mode_file(&path)?;
             let key = mode.name.to_lowercase();
             if !seen.insert(key.clone()) {
                 return Err(invalid(format!("duplicate mode: {}", mode.name)));
             }
             modes.insert(key, mode);
         }
+        let mut modes: Vec<_> = modes.into_values().collect();
+        modes.sort_by(|a, b| a.name.cmp(&b.name));
+        Ok(modes)
+    }
+    pub fn get_mode(&self, context: &Context, name: &str) -> Result<ModeSpec, Error> {
+        let name = name.trim();
+        validate_name(name)?;
+        self.check_root(context)?;
+        for ext in ["yaml", "yml"] {
+            let path = self.mode_dir().join(format!("{name}.{ext}"));
+            match std::fs::metadata(&path) {
+                Ok(_) => return parse_mode_file(&path),
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
+                Err(e) => return Err(config_error(&path, e)),
+            }
+        }
+        self.list_modes(context)?
+            .into_iter()
+            .find(|mode| {
+                mode.name.to_lowercase() == name.to_lowercase()
+                    || mode.display_name.to_lowercase() == name.to_lowercase()
+            })
+            .ok_or_else(|| {
+                invalid(format!(
+                    "mode {name:?} not found in {}",
+                    self.mode_dir().display()
+                ))
+            })
+    }
+    pub fn load_roles(&self, context: &Context) -> Result<Vec<RoleSpec>, Error> {
+        self.check_root(context)?;
         let mut roles = BTreeMap::new();
-        for path in config_files(&self.root.join("agents"), &["md"])? {
+        for path in config_files(&self.agent_dir(), &["md"])? {
             context.check_active()?;
-            let raw = read_config(&path)?.replace("\r\n", "\n");
-            let (mut role, body) = if let Some(rest) = raw.strip_prefix("---\n") {
-                let (front, body) = rest.split_once("\n---\n").ok_or_else(|| {
-                    invalid(format!("{}: unterminated role frontmatter", path.display()))
-                })?;
-                (
-                    serde_yaml::from_str::<RoleSpec>(front).map_err(|e| config_error(&path, e))?,
-                    body,
-                )
-            } else {
-                (RoleSpec::default(), raw.as_str())
-            };
-            if role.name.trim().is_empty() {
-                role.name = file_stem(&path);
-            }
-            role.name = role.name.trim().into();
-            role.instructions = body.trim().into();
-            validate_name(&role.name)?;
-            parse_access(&role.tool_access)?;
-            if role.instructions.is_empty() {
-                return Err(invalid(format!(
-                    "{}: role instructions are empty",
-                    path.display()
-                )));
-            }
+            let role = parse_role_file(&path)?;
             if roles.insert(role.name.clone(), role).is_some() {
                 return Err(invalid("duplicate role name"));
             }
         }
-        Ok(HostConfig {
-            modes: modes.into_values().collect(),
-            roles: roles.into_values().collect(),
-        })
+        Ok(roles.into_values().collect())
     }
 }
+
+fn parse_mode_file(path: &Path) -> Result<ModeSpec, Error> {
+    let raw = read_config(path)?;
+    let value: serde_yaml::Value = serde_yaml::from_str(&raw).map_err(|e| config_error(path, e))?;
+    let name = value
+        .get("metadata")
+        .and_then(|v| v.get("name"))
+        .and_then(|v| v.as_str())
+        .map(str::to_owned);
+    let mut mode: ModeSpec = match value.get("spec") {
+        Some(spec) if spec.is_null() => ModeSpec::default(),
+        Some(spec) => serde_yaml::from_value(spec.clone()).map_err(|e| config_error(path, e))?,
+        None => serde_yaml::from_value(value.clone()).map_err(|e| config_error(path, e))?,
+    };
+    // The SDK falls back to a plain document when the CRD spec is all-zero.
+    // Remove recognized envelope fields only; strict unknown-field validation
+    // still applies to the resulting plain mode.
+    if value.get("spec").is_some()
+        && mode.name.is_empty()
+        && mode.version.is_empty()
+        && mode.display_name.is_empty()
+        && mode.description.is_empty()
+        && mode.category.is_empty()
+        && !mode.autonomous
+        && mode.tool_access.is_empty()
+        && mode.instructions.is_empty()
+        && mode.model_routing.is_none()
+        && mode.constraints.is_none()
+    {
+        let mut plain = value.clone();
+        if let Some(mapping) = plain.as_mapping_mut() {
+            for key in ["spec", "metadata", "kind", "apiVersion"] {
+                mapping.remove(serde_yaml::Value::String(key.into()));
+            }
+        }
+        mode = serde_yaml::from_value(plain).map_err(|e| config_error(path, e))?;
+    }
+    if mode.name.trim().is_empty() {
+        mode.name = name
+            .filter(|name| !name.trim().is_empty())
+            .unwrap_or_else(|| file_stem(path));
+    }
+    normalize_file_mode(&mut mode)?;
+    Ok(mode)
+}
+
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+struct RoleFrontmatter {
+    name: String,
+    description: String,
+    tool_access: String,
+    #[serde(rename = "toolAccess")]
+    tool_access_alt: String,
+    model_override: String,
+    model: String,
+    #[serde(rename = "instructions")]
+    _instructions: String,
+}
+
+fn parse_role_file(path: &Path) -> Result<RoleSpec, Error> {
+    let raw = read_config(path)?.replace("\r\n", "\n");
+    let (front, body) = if let Some(rest) = raw.strip_prefix("---\n") {
+        let (front, body) = rest
+            .split_once("\n---\n")
+            .ok_or_else(|| invalid(format!("{}: unterminated role frontmatter", path.display())))?;
+        (
+            serde_yaml::from_str::<RoleFrontmatter>(front).map_err(|e| config_error(path, e))?,
+            body,
+        )
+    } else {
+        (RoleFrontmatter::default(), raw.as_str())
+    };
+    let name = if front.name.trim().is_empty() {
+        file_stem(path).trim().to_owned()
+    } else {
+        front.name.trim().to_owned()
+    };
+    validate_name(&name)?;
+    let access = if front.tool_access.trim().is_empty() {
+        &front.tool_access_alt
+    } else {
+        &front.tool_access
+    };
+    let tool_access = normalize_access(access, false)?;
+    let model_override = if front.model_override.trim().is_empty() {
+        front.model.trim()
+    } else {
+        front.model_override.trim()
+    };
+    if body.trim().is_empty() {
+        return Err(invalid(format!(
+            "{}: role instructions are empty",
+            path.display()
+        )));
+    }
+    Ok(RoleSpec {
+        name,
+        description: front.description,
+        tool_access,
+        model_override: model_override.into(),
+        instructions: body.trim().into(),
+    })
+}
+
 impl ConfigSource for FileConfigSource {
     fn load<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, Result<HostConfig, Error>> {
         Box::pin(async move { self.load_files(context) })
@@ -369,6 +515,47 @@ fn normalize_mode(mode: &mut ModeSpec) -> Result<(), Error> {
     parse_access(&mode.tool_access)?;
     Ok(())
 }
+fn normalize_file_mode(mode: &mut ModeSpec) -> Result<(), Error> {
+    normalize_mode(mode)?;
+    mode.version = mode.version.trim().into();
+    mode.display_name = mode.display_name.trim().into();
+    mode.description = mode.description.trim().into();
+    mode.category = mode.category.trim().into();
+    mode.instructions = mode.instructions.trim().into();
+    mode.tool_access = normalize_access(&mode.tool_access, true)?;
+    if let Some(routing) = &mut mode.model_routing {
+        routing.default_model = routing.default_model.trim().into();
+        routing.reasoning_level = routing.reasoning_level.trim().into();
+        routing.text_verbosity = routing.text_verbosity.trim().into();
+        normalize_fallbacks(&mut routing.fallback_models);
+        for role in routing.role_overrides.values_mut() {
+            role.model = role.model.trim().into();
+            role.reasoning_level = role.reasoning_level.trim().into();
+            role.text_verbosity = role.text_verbosity.trim().into();
+            normalize_fallbacks(&mut role.fallback_models);
+        }
+    }
+    Ok(())
+}
+fn normalize_fallbacks(models: &mut Option<Vec<String>>) {
+    if let Some(models) = models {
+        *models = models
+            .iter()
+            .map(|s| s.trim().to_owned())
+            .filter(|s| !s.is_empty())
+            .collect();
+    }
+}
+fn normalize_access(value: &str, inherit: bool) -> Result<String, Error> {
+    Ok(match parse_access(value)? {
+        None if inherit => "",
+        None | Some(AccessMode::WorkspaceWrite) => "full",
+        Some(AccessMode::ReadOnly) => "read-only",
+        Some(AccessMode::FullAccess) => "full-access",
+    }
+    .into())
+}
+
 fn parse_access(value: &str) -> Result<Option<AccessMode>, Error> {
     match value.trim().to_ascii_lowercase().as_str() {
         "" => Ok(None),
@@ -697,6 +884,19 @@ impl Builder {
                 instructions.push(mode.instructions.trim().into());
             }
             if let Some(constraints) = &mode.constraints {
+                if let Some(limit) = constraints.max_concurrent_subagents
+                    && self
+                        .session
+                        .as_ref()
+                        .and_then(SessionHandle::subagents)
+                        .is_some_and(|session| {
+                            session.scheduler.max_concurrency() > limit.get() as usize
+                        })
+                {
+                    return Err(invalid(
+                        "injected scheduler exceeds mode maxConcurrentSubAgents",
+                    ));
+                }
                 if let Some(limit) = constraints.max_turns {
                     policy.max_turns = policy.max_turns.min(limit);
                 }

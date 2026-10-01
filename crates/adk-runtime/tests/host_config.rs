@@ -369,6 +369,7 @@ async fn child_turn_caps_are_per_invocation_for_both_adapters_and_clamped_by_sch
         let owner = Scheduler::new(
             context("scheduler"),
             SchedulerConfig {
+                max_concurrency: 2,
                 max_turns: NonZeroU32::new(4).unwrap(),
                 agents: [("worker".into(), SecurityBaseline::default())]
                     .into_iter()
@@ -380,6 +381,8 @@ async fn child_turn_caps_are_per_invocation_for_both_adapters_and_clamped_by_sch
         )
         .unwrap();
         let session = Arc::new(SubagentSession::new(owner.handle()));
+        assert_eq!(session.scheduler.max_concurrency(), 2);
+        assert_eq!(session.scheduler.clone().max_concurrency(), 2);
         let make = |id: &str, config_limit: Option<u32>, request_limit: Option<u32>| {
             let tool_name = if agent_tool {
                 "worker_tool"

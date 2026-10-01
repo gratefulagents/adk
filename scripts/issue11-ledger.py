@@ -105,6 +105,11 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-core/tests/result_helpers.rs", "crates/adk/src/host/conversation.rs",
                "crates/adk/tests/host_conversation.rs", "scripts/host-reference/conversation.go",
                "fixtures/host-loop/sdk-conversation.json",
+               "crates/adk/src/host/fileconfig.rs", "crates/adk/tests/fileconfig.rs",
+               "crates/adk/tests/fileconfig_oracle.rs", "fixtures/fileconfig/sdk-fileconfig.json",
+               "scripts/fileconfig-reference/check.py", "scripts/fileconfig-reference/main.go",
+               "scripts/fileconfig-reference/scenarios.go", "scripts/fileconfig-reference/main_test.go",
+               "scripts/fileconfig-reference/go.mod", "scripts/fileconfig-reference/go.sum",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -188,6 +193,8 @@ def verify_rust() -> None:
                                   cwd=ROOT, text=True, capture_output=True, check=True)
     host_check = subprocess.run([sys.executable, str(ROOT / "scripts/host-reference/check.py")],
                                 cwd=ROOT, text=True, capture_output=True, check=True)
+    fileconfig_check = subprocess.run([sys.executable, str(ROOT / "scripts/fileconfig-reference/check.py")],
+                                      cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
@@ -195,6 +202,7 @@ def verify_rust() -> None:
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
                "-p", "adk-core", "--test", "result_helpers", "--test", "host_conversation",
                "--test", "settings", "--test", "builder",
+               "--test", "fileconfig", "--test", "fileconfig_oracle",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
@@ -222,7 +230,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},

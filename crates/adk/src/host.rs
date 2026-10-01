@@ -21,6 +21,9 @@ use std::{
 
 mod conversation;
 pub use conversation::*;
+/// File-backed implementation of both builder and host configuration contracts.
+pub mod fileconfig;
+pub use fileconfig::build_mode_directive;
 
 mod rules;
 pub use rules::{CompiledGuardrails, GuardrailRule, compile_guardrail_rules};

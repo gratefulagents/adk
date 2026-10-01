@@ -3152,6 +3152,93 @@
         "x86_64-unknown-linux-gnu",
         "core"
       ]
+    },
+    "SDK-298742B533C33991": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig.go",
+      "source_name": "BuildModeDirective",
+      "implementation_symbols": [
+        "crates/adk/src/host/fileconfig.rs::build_mode_directive"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query",
+        "pure_directive_matches_go_labels_restrictions_and_whitespace"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestSourceLoadsCRDShapedModeAndRoles",
+      "rationale": "Pure optional-template formatter: the ten independently executed direct-formatter queries compare exact text for absent/zero templates, trimmed labels/descriptions/instructions, label fallback and all read-only aliases. Native regression also asserts the complete static-authorization warning. This claim covers the formatter only, not file parsing or Source.ModeDirective with strict native policies.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-29BE663E324A4194": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig.go",
+      "source_name": "BuildModeDirective",
+      "implementation_symbols": [
+        "crates/adk/src/host/fileconfig.rs::build_mode_directive"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query",
+        "pure_directive_matches_go_labels_restrictions_and_whitespace"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestSourceLoadsCRDShapedModeAndRoles",
+      "rationale": "Pure optional-template formatter: the ten independently executed direct-formatter queries compare exact text for absent/zero templates, trimmed labels/descriptions/instructions, label fallback and all read-only aliases. Native regression also asserts the complete static-authorization warning. This claim covers the formatter only, not file parsing or Source.ModeDirective with strict native policies.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-5B616BA7F63957F2": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig_test.go",
+      "source_name": "TestBuiltinChatAndPlanModes",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::builtin_modes",
+        "crates/adk/src/builder.rs::FileConfigSource::get_mode",
+        "crates/adk/src/host/fileconfig.rs::FileConfigSource::permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestBuiltinChatAndPlanModes",
+      "rationale": "The missing-directories, builtin-chat and builtin-plan pinned oracle cases compare complete builtin mode objects, lookups and permissions including nonempty plan instructions. Closes this upstream regression only, not the full fileconfig source API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-F81B79D8BBB2888A": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig_test.go",
+      "source_name": "TestGetModeRejectsPathTraversalName",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::FileConfigSource::get_mode"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query",
+        "fallback_matches_declared_and_display_names_and_builtin_overrides"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestGetModeRejectsPathTraversalName",
+      "rationale": "Native lookup rejects blank, dot, parent, slash, backslash and colon names as InvalidInput. The blank-traversal-and-absent-names independent oracle exercises traversal rejection. Go diagnostic wording is not a Rust API contract; this closes the bounded rejection regression, not the full loader.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-2DF72F763798E69D": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig_test.go",
+      "source_name": "TestModeFileOverridesBuiltin",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::FileConfigSource::get_mode",
+        "crates/adk/src/builder.rs::FileConfigSource::list_modes"
+      ],
+      "rust_test_identifiers": [
+        "matches_every_unexcluded_pinned_go_query",
+        "fallback_matches_declared_and_display_names_and_builtin_overrides"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestModeFileOverridesBuiltin",
+      "rationale": "The builtin-override-by-declared-name oracle case verifies exact listing and lookup after a custom chat mode replaces the builtin; native assertions verify case-insensitive replacement, custom display label and a single builtin replacement. Does not claim parity for duplicate custom declarations, which Rust rejects.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

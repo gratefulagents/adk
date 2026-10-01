@@ -248,6 +248,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust evidence requires independently executed pinned trace fixtures")
     if f"typed-record reference fixtures verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust evidence requires independently executed pinned record fixtures")
+    if f"fileconfig reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust fileconfig evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

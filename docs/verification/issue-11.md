@@ -2,6 +2,18 @@
 
 ## Current continuation evidence
 
+The fileconfig claim audit closes five bounded ledger entries: the public and
+configuration records for the pure directive formatter, plus the pinned builtin,
+builtin-override and traversal-rejection regressions. Exact formatter bytes and
+complete builtin objects are compared against independently executed Go output.
+File parsing APIs remain unresolved where strict native policies differ; the
+nine source-only oracle cases are not parity passes. The ledger now has **193
+verified, 8,698 unresolved and 251 excluded** entries. Fresh claim verification
+ran **400 Rust tests, 0 failed**, regenerated the Go fixtures twice, and passed
+**11 evidence-validator tests**. The validator now requires a fileconfig-specific
+pinned-oracle success marker, so unrelated host fixture evidence cannot satisfy
+that requirement. This is not an issue-wide completion claim.
+
 The historical audit below is retained; its counts and implementation gaps are
 not a current completion claim. PR33 remains draft and issue #11 is incomplete.
 

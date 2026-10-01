@@ -52,7 +52,7 @@ def main():
     print(f"Verified sdk-fileconfig.json twice, byte-for-byte: {len(cases)} cases, "
           f"{sum(counts.values())} queries, {sum(bool(c['source_only']) for c in cases)} source-only cases")
     print(f"Operations: {json.dumps(counts, sort_keys=True)}")
-    print(f"Verified clean SDK {PIN}")
+    print(f"fileconfig reference verified at {PIN}")
 
 
 if __name__ == "__main__":

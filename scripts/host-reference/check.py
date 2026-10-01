@@ -33,13 +33,17 @@ def main():
     module = json.loads(run([GO, "list", "-mod=readonly", "-m", "-json", "github.com/gratefulagents/sdk"]))
     if Path(module.get("Replace", {}).get("Dir", "")).resolve() != SDK.resolve():
         sys.exit("SDK must use the local repos/sdk replacement")
-    expected = (ROOT / "fixtures/host-loop/sdk-chatloop.json").read_bytes()
-    for attempt in range(2):
-        if run([GO, "run", "-mod=readonly", "."]) != expected:
-            sys.exit(f"fixture differs from pinned Go regeneration (pass {attempt + 1})")
+    for filename, args in [("sdk-chatloop.json", []), ("sdk-conversation.json", ["--conversation"])]:
+        expected = (ROOT / "fixtures/host-loop" / filename).read_bytes()
+        for attempt in range(2):
+            check_sdk()
+            if run([GO, "run", "-mod=readonly", ".", *args]) != expected:
+                sys.exit(f"{filename} differs from pinned Go regeneration (pass {attempt + 1})")
+        fixture = json.loads(expected)
+        counts = {key: len(value) for key, value in fixture.items() if isinstance(value, list)}
+        print(f"Verified {filename} twice, byte-for-byte: {counts}")
     check_sdk()
-    count = len(json.loads(expected)["cases"])
-    print(f"Verified {count} ChatLoop cases twice, byte-for-byte, with clean SDK {PIN}")
+    print(f"Verified clean SDK {PIN}")
 
 
 if __name__ == "__main__":

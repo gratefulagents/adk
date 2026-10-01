@@ -102,6 +102,9 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "scripts/host-reference/go.sum", "crates/adk/examples/host_session.rs",
                "crates/adk-runtime/tests/host_history.rs", "crates/adk-security/src/policy.rs",
                "crates/adk-security/tests/security.rs", "crates/adk/tests/host_rules.rs",
+               "crates/adk-core/tests/result_helpers.rs", "crates/adk/src/host/conversation.rs",
+               "crates/adk/tests/host_conversation.rs", "scripts/host-reference/conversation.go",
+               "fixtures/host-loop/sdk-conversation.json",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -141,8 +144,8 @@ def module_reference_map() -> dict[str, dict[str, object]]:
         },
         "host": {
             "facade_feature": "host",
-            "api_paths": ["crates/adk/src/host.rs", "crates/adk/src/host/rules.rs"],
-            "test_paths": ["crates/adk/tests/host.rs", "crates/adk/tests/host_rules.rs", "crates/adk-runtime/tests/host_history.rs"],
+            "api_paths": ["crates/adk/src/host.rs", "crates/adk/src/host/rules.rs", "crates/adk/src/host/conversation.rs"],
+            "test_paths": ["crates/adk/tests/host.rs", "crates/adk/tests/host_rules.rs", "crates/adk-runtime/tests/host_history.rs", "crates/adk/tests/host_conversation.rs"],
         },
         "tools": {
             "facade_feature": "tools",
@@ -190,6 +193,7 @@ def verify_rust() -> None:
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host", "--test", "host", "--test", "host_config", "--test", "host_rules",
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
+               "-p", "adk-core", "--test", "result_helpers", "--test", "host_conversation",
                "--test", "settings", "--test", "builder",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",

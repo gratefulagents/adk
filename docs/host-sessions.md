@@ -44,6 +44,39 @@ own replay history through that collaborator. `RunBatch` keeps native items,
 authorship provenance and approval-boundary sidecars together. Missing
 provenance means unknown authorship, never the active agent.
 
+## Conversation helpers
+
+`host` supplies pure helpers for
+applications that maintain durable history or queues:
+
+- `build_conversation_tail`: filters the history floor/current message and keeps
+  the last requested number of nonblank or image-bearing messages (default 8).
+  Assistant/system summary labels are explicit provenance, not guessed authorship.
+- `build_working_state_context` / `WorkingState::context`: deterministic compact
+  working-state text, using the latest four progress summaries.
+- `derive_working_state_goal`: preserves the effective objective for shorthand
+  approval replies; `truncate_context_text` applies Unicode-safe snippet limits.
+- `build_assistant_turn_summary`: summarizes explicitly attributed assistant
+  text, tool-call counts, successful outputs and errors; unknown authorship is
+  not silently promoted to assistant text.
+- `summarize_turn_tool_calls`: deterministic count/name ordering.
+- `select_next_user_message` and `collect_immediate_run_items`: prioritize
+  unconsumed immediate messages while returning a cursor that never skips an
+  earlier pending queued message. The application owns the `BTreeSet<i64>` of
+  consumed immediate IDs. These helpers do not change ChatLoop's paged-ingestion
+  semantics or install a scheduler.
+
+Default message/summary snippet limits are 1200/320 Unicode scalar values;
+positive truncation appends `...`. A nonpositive snippet limit is unlimited.
+The conversation-tail limit separately defaults to 8 when nonpositive.
+
+The always-available `core::RunResult` offers borrowed `final_text`,
+`to_input_list`, `all_interruptions`, and `is_interrupted` views. Structured
+final output is not stringified by `final_text`. An approval-free tool pause
+is not an approval interruption. `to_input_list` means **new items only**, not
+complete history; replay `history` after resolving approvals. These views do
+not manufacture an executable continuation or durable checkpoint.
+
 ## Ordering and failure boundaries
 
 Preparation loads permissions, instructions, guardrail rules and mode snapshot,

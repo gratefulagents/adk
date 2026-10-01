@@ -19,6 +19,9 @@ use std::{
     },
 };
 
+mod conversation;
+pub use conversation::*;
+
 mod rules;
 pub use rules::{CompiledGuardrails, GuardrailRule, compile_guardrail_rules};
 
@@ -49,51 +52,7 @@ pub struct WorkingState {
 }
 impl WorkingState {
     pub fn context(&self) -> String {
-        fn snippet(s: &str) -> String {
-            let s = s.replace('\n', " ");
-            let s = s.trim();
-            let mut out: String = s.chars().take(320).collect();
-            if s.chars().count() > 320 {
-                out.push_str("...");
-            }
-            out
-        }
-        let mut lines = Vec::new();
-        for (label, value) in [
-            ("Current objective", &self.goal),
-            ("Mode", &self.current_mode),
-            ("Current step", &self.current_step),
-            ("Latest user direction", &self.last_user_message),
-            ("Latest assistant summary", &self.last_assistant_summary),
-        ] {
-            if value.is_empty() || (label == "Latest user direction" && value == &self.goal) {
-                continue;
-            }
-            lines.push(format!(
-                "{label}: {}",
-                if label == "Mode" {
-                    value.clone()
-                } else {
-                    snippet(value)
-                }
-            ));
-        }
-        if !self.recent_turn_summaries.is_empty() {
-            let start = self.recent_turn_summaries.len().saturating_sub(4);
-            lines.push(format!(
-                "Recent progress:\n- {}",
-                self.recent_turn_summaries[start..]
-                    .iter()
-                    .map(|s| snippet(s))
-                    .collect::<Vec<_>>()
-                    .join("\n- ")
-            ));
-        }
-        if lines.is_empty() {
-            String::new()
-        } else {
-            format!("## Durable Working State\n{}", lines.join("\n"))
-        }
+        build_working_state_context(self)
     }
 }
 

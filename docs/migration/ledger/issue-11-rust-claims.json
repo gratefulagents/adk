@@ -2965,6 +2965,193 @@
         "x86_64-unknown-linux-gnu",
         "durable"
       ]
+    },
+    "SDK-D2CD2B85DE634838": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildAssistantTurnSummary",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_assistant_turn_summary"
+      ],
+      "rust_test_identifiers": [
+        "summaries_use_provenance_not_roles_and_deduplicate_after_truncation",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAssistantTurnSummaryCapturesToolsAndIssues",
+      "rationale": "Matches exact ordered summaries, post-truncation deduplication, two-bullet limits, tool counts and error/success sections on typed batches; unknown authorship is never promoted to agent attribution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-623DB32095626F50": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildConversationTail",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_conversation_tail"
+      ],
+      "rust_test_identifiers": [
+        "tail_filters_before_limiting_without_sorting_and_preserves_agent_labels",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildConversationTailRespectsHistoryFloorAndCurrentMessage",
+      "rationale": "Preserves filter-before-limit ordering, signed floor/exclusion rules, default8, rune-safe text, attachments and explicit assistant/system summary provenance; independently replayed Go cases include images and out-of-order inputs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-2FE9A55C31D06828": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildWorkingStateContext",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_working_state_context"
+      ],
+      "rust_test_identifiers": [
+        "working_context_keeps_raw_mode_and_checks_raw_equality",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildWorkingStateContextUsesMostRecentProgress",
+      "rationale": "Exact heading/section order, raw mode and goal comparison, last-four progress tail and Unicode snippets match independent Go outputs; WorkingState.context delegates to the same implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-67E27F7277FF31DE": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "CollectImmediateRunItems",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::collect_immediate_run_items"
+      ],
+      "rust_test_identifiers": [
+        "selectors_prioritize_immediate_but_never_skip_pending_queue",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestCollectImmediateRunItemsPreservesOrderAndCursor",
+      "rationale": "Collects and marks immediate IDs in encounter order, preserves image attachments and trimmed content, and stops cursor advancement at a queued barrier. Native BTreeSet is the explicit mutable consumption state; no nil-map panic compatibility is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-745F85035BCD34C3": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "SelectNextUserMessage",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::select_next_user_message"
+      ],
+      "rust_test_identifiers": [
+        "selectors_prioritize_immediate_but_never_skip_pending_queue",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSelectNextUserMessagePrioritizesImmediateOverEarlierQueued",
+      "rationale": "Borrowed optional selection preserves immediate priority and source-order safe cursor without mutating consumed IDs; independently verifies blank/image-only, queued barriers, duplicate and out-of-order IDs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-2EC21F95276029AC": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "SummarizeTurnToolCalls",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::summarize_turn_tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "summaries_use_provenance_not_roles_and_deduplicate_after_truncation",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAssistantTurnSummaryCapturesToolsAndIssues",
+      "rationale": "Counts tool calls only, sorts by descending count then name, and applies positive limits; zero/negative limits and empty inputs independently verified. Native empty Vec represents the empty Go result rather than claiming JSON nil/array identity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-6655218727A36E9F": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "TruncateContextText",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::truncate_context_text"
+      ],
+      "rust_test_identifiers": [
+        "truncation_counts_runes_and_only_replaces_newlines",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildWorkingStateContextUsesMostRecentProgress",
+      "rationale": "Preserves Go trim/newline replacement, Unicode scalar truncation and literal ellipsis; independent fixtures cover positive, zero and negative limits. Domain is valid UTF-8 native strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-F24B2D8517D1BC65": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildAssistantTurnSummary",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_assistant_turn_summary"
+      ],
+      "rust_test_identifiers": [
+        "summaries_use_provenance_not_roles_and_deduplicate_after_truncation",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAssistantTurnSummaryCapturesToolsAndIssues",
+      "rationale": "Matches exact ordered summaries, post-truncation deduplication, two-bullet limits, tool counts and error/success sections on typed batches; unknown authorship is never promoted to agent attribution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-A6FC28F7CFF9563A": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildConversationTail",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_conversation_tail"
+      ],
+      "rust_test_identifiers": [
+        "tail_filters_before_limiting_without_sorting_and_preserves_agent_labels",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildConversationTailRespectsHistoryFloorAndCurrentMessage",
+      "rationale": "Preserves filter-before-limit ordering, signed floor/exclusion rules, default8, rune-safe text, attachments and explicit assistant/system summary provenance; independently replayed Go cases include images and out-of-order inputs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-3B535F784358C28E": {
+      "source": "pkg/agentsdk/conversation.go",
+      "source_name": "BuildWorkingStateContext",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_working_state_context"
+      ],
+      "rust_test_identifiers": [
+        "working_context_keeps_raw_mode_and_checks_raw_equality",
+        "oracle::all_eight_helpers_match_independent_sdk_inputs_and_outputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildWorkingStateContextUsesMostRecentProgress",
+      "rationale": "Exact heading/section order, raw mode and goal comparison, last-four progress tail and Unicode snippets match independent Go outputs; WorkingState.context delegates to the same implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-6E91D4CBC238BA9C": {
+      "source": "internal/agent/run_result.go",
+      "source_name": "RunResult.FinalText",
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunResult::final_text"
+      ],
+      "rust_test_identifiers": [
+        "final_text_does_not_serialize_structured_values",
+        "final_text_matches_independent_go_result_fixtures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesAllParallelToolApprovals",
+      "rationale": "Borrowed final text is unchanged for string output and empty for missing/null/structured/scalar nonstrings; all seven independent Go final-output variants are executed. No claim for the other result helpers or contradictory legacy interruption shapes.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "core"
+      ]
     }
   }
 }

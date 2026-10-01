@@ -312,3 +312,180 @@ func TestApprovedGuardrails(t *testing.T) {
 		}
 	}
 }
+
+func conversationCaseNamed(t *testing.T, fixture object, group, name string) conversationCase {
+	t.Helper()
+	for _, c := range fixture[group].([]conversationCase) {
+		if c.Name == name {
+			return c
+		}
+	}
+	t.Fatalf("missing %s/%s", group, name)
+	return conversationCase{}
+}
+
+func TestConversationFixtureShapeAndDeterminism(t *testing.T) {
+	first := conversationFixture()
+	counts := map[string]int{"build_conversation_tail": 11, "build_working_state_context": 7, "derive_working_state_goal": 15, "truncate_context_text": 11, "build_assistant_turn_summary": 6, "summarize_turn_tool_calls": 6, "select_next_user_message": 12, "collect_immediate_run_items": 12, "result_helpers": 13}
+	for group, count := range counts {
+		cases := first[group].([]conversationCase)
+		if len(cases) != count {
+			t.Fatalf("%s cases=%d, want %d", group, len(cases), count)
+		}
+		seen := map[string]bool{}
+		for _, c := range cases {
+			if seen[c.Name] || c.Name == "" || !json.Valid(c.Input) || c.Output == nil {
+				t.Fatalf("invalid or duplicate case %s/%s", group, c.Name)
+			}
+			seen[c.Name] = true
+		}
+	}
+	a, err := json.Marshal(first)
+	if err != nil {
+		t.Fatal(err)
+	}
+	b, err := json.Marshal(conversationFixture())
+	if err != nil || string(a) != string(b) {
+		t.Fatalf("conversation generation is not repeatable: %v", err)
+	}
+}
+
+func TestConversationTailAndTextBoundaries(t *testing.T) {
+	f := conversationFixture()
+	get := func(group, name string) any { return conversationCaseNamed(t, f, group, name).Output }
+	tail := get("build_conversation_tail", "floor-exclude-roles-images").(itemsOutput)
+	if tail.Count != 5 || tail.Items[0].AgentName != "assistant-summary" || tail.Items[1].AgentName != "system-summary" || tail.Items[2].AgentName != "" || len(tail.Items[2].MessageImages) != 2 || tail.Items[3].AgentName != "" || tail.Items[4].AgentName != "" {
+		t.Fatalf("tail provenance/images: %+v", tail)
+	}
+	for _, name := range []string{"limit-0", "limit--2"} {
+		if out := get("build_conversation_tail", name).(itemsOutput); out.Count != 8 || out.Items[0].MessageText != "message-4" {
+			t.Fatalf("default tail limit: %+v", out)
+		}
+	}
+	if out := get("build_conversation_tail", "unicode-1200-rune-cap").(itemsOutput); len([]rune(out.Items[0].MessageText)) != 1203 {
+		t.Fatal("tail must truncate runes, not bytes")
+	}
+	if got := get("truncate_context_text", "text-02").(textOutput).Text; got != "a  b\t c\r d" {
+		t.Fatalf("unexpected whitespace normalization: %q", got)
+	}
+	if got := get("truncate_context_text", "text-04").(textOutput).Text; got != "界..." {
+		t.Fatalf("rune truncation: %q", got)
+	}
+	if got := get("truncate_context_text", "text-08").(textOutput).Text; got != "e..." {
+		t.Fatalf("runes are not grapheme clusters: %q", got)
+	}
+	state := get("build_working_state_context", "all-fields-last-four").(textOutput).Text
+	if strings.Contains(state, "discard-me") || strings.Contains(state, "not-in-context") || !strings.Contains(state, "Mode:  plan\nraw ") || !strings.Contains(state, "- two lines\n- \n- five") {
+		t.Fatalf("state context: %q", state)
+	}
+	if got := get("build_working_state_context", "same-goal-direction-omitted").(textOutput).Text; strings.Contains(got, "Latest user direction:") {
+		t.Fatal("duplicate user direction")
+	}
+	if got := get("build_working_state_context", "raw-equality-before-trimming").(textOutput).Text; !strings.Contains(got, "Latest user direction: same") {
+		t.Fatal("state equality must precede trimming")
+	}
+	if got := get("derive_working_state_goal", "reply-08").(textOutput).Text; got != "original" {
+		t.Fatalf("approval shorthand: %q", got)
+	}
+	if got := get("derive_working_state_goal", "reply-13").(textOutput).Text; got != "approve : spaced colon" {
+		t.Fatalf("overbroad shorthand: %q", got)
+	}
+}
+
+func TestConversationSummaryUniquenessAndSort(t *testing.T) {
+	f := conversationFixture()
+	out := conversationCaseNamed(t, f, "build_assistant_turn_summary", "unique-assistant-first-two-tools-issues").Output.(textOutput).Text
+	want := "first answer\nsecond\nTools: alpha x 2, beta x 2,  x 1, delta x 1\nIssues: failure one | second failure"
+	if out != want {
+		t.Fatalf("summary=%q, want %q", out, want)
+	}
+	out = conversationCaseNamed(t, f, "build_assistant_turn_summary", "unique-successes-without-assistant").Output.(textOutput).Text
+	if out != "Key results: result one | two\nIssues: bad" {
+		t.Fatalf("success summary=%q", out)
+	}
+	out = conversationCaseNamed(t, f, "build_assistant_turn_summary", "dedup-after-220-rune-truncation").Output.(textOutput).Text
+	if out != strings.Repeat("界", 220)+"...\nsecond unique" {
+		t.Fatal("summary uniqueness must follow truncation")
+	}
+	for _, name := range []string{"frequency-ties-limit-0", "frequency-ties-limit--1"} {
+		got := conversationCaseNamed(t, f, "summarize_turn_tool_calls", name).Output.(toolSummaryOutput).Summaries
+		if !reflect.DeepEqual(got, []string{"alpha x 2", "beta x 2", " x 1", "delta x 1", "gamma x 1", "zeta x 1"}) {
+			t.Fatalf("tool sorting/limit: %v", got)
+		}
+	}
+}
+
+func TestConversationConsumedMutationAndCursorSafety(t *testing.T) {
+	f := conversationFixture()
+	for _, name := range []string{"queue-before-immediates", "image-only-queue-barrier"} {
+		out := conversationCaseNamed(t, f, "collect_immediate_run_items", name).Output.(immediateOutput)
+		selected := conversationCaseNamed(t, f, "select_next_user_message", name).Output.(selectionOutput)
+		if out.Cursor != 0 || selected.SkipCursor != 0 || !selected.Immediate || len(selected.ConsumedImmediateAfter) != 0 || out.Count == 0 {
+			t.Fatalf("queued input dropped or select mutated state: %+v / %+v", out, selected)
+		}
+	}
+	c := conversationCaseNamed(t, f, "collect_immediate_run_items", "consumed-prefix-queue-barrier")
+	var in queueInput
+	if err := json.Unmarshal(c.Input, &in); err != nil {
+		t.Fatal(err)
+	}
+	out := c.Output.(immediateOutput)
+	if !reflect.DeepEqual(in.ConsumedImmediate, []int64{2, 4, 99}) || !reflect.DeepEqual(out.ConsumedImmediateAfter, []int64{2, 4, 5, 99}) || out.Cursor != 2 {
+		t.Fatalf("pre/post mutation evidence lost: %+v / %+v", in, out)
+	}
+	for _, group := range []string{"select_next_user_message", "collect_immediate_run_items"} {
+		c := conversationCaseNamed(t, f, group, "out-of-order-prefix-not-max-id")
+		cursor := int64(0)
+		if group == "select_next_user_message" {
+			cursor = c.Output.(selectionOutput).SkipCursor
+		} else {
+			cursor = c.Output.(immediateOutput).Cursor
+		}
+		if cursor != 7 {
+			t.Fatalf("%s cursor=%d; SDK follows slice order, not max ID", group, cursor)
+		}
+	}
+	out = conversationCaseNamed(t, f, "collect_immediate_run_items", "out-of-order-immediate-slice-order").Output.(immediateOutput)
+	if out.Cursor != 60 || out.Count != 3 || out.Items[0].MessageText != "first" || out.Items[1].MessageText != "second" {
+		t.Fatalf("unexpected sorting: %+v", out)
+	}
+	out = conversationCaseNamed(t, f, "collect_immediate_run_items", "duplicate-immediate-id").Output.(immediateOutput)
+	if out.Count != 1 || !reflect.DeepEqual(out.ConsumedImmediateAfter, []int64{5}) {
+		t.Fatalf("duplicate consumption: %+v", out)
+	}
+}
+
+func TestResultHelpersPreserveLegacyContradictions(t *testing.T) {
+	f := conversationFixture()
+	for _, c := range f["result_helpers"].([]conversationCase) {
+		var in resultHelperInput
+		if err := json.Unmarshal(c.Input, &in); err != nil {
+			t.Fatal(err)
+		}
+		out := c.Output.(resultHelperOutput)
+		if out.InputCount != len(in.NewItems) || !reflect.DeepEqual(out.InputList, sdk.SnapshotRunItems(restore(in.NewItems))) {
+			t.Fatalf("ToInputList used history instead of NewItems: %s", c.Name)
+		}
+		if strings.HasPrefix(c.Name, "final-output-") && c.Name != "final-output-string" && out.FinalText != "" {
+			t.Fatalf("FinalText coerced nonstring: %s", c.Name)
+		}
+		if in.SourceOnly != strings.HasPrefix(in.LegacyShape, "contradictory-") {
+			t.Fatalf("unmarked source contradiction: %s", c.Name)
+		}
+	}
+	c := conversationCaseNamed(t, f, "result_helpers", "final-output-missing")
+	if strings.Contains(string(c.Input), "final_output") {
+		t.Fatal("missing must remain distinct from explicit null")
+	}
+	if out := conversationCaseNamed(t, f, "result_helpers", "final-output-string").Output.(resultHelperOutput); out.FinalText != "  final\n界🙂  " {
+		t.Fatal("FinalText must preserve string verbatim")
+	}
+	out := conversationCaseNamed(t, f, "result_helpers", "plural-without-singular").Output.(resultHelperOutput)
+	if out.IsInterrupted || len(out.AllInterruptions) != 2 {
+		t.Fatalf("source contradiction flattened: %+v", out)
+	}
+	out = conversationCaseNamed(t, f, "result_helpers", "singular-disagrees-with-plural").Output.(resultHelperOutput)
+	if !out.IsInterrupted || len(out.AllInterruptions) != 1 || out.AllInterruptions[0].ToolCallID != "c2" {
+		t.Fatalf("plural must win AllInterruptions: %+v", out)
+	}
+}

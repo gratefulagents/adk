@@ -358,6 +358,35 @@ pub struct RunResult {
     pub guardrails: Vec<GuardrailReport>,
 }
 
+impl RunResult {
+    /// Borrow the final text, or an empty string for structured/missing output.
+    pub fn final_text(&self) -> &str {
+        self.final_output
+            .as_ref()
+            .and_then(Value::as_str)
+            .unwrap_or("")
+    }
+
+    /// Whether approval requests remain unresolved. A tool-requested pause
+    /// without pending approvals is not an approval interruption.
+    pub fn is_interrupted(&self) -> bool {
+        !self.pending_approvals.is_empty()
+    }
+
+    /// Borrow newly generated items, matching the SDK helper's narrow meaning.
+    /// This is not the complete replay history or an executable continuation.
+    /// For a subsequent conversation turn, use `history` after resolving approvals.
+    pub fn to_input_list(&self) -> &[RunItem] {
+        &self.new_items
+    }
+
+    /// Borrow every pending approval in order. Native results have one list,
+    /// avoiding the SDK's potentially contradictory singular/plural fields.
+    pub fn all_interruptions(&self) -> &[ApprovalRequest] {
+        &self.pending_approvals
+    }
+}
+
 /// Events delivered to a host in emission order. The sink provides backpressure.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(tag = "type", rename_all = "snake_case")]

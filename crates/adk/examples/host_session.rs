@@ -100,6 +100,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     assert_eq!(session.cursor().token, "page-one");
     assert_eq!(store.0.lock().unwrap().len(), 1);
     assert_eq!(store.0.lock().unwrap()[0].items, result.result.new_items);
+    let summary = adk::host::build_assistant_turn_summary(&store.0.lock().unwrap()[0]);
+    assert!(summary.contains("Hello from the embedded ADK"));
+    assert_eq!(
+        adk::host::derive_working_state_goal("approve", "Finish embedding"),
+        "Finish embedding"
+    );
+    assert_eq!(result.result.final_text(), "Hello from the embedded ADK");
+    assert!(!result.result.is_interrupted());
     session.close().await?;
     println!("Offline host session: input consumed, response persisted, owner closed");
     Ok(())

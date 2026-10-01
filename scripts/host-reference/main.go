@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -275,14 +276,22 @@ func execute(spec scenario) object {
 	return object{"name": spec.Name, "spec": spec, "runs": runs, "original_agent_tools_after": sdk.SnapshotTools(a.Tools)}
 }
 func main() {
-	cases := []object{}
-	for _, s := range scenarios() {
-		cases = append(cases, execute(s))
+	conversation := flag.Bool("conversation", false, "emit the independent conversation and RunResult helper fixture")
+	flag.Parse()
+	var fixture object
+	if *conversation {
+		fixture = conversationFixture()
+	} else {
+		cases := []object{}
+		for _, s := range scenarios() {
+			cases = append(cases, execute(s))
+		}
+		fixture = object{"sdk_revision": pin, "schema_version": 1, "cases": cases}
 	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	enc.SetEscapeHTML(false)
-	if err := enc.Encode(object{"sdk_revision": pin, "schema_version": 1, "cases": cases}); err != nil {
+	if err := enc.Encode(fixture); err != nil {
 		panic(err)
 	}
 }

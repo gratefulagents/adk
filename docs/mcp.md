@@ -28,6 +28,11 @@ for versions, licenses and the native bounded-session decision.
   snapshot and host server/origin grant **before I/O**, checks credential-tenant
   equality, filters the environment and initializes the session. Low-level
   constructors remain available for host adapters and test transports.
+- Hosts embedding configuration directly can construct
+  `config::ConnectionConfig::inline(config)` and use `connection::connect_config`.
+  Inline inputs validate the same server shapes without fabricating a file path;
+  `ConnectionConfig::snapshot(snapshot)` retains the original file-change checks.
+  Neither form grants host authority or reads ambient environment variables.
 - Host callbacks own policy, approval, break-glass and audit. Bind durable
   decisions to the immutable request digest, never server-controlled display
   strings. Native `ToolPolicy` authorization still applies to tools returned by
@@ -63,6 +68,25 @@ Invalidation does not replace the pinned tool catalog. Aggregate discovery skips
 servers without the requested capability, while explicitly selecting an
 incapable server returns an error. Qualified-name collisions use deterministic
 bounded suffixes; routing and authorization retain the original server/tool names.
+`ClientManager::catalog()` returns each final definition with its original server
+and tool identity; `connected_servers()` reports the negotiated capabilities.
+Use consuming `select_tools(allow_all, allowed_names, resources)` to narrow an
+assembled manager before publishing adapters. Allowlist entries match either raw
+or final names. Filtering never reassigns collision suffixes, rejects unselected
+dispatch as well as hiding definitions, and gates resource access independently.
+Repeated selection can only narrow access. Select servers **before connecting**;
+tool selection does not undo connection side effects or grant server authority.
+
+For an already assembled manager, `session::OwnedMcpSession` owns one retained
+shutdown task. Give tools its cloneable `McpHandle`, not lifecycle authority.
+Explicit `close().await` revokes handles and in-flight calls, attempts each
+client's shutdown, and returns the same completion result to repeated waiters.
+Cancelling a close waiter does not cancel cleanup. Dropping the owner immediately
+revokes handles and requests cleanup. Close before shutting down the Tokio
+executor: drop cannot promise remote acknowledgement after executor shutdown.
+This owner currently starts **after** acquisition and discovery; it is not yet
+the facade builder's atomic connection/build rollback contract. Initialization
+and discovery before ownership transfer remain caller responsibilities.
 
 Each mutable transport owns one serialized session: there is at most one active
 request per transport, stricter than the reference's eight-request concurrency

@@ -783,13 +783,57 @@ pub fn qualified_tool_name(server: &str, tool: &str) -> String {
     crate::names::qualified_tool_name(server, tool)
 }
 
+/// Final advertised name and its original protocol routing identity.
+#[derive(Clone, Debug)]
+pub struct CatalogEntry {
+    pub definition: adk_core::ToolDefinition,
+    pub server_name: String,
+    pub tool_name: String,
+}
+
 pub struct ClientManager {
     clients: BTreeMap<String, tokio::sync::Mutex<Client>>,
     definitions: Vec<adk_core::ToolDefinition>,
     routes: BTreeMap<String, (String, String)>,
     resources: bool,
+    capabilities: BTreeMap<String, Capabilities>,
+    resource_access: bool,
 }
 impl ClientManager {
+    /// Narrows an assembled catalog without changing collision-resolved names.
+    pub fn select_tools(
+        mut self,
+        allow_all: bool,
+        allowed: &BTreeSet<String>,
+        resources: bool,
+    ) -> Self {
+        self.routes
+            .retain(|name, (_, raw)| allow_all || allowed.contains(name) || allowed.contains(raw));
+        self.definitions
+            .retain(|definition| self.routes.contains_key(&definition.name));
+        self.resource_access &= resources;
+        self.resources &= resources;
+        self
+    }
+
+    pub fn catalog(&self) -> Vec<CatalogEntry> {
+        self.definitions
+            .iter()
+            .map(|definition| {
+                let (server_name, tool_name) = &self.routes[&definition.name];
+                CatalogEntry {
+                    definition: definition.clone(),
+                    server_name: server_name.clone(),
+                    tool_name: tool_name.clone(),
+                }
+            })
+            .collect()
+    }
+
+    pub fn connected_servers(&self) -> &BTreeMap<String, Capabilities> {
+        &self.capabilities
+    }
+
     pub async fn list_prompts(&self, server: Option<&str>) -> Result<Vec<PromptDescriptor>, Error> {
         if server.is_some_and(|s| !self.clients.contains_key(s)) {
             return Err(Error::Policy("unknown server".into()));
@@ -883,6 +927,8 @@ impl ClientManager {
             definitions: Vec::new(),
             routes: BTreeMap::new(),
             resources: false,
+            capabilities: BTreeMap::new(),
+            resource_access: true,
         };
         clients.sort_by(|a, b| a.server.cmp(&b.server));
         let mut qualified = BTreeSet::new();
@@ -920,6 +966,9 @@ impl ClientManager {
             }
             manager.resources |= client.capabilities.resources;
             manager
+                .capabilities
+                .insert(client.server.clone(), client.capabilities);
+            manager
                 .clients
                 .insert(client.server.clone(), tokio::sync::Mutex::new(client));
         }
@@ -952,6 +1001,9 @@ impl crate::tools::ToolManager for ClientManager {
         server: Option<&'a str>,
     ) -> BoxFuture<'a, Result<Value, Error>> {
         Box::pin(async move {
+            if !self.resource_access {
+                return Err(Error::Policy("resources not selected".into()));
+            }
             if server.is_some_and(|s| !self.clients.contains_key(s)) {
                 return Err(Error::Policy("unknown server".into()));
             }
@@ -993,6 +1045,9 @@ impl crate::tools::ToolManager for ClientManager {
         uri: &'a str,
     ) -> BoxFuture<'a, Result<Value, Error>> {
         Box::pin(async move {
+            if !self.resource_access {
+                return Err(Error::Policy("resources not selected".into()));
+            }
             let client = self
                 .clients
                 .get(server)

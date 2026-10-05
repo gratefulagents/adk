@@ -1,7 +1,7 @@
 use adk_mcp::{
     BoxFuture, Error, Limits,
     client::{ClientManager, HostPolicy, ServerPolicy},
-    config::ConfigSnapshot,
+    config::{ConfigSnapshot, ConnectionConfig},
     connection,
     server::*,
     tools::ToolManager,
@@ -213,6 +213,47 @@ async fn configured_http_client_to_policy_server_and_adk_manager() {
     manager.close().await.unwrap();
     assert_eq!(mode.session_count(), 0);
     drop(manager);
+    let inline = ConnectionConfig::inline(snapshot.config().clone()).unwrap();
+    std::fs::write(temp.path().join(".mcp.json"), "{}").unwrap();
+    let client = connection::connect_config(
+        &inline,
+        "test",
+        policy.clone(),
+        Some(remote.clone()),
+        &BTreeMap::new(),
+        temp.path(),
+        Limits::default(),
+    )
+    .await
+    .unwrap();
+    let manager = ClientManager::new(vec![client])
+        .await
+        .unwrap()
+        .select_tools(false, &BTreeSet::new(), true);
+    let owner = adk_mcp::session::OwnedMcpSession::new(manager);
+    let manager = owner.handle();
+    assert!(manager.definitions().is_empty());
+    assert_eq!(
+        manager
+            .list_resources(None)
+            .await
+            .unwrap()
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert_eq!(
+        manager
+            .read_resource("test", "test://resource")
+            .await
+            .unwrap()["contents"][0]["text"],
+        "resource"
+    );
+    assert_eq!(executor.0.load(Ordering::SeqCst), 2);
+    owner.close().await.unwrap();
+    assert_eq!(mode.session_count(), 0);
+    assert_eq!(manager.list_resources(None).await, Err(Error::Closed));
     mode.close();
     serving.abort();
 
@@ -253,4 +294,47 @@ async fn composition_rejects_host_denial_before_any_subprocess() {
         Err(Error::Policy(_))
     ));
     assert!(!marker.exists());
+    let inline = ConnectionConfig::inline(snapshot.config().clone()).unwrap();
+    assert!(matches!(
+        connection::connect_config(
+            &inline,
+            "test",
+            HostPolicy::default(),
+            None,
+            &BTreeMap::new(),
+            temp.path(),
+            Limits::default(),
+        )
+        .await,
+        Err(Error::Policy(_))
+    ));
+    assert!(!marker.exists());
+}
+
+#[test]
+fn inline_configuration_rejects_invalid_servers_without_io() {
+    for server in [
+        json!({"command":""}),
+        json!({"type":"unknown","command":"unused"}),
+        json!({"type":"streamable-http","url":"https://user:password@example.com"}),
+        json!({"command":"unused","url":"https://example.com"}),
+    ] {
+        let config = serde_json::from_value(json!({"mcpServers":{"test":server}})).unwrap();
+        assert!(matches!(
+            ConnectionConfig::inline(config),
+            Err(Error::Config(_))
+        ));
+    }
+    let config = serde_json::from_value(json!({"mcpServers":{" ":{"command":"unused"}}})).unwrap();
+    assert!(matches!(
+        ConnectionConfig::inline(config),
+        Err(Error::Config(_))
+    ));
+    assert!(
+        ConnectionConfig::inline(Default::default())
+            .unwrap()
+            .config()
+            .servers()
+            .is_empty()
+    );
 }

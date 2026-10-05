@@ -2,7 +2,7 @@
 use crate::{
     Error, Limits, Transport,
     client::{Client, HostPolicy},
-    config::ConfigSnapshot,
+    config::{ConfigSnapshot, ConnectionConfig},
     transport::{HttpTransport, RemoteOptions, StdioTransport},
 };
 use std::{collections::BTreeMap, path::Path};
@@ -86,8 +86,53 @@ pub async fn connect_with_diagnostics(
     working_directory: &Path,
     limits: Limits,
 ) -> Result<Client, ConnectionFailure> {
-    snapshot.verify_unchanged()?;
-    let config = snapshot
+    connect_config_with_diagnostics(
+        &ConnectionConfig::snapshot(snapshot.clone()),
+        server,
+        policy,
+        remote,
+        environment,
+        working_directory,
+        limits,
+    )
+    .await
+}
+
+/// Connect using an explicitly supplied, validated inline or snapshot source.
+pub async fn connect_config(
+    source: &ConnectionConfig,
+    server: &str,
+    policy: HostPolicy,
+    remote: Option<RemoteOptions>,
+    environment: &BTreeMap<String, String>,
+    working_directory: &Path,
+    limits: Limits,
+) -> Result<Client, Error> {
+    connect_config_with_diagnostics(
+        source,
+        server,
+        policy,
+        remote,
+        environment,
+        working_directory,
+        limits,
+    )
+    .await
+    .map_err(|failure| failure.error)
+}
+
+/// Like [`connect_config`], retaining bounded host-only startup diagnostics.
+pub async fn connect_config_with_diagnostics(
+    source: &ConnectionConfig,
+    server: &str,
+    policy: HostPolicy,
+    remote: Option<RemoteOptions>,
+    environment: &BTreeMap<String, String>,
+    working_directory: &Path,
+    limits: Limits,
+) -> Result<Client, ConnectionFailure> {
+    source.verify_unchanged()?;
+    let config = source
         .config()
         .server(server)
         .ok_or_else(|| Error::Policy("server not configured".into()))?

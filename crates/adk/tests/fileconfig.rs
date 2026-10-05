@@ -416,7 +416,11 @@ async fn builder_checks_injected_concurrency_ceiling_without_mutating_owner() {
         let result = Builder::new(Config {
             active_mode: Some("limited".into()),
             features: Some(Features {
-                subagents: true,
+                subagents: adk::builder::SubagentFeatures {
+                    task: true,
+                    status: true,
+                    control: true,
+                },
                 ..Default::default()
             }),
             ..Default::default()

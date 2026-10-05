@@ -638,7 +638,11 @@ async fn owned_scheduler_is_joined_on_build_failure_and_shared_scheduler_survive
     let mut state = SessionState::with_scheduler(scheduler);
     let config = Config {
         features: Some(Features {
-            subagents: true,
+            subagents: SubagentFeatures {
+                task: true,
+                status: true,
+                control: true,
+            },
             ..Default::default()
         }),
         ..Default::default()
@@ -672,7 +676,11 @@ async fn subagents_require_an_owned_session_scheduler() {
     let model = Arc::new(RecordingModel::default());
     let config = Config {
         features: Some(Features {
-            subagents: true,
+            subagents: SubagentFeatures {
+                task: true,
+                status: true,
+                control: true,
+            },
             ..Default::default()
         }),
         ..Default::default()

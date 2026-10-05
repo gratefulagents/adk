@@ -663,11 +663,121 @@ fn session() -> SessionState {
     )
 }
 #[tokio::test]
+async fn managed_subagent_feature_matrix_is_explicit_and_session_owned() {
+    for mask in 0..8 {
+        let selection = SubagentFeatures {
+            task: mask & 1 != 0,
+            status: mask & 2 != 0,
+            control: mask & 4 != 0,
+        };
+        let mut c = config();
+        c.features.as_mut().unwrap().subagents = selection.clone();
+        let model = Script::new(vec![]);
+        let result = builder(c.clone(), &model).build(&context()).await;
+        if mask == 0 {
+            result.unwrap().close().await.unwrap();
+        } else {
+            assert!(
+                invalid(result)
+                    .info
+                    .message
+                    .contains("session-owned scheduler")
+            );
+        }
+        let mut owner = session();
+        let mut bundle = builder(c, &model)
+            .session(owner.handle())
+            .extra_tools([Probe::new("not_enabled", true) as Arc<dyn Tool>])
+            .build(&context())
+            .await
+            .unwrap();
+        let actual: std::collections::BTreeSet<_> = bundle
+            .agent()
+            .tools
+            .iter()
+            .map(|t| t.definition().name.as_str())
+            .collect();
+        let expected: std::collections::BTreeSet<_> = [
+            (selection.task, "subagent"),
+            (selection.task, "subagent_wait"),
+            (selection.status, "subagent_status"),
+            (selection.control, "subagent_control"),
+        ]
+        .into_iter()
+        .filter_map(|(on, name)| on.then_some(name))
+        .collect();
+        assert_eq!(actual, expected, "mask={mask}");
+        assert!(bundle.specialists()["reviewer"].tools.is_empty());
+        assert!(Arc::ptr_eq(
+            bundle.session().subagents().unwrap(),
+            owner.handle().subagents().unwrap()
+        ));
+        bundle.close().await.unwrap();
+        assert!(!owner.handle().is_closed());
+        owner.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn managed_subagent_selection_never_bypasses_host_name_policy() {
+    let mut owner = session();
+    let model = Script::new(vec![]);
+    for allowed in [
+        Some(std::collections::BTreeSet::new()),
+        Some(["subagent_status".into(), "subagent_control".into()].into()),
+        None,
+    ] {
+        let mut c = config();
+        c.features.as_mut().unwrap().subagents = SubagentFeatures {
+            status: true,
+            control: true,
+            ..Default::default()
+        };
+        c.policy.tools.allowed_tools = allowed.clone();
+        c.policy
+            .tools
+            .denied_tools
+            .insert("subagent_control".into());
+        let mut bundle = builder(c, &model)
+            .session(owner.handle())
+            .build(&context())
+            .await
+            .unwrap();
+        let visible: Vec<_> = bundle
+            .agent()
+            .tools
+            .iter()
+            .map(|t| t.definition().name.as_str())
+            .collect();
+        if allowed.as_ref().is_some_and(|a| a.is_empty()) {
+            assert!(visible.is_empty());
+        } else {
+            assert_eq!(visible, ["subagent_status"]);
+        }
+        assert!(
+            !bundle
+                .policy()
+                .tools
+                .allowed_tools
+                .as_ref()
+                .unwrap()
+                .contains("subagent_control")
+        );
+        bundle.close().await.unwrap();
+    }
+    owner.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn signal_and_managed_scheduler_tools_are_parent_only_and_shared_session_survives() {
     let mut session = session();
     let model = Script::new(vec![]);
     let mut c = config();
-    c.features.as_mut().unwrap().subagents = true;
+    c.features.as_mut().unwrap().subagents = SubagentFeatures {
+        task: true,
+        status: true,
+        control: true,
+    };
     c.features.as_mut().unwrap().tools = ["ExtraTools".into(), "Signals.Finish".into()].into();
     let mut bundle = builder(c, &model)
         .session(session.handle())

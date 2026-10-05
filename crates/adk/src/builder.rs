@@ -41,11 +41,27 @@ pub struct Features {
     pub parallel_tool_calls: bool,
     pub untrusted_tool_outputs: bool,
     /// Requires an explicitly supplied session with an owned scheduler.
-    pub subagents: bool,
+    pub subagents: SubagentFeatures,
     /// Catalog transfers, independent of scheduler-backed subagents.
     pub handoffs: bool,
     /// Tool-less fallback, only when handoffs are enabled and the catalog is empty.
     pub handoff_generic_fallback: bool,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct SubagentFeatures {
+    /// Spawn tasks and wait for their completion.
+    pub task: bool,
+    /// Inspect tasks without enabling spawn or control.
+    pub status: bool,
+    /// Steer or cancel existing tasks.
+    pub control: bool,
+}
+
+impl SubagentFeatures {
+    fn enabled(&self) -> bool {
+        self.task || self.status || self.control
+    }
 }
 
 #[derive(Clone)]
@@ -1147,7 +1163,7 @@ impl Builder {
         };
         tool_config.access = policy.tools.access;
         tool_config.allowed_mutating_tools = policy.tools.allowed_mutating_tools.clone();
-        if features.subagents {
+        if features.subagents.enabled() {
             let children = session
                 .subagents
                 .clone()
@@ -1156,6 +1172,12 @@ impl Builder {
             // Managed tools use ExtraTools registration, but cannot enable other extensions.
             let mut managed = adk_runtime::build_subagent_task_tools(children, agent.name.clone());
             excluded.extend(managed.iter().map(|tool| tool.definition().name.clone()));
+            managed.retain(|tool| match tool.definition().name.as_str() {
+                "subagent" | "subagent_wait" => features.subagents.task,
+                "subagent_status" => features.subagents.status,
+                "subagent_control" => features.subagents.control,
+                _ => false,
+            });
             let extras_enabled = match &tool_config.features {
                 adk_tools::Features::Strict(f) => f.contains("ExtraTools"),
                 adk_tools::Features::Legacy(f) => f.enable_tools || f.enable_subagents,

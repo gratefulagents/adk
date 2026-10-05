@@ -108,11 +108,18 @@ Go `ModelSettings::Merge` codec.
   e.g. `ReadFile`, `Bash`, `Signals.Finish`, `ProjectState.TaskTools`, and
   `ExtraTools`. Unknown names fail construction. Selected shell/LSP features
   without required runtime dependencies fail construction.
-* `subagents` requires a session containing an existing owned scheduler. Managed
-  tools are registered without enabling unrelated ExtraTools. Other injected
-  extras remain gated. Legacy `enable_subagents` in `legacy_tools` retains the
-  registry's signal/extra-tool behavior; it does **not** automatically create a
-  scheduler.
+* `subagents: SubagentFeatures` independently selects `task` (`subagent` and
+  `subagent_wait`), `status` (`subagent_status`), and `control`
+  (`subagent_control`). All three default off. Any enabled group requires a
+  session containing an existing owned scheduler, including status-only and
+  control-only builds. Managed tools do not enable unrelated ExtraTools, bypass
+  host allow/deny lists, or enter handoff specialist tool views. Legacy
+  `enable_subagents` in `legacy_tools` retains the registry's signal/extra-tool
+  behavior; it does **not** automatically create a scheduler. To migrate from
+  the former `subagents: true`, set all three fields to true; replace false with
+  `SubagentFeatures::default()`. The grouping follows pinned SDK
+  `runtime/builder.go::asyncSubAgentToolNames`; native scheduler ownership stays
+  explicit rather than allocating a hidden scheduler.
 * `handoffs` and `handoff_generic_fallback` are separate opt-ins, both off in
   strict and legacy defaults. They neither require nor enable `subagents`, a
   scheduler, or `ExtraTools`.
@@ -371,7 +378,7 @@ Go `Config` wire codec or a claim of full Go runtime parity.
 | Retry | Enabled default is 3 retries with 250–2000 ms backoff; host runner policy can supply delays, predicate, and count. Native runner owns retry advice/fallback behavior. |
 | Compaction | Explicitly gated; otherwise retains native runner policy/custom compactor. No Go provider metadata discovery or synthesized handoff-history policy. |
 | Files | YAML/YML/JSON mode specs and CRD-shaped envelopes; Markdown/YAML role frontmatter; built-in chat/plan and deterministic overrides. Unsupported fields and invalid/zero turn limits fail rather than silently falling back. |
-| Constraints | `maxTurns` and `maxRetries` supported. Go `subAgentMaxTurns`, `maxConcurrentSubAgents`, and `maxRuntimeMinutes` are rejected in mode files; configure child scheduler limits and context deadlines explicitly. |
+| Constraints | `maxTurns` caps parent turns; `subAgentMaxTurns` narrows child turns; `maxRetries` sets retries. `maxConcurrentSubAgents` validates the injected scheduler's immutable concurrency ceiling without mutating a shared owner. `maxRuntimeMinutes` is retained as metadata, matching the pinned SDK's lack of enforcement; hosts supply actual deadlines through `Context`. |
 | Roles | Active-parent role routing plus opt-in parent-to-catalog handoffs and tool-less empty-catalog fallback. Native handoff gating is independent of subagents; no agent-as-tool generation, nested graph, or scheduler registration. |
 | Runtime adapters | No automatic MCP discovery, project-state priming/store discovery, security guardrail installation, forced final summary, polling, tracing/event writer, or persistent ChatLoop. Supply explicit tools, native runner hooks, and native `Host` callbacks. Unsupported runtime features are not represented as inert booleans. |
 | Lifecycle | Explicit ownership improves on Go's warn-and-continue tool setup: construction errors fail closed. Shared state is not accidentally closed by a turn bundle. No detached background cleanup is introduced. |

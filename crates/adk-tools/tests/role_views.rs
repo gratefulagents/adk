@@ -315,9 +315,13 @@ async fn real_bash_adapter_excludes_async_tools_and_rejects_mutation() {
             },
         )
         .await;
-    let succeeded = safe.as_ref().is_ok_and(|out| !out.is_error && out.content.iter().any(|c| {
-        matches!(c, Content::Text { text } if text.starts_with("role-view") && text.ends_with("Exit code: 0"))
-    }));
+    let succeeded = safe.as_ref().is_ok_and(|out| {
+        !out.is_error
+            && out
+                .content
+                .iter()
+                .any(|c| matches!(c, Content::Text { text } if text == "role-view"))
+    });
     if !succeeded {
         assert_ne!(
             std::env::var("ADK_REQUIRE_SANDBOX").as_deref(),

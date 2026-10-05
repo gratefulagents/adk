@@ -2,6 +2,37 @@
 
 ## Current continuation evidence
 
+### Managed subagent selection and CI correction
+
+`Features::subagents` now exposes independent Task, Status and Control groups via
+`SubagentFeatures`; all eight combinations have native composition coverage,
+including scheduler requirements, disabled unrelated extras, specialist exclusion,
+shared-session ownership and host allow/deny restrictions. This is source-inspected
+mapping to the pinned `asyncSubAgentToolNames` helper, not a new independent Go
+oracle or an aggregate ledger closure. Migration is documented in the builder
+API guide. That guide also corrects stale statements about the already-supported
+mode constraints.
+
+The prior checkpoint's final CI result was **42 passed / 4 failed**, with failures
+in the Linux/macOS push and PR enforcement lanes. Inspected Linux and macOS logs
+show the new role-view safe-command assertion failing: actual output was
+`role-view`, but the test incorrectly required `Exit code: 0`. `shell_session::bash_result` appends exit status only for nonzero
+exits. The assertion now checks exact stdout; mutation-side-effect and nonzero
+failure assertions remain mandatory. Successful native enforcement must still be
+confirmed by the corrected head's CI, not inferred from this worker's fail-closed
+execution.
+
+Fresh local verification: **1,102 workspace/doctests passed, 0 failed, 30 ignored**;
+**497 hash-bound evidence tests** and **12 validators** pass. Strict all-target
+Clippy, Rustfmt, rustdoc, facade matrix, standalone consumer, twenty offline
+scenarios and host example pass. One earlier full run failed the unchanged
+`tool_policy_timeout_preserves_managed_pending_results` and
+`nested_tool_policy_timeout_resumes_without_cancelling_children` assertions;
+all 21 integration tests passed in isolation and the subsequent full run passed
+without competing builds. These intermittent failures are retained here, not
+silently discarded. Source pins and ledger counts are unchanged. Full acceptance
+and the previously stated live/review limitations remain unresolved.
+
 ### Catalog-handoff checkpoint
 
 The builder now composes explicit catalog handoffs, independent of managed

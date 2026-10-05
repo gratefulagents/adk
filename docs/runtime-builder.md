@@ -124,6 +124,50 @@ Go `ModelSettings::Merge` codec.
   strict and legacy defaults. They neither require nor enable `subagents`, a
   scheduler, or `ExtraTools`.
 
+## Builtin tool guardrails
+
+`Features::builtin_guardrails` explicitly enables runtime tool guardrails.
+Legacy configuration uses `Config::enable_guardrails`, default `false`; an
+explicit feature selection overrides that legacy field. Neither option disables
+the native shell's existing enforcement, authorization, or secret checks.
+
+The facade also exposes `adk::guardrails::builtin_tool_input_guardrails()` and
+`builtin_tool_output_guardrails()` under the `builder` Cargo feature. These
+return ordinary runtime guardrails for direct `RunnerConfig` composition:
+
+1. `block-destructive-commands` checks shell-like custom tools, not only the
+   bundled shell implementation.
+2. `detect-secret-leak` rejects secret-shaped tool arguments.
+3. `detect-secret-in-output` blocks partial credential markers that may accompany
+   undetectable credentials; ordinary secret-shaped text is redacted with a
+   notice while retaining surrounding text.
+
+Builder-installed builtins precede caller-supplied runtime tool guards. They are
+not model/agent input/output guards. Each has a stable, versioned durable key;
+custom guards still need their own replay-safe identities. Secret signatures,
+normalization and destructive-command classification remain security-owned;
+facade assembly does not maintain a second credential matcher.
+
+Native hardening is intentionally broader than the SDK's raw-string guards:
+decoded JSON argument strings are inspected, and unsupported dynamic shell
+syntax fails closed, including `env` split-string options. Reasoning text is
+scanned too, before the runtime can convert it to ordinary text. Multipart text
+is checked individually, newline-rendered, and concatenated to detect credentials
+both at and across part boundaries; detection blocks the multipart output rather
+than guessing how to distribute a replacement. Reasoning/mixed-media output
+passes unchanged when safe, but is blocked if it requires redaction because the
+runtime's string replacement contract would otherwise discard non-text content.
+Scalar output keeps its error/pause flags. These are explicit native limits,
+not full SDK guardrail parity.
+
+The independent Go fixture has 87 cases. Rust compares guard order, tripwire and
+replacement decisions plus exact redacted output bytes for 75 cases. Eleven
+malformed raw-JSON cases cannot be represented by the native `serde_json::Value`
+arguments; one escaped credential-marker case deliberately receives stronger
+native protection. Go parser-error wording and guardrail prose are not claimed
+byte-identical. The offline `guardrails` feature example exercises the public
+builtin constructors as well as existing execution-layer protection.
+
 ## Final available turn
 
 `Features::force_final_summary_turn` opts the builder into a no-tool summary on

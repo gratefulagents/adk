@@ -38,6 +38,7 @@ pub struct Features {
     pub compaction: bool,
     pub retry: bool,
     pub approval: bool,
+    pub builtin_guardrails: bool,
     pub parallel_tool_calls: bool,
     pub untrusted_tool_outputs: bool,
     pub force_final_summary_turn: bool,
@@ -89,6 +90,7 @@ pub struct Config {
     pub enable_compaction: bool,
     pub enable_retry: bool,
     pub enable_approval: bool,
+    pub enable_guardrails: bool,
     pub tool_options: adk_tools::Config,
 }
 impl Default for Config {
@@ -120,6 +122,7 @@ impl Default for Config {
             enable_compaction: false,
             enable_retry: false,
             enable_approval: false,
+            enable_guardrails: false,
             tool_options: Default::default(),
         }
     }
@@ -134,6 +137,7 @@ impl Config {
             compaction: self.enable_compaction,
             retry: self.enable_retry,
             approval: self.enable_approval,
+            builtin_guardrails: self.enable_guardrails,
             ..Default::default()
         })
     }
@@ -1310,6 +1314,14 @@ impl Builder {
         self.runner.output.work_dir = Some(self.config.work_dir.clone());
         self.runner.output.untrusted = features.untrusted_tool_outputs;
         self.runner.approve_mutating_tools = features.approval;
+        if features.builtin_guardrails {
+            let mut input = crate::guardrails::builtin_tool_input_guardrails();
+            input.append(&mut self.runner.tool_input_guardrails);
+            self.runner.tool_input_guardrails = input;
+            let mut output = crate::guardrails::builtin_tool_output_guardrails();
+            output.append(&mut self.runner.tool_output_guardrails);
+            self.runner.tool_output_guardrails = output;
+        }
         self.runner.force_final_summary_turn = features.force_final_summary_turn;
         if self.config.features.is_some() && !features.immediate_input_polling {
             self.runner.immediate_input_poller = None;

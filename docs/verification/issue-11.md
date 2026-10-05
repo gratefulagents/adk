@@ -2,6 +2,42 @@
 
 ## Current continuation evidence
 
+### Opt-in built-in tool guardrails
+
+The public facade now assembles built-in input/output tool guards before custom
+rules, with default-off legacy and explicit feature selection and stable durable
+identities. Shared security primitives avoid duplicate shell policy and secret
+signature tables. Standalone tokens are redacted; compound credential markers
+block the output. Reasoning content is scanned before runtime conversion to text;
+redaction requiring loss of non-text structure blocks instead.
+
+The pinned public SDK guard functions generate **87 independent cases** twice,
+byte-for-byte. Native comparisons cover **75 representable cases**, excluding
+11 malformed raw JSON cases and one escaped-marker case where decoded native
+scanning is intentionally stronger. Guard order, tripwires, replacement presence
+and exact redacted content are compared; parser error prose and general shell
+language equivalence are not claimed. Bounded native shell parsing rejects
+unsupported control/indirect heads and is not an execution sandbox.
+
+Security review found reasoning-content leakage, multipart scan/render boundary
+mismatches, unsupported shell heads and `env` split-string bypasses. These were
+corrected, with actual Runner regressions checking requests, history, reports,
+events and observations, plus shell classification regressions. Multipart
+credential detections block output; unsupported split-string forms fail closed.
+Final local verification: **1,141 workspace/doctests passed, 0 failed, 30 ignored**;
+**579 hash-bound tests** and **17 evidence validators** passed. Formatting,
+strict all-target lint, rustdoc, source locks, facade matrix, standalone consumer,
+and twenty offline examples plus host session passed. The guardrail example now
+exercises public built-in redaction and destructive-input rejection without
+executing the destructive command. All seven handoff-module fixtures regenerate
+twice. Ledger remains **197 verified / 8,694 unresolved / 251 excluded**;
+no aggregate parity claim is inferred from helper availability. Focused independent
+re-review confirmed both follow-up bypasses resolved by code inspection; test
+execution above is parent-run evidence. Live credentialed provider behavior
+remains unverified. Previous head `b495040` finished with **25 successful and
+21 cancelled CI jobs**, including one successful Linux and one successful macOS
+enforcement lane; cancelled jobs are not passes. New-head CI is separate evidence.
+
 ### Immediate-input wake signals
 
 Optional host-owned wake signals now replace pending attempts before native

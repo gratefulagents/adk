@@ -89,8 +89,10 @@ func main() {
 		b, err = generateImmediateInput()
 	case len(os.Args) == 2 && os.Args[1] == "immediate-signal":
 		b, err = generateImmediateSignal()
+	case len(os.Args) == 2 && os.Args[1] == "builtin-guardrails":
+		b, err = generateBuiltinGuardrails()
 	default:
-		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input|immediate-signal]")
+		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input|immediate-signal|builtin-guardrails]")
 	}
 	if err == nil {
 		_, err = os.Stdout.Write(b)

@@ -428,3 +428,37 @@ provenance policy. Relevant pinned sources are `internal/agent/run_config.go`
 (`modelOutputCommitment`, `settleImmediateInput`, interrupted-attempt branch).
 The generator invokes the actual runner. Tests compare two regenerations and the
 committed fixture; the targeted race-detector test passed 100 repetitions.
+
+## Builtin tool guardrail projection
+
+`go run -mod=readonly . builtin-guardrails` invokes the actual public SDK builtin
+input/output guard `Fn`s in order, stopping on a tripwire and applying sequential
+output replacement exactly as the runner does. The 87 cases cover 75 input and
+12 output scenarios: shell-like naming, command/cmd precedence, safe/destructive
+commands, malformed arguments, ordinary secret redaction and partial-credential
+whole-output blocking. Commands are classified only, never executed.
+
+Versioned ASCII recipes reconstruct synthetic credential-shaped inputs without
+storing those raw values in the fixture. Literal argument strings preserve raw
+malformed JSON; recipe kind/length/encoding specifies all other input bytes.
+`guards` records original SDK names, errors and exported result fields, while
+`final_content` is null for inputs/blocked outputs and otherwise the actual
+sequentially rewritten content. Generator tests scan the complete fixture with
+SDK output guards and reject leaked synthetic fragments. No credentials,
+network calls, CLI or evaluation adapter are involved.
+
+Native comparison checks names, ordered tripwire/replacement decisions and
+exact final redacted bytes for 75 cases. Eleven malformed raw-JSON inputs are
+unrepresentable by native typed `Value` arguments and are counted explicitly,
+not called passes. One escaped JSON credential marker is intentionally blocked
+by native decoded-value inspection where the SDK raw-text guard passes it.
+Guardrail prose and Go JSON parser error strings are not compared as byte parity.
+The new feature therefore does not close aggregate SDK builtin-guardrail ledger
+entries. Native shell grammar/normalization hardening and mixed-media output
+blocking have separate tests and documented limits.
+
+`builtin_guardrails.go` and `builtin_guardrails_test.go` use the same pinned
+module and GPL-3.0-only provenance policy. Source entry points are
+`pkg/agentsdk/guardrails/builtin.go` (`BuiltinToolInputGuardrails` and
+`BuiltinToolOutputGuardrails`) and their exported runtime types, at the pin above.
+The generator contains fixture construction only, not copied matchers.

@@ -1,0 +1,2353 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "input_guard_names": [
+    "block-destructive-commands",
+    "detect-secret-leak"
+  ],
+  "output_guard_names": [
+    "detect-secret-in-output"
+  ],
+  "cases": [
+    {
+      "name": "name_bash_safe",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_bash_destructive",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_bash_malformed",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_BASH_safe",
+      "phase": "input",
+      "tool_name": "BASH",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_BASH_destructive",
+      "phase": "input",
+      "tool_name": "BASH",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_BASH_malformed",
+      "phase": "input",
+      "tool_name": "BASH",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_custom_BaSh_tool_safe",
+      "phase": "input",
+      "tool_name": "custom_BaSh_tool",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_custom_BaSh_tool_destructive",
+      "phase": "input",
+      "tool_name": "custom_BaSh_tool",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_custom_BaSh_tool_malformed",
+      "phase": "input",
+      "tool_name": "custom_BaSh_tool",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_shell_safe",
+      "phase": "input",
+      "tool_name": "shell",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_shell_destructive",
+      "phase": "input",
+      "tool_name": "shell",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_shell_malformed",
+      "phase": "input",
+      "tool_name": "shell",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ShElL_safe",
+      "phase": "input",
+      "tool_name": "ShElL",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ShElL_destructive",
+      "phase": "input",
+      "tool_name": "ShElL",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ShElL_malformed",
+      "phase": "input",
+      "tool_name": "ShElL",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_exec_safe",
+      "phase": "input",
+      "tool_name": "exec",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_exec_destructive",
+      "phase": "input",
+      "tool_name": "exec",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_exec_malformed",
+      "phase": "input",
+      "tool_name": "exec",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ExEcUtE_safe",
+      "phase": "input",
+      "tool_name": "ExEcUtE",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ExEcUtE_destructive",
+      "phase": "input",
+      "tool_name": "ExEcUtE",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_ExEcUtE_malformed",
+      "phase": "input",
+      "tool_name": "ExEcUtE",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_read_file_safe",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_read_file_destructive",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_read_file_malformed",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_sh_safe",
+      "phase": "input",
+      "tool_name": "sh",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_sh_destructive",
+      "phase": "input",
+      "tool_name": "sh",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "name_sh_malformed",
+      "phase": "input",
+      "tool_name": "sh",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_00",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"ls -la\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_01",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"git status\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_02",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"grep -r \\\"rm -rf /\\\" docs/\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_03",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf ./build\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_04",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -fr /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_05",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -r -f /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_06",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"sudo rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_07",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"env rm -rf /etc\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_08",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"\\\\rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_09",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"\\\"rm\\\" -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_10",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"bash -c \\\"rm -rf /\\\"\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: bash -c: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_11",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"echo hi \\u0026\\u0026 rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_12",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"true; rm -rf /usr\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_13",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"mkfs.ext4 /dev/sda1\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: mkfs.ext4 is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_14",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"dd if=/dev/zero of=/dev/sda\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: dd to block device is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_15",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm${IFS}-rf${IFS}/\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_16",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"r$'m' -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "command_17",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"echo $(rm -rf /)\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: command substitution: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_cmd_only",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"cmd\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_wins_safe",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\",\"cmd\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_wins_blocked",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\",\"cmd\":\"printf hello\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_empty_command_fallback",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"\",\"cmd\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_null_command_fallback",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":null,\"cmd\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_empty_object",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_empty_fields",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"\",\"cmd\":\"\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_unknown_field",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"text\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_null",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "null",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_array",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "[]",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal array into Go value of type struct { Command string \"json:\\\"command\\\"\"; Cmd string \"json:\\\"cmd\\\"\" }",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_string",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "\"hello\"",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal string into Go value of type struct { Command string \"json:\\\"command\\\"\"; Cmd string \"json:\\\"cmd\\\"\" }",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_number",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "42",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal number into Go value of type struct { Command string \"json:\\\"command\\\"\"; Cmd string \"json:\\\"cmd\\\"\" }",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_empty",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_trailing",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{} trailing",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: invalid character 't' after top-level value",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_number",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":42}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal number into Go struct field .command of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_bool",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":true}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal bool into Go struct field .command of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_array",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":[]}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal array into Go struct field .command of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_command_object",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":{}}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal object into Go struct field .command of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_cmd_number",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"cmd\":42}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal number into Go struct field .cmd of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_valid_command_wrong_cmd",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"printf hello\",\"cmd\":42}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal number into Go struct field .cmd of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_literal_65",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "content": "",
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": ""
+    },
+    {
+      "name": "output_literal_66",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "content": "before\nordinary output\nafter",
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": "before\nordinary output\nafter"
+    },
+    {
+      "name": "output_literal_67",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "content": "public identifier; no credentials",
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": "public identifier; no credentials"
+    },
+    {
+      "name": "input_github_token",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_token",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential GitHub token detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_github_token",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_token",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "[guardrail detect-secret-in-output: redacted 1 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "TripwireTriggered": false,
+            "ReplacementContent": "before\ntoken=[REDACTED:GitHub token]\nafter\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "ContentReplaced": true
+          }
+        }
+      ],
+      "final_content": "before\ntoken=[REDACTED:GitHub token]\nafter\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]"
+    },
+    {
+      "name": "input_github_repeated",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_repeated",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential GitHub token detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_github_repeated",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_repeated",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "TripwireTriggered": false,
+            "ReplacementContent": "before\ntoken=[REDACTED:GitHub token]\nagain=[REDACTED:GitHub token]\nafter\n\n[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "ContentReplaced": true
+          }
+        }
+      ],
+      "final_content": "before\ntoken=[REDACTED:GitHub token]\nagain=[REDACTED:GitHub token]\nafter\n\n[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]"
+    },
+    {
+      "name": "input_pem_closed",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "pem_closed",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential private key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_pem_closed",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "pem_closed",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "TripwireTriggered": false,
+            "ReplacementContent": "before\n[REDACTED:private key]\nafter\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "ContentReplaced": true
+          }
+        }
+      ],
+      "final_content": "before\n[REDACTED:private key]\nafter\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]"
+    },
+    {
+      "name": "input_pem_unterminated",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "pem_unterminated",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential private key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_pem_unterminated",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "pem_unterminated",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "TripwireTriggered": false,
+            "ReplacementContent": "before\n[REDACTED:private key]\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "ContentReplaced": true
+          }
+        }
+      ],
+      "final_content": "before\n[REDACTED:private key]\n\n[guardrail detect-secret-in-output: redacted 1 potential secret(s): private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]"
+    },
+    {
+      "name": "input_github_and_pem",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_and_pem",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential GitHub token detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_github_and_pem",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_and_pem",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token, private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "TripwireTriggered": false,
+            "ReplacementContent": "before\ntoken=[REDACTED:GitHub token]\n[REDACTED:private key]\nafter\n\n[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token, private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]",
+            "ContentReplaced": true
+          }
+        }
+      ],
+      "final_content": "before\ntoken=[REDACTED:GitHub token]\n[REDACTED:private key]\nafter\n\n[guardrail detect-secret-in-output: redacted 2 potential secret(s): GitHub token, private key. If these are placeholders or test fixtures the surrounding content is still usable; do not try to reconstruct redacted values.]"
+    },
+    {
+      "name": "input_aws_pair",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "aws_pair",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_aws_pair",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "aws_pair",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool output — output blocked: this marker usually travels with companion credentials (e.g. paired secret keys) that cannot be detected independently, so nothing was passed through. If you need the surrounding content, re-read a narrower range that excludes the credential block.",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_aws_temporary_pair",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "aws_temporary_pair",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_aws_temporary_pair",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "aws_temporary_pair",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool output — output blocked: this marker usually travels with companion credentials (e.g. paired secret keys) that cannot be detected independently, so nothing was passed through. If you need the surrounding content, re-read a narrower range that excludes the credential block.",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_github_and_aws",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_and_aws",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_github_and_aws",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_and_aws",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool output — output blocked: this marker usually travels with companion credentials (e.g. paired secret keys) that cannot be detected independently, so nothing was passed through. If you need the surrounding content, re-read a narrower range that excludes the credential block.",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_gcp_service_account",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "gcp_service_account",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential GCP service-account key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "output_gcp_service_account",
+      "phase": "output",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "gcp_service_account",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "detect-secret-in-output",
+          "error": "",
+          "result": {
+            "Output": "Potential GCP service-account key detected in tool output — output blocked: this marker usually travels with companion credentials (e.g. paired secret keys) that cannot be detected independently, so nothing was passed through. If you need the surrounding content, re-read a narrower range that excludes the credential block.",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_gcp_escaped_json_text",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "gcp_service_account",
+        "length": 36,
+        "encoding": "json_text"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    }
+  ]
+}

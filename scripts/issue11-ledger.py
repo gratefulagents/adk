@@ -128,6 +128,14 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "fixtures/handoff/sdk-immediate-input.json",
                "scripts/handoff-reference/immediate_signal.go", "scripts/handoff-reference/immediate_signal_test.go",
                "fixtures/handoff/sdk-immediate-signal.json",
+               "scripts/handoff-reference/builtin_guardrails.go", "scripts/handoff-reference/builtin_guardrails_test.go",
+               "fixtures/handoff/sdk-builtin-guardrails.json",
+               "crates/adk/src/guardrails.rs", "crates/adk/tests/builtin_guardrails.rs",
+               "crates/adk/tests/builtin_guardrails_oracle.rs",
+               "crates/adk-security/src/lib.rs", "crates/adk-security/src/secrets.rs",
+               "crates/adk-security/src/signatures.rs", "crates/adk-security/src/shell.rs",
+               "crates/adk-security/tests/builtin_guardrails.rs",
+               "crates/adk-tools/src/shell_policy.rs",
                "crates/adk-runtime/tests/immediate_input_oracle/mod.rs",
                "crates/adk-runtime/tests/immediate_input_oracle/signal.rs",
                str(RUST_CLAIMS.relative_to(ROOT))]
@@ -224,6 +232,7 @@ def verify_rust() -> None:
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
                "-p", "adk-core", "--test", "result_helpers", "--test", "host_conversation",
                "--test", "settings", "--test", "builder", "--test", "catalog_handoffs",
+               "--test", "builtin_guardrails", "--test", "builtin_guardrails_oracle",
                "--test", "fileconfig", "--test", "fileconfig_oracle", "-p", "adk-tools",
                "--test", "role_views", "--test", "bundle", "--test", "shell", "--test", "shell_security",
                "--test", "observability", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
@@ -283,6 +292,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust immediate input evidence requires independently executed pinned fixtures")
     if f"immediate signal reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust immediate signal evidence requires independently executed pinned fixtures")
+    if f"builtin guardrails reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust builtin guardrail evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

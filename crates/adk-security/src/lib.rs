@@ -6,8 +6,14 @@ mod secrets;
 mod shell;
 
 pub use policy::{SecurityPolicy, clamp_access, normalize_access};
-pub use secrets::{SecretKind, check_secrets, redact_secrets};
-pub use shell::{CommandClass, classify_command, inspect_literal_commands, validate_git_push};
+pub use secrets::{
+    SecretKind, ToolOutputDisposition, check_secrets, redact_secrets, sanitize_tool_output,
+};
+pub use shell::{
+    CommandClass, check_destructive_command, classify_command, inspect_literal_commands,
+    validate_git_push,
+};
+pub use shell::{destructive_shell_words, is_shell_assignment, unwrap_shell_words};
 
 use adk_core::{
     ApprovalDecision, ApprovalRequest, Context, Error, ErrorCategory, Host, ToolCall, ToolDecision,

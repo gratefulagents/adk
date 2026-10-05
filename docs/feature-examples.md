@@ -46,7 +46,7 @@ boundaries are deliberately explicit.
 | `sandbox` | Run bounded shell output in a temporary workspace; assert successful exit, exact capture limit/truncation, fixed PATH and absence of inherited provider/cloud secrets. | Explicit `Backend::Local` is **not OS isolation**. This does not claim bubblewrap/Seatbelt enforcement. |
 | `chatloop` | `run_go_chat` resolves a deferred approval through a gate exactly once; a second invocation receives stored first-turn history without replaying the tool. | In-memory history is host-owned, not a new public ChatLoop/session persistence adapter. |
 | `handoffs_subagents` | Transfer to a specialist changes `last_agent`; a real scheduler plus `RunnerChildExecutor` and `AgentAsTool` executes a nested runner, delivers child evidence to the parent, then shuts down. | No distributed workers or external task queues. |
-| `guardrails` | Safe text passes secret detection; synthetic credential text returns `Guardrail` without leaking the secret; authorized subprocess output is blocked by the actual execution facade's output guardrail. | Generic Go input/output/tool callback guardrails and typed tripwire results are unavailable; see below. |
+| `guardrails` | Safe text passes secret detection; synthetic credential text returns `Guardrail` without leaking the secret; authorized subprocess output is blocked by the execution facade. Public built-in tool guards redact a synthetic output and trip on destructive shell input without executing it. | The scenario covers built-in helpers, not every custom callback combination or shell language construct; see below. |
 | `structured_output` | Valid JSON is returned as a parsed object; wrong-type JSON emits exactly one `OutputValidationFailed` observation, whereas valid output emits none. | Validation is observational, **not fail-closed**; see below. |
 | `streaming` | A real pull-stream runner delivers two ordered text deltas, exactly one terminal event, and the same complete final answer. | Scripted stream, not an SSE/HTTP integration test. |
 | `context_compaction` | Real deterministic local compaction shrinks history, generates a summary, preserves the first goal and latest question; disabled compaction leaves history unchanged. | No paid LLM summary or native provider compaction request. |
@@ -60,10 +60,13 @@ boundaries are deliberately explicit.
 
 ## Genuine gaps and semantic differences
 
-- **Guardrail callbacks:** native secret detection/execution guardrails are real and
-  exercised, but there is no equivalent public API for the Go example's arbitrary
-  agent-input, agent-output, tool-input and tool-output callbacks with typed tripwire
-  results. Secret scanning is not a substitute for those four interfaces.
+- **Guardrails:** public runtime `Guardrail` implementations support agent-input,
+  agent-output, tool-input and tool-output checks with typed results; the example
+  focuses on secret detection/execution and built-in tool guards. Builder opt-in,
+  custom ordering, durable identities and independent SDK fixture comparisons are
+  tested separately. Built-in shell checks are a bounded, fail-closed syntax
+  policy, not an OS sandbox or full shell interpreter. See
+  [runtime builder](runtime-builder.md) for defaults and semantic limits.
 - **Structured output:** `Runner::validate_output` reports schema/parser violations
   through `RunHooks`, then returns parsed JSON or raw text. The executable asserts
   this current contract. Applications needing fail-closed validation must not assume

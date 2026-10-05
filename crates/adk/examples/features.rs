@@ -650,6 +650,33 @@ async fn guardrails() {
     let error = adk::security::check_secrets(&secret).unwrap_err();
     assert_eq!(error.info.category, ErrorCategory::Guardrail);
     assert!(!error.info.message.contains(&secret));
+    // Runtime builtins protect custom tools too, independently of shell execution.
+    let read = call("custom_read", json!({}));
+    let output = ToolOutput {
+        content: vec![Content::Text {
+            text: format!("public prefix\n{secret}\npublic suffix"),
+        }],
+        is_error: false,
+        should_pause: false,
+    };
+    let guards = adk::guardrails::builtin_tool_output_guardrails();
+    let checked = guards[0]
+        .check(
+            &context(),
+            "example",
+            GuardrailInput::ToolOutput {
+                call: &read,
+                output: &output,
+            },
+        )
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(!checked.tripwire_triggered);
+    let replacement = checked.replacement_content.unwrap();
+    assert!(replacement.contains("public prefix"));
+    assert!(replacement.contains("public suffix"));
+    assert!(!replacement.contains(&secret));
     let temp = tempfile::tempdir().unwrap();
     std::fs::write(temp.path().join("fixture"), &secret).unwrap();
     let mut config = adk::sandbox::Config::new(temp.path());

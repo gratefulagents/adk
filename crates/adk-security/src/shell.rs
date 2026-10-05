@@ -17,6 +17,113 @@ fn blocked(message: &'static str) -> Error {
     Error::new(ErrorCategory::PermissionDenied, message)
 }
 
+/// Destructive-command defense in depth, not program authorization. Unknown
+/// literal programs pass; unsupported dynamic syntax fails closed. This bounded
+/// native grammar is intentionally stricter than the SDK shell tokenizer.
+pub fn check_destructive_command(command: &str) -> Result<(), Error> {
+    check_destructive_nested(command, 0)
+}
+
+fn check_destructive_nested(command: &str, depth: usize) -> Result<(), Error> {
+    if depth > 64 {
+        return Err(blocked("shell nesting exceeds classifier limit"));
+    }
+    let mut tokens = tokenize(command)?.into_iter().peekable();
+    let mut argv = Vec::new();
+    let mut redirects = Vec::new();
+    loop {
+        match tokens.next() {
+            Some(Token::Word(word)) => argv.push(word),
+            Some(Token::Redirect(write)) => {
+                let Some(Token::Word(path)) = tokens.next() else {
+                    return Err(blocked("missing redirect target"));
+                };
+                redirects.push((if write { ">" } else { "<" }.into(), path));
+            }
+            token => {
+                let words = unwrap_shell_words_inner(&argv, true)?;
+                if destructive_shell_words(&words, &redirects).is_some() {
+                    // Shared policy reasons can contain argv; guardrail reports must not.
+                    return Err(blocked("destructive command is not allowed"));
+                }
+                if let Some(head) = words.first() {
+                    let head = base(head);
+                    if matches!(
+                        head,
+                        "!" | "time"
+                            | "if"
+                            | "then"
+                            | "else"
+                            | "elif"
+                            | "fi"
+                            | "for"
+                            | "while"
+                            | "until"
+                            | "do"
+                            | "done"
+                            | "case"
+                            | "esac"
+                            | "select"
+                            | "in"
+                            | "function"
+                            | "coproc"
+                            | "source"
+                            | "."
+                            | "alias"
+                            | "xargs"
+                            | "parallel"
+                            | "export"
+                            | "unset"
+                            | "readonly"
+                            | "declare"
+                            | "typeset"
+                            | "local"
+                            | "let"
+                            | "set"
+                            | "enable"
+                            | "unalias"
+                            | "bind"
+                            | "trap"
+                            | "read"
+                            | "mapfile"
+                            | "readarray"
+                            | "hash"
+                            | "busybox"
+                            | "toybox"
+                    ) {
+                        return Err(blocked("unsupported shell command head"));
+                    }
+                    if matches!(head, "sh" | "bash" | "zsh" | "ksh" | "dash" | "ash") {
+                        let mut classified = false;
+                        for pair in words[1..].windows(2) {
+                            if pair[0].starts_with('-') && pair[0].contains('c') {
+                                check_destructive_nested(&pair[1], depth + 1)?;
+                                classified = true;
+                            }
+                        }
+                        if !classified {
+                            return Err(blocked("shell input cannot be classified statically"));
+                        }
+                    } else if head == "eval" {
+                        check_destructive_nested(&words[1..].join(" "), depth + 1)?;
+                    }
+                }
+                if token.is_none() {
+                    break;
+                }
+                if argv.is_empty()
+                    || matches!(token, Some(Token::Separator(false))) && tokens.peek().is_none()
+                {
+                    return Err(blocked("incomplete shell statement"));
+                }
+                argv.clear();
+                redirects.clear();
+            }
+        }
+    }
+    Ok(())
+}
+
 // This is a recognizer for a literal shell subset, not a shell emulator. Rejecting
 // expansion before classification avoids guessing the command's runtime argv.
 fn tokenize(input: &str) -> Result<Vec<Token>, Error> {
@@ -487,4 +594,209 @@ fn simple_ref(value: &str) -> bool {
         && value
             .bytes()
             .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'/' | b'_' | b'-' | b'.'))
+}
+
+fn base(s: &str) -> &str {
+    s.rsplit('/').next().unwrap_or(s)
+}
+pub fn is_shell_assignment(s: &str) -> bool {
+    s.split_once('=').is_some_and(|(name, _)| {
+        !name.is_empty()
+            && name
+                .bytes()
+                .enumerate()
+                .all(|(i, c)| c == b'_' || c.is_ascii_alphabetic() || i > 0 && c.is_ascii_digit())
+    })
+}
+pub fn unwrap_shell_words(words: &[String]) -> Vec<String> {
+    unwrap_shell_words_inner(words, false).expect("permissive wrapper normalization cannot fail")
+}
+
+fn unwrap_shell_words_inner(
+    words: &[String],
+    reject_env_split_string: bool,
+) -> Result<Vec<String>, Error> {
+    let mut words = words.to_vec();
+    loop {
+        while words.first().is_some_and(|s| is_shell_assignment(s)) {
+            words.remove(0);
+        }
+        let Some(head) = words.first().map(|s| base(s).to_owned()) else {
+            return Ok(words);
+        };
+        let operands: &[&str] = match head.as_str() {
+            "sudo" => &[
+                "-u",
+                "--user",
+                "-g",
+                "--group",
+                "-h",
+                "--host",
+                "-p",
+                "--prompt",
+                "-C",
+                "--close-from",
+                "-D",
+                "--chdir",
+                "-R",
+                "--chroot",
+                "-r",
+                "--role",
+                "-t",
+                "--type",
+                "-T",
+                "--command-timeout",
+                "-U",
+                "--other-user",
+            ],
+            "doas" => &["-C", "-u"],
+            "env" => &["-u", "--unset", "-C", "--chdir"],
+            "nice" => &["-n", "--adjustment"],
+            "ionice" => &["-c", "--class", "-n", "--classdata", "-p", "--pid"],
+            "stdbuf" => &["-i", "--input", "-o", "--output", "-e", "--error"],
+            "exec" => &["-a"],
+            "timeout" => &["-k", "--kill-after", "-s", "--signal"],
+            "command" | "nohup" | "setsid" | "builtin" => &[],
+            _ => return Ok(words),
+        };
+        let mut i = 1;
+        let mut splice = None;
+        while i < words.len() {
+            let a = &words[i];
+            if a.starts_with('-') {
+                // env has its own quoting grammar; whitespace splitting cannot classify it.
+                if reject_env_split_string
+                    && head == "env"
+                    && (a == "--split-string"
+                        || a.starts_with("--split-string=")
+                        || !a.starts_with("--") && a.contains('S'))
+                {
+                    return Err(blocked("env split-string cannot be classified statically"));
+                }
+                let (name, value) = a
+                    .split_once('=')
+                    .map_or((a.as_str(), None), |(n, v)| (n, Some(v)));
+                if head == "env" && matches!(name, "-S" | "--split-string") {
+                    let value = value
+                        .or_else(|| words.get(i + 1).map(String::as_str))
+                        .unwrap_or("");
+                    let mut split: Vec<_> = value.split_whitespace().map(str::to_owned).collect();
+                    split.extend_from_slice(
+                        &words[(i + if a.contains('=') { 1 } else { 2 }).min(words.len())..],
+                    );
+                    splice = Some(split);
+                    break;
+                }
+                i += if value.is_none() && operands.contains(&name) {
+                    2
+                } else {
+                    1
+                };
+            } else if matches!(head.as_str(), "env" | "sudo" | "doas") && is_shell_assignment(a) {
+                i += 1;
+            } else {
+                break;
+            }
+        }
+        if let Some(split) = splice {
+            words = split;
+            continue;
+        }
+        if head == "timeout" && i < words.len() {
+            i += 1;
+        }
+        words.drain(..i.min(words.len()));
+    }
+}
+fn forbidden(path: &str) -> bool {
+    if matches!(
+        path,
+        "/dev/null"
+            | "/dev/zero"
+            | "/dev/full"
+            | "/dev/tty"
+            | "/dev/stdin"
+            | "/dev/stdout"
+            | "/dev/stderr"
+            | "/dev/random"
+            | "/dev/urandom"
+    ) || path.starts_with("/dev/fd/")
+    {
+        return false;
+    }
+    ["/etc", "/dev", "/sys", "/proc", "/boot"]
+        .iter()
+        .any(|p| path == *p || path.starts_with(&format!("{p}/")))
+}
+pub fn destructive_shell_words(argv: &[String], redirects: &[(String, String)]) -> Option<String> {
+    for (op, target) in redirects {
+        if op.starts_with('>') && forbidden(target) {
+            return Some(format!(
+                "redirect to protected path {target:?} is not allowed"
+            ));
+        }
+    }
+    let head = base(argv.first()?);
+    let args = &argv[1..];
+    if head == "rm"
+        && args.iter().any(|a| {
+            a == "--recursive"
+                || a.starts_with('-') && !a.starts_with("--") && a.contains(['r', 'R'])
+        })
+        && args.iter().any(|a| {
+            a.starts_with("/*")
+                || matches!(
+                    a.trim_end_matches('/'),
+                    "" | "/etc"
+                        | "/usr"
+                        | "/bin"
+                        | "/sbin"
+                        | "/lib"
+                        | "/lib64"
+                        | "/var"
+                        | "/boot"
+                        | "/root"
+                        | "/home"
+                        | "/opt"
+                        | "/dev"
+                        | "/proc"
+                        | "/sys"
+                )
+        })
+    {
+        return Some("recursive removal of root paths is not allowed".into());
+    }
+    if matches!(head, "chmod" | "chown")
+        && args
+            .iter()
+            .any(|a| a == "--recursive" || a.starts_with('-') && a.contains('R'))
+        && args.iter().any(|a| a == "/" || a.starts_with("/*"))
+    {
+        return Some(format!("{head} recursive at root is not allowed"));
+    }
+    if head == "dd" && args.iter().any(|a| a.starts_with("of=/dev/")) {
+        return Some("dd to block device is not allowed".into());
+    }
+    if head.starts_with("mkfs") {
+        return Some(format!("{head} is not allowed"));
+    }
+    if head == "tee"
+        && let Some(path) = args.iter().find(|a| forbidden(a))
+    {
+        return Some(format!("tee to protected path {path:?} is not allowed"));
+    }
+    if head.starts_with(":()") {
+        return Some("fork bomb pattern is not allowed".into());
+    }
+    if matches!(head, "python" | "python3" | "perl" | "ruby" | "node")
+        && args.windows(2).any(|p| {
+            p[0] == "-c"
+                && ["/etc/passwd", "/etc/shadow", "/etc/hosts", "/etc/sudoers"]
+                    .iter()
+                    .any(|s| p[1].contains(s))
+        })
+    {
+        return Some(format!("{head} -c writing to system files is not allowed"));
+    }
+    None
 }

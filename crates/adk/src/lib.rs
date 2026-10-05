@@ -56,6 +56,10 @@ pub mod telemetry;
 #[cfg(feature = "builder")]
 pub mod builder;
 
+/// Opt-in builtin runtime tool guardrails backed by the shared security policy.
+#[cfg(feature = "builder")]
+pub mod guardrails;
+
 /// Host-owned message ingestion, approvals and session persistence.
 #[cfg(feature = "host")]
 pub mod host;

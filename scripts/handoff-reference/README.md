@@ -398,3 +398,33 @@ GPL-3.0-only provenance policy. Relevant source is
 projects only fixture-covered message/tool-call/tool-output payloads and exact
 provenance; it does not claim equivalence for event formats, unknown item kinds,
 media, asynchronous wake signals or crash-atomic external queue admission.
+
+## Immediate-input signal projection
+
+`go run -mod=readonly . immediate-signal` executes eight public SDK runner cases.
+Four wake a pending, not-yet-visible attempt (normal/streaming, turn budgets one
+and three). Four wake after the host receives a text or reasoning delta, then
+admit steering at a tool boundary or finalizer. Channel handshakes—not sleeps—
+establish visibility before signaling; host/model goroutines are joined. The
+source model deliberately returns a hidden response after cancellation so the
+oracle can verify that the SDK discards it. The one-turn cases demonstrate the
+SDK's interrupted-turn refund and late-finalizer extension.
+
+The fixture records request input, actual callback order, cancellation, retry
+advice calls, accepted responses, output/history and consumed SDK stream events.
+The native comparator checks exact request input, callback order/counts,
+cancellation, tool counts, output/history/new items, consumed text/reasoning
+deltas and the number of accepted responses. It does **not** claim raw SDK event
+format equivalence, compare SDK retry-advice invocation counts, or manufacture
+agent labels for native raw responses. Native cancellation drops its pending
+future rather than waiting for a provider that returns despite cancellation.
+Accounting for usage in such a late provider response is outside this fixture's
+zero-usage scope. Independent native tests cover child caps, concurrent steering,
+parent cancellation, stream drop, generation cleanup and durable keys.
+
+`immediate_signal.go` and `immediate_signal_test.go` follow the same GPL-3.0-only
+provenance policy. Relevant pinned sources are `internal/agent/run_config.go`
+(`immediateInputContext`) and `internal/agent/runner.go`
+(`modelOutputCommitment`, `settleImmediateInput`, interrupted-attempt branch).
+The generator invokes the actual runner. Tests compare two regenerations and the
+committed fixture; the targeted race-detector test passed 100 repetitions.

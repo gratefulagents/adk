@@ -181,9 +181,40 @@ The pinned SDK oracle covers fourteen complete/streaming boundary cases and
 compares model inputs, returned history/new items, actual authorship labels,
 callback/tool counts and output. Native cancellation, malformed batches and
 durable recovery have separate regressions. The SDK's optional
-`ImmediateInputSignal` (interrupt an in-flight, not-yet-visible model attempt)
-is **not implemented** by these boundary callbacks and remains a capability
-gap; steering currently waits for the next boundary.
+`ImmediateInputSignal` is an optional companion described below; boundary
+callbacks alone do not interrupt an in-flight model attempt.
+
+### Waking a pending attempt
+
+`RunnerConfig::immediate_input_signal` accepts a host-owned
+`ImmediateInputSignal` alongside a poller. A signal without a poller is rejected.
+Strict `Features::immediate_input_polling` selection gates the signal too;
+legacy mode retains supplied callbacks. Implement `wait` as a drop-safe future
+that consumes one notification, not a permanently ready future; it must not
+drain the input queue or detach tasks.
+
+A wake before visible output cancels the pending attempt and returns to the
+normal polling boundary, rebuilding the request with newly admitted input. A
+wake after visible text or reasoning leaves the committed stream running;
+native publication of other model events (tool arguments, completed items
+or a complete response) also commits the attempt. This conservative native
+boundary avoids replaying events already delivered to the host; the SDK oracle
+only establishes equivalence for its text/reasoning event variants.
+Queued input is consumed at the next boundary or finalizer. The native run's
+ordinary root-run turn allowance is extended for superseded attempts, allowing a
+replacement even at a one-turn limit. Managed-child turn caps are not extended by
+signals. Physical attempt metrics and independent shared/security budget charges
+remain intact. Supersession does not
+consume provider retry allowance. Native generation observers see interrupted
+attempt cleanup rather than a fabricated successful response.
+
+The host still owns queue admission and finalization. Parent cancellation,
+deadlines and stream drop stop owned work; a signal is not permission to widen
+security budgets. Durable configuration binds the signal's stable key, and
+ambiguous dispatched model/admission checkpoints remain fail-closed. No usage
+or cost is invented for a dropped provider call whose response was not obtained.
+The SDK may account for a completed response returned despite cancellation;
+that transport-specific accounting is outside the bounded signal comparison.
 
 ## Host and file configuration
 

@@ -95,6 +95,17 @@ def main():
     check_sdk()
     print(f"Verified sdk-immediate-input.json twice, byte-for-byte: {len(fixture['cases'])} runner cases")
     print(f"immediate input reference verified at {PIN}")
+    expected = (ROOT / "fixtures/handoff/sdk-immediate-signal.json").read_bytes()
+    fixture = json.loads(expected)
+    if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:
+        sys.exit("Unexpected immediate-signal fixture revision/schema")
+    for attempt in range(2):
+        check_sdk()
+        if run([GO, "run", "-mod=readonly", ".", "immediate-signal"]) != expected:
+            sys.exit(f"sdk-immediate-signal.json differs from pinned Go regeneration (pass {attempt + 1})")
+    check_sdk()
+    print(f"Verified sdk-immediate-signal.json twice, byte-for-byte: {len(fixture['cases'])} runner cases")
+    print(f"immediate signal reference verified at {PIN}")
     print(f"subagent selection reference verified at {PIN}")
     print(f"handoff reference verified at {PIN}")
 

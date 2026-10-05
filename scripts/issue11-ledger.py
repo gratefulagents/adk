@@ -126,7 +126,10 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "scripts/handoff-reference/final_summary.go", "scripts/handoff-reference/final_summary_test.go",
                "scripts/handoff-reference/immediate_input.go", "scripts/handoff-reference/immediate_input_test.go",
                "fixtures/handoff/sdk-immediate-input.json",
+               "scripts/handoff-reference/immediate_signal.go", "scripts/handoff-reference/immediate_signal_test.go",
+               "fixtures/handoff/sdk-immediate-signal.json",
                "crates/adk-runtime/tests/immediate_input_oracle/mod.rs",
+               "crates/adk-runtime/tests/immediate_input_oracle/signal.rs",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -278,6 +281,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust final summary evidence requires independently executed pinned fixtures")
     if f"immediate input reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust immediate input evidence requires independently executed pinned fixtures")
+    if f"immediate signal reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust immediate signal evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

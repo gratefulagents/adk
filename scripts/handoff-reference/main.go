@@ -87,8 +87,10 @@ func main() {
 		b, err = generateFinalSummary()
 	case len(os.Args) == 2 && os.Args[1] == "immediate-input":
 		b, err = generateImmediateInput()
+	case len(os.Args) == 2 && os.Args[1] == "immediate-signal":
+		b, err = generateImmediateSignal()
 	default:
-		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input]")
+		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input|immediate-signal]")
 	}
 	if err == nil {
 		_, err = os.Stdout.Write(b)

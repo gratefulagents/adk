@@ -881,6 +881,14 @@ impl adk::runtime::ImmediateInputPoller for BuilderImmediate {
         })
     }
 }
+impl adk::runtime::ImmediateInputSignal for BuilderImmediate {
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push("signal");
+            std::future::pending().await
+        })
+    }
+}
 impl adk::runtime::ImmediateInputFinalizer for BuilderImmediate {
     fn finalize<'a>(
         &'a self,
@@ -915,6 +923,7 @@ async fn immediate_input_feature_gate_and_legacy_runner_config_in_run_and_stream
             )
             .runner_config(RunnerConfig {
                 immediate_input_poller: Some(callback.clone()),
+                immediate_input_signal: Some(callback.clone()),
                 immediate_input_finalizer: Some(callback.clone()),
                 ..Default::default()
             })
@@ -933,7 +942,7 @@ async fn immediate_input_feature_gate_and_legacy_runner_config_in_run_and_stream
             assert_eq!(
                 *callback.0.lock().unwrap(),
                 if enabled {
-                    vec!["poll", "finalize"]
+                    vec!["poll", "signal", "finalize"]
                 } else {
                     vec![]
                 }

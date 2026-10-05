@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Immediate-input wake signals
+
+Optional host-owned wake signals now replace pending attempts before native
+model-event publication. Once an event has been published, the stream continues
+without replay; queued input waits for polling/finalization. Signals require a
+poller, follow the builder's explicit feature gate, and bind durable identity.
+Superseded root attempts gain a replacement turn while physical metrics and
+child/shared security budgets remain charged. Generation cleanup is exactly
+once. Restore now accepts legitimate finalizer/signal-created turn extensions.
+
+Eight independently executed SDK cases compare pending-attempt cancellation,
+one-turn replacement, text/reasoning publication, tool-boundary and finalizer
+admission. The source oracle uses channel handshakes and passed race-detector
+testing for 100 repetitions. Rust compares exact projected input, callbacks,
+histories/new items, output, deltas and accepted-response counts. Raw SDK event
+formats, retry-advice call counts and late returned-response billing are not
+claimed equivalent. Native completed-item/tool-argument/complete events also
+commit an attempt because they are public to the host. Independent review found
+no actionable regression; limitations remain explicit in the builder guide.
+
+Verification: **1,131 workspace/doctests passed, 0 failed, 30 ignored**;
+**569 hash-bound tests** and **16 evidence validators** passed. All six pinned
+handoff-module fixtures regenerate twice. Formatting, strict all-target Clippy,
+rustdoc, source locks, facade matrix, standalone consumer and twenty offline
+examples plus host session passed. Ledger remains **197 verified / 8,694
+unresolved / 251 excluded**; no aggregate entry was closed solely because a
+feature flag now exists. Live credentialed provider tests remain unverified.
+
 ### Immediate input at boundaries
 
 Native runtime polling and atomic finalization now accept provenance-aware

@@ -1,7 +1,7 @@
 //! Opt-in execution engine and explicitly owned Tokio lifecycle primitives.
 //!
 //! Immediate input is host-owned boundary polling with optional atomic admission
-//! finalization; it does not wake or cancel an in-flight model request. Durable
+//! finalization and pre-output wake signals. Committed streams are never replayed. Durable
 //! admission interrupted after its dispatch checkpoint requires reconciliation.
 //!
 //! [`TaskGroup`] never detaches tasks: drop cancels and requests abortion;

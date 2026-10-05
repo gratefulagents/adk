@@ -436,6 +436,8 @@ impl Runner {
             if (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
                 || (self.config.stop_gate.is_none()
                     && self.config.subagents.is_none()
+                    && self.config.immediate_input_signal.is_none()
+                    && self.config.immediate_input_finalizer.is_none()
                     && saved.policy.max_turns != original_policy.max_turns)
                 || saved.policy.max_turns < original_policy.max_turns
                 || saved.stop_gate_blocks > self.config.stop_gate_max_blocks
@@ -636,6 +638,10 @@ impl Runner {
             .as_ref()
             .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
             || config
+                .immediate_input_signal
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
                 .immediate_input_finalizer
                 .as_ref()
                 .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
@@ -740,6 +746,9 @@ impl Runner {
         }
         if let Some(callback) = &config.immediate_input_poller {
             baseline["immediate_input_poller"] = serde_json::json!(callback.durable_key());
+        }
+        if let Some(callback) = &config.immediate_input_signal {
+            baseline["immediate_input_signal"] = serde_json::json!(callback.durable_key());
         }
         if let Some(callback) = &config.immediate_input_finalizer {
             baseline["immediate_input_finalizer"] = serde_json::json!(callback.durable_key());

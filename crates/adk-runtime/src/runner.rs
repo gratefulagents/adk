@@ -377,6 +377,21 @@ pub trait ImmediateInputPoller: Send + Sync {
     ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>>;
 }
 
+/// Host-owned notification that input may be available to the poller.
+/// Requires an ImmediateInputPoller. Wakes before visible output replace the
+/// pending attempt; later wakes leave queued input for the next boundary.
+/// Futures must be drop-safe, must not detach work, and must not drain input.
+/// Consume one notification per wait rather than returning a permanently ready future.
+/// Only the ordinary turn allowance is refunded; physical attempt metrics and
+/// child/security budgets remain charged. Child turn caps are never extended.
+/// No usage is invented for dropped calls.
+pub trait ImmediateInputSignal: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn wait<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, ()>;
+}
+
 /// Atomically close admission when empty, or drain accepted input and leave it
 /// open for another turn. Errors abort finalization. Without this callback a
 /// poller alone cannot guarantee admission of input racing with completion.
@@ -426,6 +441,7 @@ pub trait CompactionCarryForward: Send + Sync {
 #[derive(Clone)]
 pub struct RunnerConfig {
     pub immediate_input_poller: Option<Arc<dyn ImmediateInputPoller>>,
+    pub immediate_input_signal: Option<Arc<dyn ImmediateInputSignal>>,
     pub immediate_input_finalizer: Option<Arc<dyn ImmediateInputFinalizer>>,
     /// Reserve the last model attempt for a no-tool summary, unless children still need joining.
     pub force_final_summary_turn: bool,
@@ -474,6 +490,7 @@ impl Default for RunnerConfig {
     fn default() -> Self {
         Self {
             immediate_input_poller: None,
+            immediate_input_signal: None,
             immediate_input_finalizer: None,
             force_final_summary_turn: false,
             work_dir: PathBuf::from("."),
@@ -745,6 +762,12 @@ impl RunStream {
 impl Runner {
     pub fn new(agent: AgentConfig, mut config: RunnerConfig) -> Result<Self, Error> {
         validate_agent(&agent, &mut HashSet::new())?;
+        if config.immediate_input_signal.is_some() && config.immediate_input_poller.is_none() {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "immediate input signal requires a poller",
+            ));
+        }
         config.output.work_dir = Some(config.work_dir.clone());
         config.local_compaction = config.local_compaction.normalized();
         if config.stop_gate_max_blocks == 0 {
@@ -2260,25 +2283,53 @@ impl Engine {
                 let responses_before = self.result.responses.len();
                 let cost_before = self.cost;
                 let control = self.child_control.clone();
+                let signal = self.config.immediate_input_signal.clone();
+                let context = self.context.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
                 let attempt_result = {
                     let attempt = self.model_attempt(binding, request.clone(), visible.clone());
                     tokio::pin!(attempt);
-                    if let Some(control) = control {
+                    let wake = async {
+                        match &signal {
+                            Some(signal) => signal.wait(&context).await,
+                            None => std::future::pending().await,
+                        }
+                    };
+                    tokio::pin!(wake);
+                    let mut signal_enabled = signal.is_some();
+                    let mut child_enabled = control.is_some();
+                    loop {
                         tokio::select! {
                             biased;
-                            message = control.wait_for_messages() => {
+                            _ = &mut wake, if signal_enabled => {
+                                context.check_active()?;
+                                if !visible.load(std::sync::atomic::Ordering::Acquire) {
+                                    break None;
+                                }
+                                signal_enabled = false;
+                            }
+                            message = async {
+                                match &control {
+                                    Some(control) => control.wait_for_messages().await,
+                                    None => std::future::pending().await,
+                                }
+                            }, if child_enabled => {
                                 message?;
                                 if !visible.load(std::sync::atomic::Ordering::Acquire) {
                                     return Ok(None);
                                 }
-                                attempt.await
+                                child_enabled = false;
                             }
-                            result = &mut attempt => result,
+                            result = &mut attempt => break Some(result),
                         }
-                    } else {
-                        attempt.await
                     }
+                };
+                let Some(attempt_result) = attempt_result else {
+                    // A child turn limit may already be narrowed by host security policy.
+                    if self.child_control.is_none() {
+                        self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                    }
+                    return Ok(None);
                 };
                 if let Some(generation) = &mut generation {
                     generation.returned();
@@ -2536,6 +2587,8 @@ impl Engine {
                                 ));
                             }
                             committed = true;
+                            // Every native model event is published to the host. Do not
+                            // replay even tool-argument/item events it may already have seen.
                             visible.store(true, std::sync::atomic::Ordering::Release);
                             match &event {
                                 ModelEvent::Complete { response } => {

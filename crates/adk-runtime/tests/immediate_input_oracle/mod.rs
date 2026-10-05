@@ -1,6 +1,8 @@
 //! Bounded projection of actual pinned SDK runner observations, not fabricated expectations.
 use super::*;
 
+mod signal;
+
 struct InputQueue {
     name: String,
     polls: AtomicUsize,

@@ -3859,3 +3859,474 @@ async fn malformed_immediate_history_does_not_poison_partial_results() {
         );
     }
 }
+
+#[derive(Default)]
+struct WakeSignal {
+    wake: tokio::sync::Notify,
+    consumed: tokio::sync::Notify,
+    drops: AtomicUsize,
+}
+struct WakeDrop<'a>(&'a AtomicUsize);
+impl Drop for WakeDrop<'_> {
+    fn drop(&mut self) {
+        self.0.fetch_add(1, Ordering::SeqCst);
+    }
+}
+impl ImmediateInputSignal for WakeSignal {
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            let _guard = WakeDrop(&self.drops);
+            self.wake.notified().await;
+            self.consumed.notify_one();
+        })
+    }
+}
+#[derive(Default)]
+struct WakeModel {
+    entered: tokio::sync::Notify,
+    release: tokio::sync::Notify,
+    requests: Mutex<Vec<ModelRequest>>,
+    drops: AtomicUsize,
+    visible: Option<ModelEvent>,
+}
+impl Model for WakeModel {
+    fn provider(&self) -> &str {
+        "test"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            let _guard = WakeDrop(&self.drops);
+            let first = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len() == 1
+            };
+            if first {
+                self.entered.notify_one();
+                self.release.notified().await;
+            }
+            Ok(answer("done"))
+        })
+    }
+}
+struct WakeStream<'a> {
+    model: &'a WakeModel,
+    first: bool,
+    step: usize,
+}
+impl Drop for WakeStream<'_> {
+    fn drop(&mut self) {
+        self.model.drops.fetch_add(1, Ordering::SeqCst);
+    }
+}
+impl ModelStream for WakeStream<'_> {
+    fn next(&mut self) -> BoxFuture<'_, Result<Option<ModelEvent>, Error>> {
+        Box::pin(async move {
+            self.step += 1;
+            if self.first && self.step == 1 {
+                if let Some(event) = &self.model.visible {
+                    return Ok(Some(event.clone()));
+                }
+            }
+            if self.first && self.step == 1 + usize::from(self.model.visible.is_some()) {
+                self.model.entered.notify_one();
+                self.model.release.notified().await;
+            }
+            if self.step <= 1 + usize::from(self.first && self.model.visible.is_some()) {
+                Ok(Some(ModelEvent::Complete {
+                    response: answer("done"),
+                }))
+            } else {
+                Ok(None)
+            }
+        })
+    }
+}
+impl StreamingModel for WakeModel {
+    fn stream<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            let first = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len() == 1
+            };
+            Ok(Box::new(WakeStream {
+                model: self,
+                first,
+                step: 0,
+            }) as Box<dyn ModelStream>)
+        })
+    }
+}
+
+#[test]
+fn immediate_signal_requires_poller_even_with_finalizer() {
+    for finalizer in [false, true] {
+        let result = Runner::new(
+            agent(TestModel::default().into()),
+            RunnerConfig {
+                immediate_input_signal: Some(Arc::new(WakeSignal::default())),
+                immediate_input_finalizer: finalizer.then(|| {
+                    Arc::new(ImmediateQueue::default()) as Arc<dyn ImmediateInputFinalizer>
+                }),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            result.err().unwrap().info.category,
+            ErrorCategory::InvalidInput
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_rebuilds_run_and_stream_at_one_turn_with_honest_attempts() {
+    for streaming in [false, true] {
+        for summary in [false, true] {
+            let model = Arc::new(WakeModel::default());
+            let queue = Arc::new(ImmediateQueue::default());
+            let signal = Arc::new(WakeSignal::default());
+            let generations = Arc::new(Generations::default());
+            let runner = Runner::new(
+                AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+                RunnerConfig {
+                    immediate_input_poller: Some(queue.clone()),
+                    immediate_input_signal: Some(signal.clone()),
+                    generation_observer: Some(generations.clone()),
+                    force_final_summary_turn: summary,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let drive = async {
+                if streaming {
+                    runner
+                        .stream(context(), request(1), Arc::new(TestHost::default()))
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(), request(1), Arc::new(TestHost::default()))
+                        .await
+                }
+            };
+            let steer = async {
+                model.entered.notified().await;
+                queue
+                    .polls
+                    .lock()
+                    .unwrap()
+                    .push_back(Ok(steering("new instructions")));
+                signal.wake.notify_one();
+            };
+            let (outcome, _) = tokio::join!(drive, steer);
+            let result = outcome.unwrap().result;
+            assert_eq!(result.metrics.unwrap().turns, 2);
+            assert_eq!(result.responses.len(), 1);
+            assert_eq!(result.usage.input_tokens, 10);
+            assert_eq!(model.drops.load(Ordering::SeqCst), 2);
+            assert_eq!(signal.drops.load(Ordering::SeqCst), 2);
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(
+                !requests[0]
+                    .input
+                    .contains(&message(Role::User, "new instructions"))
+            );
+            assert!(
+                requests[1]
+                    .input
+                    .contains(&message(Role::User, "new instructions"))
+            );
+            for request in requests.iter() {
+                assert_eq!(request.instructions.contains("<final_turn>"), summary);
+                if summary {
+                    assert!(request.tools.is_empty());
+                }
+            }
+            let records = generations.records.lock().unwrap();
+            assert_eq!(records.len(), 4);
+            assert_eq!(
+                records[1].1.status,
+                adk_runtime::tracing::GenerationStatus::Interrupted
+            );
+            assert_eq!(
+                records[3].1.status,
+                adk_runtime::tracing::GenerationStatus::Completed
+            );
+            assert_ne!(records[0].1.id, records[2].1.id);
+            assert_eq!((records[0].1.turn, records[2].1.turn), (1, 2));
+            assert!(records[1].1.response.is_none());
+            assert!(records[1].1.cost_usd.is_none());
+        }
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_never_replays_visible_text_or_reasoning_and_finalizer_drains() {
+    for visible in [
+        ModelEvent::TextDelta {
+            delta: "visible".into(),
+        },
+        ModelEvent::ReasoningDelta {
+            delta: "thinking".into(),
+        },
+    ] {
+        let model = Arc::new(WakeModel {
+            visible: Some(visible.clone()),
+            ..Default::default()
+        });
+        let queue = Arc::new(ImmediateQueue::default());
+        let signal = Arc::new(WakeSignal::default());
+        let host = Arc::new(TestHost::default());
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_signal: Some(signal.clone()),
+                immediate_input_finalizer: Some(queue.clone()),
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let steer = async {
+            model.entered.notified().await;
+            queue
+                .finals
+                .lock()
+                .unwrap()
+                .push_back(Ok(steering("late input")));
+            signal.wake.notify_one();
+            signal.consumed.notified().await;
+            assert_eq!(model.requests.lock().unwrap().len(), 1);
+            assert_eq!(model.drops.load(Ordering::SeqCst), 0);
+            model.release.notify_one();
+        };
+        let (result, _) = tokio::join!(
+            runner.stream(context(), request(1), host.clone()).finish(),
+            steer
+        );
+        let result = result.unwrap().result;
+        assert_eq!(result.responses.len(), 2);
+        assert!(
+            model.requests.lock().unwrap()[1]
+                .input
+                .contains(&message(Role::User, "late input"))
+        );
+        assert_eq!(
+            host.events
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|event| matches!(event, RunEvent::Model { event } if event == &visible))
+                .count(),
+            1
+        );
+        assert!(
+            generations
+                .records
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(ended, _)| *ended)
+                .all(|(_, record)| record.status
+                    == adk_runtime::tracing::GenerationStatus::Completed)
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_parent_cancel_deadline_and_stream_drop_cleanup() {
+    for mode in 0..3 {
+        let model = Arc::new(WakeModel::default());
+        let signal = Arc::new(WakeSignal::default());
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(Arc::new(ImmediateQueue::default())),
+                immediate_input_signal: Some(signal.clone()),
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let token = CancellationToken::new();
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token.clone());
+        if mode == 2 {
+            tokio::time::pause();
+            ctx.deadline = Some(Instant::now() + Duration::from_secs(1));
+        }
+        if mode == 1 {
+            let mut stream = runner.stream(ctx, request(1), Arc::new(TestHost::default()));
+            assert!(matches!(
+                stream.next().await,
+                Some(RunEvent::Started { .. })
+            ));
+            tokio::select! {
+                biased;
+                _ = stream.next() => panic!("unexpected output"),
+                _ = model.entered.notified() => {}
+            }
+            drop(stream);
+        } else {
+            let cancel = async {
+                model.entered.notified().await;
+                if mode == 2 {
+                    tokio::time::advance(Duration::from_secs(2)).await;
+                } else {
+                    token.cancel();
+                    signal.wake.notify_one();
+                }
+            };
+            let (result, _) = tokio::join!(
+                runner.run(ctx, request(1), Arc::new(TestHost::default())),
+                cancel
+            );
+            assert_eq!(
+                result.err().unwrap().error.info.category,
+                if mode == 2 {
+                    ErrorCategory::DeadlineExceeded
+                } else {
+                    ErrorCategory::Cancelled
+                }
+            );
+        }
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+        assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+        assert_eq!(signal.drops.load(Ordering::SeqCst), 1);
+        let records = generations.records.lock().unwrap();
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0].1.id, records[1].1.id);
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_keeps_child_turn_caps_and_shared_budget_charged() {
+    use adk_runtime::subagent::*;
+    for shared_cap in [false, true] {
+        let model = Arc::new(WakeModel::default());
+        let signal = Arc::new(WakeSignal::default());
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(Arc::new(ImmediateQueue::default())),
+                immediate_input_signal: Some(signal.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let baseline = SecurityBaseline::default();
+        let owner = Scheduler::new(
+            context(),
+            SchedulerConfig {
+                max_turns: NonZeroU32::new(if shared_cap { 3 } else { 1 }).unwrap(),
+                security: baseline.clone(),
+                agents: [("worker".into(), baseline)].into(),
+                budget: BudgetLimits {
+                    turns: shared_cap.then_some(1),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            Arc::new(RunnerChildExecutor::new(
+                [("worker".into(), child)].into(),
+                Arc::new(TestHost::default()),
+            )),
+            None,
+        )
+        .unwrap();
+        let handle = owner.handle();
+        let id = handle
+            .submit(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        model.entered.notified().await;
+        signal.wake.notify_one();
+        handle
+            .wait(std::slice::from_ref(&id), WaitMode::All, None)
+            .await
+            .unwrap();
+        let task = handle.status(&id, Detail::Full).unwrap();
+        assert_ne!(task.status, TaskStatus::Completed);
+        assert_eq!(task.usage.turns, 1);
+        assert_eq!(handle.snapshot().usage.turns, 1);
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+        assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_and_child_steering_share_one_rebuilt_request() {
+    use adk_runtime::subagent::*;
+    let model = Arc::new(WakeModel::default());
+    let signal = Arc::new(WakeSignal::default());
+    let queue = Arc::new(ImmediateQueue::default());
+    let child = Runner::new(
+        AgentConfig::new("worker", ModelBinding::complete("test", model.clone())),
+        RunnerConfig {
+            immediate_input_poller: Some(queue.clone()),
+            immediate_input_signal: Some(signal.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let baseline = SecurityBaseline::default();
+    let owner = Scheduler::new(
+        context(),
+        SchedulerConfig {
+            max_turns: NonZeroU32::new(3).unwrap(),
+            security: baseline.clone(),
+            agents: [("worker".into(), baseline)].into(),
+            ..Default::default()
+        },
+        Arc::new(RunnerChildExecutor::new(
+            [("worker".into(), child)].into(),
+            Arc::new(TestHost::default()),
+        )),
+        None,
+    )
+    .unwrap();
+    let handle = owner.handle();
+    let id = handle
+        .submit(Submission::new("worker", "start"))
+        .await
+        .unwrap();
+    model.entered.notified().await;
+    queue
+        .polls
+        .lock()
+        .unwrap()
+        .push_back(Ok(steering("host wake")));
+    signal.wake.notify_one();
+    handle.steer(&id, "steer-1", "child wake").await.unwrap();
+    handle
+        .wait(std::slice::from_ref(&id), WaitMode::All, None)
+        .await
+        .unwrap();
+    let task = handle.status(&id, Detail::Full).unwrap();
+    assert_eq!(task.status, TaskStatus::Completed);
+    assert_eq!(task.usage.turns, 2);
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        let input = serde_json::to_string(&requests[1].input).unwrap();
+        assert!(input.contains("host wake"));
+        assert!(input.contains("child wake"));
+    }
+    assert_eq!(model.drops.load(Ordering::SeqCst), 2);
+    assert_eq!(signal.drops.load(Ordering::SeqCst), 2);
+    owner.shutdown().await.unwrap();
+}

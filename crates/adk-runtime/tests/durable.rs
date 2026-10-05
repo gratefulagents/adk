@@ -2357,9 +2357,22 @@ impl ImmediateInputFinalizer for DurableImmediate {
     }
 }
 
+impl ImmediateInputSignal for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            std::future::pending().await
+        })
+    }
+}
+
 #[tokio::test]
 async fn immediate_input_durable_requires_keys_and_binds_each_callback() {
-    for finalizer in [false, true] {
+    for kind in 0..3 {
+        let finalizer = kind == 1;
         let (_, model, _) = setup(vec![message(Role::Assistant, "answer")], false, false);
         let agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
         let make_runner = |key| {
@@ -2369,7 +2382,14 @@ async fn immediate_input_durable_requires_keys_and_binds_each_callback() {
                 fail_after: None,
             });
             let mut config = RunnerConfig::default();
-            if finalizer {
+            if kind == 2 {
+                config.immediate_input_signal = Some(callback.clone());
+                config.immediate_input_poller = Some(Arc::new(DurableImmediate {
+                    key: Some("poll-v1"),
+                    calls: AtomicUsize::new(0),
+                    fail_after: None,
+                }));
+            } else if finalizer {
                 config.immediate_input_finalizer = Some(callback.clone());
             } else {
                 config.immediate_input_poller = Some(callback.clone());
@@ -2524,4 +2544,103 @@ async fn interrupted_immediate_admission_never_replays_queue_effects() {
             );
         }
     }
+}
+
+#[derive(Default)]
+struct DurableWake {
+    entered: tokio::sync::Notify,
+    wake: tokio::sync::Notify,
+    calls: AtomicUsize,
+}
+impl ImmediateInputSignal for DurableWake {
+    fn durable_key(&self) -> Option<&str> {
+        Some("wake-v1")
+    }
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(self.wake.notified())
+    }
+}
+impl Model for DurableWake {
+    fn provider(&self) -> &str {
+        "test"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            if self.calls.fetch_add(1, Ordering::SeqCst) == 0 {
+                self.entered.notify_one();
+                std::future::pending::<()>().await;
+            }
+            Ok(response(vec![message(Role::Assistant, "answer")]))
+        })
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_durable_refund_restores_but_dispatch_requires_reconciliation() {
+    let wake = Arc::new(DurableWake::default());
+    let poller = Arc::new(DurableImmediate {
+        key: Some("poll-v1"),
+        calls: AtomicUsize::new(0),
+        fail_after: None,
+    });
+    let runner = Runner::new(
+        AgentConfig::new("agent", ModelBinding::complete("model", wake.clone())),
+        RunnerConfig {
+            immediate_input_poller: Some(poller.clone()),
+            immediate_input_signal: Some(wake.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let notify = async {
+        wake.entered.notified().await;
+        wake.wake.notify_one();
+    };
+    let (result, _) = tokio::join!(
+        runner.run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone())
+        ),
+        notify
+    );
+    let result = result.unwrap().result;
+    assert_eq!(result.metrics.unwrap().turns, 2);
+    assert_eq!(result.responses.len(), 1);
+    assert_eq!(wake.calls.load(Ordering::SeqCst), 2);
+    req.input.clear();
+    let restored = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(store.latest())),
+        )
+        .await
+        .unwrap();
+    assert_eq!(restored.result.responses.len(), 1);
+    let error = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            durable(
+                Arc::new(Store::default()),
+                Some(store.at("model_dispatched")),
+            ),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(error.error.info.message.contains("reconciliation"));
+    assert_eq!(wake.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(poller.calls.load(Ordering::SeqCst), 2);
 }

@@ -1313,6 +1313,7 @@ impl Builder {
         self.runner.force_final_summary_turn = features.force_final_summary_turn;
         if self.config.features.is_some() && !features.immediate_input_polling {
             self.runner.immediate_input_poller = None;
+            self.runner.immediate_input_signal = None;
             self.runner.immediate_input_finalizer = None;
         }
         if !features.retry {

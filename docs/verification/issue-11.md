@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Independent managed-selection proof
+
+The managed selection matrix now compares against actual pinned public SDK
+`runtime.NewBuilder(...).Build(...)` output for all eight boolean combinations,
+not handwritten expected tool names. The independent generator records original
+SDK ordering and scheduler presence, closes owned resources, and rejects any
+provider request through a loopback trap. Rust compares tool-name sets; automatic
+SDK allocation and differing tool order remain outside the native ownership
+claim. All three handoff-module fixtures regenerate twice byte-for-byte; Go
+test/vet/build, scoped strict Clippy, **497 hash-bound Rust tests** and
+**13 evidence validators** pass.
+
+Only `AsyncSubAgentFeatures.any` (`SDK-6866B794E8FC3833`) is newly closed: its
+three-boolean truth table is exhausted. Full runtime/features/builder entries
+remain unresolved. The ledger is **197 verified / 8,694 unresolved / 251 excluded**.
+The validator requires a selection-specific pinned execution marker. Corrected
+implementation head `8feca21` has passed both Linux and macOS enforcing lanes and
+Windows unsupported-target lanes; those are actual CI observations, distinct
+from the worker's local fail-closed checks. Full issue acceptance is not claimed.
+
 ### Managed subagent selection and CI correction
 
 `Features::subagents` now exposes independent Task, Status and Control groups via

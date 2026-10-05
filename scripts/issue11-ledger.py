@@ -120,6 +120,8 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "fixtures/handoff/sdk-handoff-filter.json",
                "scripts/handoff-reference/catalog.go", "scripts/handoff-reference/catalog_scenarios.go",
                "scripts/handoff-reference/catalog_test.go", "fixtures/handoff/sdk-catalog-handoffs.json",
+               "scripts/handoff-reference/subagents.go", "scripts/handoff-reference/subagents_test.go",
+               "fixtures/handoff/sdk-subagent-selection.json",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -265,6 +267,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust fileconfig evidence requires independently executed pinned fixtures")
     if f"handoff reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust handoff evidence requires independently executed pinned fixtures")
+    if f"subagent selection reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust subagent selection evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

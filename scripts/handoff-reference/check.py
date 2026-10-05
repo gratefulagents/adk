@@ -63,6 +63,17 @@ def main():
           f"{sum(len(c['output']['specialists'] or {}) for c in cases)} specialist entries, "
           f"{sum(len(c['output']['handoffs'] or []) for c in cases)} handoffs, "
           f"{sum(bool(c['source_only']) for c in cases)} source-only cases")
+    expected = (ROOT / "fixtures/handoff/sdk-subagent-selection.json").read_bytes()
+    fixture = json.loads(expected)
+    if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:
+        sys.exit("Unexpected subagent fixture revision/schema")
+    for attempt in range(2):
+        check_sdk()
+        if run([GO, "run", "-mod=readonly", ".", "subagents"]) != expected:
+            sys.exit(f"sdk-subagent-selection.json differs from pinned Go regeneration (pass {attempt + 1})")
+    check_sdk()
+    print(f"Verified sdk-subagent-selection.json twice, byte-for-byte: {len(fixture['cases'])} public builder selections")
+    print(f"subagent selection reference verified at {PIN}")
     print(f"handoff reference verified at {PIN}")
 
 

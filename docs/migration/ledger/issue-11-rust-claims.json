@@ -2,6 +2,22 @@
   "schema_version": 1,
   "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "claims": {
+    "SDK-6866B794E8FC3833": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.any",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::enabled"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Only the three-boolean any-enabled predicate is closed. Independent execution of the pinned public runtime builder records all eight Task/Status/Control combinations, actual tool names and scheduler presence. The native comparator verifies all eight selection inputs, tool-name sets, and that every nonempty selection requires an injected scheduler while all-off does not. This exhausts the predicate truth table; it does not claim SDK automatic scheduler allocation, tool ordering, complete feature/config serialization, catalog registration or whole-builder parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
     "SDK-32E4C5FF719DCB40": {
       "source": "pkg/agentsdk/tracestore/trace_store.go",
       "source_name": "ErrTraceCategoryFull",

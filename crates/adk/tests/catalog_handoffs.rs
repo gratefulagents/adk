@@ -663,15 +663,27 @@ fn session() -> SessionState {
     )
 }
 #[tokio::test]
-async fn managed_subagent_feature_matrix_is_explicit_and_session_owned() {
-    for mask in 0..8 {
+async fn managed_subagent_feature_matrix_matches_pinned_public_builder() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-subagent-selection.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    assert_eq!(fixture["schema_version"], 1);
+    let cases = fixture["cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 8);
+    for (mask, case) in cases.iter().enumerate() {
         let selection = SubagentFeatures {
-            task: mask & 1 != 0,
-            status: mask & 2 != 0,
-            control: mask & 4 != 0,
+            task: case["selection"]["task"].as_bool().unwrap(),
+            status: case["selection"]["status"].as_bool().unwrap(),
+            control: case["selection"]["control"].as_bool().unwrap(),
         };
+        assert_eq!(case["scheduler"], mask != 0);
         let mut c = config();
-        c.features.as_mut().unwrap().subagents = selection.clone();
+        c.features.as_mut().unwrap().subagents = selection;
         let model = Script::new(vec![]);
         let result = builder(c.clone(), &model).build(&context()).await;
         if mask == 0 {
@@ -697,15 +709,12 @@ async fn managed_subagent_feature_matrix_is_explicit_and_session_owned() {
             .iter()
             .map(|t| t.definition().name.as_str())
             .collect();
-        let expected: std::collections::BTreeSet<_> = [
-            (selection.task, "subagent"),
-            (selection.task, "subagent_wait"),
-            (selection.status, "subagent_status"),
-            (selection.control, "subagent_control"),
-        ]
-        .into_iter()
-        .filter_map(|(on, name)| on.then_some(name))
-        .collect();
+        let expected: std::collections::BTreeSet<_> = case["tools"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|name| name.as_str().unwrap())
+            .collect();
         assert_eq!(actual, expected, "mask={mask}");
         assert!(bundle.specialists()["reviewer"].tools.is_empty());
         assert!(Arc::ptr_eq(

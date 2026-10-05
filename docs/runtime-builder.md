@@ -401,6 +401,13 @@ preflight validation, feature/generic gates, read-only mutation denial, signal/t
 stripping, graph allowlists, name collisions, and saved-handle revocation.
 No provider credentials, external service, or platform adapter is needed.
 
+The eight managed-subagent feature combinations compare tool-name sets with
+`fixtures/handoff/sdk-subagent-selection.json`, independently generated through
+the pinned public SDK `runtime.NewBuilder(...).Build(...)`. The fixture records
+original SDK ordering; Rust's registry ordering is intentionally not compared.
+Explicit native scheduler ownership and host-policy/exclusion checks remain
+separate lifecycle assertions rather than claims of automatic SDK allocation.
+
 ### Bounded catalog oracle comparison
 
 `bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle` reads

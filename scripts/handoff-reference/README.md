@@ -315,3 +315,31 @@ Additional immutable-pin source paths:
 - `internal/agent/mode_routing.go`: mode/role model routing and settings.
 - `internal/agent/handoff.go`: public definition and read-only tool adapter.
 - `pkg/agentsdk/tools/shell/bash.go`: real Bash read-only access adapter.
+
+## Managed subagent feature selection
+
+`go run -mod=readonly . subagents` generates
+`fixtures/handoff/sdk-subagent-selection.json` by executing the public
+`runtime.NewBuilder(config).Build(context)` for all eight Task/Status/Control
+combinations. Unlike the catalog projection, this exercises the stage that
+attaches managed subagent tools. Each configuration supplies one catalog role,
+no ordinary tool features and an explicit temporary workspace. A synthetic test
+API-key placeholder and a loopback HTTP trap isolate provider configuration;
+no inference, task spawning or external credentials are used, and any provider
+request makes generation fail. All bundle closers are called before recording
+the next case. The checker regenerates this third fixture twice too.
+
+The output records the actual ordered `bundle.Tools` names and whether the SDK
+created a session scheduler. Rust compares the **name sets**, not tool ordering,
+across all eight selections. Its registry sorts names, whereas the SDK adapter
+order is preserved verbatim in this fixture. Native tests also require an
+explicit host-owned scheduler for every nonempty selection and check retained
+ownership; these are native lifecycle assertions, not claims of equivalent SDK
+automatic allocation. Descriptor schemas, actual child execution and complete
+Builder output remain outside this narrow comparison.
+
+`subagents.go` and `subagents_test.go` use the same pinned module and
+GPL-3.0-only provenance policy as the other harness files. Inspected upstream
+sources are `pkg/agentsdk/runtime/{builder,features}.go` at the pin above,
+particularly `attachAsyncSubAgentTools` and `asyncSubAgentToolNames`. The generator
+invokes the exported builder instead of reimplementing either selector.

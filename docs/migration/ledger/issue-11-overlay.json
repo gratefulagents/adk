@@ -33,8 +33,8 @@
       },
       "configuration": {
         "excluded": 6,
-        "unresolved": 243,
-        "verified": 4
+        "unresolved": 242,
+        "verified": 5
       },
       "defaults": {
         "excluded": 2,
@@ -90,8 +90,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8695,
-    "verified": 196
+    "unresolved": 8694,
+    "verified": 197
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -12417,7 +12417,7 @@
     "SDK-685DFFB3D7A1553B": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.DurableCheckpointHook@pkg/agentsdk/aliases.go", "proposed_rust_module": "sdk::durable", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/aliases.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::durable", "verification_status": "not_run"},
     "SDK-685F2F516BF68E97": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/runtime.Config.TracingProcessor@pkg/agentsdk/runtime/builder.go", "proposed_rust_module": "sdk::runtime", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/runtime/builder.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::runtime", "verification_status": "not_run"},
     "SDK-6860E823CF83FBE2": {"approved_divergence_reference": null, "category": "configuration", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "configuration:pkg/agentsdk/mcp/snapshot.go:ConfigSnapshot.VerifyUnchanged", "proposed_rust_module": "sdk::mcp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/mcp/snapshot.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::mcp", "verification_status": "not_run"},
-    "SDK-6866B794E8FC3833": {"approved_divergence_reference": null, "category": "configuration", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "configuration:pkg/agentsdk/runtime/features.go:AsyncSubAgentFeatures.any", "proposed_rust_module": "sdk::runtime", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/runtime/features.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::runtime", "verification_status": "not_run"},
+    "SDK-6866B794E8FC3833": {"approved_divergence_reference": null, "category": "configuration", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Only the three-boolean any-enabled predicate is closed. Independent execution of the pinned public runtime builder records all eight Task/Status/Control combinations, actual tool names and scheduler presence. The native comparator verifies all eight selection inputs, tool-name sets, and that every nonempty selection requires an injected scheduler while all-off does not. This exhausts the predicate truth table; it does not claim SDK automatic scheduler allocation, tool ordering, complete feature/config serialization, catalog registration or whole-builder parity.", "implementation_symbols": ["crates/adk/src/builder.rs::SubagentFeatures::enabled"], "ledger_record_id": "configuration:pkg/agentsdk/runtime/features.go:AsyncSubAgentFeatures.any", "proposed_rust_module": "sdk::runtime", "rust_test_identifiers": ["managed_subagent_feature_matrix_matches_pinned_public_builder"], "scope": "in_scope", "semantic_closure": "verified", "source": "pkg/agentsdk/runtime/features.go", "target_features": ["x86_64-unknown-linux-gnu", "builder"], "upstream_regression_reference_group": "verification_groups:sdk::runtime", "verification_status": "passed"},
     "SDK-6866F9091E61E780": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/durable.PostgresStore.redactor@pkg/agentsdk/durable/postgres.go", "proposed_rust_module": "sdk::durable", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/durable/postgres.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::durable", "verification_status": "not_run"},
     "SDK-68785EC70B35D308": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/memory.Memory.Similarity@pkg/agentsdk/memory/store.go", "proposed_rust_module": "sdk::memory", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/memory/store.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::memory", "verification_status": "not_run"},
     "SDK-687EE74AB67501A1": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/modelsdev.Resolver.client@pkg/agentsdk/modelsdev/modelsdev.go", "proposed_rust_module": "sdk::models_dev", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/modelsdev/modelsdev.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::models_dev", "verification_status": "not_run"},

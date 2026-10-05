@@ -335,6 +335,7 @@ async fn replay(script: &Value) -> Value {
         let mut target = AgentConfig::new("target", binding);
         target.instructions = "Follow the replay script.".into();
         agent.handoffs = vec![adk_runtime::Handoff {
+            input_filter: Default::default(),
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "Transfer".into(),

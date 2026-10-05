@@ -664,6 +664,7 @@ async fn wire_bridge_preserves_pause_continuation_and_projects_handoff_outputs_i
     let after = TestTool::new("after", true, false, false, false);
     source.tools = vec![before.clone(), after.clone()];
     source.handoffs = vec![Handoff {
+        input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
             .clone(),
@@ -879,6 +880,7 @@ async fn handoff_skipped_siblings_preserve_but_do_not_advance_tool_error_streak(
     let skipped = TestTool::new("skip", true, false, false, false);
     source.tools = vec![skipped.clone()];
     source.handoffs = vec![Handoff {
+        input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
             .clone(),
@@ -917,6 +919,7 @@ async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
     ));
     let mut agent = AgentConfig::new("source", ModelBinding::complete("source", model.clone()));
     agent.handoffs = vec![Handoff {
+        input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
             .clone(),

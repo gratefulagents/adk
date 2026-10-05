@@ -2,6 +2,38 @@
 
 ## Current continuation evidence
 
+### Catalog-handoff checkpoint
+
+The builder now composes explicit catalog handoffs, independent of managed
+subagents, with shared provider routes, per-role routing/access, owner-bound tool
+views and explicit bundle/session lifetimes. Runtime history filtering preserves
+audit records and provenance while clearing forwarded approval anchors. A
+regression verifies that a failing history-replacement hook cannot return a
+journal/history mismatch. See [composition boundaries](../handoff-composition.md)
+and [builder documentation](../runtime-builder.md).
+
+Fresh Rust 1.88.0/Linux x86_64 verification: **1,100 passed, 0 failed, 30 ignored**
+across workspace tests and doctests; strict workspace Clippy, Rustfmt, rustdoc,
+facade matrix, platform-free standalone consumer, **20 offline feature scenarios**
+and the host-session example passed. The example script's Clippy launcher still
+panics because this worker lacks `/proc/self/exe`; direct-driver warning-denied
+workspace/all-target checks and separate example build/runs passed. This is not a
+claim that the unmodified example script exited successfully.
+
+The independent pinned Go oracle regenerates both fixtures twice byte-for-byte:
+23 filter cases (15 native-compatible, eight source-only), and 30 catalog cases
+(ten compared through the documented bounded native projection, not all 30).
+Go tests, vet, build and formatting pass. Hash-bound evidence runs **495 Rust
+tests, 0 failed**, and **12 evidence-validator tests** pass. Source locks and the
+overlay validate without changes to the immutable inventory. The ledger remains
+**196 verified / 8,695 unresolved / 251 excluded**; no aggregate handoff parity
+claim is closed by these bounded comparisons. Successful native OS confinement,
+non-Linux targets and credential-dependent live services remain unverified in
+this worker. Independent re-review of the final integrated checkpoint has not
+been obtained. PR33 remains draft; issue #11 is incomplete.
+
+### Previous fileconfig checkpoint
+
 The fileconfig claim audit closes five bounded ledger entries: the public and
 configuration records for the pure directive formatter, plus the pinned builtin,
 builtin-override and traversal-rejection regressions. Exact formatter bytes and

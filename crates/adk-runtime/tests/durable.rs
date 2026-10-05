@@ -74,6 +74,7 @@ impl Host for HostImpl {
     }
 }
 struct ModelImpl {
+    requests: Mutex<Vec<ModelRequest>>,
     responses: Mutex<VecDeque<ModelResponse>>,
     calls: AtomicUsize,
     fail: bool,
@@ -85,9 +86,10 @@ impl Model for ModelImpl {
     fn complete<'a>(
         &'a self,
         _: &'a Context,
-        _: ModelRequest,
+        request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
+            self.requests.lock().unwrap().push(request);
             self.calls.fetch_add(1, Ordering::SeqCst);
             if self.fail {
                 return Err(Error::new(ErrorCategory::Provider, "ambiguous failure"));
@@ -191,6 +193,7 @@ fn setup(
     model_fail: bool,
 ) -> (Runner, Arc<ModelImpl>, Arc<ToolImpl>) {
     let model = Arc::new(ModelImpl {
+        requests: Mutex::new(vec![]),
         responses: Mutex::new(VecDeque::from([
             response(items),
             response(vec![message(Role::Assistant, "answer")]),
@@ -749,6 +752,7 @@ async fn cumulative_turn_token_and_cost_limits_remain_exhausted_after_go_migrati
     }
     for budget in ["turn", "token", "cost"] {
         let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
             responses: Mutex::new(VecDeque::new()),
             calls: AtomicUsize::new(0),
             fail: false,
@@ -1165,6 +1169,7 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
                 AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
+                input_filter: Default::default(),
                 definition: ToolDefinition {
                     name: "transfer_to_target".into(),
                     description: "".into(),
@@ -1222,6 +1227,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     );
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
+        input_filter: Default::default(),
         definition: ToolDefinition {
             name: "transfer".into(),
             description: "".into(),
@@ -1735,6 +1741,7 @@ async fn durable_guardrails_require_stable_keys_and_completed_recovery_preserves
     let calls = Arc::new(AtomicUsize::new(0));
     let make_runner = |key| {
         let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
             responses: Mutex::new(VecDeque::from([response(vec![message(
                 Role::Assistant,
                 "done",
@@ -2036,4 +2043,204 @@ async fn compatibility_projection_survives_actual_checkpoint_and_completed_resum
         }
     }
     assert_eq!(count, 15);
+}
+
+#[tokio::test]
+async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configuration_changes() {
+    for filter in [
+        HandoffInputFilter::Preserve,
+        HandoffInputFilter::RemoveTools,
+    ] {
+        let (_, model, _) = setup(
+            vec![
+                RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "thinking".into(),
+                        ..Default::default()
+                    },
+                },
+                message(Role::Assistant, "transfer now"),
+                RunItem::ToolCall {
+                    call: ToolCall {
+                        id: "transfer".into(),
+                        name: "transfer".into(),
+                        arguments: json!({}),
+                    },
+                },
+            ],
+            false,
+            false,
+        );
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+        agent.handoffs.push(Handoff {
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: true,
+                requires_approval: true,
+            },
+            target: Arc::new(AgentConfig::new(
+                "target",
+                ModelBinding::complete("model", model.clone()),
+            )),
+            input_filter: filter,
+        });
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let failure = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(failure.error.info.message, "injected persistence failure");
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let checkpoint = store.latest();
+        assert_eq!(checkpoint.execution_boundary(), "handoff_completed");
+        assert_eq!(checkpoint.agent_name, "target");
+        let snapshot = serde_json::to_value(&checkpoint).unwrap();
+        let state = &snapshot["runtime"];
+        let before: RunResult = serde_json::from_value(state["result"].clone()).unwrap();
+        assert_eq!(before.usage.input_tokens, 10);
+        assert_eq!(before.usage.output_tokens, 2);
+        assert_eq!(before.usage.requests, 1);
+        assert_eq!(before.new_items.len(), 4);
+        assert_eq!(before.responses.len(), 1);
+        assert_eq!(state["approval_journal"].as_array().unwrap().len(), 1);
+        if filter == HandoffInputFilter::RemoveTools {
+            assert_eq!(
+                before.history,
+                vec![
+                    message(Role::User, "go"),
+                    message(Role::Assistant, "transfer now")
+                ]
+            );
+            assert_eq!(
+                before.history_provenance,
+                vec![
+                    ItemProvenance::Unknown,
+                    ItemProvenance::Agent {
+                        name: "agent".into()
+                    }
+                ]
+            );
+            assert_eq!(
+                before.usage.context_tokens,
+                Some(compaction::estimate_history_tokens(&before.history))
+            );
+            assert!(state["approval_journal"][0]["history_before"].is_null());
+            assert_eq!(checkpoint.history.len(), 2);
+        } else {
+            assert_eq!(before.history.len(), 5);
+            assert!(state["approval_journal"][0]["history_before"].is_number());
+            assert_eq!(checkpoint.history.len(), 6);
+        }
+        agent.handoffs[0].input_filter = if filter == HandoffInputFilter::RemoveTools {
+            HandoffInputFilter::Preserve
+        } else {
+            HandoffInputFilter::RemoveTools
+        };
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        for cp in [store.at("run_started"), checkpoint.clone()] {
+            let error = run(&changed, Arc::new(Store::default()), Some(cp))
+                .await
+                .err()
+                .unwrap();
+            assert!(
+                error
+                    .error
+                    .info
+                    .message
+                    .contains("configuration or security policy changed")
+            );
+        }
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let result = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+            .await
+            .unwrap();
+        assert_eq!(result.result.status, RunStatus::Completed);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests[1].input, before.history);
+        assert_eq!(requests[1].input_provenance, before.history_provenance);
+        assert_eq!(&result.result.new_items[..4], before.new_items);
+        assert_eq!(result.result.responses[0], before.responses[0]);
+        assert_eq!(result.result.usage.input_tokens, 20);
+    }
+}
+
+#[tokio::test]
+async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_definitions() {
+    for ceiling in [
+        None,
+        Some(AccessMode::ReadOnly),
+        Some(AccessMode::FullAccess),
+    ] {
+        let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
+            responses: Mutex::new(VecDeque::from([
+                response(vec![RunItem::ToolCall {
+                    call: ToolCall {
+                        id: "transfer".into(),
+                        name: "transfer".into(),
+                        arguments: json!({}),
+                    },
+                }]),
+                response(vec![message(Role::Assistant, "done")]),
+            ])),
+            calls: AtomicUsize::new(0),
+            fail: false,
+        });
+        let mut target = AgentConfig::new("target", ModelBinding::complete("model", model.clone()));
+        target.tool_access_ceiling = ceiling;
+        let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
+        parent.handoffs.push(Handoff {
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "transfer".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: true,
+                requires_approval: false,
+            },
+            target: Arc::new(target),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let runner = Runner::new(parent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let failure = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(failure.error.info.message, "injected persistence failure");
+        let checkpoint = store.latest();
+        assert_eq!(checkpoint.agent_name, "target");
+        for changed_ceiling in [
+            None,
+            Some(AccessMode::ReadOnly),
+            Some(AccessMode::WorkspaceWrite),
+            Some(AccessMode::FullAccess),
+        ] {
+            if changed_ceiling == ceiling {
+                continue;
+            }
+            let mut changed = parent.clone();
+            Arc::make_mut(&mut changed.handoffs[0].target).tool_access_ceiling = changed_ceiling;
+            let changed = Runner::new(changed, RunnerConfig::default()).unwrap();
+            for checkpoint in [store.at("run_started"), checkpoint.clone()] {
+                let error = run(&changed, Arc::new(Store::default()), Some(checkpoint))
+                    .await
+                    .err()
+                    .unwrap();
+                assert!(
+                    error
+                        .error
+                        .info
+                        .message
+                        .contains("configuration or security policy changed")
+                );
+            }
+        }
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let result = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+            .await
+            .unwrap();
+        assert_eq!(result.result.status, RunStatus::Completed);
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    }
 }

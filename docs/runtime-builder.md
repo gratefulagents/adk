@@ -113,6 +113,9 @@ Go `ModelSettings::Merge` codec.
   extras remain gated. Legacy `enable_subagents` in `legacy_tools` retains the
   registry's signal/extra-tool behavior; it does **not** automatically create a
   scheduler.
+* `handoffs` and `handoff_generic_fallback` are separate opt-ins, both off in
+  strict and legacy defaults. They neither require nor enable `subagents`, a
+  scheduler, or `ExtraTools`.
 
 ## Host and file configuration
 
@@ -216,8 +219,8 @@ these documents.
 3. Enabled mode routing replaces nonempty model/reasoning/verbosity fields and
    merges setting keys. An absent fallback list inherits; an explicit empty
    list clears fallbacks. Mode instructions append to base instructions.
-4. The active role appends instructions, supplies its nonempty model override,
-   and narrows access. Explicit `Config::roles` override source roles by name.
+4. The active role appends instructions, supplies its nonempty model override
+   and optional programmatic fallback override, and narrows access. Explicit `Config::roles` override source roles by name.
 5. Enabled per-role mode routing wins over the role model and general mode
    routing. Its settings override earlier keys. `parallel_tool_calls` is always
    set from the resolved feature selection last.
@@ -228,6 +231,60 @@ workspace-write baseline. Go's `full` tool-access spelling maps to
 `full-access` is available but still cannot widen the host policy. `maxTurns`
 is a positive cap intersected with the host cap, not permission to increase it.
 `maxRetries` only has an effect when retries are enabled, and zero disables them.
+
+## Catalog handoff composition
+
+Enable `Features { handoffs: true, ..Default::default() }` and supply catalog
+roles through `Config::roles` or `ConfigSource`. `Bundle::specialists()` exposes
+an immutable map of role names to `Arc<AgentConfig>` targets. Parent handoffs
+retain source order: host entries first, explicit config replaces entries in
+place by trimmed name, and new config entries append. File catalogs already
+arrive sorted by name.
+
+Each target starts from the **configured base**, not the active parent role's
+mutated model/settings/instructions. Its routing order is base → role model and
+fallbacks → mode defaults → mode role override. The last two steps require
+`mode_model_routing`; role overrides do not. `RoleSpec::fallback_models` is a
+programmatic `Option<Vec<String>>`, default `None`. Like native mode routing,
+`Some(vec![])` explicitly clears inherited fallbacks, unlike pinned Go's
+nonempty-only fallback replacement. The shared Markdown/frontmatter parser is
+unchanged and rejects new fallback fields. Every enabled target model/fallback
+resolves against the same shared `Routes` before tool resources are created;
+there is no credential fetch or provider discovery.
+
+Targets preserve their role instruction text verbatim (no parent or mode prompt blocks),
+cloned input/output guardrails, and owner-bound role tool views. Their explicit
+`tool_access_ceiling` intersects host, mode, active-parent-role, and target-role
+access and removes mutation exceptions. `finish`, `present_plan`,
+`AskUserQuestion`, and all generated managed scheduler tool names are removed.
+Parent tools remain unchanged. Role views share the existing resource owner,
+not new tool bundles. Saved handles are revoked on bundle close/drop.
+
+Only the parent receives `transfer_to_*` handoffs with `RemoveTools`. Transfer
+descriptions use the trimmed role description or the SDK default. Names use the
+source sanitization: lowercase ASCII letters/digits survive; spaces, hyphens,
+underscores and dots become underscores; other characters are dropped; leading
+and trailing underscores are removed; an empty result becomes `specialist`.
+Blank names/instructions, duplicates within either catalog, sanitized collisions,
+and collisions with enabled parent tools fail construction rather than silently
+creating a generic fallback. The graph allowlist includes ordinary tools and
+transfers but intersects the **original** host allowlist/denylist; an explicit
+empty allowlist stays empty. Denied transfers are not advertised or described as
+available delegation options.
+
+For an empty catalog only, additionally enabling `handoff_generic_fallback`
+creates a tool-less `specialist` using the SDK handoff prompt and transfer
+description, the configured base model/settings, and no fallback bindings.
+Otherwise an empty catalog produces no handoffs. The generic target also carries
+the host guardrails and access ceiling.
+
+**Intentional gate divergence:** pinned SDK `BuildAgentWithSpecialists` builds
+catalog targets behind its subagent gate, then attaches handoffs. Native catalog
+handoffs are independent of scheduler/subagent selection. No agents-as-tools,
+nested/return handoffs, or scheduler role registration are created. The parent
+delegation guidance describes a transfer of conversation ownership, not an
+unavailable nested task API. See [handoff composition contracts](handoff-composition.md)
+for runtime filtering and access-ceiling details.
 
 ## Bundle and session lifecycle
 
@@ -315,14 +372,14 @@ Go `Config` wire codec or a claim of full Go runtime parity.
 | Compaction | Explicitly gated; otherwise retains native runner policy/custom compactor. No Go provider metadata discovery or synthesized handoff-history policy. |
 | Files | YAML/YML/JSON mode specs and CRD-shaped envelopes; Markdown/YAML role frontmatter; built-in chat/plan and deterministic overrides. Unsupported fields and invalid/zero turn limits fail rather than silently falling back. |
 | Constraints | `maxTurns` and `maxRetries` supported. Go `subAgentMaxTurns`, `maxConcurrentSubAgents`, and `maxRuntimeMinutes` are rejected in mode files; configure child scheduler limits and context deadlines explicitly. |
-| Roles | One selected role per bundle, including mode role routing. No automatic specialist agent graph, generic handoff fallback, or agent-as-tool generation. Existing native runner/scheduler APIs remain available to host code. |
+| Roles | Active-parent role routing plus opt-in parent-to-catalog handoffs and tool-less empty-catalog fallback. Native handoff gating is independent of subagents; no agent-as-tool generation, nested graph, or scheduler registration. |
 | Runtime adapters | No automatic MCP discovery, project-state priming/store discovery, security guardrail installation, forced final summary, polling, tracing/event writer, or persistent ChatLoop. Supply explicit tools, native runner hooks, and native `Host` callbacks. Unsupported runtime features are not represented as inert booleans. |
 | Lifecycle | Explicit ownership improves on Go's warn-and-continue tool setup: construction errors fail closed. Shared state is not accidentally closed by a turn bundle. No detached background cleanup is introduced. |
 
 ## Offline verification
 
 ```sh
-cargo test -p adk --features builder --test builder
+cargo test -p adk --features builder --test builder --test catalog_handoffs
 cargo check -p adk --features builder
 ```
 
@@ -332,4 +389,32 @@ preparation/dispatch, isolated missing/empty/relative HOME rejection, explicit
 host roots, YAML/role loading and rejection, mode/role
 precedence, opaque provider routing, fallback validation, cancellation/deadlines,
 escaped stream revocation, shared-session rebuilds, and adopted scheduler cleanup.
+Catalog tests also cover actual run/stream transfers, role routing independence,
+preflight validation, feature/generic gates, read-only mutation denial, signal/task
+stripping, graph allowlists, name collisions, and saved-handle revocation.
 No provider credentials, external service, or platform adapter is needed.
+
+### Bounded catalog oracle comparison
+
+`bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle` reads
+`fixtures/handoff/sdk-catalog-handoffs.json` generated independently from the
+pinned SDK. It compares ten explicitly selected cases: ordered handoff names,
+descriptions/read-only flags, filter presence, target names/instructions/models,
+ordered fallback lists, model settings and catalog target pointer identity.
+SDK nil and empty fallback slices both map to native empty vectors. SDK scalar
+MaxTokens maps to the native `max_tokens` settings entry. Tool surfaces and their
+ordering, parent prompts/routing, MCP fields, full Agent serialization and actual
+filter outputs are **not** part of this comparator; separate native run/stream,
+policy and lifecycle tests cover execution. No excluded case counts as a pass.
+The selected cases are named in the test; seven source-only cases and the other
+thirteen unselected cases remain outside this comparison.
+
+Additional native differences are deliberate: `Config::settings` maps are
+honored whereas this SDK builder uses scalar settings only; unknown role access
+strings fail instead of becoming read-only; disabled ExtraTools cannot supply
+target tools; the immutable specialist getter includes the generic target while
+the SDK specialist map does not. Native tools retain the registry's deterministic
+name ordering rather than injected host order. Native strict catalog validation,
+independent handoff gating, explicit-empty fallback clearing and handoff-only
+parent guidance are not normalized into SDK parity claims. Exact-case signal
+stripping leaves differently cased host names such as `Finish` intact.

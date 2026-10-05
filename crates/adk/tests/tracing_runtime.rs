@@ -516,6 +516,7 @@ async fn runner_handoff_switches_generation_parent_on_shared_root() {
     let mut source = agent("source", vec![response(vec![RunItem::ToolCall { call }])]);
     source.instructions = "source instructions".into();
     source.handoffs.push(Handoff {
+        input_filter: Default::default(),
         definition: definition("transfer"),
         target,
     });

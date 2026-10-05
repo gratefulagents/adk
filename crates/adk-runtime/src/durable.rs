@@ -685,6 +685,22 @@ impl Runner {
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
             });
+            if let Some(ceiling) = agent.tool_access_ceiling {
+                entry["tool_access_ceiling"] = serde_json::json!(ceiling);
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.input_filter != HandoffInputFilter::Preserve)
+            {
+                entry["handoff_input_filters"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff.input_filter)
+                        .collect::<Vec<_>>()
+                );
+            }
             if !agent.input_guardrails.is_empty() || !agent.output_guardrails.is_empty() {
                 entry["guardrails"] = serde_json::json!({"input": agent.input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": agent.output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
             }

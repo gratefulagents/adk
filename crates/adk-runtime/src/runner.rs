@@ -81,10 +81,23 @@ impl ModelBinding {
     }
 }
 
+/// Model-facing history selection after a transfer; never erases the audit record.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HandoffInputFilter {
+    /// Retain prior behavior, including tool and reasoning history.
+    #[default]
+    Preserve,
+    /// Retain messages and compaction with exact provenance; remove tool,
+    /// handoff and reasoning items and clear forwarded approval markers.
+    RemoveTools,
+}
+
 #[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
+    pub input_filter: HandoffInputFilter,
 }
 
 pub trait OutputParser: Send + Sync {
@@ -98,6 +111,8 @@ pub struct AgentConfig {
     pub model: ModelBinding,
     pub fallbacks: Vec<ModelBinding>,
     pub tools: Vec<Arc<dyn Tool>>,
+    /// Narrows host access and disables host mutation exceptions when set.
+    pub tool_access_ceiling: Option<AccessMode>,
     pub handoffs: Vec<Handoff>,
     pub output_schema: Option<schemars::Schema>,
     pub output_schema_name: String,
@@ -117,6 +132,7 @@ impl AgentConfig {
             model,
             fallbacks: vec![],
             tools: vec![],
+            tool_access_ceiling: None,
             handoffs: vec![],
             output_schema: None,
             output_schema_name: "final_output".into(),
@@ -1650,7 +1666,9 @@ impl Engine {
             .iter()
             .map(|tool| (tool.definition(), tool.timeout()))
             .chain(self.agent.handoffs.iter().map(|h| (&h.definition, None)))
-            .filter(|(definition, _)| self.policy.tools.decision(definition) != ToolDecision::Deny)
+            .filter(|(definition, _)| {
+                self.effective_tool_policy().decision(definition) != ToolDecision::Deny
+            })
             .map(|(definition, timeout)| (definition.clone(), timeout))
             .unzip();
         let mut instructions = if self.config.cache_prefix.is_empty() {
@@ -2427,18 +2445,30 @@ impl Engine {
             }
         }
     }
+    fn effective_tool_policy(&self) -> ToolPolicy {
+        let mut policy = self.policy.tools.clone();
+        if let Some(ceiling) = self.agent.tool_access_ceiling {
+            policy.access = match (policy.access, ceiling) {
+                (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
+                (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
+                    AccessMode::WorkspaceWrite
+                }
+                _ => AccessMode::FullAccess,
+            };
+            policy.allowed_mutating_tools.clear();
+        }
+        policy
+    }
     fn tools_for_access(&self) -> Vec<Arc<dyn Tool>> {
+        let access = self.effective_tool_policy().access;
         self.agent
             .tools
             .iter()
-            .map(|tool| {
-                tool.for_access(self.policy.tools.access)
-                    .unwrap_or_else(|| tool.clone())
-            })
+            .map(|tool| tool.for_access(access).unwrap_or_else(|| tool.clone()))
             .collect()
     }
     fn tool_decision(&self, definition: &ToolDefinition) -> ToolDecision {
-        let decision = self.policy.tools.decision(definition);
+        let decision = self.effective_tool_policy().decision(definition);
         if decision == ToolDecision::Allow
             && self.config.approve_mutating_tools
             && !definition.read_only
@@ -2591,9 +2621,9 @@ impl Engine {
         let definition = tool
             .map(|t| t.definition())
             .or_else(|| handoff.map(|h| &h.definition));
-        if definition
-            .is_none_or(|definition| self.policy.tools.decision(definition) == ToolDecision::Deny)
-        {
+        if definition.is_none_or(|definition| {
+            self.effective_tool_policy().decision(definition) == ToolDecision::Deny
+        }) {
             let output = ToolOutput {
                 content: vec![Content::Text {
                     text: format!("unknown tool: {}", call.name),
@@ -2727,6 +2757,35 @@ impl Engine {
                 }
             }
             self.publish_committed().await?;
+            if handoff.input_filter == HandoffInputFilter::RemoveTools {
+                let (history, provenance): (Vec<_>, Vec<_>) = self
+                    .result
+                    .history
+                    .iter()
+                    .zip(&self.result.history_provenance)
+                    .filter(|(item, _)| {
+                        matches!(
+                            item,
+                            RunItem::Message { .. }
+                                | RunItem::PhasedMessage { .. }
+                                | RunItem::Compaction { .. }
+                        )
+                    })
+                    .map(|(item, source)| (item.clone(), source.clone()))
+                    .unzip();
+                // observe updates the approval journal before invoking fallible
+                // host hooks. Commit the matching history first so a hook error
+                // cannot return unfiltered history with already-cleared anchors.
+                self.result.usage.context_tokens = Some(estimate_history_tokens(&history));
+                let before = std::mem::replace(&mut self.result.history, history);
+                self.result.history_provenance = provenance;
+                self.observe(Observation::ApprovalHistoryReplaced {
+                    before,
+                    after: self.result.history.clone(),
+                    markers: vec![],
+                })
+                .await?;
+            }
             let from = self.agent.name.clone();
             self.agent = handoff.target.clone();
             self.result.last_agent = Some(self.agent.name.clone());
@@ -2778,7 +2837,8 @@ impl Engine {
         self.emit(RunEvent::ToolStarted { call: call.clone() })
             .await?;
         let mut operation = self.context.clone();
-        let timeout = self.policy.tools.timeout.or_else(|| tool.timeout());
+        let policy = self.effective_tool_policy();
+        let timeout = policy.timeout.or_else(|| tool.timeout());
         if let Some(timeout) = timeout {
             if let Some(deadline) = Instant::now().checked_add(timeout) {
                 operation.deadline = Some(operation.deadline.map_or(deadline, |d| d.min(deadline)));
@@ -2787,7 +2847,7 @@ impl Engine {
         let context = ToolContext {
             operation,
             work_dir: self.config.work_dir.clone(),
-            policy: self.policy.tools.clone(),
+            policy,
             idempotency_key: Some(
                 self.durable_state
                     .as_ref()
@@ -2928,7 +2988,8 @@ impl Engine {
         }
         let processed = match self.config.output.process(
             raw,
-            self.durable_state.is_none() && self.policy.tools.access != AccessMode::ReadOnly,
+            self.durable_state.is_none()
+                && self.effective_tool_policy().access != AccessMode::ReadOnly,
         ) {
             Ok(processed) => processed,
             Err(error) => {

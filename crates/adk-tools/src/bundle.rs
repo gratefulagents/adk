@@ -4,10 +4,13 @@
 //! call `close().await` before shutting down the executor to await process cleanup.
 use crate::{BuildError, Config, PreparedTools, Registry, select, shell};
 use adk_core::{
-    BoxFuture, Cancellation, Context, Error, ErrorCategory, Tool, ToolCall, ToolContext,
-    ToolDefinition, ToolOutput, ToolPolicy,
+    AccessMode, ApprovalPolicy, BoxFuture, Cancellation, Context, Error, ErrorCategory, Tool,
+    ToolCall, ToolContext, ToolDecision, ToolDefinition, ToolOutput, ToolPolicy,
 };
-use std::sync::{Arc, Weak};
+use std::{
+    collections::BTreeSet,
+    sync::{Arc, Weak},
+};
 use tokio::sync::watch;
 
 #[derive(Debug, thiserror::Error)]
@@ -18,6 +21,8 @@ pub enum BundleError {
     Sandbox(#[from] adk_sandbox::Error),
     #[error("tool teardown failed: {0}")]
     Teardown(String),
+    #[error("tool bundle is closed")]
+    Closed,
 }
 
 /// Host dependencies are explicit; no executable, store or credential discovery.
@@ -154,12 +159,16 @@ impl BundleBuilder {
                     definition: tool.definition().clone(),
                     control_flow: tool.is_control_flow(),
                     timeout: tool.timeout(),
+                    ceiling: None,
                     closed: receiver.clone(),
                 }) as Arc<dyn Tool>
             })
             .collect();
         Ok(ToolBundle {
+            config: self.config,
+            builtin_names: selected.iter().map(|c| c.name.clone()).collect(),
             tools: prepared.tools,
+            view_tools: Vec::new(),
             prepared: PreparedTools {
                 tools: handles,
                 policy: prepared.policy,
@@ -176,7 +185,10 @@ impl BundleBuilder {
 
 /// Non-cloneable lifecycle owner. Prepared handles do not extend its lifetime.
 pub struct ToolBundle {
+    config: Config,
+    builtin_names: BTreeSet<String>,
     tools: Vec<Arc<dyn Tool>>,
+    view_tools: Vec<Arc<dyn Tool>>,
     prepared: PreparedTools,
     closed: watch::Sender<bool>,
     shell: Option<shell::ShellBundle>,
@@ -192,6 +204,73 @@ impl ToolBundle {
             tools: self.prepared.tools.clone(),
             policy: self.prepared.policy.clone(),
         }
+    }
+
+    /// Create an owner-bound, non-escalating view for a specialist agent.
+    ///
+    /// Adapters share this bundle's resources. Mutation exceptions and control-flow
+    /// grants are not inherited; caller exclusions apply before adaptation. Saved
+    /// handles stop working when the owner closes or drops, just like parent handles.
+    pub fn role_view(
+        &mut self,
+        access: AccessMode,
+        excluded: &BTreeSet<String>,
+    ) -> Result<PreparedTools, BundleError> {
+        if *self.closed.borrow() {
+            return Err(BundleError::Closed);
+        }
+        let mut policy = self.prepared.policy.clone();
+        policy.access = narrow_access(narrow_access(policy.access, self.config.access), access);
+        policy.allowed_mutating_tools.clear();
+        let mut config = self.config.clone();
+        config.access = policy.access;
+        config.allowed_mutating_tools.clear();
+        let selected: BTreeSet<_> = select(&config)?
+            .into_iter()
+            .map(|c| c.name.clone())
+            .collect();
+        let mut adapted = Vec::new();
+        let mut names = BTreeSet::new();
+        for tool in &self.tools {
+            let name = &tool.definition().name;
+            if excluded.contains(name)
+                || (self.builtin_names.contains(name) && !selected.contains(name))
+            {
+                continue;
+            }
+            let tool = tool
+                .for_access(policy.access)
+                .unwrap_or_else(|| tool.clone());
+            if &tool.definition().name != name {
+                return Err(BuildError::Contract(format!("access adapter renamed {name}")).into());
+            }
+            if policy.decision(tool.definition()) == ToolDecision::Deny {
+                continue;
+            }
+            if !names.insert(name.clone()) {
+                return Err(BuildError::Duplicate(name.clone()).into());
+            }
+            adapted.push(tool);
+        }
+        policy.allowed_tools = Some(names);
+        let handles = adapted
+            .iter()
+            .map(|tool| {
+                Arc::new(OwnedTool {
+                    tool: Arc::downgrade(tool),
+                    definition: tool.definition().clone(),
+                    control_flow: tool.is_control_flow(),
+                    timeout: tool.timeout(),
+                    ceiling: Some(policy.clone()),
+                    closed: self.closed.subscribe(),
+                }) as Arc<dyn Tool>
+            })
+            .collect();
+        self.view_tools.extend(adapted);
+        Ok(PreparedTools {
+            tools: handles,
+            policy,
+        })
     }
 
     /// Join caller cancellation with this owner's lifetime, without cancelling the caller.
@@ -220,6 +299,7 @@ impl ToolBundle {
         #[cfg(not(any(target_os = "linux", target_os = "macos")))]
         let result = Ok(());
         self.tools.clear();
+        self.view_tools.clear();
         result
     }
 }
@@ -262,11 +342,52 @@ fn scoped_context(context: &Context, closed: watch::Receiver<bool>) -> Context {
     }
 }
 
+fn narrow_access(a: AccessMode, b: AccessMode) -> AccessMode {
+    match (a, b) {
+        (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
+        (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
+            AccessMode::WorkspaceWrite
+        }
+        _ => AccessMode::FullAccess,
+    }
+}
+
+fn intersect_policy(caller: &ToolPolicy, ceiling: &ToolPolicy) -> ToolPolicy {
+    let mut policy = caller.clone();
+    policy.access = narrow_access(caller.access, ceiling.access);
+    policy.allowed_tools = match (&caller.allowed_tools, &ceiling.allowed_tools) {
+        (Some(a), Some(b)) => Some(a.intersection(b).cloned().collect()),
+        (Some(a), None) | (None, Some(a)) => Some(a.clone()),
+        (None, None) => None,
+    };
+    policy
+        .denied_tools
+        .extend(ceiling.denied_tools.iter().cloned());
+    policy.allowed_mutating_tools = caller
+        .allowed_mutating_tools
+        .intersection(&ceiling.allowed_mutating_tools)
+        .cloned()
+        .collect();
+    if ceiling.approval == ApprovalPolicy::All {
+        policy.approval = ApprovalPolicy::All;
+    }
+    policy.timeout = match (caller.timeout, ceiling.timeout) {
+        (Some(a), Some(b)) => Some(a.min(b)),
+        (a, b) => a.or(b),
+    };
+    policy.max_child_turns = match (caller.max_child_turns, ceiling.max_child_turns) {
+        (Some(a), Some(b)) => Some(a.min(b)),
+        (a, b) => a.or(b),
+    };
+    policy
+}
+
 struct OwnedTool {
     tool: Weak<dyn Tool>,
     definition: ToolDefinition,
     control_flow: bool,
     timeout: Option<std::time::Duration>,
+    ceiling: Option<ToolPolicy>,
     closed: watch::Receiver<bool>,
 }
 impl Tool for OwnedTool {
@@ -285,13 +406,25 @@ impl Tool for OwnedTool {
         call: ToolCall,
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
+            let policy = self.ceiling.as_ref().map_or_else(
+                || context.policy.clone(),
+                |ceiling| intersect_policy(&context.policy, ceiling),
+            );
             let context = ToolContext {
                 operation: scoped_context(&context.operation, self.closed.clone()),
                 work_dir: context.work_dir.clone(),
-                policy: context.policy.clone(),
+                policy,
                 idempotency_key: context.idempotency_key.clone(),
             };
             context.operation.check_active()?;
+            if self.ceiling.is_some()
+                && context.policy.decision(&self.definition) == ToolDecision::Deny
+            {
+                return Err(Error::new(
+                    ErrorCategory::PermissionDenied,
+                    "specialist tool access denied",
+                ));
+            }
             let tool = self
                 .tool
                 .upgrade()

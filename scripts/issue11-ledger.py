@@ -63,7 +63,8 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-runtime/Cargo.toml", "crates/adk-runtime/src/lib.rs",
                "crates/adk-runtime/tests/error_contracts.rs", "crates/adk-runtime/src/settings.rs",
                "crates/adk-runtime/tests/settings.rs", "crates/adk/src/builder.rs",
-               "crates/adk/tests/builder.rs", "scripts/trace-reference/settings.go",
+               "crates/adk/tests/builder.rs", "crates/adk/tests/catalog_handoffs.rs",
+               "scripts/trace-reference/settings.go",
                "fixtures/tracestore/sdk-writer.json", "scripts/trace-reference/writer.go",
                "fixtures/tracestore/sdk-store.json", "scripts/trace-reference/main.go",
                "scripts/trace-reference/check.py",
@@ -110,6 +111,15 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "scripts/fileconfig-reference/check.py", "scripts/fileconfig-reference/main.go",
                "scripts/fileconfig-reference/scenarios.go", "scripts/fileconfig-reference/main_test.go",
                "scripts/fileconfig-reference/go.mod", "scripts/fileconfig-reference/go.sum",
+               "crates/adk-tools/src/bundle.rs", "crates/adk-tools/tests/role_views.rs",
+               "crates/adk-tools/tests/bundle.rs", "crates/adk-tools/src/shell.rs",
+               "crates/adk-tools/tests/shell.rs", "crates/adk-tools/tests/shell_security.rs",
+               "scripts/handoff-reference/main.go", "scripts/handoff-reference/scenarios.go",
+               "scripts/handoff-reference/main_test.go", "scripts/handoff-reference/check.py",
+               "scripts/handoff-reference/go.mod", "scripts/handoff-reference/go.sum",
+               "fixtures/handoff/sdk-handoff-filter.json",
+               "scripts/handoff-reference/catalog.go", "scripts/handoff-reference/catalog_scenarios.go",
+               "scripts/handoff-reference/catalog_test.go", "fixtures/handoff/sdk-catalog-handoffs.json",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -195,14 +205,17 @@ def verify_rust() -> None:
                                 cwd=ROOT, text=True, capture_output=True, check=True)
     fileconfig_check = subprocess.run([sys.executable, str(ROOT / "scripts/fileconfig-reference/check.py")],
                                       cwd=ROOT, text=True, capture_output=True, check=True)
+    handoff_check = subprocess.run([sys.executable, str(ROOT / "scripts/handoff-reference/check.py")],
+                                  cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host", "--test", "host", "--test", "host_config", "--test", "host_rules",
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
                "-p", "adk-core", "--test", "result_helpers", "--test", "host_conversation",
-               "--test", "settings", "--test", "builder",
-               "--test", "fileconfig", "--test", "fileconfig_oracle",
+               "--test", "settings", "--test", "builder", "--test", "catalog_handoffs",
+               "--test", "fileconfig", "--test", "fileconfig_oracle", "-p", "adk-tools",
+               "--test", "role_views", "--test", "bundle", "--test", "shell", "--test", "shell_security",
                "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
@@ -230,7 +243,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -250,6 +263,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust evidence requires independently executed pinned record fixtures")
     if f"fileconfig reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust fileconfig evidence requires independently executed pinned fixtures")
+    if f"handoff reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust handoff evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

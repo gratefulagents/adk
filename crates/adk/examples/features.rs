@@ -527,6 +527,7 @@ async fn handoffs_subagents() {
         json!({"key":"answer"}),
     )]));
     a.handoffs.push(Handoff {
+        input_filter: Default::default(),
         definition: definition("transfer", false),
         target: Arc::new(AgentConfig::new(
             "specialist",
@@ -537,6 +538,57 @@ async fn handoffs_subagents() {
     assert_eq!(result.final_output, Some(json!("specialist evidence")));
     assert_eq!(result.last_agent.as_deref(), Some("specialist"));
     assert_eq!(specialist.requests.lock().unwrap().len(), 1);
+
+    // The facade can compose a catalog transfer without an async scheduler.
+    {
+        use adk::builder::{Builder, Config, Features, RoleSpec};
+        let model = Scripted::new(vec![
+            tool_response("transfer_to_reviewer", json!({})),
+            answer("catalog review"),
+        ]);
+        let mut bundle = Builder::new(Config {
+            model: "mock/base".into(),
+            roles: vec![RoleSpec {
+                name: "reviewer".into(),
+                instructions: "Review carefully.".into(),
+                tool_access: "read-only".into(),
+                ..Default::default()
+            }],
+            features: Some(Features {
+                handoffs: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, model.clone())
+        .unwrap()
+        .build(&context())
+        .await
+        .unwrap();
+        assert!(bundle.specialists().contains_key("reviewer"));
+        let result = bundle
+            .run(
+                context(),
+                request().input,
+                Arc::new(RecordingHost::default()),
+            )
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("reviewer"));
+        assert_eq!(result.result.final_output, Some(json!("catalog review")));
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert_eq!(requests[1].instructions, "Review carefully.");
+            assert!(
+                requests[1]
+                    .input
+                    .iter()
+                    .all(|item| matches!(item, RunItem::Message { .. }))
+            );
+        }
+        bundle.close().await.unwrap();
+    }
 
     use subagent::{Scheduler, SchedulerConfig, SecurityBaseline};
     let child = Scripted::new(vec![answer("child evidence")]);

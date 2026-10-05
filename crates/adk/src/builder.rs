@@ -1,7 +1,7 @@
 //! Host-neutral composition of native providers, tools and owned runtime lifetimes.
 use adk_core::{
     AccessMode, BoxFuture, Cancellation, Context, Error, ErrorCategory, Host, ItemProvenance,
-    RunError, RunItem, RunPolicy, RunRequest, StreamingModel, Tool, ToolPolicy,
+    RunError, RunItem, RunPolicy, RunRequest, StreamingModel, Tool, ToolDefinition, ToolPolicy,
 };
 use adk_providers::{
     auth::{CredentialStore, Refresh},
@@ -9,8 +9,8 @@ use adk_providers::{
     routing::Routes,
 };
 use adk_runtime::{
-    AgentConfig, CancellationToken, ModelBinding, RunOutcome, RunStream, Runner, RunnerConfig,
-    SubagentSession, subagent::Scheduler,
+    AgentConfig, CancellationToken, Handoff, HandoffInputFilter, ModelBinding, RunOutcome,
+    RunStream, Runner, RunnerConfig, SubagentSession, subagent::Scheduler,
 };
 use adk_tools::bundle::{BundleBuilder, ToolBundle};
 use serde::Deserialize;
@@ -42,6 +42,10 @@ pub struct Features {
     pub untrusted_tool_outputs: bool,
     /// Requires an explicitly supplied session with an owned scheduler.
     pub subagents: bool,
+    /// Catalog transfers, independent of scheduler-backed subagents.
+    pub handoffs: bool,
+    /// Tool-less fallback, only when handoffs are enabled and the catalog is empty.
+    pub handoff_generic_fallback: bool,
 }
 
 #[derive(Clone)]
@@ -170,6 +174,9 @@ pub struct RoleSpec {
     pub tool_access: String,
     #[serde(alias = "model")]
     pub model_override: String,
+    /// Programmatic override; Some(empty) explicitly clears inherited fallbacks.
+    #[serde(skip)]
+    pub fallback_models: Option<Vec<String>>,
     pub instructions: String,
 }
 
@@ -459,6 +466,7 @@ fn parse_role_file(path: &Path) -> Result<RoleSpec, Error> {
         description: front.description,
         tool_access,
         model_override: model_override.into(),
+        fallback_models: None,
         instructions: body.trim().into(),
     })
 }
@@ -848,13 +856,24 @@ impl Builder {
                 None => None,
             },
         };
-        let mut roles: BTreeMap<_, _> = host
-            .roles
-            .into_iter()
-            .map(|r| (r.name.clone(), r))
-            .collect();
-        for role in &self.config.roles {
-            roles.insert(role.name.clone(), role.clone());
+        let mut roles = Vec::<RoleSpec>::new();
+        for catalog in [host.roles.as_slice(), self.config.roles.as_slice()] {
+            let mut seen = BTreeSet::new();
+            for role in catalog {
+                let mut role = role.clone();
+                role.name = role.name.trim().to_owned();
+                if role.name.is_empty() || role.instructions.trim().is_empty() {
+                    return Err(invalid("role name and instructions must not be empty"));
+                }
+                if !seen.insert(role.name.clone()) {
+                    return Err(invalid(format!("duplicate role: {}", role.name)));
+                }
+                if let Some(existing) = roles.iter_mut().find(|r| r.name == role.name) {
+                    *existing = role;
+                } else {
+                    roles.push(role);
+                }
+            }
         }
         let role = self
             .config
@@ -862,7 +881,8 @@ impl Builder {
             .as_ref()
             .map(|name| {
                 roles
-                    .get(name)
+                    .iter()
+                    .find(|r| r.name == name.trim())
                     .ok_or_else(|| invalid("active role not found"))
             })
             .transpose()?;
@@ -881,6 +901,7 @@ impl Builder {
             },
         );
         settings.extend(self.config.settings.clone());
+        let base_settings = settings.clone();
         let mut policy = self.config.policy.clone();
         let mut instructions = vec![self.config.instructions.trim().to_owned()];
         if let Some(mode) = &mode {
@@ -950,6 +971,9 @@ impl Builder {
             if !role.model_override.trim().is_empty() {
                 model = role.model_override.trim().into();
             }
+            if let Some(selected) = &role.fallback_models {
+                fallbacks = selected.clone();
+            }
             if features.mode_model_routing
                 && let Some(routing) = mode
                     .as_ref()
@@ -1009,6 +1033,113 @@ impl Builder {
             features.parallel_tool_calls.into(),
         );
         agent.settings = settings;
+        let mut targets = Vec::new();
+        if features.handoffs {
+            let mut names = BTreeSet::new();
+            for role in &roles {
+                let transfer = format!("transfer_to_{}", sanitize_handoff_name(&role.name));
+                if !names.insert(transfer.clone()) {
+                    return Err(invalid(format!("duplicate handoff name: {transfer}")));
+                }
+                let mut model = self.config.model.trim().to_owned();
+                let mut fallbacks = self.config.fallback_models.clone();
+                let mut settings = base_settings.clone();
+                apply_routing(
+                    &mut model,
+                    &mut fallbacks,
+                    &mut settings,
+                    &role.model_override,
+                    &role.fallback_models,
+                    "",
+                    "",
+                    &Map::new(),
+                );
+                if features.mode_model_routing
+                    && let Some(routing) = mode.as_ref().and_then(|m| m.model_routing.as_ref())
+                {
+                    apply_routing(
+                        &mut model,
+                        &mut fallbacks,
+                        &mut settings,
+                        &routing.default_model,
+                        &routing.fallback_models,
+                        &routing.reasoning_level,
+                        &routing.text_verbosity,
+                        &routing.settings,
+                    );
+                    if let Some(routing) = routing.role_overrides.get(&role.name) {
+                        apply_routing(
+                            &mut model,
+                            &mut fallbacks,
+                            &mut settings,
+                            &routing.model,
+                            &routing.fallback_models,
+                            &routing.reasoning_level,
+                            &routing.text_verbosity,
+                            &routing.settings,
+                        );
+                    }
+                }
+                let (_, resolved) = routes.resolve(&model)?;
+                if model.is_empty() {
+                    model = resolved;
+                }
+                for fallback in &fallbacks {
+                    routes.resolve(fallback)?;
+                }
+                let mut target =
+                    AgentConfig::new(&role.name, ModelBinding::streaming(model, routes.clone()));
+                target.instructions = role.instructions.clone();
+                target.fallbacks = fallbacks
+                    .into_iter()
+                    .map(|name| ModelBinding::streaming(name, routes.clone()))
+                    .collect();
+                settings.insert(
+                    "parallel_tool_calls".into(),
+                    features.parallel_tool_calls.into(),
+                );
+                target.settings = settings;
+                target.input_guardrails = self.input_guardrails.clone();
+                target.output_guardrails = self.output_guardrails.clone();
+                target.tool_access_ceiling = Some(narrow_access(
+                    policy.tools.access,
+                    parse_access(&role.tool_access)?,
+                ));
+                let description = if role.description.trim().is_empty() {
+                    format!("Transfer the conversation to the {} specialist.", role.name)
+                } else {
+                    role.description.trim().to_owned()
+                };
+                targets.push((transfer, description, target));
+            }
+            if roles.is_empty() && features.handoff_generic_fallback {
+                let mut model = self.config.model.trim().to_owned();
+                let (_, resolved) = routes.resolve(&model)?;
+                if model.is_empty() {
+                    model = resolved;
+                }
+                let mut target =
+                    AgentConfig::new("specialist", ModelBinding::streaming(model, routes.clone()));
+                target.instructions = "# System context\nYou are part of a multi-agent system designed to make agent coordination and execution easy. Agents use two primary abstractions: tools and handoffs. Handoffs transfer control to another agent that is better suited for the task, and are achieved by calling a handoff function, generally named `transfer_to_<agent_name>`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user.\n\nYou are the handoff specialist. Resolve the delegated request and explain the result briefly.".into();
+                target.settings = base_settings;
+                target.settings.insert(
+                    "parallel_tool_calls".into(),
+                    features.parallel_tool_calls.into(),
+                );
+                target.tool_access_ceiling = Some(policy.tools.access);
+                target.input_guardrails = self.input_guardrails.clone();
+                target.output_guardrails = self.output_guardrails.clone();
+                targets.push((
+                    "transfer_to_specialist".into(),
+                    "Transfer to a specialist agent.".into(),
+                    target,
+                ));
+            }
+        }
+        let mut excluded: BTreeSet<String> = ["finish", "present_plan", "AskUserQuestion"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect();
         let mut tool_config = self.config.tool_options.clone();
         tool_config.features = match &self.config.features {
             Some(_) => adk_tools::Features::Strict(features.tools.clone()),
@@ -1024,6 +1155,7 @@ impl Builder {
             self.runner.subagents = Some(children.clone());
             // Managed tools use ExtraTools registration, but cannot enable other extensions.
             let mut managed = adk_runtime::build_subagent_task_tools(children, agent.name.clone());
+            excluded.extend(managed.iter().map(|tool| tool.definition().name.clone()));
             let extras_enabled = match &tool_config.features {
                 adk_tools::Features::Strict(f) => f.contains("ExtraTools"),
                 adk_tools::Features::Legacy(f) => f.enable_tools || f.enable_subagents,
@@ -1037,6 +1169,27 @@ impl Builder {
             }
         } else {
             self.runner.subagents = None;
+        }
+        let extras_enabled = match &tool_config.features {
+            adk_tools::Features::Strict(f) => f.contains("ExtraTools"),
+            adk_tools::Features::Legacy(f) => f.enable_tools || f.enable_subagents,
+        };
+        if extras_enabled {
+            for (name, _, _) in &targets {
+                if self
+                    .extra_tools
+                    .iter()
+                    .any(|t| t.definition().name == *name)
+                    && tool_config
+                        .allowed_names
+                        .as_ref()
+                        .is_none_or(|names| names.contains(name))
+                {
+                    return Err(invalid(format!(
+                        "handoff collides with parent tool: {name}"
+                    )));
+                }
+            }
         }
         let mut tool_builder = BundleBuilder::new(tool_config)
             .implementations(std::mem::take(&mut self.implementations))
@@ -1058,6 +1211,77 @@ impl Builder {
         let prepared = tools.prepared();
         policy.tools = prepared.policy;
         agent.tools = prepared.tools;
+        let composed = (|| -> Result<BTreeMap<String, Arc<AgentConfig>>, Error> {
+            let mut specialists = BTreeMap::new();
+            let mut graph_names: BTreeSet<_> = agent
+                .tools
+                .iter()
+                .map(|t| t.definition().name.clone())
+                .collect();
+            for (name, description, mut target) in targets {
+                if graph_names.contains(&name) {
+                    return Err(invalid(format!(
+                        "handoff collides with parent tool: {name}"
+                    )));
+                }
+                if !roles.is_empty() {
+                    let view = tools
+                        .role_view(target.tool_access_ceiling.unwrap(), &excluded)
+                        .map_err(|e| {
+                            invalid("specialist tool preparation failed").with_source(e)
+                        })?;
+                    target.tools = view.tools;
+                    graph_names.extend(target.tools.iter().map(|t| t.definition().name.clone()));
+                }
+                graph_names.insert(name.clone());
+                let target = Arc::new(target);
+                specialists.insert(target.name.clone(), target.clone());
+                agent.handoffs.push(Handoff {
+                    definition: ToolDefinition {
+                        name, description,
+                        input_schema: serde_json::json!({"type":"object", "properties":{}, "additionalProperties":false}).try_into().expect("object schema"),
+                        read_only: true,
+                        requires_approval: false,
+                    },
+                    target,
+                    input_filter: HandoffInputFilter::RemoveTools,
+                });
+            }
+            graph_names.retain(|name| {
+                !self.config.policy.tools.denied_tools.contains(name)
+                    && self
+                        .config
+                        .policy
+                        .tools
+                        .allowed_tools
+                        .as_ref()
+                        .is_none_or(|allowed| allowed.contains(name))
+            });
+            policy.tools.allowed_tools = Some(graph_names);
+            let available: Vec<_> = agent
+                .handoffs
+                .iter()
+                .filter(|h| policy.tools.decision(&h.definition) != adk_core::ToolDecision::Deny)
+                .map(|h| format!("- {}: {}", h.definition.name, h.definition.description))
+                .collect();
+            if !available.is_empty() {
+                if !agent.instructions.is_empty() {
+                    agent.instructions.push_str("\n\n");
+                }
+                agent.instructions.push_str("Delegate by transferring the conversation to an available specialist. A transfer gives that specialist ownership of the response; it does not run a nested task or return control.\n");
+                agent.instructions.push_str(&available.join("\n"));
+            }
+            Ok(specialists)
+        })();
+        let specialists = match composed {
+            Ok(specialists) => specialists,
+            Err(error) => {
+                tools.close().await.map_err(|e| {
+                    Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
+                })?;
+                return Err(error);
+            }
+        };
         self.runner.work_dir = self.config.work_dir.clone();
         self.runner.output.work_dir = Some(self.config.work_dir.clone());
         self.runner.output.untrusted = features.untrusted_tool_outputs;
@@ -1095,11 +1319,31 @@ impl Builder {
         Ok(Bundle {
             runner,
             agent,
+            specialists,
             policy,
             tools,
             session,
             owned_session: self.owned_session.take(),
         })
+    }
+}
+
+fn sanitize_handoff_name(name: &str) -> String {
+    let name: String = name
+        .trim()
+        .to_lowercase()
+        .chars()
+        .filter_map(|c| match c {
+            'a'..='z' | '0'..='9' => Some(c),
+            ' ' | '-' | '_' | '.' => Some('_'),
+            _ => None,
+        })
+        .collect();
+    let name = name.trim_matches('_');
+    if name.is_empty() {
+        "specialist".into()
+    } else {
+        name.into()
     }
 }
 
@@ -1134,6 +1378,7 @@ fn apply_routing(
 pub struct Bundle {
     runner: Runner,
     agent: AgentConfig,
+    specialists: BTreeMap<String, Arc<AgentConfig>>,
     policy: RunPolicy,
     tools: ToolBundle,
     session: SessionHandle,
@@ -1142,6 +1387,9 @@ pub struct Bundle {
 impl Bundle {
     pub fn agent(&self) -> &AgentConfig {
         &self.agent
+    }
+    pub fn specialists(&self) -> &BTreeMap<String, Arc<AgentConfig>> {
+        &self.specialists
     }
     pub fn policy(&self) -> &RunPolicy {
         &self.policy

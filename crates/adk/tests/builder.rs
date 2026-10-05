@@ -188,6 +188,14 @@ async fn defaults_build_and_run_offline_without_ambient_credentials_or_tools() {
         .build(&context())
         .await
         .unwrap();
+    assert!(!Config::default().resolved_features().handoffs);
+    assert!(
+        !Config::default()
+            .resolved_features()
+            .handoff_generic_fallback
+    );
+    assert!(bundle.agent().handoffs.is_empty());
+    assert!(bundle.specialists().is_empty());
     assert_eq!(bundle.agent().name, "agent");
     assert_eq!(bundle.agent().model.name(), "gpt-5.6-sol");
     assert_eq!(bundle.policy().max_turns.get(), 100);
@@ -823,5 +831,21 @@ async fn typed_resources_preserve_selection_and_plan_policy() {
             bundle.agent().tools.len()
         );
         bundle.close().await.unwrap();
+    }
+}
+
+#[test]
+fn role_file_parser_does_not_accept_programmatic_fallback_fields() {
+    let root = tempfile::tempdir().unwrap();
+    for key in ["fallback_models", "fallbackModels"] {
+        std::fs::write(
+            root.path().join("role.md"),
+            format!("---\nname: role\n{key}: [openai/small]\n---\nInstructions"),
+        )
+        .unwrap();
+        assert_eq!(
+            category(load_role_catalog(&context(), root.path())),
+            ErrorCategory::InvalidInput
+        );
     }
 }

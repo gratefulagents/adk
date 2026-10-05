@@ -707,6 +707,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     let mut a = agent(source);
     a.tools = vec![effect.clone()];
     a.handoffs = vec![Handoff {
+        input_filter: Default::default(),
         definition,
         target: Arc::new(target),
     }];
@@ -1580,6 +1581,7 @@ async fn fallback_state_is_per_agent_identity_not_display_name() {
     assert_eq!(source.name, target.name);
     source.fallbacks = vec![ModelBinding::complete("backup", backup)];
     source.handoffs = vec![Handoff {
+        input_filter: Default::default(),
         definition: TestTool::new("transfer", false, false).definition.clone(),
         target: Arc::new(target),
     }];
@@ -2397,6 +2399,831 @@ async fn generation_snapshots_use_actual_attempts_and_declared_timeouts_without_
                         .contains("provenance is unknown")
                 );
             }
+        }
+    }
+}
+
+#[tokio::test]
+async fn handoff_filter_hook_failure_keeps_partial_history_and_journal_coherent() {
+    struct FailFilter(ErrorCategory);
+    impl RunHooks for FailFilter {
+        fn observe<'a>(
+            &'a self,
+            _: &'a Context,
+            event: Observation,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(event, Observation::ApprovalHistoryReplaced { .. }) {
+                    Err(Error::new(self.0, "filter notification failed"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+    }
+    for streaming in [false, true] {
+        for category in [ErrorCategory::Host, ErrorCategory::Cancelled] {
+            let source = TestModel::with(vec![Ok(response(
+                vec![
+                    message(Role::Assistant, "transferring"),
+                    call("transfer", "transfer"),
+                ],
+                None,
+            ))]);
+            source
+                .streams
+                .lock()
+                .unwrap()
+                .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                    response: response(
+                        vec![
+                            message(Role::Assistant, "transferring"),
+                            call("transfer", "transfer"),
+                        ],
+                        None,
+                    ),
+                })]);
+            let target = TestModel::with(vec![Ok(answer("never called"))]);
+            let mut target_agent = agent(target.clone());
+            target_agent.name = "target".into();
+            let mut source_agent = agent(source);
+            source_agent.handoffs.push(Handoff {
+                definition: TestTool::new("transfer", true, true).definition.clone(),
+                target: Arc::new(target_agent),
+                input_filter: HandoffInputFilter::RemoveTools,
+            });
+            let journal = Arc::new(compat::ApprovalJournal::default());
+            let runner = Runner::new(
+                source_agent,
+                RunnerConfig {
+                    hooks: Some(Arc::new(CompositeHooks::new([
+                        journal.clone() as Arc<dyn RunHooks>,
+                        Arc::new(FailFilter(category)),
+                    ]))),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let request = RunRequest {
+                input_provenance: vec![ItemProvenance::Unattributed],
+                ..request(3)
+            };
+            let result = if streaming {
+                runner
+                    .stream(context(), request, Arc::new(TestHost::default()))
+                    .finish()
+                    .await
+            } else {
+                runner
+                    .run(context(), request, Arc::new(TestHost::default()))
+                    .await
+            };
+            let error = result.err().expect("hook must fail");
+            let partial = error.partial.unwrap();
+            assert!(target.requests.lock().unwrap().is_empty());
+            assert!(journal.history_markers().unwrap().is_empty());
+            assert!(!journal.entries().is_empty(), "approval audit retained");
+            assert_eq!(
+                partial.history,
+                vec![
+                    message(Role::User, "go"),
+                    message(Role::Assistant, "transferring")
+                ]
+            );
+            assert_eq!(
+                partial.history_provenance,
+                vec![
+                    ItemProvenance::Unattributed,
+                    ItemProvenance::Agent {
+                        name: "test".into()
+                    }
+                ]
+            );
+            assert!(
+                partial
+                    .new_items
+                    .iter()
+                    .any(|i| matches!(i, RunItem::Handoff { .. }))
+            );
+            assert!(
+                partial
+                    .new_items
+                    .iter()
+                    .any(|i| matches!(i, RunItem::ToolCall { .. }))
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn handoff_input_filter_preserves_audit_and_filters_run_stream_and_approval_history() {
+    assert_eq!(HandoffInputFilter::default(), HandoffInputFilter::Preserve);
+    for streaming in [false, true] {
+        for deferred in [false, true] {
+            let mut baseline = None;
+            for input_filter in [
+                HandoffInputFilter::Preserve,
+                HandoffInputFilter::RemoveTools,
+            ] {
+                let phased = RunItem::PhasedMessage {
+                    message: Message {
+                        role: Role::Assistant,
+                        content: vec![Content::Text {
+                            text: "phase".into(),
+                        }],
+                    },
+                    phase: "commentary".into(),
+                };
+                let compacted = RunItem::Compaction {
+                    compaction: Compaction {
+                        content: "summary".into(),
+                        ..Default::default()
+                    },
+                };
+                let reasoning = RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "private".into(),
+                        ..Default::default()
+                    },
+                };
+                let input = vec![
+                    message(Role::User, "go"),
+                    call("old", "effect"),
+                    RunItem::ToolResult {
+                        call_id: "old".into(),
+                        output: TestTool::new("effect", false, false).output.clone(),
+                    },
+                    phased,
+                    reasoning.clone(),
+                    call("old-transfer", "transfer"),
+                    RunItem::Handoff {
+                        call_id: "old-transfer".into(),
+                        agent: "test".into(),
+                    },
+                    compacted,
+                    message(Role::Assistant, "retained"),
+                    message(Role::System, "system retained"),
+                    message(Role::Developer, "developer retained"),
+                ];
+                let input_provenance: Vec<_> = (0..input.len())
+                    .map(|index| match index {
+                        0 => ItemProvenance::Unattributed,
+                        3 => ItemProvenance::Unknown,
+                        _ => ItemProvenance::Agent {
+                            name: format!("prior-{index}"),
+                        },
+                    })
+                    .collect();
+                let current = vec![
+                    message(Role::Assistant, "transferring"),
+                    reasoning,
+                    call("before", "effect"),
+                    call("transfer", "transfer"),
+                    call("after", "effect"),
+                ];
+                let mut source_response = response(current.clone(), None);
+                source_response.usage.context_tokens = Some(100_000);
+                let source = TestModel::with(vec![Ok(source_response.clone())]);
+                source
+                    .streams
+                    .lock()
+                    .unwrap()
+                    .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                        response: source_response,
+                    })]);
+                let target = TestModel::with(vec![Ok(answer("done"))]);
+                target
+                    .streams
+                    .lock()
+                    .unwrap()
+                    .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                        response: answer("done"),
+                    })]);
+                let mut target_agent = agent(target.clone());
+                target_agent.name = "target".into();
+                let effect = TestTool::new("effect", false, false);
+                let mut source_agent = agent(source);
+                source_agent.tools = vec![effect.clone()];
+                source_agent.handoffs.push(Handoff {
+                    definition: TestTool::new("transfer", true, false).definition.clone(),
+                    target: Arc::new(target_agent),
+                    input_filter,
+                });
+                let journal = Arc::new(compat::ApprovalJournal::default());
+                let observations = Arc::new(Observations::default());
+                let runner = Runner::new(
+                    source_agent,
+                    RunnerConfig {
+                        hooks: Some(Arc::new(CompositeHooks::new([
+                            journal.clone() as Arc<dyn RunHooks>,
+                            observations.clone(),
+                        ]))),
+                        compaction: (input_filter == HandoffInputFilter::RemoveTools).then(|| {
+                            CompactionConfig {
+                                trigger_tokens: 10_000,
+                                target_tokens: 5,
+                                compactor: Arc::new(Compact),
+                            }
+                        }),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+                let req = RunRequest {
+                    input: input.clone(),
+                    input_provenance: input_provenance.clone(),
+                    policy: policy(3),
+                };
+                let host = Arc::new(TestHost::default());
+                if deferred {
+                    host.approvals
+                        .lock()
+                        .unwrap()
+                        .push_back(ApprovalDecision::Defer);
+                }
+                let mut outcome = if streaming {
+                    runner
+                        .stream(context(), req, host.clone())
+                        .finish()
+                        .await
+                        .unwrap()
+                } else {
+                    runner.run(context(), req, host.clone()).await.unwrap()
+                };
+                if deferred {
+                    assert_eq!(outcome.result.status, RunStatus::Paused);
+                    assert!(target.requests.lock().unwrap().is_empty());
+                    assert_eq!(journal.history_markers().unwrap().len(), 1);
+                    let continuation = outcome.continuation.unwrap();
+                    outcome = if streaming {
+                        continuation
+                            .stream(Some(ApprovalDecision::Approve))
+                            .unwrap()
+                            .finish()
+                            .await
+                            .unwrap()
+                    } else {
+                        continuation
+                            .resume(Some(ApprovalDecision::Approve))
+                            .await
+                            .unwrap()
+                    };
+                }
+                let result = outcome.result;
+                let target_requests = target.requests.lock().unwrap();
+                let sent = &target_requests[0];
+                let mut expected_audit = current;
+                for id in ["before", "transfer", "after"] {
+                    expected_audit.push(if id == "transfer" {
+                        RunItem::Handoff { call_id: id.into(), agent: "target".into() }
+                    } else {
+                        RunItem::ToolResult { call_id: id.into(), output: ToolOutput {
+                            content: vec![Content::Text { text: "not executed: the conversation was handed off to target in this turn".into() }],
+                            is_error: true,
+                            should_pause: false,
+                        }}
+                    });
+                }
+                let mut expected_history = input.clone();
+                expected_history.extend(expected_audit.clone());
+                let mut expected_provenance = input_provenance.clone();
+                expected_provenance.extend(vec![
+                    ItemProvenance::Agent {
+                        name: "test".into()
+                    };
+                    expected_audit.len()
+                ]);
+                if input_filter == HandoffInputFilter::RemoveTools {
+                    expected_history = [0, 3, 7, 8, 9, 10]
+                        .map(|index| input[index].clone())
+                        .to_vec();
+                    expected_history.push(message(Role::Assistant, "transferring"));
+                    expected_provenance = [0, 3, 7, 8, 9, 10]
+                        .map(|index| input_provenance[index].clone())
+                        .to_vec();
+                    expected_provenance.push(ItemProvenance::Agent {
+                        name: "test".into(),
+                    });
+                    assert!(journal.history_markers().unwrap().is_empty());
+                    assert!(
+                        journal
+                            .entries()
+                            .iter()
+                            .all(|entry| entry.history_before.is_none())
+                    );
+                } else {
+                    assert_eq!(
+                        journal.history_markers().unwrap().len(),
+                        if deferred { 2 } else { 1 }
+                    );
+                }
+                assert_eq!(sent.input, expected_history);
+                assert_eq!(sent.input_provenance, expected_provenance);
+                expected_history.push(message(Role::Assistant, "done"));
+                expected_provenance.push(ItemProvenance::Agent {
+                    name: "target".into(),
+                });
+                assert_eq!(result.history, expected_history);
+                assert_eq!(result.history_provenance, expected_provenance);
+                expected_audit.push(message(Role::Assistant, "done"));
+                assert_eq!(result.new_items, expected_audit);
+                assert_eq!(effect.calls.load(Ordering::SeqCst), 0);
+                assert_eq!(journal.entries().len(), if deferred { 2 } else { 1 });
+                let committed: Vec<_> = observations
+                    .seen
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .filter_map(|observation| match observation {
+                        Observation::CommittedItems {
+                            items,
+                            agents,
+                            markers,
+                        } => Some(json!([
+                            items,
+                            agents,
+                            markers
+                                .iter()
+                                .map(|marker| (marker.before_item, &marker.marker))
+                                .collect::<Vec<_>>()
+                        ])),
+                        _ => None,
+                    })
+                    .collect();
+                let audit = json!({
+                    "new_items": result.new_items,
+                    "provenance": result.new_items_provenance,
+                    "responses": result.responses,
+                    "events": host.events.lock().unwrap().iter().filter(|event| !matches!(event, RunEvent::Finished { .. })).collect::<Vec<_>>(),
+                    "committed": committed,
+                    "markers": journal.entries().iter().map(|entry| (&entry.marker, entry.new_items_before, &entry.reason)).collect::<Vec<_>>(),
+                });
+                if let Some(baseline) = &baseline {
+                    assert_eq!(&audit, baseline);
+                } else {
+                    baseline = Some(audit);
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn native_handoff_target_history_matches_pinned_go_filter_cases() {
+    use adk_codec::{approval::decode_item, dto};
+    use std::collections::HashSet;
+
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-handoff-filter.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["schema_version"], 1);
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    let mut compared = 0;
+    let mut source_only = 0;
+    for case in fixture["cases"].as_array().unwrap() {
+        if !case["source_only"].as_array().unwrap().is_empty() {
+            source_only += 1;
+            continue;
+        }
+        let decode = |value: &Value| -> (Vec<RunItem>, Vec<ItemProvenance>) {
+            value
+                .as_array()
+                .into_iter()
+                .flatten()
+                .enumerate()
+                .map(|(index, item)| {
+                    let wire: dto::RunItem = serde_json::from_value(item.clone()).unwrap();
+                    let provenance =
+                        wire.agent
+                            .as_ref()
+                            .map_or(ItemProvenance::Unattributed, |agent| {
+                                ItemProvenance::Agent {
+                                    name: agent.name.clone(),
+                                }
+                            });
+                    let native = if wire.kind.0 == 3 {
+                        // SDK handoffs have no call ID; this ID is a native test scaffold, not Go evidence.
+                        RunItem::Handoff {
+                            call_id: format!("oracle-native-handoff-{index}"),
+                            agent: wire.handoff_call.unwrap().to_agent,
+                        }
+                    } else {
+                        decode_item(&wire).unwrap()
+                    };
+                    (native, provenance)
+                })
+                .unzip()
+        };
+        let (input, provenance) = decode(&case["input"]);
+        let (expected, expected_provenance) = decode(&case["output"]);
+        let mut paired = vec![];
+        let mut paired_provenance = vec![];
+        let mut pending = HashSet::new();
+        // Runner input requires paired calls. Added counterparts are all stripped;
+        // retained payloads and attribution remain exactly those in the Go oracle.
+        for (item, provenance) in input.into_iter().zip(provenance) {
+            match &item {
+                RunItem::ToolCall { call } => {
+                    pending.insert(call.id.clone());
+                }
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. } => {
+                    if !pending.remove(call_id) {
+                        paired.push(call(call_id, "oracle-pair"));
+                        paired_provenance.push(ItemProvenance::Unattributed);
+                    }
+                }
+                _ => {}
+            }
+            paired.push(item);
+            paired_provenance.push(provenance);
+        }
+        for call_id in pending {
+            paired.push(RunItem::ToolResult {
+                call_id,
+                output: TestTool::new("oracle-pair", false, false).output.clone(),
+            });
+            paired_provenance.push(ItemProvenance::Unattributed);
+        }
+        let target = TestModel::with(vec![Ok(answer("done"))]);
+        let source = TestModel::with(vec![Ok(response(
+            vec![call("current-transfer", "transfer")],
+            None,
+        ))]);
+        let mut target_agent = agent(target.clone());
+        target_agent.name = "target".into();
+        let mut source_agent = agent(source);
+        source_agent.handoffs.push(Handoff {
+            definition: TestTool::new("transfer", false, false).definition.clone(),
+            target: Arc::new(target_agent),
+            input_filter: HandoffInputFilter::RemoveTools,
+        });
+        // The SDK helper's independent new_items argument and nil-vs-empty slices
+        // have no native runner equivalent; this comparison covers target history only.
+        let outcome = runner(source_agent)
+            .run(
+                context(),
+                RunRequest {
+                    input: paired,
+                    input_provenance: paired_provenance,
+                    policy: policy(2),
+                },
+                Arc::new(TestHost::default()),
+            )
+            .await
+            .unwrap();
+        let requests = target.requests.lock().unwrap();
+        assert_eq!(requests[0].input, expected, "{}", case["name"]);
+        assert_eq!(
+            requests[0].input_provenance, expected_provenance,
+            "{}",
+            case["name"]
+        );
+        assert_eq!(
+            outcome.result.new_items,
+            vec![
+                call("current-transfer", "transfer"),
+                RunItem::Handoff {
+                    call_id: "current-transfer".into(),
+                    agent: "target".into()
+                },
+                message(Role::Assistant, "done"),
+            ]
+        );
+        compared += 1;
+    }
+    assert_eq!(compared, 15);
+    assert_eq!(source_only, 8);
+}
+
+struct CeilingProbe {
+    definition: ToolDefinition,
+    control_flow: bool,
+    policies: Mutex<Vec<ToolPolicy>>,
+    adaptations: Mutex<Vec<AccessMode>>,
+}
+impl CeilingProbe {
+    fn new(name: &str, read_only: bool, control_flow: bool) -> Arc<Self> {
+        Arc::new(Self {
+            definition: ToolDefinition {
+                name: name.into(),
+                description: name.into(),
+                input_schema: schemars::json_schema!({"type":"object", "additionalProperties":false}),
+                read_only,
+                requires_approval: false,
+            },
+            control_flow,
+            policies: Mutex::new(vec![]),
+            adaptations: Mutex::new(vec![]),
+        })
+    }
+}
+impl Tool for CeilingProbe {
+    fn definition(&self) -> &ToolDefinition {
+        &self.definition
+    }
+    fn is_control_flow(&self) -> bool {
+        self.control_flow
+    }
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        self.adaptations.lock().unwrap().push(access);
+        None
+    }
+    fn execute<'a>(
+        &'a self,
+        context: &'a ToolContext,
+        _: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            self.policies.lock().unwrap().push(context.policy.clone());
+            Ok(ToolOutput {
+                content: vec![],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+
+#[tokio::test]
+async fn handoff_tool_ceiling_denies_before_approval_and_preserves_parent_policy_on_reuse() {
+    for approval in [ApprovalPolicy::RequiredByTool, ApprovalPolicy::All] {
+        let parent_model = TestModel::with(
+            (0..2)
+                .flat_map(|_| {
+                    [
+                        Ok(response(vec![call("parent-write", "write")], None)),
+                        Ok(response(vec![call("transfer", "transfer")], None)),
+                    ]
+                })
+                .collect(),
+        );
+        let target_model = TestModel::with(
+            (0..2)
+                .flat_map(|_| {
+                    [
+                        Ok(response(
+                            [
+                                "write",
+                                "control",
+                                "exception",
+                                "escape",
+                                "excluded",
+                                "denied",
+                            ]
+                            .iter()
+                            .map(|name| RunItem::ToolCall {
+                                call: ToolCall {
+                                    id: (*name).into(),
+                                    name: (*name).into(),
+                                    arguments: json!({"invalid": true}),
+                                },
+                            })
+                            .collect(),
+                            None,
+                        )),
+                        Ok(response(
+                            vec![call("read-1", "read"), call("read-2", "read")],
+                            None,
+                        )),
+                        Ok(answer("done")),
+                    ]
+                })
+                .collect(),
+        );
+        let parent_write = CeilingProbe::new("write", false, false);
+        let read = CeilingProbe::new("read", true, false);
+        let forbidden = [
+            CeilingProbe::new("write", false, false),
+            CeilingProbe::new("control", false, true),
+            CeilingProbe::new("exception", false, false),
+            CeilingProbe::new("excluded", true, false),
+            CeilingProbe::new("denied", true, false),
+        ];
+        let mut target = agent(target_model.clone());
+        target.name = "readonly".into();
+        target.tool_access_ceiling = Some(AccessMode::ReadOnly);
+        target.tools = vec![read.clone()];
+        target
+            .tools
+            .extend(forbidden.iter().cloned().map(|t| t as Arc<dyn Tool>));
+        target.handoffs.push(Handoff {
+            definition: ToolDefinition {
+                name: "escape".into(),
+                description: "escape".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: false,
+                requires_approval: true,
+            },
+            target: Arc::new(agent(TestModel::with(vec![]))),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let mut parent = agent(parent_model.clone());
+        parent.tools.push(parent_write.clone());
+        parent.handoffs.push(Handoff {
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "transfer".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: false,
+                requires_approval: true,
+            },
+            target: Arc::new(target),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let runner = runner(parent);
+        let mut req = request(5);
+        req.policy.tools = ToolPolicy {
+            access: AccessMode::FullAccess,
+            approval,
+            allowed_tools: Some(
+                [
+                    "write",
+                    "read",
+                    "control",
+                    "exception",
+                    "escape",
+                    "transfer",
+                    "denied",
+                ]
+                .map(String::from)
+                .into(),
+            ),
+            denied_tools: ["denied".into()].into(),
+            allowed_mutating_tools: ["exception", "control", "escape"].map(String::from).into(),
+            timeout: Some(Duration::from_secs(30)),
+            max_child_turns: NonZeroU32::new(3),
+        };
+        let mut narrowed = req.policy.tools.clone();
+        narrowed.access = AccessMode::ReadOnly;
+        narrowed.allowed_mutating_tools.clear();
+        for _ in 0..2 {
+            let host = Arc::new(TestHost::default());
+            let outcome = runner
+                .run(context(), req.clone(), host.clone())
+                .await
+                .unwrap();
+            assert_eq!(outcome.result.status, RunStatus::Completed);
+            assert_eq!(outcome.result.last_agent.as_deref(), Some("readonly"));
+            for name in [
+                "write",
+                "control",
+                "exception",
+                "escape",
+                "excluded",
+                "denied",
+            ] {
+                assert!(
+                    outcome.result.new_items.iter().any(|item| matches!(item,
+                    RunItem::ToolResult { call_id, output } if call_id == name && output.is_error))
+                );
+            }
+            let approvals: Vec<_> = host
+                .events
+                .lock()
+                .unwrap()
+                .iter()
+                .filter_map(|event| {
+                    if let RunEvent::ApprovalRequired { request } = event {
+                        Some(request.call.id.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            let expected = if approval == ApprovalPolicy::All {
+                vec!["parent-write", "transfer", "read-1", "read-2"]
+            } else {
+                vec!["transfer"]
+            };
+            assert_eq!(approvals, expected);
+        }
+        assert_eq!(
+            *parent_write.policies.lock().unwrap(),
+            vec![req.policy.tools.clone(); 2]
+        );
+        assert_eq!(*read.policies.lock().unwrap(), vec![narrowed; 4]);
+        assert!(
+            read.adaptations
+                .lock()
+                .unwrap()
+                .iter()
+                .all(|access| *access == AccessMode::ReadOnly)
+        );
+        for tool in forbidden {
+            assert!(tool.policies.lock().unwrap().is_empty());
+        }
+        for request in target_model.requests.lock().unwrap().iter() {
+            assert_eq!(
+                request
+                    .tools
+                    .iter()
+                    .map(|tool| tool.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["read"]
+            );
+        }
+        for request in parent_model.requests.lock().unwrap().iter() {
+            assert_eq!(
+                request
+                    .tools
+                    .iter()
+                    .map(|tool| tool.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["write", "transfer"]
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn tool_ceiling_intersects_every_host_access_and_none_preserves_exceptions() {
+    for host_access in [
+        AccessMode::ReadOnly,
+        AccessMode::WorkspaceWrite,
+        AccessMode::FullAccess,
+    ] {
+        for ceiling in [
+            None,
+            Some(AccessMode::ReadOnly),
+            Some(AccessMode::WorkspaceWrite),
+            Some(AccessMode::FullAccess),
+        ] {
+            let model = TestModel::with(vec![
+                Ok(response(
+                    vec![call("read", "read"), call("write", "write")],
+                    None,
+                )),
+                Ok(answer("done")),
+            ]);
+            let read = CeilingProbe::new("read", true, false);
+            let write = CeilingProbe::new("write", false, true);
+            let mut a = agent(model.clone());
+            a.tool_access_ceiling = ceiling;
+            a.tools = vec![read.clone(), write.clone()];
+            a.name = "target".into();
+            let mut parent = agent(TestModel::with(vec![Ok(response(
+                vec![call("transfer", "transfer")],
+                None,
+            ))]));
+            parent.handoffs.push(Handoff {
+                definition: ToolDefinition {
+                    name: "transfer".into(),
+                    description: "transfer".into(),
+                    input_schema: schemars::json_schema!({"type":"object"}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                target: Arc::new(a),
+                input_filter: HandoffInputFilter::Preserve,
+            });
+            let mut req = request(3);
+            req.policy.tools.access = host_access;
+            req.policy
+                .tools
+                .allowed_mutating_tools
+                .insert("write".into());
+            req.policy.tools.timeout = Some(Duration::from_secs(30));
+            req.policy.tools.max_child_turns = NonZeroU32::new(2);
+            let mut expected = req.policy.tools.clone();
+            if let Some(ceiling) = ceiling {
+                expected.access = match (host_access, ceiling) {
+                    (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
+                    (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
+                        AccessMode::WorkspaceWrite
+                    }
+                    _ => AccessMode::FullAccess,
+                };
+                expected.allowed_mutating_tools.clear();
+            }
+            let allowed = expected.decision(write.definition()) != ToolDecision::Deny;
+            runner(parent)
+                .run(context(), req, Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+            assert_eq!(*read.policies.lock().unwrap(), vec![expected.clone()]);
+            assert_eq!(
+                *write.policies.lock().unwrap(),
+                if allowed {
+                    vec![expected.clone()]
+                } else {
+                    vec![]
+                }
+            );
+            assert!(
+                read.adaptations
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .all(|access| *access == expected.access)
+            );
+            assert_eq!(
+                model.requests.lock().unwrap()[0].tools.len(),
+                if allowed { 2 } else { 1 }
+            );
         }
     }
 }

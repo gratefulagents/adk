@@ -85,8 +85,10 @@ func main() {
 		b, err = generateSubagents()
 	case len(os.Args) == 2 && os.Args[1] == "final-summary":
 		b, err = generateFinalSummary()
+	case len(os.Args) == 2 && os.Args[1] == "immediate-input":
+		b, err = generateImmediateInput()
 	default:
-		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary]")
+		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input]")
 	}
 	if err == nil {
 		_, err = os.Stdout.Write(b)

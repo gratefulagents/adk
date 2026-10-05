@@ -124,6 +124,9 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "scripts/handoff-reference/subagents.go", "scripts/handoff-reference/subagents_test.go",
                "fixtures/handoff/sdk-subagent-selection.json", "fixtures/handoff/sdk-final-summary.json",
                "scripts/handoff-reference/final_summary.go", "scripts/handoff-reference/final_summary_test.go",
+               "scripts/handoff-reference/immediate_input.go", "scripts/handoff-reference/immediate_input_test.go",
+               "fixtures/handoff/sdk-immediate-input.json",
+               "crates/adk-runtime/tests/immediate_input_oracle/mod.rs",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -220,7 +223,7 @@ def verify_rust() -> None:
                "--test", "settings", "--test", "builder", "--test", "catalog_handoffs",
                "--test", "fileconfig", "--test", "fileconfig_oracle", "-p", "adk-tools",
                "--test", "role_views", "--test", "bundle", "--test", "shell", "--test", "shell_security",
-               "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
+               "--test", "observability", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
@@ -273,6 +276,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust subagent selection evidence requires independently executed pinned fixtures")
     if f"final summary reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust final summary evidence requires independently executed pinned fixtures")
+    if f"immediate input reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust immediate input evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

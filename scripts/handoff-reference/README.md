@@ -367,3 +367,34 @@ provenance policy. Inspected sources at the pin above are
 `internal/agent/runner.go` (`finalSummaryTurnDirective` and its final-turn
 branch) and the public `pkg/agentsdk` runner exports. The oracle invokes that
 implementation; it does not recreate its directive or selection logic.
+
+## Immediate-input boundary projection
+
+`go run -mod=readonly . immediate-input` executes the pinned public runner for
+seven scenarios in both normal and streaming mode (14 cases). It records ordered
+model request input, returned new items/history, exact observed agent labels or
+null, poll/finalizer/tool call counts, final output and a narrow error category.
+The callbacks exercise input before the first request, input after tool results,
+best-effort poll failure, late input at finalization, empty finalization,
+finalizer failure and admission after the model budget is exhausted.
+
+The model and callbacks are local scripted implementations. The runner itself
+performs polling, ordering, finalization and budget extension; none of that
+control flow is replicated by the oracle. No network, live credentials, timers,
+worker CLI, evaluation adapters or `ImmediateInputSignal` are involved. Direct
+SDK agent pointers are projected only to their observed name or null, not
+inferred from roles. Fixtures retain raw tool outputs in `new_items` and the SDK
+untrusted-output delimiters in model requests and final history.
+
+Two particularly important observations: a poll result returned together with
+an error is discarded; finalizer failure retains the completed answer in partial
+history/new items but leaves final output null. The max-turn extension case has
+two poll calls, despite an upstream comment saying the normal poll is skipped.
+These are executable observations, not interpretations of comments.
+
+`immediate_input.go` and `immediate_input_test.go` use the same pinned module and
+GPL-3.0-only provenance policy. Relevant source is
+`internal/agent/{runner,run_config}.go` at the pin above. The native comparator
+projects only fixture-covered message/tool-call/tool-output payloads and exact
+provenance; it does not claim equivalence for event formats, unknown item kinds,
+media, asynchronous wake signals or crash-atomic external queue admission.

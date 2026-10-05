@@ -2319,3 +2319,209 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
         assert_eq!(model.calls.load(Ordering::SeqCst), 2);
     }
 }
+
+struct DurableImmediate {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+    fail_after: Option<Arc<Store>>,
+}
+impl ImmediateInputPoller for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if let Some(store) = &self.fail_after {
+                *store.fail.lock().unwrap() = Some(("model_prepared".into(), false));
+            }
+            Ok(ImmediateInputBatch {
+                items: vec![message(Role::User, "steer")],
+                provenance: vec![ItemProvenance::Unattributed],
+            })
+        })
+    }
+}
+impl ImmediateInputFinalizer for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if let Some(store) = &self.fail_after {
+                *store.fail.lock().unwrap() = Some(("model_completed".into(), false));
+            }
+            Ok(ImmediateInputBatch::default())
+        })
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_durable_requires_keys_and_binds_each_callback() {
+    for finalizer in [false, true] {
+        let (_, model, _) = setup(vec![message(Role::Assistant, "answer")], false, false);
+        let agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+        let make_runner = |key| {
+            let callback = Arc::new(DurableImmediate {
+                key,
+                calls: AtomicUsize::new(0),
+                fail_after: None,
+            });
+            let mut config = RunnerConfig::default();
+            if finalizer {
+                config.immediate_input_finalizer = Some(callback.clone());
+            } else {
+                config.immediate_input_poller = Some(callback.clone());
+            }
+            (Runner::new(agent.clone(), config).unwrap(), callback)
+        };
+        let (runner, callback) = make_runner(None);
+        let error = runner
+            .run_durable(
+                context(),
+                request(false),
+                Arc::new(HostImpl),
+                DurableRun::new(Arc::new(Store::default())),
+            )
+            .await
+            .err()
+            .unwrap();
+        assert!(error.error.info.message.contains("immediate input"));
+        assert_eq!(callback.calls.load(Ordering::SeqCst), 0);
+        let (runner, callback) = make_runner(Some("queue-v1"));
+        let store = Arc::new(Store::default());
+        let outcome = runner
+            .run_durable(
+                context(),
+                request(false),
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone()),
+            )
+            .await
+            .unwrap();
+        assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+        if !finalizer {
+            assert_eq!(
+                outcome.result.new_items_provenance[0],
+                ItemProvenance::Unattributed
+            );
+        }
+        for key in [Some("queue-v2"), Some("queue-v1")] {
+            let (restored, callback) = make_runner(key);
+            let result = restored
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(store.latest())),
+                )
+                .await;
+            if key == Some("queue-v1") {
+                assert!(result.is_ok());
+            } else {
+                assert!(
+                    result
+                        .err()
+                        .unwrap()
+                        .error
+                        .info
+                        .message
+                        .contains("configuration or security policy changed")
+                );
+            }
+            assert_eq!(callback.calls.load(Ordering::SeqCst), 0);
+        }
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(store.latest()))
+                )
+                .await
+                .err()
+                .unwrap()
+                .error
+                .info
+                .message
+                .contains("configuration or security policy changed")
+        );
+    }
+}
+
+#[tokio::test]
+async fn interrupted_immediate_admission_never_replays_queue_effects() {
+    for finalizer in [false, true] {
+        for after_callback in [false, true] {
+            let (_, model, _) = setup(vec![message(Role::Assistant, "answer")], false, false);
+            let store = Arc::new(Store::default());
+            if !after_callback {
+                *store.fail.lock().unwrap() = Some(("immediate_input_dispatched".into(), true));
+            }
+            let callback = Arc::new(DurableImmediate {
+                key: Some("queue-v1"),
+                calls: AtomicUsize::new(0),
+                fail_after: after_callback.then(|| store.clone()),
+            });
+            let mut config = RunnerConfig::default();
+            if finalizer {
+                config.immediate_input_finalizer = Some(callback.clone());
+            } else {
+                config.immediate_input_poller = Some(callback.clone());
+            }
+            let runner = Runner::new(
+                AgentConfig::new("agent", ModelBinding::complete("model", model)),
+                config,
+            )
+            .unwrap();
+            let error = runner
+                .run_durable(
+                    context(),
+                    request(false),
+                    Arc::new(HostImpl),
+                    DurableRun::new(store.clone()),
+                )
+                .await
+                .err()
+                .unwrap();
+            assert_eq!(error.error.info.message, "injected persistence failure");
+            assert_eq!(
+                callback.calls.load(Ordering::SeqCst),
+                usize::from(after_callback)
+            );
+            let checkpoint = store.latest();
+            assert_eq!(
+                checkpoint.execution_boundary(),
+                "immediate_input_dispatched"
+            );
+            if after_callback && !finalizer {
+                assert!(
+                    error
+                        .partial
+                        .as_ref()
+                        .unwrap()
+                        .history
+                        .contains(&message(Role::User, "steer"))
+                );
+            }
+            let error = runner
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(checkpoint)),
+                )
+                .await
+                .err()
+                .unwrap();
+            assert!(error.error.info.message.contains("reconciliation"));
+            assert_eq!(
+                callback.calls.load(Ordering::SeqCst),
+                usize::from(after_callback)
+            );
+        }
+    }
+}

@@ -857,3 +857,98 @@ fn role_file_parser_does_not_accept_programmatic_fallback_fields() {
         );
     }
 }
+
+#[derive(Default)]
+struct BuilderImmediate(Mutex<Vec<&'static str>>);
+impl adk::runtime::ImmediateInputPoller for BuilderImmediate {
+    fn poll<'a>(
+        &'a self,
+        _: &'a Context,
+    ) -> BoxFuture<'a, Result<adk::runtime::ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push("poll");
+            Ok(adk::runtime::ImmediateInputBatch {
+                items: vec![RunItem::Message {
+                    message: Message {
+                        role: Role::User,
+                        content: vec![Content::Text {
+                            text: "steering".into(),
+                        }],
+                    },
+                }],
+                provenance: vec![ItemProvenance::Unattributed],
+            })
+        })
+    }
+}
+impl adk::runtime::ImmediateInputFinalizer for BuilderImmediate {
+    fn finalize<'a>(
+        &'a self,
+        _: &'a Context,
+    ) -> BoxFuture<'a, Result<adk::runtime::ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push("finalize");
+            Ok(adk::runtime::ImmediateInputBatch::default())
+        })
+    }
+}
+#[tokio::test]
+async fn immediate_input_feature_gate_and_legacy_runner_config_in_run_and_stream() {
+    for features in [
+        None,
+        Some(Features::default()),
+        Some(Features {
+            immediate_input_polling: true,
+            ..Default::default()
+        }),
+    ] {
+        for streaming in [false, true] {
+            let enabled = features.as_ref().is_none_or(|f| f.immediate_input_polling);
+            let model = Arc::new(RecordingModel::default());
+            let callback = Arc::new(BuilderImmediate::default());
+            let mut bundle = builder(
+                Config {
+                    features: features.clone(),
+                    ..Default::default()
+                },
+                &model,
+            )
+            .runner_config(RunnerConfig {
+                immediate_input_poller: Some(callback.clone()),
+                immediate_input_finalizer: Some(callback.clone()),
+                ..Default::default()
+            })
+            .build(&context())
+            .await
+            .unwrap();
+            let outcome = if streaming {
+                bundle
+                    .stream(context(), vec![], Arc::new(TestHost))
+                    .finish()
+                    .await
+            } else {
+                bundle.run(context(), vec![], Arc::new(TestHost)).await
+            }
+            .unwrap();
+            assert_eq!(
+                *callback.0.lock().unwrap(),
+                if enabled {
+                    vec!["poll", "finalize"]
+                } else {
+                    vec![]
+                }
+            );
+            if enabled {
+                assert_eq!(
+                    outcome.result.history_provenance[0],
+                    ItemProvenance::Unattributed
+                );
+                assert_eq!(
+                    model.requests.lock().unwrap()[0].input[0],
+                    outcome.result.history[0]
+                );
+            }
+            bundle.close().await.unwrap();
+        }
+    }
+}

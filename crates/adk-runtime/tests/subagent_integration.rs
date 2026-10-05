@@ -760,6 +760,139 @@ impl SchedulerStore for SchedulerCheckpoints {
     }
 }
 
+struct LateChildInput(Mutex<usize>);
+impl ImmediateInputFinalizer for LateChildInput {
+    fn durable_key(&self) -> Option<&str> {
+        Some("late-child-input-v1")
+    }
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            let mut calls = self.0.lock().unwrap();
+            *calls += 1;
+            Ok(if *calls == 1 {
+                ImmediateInputBatch {
+                    items: vec![message(Role::User, "late child input")],
+                    provenance: vec![ItemProvenance::Unattributed],
+                }
+            } else {
+                ImmediateInputBatch::default()
+            })
+        })
+    }
+}
+
+struct LateInputChildModel {
+    started: tokio::sync::Notify,
+    release: tokio::sync::Notify,
+    requests: Mutex<Vec<ModelRequest>>,
+}
+impl Model for LateInputChildModel {
+    fn provider(&self) -> &str {
+        "fake"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            let turn = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len()
+            };
+            if turn == 2 {
+                self.started.notify_one();
+                self.release.notified().await;
+            }
+            Ok(answer(if turn == 1 { "candidate" } else { "done" }))
+        })
+    }
+}
+
+#[tokio::test]
+async fn late_immediate_input_reopens_child_steering() {
+    for durable in [false, true] {
+        let model = Arc::new(LateInputChildModel {
+            started: tokio::sync::Notify::new(),
+            release: tokio::sync::Notify::new(),
+            requests: Mutex::new(vec![]),
+        });
+        let finalizer = Arc::new(LateChildInput(Mutex::new(0)));
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("fake", model.clone())),
+            RunnerConfig {
+                immediate_input_finalizer: Some(finalizer.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let store =
+            durable.then(|| Arc::new(SchedulerCheckpoints::default()) as Arc<dyn SchedulerStore>);
+        let (owner, session) = session_with_runner(child, store).await;
+        let id = session
+            .scheduler
+            .submit(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        tokio::time::timeout(Duration::from_secs(2), model.started.notified())
+            .await
+            .unwrap();
+        assert_eq!(
+            session
+                .scheduler
+                .status(&id, Detail::Summary)
+                .unwrap()
+                .status,
+            TaskStatus::Running
+        );
+        session
+            .scheduler
+            .steer(&id, "after-late-input", "parent steering after late input")
+            .await
+            .unwrap();
+        model.release.notify_one();
+        tokio::time::timeout(
+            Duration::from_secs(2),
+            session
+                .scheduler
+                .wait(std::slice::from_ref(&id), WaitMode::All, None),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+        let record = session.scheduler.snapshot().records.remove(0);
+        assert_eq!(
+            record.task.status,
+            TaskStatus::Completed,
+            "{:?}",
+            record.task.error
+        );
+        assert!(!record.accepting_messages);
+        assert_eq!(record.acknowledged_messages.len(), 1);
+        assert_eq!(*finalizer.0.lock().unwrap(), 2);
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 3);
+            assert!(history_text(&requests[1].input).contains("late child input"));
+            assert_eq!(
+                history_text(&requests[2].input)
+                    .matches("parent steering after late input")
+                    .count(),
+                1
+            );
+        }
+        assert!(
+            session
+                .scheduler
+                .steer(&id, "too-late", "closed")
+                .await
+                .is_err()
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
 struct InterruptModel {
     started: tokio::sync::Notify,
     requests: Mutex<Vec<ModelRequest>>,

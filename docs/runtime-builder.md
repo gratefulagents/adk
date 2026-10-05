@@ -150,6 +150,41 @@ Pending-child joins, retries, denied hallucinated calls, generation snapshots an
 native durable recovery have separate Rust tests, not independent Go parity
 claims. See `scripts/handoff-reference/README.md`.
 
+## Immediate input at run boundaries
+
+Hosts can supply `ImmediateInputPoller` and `ImmediateInputFinalizer` through
+`Builder::runner_config` (or directly through `RunnerConfig`). Strict explicit
+selection requires `Features::immediate_input_polling`; when it is off, neither
+callback is installed. Legacy selection retains callbacks supplied by the host.
+The callbacks are optional independently, but only a finalizer can atomically
+close admission with a last queue check. A poller alone cannot protect input
+racing with run completion.
+
+Callbacks return `ImmediateInputBatch { items, provenance }` with exactly one
+authorship entry per item. The runner does not infer authorship from the active
+agent. Polling appends accepted input before the next model turn; a finalizer
+can return late input instead of completing, extending an exhausted model
+budget by one attempt. Normal and streaming execution share this behavior.
+Poll errors are best-effort and observable through
+`Observation::ImmediateInputPollFailed`; finalizer and malformed-batch errors
+abort. Callback futures must not detach work and must be safe to drop when the
+parent is cancelled or its deadline expires.
+
+Durable callbacks require nonempty stable `durable_key()` identities. The runner
+writes an `immediate_input_dispatched` boundary before invoking the host. A crash
+at that boundary is ambiguous: the external queue may already have drained or
+closed. Recovery fails closed rather than replaying the callback automatically;
+the host must reconcile its queue and checkpoint. This is **not** exactly-once
+queue admission. Hosts own the external queue and its retention policy.
+
+The pinned SDK oracle covers fourteen complete/streaming boundary cases and
+compares model inputs, returned history/new items, actual authorship labels,
+callback/tool counts and output. Native cancellation, malformed batches and
+durable recovery have separate regressions. The SDK's optional
+`ImmediateInputSignal` (interrupt an in-flight, not-yet-visible model attempt)
+is **not implemented** by these boundary callbacks and remains a capability
+gap; steering currently waits for the next boundary.
+
 ## Host and file configuration
 
 `ConfigSource::load` returns a native `HostConfig` snapshot of modes and roles.

@@ -3409,3 +3409,453 @@ async fn tool_ceiling_intersects_every_host_access_and_none_preserves_exceptions
         }
     }
 }
+
+#[derive(Default)]
+struct ImmediateQueue {
+    polls: Mutex<VecDeque<Result<ImmediateInputBatch, Error>>>,
+    finals: Mutex<VecDeque<Result<ImmediateInputBatch, Error>>>,
+    calls: Mutex<Vec<&'static str>>,
+}
+impl ImmediateInputPoller for ImmediateQueue {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.lock().unwrap().push("poll");
+            self.polls
+                .lock()
+                .unwrap()
+                .pop_front()
+                .unwrap_or_else(|| Ok(ImmediateInputBatch::default()))
+        })
+    }
+}
+impl ImmediateInputFinalizer for ImmediateQueue {
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.lock().unwrap().push("finalize");
+            self.finals
+                .lock()
+                .unwrap()
+                .pop_front()
+                .unwrap_or_else(|| Ok(ImmediateInputBatch::default()))
+        })
+    }
+}
+fn steering(text: &str) -> ImmediateInputBatch {
+    ImmediateInputBatch {
+        items: vec![message(Role::User, text)],
+        provenance: vec![ItemProvenance::Unattributed],
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_order_provenance_finalization_and_summary_in_run_and_stream() {
+    for streaming in [false, true] {
+        let model = TestModel::with(vec![Ok(answer("candidate")), Ok(answer("done"))]);
+        let queue = Arc::new(ImmediateQueue::default());
+        let mut initial = steering("first");
+        initial.items.push(message(Role::Assistant, "forwarded"));
+        initial.provenance.push(ItemProvenance::Agent {
+            name: "other".into(),
+        });
+        queue.polls.lock().unwrap().push_back(Ok(initial));
+        queue.finals.lock().unwrap().push_back(Ok(steering("late")));
+        let hooks = Arc::new(Observations::default());
+        let runner = Runner::new(
+            AgentConfig::new("test", ModelBinding::complete("primary", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue.clone()),
+                force_final_summary_turn: true,
+                hooks: Some(hooks.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let result = if streaming {
+            runner
+                .stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+        }
+        .unwrap()
+        .result;
+        assert_eq!(
+            *queue.calls.lock().unwrap(),
+            ["poll", "finalize", "poll", "finalize"]
+        );
+        assert_eq!(
+            result.new_items,
+            vec![
+                message(Role::User, "first"),
+                message(Role::Assistant, "forwarded"),
+                message(Role::Assistant, "candidate"),
+                message(Role::User, "late"),
+                message(Role::Assistant, "done")
+            ]
+        );
+        assert_eq!(result.new_items_provenance[0], ItemProvenance::Unattributed);
+        assert_eq!(
+            result.new_items_provenance[1],
+            ItemProvenance::Agent {
+                name: "other".into()
+            }
+        );
+        assert_eq!(result.new_items_provenance[3], ItemProvenance::Unattributed);
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[1].input.last(), Some(&message(Role::User, "late")));
+        assert!(
+            requests
+                .iter()
+                .all(|r| r.tools.is_empty() && r.instructions.contains("<final_turn>"))
+        );
+        let seen = hooks.seen.lock().unwrap();
+        let admitted = seen.iter().position(|o| matches!(o, Observation::CommittedItems { items, agents, .. } if items.first() == Some(&message(Role::User, "first")) && agents[0].is_none() && agents[1].as_ref().unwrap().name == "other")).unwrap();
+        let attempted = seen
+            .iter()
+            .position(|o| matches!(o, Observation::ModelAttempt { .. }))
+            .unwrap();
+        assert!(admitted < attempted);
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_errors_are_observed_but_finalizer_and_invalid_batches_fail() {
+    for kind in ["poll", "finalize", "invalid"] {
+        let model = TestModel::with(vec![Ok(answer("done"))]);
+        let queue = Arc::new(ImmediateQueue::default());
+        if kind == "invalid" {
+            queue
+                .polls
+                .lock()
+                .unwrap()
+                .push_back(Ok(ImmediateInputBatch {
+                    items: steering("bad").items,
+                    provenance: vec![],
+                }));
+        } else if kind == "poll" {
+            queue
+                .polls
+                .lock()
+                .unwrap()
+                .push_back(Err(Error::new(ErrorCategory::Host, "queue failure")));
+        } else {
+            queue
+                .finals
+                .lock()
+                .unwrap()
+                .push_back(Err(Error::new(ErrorCategory::Host, "close failure")));
+        }
+        let hooks = Arc::new(Observations::default());
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue),
+                hooks: Some(hooks.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let outcome = runner
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await;
+        if kind == "poll" {
+            assert!(outcome.is_ok());
+            assert!(hooks.seen.lock().unwrap().iter().any(|o| matches!(o, Observation::ImmediateInputPollFailed { error } if error.message == "queue failure")));
+        } else {
+            let error = outcome.err().unwrap();
+            assert_eq!(
+                error.error.info.category,
+                if kind == "invalid" {
+                    ErrorCategory::InvalidInput
+                } else {
+                    ErrorCategory::Host
+                }
+            );
+            assert_eq!(
+                model.completes.load(Ordering::SeqCst),
+                usize::from(kind == "finalize")
+            );
+        }
+    }
+}
+
+struct PendingImmediate {
+    entered: tokio::sync::Notify,
+    drops: AtomicUsize,
+}
+impl ImmediateInputPoller for PendingImmediate {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            struct Guard<'a>(&'a AtomicUsize);
+            impl Drop for Guard<'_> {
+                fn drop(&mut self) {
+                    self.0.fetch_add(1, Ordering::SeqCst);
+                }
+            }
+            let _guard = Guard(&self.drops);
+            self.entered.notify_one();
+            std::future::pending().await
+        })
+    }
+}
+impl ImmediateInputFinalizer for PendingImmediate {
+    fn finalize<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        self.poll(context)
+    }
+}
+#[tokio::test]
+async fn immediate_input_cancellation_and_stream_drop_drop_callback_future() {
+    for drop_stream in [false, true] {
+        let queue = Arc::new(PendingImmediate {
+            entered: tokio::sync::Notify::new(),
+            drops: AtomicUsize::new(0),
+        });
+        let model = TestModel::with(vec![]);
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let token = CancellationToken::new();
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token.clone());
+        if drop_stream {
+            let mut stream = runner.stream(ctx, request(1), Arc::new(TestHost::default()));
+            assert!(matches!(
+                stream.next().await,
+                Some(RunEvent::Started { .. })
+            ));
+            tokio::select! {
+                biased;
+                _ = stream.next() => panic!("unexpected event"),
+                _ = queue.entered.notified() => {}
+            }
+            drop(stream);
+        } else {
+            let run = runner.run(ctx, request(1), Arc::new(TestHost::default()));
+            let cancel = async {
+                queue.entered.notified().await;
+                token.cancel();
+            };
+            let (result, _) = tokio::join!(run, cancel);
+            assert_eq!(
+                result.err().unwrap().error.info.category,
+                ErrorCategory::Cancelled
+            );
+        }
+        assert_eq!(queue.drops.load(Ordering::SeqCst), 1);
+        assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+    }
+}
+
+#[tokio::test]
+async fn immediate_finalizer_extends_exhausted_budget_then_polls() {
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![message(Role::Assistant, "continue")],
+            Some(false),
+        )),
+        Ok(answer("done")),
+    ]);
+    let queue = Arc::new(ImmediateQueue::default());
+    queue.finals.lock().unwrap().push_back(Ok(steering("last")));
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            immediate_input_poller: Some(queue.clone()),
+            immediate_input_finalizer: Some(queue.clone()),
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let result = runner
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(
+        *queue.calls.lock().unwrap(),
+        ["poll", "finalize", "poll", "finalize"]
+    );
+    assert_eq!(result.result.final_output, Some(json!("done")));
+    assert_eq!(
+        model.requests.lock().unwrap()[1].input.last(),
+        Some(&message(Role::User, "last"))
+    );
+}
+
+mod immediate_input_oracle;
+
+#[tokio::test]
+async fn immediate_finalizer_precedes_stop_after_tool_and_grants_a_turn() {
+    for return_tool_output in [false, true] {
+        let model = TestModel::with(vec![
+            Ok(response(vec![call("one", "read")], None)),
+            Ok(answer("steered")),
+        ]);
+        let tool = TestTool::new("read", false, false);
+        let mut agent = agent(model.clone());
+        agent.tools.push(tool.clone());
+        let queue = Arc::new(ImmediateQueue::default());
+        queue.finals.lock().unwrap().push_back(Ok(steering("late")));
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                immediate_input_finalizer: Some(queue.clone()),
+                return_tool_output,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut req = request(1);
+        req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        let outcome = runner
+            .run(context(), req, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(outcome.result.final_output, Some(json!("steered")));
+        assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+        assert_eq!(*queue.calls.lock().unwrap(), ["finalize", "finalize"]);
+        assert_eq!(
+            model.requests.lock().unwrap()[1].input.last(),
+            Some(&message(Role::User, "late"))
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_batch_is_retained_when_publication_fails() {
+    struct RejectAdmission;
+    impl RunHooks for RejectAdmission {
+        fn observe<'a>(
+            &'a self,
+            _: &'a Context,
+            event: Observation,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(event, Observation::CommittedItems { .. }) {
+                    Err(Error::new(ErrorCategory::Host, "reject observation"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+    }
+    let model = TestModel::with(vec![]);
+    let queue = Arc::new(ImmediateQueue::default());
+    queue
+        .polls
+        .lock()
+        .unwrap()
+        .push_back(Ok(steering("retained")));
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            immediate_input_poller: Some(queue),
+            hooks: Some(Arc::new(RejectAdmission)),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "reject observation");
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.new_items, vec![message(Role::User, "retained")]);
+    assert_eq!(
+        partial.new_items_provenance,
+        vec![ItemProvenance::Unattributed]
+    );
+    assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn immediate_finalizer_is_deadline_bounded_and_retains_candidate() {
+    let queue = Arc::new(PendingImmediate {
+        entered: tokio::sync::Notify::new(),
+        drops: AtomicUsize::new(0),
+    });
+    let model = TestModel::with(vec![Ok(answer("candidate"))]);
+    let runner = Runner::new(
+        agent(model),
+        RunnerConfig {
+            immediate_input_finalizer: Some(queue.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut ctx = context();
+    ctx.deadline = Some(Instant::now() + Duration::from_millis(100));
+    let error = runner
+        .run(ctx, request(1), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::DeadlineExceeded);
+    assert_eq!(queue.drops.load(Ordering::SeqCst), 1);
+    assert_eq!(
+        error.partial.unwrap().new_items,
+        vec![message(Role::Assistant, "candidate")]
+    );
+}
+
+#[tokio::test]
+async fn malformed_immediate_history_does_not_poison_partial_results() {
+    for finalizing in [false, true] {
+        let queue = Arc::new(ImmediateQueue::default());
+        let batch = ImmediateInputBatch {
+            items: vec![
+                message(Role::User, "not admitted"),
+                call("orphan", "inspect"),
+            ],
+            provenance: vec![ItemProvenance::Unattributed; 2],
+        };
+        if finalizing {
+            queue.finals.lock().unwrap().push_back(Ok(batch));
+        } else {
+            queue.polls.lock().unwrap().push_back(Ok(batch));
+        }
+        let model = TestModel::with(vec![Ok(answer("candidate"))]);
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let error = runner
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await
+            .err()
+            .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+        let partial = error.partial.unwrap();
+        let mut expected = vec![message(Role::User, "go")];
+        if finalizing {
+            expected.push(message(Role::Assistant, "candidate"));
+        }
+        assert_eq!(partial.history, expected);
+        assert_eq!(partial.history.len(), partial.history_provenance.len());
+        assert_eq!(
+            model.completes.load(Ordering::SeqCst),
+            usize::from(finalizing)
+        );
+    }
+}

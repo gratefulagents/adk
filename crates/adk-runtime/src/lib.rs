@@ -1,5 +1,9 @@
 //! Opt-in execution engine and explicitly owned Tokio lifecycle primitives.
 //!
+//! Immediate input is host-owned boundary polling with optional atomic admission
+//! finalization; it does not wake or cancel an in-flight model request. Durable
+//! admission interrupted after its dispatch checkpoint requires reconciliation.
+//!
 //! [`TaskGroup`] never detaches tasks: drop cancels and requests abortion;
 //! [`TaskGroup::shutdown`] additionally joins every task before returning.
 //! Abortion only takes effect when a task yields. Non-yielding work can prevent

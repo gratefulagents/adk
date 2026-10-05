@@ -467,6 +467,10 @@ impl RunHooks for Observability {
     ) -> BoxFuture<'a, Result<(), Error>> {
         Box::pin(async move {
             let (kind, data) = match observation {
+                Observation::ImmediateInputPollFailed { error } => (
+                    "immediate_input_poll_failed",
+                    json!({"category":error.category,"error":error.message}),
+                ),
                 Observation::TextDelta { delta } => ("hook_delta", json!({"delta":delta})),
                 Observation::CommittedItems {
                     items,

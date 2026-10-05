@@ -190,6 +190,9 @@ pub trait CostEstimator: Send + Sync {
 
 #[derive(Debug, Clone)]
 pub enum Observation {
+    ImmediateInputPollFailed {
+        error: ErrorInfo,
+    },
     TextDelta {
         delta: String,
     },
@@ -324,6 +327,7 @@ pub struct CompactionConfig {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Boundary {
+    ImmediateInputDispatched,
     Started,
     ModelPrepared,
     ModelCompleted,
@@ -347,6 +351,44 @@ pub trait DurableHook: Send + Sync {
         snapshot: &'a RunResult,
         pending: Option<&'a ToolCall>,
     ) -> BoxFuture<'a, Result<(), Error>>;
+}
+
+/// Host-supplied items and exact authorship, in admission order.
+/// Nonempty batches require one provenance entry per item; no author is inferred.
+#[derive(Debug, Clone, Default)]
+pub struct ImmediateInputBatch {
+    pub items: Vec<RunItem>,
+    pub provenance: Vec<ItemProvenance>,
+}
+
+/// Boundary-only steering; this does not interrupt an in-flight model request.
+/// Futures must not detach work and must be safe to drop on cancellation.
+/// Errors are reported to hooks as ImmediateInputPollFailed and otherwise ignored.
+pub trait ImmediateInputPoller: Send + Sync {
+    /// Stable identity/version of the callback and its queue configuration.
+    /// Durable runs checkpoint before calling; an interrupted admission requires
+    /// host reconciliation, not automatic replay. This is not exactly-once delivery.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn poll<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>>;
+}
+
+/// Atomically close admission when empty, or drain accepted input and leave it
+/// open for another turn. Errors abort finalization. Without this callback a
+/// poller alone cannot guarantee admission of input racing with completion.
+/// Futures have the same cancellation and durable reconciliation contract as pollers.
+pub trait ImmediateInputFinalizer: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn finalize<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>>;
 }
 
 pub trait TurnContext: Send + Sync {
@@ -383,6 +425,8 @@ pub trait CompactionCarryForward: Send + Sync {
 
 #[derive(Clone)]
 pub struct RunnerConfig {
+    pub immediate_input_poller: Option<Arc<dyn ImmediateInputPoller>>,
+    pub immediate_input_finalizer: Option<Arc<dyn ImmediateInputFinalizer>>,
     /// Reserve the last model attempt for a no-tool summary, unless children still need joining.
     pub force_final_summary_turn: bool,
     pub work_dir: PathBuf,
@@ -429,6 +473,8 @@ pub struct RunnerConfig {
 impl Default for RunnerConfig {
     fn default() -> Self {
         Self {
+            immediate_input_poller: None,
+            immediate_input_finalizer: None,
             force_final_summary_turn: false,
             work_dir: PathBuf::from("."),
             output: OutputPolicy::default(),
@@ -1260,6 +1306,12 @@ impl Engine {
                         && self.tool_final.is_some()
                     {
                         self.settle_tool_turn();
+                        if (!self.config.return_tool_output
+                            || (self.config.subagents.is_none() && self.child_control.is_none()))
+                            && self.finalize_immediate_input().await?
+                        {
+                            continue;
+                        }
                         if self.config.return_tool_output {
                             let output = self.tool_final.take().unwrap();
                             let output = self.validate_output(output).await?;
@@ -1632,9 +1684,81 @@ impl Engine {
             self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
         }
     }
+    async fn admit_immediate_input(&mut self, batch: ImmediateInputBatch) -> Result<bool, Error> {
+        if batch.items.len() != batch.provenance.len() {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "immediate input provenance length mismatch",
+            ));
+        }
+        let provenance = normalize_provenance(batch.items.len(), &batch.provenance)?;
+        let admitted = !batch.items.is_empty();
+        let mut candidate = self.result.history.clone();
+        candidate.extend(batch.items.iter().cloned());
+        validate_history_pairs(&candidate)?;
+        for (item, provenance) in batch.items.into_iter().zip(provenance) {
+            self.append_with_provenance(item, provenance);
+        }
+        self.publish_committed().await?;
+        Ok(admitted)
+    }
+    async fn poll_immediate_input(&mut self) -> Result<(), Error> {
+        let Some(poller) = self.config.immediate_input_poller.clone() else {
+            return Ok(());
+        };
+        self.checkpoint(Boundary::ImmediateInputDispatched, None)
+            .await?;
+        match bounded(&self.context, None, poller.poll(&self.context)).await {
+            Ok(batch) => {
+                self.admit_immediate_input(batch).await?;
+            }
+            Err(error) => {
+                self.context.check_active()?;
+                let _ = self
+                    .observe(Observation::ImmediateInputPollFailed { error: error.info })
+                    .await;
+                self.context.check_active()?;
+            }
+        }
+        Ok(())
+    }
+    async fn finalize_immediate_input(&mut self) -> Result<bool, Error> {
+        let Some(finalizer) = self.config.immediate_input_finalizer.clone() else {
+            return Ok(false);
+        };
+        self.checkpoint(Boundary::ImmediateInputDispatched, None)
+            .await?;
+        let batch = bounded(&self.context, None, finalizer.finalize(&self.context)).await?;
+        if !self.admit_immediate_input(batch).await? {
+            return Ok(false);
+        }
+        if let Some(control) = &self.child_control {
+            control.reopen_message_admission().await?;
+        }
+        if self.turns >= self.policy.max_turns.get() {
+            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+        }
+        self.result.final_output = None;
+        self.phase = Phase::Model;
+        Ok(true)
+    }
     async fn model_turn(&mut self) -> Result<(), Error> {
         self.summary_turn = false;
         self.settle_tool_turn();
+        if self.turns >= self.policy.max_turns.get()
+            && self.config.immediate_input_finalizer.is_some()
+        {
+            self.publish_committed().await?;
+            if !self.finalize_immediate_input().await? {
+                return Err(Error::new(
+                    ErrorCategory::MaxTurns,
+                    "maximum model turns exceeded",
+                ));
+            }
+        }
+        if self.turns < self.policy.max_turns.get() {
+            self.poll_immediate_input().await?;
+        }
         self.apply_child_messages(false).await?;
         if let Some(control) = &self.child_control {
             control
@@ -1832,7 +1956,9 @@ impl Engine {
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
             if self.durable_state.is_some()
-                && (self.config.stop_gate.is_some() || self.config.subagents.is_some())
+                && (self.config.stop_gate.is_some()
+                    || self.config.subagents.is_some()
+                    || self.config.immediate_input_finalizer.is_some())
             {
                 self.result.final_output = Some(output);
                 self.phase = Phase::Finalize;
@@ -1923,6 +2049,9 @@ impl Engine {
         }
         if self.apply_child_messages(true).await? {
             self.phase = Phase::Model;
+            return Ok(());
+        }
+        if self.finalize_immediate_input().await? {
             return Ok(());
         }
         self.check_output_guardrails(&output).await?;

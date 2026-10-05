@@ -1226,3 +1226,40 @@ mod telemetry {
         provider.shutdown().unwrap();
     }
 }
+
+#[tokio::test]
+async fn immediate_poll_failure_is_nonterminal_and_respects_capture_policy() {
+    for mode in [CaptureMode::Metadata, CaptureMode::Full] {
+        let (pipeline, records) = pipeline(mode);
+        pipeline
+            .observe(
+                &context(),
+                Observation::ImmediateInputPollFailed {
+                    error: Error::new(ErrorCategory::Host, "private queue failure").info,
+                },
+            )
+            .await
+            .unwrap();
+        pipeline
+            .observe(
+                &context(),
+                Observation::TextDelta {
+                    delta: "continued".into(),
+                },
+            )
+            .await
+            .unwrap();
+        let records = records.0.lock().unwrap();
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0].kind, "immediate_input_poll_failed");
+        assert_eq!(records[0].data["category"], "host");
+        assert!(records[1].sequence > records[0].sequence);
+        assert_eq!(
+            records[0]
+                .data
+                .to_string()
+                .contains("private queue failure"),
+            mode == CaptureMode::Full
+        );
+    }
+}

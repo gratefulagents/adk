@@ -124,6 +124,16 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_immediate_input_oracle_is_required(self):
+        original = copy.deepcopy(self.evidence)
+        for replacement in ("", "immediate input reference verified at wrong"):
+            with self.subTest(replacement=replacement):
+                self.evidence = copy.deepcopy(original)
+                self.evidence["reference_fixture_check"] = self.evidence["reference_fixture_check"].replace(
+                    f"immediate input reference verified at {ledger.BASELINE_REVISION}", replacement)
+                with self.assertRaises(SystemExit):
+                    self.apply()
+
     def test_excluded_entry_cannot_be_verified(self):
         self.entries[next(iter(self.entries))]["scope"] = "out_of_scope"
         with self.assertRaises(SystemExit):

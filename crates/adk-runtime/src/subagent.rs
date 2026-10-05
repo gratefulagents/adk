@@ -1485,6 +1485,22 @@ impl ChildControl {
             .await
     }
 
+    pub(crate) async fn reopen_message_admission(&self) -> Result<(), Error> {
+        self.handle
+            .transact(|state| {
+                let record = record_mut(state, &self.id)?;
+                if record.task.status != TaskStatus::Running {
+                    return Err(invalid("child is not running"));
+                }
+                if self.handle.token(&self.id).is_cancelled() {
+                    return Err(Error::new(ErrorCategory::Cancelled, "child cancelled"));
+                }
+                record.accepting_messages = true;
+                Ok(())
+            })
+            .await
+    }
+
     /// In-flight messages precede new messages. Retry with the same IDs is safe;
     /// acknowledgement must follow committing their application to child history.
     pub async fn take_messages(&self) -> Result<Vec<SteeringMessage>, Error> {

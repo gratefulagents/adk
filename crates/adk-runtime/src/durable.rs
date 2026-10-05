@@ -632,10 +632,18 @@ impl Runner {
     fn durable_fingerprint(&self) -> Result<String, Error> {
         let config = &self.config;
         if config
-            .tool_input_guardrails
-            .iter()
-            .chain(&config.tool_output_guardrails)
-            .any(|g| g.durable_key().is_none_or(str::is_empty))
+            .immediate_input_poller
+            .as_ref()
+            .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .immediate_input_finalizer
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .tool_input_guardrails
+                .iter()
+                .chain(&config.tool_output_guardrails)
+                .any(|g| g.durable_key().is_none_or(str::is_empty))
             || config.compaction.is_some()
             || config.turn_context.is_some()
             || config
@@ -653,7 +661,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, or replay-unsafe carry-forward callbacks, guardrails, stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe immediate input or carry-forward callbacks, guardrails, stop gates or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -730,6 +738,12 @@ impl Runner {
         if let Some(callback) = &config.compaction_carry_forward {
             baseline["compaction_carry_forward"] = serde_json::json!(callback.durable_key());
         }
+        if let Some(callback) = &config.immediate_input_poller {
+            baseline["immediate_input_poller"] = serde_json::json!(callback.durable_key());
+        }
+        if let Some(callback) = &config.immediate_input_finalizer {
+            baseline["immediate_input_finalizer"] = serde_json::json!(callback.durable_key());
+        }
         if config.force_final_summary_turn {
             baseline["force_final_summary_turn"] = serde_json::json!(true);
         }
@@ -783,6 +797,8 @@ impl Engine {
             }
         }
         let name = match boundary {
+            // A drain/close may have happened after this write. Never replay it blindly.
+            Boundary::ImmediateInputDispatched => "immediate_input_dispatched",
             Boundary::Started => "run_started",
             Boundary::ModelPrepared => "model_prepared",
             Boundary::ModelDispatched => "model_dispatched",

@@ -2,6 +2,42 @@
 
 ## Current continuation evidence
 
+### Immediate input at boundaries
+
+Native runtime polling and atomic finalization now accept provenance-aware
+batches, preserve normal/streaming ordering, and support late-input budget
+extension. Explicit builder selection gates both host callbacks; legacy mode
+retains them. Poll errors are best-effort observations; finalizer errors abort.
+The observability pipeline preserves error capture policy and keeps polling
+failures nonterminal. Fourteen independent pinned SDK cases compare complete
+projected requests, histories, new items, actual authorship, callback/tool counts
+and outputs. All five handoff-module fixtures regenerate twice byte-for-byte.
+
+Review found that child steering could remain closed after a late-input
+continuation. Transactional reopening now rejects cancellation and non-running
+children; a Notify-gated durable/non-durable regression verifies subsequent
+parent steering, exactly-once application and final closure. Malformed batches
+are validated before mutating history. Cancellation/deadline and failed
+publication regressions preserve ownership and admitted input.
+
+Durable callbacks require stable keys. A dispatched-admission checkpoint is
+explicitly non-replayable without host reconciliation; no crash-atomic external
+queue admission is claimed. Wake-before-visible-output `ImmediateInputSignal`
+remains missing, not silently treated as equivalent to boundary polling.
+
+Final verification after the review fix: **1,123 workspace/doctests passed,
+0 failed, 30 ignored**; **561 hash-bound tests** and **15 evidence validators**
+passed. Strict all-target Clippy, Rustfmt, rustdoc, source locks, facade matrix
+and the standalone platform-free consumer passed. All twenty offline feature
+examples, the host-session example, and Go test/vet/build passed. No additional ledger entries
+were closed: **197 verified / 8,694 unresolved / 251 excluded**. Live
+credentialed provider tests remain unverified.
+
+Previous head `84b3200` finished with **28 successful and 18 cancelled CI jobs**
+(not 46 passes). Both Linux and both macOS enforcement jobs passed, including
+the PID-readiness correction; one Windows unsupported-target lane passed and
+the other was cancelled. New-head CI is separate evidence.
+
 ### Final-summary selection and lifecycle readiness
 
 The builder and direct runner now expose opt-in final-summary attempts. Exact

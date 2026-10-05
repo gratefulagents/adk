@@ -41,6 +41,7 @@ pub struct Features {
     pub parallel_tool_calls: bool,
     pub untrusted_tool_outputs: bool,
     pub force_final_summary_turn: bool,
+    pub immediate_input_polling: bool,
     /// Requires an explicitly supplied session with an owned scheduler.
     pub subagents: SubagentFeatures,
     /// Catalog transfers, independent of scheduler-backed subagents.
@@ -1310,6 +1311,10 @@ impl Builder {
         self.runner.output.untrusted = features.untrusted_tool_outputs;
         self.runner.approve_mutating_tools = features.approval;
         self.runner.force_final_summary_turn = features.force_final_summary_turn;
+        if self.config.features.is_some() && !features.immediate_input_polling {
+            self.runner.immediate_input_poller = None;
+            self.runner.immediate_input_finalizer = None;
+        }
         if !features.retry {
             self.runner.retry.max_retries = 0;
         } else if self.runner.retry.max_retries == 0

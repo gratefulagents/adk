@@ -145,6 +145,44 @@ async fn mode_and_role_reads_are_independent() {
 }
 
 #[test]
+fn standalone_role_catalog_uses_requested_directory_and_strict_policy() {
+    use adk::host::fileconfig::load_role_catalog;
+    let dir = tempfile::tempdir().unwrap();
+    write(dir.path(), "agents/bad.md", "---\nunknown: yes\n---\nBad");
+    write(dir.path(), "custom/reviewer.md", "Review carefully.");
+    let ctx = context();
+    let roles = load_role_catalog(&ctx, dir.path().join("custom")).unwrap();
+    assert_eq!(roles.len(), 1);
+    assert_eq!(roles[0].name, "reviewer");
+    assert_eq!(roles[0].instructions, "Review carefully.");
+    assert!(
+        load_role_catalog(&ctx, dir.path().join("missing"))
+            .unwrap()
+            .is_empty()
+    );
+    for text in [
+        "---\nunknown: yes\n---\nBad",
+        "---\nname: reviewer\n---\nDuplicate",
+    ] {
+        write(dir.path(), "custom/invalid.md", text);
+        assert!(load_role_catalog(&ctx, dir.path().join("custom")).is_err());
+    }
+    let token = CancellationToken::new();
+    token.cancel();
+    let cancelled = Context {
+        cancellation: Arc::new(token),
+        ..context()
+    };
+    assert_eq!(
+        load_role_catalog(&cancelled, dir.path().join("missing"))
+            .unwrap_err()
+            .info
+            .category,
+        ErrorCategory::Cancelled,
+    );
+}
+
+#[test]
 fn normalized_mode_fields_routing_and_constraints_are_preserved() {
     let dir = tempfile::tempdir().unwrap();
     write(

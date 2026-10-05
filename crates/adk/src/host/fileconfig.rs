@@ -1,4 +1,4 @@
-pub use crate::builder::FileConfigSource;
+pub use crate::builder::{FileConfigSource, load_role_catalog};
 use crate::builder::{ModeSpec, RoleSpec};
 use crate::host::{ConfigSource, PermissionMode};
 use adk_core::{BoxFuture, Context, Error};

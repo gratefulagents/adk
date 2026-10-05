@@ -143,8 +143,16 @@ workspace-write permission. Independent `list_modes`, `get_mode`, and `load_role
 allow callers to inspect one catalog without loading the other. Direct mode
 lookup prefers `.yaml` over `.yml`, before catalog fallback; the runtime builder
 still validates the complete snapshot before assembly. `build_mode_directive`
-is also available as a pure formatter. See the pinned Go differential coverage
-and explicit strict-parser exclusions in `scripts/fileconfig-reference/README.md`.
+is also available as a pure formatter. For a standalone role directory, call
+`builder::load_role_catalog(&context, directory)` (also reexported through
+`host::fileconfig`). This does not append `agents/`, consult HOME, load modes or
+read another source's role directory. It uses the same strict role parser and
+checks cancellation before directory access and between files; unlike Go's
+context-free helper, cancelled native contexts return a cancellation error.
+Missing directories yield an empty catalog. Duplicate names and unknown fields
+remain errors rather than inheriting the SDK's permissive policies. See the
+pinned Go differential coverage and explicit strict-parser exclusions in
+`scripts/fileconfig-reference/README.md`.
 
 Mode `maxConcurrentSubAgents` is checked against the injected scheduler's
 immutable concurrency ceiling. A wider scheduler fails construction rather than

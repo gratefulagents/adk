@@ -50,13 +50,14 @@ Files:
 
 ## Counts
 
-51 cases, 190 queries, including 9 source-only cases:
+52 cases, 193 queries, including 9 source-only cases:
 
 | Operation | Queries |
 | --- | ---: |
 | `ListModes` | 15 |
 | `GetMode` | 57 |
 | `RoleCatalog` | 25 |
+| `LoadRoleCatalog` | 3 |
 | `PermissionMode` | 25 |
 | `ModeSnapshot` | 19 |
 | `ModeDirective` | 25 |
@@ -177,7 +178,7 @@ Rust expected result**. The 9 marked cases must be reported separately:
 Rust keeps its strict duplicate, unknown-field, access, zero-limit, frontmatter
 and HOME policies. This oracle does not fabricate their expected errors or
 assert parity for marked cases. `crates/adk/tests/fileconfig_oracle.rs` compares
-all 171 eligible queries across 42 cases, including complete mode/role DTOs,
+all 174 eligible queries across 43 cases, including complete mode/role DTOs,
 errors, independent loading, root styles and isolated-process HOME behavior.
 The nine source-only cases contain 19 queries, explicitly excluded rather than
 counted as passes. Run `cargo test -p adk --all-features --test fileconfig_oracle`
@@ -190,7 +191,13 @@ slices, compared to asserted-empty native values (including empty history
 sidecars), not fabricated populated results. Pure builtin results are compared
 field-for-field independently of Source loading.
 
+Standalone `LoadRoleCatalog` calls use an explicit directory independent of the
+source's malformed agents directory, preserve declared-name ordering, ignore
+non-Markdown/nested files, and cover missing and non-directory paths. Native
+cancellation is tested separately: the Go helper has no context parameter.
+Strict native duplicate/unknown-field policies still prevent a full API parity
+claim for this helper.
+
 Not covered: filesystem permission denial, symlink security, races or concurrent
-mutation, Windows path behavior, standalone LoadRoleCatalog calls (their behavior
-is observed through Source), or SDK internals. These are not implied by the
+mutation, Windows path behavior, or SDK internals. These are not implied by the
 counts above.

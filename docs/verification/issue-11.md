@@ -11,11 +11,22 @@ nine source-only oracle cases are not parity passes. A subsequent direct-helper
 fixture closes three more entries: standalone builtin templates and the
 fileconfig guardrail/history no-ops. Those calls are verified with malformed
 files, nonexistent active modes and cancelled contexts. The differential now
-passes **171/171 eligible queries across 42 cases**; nine cases / 19 queries remain
-explicitly excluded. Go test/vet/build and strict Rust comparator Clippy pass.
-The ledger now has **196 verified, 8,695 unresolved and 251 excluded** entries.
+passes **174/174 eligible queries across 43 cases**; nine cases / 19 queries remain
+explicitly excluded. The standalone `load_role_catalog(context, directory)`
+facade now reuses the strict parser without requiring a source root, with direct
+Go observations for ordering, isolation, missing directories and directory
+errors. Native cancellation and strict duplicate/unknown-field tests are
+separate; full loader parity is not claimed. Fresh Rust 1.88 workspace tests
+pass **1,072 tests, 0 failed, 30 ignored**. The previous pushed head's two CI
+quality failures were formatting-only; the corrected workspace formatting
+check passes locally. Strict workspace Clippy, rustdoc/doctests, feature matrix,
+platform-free standalone consumer, twenty offline feature scenarios and the host
+session example pass. The example script's `cargo clippy` launcher hit the
+container's missing `/proc/self/exe`; equivalent warning-denied checks succeeded
+through the direct Clippy driver before the example build and runs.
+The ledger has **196 verified, 8,695 unresolved and 251 excluded** entries.
 Fresh claim verification
-ran **400 Rust tests, 0 failed**, regenerated the Go fixtures twice, and passed
+ran **401 Rust tests, 0 failed**, regenerated the Go fixtures twice, and passed
 **11 evidence-validator tests**. The validator now requires a fileconfig-specific
 pinned-oracle success marker, so unrelated host fixture evidence cannot satisfy
 that requirement. This is not an issue-wide completion claim.

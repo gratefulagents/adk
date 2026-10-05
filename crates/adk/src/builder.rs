@@ -333,16 +333,30 @@ impl FileConfigSource {
     }
     pub fn load_roles(&self, context: &Context) -> Result<Vec<RoleSpec>, Error> {
         self.check_root(context)?;
-        let mut roles = BTreeMap::new();
-        for path in config_files(&self.agent_dir(), &["md"])? {
-            context.check_active()?;
-            let role = parse_role_file(&path)?;
-            if roles.insert(role.name.clone(), role).is_some() {
-                return Err(invalid("duplicate role name"));
-            }
-        }
-        Ok(roles.into_values().collect())
+        load_role_catalog(context, self.agent_dir())
     }
+}
+
+/// Load a standalone Markdown role directory, ordered by declared role name.
+///
+/// Missing directories produce an empty catalog. Uses the same strict parser as
+/// [`FileConfigSource::load_roles`], without consulting HOME or appending `agents`.
+/// Checks cancellation before reading the directory and between files. Reads are
+/// synchronous; callers should provide a local configuration directory.
+pub fn load_role_catalog(
+    context: &Context,
+    directory: impl AsRef<Path>,
+) -> Result<Vec<RoleSpec>, Error> {
+    context.check_active()?;
+    let mut roles = BTreeMap::new();
+    for path in config_files(directory.as_ref(), &["md"])? {
+        context.check_active()?;
+        let role = parse_role_file(&path)?;
+        if roles.insert(role.name.clone(), role).is_some() {
+            return Err(invalid("duplicate role name"));
+        }
+    }
+    Ok(roles.into_values().collect())
 }
 
 fn parse_mode_file(path: &Path) -> Result<ModeSpec, Error> {

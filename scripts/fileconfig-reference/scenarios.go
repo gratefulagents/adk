@@ -21,6 +21,14 @@ func scenarios() []testCase {
 		query{Operation: "GuardrailRules", Cancelled: true},
 		query{Operation: "HandoffHistory", Cancelled: true})
 	add("builtin-chat", nil, "chat", get("chat"), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"))
+	add("standalone-role-catalog", map[string]string{
+		"roles/z.md":        "---\nname: alpha\ntool_access: analysis\nmodel: openai/reviewer\n---\nReview carefully.\n",
+		"roles/a.md":        "---\nname: zeta\n---\nImplement carefully.\n",
+		"roles/ignored.txt": "ignored", "roles/nested/ignored.md": "ignored",
+		"not-a-directory": "plain file", "agents/bad.md": "---\nunknown: yes\n---\nBad",
+	}, "", query{Operation: "LoadRoleCatalog", Lookup: "roles"},
+		query{Operation: "LoadRoleCatalog", Lookup: "missing"},
+		query{Operation: "LoadRoleCatalog", Lookup: "not-a-directory"})
 	add("builtin-plan", nil, " \tplan\n", get(" PLAN "), q("ModeSnapshot"), q("PermissionMode"), q("ModeDirective"))
 	add("plain-full-schema", map[string]string{"modes/custom.yaml": `name: " custom "
 version: " v2 "

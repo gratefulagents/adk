@@ -123,6 +123,8 @@ func execute(in input) ([]observation, error) {
 			result, callErr = src.GetMode(ctx, q.Lookup)
 		case "RoleCatalog":
 			result, callErr = src.RoleCatalog(ctx)
+		case "LoadRoleCatalog":
+			result, callErr = fileconfig.LoadRoleCatalog(filepath.Join(root, q.Lookup))
 		case "PermissionMode":
 			result, callErr = src.PermissionMode(ctx)
 		case "ModeSnapshot":

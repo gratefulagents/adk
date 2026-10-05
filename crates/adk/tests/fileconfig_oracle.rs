@@ -186,10 +186,16 @@ async fn execute(case: &Case, root: &Path) -> Vec<Value> {
         };
         let result = match query.operation.as_str() {
             "BuiltinModes" => Ok(Value::Array(
-                adk::builder::builtin_modes().iter().map(mode_value).collect(),
+                adk::builder::builtin_modes()
+                    .iter()
+                    .map(mode_value)
+                    .collect(),
             )),
             "GuardrailRules" => source.guardrail_rules(&context).await.map(|rules| {
-                assert!(rules.is_empty(), "fileconfig must not supply guardrail rules");
+                assert!(
+                    rules.is_empty(),
+                    "fileconfig must not supply guardrail rules"
+                );
                 Value::Null
             }),
             "HandoffHistory" => source.handoff_history(&context).await.map(|history| {
@@ -212,6 +218,17 @@ async fn execute(case: &Case, root: &Path) -> Vec<Value> {
                     Value::Array(roles.iter().map(role_value).collect())
                 }
             }),
+            "LoadRoleCatalog" => {
+                adk::host::fileconfig::load_role_catalog(&context, root.join(&query.lookup)).map(
+                    |roles| {
+                        if roles.is_empty() {
+                            Value::Null
+                        } else {
+                            Value::Array(roles.iter().map(role_value).collect())
+                        }
+                    },
+                )
+            }
             "PermissionMode" => source.permission_mode(&context).await.map(|permission| {
                 json!(match permission {
                     PermissionMode::ReadOnly => "read-only",
@@ -272,14 +289,14 @@ fn differences(path: &str, actual: &Value, expected: &Value, out: &mut Vec<Strin
 fn assert_inventory(fixture: &Fixture) {
     assert_eq!(fixture.schema_version, 1);
     assert_eq!(fixture.sdk_revision, PIN);
-    assert_eq!(fixture.cases.len(), 51);
+    assert_eq!(fixture.cases.len(), 52);
     assert_eq!(
         fixture
             .cases
             .iter()
             .map(|c| c.input.queries.len())
             .sum::<usize>(),
-        190
+        193
     );
     let exclusions = BTreeMap::from([
         ("duplicate-declared-mode-names", "duplicate-name-policy"),
@@ -329,6 +346,7 @@ fn assert_inventory(fixture: &Fixture) {
             ("ListModes", 13),
             ("GetMode", 53),
             ("RoleCatalog", 21),
+            ("LoadRoleCatalog", 3),
             ("PermissionMode", 23),
             ("ModeSnapshot", 17),
             ("ModeDirective", 23),
@@ -459,10 +477,10 @@ async fn matches_every_unexcluded_pinned_go_query() {
         }
     }
     eprintln!(
-        "Go fileconfig oracle: {passed}/{checked} queries passed; {checked_cases}/42 cases executed; 9 cases / 19 queries EXCLUDED (not passes); {} mismatches/infrastructure failures",
+        "Go fileconfig oracle: {passed}/{checked} queries passed; {checked_cases}/43 cases executed; 9 cases / 19 queries EXCLUDED (not passes); {} mismatches/infrastructure failures",
         failures.len()
     );
-    assert_eq!(checked_cases, 42);
+    assert_eq!(checked_cases, 43);
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-    assert_eq!(checked, 171, "all non-source-only queries must execute");
+    assert_eq!(checked, 174, "all non-source-only queries must execute");
 }

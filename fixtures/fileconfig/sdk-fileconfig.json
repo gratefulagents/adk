@@ -323,6 +323,77 @@
       ]
     },
     {
+      "name": "standalone-role-catalog",
+      "source_only": [],
+      "input": {
+        "files": {
+          "agents/bad.md": "---\nunknown: yes\n---\nBad",
+          "not-a-directory": "plain file",
+          "roles/a.md": "---\nname: zeta\n---\nImplement carefully.\n",
+          "roles/ignored.txt": "ignored",
+          "roles/nested/ignored.md": "ignored",
+          "roles/z.md": "---\nname: alpha\ntool_access: analysis\nmodel: openai/reviewer\n---\nReview carefully.\n"
+        },
+        "active_mode": "",
+        "root_style": "literal",
+        "home_unset": false,
+        "queries": [
+          {
+            "operation": "LoadRoleCatalog",
+            "lookup": "roles",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "LoadRoleCatalog",
+            "lookup": "missing",
+            "cancelled": false,
+            "template": null
+          },
+          {
+            "operation": "LoadRoleCatalog",
+            "lookup": "not-a-directory",
+            "cancelled": false,
+            "template": null
+          }
+        ]
+      },
+      "output": [
+        {
+          "result": [
+            {
+              "Name": "alpha",
+              "Description": "",
+              "Instructions": "Review carefully.",
+              "ToolAccess": "read-only",
+              "ModelOverride": "openai/reviewer",
+              "FallbackModels": null
+            },
+            {
+              "Name": "zeta",
+              "Description": "",
+              "Instructions": "Implement carefully.",
+              "ToolAccess": "full",
+              "ModelOverride": "",
+              "FallbackModels": null
+            }
+          ],
+          "error": null
+        },
+        {
+          "result": null,
+          "error": null
+        },
+        {
+          "result": null,
+          "error": {
+            "message": "read agents dir \u003croot\u003e/not-a-directory: open \u003croot\u003e/not-a-directory: not a directory",
+            "category": "fileconfig"
+          }
+        }
+      ]
+    },
+    {
       "name": "builtin-plan",
       "source_only": [],
       "input": {

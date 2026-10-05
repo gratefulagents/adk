@@ -187,13 +187,17 @@ pub async fn connect_config_with_diagnostics(
             .await?,
         )
     };
-    let mut client = Client::with_limits(transport, server, config, policy, limits)?;
-    if let Err(error) = client.initialize().await {
-        let _ = client.close().await;
+    let client = Client::with_limits(transport, server, config, policy, limits)?;
+    let mut acquired = crate::session::AcquiredClients(vec![client]);
+    if let Err(error) = acquired.0[0].initialize().await {
+        let closed = acquired
+            .start_cleanup()
+            .await
+            .map_err(|_| Error::Transport)?;
         return Err(ConnectionFailure {
             error,
-            diagnostics: client.diagnostics(),
+            diagnostics: closed[0].diagnostics(),
         });
     }
-    Ok(client)
+    Ok(acquired.0.pop().expect("acquired client"))
 }

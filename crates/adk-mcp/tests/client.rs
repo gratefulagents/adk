@@ -97,6 +97,137 @@ async fn client(replies: Vec<Result<Value, Error>>) -> (Client, Log) {
 }
 
 #[tokio::test]
+async fn manager_discovery_failure_rolls_back_every_acquired_client() {
+    let mut clients = vec![];
+    let mut logs = vec![];
+    for (name, replies) in [
+        ("a", vec![handshake(), Ok(json!({"tools":[]}))]),
+        ("b", vec![handshake(), Err(Error::Transport)]),
+        ("c", vec![]),
+    ] {
+        let (transport, log) = transport(replies);
+        let mut policy = policy();
+        let grant = policy.servers.remove("server").unwrap();
+        policy.servers.insert(name.into(), grant);
+        clients.push(Client::new(transport, name, config(), policy).unwrap());
+        logs.push(log);
+    }
+    assert!(ClientManager::new(clients).await.is_err());
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if logs.iter().all(|log| {
+                log.lock()
+                    .unwrap()
+                    .iter()
+                    .any(|(method, _)| method == "close")
+            }) {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    for log in logs {
+        assert_eq!(
+            log.lock()
+                .unwrap()
+                .iter()
+                .filter(|(method, _)| method == "close")
+                .count(),
+            1
+        );
+    }
+}
+
+#[tokio::test]
+async fn cancelled_manager_discovery_retains_cleanup() {
+    let log = Log::default();
+    let peer = Box::new(Mock {
+        replies: vec![handshake()].into(),
+        log: log.clone(),
+        hang: true,
+    });
+    let client = Client::new(peer, "server", config(), policy()).unwrap();
+    let building = tokio::spawn(ClientManager::new(vec![client]));
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "tools/list")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    building.abort();
+    assert!(building.await.is_err());
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "close")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|(method, _)| method == "close")
+            .count(),
+        1
+    );
+}
+
+#[tokio::test]
+async fn unpolled_manager_construction_still_owns_client_cleanup() {
+    let (client, log) = client(vec![]).await;
+    drop(ClientManager::new(vec![client]));
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "close")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|(method, _)| method == "close")
+            .count(),
+        1
+    );
+    assert!(
+        !log.lock()
+            .unwrap()
+            .iter()
+            .any(|(method, _)| method == "tools/list")
+    );
+}
+
+#[tokio::test]
 async fn selected_catalog_filters_raw_and_final_names_and_cannot_widen() {
     for allowed in ["a b", "mcp__server__a_b_2"] {
         let (client, log) = client(vec![

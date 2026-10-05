@@ -9,6 +9,28 @@ use serde_json::Value;
 use std::{collections::BTreeMap, sync::Arc};
 use tokio::sync::{oneshot, watch};
 
+pub(crate) struct AcquiredClients(pub Vec<crate::client::Client>);
+
+impl AcquiredClients {
+    pub fn start_cleanup(&mut self) -> tokio::task::JoinHandle<Vec<crate::client::Client>> {
+        let mut clients = std::mem::take(&mut self.0);
+        tokio::spawn(async move {
+            for client in &mut clients {
+                let _ = client.close().await;
+            }
+            clients
+        })
+    }
+}
+
+impl Drop for AcquiredClients {
+    fn drop(&mut self) {
+        if !self.0.is_empty() && tokio::runtime::Handle::try_current().is_ok() {
+            self.start_cleanup();
+        }
+    }
+}
+
 /// Must be closed before the Tokio executor shuts down. Dropping requests cleanup;
 /// it cannot guarantee remote acknowledgement after executor shutdown.
 pub struct OwnedMcpSession {
@@ -99,7 +121,12 @@ impl McpHandle {
             };
             let _ = completed.send(result);
         });
-        result.await.map_err(|_| Error::Closed)?
+        let result = result.await.map_err(|_| Error::Closed)?;
+        if *self.shutdown.borrow() {
+            Err(Error::Closed)
+        } else {
+            result
+        }
     }
 }
 

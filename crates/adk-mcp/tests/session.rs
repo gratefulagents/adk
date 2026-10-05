@@ -22,6 +22,7 @@ struct Control {
     closing: Notify,
     release: Semaphore,
     fail_close: bool,
+    complete_call: bool,
 }
 impl Default for Control {
     fn default() -> Self {
@@ -32,6 +33,7 @@ impl Default for Control {
             closing: Notify::new(),
             release: Semaphore::new(0),
             fail_close: false,
+            complete_call: false,
         }
     }
 }
@@ -49,7 +51,11 @@ impl Transport for Peer {
                 "tools/call" => {
                     self.0.calls.fetch_add(1, Ordering::SeqCst);
                     self.0.dispatched.notify_one();
-                    std::future::pending().await
+                    if self.0.complete_call {
+                        Ok(json!({"content":[]}))
+                    } else {
+                        std::future::pending().await
+                    }
                 }
                 _ => panic!("unexpected request {method}"),
             }
@@ -214,6 +220,27 @@ async fn dropped_dispatched_call_poisoning_is_preserved_without_replay() {
     );
     assert_eq!(control.calls.load(Ordering::SeqCst), 1);
     session.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn owner_shutdown_revokes_buffered_call_result() {
+    let control = Arc::new(Control {
+        complete_call: true,
+        ..Default::default()
+    });
+    control.release.add_permits(1);
+    let session = session(&[control.clone()]).await;
+    let handle = session.handle();
+    let mut call = handle.call("mcp__server0__read", json!({}));
+    std::future::poll_fn(|cx| {
+        assert!(call.as_mut().poll(cx).is_pending());
+        std::task::Poll::Ready(())
+    })
+    .await;
+    notified(&control.dispatched).await;
+    session.close().await.unwrap();
+    assert_eq!(call.await, Err(Error::Closed));
+    assert_eq!(control.calls.load(Ordering::SeqCst), 1);
 }
 
 #[tokio::test]

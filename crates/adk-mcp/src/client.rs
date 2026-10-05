@@ -921,59 +921,69 @@ impl ClientManager {
         }
         Ok(())
     }
-    pub async fn new(mut clients: Vec<Client>) -> Result<Self, Error> {
-        let mut manager = Self {
-            clients: BTreeMap::new(),
-            definitions: Vec::new(),
-            routes: BTreeMap::new(),
-            resources: false,
-            capabilities: BTreeMap::new(),
-            resource_access: true,
-        };
-        clients.sort_by(|a, b| a.server.cmp(&b.server));
-        let mut qualified = BTreeSet::new();
-        for mut client in clients {
-            if manager.clients.contains_key(client.server_name()) {
-                return Err(Error::Config("duplicate server name".into()));
+    pub fn new(
+        clients: Vec<Client>,
+    ) -> impl std::future::Future<Output = Result<Self, Error>> + Send {
+        let mut acquired = crate::session::AcquiredClients(clients);
+        async move {
+            let mut manager = Self {
+                clients: BTreeMap::new(),
+                definitions: Vec::new(),
+                routes: BTreeMap::new(),
+                resources: false,
+                capabilities: BTreeMap::new(),
+                resource_access: true,
+            };
+            acquired.0.sort_by(|a, b| a.server.cmp(&b.server));
+            let mut qualified = BTreeSet::new();
+            let mut servers = BTreeSet::new();
+            for client in &acquired.0 {
+                if !servers.insert(client.server.clone()) {
+                    return Err(Error::Config("duplicate server name".into()));
+                }
             }
-            if client.state == State::New {
-                client.initialize().await?;
+            for client in &mut acquired.0 {
+                if client.state == State::New {
+                    client.initialize().await?;
+                }
+                client.list_tools().await?;
+                for tool in client.tools.iter().flatten().filter(|tool| {
+                    client.tool_allowed(&tool.tool_name) && client.remote_read_only(tool)
+                }) {
+                    let name = crate::names::ensure_unique_tool_name(
+                        &qualified_tool_name(&tool.server_name, &tool.tool_name),
+                        &mut qualified,
+                    )
+                    .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
+                    manager.routes.insert(
+                        name.clone(),
+                        (tool.server_name.clone(), tool.tool_name.clone()),
+                    );
+                    manager.definitions.push(adk_core::ToolDefinition {
+                        name,
+                        description: tool.display_description.clone(),
+                        input_schema: tool
+                            .input_schema
+                            .clone()
+                            .try_into()
+                            .map_err(|_| Error::Protocol("invalid tool schema".into()))?,
+                        read_only: tool.read_only,
+                        requires_approval: !tool.read_only,
+                    });
+                }
+                manager.resources |= client.capabilities.resources;
+                manager
+                    .capabilities
+                    .insert(client.server.clone(), client.capabilities);
             }
-            client.list_tools().await?;
-            for tool in client.tools.iter().flatten().filter(|tool| {
-                client.tool_allowed(&tool.tool_name) && client.remote_read_only(tool)
-            }) {
-                let name = crate::names::ensure_unique_tool_name(
-                    &qualified_tool_name(&tool.server_name, &tool.tool_name),
-                    &mut qualified,
-                )
-                .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
-                manager.routes.insert(
-                    name.clone(),
-                    (tool.server_name.clone(), tool.tool_name.clone()),
-                );
-                manager.definitions.push(adk_core::ToolDefinition {
-                    name,
-                    description: tool.display_description.clone(),
-                    input_schema: tool
-                        .input_schema
-                        .clone()
-                        .try_into()
-                        .map_err(|_| Error::Protocol("invalid tool schema".into()))?,
-                    read_only: tool.read_only,
-                    requires_approval: !tool.read_only,
-                });
+            for client in std::mem::take(&mut acquired.0) {
+                manager
+                    .clients
+                    .insert(client.server.clone(), tokio::sync::Mutex::new(client));
             }
-            manager.resources |= client.capabilities.resources;
-            manager
-                .capabilities
-                .insert(client.server.clone(), client.capabilities);
-            manager
-                .clients
-                .insert(client.server.clone(), tokio::sync::Mutex::new(client));
+            manager.definitions.sort_by(|a, b| a.name.cmp(&b.name));
+            Ok(manager)
         }
-        manager.definitions.sort_by(|a, b| a.name.cmp(&b.name));
-        Ok(manager)
     }
 }
 impl crate::tools::ToolManager for ClientManager {

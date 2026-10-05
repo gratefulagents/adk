@@ -85,8 +85,13 @@ Cancelling a close waiter does not cancel cleanup. Dropping the owner immediatel
 revokes handles and requests cleanup. Close before shutting down the Tokio
 executor: drop cannot promise remote acknowledgement after executor shutdown.
 This owner currently starts **after** acquisition and discovery; it is not yet
-the facade builder's atomic connection/build rollback contract. Initialization
-and discovery before ownership transfer remain caller responsibilities.
+the facade builder's atomic connection/build rollback contract.
+The protected connection functions retain cleanup when initialization fails or
+is cancelled. `ClientManager::new` takes cleanup responsibility for all supplied
+clients immediately, even if its returned future is never polled, and requests
+rollback on discovery failure or cancellation. Such rollback requires a running
+Tokio executor. Hosts connecting multiple clients still own the interval between
+successful individual connections and transfer into manager construction.
 
 Each mutable transport owns one serialized session: there is at most one active
 request per transport, stricter than the reference's eight-request concurrency

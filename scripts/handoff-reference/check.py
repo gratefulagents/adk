@@ -73,6 +73,17 @@ def main():
             sys.exit(f"sdk-subagent-selection.json differs from pinned Go regeneration (pass {attempt + 1})")
     check_sdk()
     print(f"Verified sdk-subagent-selection.json twice, byte-for-byte: {len(fixture['cases'])} public builder selections")
+    expected = (ROOT / "fixtures/handoff/sdk-final-summary.json").read_bytes()
+    fixture = json.loads(expected)
+    if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:
+        sys.exit("Unexpected final-summary fixture revision/schema")
+    for attempt in range(2):
+        check_sdk()
+        if run([GO, "run", "-mod=readonly", ".", "final-summary"]) != expected:
+            sys.exit(f"sdk-final-summary.json differs from pinned Go regeneration (pass {attempt + 1})")
+    check_sdk()
+    print(f"Verified sdk-final-summary.json twice, byte-for-byte: {len(fixture['cases'])} runner cases")
+    print(f"final summary reference verified at {PIN}")
     print(f"subagent selection reference verified at {PIN}")
     print(f"handoff reference verified at {PIN}")
 

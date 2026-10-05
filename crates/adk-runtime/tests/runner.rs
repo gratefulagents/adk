@@ -261,6 +261,188 @@ fn runner(agent: AgentConfig) -> Runner {
 }
 
 #[tokio::test]
+async fn final_summary_turn_is_opt_in_and_request_only_in_run_and_stream() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-final-summary.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    assert_eq!(fixture["schema_version"], 1);
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 8);
+    for enabled in [false, true] {
+        for turns in [1, 2] {
+            for streaming in [false, true] {
+                let mut responses = Vec::new();
+                if turns == 2 {
+                    responses.push(response(vec![call("read", "inspect")], Some(false)));
+                }
+                responses.push(answer("summary"));
+                let model = TestModel::with(responses.iter().cloned().map(Ok).collect());
+                *model.streams.lock().unwrap() = responses
+                    .into_iter()
+                    .map(|response| vec![StreamStep::Event(ModelEvent::Complete { response })])
+                    .collect();
+                let tool = TestTool::new("inspect", false, false);
+                let mut a = agent(model.clone());
+                a.instructions = "stable instructions".into();
+                a.tools.push(tool.clone());
+                let observer = Arc::new(Generations::default());
+                let runner = Runner::new(
+                    a,
+                    RunnerConfig {
+                        force_final_summary_turn: enabled,
+                        generation_observer: Some(observer.clone()),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+                let mut req = request(turns);
+                req.input_provenance = vec![ItemProvenance::Unattributed];
+                let result = if streaming {
+                    runner
+                        .stream(context(), req, Arc::new(TestHost::default()))
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(), req, Arc::new(TestHost::default()))
+                        .await
+                }
+                .unwrap();
+                let expected = fixture["cases"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|case| {
+                        case["enabled"] == enabled
+                            && case["turns"] == turns
+                            && case["streaming"] == streaming
+                    })
+                    .unwrap();
+                assert_eq!(
+                    result.result.final_output.as_ref(),
+                    Some(&expected["output"])
+                );
+                assert_eq!(
+                    tool.calls.load(Ordering::SeqCst) as u64,
+                    expected["tool_calls"].as_u64().unwrap()
+                );
+                let requests = model.requests.lock().unwrap();
+                let projected: Vec<_> = requests.iter().map(|request| json!({"instructions": request.instructions, "tools": request.tools.iter().map(|tool| tool.name.as_str()).collect::<Vec<_>>()})).collect();
+                assert_eq!(json!(projected), expected["requests"]);
+                let generations = observer.records.lock().unwrap();
+                let completed: Vec<_> = generations.iter().filter(|(ended, _)| *ended).collect();
+                assert_eq!(completed.len(), requests.len());
+                for ((_, record), request) in completed.into_iter().zip(requests.iter()) {
+                    assert_eq!(record.request.instructions, request.instructions);
+                    assert_eq!(record.declared_tool_timeouts.len(), request.tools.len());
+                    assert!(
+                        record.request_snapshot.is_ok(),
+                        "{:?}",
+                        record.request_snapshot
+                    );
+                }
+                assert_eq!(requests.len(), turns as usize);
+                for (index, request) in requests.iter().enumerate() {
+                    let final_turn = enabled && index + 1 == turns as usize;
+                    assert_eq!(request.tools.is_empty(), final_turn);
+                    assert_eq!(request.instructions.contains("<final_turn>"), final_turn);
+                    assert!(request.instructions.starts_with("stable instructions"));
+                    assert!(request.input.iter().all(|item| {
+                        !serde_json::to_string(item)
+                            .unwrap()
+                            .contains("<final_turn>")
+                    }));
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn final_summary_turn_denies_hallucinated_tools_and_handoffs_without_approval() {
+    let model = TestModel::with(vec![Ok(response(
+        vec![call("tool", "inspect"), call("handoff", "transfer")],
+        Some(false),
+    ))]);
+    let target = TestModel::with(vec![Ok(answer("not reached"))]);
+    let tool = TestTool::new("inspect", true, false);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    a.handoffs.push(Handoff {
+        definition: ToolDefinition {
+            name: "transfer".into(),
+            ..tool.definition().clone()
+        },
+        target: Arc::new(agent(target.clone())),
+        input_filter: HandoffInputFilter::Preserve,
+    });
+    let host = Arc::new(TestHost::default());
+    let error = Runner::new(
+        a,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .run(context(), request(1), host.clone())
+    .await
+    .err()
+    .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(target.completes.load(Ordering::SeqCst), 0);
+    assert!(host.events.lock().unwrap().iter().all(|event| !matches!(
+        event,
+        RunEvent::ApprovalRequired { .. } | RunEvent::ToolStarted { .. }
+    )));
+    let partial = error.partial.unwrap();
+    assert_eq!(
+        partial
+            .new_items
+            .iter()
+            .filter(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+            .count(),
+        2
+    );
+    assert!(model.requests.lock().unwrap()[0].tools.is_empty());
+}
+
+#[tokio::test]
+async fn final_summary_turn_applies_on_the_last_retry_attempt() {
+    let model = TestModel::with(vec![Err(provider_error()), Ok(answer("summary"))]);
+    let mut a = agent(model.clone());
+    a.tools.push(TestTool::new("inspect", false, false));
+    let runner = Runner::new(
+        a,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            retry: RetryPolicy {
+                max_retries: 1,
+                initial_delay: Duration::ZERO,
+                max_delay: Duration::ZERO,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    runner
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0].tools.len(), 1);
+    assert!(requests[1].tools.is_empty());
+    assert_eq!(requests[1].instructions.matches("<final_turn>").count(), 1);
+}
+
+#[tokio::test]
 async fn approval_resume_keeps_cursor_and_completed_effects() {
     let model = TestModel::with(vec![
         Ok(response(

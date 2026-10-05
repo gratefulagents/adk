@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Final-summary selection and lifecycle readiness
+
+The builder and direct runner now expose opt-in final-summary attempts. Exact
+request instructions, tool names, tool-call counts and outputs match eight
+independently executed pinned SDK normal/streaming cases. Native tests separately
+cover retry attempts, pending-child joins, denial of unexpected tool/handoff
+calls without approval, snapshot/provenance alignment and durable recovery.
+These additional cases do not claim independent SDK equivalence. Retry budgets
+remain native attempt budgets. The feature defaults off and preserves default
+durable fingerprints.
+
+Verification: **1,108 workspace/doctests passed, 0 failed, 30 ignored**;
+**524 hash-bound evidence tests** and **14 evidence validators** passed. Go
+test/vet/build, twice-identical oracle regeneration, source locks, strict Clippy,
+Rustfmt, rustdoc, facade feature matrix, standalone consumer, twenty offline
+examples and host-session example passed. No additional aggregate ledger entries
+are closed: **197 verified / 8,694 unresolved / 251 excluded**.
+
+Head `150ca251` finished CI with **45 passed / 1 failed**. One macOS lifecycle
+lane failed parsing an empty PID file; the other macOS lane passed. Shell
+redirection creates the file before `echo` writes the PID. The test readiness
+helper now waits for a complete newline-terminated record, with a regression for
+empty and partial writes. All **25 lifecycle tests** and scoped Clippy passed
+locally after this test-only correction; the full-suite total above precedes
+that one added regression. macOS validation of the correction requires new CI.
+No enforcement or process-reaping assertion was removed. Live credentialed
+provider tests remain unverified; full issue acceptance is not claimed.
+
 ### Independent managed-selection proof
 
 The managed selection matrix now compares against actual pinned public SDK

@@ -54,7 +54,8 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "crates/adk-runtime/tests/fixtures/checkpoint.go",
                "crates/adk-runtime/tests/fixtures/go-checkpoint.json",
                "crates/adk-runtime/tests/fixtures/go-stop-gate.json",
-               "crates/adk-runtime/tests/runner.rs", "crates/adk/src/observability.rs",
+               "crates/adk-runtime/tests/runner.rs", "crates/adk-runtime/tests/subagent_integration.rs",
+               "crates/adk/src/observability.rs",
                "crates/adk/tests/observability.rs",
                "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
                "crates/adk-core/src/contracts.rs", "crates/adk-core/src/types.rs",
@@ -121,7 +122,8 @@ RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_ru
                "scripts/handoff-reference/catalog.go", "scripts/handoff-reference/catalog_scenarios.go",
                "scripts/handoff-reference/catalog_test.go", "fixtures/handoff/sdk-catalog-handoffs.json",
                "scripts/handoff-reference/subagents.go", "scripts/handoff-reference/subagents_test.go",
-               "fixtures/handoff/sdk-subagent-selection.json",
+               "fixtures/handoff/sdk-subagent-selection.json", "fixtures/handoff/sdk-final-summary.json",
+               "scripts/handoff-reference/final_summary.go", "scripts/handoff-reference/final_summary_test.go",
                str(RUST_CLAIMS.relative_to(ROOT))]
 
 
@@ -223,7 +225,7 @@ def verify_rust() -> None:
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
-               "--test", "guardrails", "--test", "runner", "--test", "tracing_runtime"]
+               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
                             env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")
@@ -269,6 +271,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust handoff evidence requires independently executed pinned fixtures")
     if f"subagent selection reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust subagent selection evidence requires independently executed pinned fixtures")
+    if f"final summary reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
+        raise SystemExit("Rust final summary evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":
         raise SystemExit("Rust record evidence requires live Go record decoding")
     if evidence["exit_code"] != 0:

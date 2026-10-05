@@ -83,8 +83,10 @@ func main() {
 		b, err = generateCatalog()
 	case len(os.Args) == 2 && os.Args[1] == "subagents":
 		b, err = generateSubagents()
+	case len(os.Args) == 2 && os.Args[1] == "final-summary":
+		b, err = generateFinalSummary()
 	default:
-		err = fmt.Errorf("usage: handoff-reference [catalog|subagents]")
+		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary]")
 	}
 	if err == nil {
 		_, err = os.Stdout.Write(b)

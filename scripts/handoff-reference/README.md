@@ -343,3 +343,27 @@ GPL-3.0-only provenance policy as the other harness files. Inspected upstream
 sources are `pkg/agentsdk/runtime/{builder,features}.go` at the pin above,
 particularly `attachAsyncSubAgentTools` and `asyncSubAgentToolNames`. The generator
 invokes the exported builder instead of reimplementing either selector.
+
+## Final-summary request projection
+
+`go run -mod=readonly . final-summary` executes the pinned public SDK runner in
+complete and streaming modes with `ForceFinalSummaryTurn` off/on and one/two
+available turns. The eight cases in `fixtures/handoff/sdk-final-summary.json`
+record exact instruction bytes, ordered advertised tool names, executed tool
+counts and final output. A local scripted model and tool provide deterministic
+responses; no network, credentials, worker CLI or evaluation adapter is used.
+`check.py` regenerates this fixture twice and checks exact bytes.
+
+Rust compares those fields in
+`final_summary_turn_is_opt_in_and_request_only_in_run_and_stream`. Additional
+Rust tests cover retries, pending managed-child joins, observer snapshots,
+provenance and durable recovery; these are not independently established SDK
+parity. In particular, native budgets count retry attempts, and these Go cases
+do not test retries. The test deliberately does not project complete SDK
+RunResult/events or assert equivalent malformed-response handling.
+
+`final_summary.go` and `final_summary_test.go` follow the same GPL-3.0-only
+provenance policy. Inspected sources at the pin above are
+`internal/agent/runner.go` (`finalSummaryTurnDirective` and its final-turn
+branch) and the public `pkg/agentsdk` runner exports. The oracle invokes that
+implementation; it does not recreate its directive or selection logic.

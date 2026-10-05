@@ -383,6 +383,8 @@ pub trait CompactionCarryForward: Send + Sync {
 
 #[derive(Clone)]
 pub struct RunnerConfig {
+    /// Reserve the last model attempt for a no-tool summary, unless children still need joining.
+    pub force_final_summary_turn: bool,
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
@@ -427,6 +429,7 @@ pub struct RunnerConfig {
 impl Default for RunnerConfig {
     fn default() -> Self {
         Self {
+            force_final_summary_turn: false,
             work_dir: PathBuf::from("."),
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
@@ -792,6 +795,7 @@ impl Runner {
             fallbacks: HashMap::new(),
             cost: 0.0,
             tool_pause: false,
+            summary_turn: false,
             tool_final: None,
             streaming: false,
             sender: None,
@@ -864,12 +868,15 @@ struct Engine {
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
     tool_pause: bool,
+    summary_turn: bool,
     tool_final: Option<String>,
     streaming: bool,
     sender: Option<mpsc::Sender<RunEvent>>,
     spills: Vec<Arc<SpillFile>>,
     result: RunResult,
 }
+
+const FINAL_SUMMARY_DIRECTIVE: &str = "\n\n<final_turn>\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n</final_turn>";
 
 fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), Error> {
     if !seen.insert(agent as *const AgentConfig as usize) {
@@ -1626,6 +1633,7 @@ impl Engine {
         }
     }
     async fn model_turn(&mut self) -> Result<(), Error> {
+        self.summary_turn = false;
         self.settle_tool_turn();
         self.apply_child_messages(false).await?;
         if let Some(control) = &self.child_control {
@@ -1662,7 +1670,7 @@ impl Engine {
             );
         }
         let accessible_tools = self.tools_for_access();
-        let (tools, declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
+        let (mut tools, mut declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
             .map(|tool| (tool.definition(), tool.timeout()))
             .chain(self.agent.handoffs.iter().map(|h| (&h.definition, None)))
@@ -1692,6 +1700,12 @@ impl Engine {
                 ""
             };
             instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+        }
+        self.summary_turn = self.final_summary_required();
+        if self.summary_turn {
+            instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+            tools.clear();
+            declared_tool_timeouts.clear();
         }
         let mut settings = self.agent.settings.clone();
         if let Some(key) = &self.config.prompt_cache_key {
@@ -2034,7 +2048,7 @@ impl Engine {
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
-        declared_tool_timeouts: Vec<Option<Duration>>,
+        mut declared_tool_timeouts: Vec<Option<Duration>>,
     ) -> Result<Option<(ModelResponse, String, bool, Option<f64>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
@@ -2049,6 +2063,13 @@ impl Engine {
                         ErrorCategory::MaxTurns,
                         "maximum model turns exceeded",
                     ));
+                }
+                if !self.summary_turn && self.final_summary_required() {
+                    self.summary_turn = true;
+                    request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+                    request.tools.clear();
+                    declared_tool_timeouts.clear();
+                    self.compact_local(&mut request, false).await?;
                 }
                 self.turns += 1;
                 self.observe(Observation::AgentStarted {
@@ -2445,8 +2466,20 @@ impl Engine {
             }
         }
     }
+    fn final_summary_required(&self) -> bool {
+        self.config.force_final_summary_turn
+            && self.turns.saturating_add(1) == self.policy.max_turns.get()
+            && !self
+                .config
+                .subagents
+                .as_ref()
+                .is_some_and(|session| session.has_pending_final_join())
+    }
     fn effective_tool_policy(&self) -> ToolPolicy {
         let mut policy = self.policy.tools.clone();
+        if self.summary_turn {
+            policy.allowed_tools = Some(Default::default());
+        }
         if let Some(ceiling) = self.agent.tool_access_ceiling {
             policy.access = match (policy.access, ceiling) {
                 (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,

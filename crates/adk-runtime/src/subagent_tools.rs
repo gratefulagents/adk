@@ -574,6 +574,14 @@ impl SubagentSession {
             })
             .collect())
     }
+    pub(crate) fn has_pending_final_join(&self) -> bool {
+        !self.pending_ids().is_empty()
+            || self
+                .scheduler
+                .list()
+                .iter()
+                .any(|task| !task.status.is_terminal())
+    }
     pub(crate) async fn join(&self, context: &Context) -> Result<Vec<RunItem>, Error> {
         let mut ids = self.pending_ids();
         // A direct child may intentionally end a no-output turn while its own

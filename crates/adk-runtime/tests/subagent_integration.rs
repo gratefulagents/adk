@@ -176,6 +176,82 @@ fn parent(model: Arc<FakeModel>, session: Arc<SubagentSession>) -> Runner {
 }
 
 #[tokio::test]
+async fn final_summary_waits_for_child_join_before_disabling_tools() {
+    struct GatedChild(Arc<tokio::sync::Notify>);
+    impl Model for GatedChild {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                self.0.notified().await;
+                Ok(answer("child evidence"))
+            })
+        }
+    }
+    struct ReleasingParent(Arc<FakeModel>, Arc<tokio::sync::Notify>);
+    impl Model for ReleasingParent {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            context: &'a Context,
+            request: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            self.1.notify_one();
+            self.0.complete(context, request)
+        }
+    }
+    let gate = Arc::new(tokio::sync::Notify::new());
+    let (owner, session) = session(Arc::new(GatedChild(gate.clone()))).await;
+    owner
+        .handle()
+        .submit(Submission::new("worker", "inspect"))
+        .await
+        .unwrap();
+    let model = FakeModel::new(
+        vec![answer("premature"), answer("synthesized")],
+        Duration::ZERO,
+    );
+    let mut agent = AgentConfig::new(
+        "parent",
+        ModelBinding::complete("fake", Arc::new(ReleasingParent(model.clone(), gate))),
+    );
+    agent.tools = build_subagent_task_tools(session.clone(), "worker");
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            subagents: Some(session),
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request();
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let result = runner
+        .run(context(), req, Arc::new(TestHost))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("synthesized")));
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert!(!requests[0].tools.is_empty());
+        assert!(!requests[0].instructions.contains("<final_turn>"));
+        assert!(requests[1].tools.is_empty());
+        assert!(requests[1].instructions.contains("<final_turn>"));
+        assert!(history_text(&requests[1].input).contains("child evidence"));
+    }
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
 async fn background_final_answer_waits_and_delivers_exactly_once() {
     let child = FakeModel::new(vec![answer("child evidence")], Duration::from_millis(50));
     let (owner, session) = session(child.clone()).await;

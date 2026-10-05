@@ -81,6 +81,8 @@ pub struct RuntimeCheckpoint {
     cost: f64,
     tool_calls: u64,
     tool_pause: bool,
+    #[serde(default)]
+    summary_turn: bool,
     tool_final: Option<String>,
     tool_turn_start: Option<usize>,
     consecutive_tool_errors: usize,
@@ -566,6 +568,7 @@ impl Runner {
             engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
+            engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
             engine.tool_turn_start = saved.tool_turn_start;
             engine.consecutive_tool_errors = saved.consecutive_tool_errors;
@@ -726,6 +729,9 @@ impl Runner {
         }
         if let Some(callback) = &config.compaction_carry_forward {
             baseline["compaction_carry_forward"] = serde_json::json!(callback.durable_key());
+        }
+        if config.force_final_summary_turn {
+            baseline["force_final_summary_turn"] = serde_json::json!(true);
         }
         if config.subagents.is_some() {
             baseline["subagents"] = serde_json::json!({"version": 1});
@@ -965,6 +971,7 @@ impl Engine {
                 cost: self.cost,
                 tool_calls: state.tool_calls,
                 tool_pause: self.tool_pause,
+                summary_turn: self.summary_turn,
                 tool_final: self.tool_final.clone(),
                 tool_turn_start: self.tool_turn_start,
                 consecutive_tool_errors: self.consecutive_tool_errors,
@@ -1227,6 +1234,7 @@ impl Runner {
             cost: recovery.cost,
             tool_calls: recovery.tool_calls,
             tool_pause: false,
+            summary_turn: false,
             tool_final: None,
             tool_turn_start: None,
             consecutive_tool_errors: 0,

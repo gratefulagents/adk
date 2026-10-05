@@ -124,6 +124,32 @@ Go `ModelSettings::Merge` codec.
   strict and legacy defaults. They neither require nor enable `subagents`, a
   scheduler, or `ExtraTools`.
 
+## Final available turn
+
+`Features::force_final_summary_turn` opts the builder into a no-tool summary on
+the last available model attempt. Direct runner consumers use
+`RunnerConfig::force_final_summary_turn`. Both default off; builder selection is
+authoritative over the supplied runner configuration. The request receives the
+pinned SDK `<final_turn>` directive without adding it to persisted conversation
+history. Tool and handoff descriptors are removed, declared timeout sidecars stay
+aligned, and hallucinated tool/handoff calls are denied without approval or
+execution. This requests a summary; it cannot guarantee that a model obeys it.
+
+Managed children that still require final joining keep the tool surface
+available. Once their results have joined, the existing final-join turn extension
+can produce the summary. Native continuation checkpoints preserve whether the
+last response was from a no-tool summary attempt; changing the configuration
+invalidates durable recovery. The opt-out keeps previous graph fingerprints.
+
+Native budgets count model attempts, including retries/fallbacks. The directive
+therefore also applies when a retry consumes the last available attempt. This is
+not a claim that native and SDK retry budget accounting are identical. Eight
+independently executed pinned Go normal/streamed cases compare exact instruction
+bytes, ordered tool names, tool-call counts and final outputs at one/two turns.
+Pending-child joins, retries, denied hallucinated calls, generation snapshots and
+native durable recovery have separate Rust tests, not independent Go parity
+claims. See `scripts/handoff-reference/README.md`.
+
 ## Host and file configuration
 
 `ConfigSource::load` returns a native `HostConfig` snapshot of modes and roles.

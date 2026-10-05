@@ -200,6 +200,45 @@ impl Tool for Probe {
 }
 
 #[tokio::test]
+async fn builder_final_summary_selection_controls_the_last_request() {
+    for enabled in [false, true] {
+        let model = Script::new(vec![response(vec![message("summary")])]);
+        let mut c = config();
+        c.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+        c.features.as_mut().unwrap().force_final_summary_turn = enabled;
+        c.features
+            .as_mut()
+            .unwrap()
+            .tools
+            .insert("ExtraTools".into());
+        let mut bundle = builder(c, &model)
+            .runner_config(RunnerConfig {
+                force_final_summary_turn: !enabled,
+                ..Default::default()
+            })
+            .extra_tools([Probe::new("inspect", true) as Arc<dyn Tool>])
+            .build(&context())
+            .await
+            .unwrap();
+        bundle
+            .run(
+                context(),
+                vec![message("go")],
+                Arc::new(TestHost::default()),
+            )
+            .await
+            .unwrap();
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 1);
+            assert_eq!(requests[0].tools.is_empty(), enabled);
+            assert_eq!(requests[0].instructions.contains("<final_turn>"), enabled);
+        }
+        bundle.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn actual_transfer_run_and_stream_filter_tools_and_preserve_role_only_prompt() {
     for streaming in [false, true] {
         let model = Script::new(vec![

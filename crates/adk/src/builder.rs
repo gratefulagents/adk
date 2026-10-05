@@ -25,6 +25,11 @@ use std::{
     time::Duration,
 };
 
+#[cfg(feature = "mcp")]
+mod mcp;
+#[cfg(feature = "mcp")]
+pub use adk_mcp::session::ConnectionSet as McpInput;
+
 fn invalid(message: impl Into<String>) -> Error {
     Error::new(ErrorCategory::InvalidInput, message)
 }
@@ -39,6 +44,7 @@ pub struct Features {
     pub retry: bool,
     pub approval: bool,
     pub builtin_guardrails: bool,
+    pub mcp: McpFeatures,
     pub parallel_tool_calls: bool,
     pub untrusted_tool_outputs: bool,
     pub force_final_summary_turn: bool,
@@ -49,6 +55,24 @@ pub struct Features {
     pub handoffs: bool,
     /// Tool-less fallback, only when handoffs are enabled and the catalog is empty.
     pub handoff_generic_fallback: bool,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct McpFeatures {
+    pub enabled: bool,
+    pub allow_all_servers: bool,
+    pub allowed_servers: BTreeSet<String>,
+    pub allow_all_tools: bool,
+    pub allowed_tools: BTreeSet<String>,
+    pub resource_tools: bool,
+}
+
+impl McpFeatures {
+    fn active(&self) -> bool {
+        self.enabled
+            && (self.allow_all_servers || !self.allowed_servers.is_empty())
+            && (self.allow_all_tools || !self.allowed_tools.is_empty() || self.resource_tools)
+    }
 }
 
 #[derive(Clone, Debug, Default)]
@@ -91,6 +115,7 @@ pub struct Config {
     pub enable_retry: bool,
     pub enable_approval: bool,
     pub enable_guardrails: bool,
+    pub enable_mcp: bool,
     pub tool_options: adk_tools::Config,
 }
 impl Default for Config {
@@ -123,6 +148,7 @@ impl Default for Config {
             enable_retry: false,
             enable_approval: false,
             enable_guardrails: false,
+            enable_mcp: false,
             tool_options: Default::default(),
         }
     }
@@ -138,6 +164,13 @@ impl Config {
             retry: self.enable_retry,
             approval: self.enable_approval,
             builtin_guardrails: self.enable_guardrails,
+            mcp: McpFeatures {
+                enabled: self.enable_mcp,
+                allow_all_servers: self.enable_mcp,
+                allow_all_tools: self.enable_mcp,
+                resource_tools: self.enable_mcp,
+                ..Default::default()
+            },
             ..Default::default()
         })
     }
@@ -721,6 +754,10 @@ pub struct Builder {
     output_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
     implementations: Vec<Arc<dyn Tool>>,
     extra_tools: Vec<Arc<dyn Tool>>,
+    #[cfg(feature = "mcp")]
+    mcp: Option<McpInput>,
+    #[cfg(feature = "mcp")]
+    owned_mcp: Option<adk_mcp::session::OwnedMcpSession>,
     shell: Option<adk_sandbox::Config>,
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     lsp: Option<adk_tools::lsp::Config>,
@@ -745,6 +782,10 @@ impl Builder {
             output_guardrails: vec![],
             implementations: vec![],
             extra_tools: vec![],
+            #[cfg(feature = "mcp")]
+            mcp: None,
+            #[cfg(feature = "mcp")]
+            owned_mcp: None,
             shell: None,
             #[cfg(any(target_os = "linux", target_os = "macos"))]
             lsp: None,
@@ -815,6 +856,12 @@ impl Builder {
         self
     }
 
+    #[cfg(feature = "mcp")]
+    pub fn mcp(mut self, input: McpInput) -> Self {
+        self.mcp = Some(input);
+        self
+    }
+
     /// Supply shell resources without changing the frozen tool selection.
     pub fn shell(mut self, config: adk_sandbox::Config) -> Self {
         self.shell = Some(config);
@@ -835,6 +882,12 @@ impl Builder {
 
     pub async fn build(mut self, context: &Context) -> Result<Bundle, Error> {
         let result = self.assemble(context).await;
+        #[cfg(feature = "mcp")]
+        if result.is_err()
+            && let Some(mcp) = &self.owned_mcp
+        {
+            let _ = mcp.close().await;
+        }
         if result.is_err()
             && let Some(session) = &mut self.owned_session
         {
@@ -844,12 +897,22 @@ impl Builder {
     }
     async fn assemble(&mut self, context: &Context) -> Result<Bundle, Error> {
         context.check_active()?;
+        let features = self.config.resolved_features();
+        #[cfg(not(feature = "mcp"))]
+        if features.mcp.active() {
+            return Err(invalid("MCP selection requires the mcp Cargo feature"));
+        }
+        #[cfg(feature = "mcp")]
+        if features.mcp.active() && self.mcp.is_none() {
+            return Err(invalid(
+                "MCP selection requires explicit configuration and host authority",
+            ));
+        }
         let host = match &self.source {
             Some(source) => source.load(context).await?,
             None => HostConfig::default(),
         };
         context.check_active()?;
-        let features = self.config.resolved_features();
         let mut modes: BTreeMap<String, ModeSpec> = builtin_modes()
             .into_iter()
             .map(|m| (m.name.clone(), m))
@@ -1222,6 +1285,19 @@ impl Builder {
         let mut tool_builder = BundleBuilder::new(tool_config)
             .implementations(std::mem::take(&mut self.implementations))
             .extra_tools(std::mem::take(&mut self.extra_tools));
+        #[cfg(feature = "mcp")]
+        if features.mcp.active() {
+            let owned = mcp::assemble(
+                self.mcp.take().expect("preflight MCP input"),
+                &features.mcp,
+                &self.config.work_dir,
+                context,
+            )
+            .await?;
+            let composed = adk_mcp::tools::build_tools(Arc::new(owned.handle()));
+            self.owned_mcp = Some(owned);
+            tool_builder = tool_builder.composed_tools(composed);
+        }
         if let Some(config) = self.shell.take() {
             tool_builder = tool_builder.shell(config);
         }
@@ -1366,6 +1442,8 @@ impl Builder {
             tools,
             session,
             owned_session: self.owned_session.take(),
+            #[cfg(feature = "mcp")]
+            owned_mcp: self.owned_mcp.take(),
         })
     }
 }
@@ -1425,8 +1503,23 @@ pub struct Bundle {
     tools: ToolBundle,
     session: SessionHandle,
     owned_session: Option<SessionState>,
+    #[cfg(feature = "mcp")]
+    owned_mcp: Option<adk_mcp::session::OwnedMcpSession>,
 }
 impl Bundle {
+    #[cfg(feature = "mcp")]
+    pub fn mcp_catalog(&self) -> Vec<adk_mcp::client::CatalogEntry> {
+        self.owned_mcp
+            .as_ref()
+            .map_or_else(Vec::new, |mcp| mcp.catalog())
+    }
+
+    #[cfg(feature = "mcp")]
+    pub fn mcp_servers(&self) -> BTreeMap<String, adk_mcp::client::Capabilities> {
+        self.owned_mcp
+            .as_ref()
+            .map_or_else(BTreeMap::new, |mcp| mcp.connected_servers().clone())
+    }
     pub fn agent(&self) -> &AgentConfig {
         &self.agent
     }
@@ -1491,6 +1584,10 @@ impl Bundle {
         )
     }
     pub async fn close(&mut self) -> Result<(), Error> {
+        #[cfg(feature = "mcp")]
+        if let Some(mcp) = &self.owned_mcp {
+            mcp.begin_close();
+        }
         let tools =
             self.tools.close().await.map_err(|e| {
                 Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
@@ -1499,6 +1596,16 @@ impl Bundle {
             Some(state) => state.close().await,
             None => Ok(()),
         };
-        tools.and(session)
+        #[cfg(feature = "mcp")]
+        let mcp = match &self.owned_mcp {
+            Some(mcp) => mcp.close().await.map_err(|error| {
+                Error::new(ErrorCategory::Host, "MCP teardown failed").with_source(error)
+            }),
+            None => Ok(()),
+        };
+        let result = tools.and(session);
+        #[cfg(feature = "mcp")]
+        let result = result.and(mcp);
+        result
     }
 }

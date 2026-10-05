@@ -70,8 +70,15 @@ tool builder or change its frozen feature selection and access policy; a resourc
 input cannot enable an unselected feature. Host-injected implementations
 must follow the core no-detached-work contract; custom resources remain the
 host's responsibility unless the underlying tool bundle explicitly owns them.
-Project-state, MCP, and other trusted adapters can supply tool implementations;
-this builder does not discover their stores or connections.
+With Cargo features `builder,mcp`, `Builder::mcp(McpInput)` supplies validated
+configuration and explicit per-server host authority. `Features::mcp` selects
+servers, raw/final tool names, and resource adapters independently; input alone
+does not enable connections. The bundle owns preflight, bounded acquisition,
+discovery, rollback and shutdown. It registers prepared MCP tools without
+enabling unrelated `ExtraTools`. See [MCP builder composition](mcp.md#runtime-builder-composition)
+for selection defaults, limits and runnable offline cases. Project-state and
+other trusted adapters can still supply tool implementations; this builder
+does not discover their stores.
 
 `runner_config` supplies existing native runtime hooks, compaction adapters,
 budget limits, spill directories, and other supported runner configuration. The
@@ -96,8 +103,9 @@ Go `ModelSettings::Merge` codec.
 
 ## Strict selection versus legacy defaults
 
-* `Config::features = None` uses `legacy_tools` and the three
-  `enable_compaction`, `enable_retry`, `enable_approval` switches. Mode
+* `Config::features = None` uses `legacy_tools` and the
+  `enable_compaction`, `enable_retry`, `enable_approval`, `enable_guardrails`,
+  and `enable_mcp` switches. Mode
   instructions/routing, parallel-call model requests, and untrusted-output
   wrapping are on. Tools are off unless selected by legacy switches.
 * `Some(Features::default())` is explicitly all off. It overrides legacy flags,
@@ -123,6 +131,11 @@ Go `ModelSettings::Merge` codec.
 * `handoffs` and `handoff_generic_fallback` are separate opt-ins, both off in
   strict and legacy defaults. They neither require nor enable `subagents`, a
   scheduler, or `ExtraTools`.
+* `mcp: McpFeatures` defaults off. An enabled selection needs both a server
+  selection and a tool/resource selection, plus explicit `McpInput`; requesting
+  it without the `mcp` Cargo feature is an error, not a hidden disabled capability.
+  Legacy `enable_mcp` selects all configured servers/tools and resource adapters,
+  but still requires explicit host-authorized input.
 
 ## Builtin tool guardrails
 

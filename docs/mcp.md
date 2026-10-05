@@ -36,7 +36,8 @@ for versions, licenses and the native bounded-session decision.
 - Host callbacks own policy, approval, break-glass and audit. Bind durable
   decisions to the immutable request digest, never server-controlled display
   strings. Native `ToolPolicy` authorization still applies to tools returned by
-  `tools::build_tools`; register them as host extra tools, not canonical built-ins.
+  `tools::build_tools`; use the builder's composed lane or explicitly enabled host
+  extra tools, not canonical built-ins.
 - Remote tools require host server enablement, `trustReadOnlyHint`, the server's
   `readOnlyHint` annotation and an exact host read-only name allowlist. Repository
   `allowedTools` further narrows exposure. Invocation checks the registered
@@ -84,14 +85,72 @@ client's shutdown, and returns the same completion result to repeated waiters.
 Cancelling a close waiter does not cancel cleanup. Dropping the owner immediately
 revokes handles and requests cleanup. Close before shutting down the Tokio
 executor: drop cannot promise remote acknowledgement after executor shutdown.
-This owner currently starts **after** acquisition and discovery; it is not yet
-the facade builder's atomic connection/build rollback contract.
+`OwnedMcpSession::new` starts **after** acquisition and discovery.
 The protected connection functions retain cleanup when initialization fails or
 is cancelled. `ClientManager::new` takes cleanup responsibility for all supplied
 clients immediately, even if its returned future is never polled, and requests
 rollback on discovery failure or cancellation. Such rollback requires a running
 Tokio executor. Hosts connecting multiple clients still own the interval between
 successful individual connections and transfer into manager construction.
+
+For a fully owned path, use `OwnedMcpSession::connect(ConnectionSet, servers,
+ToolSelection, work_dir)` or the facade builder below. Every selected host grant,
+remote origin, credential tenant and required remote option is checked before
+any selected connection starts. Individual connection successes stay owned during
+later acquisition/discovery; errors, build deadlines and cancellation request
+rollback rather than publishing a partial bundle. Limits default to 32 selected
+servers, 10,000 retained discovery entries across tools/resources/prompts and a
+60-second build deadline, in addition to per-client limits. Raw entries are
+charged before authority filtering; scoped resource queries share the same
+budget, and invalidation/reconnect/drop release their cache reservations.
+Shutdown attempts each client once with its
+per-client timeout; the aggregate cleanup bound is the selected-server count
+times that timeout. Cleanup needs a running executor, not an unpolled caller.
+
+## Runtime builder composition
+
+Enable Cargo features `builder,mcp`. Set `builder::Features.mcp` and pass explicit
+`builder::McpInput` through `Builder::mcp(input)`:
+
+| Selection field | Meaning |
+| --- | --- |
+| `enabled` | Activates MCP only when server and tool/resource selections also exist |
+| `allow_all_servers` / `allowed_servers` | Select configured, enabled servers before connecting |
+| `allow_all_tools` / `allowed_tools` | Select tools by raw or final qualified name without renaming routes |
+| `resource_tools` | Independently include resource listing/reading adapters |
+
+`McpInput` is the explicit `ConnectionSet`: validated configuration, `HostPolicy`,
+per-server `ServerOptions` (remote transport authority and selected environment),
+and limits. Configuration may be an explicit file snapshot or inline config.
+No input discovers `.mcp.json`, environment variables, origins, tenant IDs or
+credentials implicitly. Supplying input alone does not enable MCP. An active
+selection without input or without the `mcp` Cargo feature errors explicitly.
+Disabled/empty selections have no connection effects. Unmatched server names
+yield an empty selection, not fallback to all servers.
+
+Legacy `Config.enable_mcp` enables all configured servers, tools and resource
+adapters only when `Config.features` is absent. Strict features always win.
+MCP tools enter a separate host-composed registration lane, so they do not enable
+`ExtraTools` or unrelated built-ins. Duplicate checks, configured allowed names,
+prepared dispatch policy and read-only specialist ceilings still apply.
+`Bundle::mcp_catalog` and `mcp_servers` expose owned selection metadata;
+the agent's prepared tool list may be narrower due to policy. Bundle close/drop
+revokes retained handles and starts MCP cleanup; explicit close awaits it.
+
+Runnable offline builder and lifecycle cases (real stdio peers) are in
+`crates/adk/tests/builder_mcp/mod.rs`:
+
+```sh
+cargo test -p adk --features builder,mcp --test builder
+python3 scripts/mcp-runtime-reference/run.py --check
+```
+
+The independent pinned SDK `BuildToolBundle` oracle covers twelve selection,
+resource-gating and raw/final identity cases. It uses a trusted offline peer with
+an explicit SDK full-access local launcher; it does **not** assert sandbox parity.
+Explicit native host authority, aggregate bounds and atomic rollback are
+intentional native differences, not silently claimed Go behavior. See
+`fixtures/mcp/runtime-observations.json` for source/harness hashes and launch policy.
 
 Each mutable transport owns one serialized session: there is at most one active
 request per transport, stricter than the reference's eight-request concurrency

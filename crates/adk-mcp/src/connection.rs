@@ -131,38 +131,10 @@ pub async fn connect_config_with_diagnostics(
     working_directory: &Path,
     limits: Limits,
 ) -> Result<Client, ConnectionFailure> {
-    source.verify_unchanged()?;
-    let config = source
-        .config()
-        .server(server)
-        .ok_or_else(|| Error::Policy("server not configured".into()))?
-        .clone();
-    let grant = policy
-        .servers
-        .get(server)
-        .ok_or_else(|| Error::Policy("server not granted by host".into()))?;
-    if !config.enabled() || !grant.enabled || policy.tenant_id.trim().is_empty() {
-        return Err(Error::Policy("server disabled or tenant missing".into()).into());
-    }
-    if limits.max_pages == 0
-        || limits.max_items == 0
-        || limits.max_message_bytes == 0
-        || limits.timeout.is_zero()
-    {
-        return Err(Error::Config("positive limits required".into()).into());
-    }
+    let config = preflight(source, server, &policy, remote.as_ref(), &limits)?.clone();
+    let grant = &policy.servers[server];
     let transport: Box<dyn Transport> = if config.is_remote() {
-        if !grant.allowed_origins.contains(&config.origin()?) {
-            return Err(Error::Policy("remote origin not granted by host".into()).into());
-        }
-        let remote =
-            remote.ok_or_else(|| Error::Policy("remote transport requires host options".into()))?;
-        if remote.tenant_id != policy.tenant_id {
-            return Err(Error::Policy(
-                "transport credential tenant differs from policy tenant".into(),
-            )
-            .into());
-        }
+        let remote = remote.expect("preflight remote options");
         Box::new(
             HttpTransport::connect(
                 server,
@@ -200,4 +172,46 @@ pub async fn connect_config_with_diagnostics(
         });
     }
     Ok(acquired.0.pop().expect("acquired client"))
+}
+
+pub(crate) fn preflight<'a>(
+    source: &'a ConnectionConfig,
+    server: &str,
+    policy: &HostPolicy,
+    remote: Option<&RemoteOptions>,
+    limits: &Limits,
+) -> Result<&'a crate::config::ServerConfig, Error> {
+    source.verify_unchanged()?;
+    let config = source
+        .config()
+        .server(server)
+        .ok_or_else(|| Error::Policy("server not configured".into()))?;
+    let grant = policy
+        .servers
+        .get(server)
+        .ok_or_else(|| Error::Policy("server not granted by host".into()))?;
+    if !config.enabled() || !grant.enabled || policy.tenant_id.trim().is_empty() {
+        return Err(Error::Policy("server disabled or tenant missing".into()));
+    }
+    if limits.max_pages == 0
+        || limits.max_items == 0
+        || limits.max_message_bytes == 0
+        || limits.timeout.is_zero()
+    {
+        return Err(Error::Config("positive limits required".into()));
+    }
+    if config.is_remote() {
+        if !grant.allowed_origins.contains(&config.origin()?) {
+            return Err(Error::Policy("remote origin not granted by host".into()));
+        }
+        let remote =
+            remote.ok_or_else(|| Error::Policy("remote transport requires host options".into()))?;
+        if remote.tenant_id != policy.tenant_id {
+            return Err(Error::Policy(
+                "transport credential tenant differs from policy tenant".into(),
+            ));
+        }
+        crate::transport::validate_remote_options(config.url(), remote, limits)?;
+    }
+    Ok(config)
 }

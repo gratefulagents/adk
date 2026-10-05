@@ -32,6 +32,7 @@ pub struct BundleBuilder {
     config: Config,
     implementations: Vec<Arc<dyn Tool>>,
     extra_tools: Vec<Arc<dyn Tool>>,
+    composed_tools: Vec<Arc<dyn Tool>>,
     shell: Option<adk_sandbox::Config>,
     #[cfg(any(target_os = "linux", target_os = "macos"))]
     lsp: Option<crate::lsp::Config>,
@@ -45,6 +46,7 @@ impl BundleBuilder {
             config,
             implementations: Vec::new(),
             extra_tools: Vec::new(),
+            composed_tools: Vec::new(),
             shell: None,
             #[cfg(any(target_os = "linux", target_os = "macos"))]
             lsp: None,
@@ -60,6 +62,12 @@ impl BundleBuilder {
 
     pub fn extra_tools(mut self, tools: impl IntoIterator<Item = Arc<dyn Tool>>) -> Self {
         self.extra_tools.extend(tools);
+        self
+    }
+
+    /// Host-composed integrations selected independently of the ExtraTools feature.
+    pub fn composed_tools(mut self, tools: impl IntoIterator<Item = Arc<dyn Tool>>) -> Self {
+        self.composed_tools.extend(tools);
         self
     }
 
@@ -137,8 +145,9 @@ impl BundleBuilder {
         } else {
             None
         };
-        let registry =
+        let mut registry =
             Registry::build_with_extra_tools(&self.config, self.implementations, self.extra_tools)?;
+        registry.add_composed_tools(&self.config, self.composed_tools)?;
         // Optional host injections remain optional, matching the SDK bundle.
         // Registry construction already rejects absent runtime implementations.
         let mut prepared = registry.prepare(policy);

@@ -1,0 +1,248 @@
+{
+  "cases": [
+    {
+      "catalog": [],
+      "name": "disabled",
+      "servers": [],
+      "tools": []
+    },
+    {
+      "catalog": [],
+      "name": "no_server_selection",
+      "servers": [],
+      "tools": []
+    },
+    {
+      "catalog": [],
+      "name": "no_tool_selection",
+      "servers": [],
+      "tools": []
+    },
+    {
+      "catalog": [],
+      "name": "absent_server",
+      "servers": [],
+      "tools": []
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        }
+      ],
+      "name": "selected_raw",
+      "servers": [
+        "chosen"
+      ],
+      "tools": [
+        "mcp__chosen__a_b_2"
+      ]
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        }
+      ],
+      "name": "selected_final",
+      "servers": [
+        "chosen"
+      ],
+      "tools": [
+        "mcp__chosen__a_b_2"
+      ]
+    },
+    {
+      "catalog": [],
+      "name": "selected_unknown_tool",
+      "servers": [
+        "chosen"
+      ],
+      "tools": []
+    },
+    {
+      "catalog": [],
+      "name": "resources_only",
+      "servers": [
+        "chosen"
+      ],
+      "tools": [
+        "ListMcpResourcesTool",
+        "ReadMcpResourceTool"
+      ]
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b",
+          "raw": "a?b",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__chosen__write",
+          "raw": "write",
+          "server": "chosen"
+        }
+      ],
+      "name": "all_tools_selected_server",
+      "servers": [
+        "chosen"
+      ],
+      "tools": [
+        "mcp__chosen__a_b",
+        "mcp__chosen__a_b_2",
+        "mcp__chosen__write"
+      ]
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__other__a_b_2",
+          "raw": "a b",
+          "server": "other"
+        }
+      ],
+      "name": "all_servers_raw",
+      "servers": [
+        "chosen",
+        "other"
+      ],
+      "tools": [
+        "mcp__chosen__a_b_2",
+        "mcp__other__a_b_2"
+      ]
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b",
+          "raw": "a?b",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__chosen__write",
+          "raw": "write",
+          "server": "chosen"
+        },
+        {
+          "name": "mcp__other__a_b",
+          "raw": "a?b",
+          "server": "other"
+        },
+        {
+          "name": "mcp__other__a_b_2",
+          "raw": "a b",
+          "server": "other"
+        },
+        {
+          "name": "mcp__other__write",
+          "raw": "write",
+          "server": "other"
+        }
+      ],
+      "name": "all_tools_and_resources",
+      "servers": [
+        "chosen",
+        "other"
+      ],
+      "tools": [
+        "ListMcpResourcesTool",
+        "ReadMcpResourceTool",
+        "mcp__chosen__a_b",
+        "mcp__chosen__a_b_2",
+        "mcp__chosen__write",
+        "mcp__other__a_b",
+        "mcp__other__a_b_2",
+        "mcp__other__write"
+      ]
+    },
+    {
+      "catalog": [
+        {
+          "name": "mcp__chosen__a_b_2",
+          "raw": "a b",
+          "server": "chosen"
+        }
+      ],
+      "name": "trimmed_selection",
+      "servers": [
+        "chosen"
+      ],
+      "tools": [
+        "mcp__chosen__a_b_2"
+      ]
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "fixtures/mcp/builder-peer.py": "3876267ee89f2a76c669515fe80e0f74730cd89ffa9eb965e6c0682b5b63743c",
+      "fixtures/mcp/runtime-inputs.json": "20a4e50b6d1d07fa07abdb1c1d0f58315251a8aef7f447078b6ccd27eef47d46",
+      "scripts/mcp-runtime-reference/reference_test.go": "167f149ce72cd37a0d02fb5629a070f4624406ef6354383cdb652d435627f9ee",
+      "scripts/mcp-runtime-reference/run.py": "4c4f33f9d2bb92ea2514cd6fe22224b9a660889d94df2cfd984cf516749a72b1"
+    },
+    "launchPolicy": "Trusted offline Python peer only; SDK DangerFullAccess with explicitly disabled application sandbox. Worker execution restrictions remain in force. This fixture does not assert sandbox parity.",
+    "normalization": "Sort server/tool/catalog observations by final names; preserve raw identities. No expected outputs are read by Go. Explicit native host authority and atomic rollback are intentional differences, not asserted SDK parity.",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "pkg/agentsdk/mcp/breakglass.go": "16d19ced7c3a7cc0f3e70f6fbdd1379b3be82ff6cff049b9e96f34162f692757",
+      "pkg/agentsdk/mcp/breakglass_test.go": "b32c94fb43af3449d348a60284ad3448bef577486e4e636c703c1fa354b61f4b",
+      "pkg/agentsdk/mcp/breakglass_tool.go": "c43e23d8b6d32dd46f9eb82a00a5e28a77f071c9a79bf7adad2e1624027b3154",
+      "pkg/agentsdk/mcp/breakglass_tool_test.go": "b095f956c0595d1eb040e1e74bfb98d468ff761f5a05b7f5d9d26084e6b1639a",
+      "pkg/agentsdk/mcp/config.go": "eaf22da7fa4979869fa14338fc1cfc5b8815b80f0156892dde3d3d8241eb4cb4",
+      "pkg/agentsdk/mcp/config_test.go": "20c10c7174e1fe1e9e773b5ee188862d10870bf418d5a6c3b8fbaa7df926378a",
+      "pkg/agentsdk/mcp/env_filter.go": "a3068abca940f5c93c81f5855a1958f59f789032fe4904fd467b07c46d0f046f",
+      "pkg/agentsdk/mcp/env_filter_test.go": "7b2fcc6bf1a116c01567882940b415d5c5d5386ad322a244050adf53aa55c8d6",
+      "pkg/agentsdk/mcp/lifecycle.go": "f164bdafd635745b96a8e9ae21815dd6a01e8fb5c9bb9a58bb78fdbefa582568",
+      "pkg/agentsdk/mcp/lifecycle_other.go": "4defce62921b6f36252ead25d9633622c2401d63a86a61f78442a60802becfd8",
+      "pkg/agentsdk/mcp/lifecycle_unix.go": "e66e60e90e2ebd1a1adcbcfd8e1c39e6482a4f2362d0ad781ff473e13ded0dce",
+      "pkg/agentsdk/mcp/lifecycle_unix_test.go": "0e2589cf1ba496a84d702b786154c9fa22f12641430aa4ab3dfbcd90518e58cd",
+      "pkg/agentsdk/mcp/manager.go": "61727c866586886f430d634e97039c76e4d9e40e7c7f100642aac153f17cdcb1",
+      "pkg/agentsdk/mcp/manager_lifecycle_test.go": "45b496d1bdf83b21c86e8cd0b6dc956533b1fceacac19e4285bc71edc6a878f4",
+      "pkg/agentsdk/mcp/manager_options_test.go": "622dc9585c2fc67f75460928389a165c9f463d121680a81fd4324c4e68ce70c0",
+      "pkg/agentsdk/mcp/manager_test.go": "c742ac3da29a9f26295c55d7fb60239d84af951c1f3f64d26cc23f2204015f2b",
+      "pkg/agentsdk/mcp/names.go": "a1d0e009004b1a7e413c83ddc64ccc14367c3301efc7c356580f33d00fbe94df",
+      "pkg/agentsdk/mcp/names_test.go": "35a93b8c39878abb32f13462bc4659250bf75da4f1c56ebfa4867bfba60c3d75",
+      "pkg/agentsdk/mcp/nofollow_other.go": "47c59702caa6b3d490c5e23ba8faa3a0603d90c498b511f6acbd7deb402416fc",
+      "pkg/agentsdk/mcp/nofollow_unix.go": "7ec1070f95f0af4df5877f4ba6e3246c041b7f3e2ae20519495f3b9f93eaf648",
+      "pkg/agentsdk/mcp/remote.go": "e16f0613da7ddac3b925726cd6c184962adb9a896d5f3d40d4679b6ce6f680a7",
+      "pkg/agentsdk/mcp/remote_test.go": "e8d5de1e0208f0fbaeb9417b9bed83d3cd45c3553116ae298b4c0a71a0205136",
+      "pkg/agentsdk/mcp/sanitize.go": "90332c3a1b957a68f0d79d10df021f0adc53de7f9bf0087edf1be6161e25afb8",
+      "pkg/agentsdk/mcp/sanitize_test.go": "93c9e8ba115c8a14fd8b858f0d858cd7b203827ed4c1cb9040bf81788e3a07a8",
+      "pkg/agentsdk/mcp/server_mode.go": "3961513ab1d1cad5eb03717d31672e4f2d4e11da91768e9f26f31289257ac3fa",
+      "pkg/agentsdk/mcp/server_mode_test.go": "e91f16f0552b5e446724ea78e7a64d95ebfa275012ce2d2208291b9a810cd857",
+      "pkg/agentsdk/mcp/snapshot.go": "b61f5de5681c5acf0adbdf32ecb6a2b7d69d236531186d900e0779d1a3822977",
+      "pkg/agentsdk/mcp/snapshot_test.go": "72fe8fe08cf9fcf6573a301c02e9c0858615b3a635c8db6fe7bbcb8c897d3afa",
+      "pkg/agentsdk/mcp/stderr_tail.go": "2e6b53b30da995f8be656484c420406e77547d67541980a164ac3f4d17e6293c",
+      "pkg/agentsdk/mcp/stderr_tail_test.go": "f8503bfdc39fbef1debe25987e8989111203f4e1a0f6729130d0f350eade05d6",
+      "pkg/agentsdk/mcp/tools.go": "884e896f460dc473f93ffe51e0d9ea6d06704ccff057e99b8ff6677d554f8852",
+      "pkg/agentsdk/mcp/tools_test.go": "6ed6d96e28d534b7fa167f35cb1f02b7f202b16eed969de2c85e9dc8035cfddf",
+      "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
+      "pkg/agentsdk/runtime/builder_test.go": "0c557ad7d463f635b81adae340a30a8dcd4c46d83965f4f74b41f13664e98803",
+      "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",
+      "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0"
+    }
+  }
+}

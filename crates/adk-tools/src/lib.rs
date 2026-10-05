@@ -222,22 +222,31 @@ impl Registry {
             Features::Legacy(features) => features.enable_tools || features.enable_subagents,
         };
         if enabled {
-            for tool in extra_tools {
-                let name = tool.definition().name.clone();
-                if config
-                    .allowed_names
-                    .as_ref()
-                    .is_some_and(|names| !names.contains(&name))
-                {
-                    continue;
-                }
-                if registry.tools.contains_key(&name) {
-                    return Err(BuildError::Duplicate(name));
-                }
-                registry.tools.insert(name, tool);
-            }
+            registry.add_composed_tools(config, extra_tools)?;
         }
         Ok(registry)
+    }
+
+    pub(crate) fn add_composed_tools(
+        &mut self,
+        config: &Config,
+        tools: impl IntoIterator<Item = Arc<dyn Tool>>,
+    ) -> Result<(), BuildError> {
+        for tool in tools {
+            let name = tool.definition().name.clone();
+            if config
+                .allowed_names
+                .as_ref()
+                .is_some_and(|names| !names.contains(&name))
+            {
+                continue;
+            }
+            if self.tools.contains_key(&name) {
+                return Err(BuildError::Duplicate(name));
+            }
+            self.tools.insert(name, tool);
+        }
+        Ok(())
     }
 
     pub fn prepare(&self, mut policy: ToolPolicy) -> PreparedTools {

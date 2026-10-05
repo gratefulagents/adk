@@ -6,8 +6,97 @@ use crate::{
 };
 use adk_core::ToolDefinition;
 use serde_json::Value;
-use std::{collections::BTreeMap, sync::Arc};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::Path,
+    sync::Arc,
+    time::Duration,
+};
 use tokio::sync::{oneshot, watch};
+
+#[cfg(test)]
+#[path = "session_budget_tests.rs"]
+mod budget_tests;
+
+pub(crate) struct CatalogBudget {
+    limit: usize,
+    used: std::sync::atomic::AtomicUsize,
+}
+
+pub(crate) struct CatalogReservation {
+    budget: Arc<CatalogBudget>,
+    count: usize,
+}
+
+impl CatalogBudget {
+    fn new(limit: usize) -> Arc<Self> {
+        Arc::new(Self {
+            limit,
+            used: std::sync::atomic::AtomicUsize::new(0),
+        })
+    }
+
+    pub(crate) fn reserve(self: &Arc<Self>, count: usize) -> Result<CatalogReservation, Error> {
+        use std::sync::atomic::Ordering;
+        self.used
+            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |used| {
+                used.checked_add(count).filter(|total| *total <= self.limit)
+            })
+            .map_err(|_| Error::Limit)?;
+        Ok(CatalogReservation {
+            budget: self.clone(),
+            count,
+        })
+    }
+}
+
+impl Drop for CatalogReservation {
+    fn drop(&mut self) {
+        self.budget
+            .used
+            .fetch_sub(self.count, std::sync::atomic::Ordering::Release);
+    }
+}
+
+#[derive(Clone, Default)]
+pub struct ServerOptions {
+    pub remote: Option<crate::transport::RemoteOptions>,
+    pub environment: BTreeMap<String, String>,
+}
+
+pub struct ConnectionSet {
+    pub config: crate::config::ConnectionConfig,
+    pub host_policy: crate::client::HostPolicy,
+    pub server_options: BTreeMap<String, ServerOptions>,
+    pub limits: crate::Limits,
+    pub max_servers: usize,
+    pub max_catalog_items: usize,
+    pub build_timeout: Duration,
+}
+
+impl ConnectionSet {
+    pub fn new(
+        config: crate::config::ConnectionConfig,
+        host_policy: crate::client::HostPolicy,
+    ) -> Self {
+        Self {
+            config,
+            host_policy,
+            server_options: BTreeMap::new(),
+            limits: crate::Limits::default(),
+            max_servers: 32,
+            max_catalog_items: 10_000,
+            build_timeout: Duration::from_secs(60),
+        }
+    }
+}
+
+#[derive(Clone, Default)]
+pub struct ToolSelection {
+    pub allow_all: bool,
+    pub allowed: BTreeSet<String>,
+    pub resources: bool,
+}
 
 pub(crate) struct AcquiredClients(pub Vec<crate::client::Client>);
 
@@ -46,6 +135,70 @@ pub struct McpHandle {
 }
 
 impl OwnedMcpSession {
+    /// Preflights every selected grant before connecting, then owns acquisition,
+    /// discovery and rollback as well as the published manager's lifecycle.
+    pub async fn connect(
+        mut input: ConnectionSet,
+        servers: BTreeSet<String>,
+        tools: ToolSelection,
+        work_dir: &Path,
+    ) -> Result<Self, Error> {
+        if input.max_servers == 0
+            || input.max_catalog_items == 0
+            || input.build_timeout.is_zero()
+            || input.limits.max_pages == 0
+            || input.limits.max_items == 0
+            || input.limits.max_message_bytes == 0
+            || input.limits.timeout.is_zero()
+        {
+            return Err(Error::Config("positive session bounds required".into()));
+        }
+        if servers.len() > input.max_servers {
+            return Err(Error::Limit);
+        }
+        for server in &servers {
+            let options = input.server_options.get(server);
+            crate::connection::preflight(
+                &input.config,
+                server,
+                &input.host_policy,
+                options.and_then(|options| options.remote.as_ref()),
+                &input.limits,
+            )?;
+        }
+        tokio::time::timeout(input.build_timeout, async move {
+            let mut acquired = AcquiredClients(Vec::new());
+            let budget = CatalogBudget::new(input.max_catalog_items);
+            for server in servers {
+                let options = input.server_options.remove(&server).unwrap_or_default();
+                let mut client = crate::connection::connect_config(
+                    &input.config,
+                    &server,
+                    input.host_policy.clone(),
+                    options.remote,
+                    &options.environment,
+                    work_dir,
+                    input.limits.clone(),
+                )
+                .await?;
+                client.set_catalog_budget(budget.clone());
+                acquired.0.push(client);
+                acquired
+                    .0
+                    .last_mut()
+                    .expect("acquired client")
+                    .list_tools()
+                    .await?;
+            }
+            let manager = ClientManager::new(std::mem::take(&mut acquired.0))
+                .await?
+                .select_tools(tools.allow_all, &tools.allowed, tools.resources);
+            Ok(Self::new(manager))
+        })
+        .await
+        .map_err(|_| Error::Transport)?
+    }
+
     /// Takes exclusive lifecycle authority over an already assembled manager.
     /// Connection and discovery failures before this call remain caller-owned.
     pub fn new(manager: ClientManager) -> Self {
@@ -83,7 +236,7 @@ impl OwnedMcpSession {
     /// Revokes all handles before waiting. Cancellation of this waiter does not
     /// cancel cleanup; subsequent waiters observe the same completion result.
     pub async fn close(&self) -> Result<(), Error> {
-        self.shutdown.send_replace(true);
+        self.begin_close();
         let mut completion = self.completion.clone();
         completion
             .wait_for(Option::is_some)
@@ -93,11 +246,15 @@ impl OwnedMcpSession {
             .expect("completed shutdown")
             .clone()
     }
+
+    pub fn begin_close(&self) {
+        self.shutdown.send_replace(true);
+    }
 }
 
 impl Drop for OwnedMcpSession {
     fn drop(&mut self) {
-        self.shutdown.send_replace(true);
+        self.begin_close();
     }
 }
 

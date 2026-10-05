@@ -151,6 +151,10 @@ pub struct Client {
     discovery_cache_ttl: Duration,
     resources_discovered_at: Option<Instant>,
     prompts_discovered_at: Option<Instant>,
+    catalog_budget: Option<Arc<crate::session::CatalogBudget>>,
+    tools_reservation: Option<crate::session::CatalogReservation>,
+    resources_reservation: Option<crate::session::CatalogReservation>,
+    prompts_reservation: Option<crate::session::CatalogReservation>,
 }
 impl Client {
     pub fn new(
@@ -194,12 +198,29 @@ impl Client {
             discovery_cache_ttl: Duration::from_secs(30),
             resources_discovered_at: None,
             prompts_discovered_at: None,
+            catalog_budget: None,
+            tools_reservation: None,
+            resources_reservation: None,
+            prompts_reservation: None,
         };
         client.check_server()?;
         Ok(client)
     }
     pub fn server_name(&self) -> &str {
         &self.server
+    }
+    pub(crate) fn set_catalog_budget(&mut self, budget: Arc<crate::session::CatalogBudget>) {
+        self.catalog_budget = Some(budget);
+    }
+
+    fn reserve_catalog(
+        &self,
+        count: usize,
+    ) -> Result<Option<crate::session::CatalogReservation>, Error> {
+        self.catalog_budget
+            .as_ref()
+            .map(|budget| budget.reserve(count))
+            .transpose()
     }
     pub fn diagnostics(&self) -> Option<String> {
         self.transport.diagnostics()
@@ -214,6 +235,8 @@ impl Client {
     pub fn invalidate_discovery(&mut self) {
         self.resources = None;
         self.prompts = None;
+        self.resources_reservation = None;
+        self.prompts_reservation = None;
         self.resources_discovered_at = None;
         self.prompts_discovered_at = None;
     }
@@ -410,6 +433,7 @@ impl Client {
         self.transport = fresh_transport;
         self.capabilities = Capabilities::default();
         self.tools = None;
+        self.tools_reservation = None;
         self.invalidate_discovery();
         self.state = State::New;
         self.initialize().await
@@ -514,6 +538,7 @@ impl Client {
                 }
                 tools.push(descriptor);
             }
+            self.tools_reservation = self.reserve_catalog(tools.len())?;
             self.tools = Some(tools);
         }
         let mut tools: Vec<_> = self
@@ -606,6 +631,7 @@ impl Client {
             .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
         {
             self.resources = None;
+            self.resources_reservation = None;
             self.resources_discovered_at = None;
             let discovered_at = Instant::now();
             let items = self.pages("resources/list", "resources").await?;
@@ -624,6 +650,7 @@ impl Client {
                     return Err(Error::Protocol("ambiguous resource URI".into()));
                 }
             }
+            self.resources_reservation = self.reserve_catalog(resources.len())?;
             self.resources = Some(resources);
             self.resources_discovered_at = Some(discovered_at);
         }
@@ -668,6 +695,7 @@ impl Client {
             .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
         {
             self.prompts = None;
+            self.prompts_reservation = None;
             self.prompts_discovered_at = None;
             let discovered_at = Instant::now();
             let items = self.pages("prompts/list", "prompts").await?;
@@ -694,6 +722,7 @@ impl Client {
                     return Err(Error::Protocol("ambiguous prompt name".into()));
                 }
             }
+            self.prompts_reservation = self.reserve_catalog(prompts.len())?;
             self.prompts = Some(prompts);
             self.prompts_discovered_at = Some(discovered_at);
         }

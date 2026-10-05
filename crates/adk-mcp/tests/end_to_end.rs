@@ -215,22 +215,25 @@ async fn configured_http_client_to_policy_server_and_adk_manager() {
     drop(manager);
     let inline = ConnectionConfig::inline(snapshot.config().clone()).unwrap();
     std::fs::write(temp.path().join(".mcp.json"), "{}").unwrap();
-    let client = connection::connect_config(
-        &inline,
-        "test",
-        policy.clone(),
-        Some(remote.clone()),
-        &BTreeMap::new(),
+    let mut connections = adk_mcp::session::ConnectionSet::new(inline, policy.clone());
+    connections.server_options.insert(
+        "test".into(),
+        adk_mcp::session::ServerOptions {
+            remote: Some(remote.clone()),
+            environment: BTreeMap::new(),
+        },
+    );
+    let owner = adk_mcp::session::OwnedMcpSession::connect(
+        connections,
+        BTreeSet::from(["test".into()]),
+        adk_mcp::session::ToolSelection {
+            resources: true,
+            ..Default::default()
+        },
         temp.path(),
-        Limits::default(),
     )
     .await
     .unwrap();
-    let manager = ClientManager::new(vec![client])
-        .await
-        .unwrap()
-        .select_tools(false, &BTreeSet::new(), true);
-    let owner = adk_mcp::session::OwnedMcpSession::new(manager);
     let manager = owner.handle();
     assert!(manager.definitions().is_empty());
     assert_eq!(

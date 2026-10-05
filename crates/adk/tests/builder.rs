@@ -1,4 +1,7 @@
 #![cfg(feature = "builder")]
+#[cfg(all(feature = "mcp", unix))]
+#[path = "builder_mcp/mod.rs"]
+mod mcp_composition;
 use adk::{
     builder::*,
     core::*,
@@ -95,6 +98,44 @@ fn builder(config: Config, model: &Arc<RecordingModel>) -> Builder {
 }
 fn category<T>(result: Result<T, Error>) -> ErrorCategory {
     result.err().expect("expected failure").info.category
+}
+
+#[tokio::test]
+async fn mcp_requested_without_input_or_cargo_support_is_explicit() {
+    let model = Arc::new(RecordingModel::default());
+    let config = Config {
+        features: Some(Features {
+            mcp: McpFeatures {
+                enabled: true,
+                allow_all_servers: true,
+                allow_all_tools: true,
+                ..Default::default()
+            },
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+    let error = builder(config, &model)
+        .build(&context())
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.info.category, ErrorCategory::InvalidInput);
+    #[cfg(feature = "mcp")]
+    assert!(error.info.message.contains("explicit configuration"));
+    #[cfg(not(feature = "mcp"))]
+    assert!(error.info.message.contains("mcp Cargo feature"));
+    let resolved = Config {
+        enable_mcp: true,
+        ..Default::default()
+    }
+    .resolved_features();
+    assert!(
+        resolved.mcp.enabled
+            && resolved.mcp.allow_all_servers
+            && resolved.mcp.allow_all_tools
+            && resolved.mcp.resource_tools
+    );
 }
 
 #[tokio::test]

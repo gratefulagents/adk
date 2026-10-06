@@ -741,6 +741,17 @@ impl Runner {
         if let Some(limit) = config.subagent_max_turns {
             baseline["subagent_max_turns"] = serde_json::json!(limit);
         }
+        let compaction = config.local_compaction;
+        if compaction != LocalCompactionPolicy::default() {
+            baseline["local_compaction"] = serde_json::json!({
+                "enabled": compaction.enabled,
+                "trigger_tokens": compaction.trigger_tokens,
+                "target_tokens": compaction.target_tokens,
+                "preserve_recent_items": compaction.preserve_recent_items,
+                "preserve_initial_user_messages": compaction.preserve_initial_user_messages,
+                "summary_bullet_limit": compaction.summary_bullet_limit,
+            });
+        }
         if !config.additional_instructions.trim().is_empty() {
             baseline["additional_instructions"] =
                 serde_json::json!(config.additional_instructions.trim());

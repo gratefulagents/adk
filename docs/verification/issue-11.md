@@ -2,6 +2,17 @@
 
 ## Current continuation evidence
 
+### Durable local-compaction identity
+
+Durable resumes now bind all six normalized local-compaction policy fields.
+The regression first failed because changing the enabled flag was accepted;
+after the fix, a seven-policy cross-product rejects every changed policy before
+model dispatch and accepts identical or normalization-equivalent policies.
+Default-policy identities remain unchanged. Previously written nondefault-policy
+checkpoints did not bind these settings and must not be treated as proof of the
+original compaction configuration; no automatic migration is supplied. This is
+a native recovery correction, not an additional SDK ledger parity claim.
+
 ### Builder working-state fallback
 
 Full builds now select the SDK host-adapter working-state fallback only after

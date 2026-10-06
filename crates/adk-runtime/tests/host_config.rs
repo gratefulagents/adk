@@ -697,3 +697,92 @@ async fn replacing_carry_forward_preserves_approval_markers_and_item_sources() {
         )
         .unwrap();
 }
+
+#[tokio::test]
+async fn durable_local_compaction_policy_is_bound_and_normalized() {
+    let mut policies = vec![LocalCompactionPolicy::default(); 7];
+    policies[1].enabled = false;
+    policies[2].trigger_tokens += 1;
+    policies[3].target_tokens -= 1;
+    policies[4].preserve_recent_items += 1;
+    policies[5].preserve_initial_user_messages += 1;
+    policies[6].summary_bullet_limit += 1;
+    for policy in &policies {
+        let config = RunnerConfig {
+            local_compaction: *policy,
+            ..Default::default()
+        };
+        let store = Arc::new(Store::default());
+        runner(Arc::new(ModelImpl::default()), config.clone())
+            .run_durable(
+                context("compaction-policy"),
+                request(vec![message("task")]),
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone()),
+            )
+            .await
+            .unwrap();
+        let checkpoint = store.0.lock().unwrap().clone().unwrap();
+        for resumed_policy in &policies {
+            let model = Arc::new(ModelImpl::default());
+            let mut durable = DurableRun::new(store.clone());
+            durable.resume = Some(checkpoint.clone());
+            let result = runner(
+                model.clone(),
+                RunnerConfig {
+                    local_compaction: *resumed_policy,
+                    ..config.clone()
+                },
+            )
+            .run_durable(
+                context("compaction-policy"),
+                request(vec![]),
+                Arc::new(HostImpl),
+                durable,
+            )
+            .await;
+            if resumed_policy == policy {
+                result.unwrap();
+            } else {
+                let error = result
+                    .err()
+                    .expect("changed compaction policy must reject resume");
+                assert!(
+                    error
+                        .error
+                        .info
+                        .message
+                        .contains("configuration or security policy changed")
+                );
+            }
+            assert!(model.requests.lock().unwrap().is_empty());
+        }
+        let mut normalized = *policy;
+        if normalized.preserve_recent_items == 12 {
+            normalized.preserve_recent_items = 0;
+        }
+        if normalized.preserve_initial_user_messages == 2 {
+            normalized.preserve_initial_user_messages = 0;
+        }
+        if normalized.summary_bullet_limit == 4 {
+            normalized.summary_bullet_limit = 0;
+        }
+        let mut durable = DurableRun::new(store);
+        durable.resume = Some(checkpoint);
+        runner(
+            Arc::new(ModelImpl::default()),
+            RunnerConfig {
+                local_compaction: normalized,
+                ..config
+            },
+        )
+        .run_durable(
+            context("compaction-policy"),
+            request(vec![]),
+            Arc::new(HostImpl),
+            durable,
+        )
+        .await
+        .unwrap();
+    }
+}

@@ -363,7 +363,10 @@
   ],
   "compaction_cases": [
     {
+      "blank_carry": false,
       "custom": false,
+      "mode_display_name": "",
+      "mode_name": "",
       "model": "gpt-5-mini",
       "policy": {
         "Enabled": true,
@@ -374,6 +377,7 @@
         "TriggerTokens": 110000,
         "UseLLMSummary": false
       },
+      "provider": "",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -389,11 +393,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "6670a9f94c241b31e7767bee645be60a8994c5b0b754301cd02423ad016eeb47"
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": true,
       "custom": false,
+      "mode_display_name": "",
+      "mode_name": "",
       "model": "gpt-5-mini",
       "policy": {
         "Enabled": true,
@@ -404,6 +412,77 @@
         "TriggerTokens": 110000,
         "UseLLMSummary": false
       },
+      "provider": "",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": false,
+      "custom": false,
+      "mode_display_name": "",
+      "mode_name": "",
+      "model": "gpt-5-mini",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 60000,
+        "TriggerTokens": 110000,
+        "UseLLMSummary": false
+      },
+      "provider": "",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "6670a9f94c241b31e7767bee645be60a8994c5b0b754301cd02423ad016eeb47"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": true,
+      "custom": false,
+      "mode_display_name": "",
+      "mode_name": "",
+      "model": "gpt-5-mini",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 60000,
+        "TriggerTokens": 110000,
+        "UseLLMSummary": false
+      },
+      "provider": "",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -420,10 +499,14 @@
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
         "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": false,
       "custom": true,
+      "mode_display_name": "",
+      "mode_name": "",
       "model": "gpt-5-mini",
       "policy": {
         "Enabled": true,
@@ -434,6 +517,7 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -441,11 +525,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "6670a9f94c241b31e7767bee645be60a8994c5b0b754301cd02423ad016eeb47"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
       "custom": true,
+      "mode_display_name": "",
+      "mode_name": "",
       "model": "gpt-5-mini",
       "policy": {
         "Enabled": true,
@@ -456,6 +544,34 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
+      "custom": true,
+      "mode_display_name": "",
+      "mode_name": "",
+      "model": "gpt-5-mini",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -463,11 +579,42 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "6670a9f94c241b31e7767bee645be60a8994c5b0b754301cd02423ad016eeb47"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
+      "custom": true,
+      "mode_display_name": "",
+      "mode_name": "",
+      "model": "gpt-5-mini",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
       "custom": false,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
       "model": "gpt-6",
       "policy": {
         "Enabled": true,
@@ -478,6 +625,7 @@
         "TriggerTokens": 244800,
         "UseLLMSummary": false
       },
+      "provider": "anthropic",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -493,11 +641,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "7bb045517b3be8205aa71b96d10abc2a9bfdedc68583d16bd3eb622677ef627e"
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": true,
       "custom": false,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
       "model": "gpt-6",
       "policy": {
         "Enabled": true,
@@ -508,6 +660,77 @@
         "TriggerTokens": 244800,
         "UseLLMSummary": false
       },
+      "provider": "anthropic",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": false,
+      "custom": false,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
+      "model": "gpt-6",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 136000,
+        "TriggerTokens": 244800,
+        "UseLLMSummary": false
+      },
+      "provider": "anthropic",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "7bb045517b3be8205aa71b96d10abc2a9bfdedc68583d16bd3eb622677ef627e"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": true,
+      "custom": false,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
+      "model": "gpt-6",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 136000,
+        "TriggerTokens": 244800,
+        "UseLLMSummary": false
+      },
+      "provider": "anthropic",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -524,10 +747,14 @@
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
         "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": false,
       "custom": true,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
       "model": "gpt-6",
       "policy": {
         "Enabled": true,
@@ -538,6 +765,7 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "anthropic",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -545,11 +773,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "7bb045517b3be8205aa71b96d10abc2a9bfdedc68583d16bd3eb622677ef627e"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
       "custom": true,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
       "model": "gpt-6",
       "policy": {
         "Enabled": true,
@@ -560,6 +792,34 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "anthropic",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
+      "custom": true,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
+      "model": "gpt-6",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "anthropic",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -567,11 +827,42 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "7bb045517b3be8205aa71b96d10abc2a9bfdedc68583d16bd3eb622677ef627e"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
+      "custom": true,
+      "mode_display_name": " Planning ",
+      "mode_name": "planner",
+      "model": "gpt-6",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "anthropic",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
       "custom": false,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
       "model": "gpt-5.4",
       "policy": {
         "Enabled": true,
@@ -582,6 +873,7 @@
         "TriggerTokens": 360000,
         "UseLLMSummary": false
       },
+      "provider": "copilot",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -597,11 +889,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "cdb2c013ba9271e705691283e0179dcb42fccc345db0881b225a432feadc581e"
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": true,
       "custom": false,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
       "model": "gpt-5.4",
       "policy": {
         "Enabled": true,
@@ -612,6 +908,77 @@
         "TriggerTokens": 360000,
         "UseLLMSummary": false
       },
+      "provider": "copilot",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": false,
+      "custom": false,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
+      "model": "gpt-5.4",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 200000,
+        "TriggerTokens": 360000,
+        "UseLLMSummary": false
+      },
+      "provider": "copilot",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "cdb2c013ba9271e705691283e0179dcb42fccc345db0881b225a432feadc581e"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": true,
+      "custom": false,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
+      "model": "gpt-5.4",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 200000,
+        "TriggerTokens": 360000,
+        "UseLLMSummary": false
+      },
+      "provider": "copilot",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -628,10 +995,14 @@
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
         "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": false,
       "custom": true,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
       "model": "gpt-5.4",
       "policy": {
         "Enabled": true,
@@ -642,6 +1013,7 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "copilot",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -649,11 +1021,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "cdb2c013ba9271e705691283e0179dcb42fccc345db0881b225a432feadc581e"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
       "custom": true,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
       "model": "gpt-5.4",
       "policy": {
         "Enabled": true,
@@ -664,6 +1040,34 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "copilot",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
+      "custom": true,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
+      "model": "gpt-5.4",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "copilot",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -671,11 +1075,42 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "cdb2c013ba9271e705691283e0179dcb42fccc345db0881b225a432feadc581e"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
+      "custom": true,
+      "mode_display_name": "\u0394",
+      "mode_name": "unicode",
+      "model": "gpt-5.4",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "copilot",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
       "custom": false,
+      "mode_display_name": "",
+      "mode_name": "fallback",
       "model": "unknown",
       "policy": {
         "Enabled": true,
@@ -686,6 +1121,42 @@
         "TriggerTokens": 180000,
         "UseLLMSummary": false
       },
+      "provider": "local",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "cab7df5dad7e07a58106aeda99e544b78cbbb857213c6b48b615714c344a58b1"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": true,
+      "custom": false,
+      "mode_display_name": "",
+      "mode_name": "fallback",
+      "model": "unknown",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 100000,
+        "TriggerTokens": 180000,
+        "UseLLMSummary": false
+      },
+      "provider": "local",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -702,10 +1173,14 @@
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
         "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": false,
       "custom": false,
+      "mode_display_name": "",
+      "mode_name": "fallback",
       "model": "unknown",
       "policy": {
         "Enabled": true,
@@ -716,6 +1191,42 @@
         "TriggerTokens": 180000,
         "UseLLMSummary": false
       },
+      "provider": "local",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "090ca955447c1183d5fd1e943564cc7ceb94861eb0d2928000620afca9e1a49b",
+        "c25c67a3d5111b837b092baab7fd46e5ef45d83b50a96138de49998fbb43bbbf",
+        "2302fef4e22ab8db2233911528a5383ae21fc992087bbbd294bbab09990c6be0",
+        "12b39eed0e31b3a822f57d55c6285537b1aa0faf7c7fea86c098105ff5730958",
+        "99a10da05879c67700cb4ce3bd51c3ea6f93cfa5d2a505040d60d9ed5ab7eec7",
+        "9ad0b63afc28cf24a84d5d3bfa643fabe88b6c0a0de7e6d0587f0e90cd6c4349",
+        "8e52c73fee6add9d1713e8933278c69ff3d0f043856d62bc9a3d7e03a74a105e",
+        "ef87eec7f2e0678175529bdf8969583482e657590baf733b7606eddba083aae1",
+        "4018d0d373649e5085e96d3846fd19104e4e742e4dfbd110f007c4a1e315807f",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "cab7df5dad7e07a58106aeda99e544b78cbbb857213c6b48b615714c344a58b1"
+      ],
+      "working_state_text": ""
+    },
+    {
+      "blank_carry": true,
+      "custom": false,
+      "mode_display_name": "",
+      "mode_name": "fallback",
+      "model": "unknown",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 2,
+        "PreserveRecentItems": 10,
+        "SummaryBulletLimit": 5,
+        "TargetTokens": 100000,
+        "TriggerTokens": 180000,
+        "UseLLMSummary": false
+      },
+      "provider": "local",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -732,10 +1243,14 @@
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
         "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+      ],
+      "working_state_text": ""
     },
     {
+      "blank_carry": false,
       "custom": true,
+      "mode_display_name": "",
+      "mode_name": "fallback",
       "model": "unknown",
       "policy": {
         "Enabled": true,
@@ -746,6 +1261,7 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "local",
       "streaming": false,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -753,11 +1269,15 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "cab7df5dad7e07a58106aeda99e544b78cbbb857213c6b48b615714c344a58b1"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     },
     {
+      "blank_carry": true,
       "custom": true,
+      "mode_display_name": "",
+      "mode_name": "fallback",
       "model": "unknown",
       "policy": {
         "Enabled": true,
@@ -768,6 +1288,34 @@
         "TriggerTokens": 90000,
         "UseLLMSummary": false
       },
+      "provider": "local",
+      "streaming": false,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": false,
+      "custom": true,
+      "mode_display_name": "",
+      "mode_name": "fallback",
+      "model": "unknown",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "local",
       "streaming": true,
       "text_sha256": [
         "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
@@ -775,15 +1323,43 @@
         "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
         "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
         "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
-        "5ed119b6a771975dd4a5cf5aaa40971a827eb17845b9fac4d93d72b2cbc0c77a"
-      ]
+        "cab7df5dad7e07a58106aeda99e544b78cbbb857213c6b48b615714c344a58b1"
+      ],
+      "working_state_text": " custom state \n\u0394 "
+    },
+    {
+      "blank_carry": true,
+      "custom": true,
+      "mode_display_name": "",
+      "mode_name": "fallback",
+      "model": "unknown",
+      "policy": {
+        "Enabled": true,
+        "PreserveInitialUserMessages": 1,
+        "PreserveRecentItems": 3,
+        "SummaryBulletLimit": 7,
+        "TargetTokens": 40000,
+        "TriggerTokens": 90000,
+        "UseLLMSummary": false
+      },
+      "provider": "local",
+      "streaming": true,
+      "text_sha256": [
+        "76e66332ec34b5bbebd025e8937d7a04fa453c230e5638f9d36ab4bb6b000913",
+        "7a35eef0b66dd90b64eb7cc61a271b119c31ea6a0c9818e6972a449e9e3b23f4",
+        "9d32a25480987c31ea7bdf4318cbc5a748e5917eb4060345ad540efd6c09a901",
+        "87a9c45c7f947f39c537795bad6882d66bfe081b478d1b2d81b58094267d1257",
+        "1dad9f51563bf6ead7a44a4fc8db5f264314536c835a9c89a79279e5a5155192",
+        "083120084b361191be9a85496f17717748f3a0db2c934b36ca9981f41363589a"
+      ],
+      "working_state_text": " custom state \n\u0394 "
     }
   ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "c246bea5d49512e9a8d0ce0b5cbce51b48a6232a5a27df19dcc6c58afe83be73",
+      "scripts/run-instructions-reference/reference_test.go": "58b3082b90af65797680efa1cbdda0b421715d03a6d307fff3d2a9c499edf1ed",
       "scripts/run-instructions-reference/run.py": "091ac69fde7bcbd16f6f8a7a05a80973e91cc6d29cd749bb5d0597b338f082fb"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",

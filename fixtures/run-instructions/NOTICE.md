@@ -17,12 +17,12 @@ working-state text and the resulting SDK carry-forward default. Native builder
 tests check the recorded result after local compaction in normal and streamed
 requests, and its absence from uncompacted input.
 
-Sixteen `compaction_cases` record actual normal/streamed model requests across
-four model families and default/explicit policies. Each message is compared by
+Thirty-two `compaction_cases` record actual normal/streamed model requests across
+four model/provider pairs and default/explicit policies. Each message is compared by
 SHA-256, in order; input is deterministic with a large prefix and small recent
-tail to exercise retention and summary rules. Both sides explicitly supply a
-blank carry-forward callback (and explicit policies disable model-threshold
-resolution); the SDK default dynamic provider/mode callback is not covered.
+tail to exercise retention and summary rules. Both default provider/mode and
+explicit-blank carry-forward callbacks are covered, including whitespace and
+Unicode mode labels. Explicit policies disable model-threshold resolution.
 
 SDK-derived fixture text and ported composition retain upstream ownership and
 **GPL-3.0-only** licensing. The original license is retained in

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gratefulagents/sdk/pkg/agentsdk"
+	sdkmode "github.com/gratefulagents/sdk/pkg/agentsdk/mode"
 	"os"
 	"strings"
 	"testing"
@@ -69,51 +70,63 @@ func TestRunInstructionsReference(t *testing.T) {
 		t.Fatal(err)
 	}
 	compactions := []map[string]any{}
-	for _, model := range []string{"gpt-5-mini", "gpt-6", "gpt-5.4", "unknown"} {
+	for index, model := range []string{"gpt-5-mini", "gpt-6", "gpt-5.4", "unknown"} {
 		for _, custom := range []bool{false, true} {
 			for _, streaming := range []bool{false, true} {
-				config := Config{Model: model, Features: &Features{Runtime: RuntimeFeatures{Compaction: true}}, CompactionCarryForward: func(context.Context) string { return "" }}
-				if custom {
-					config.CompactionConfig = &agentsdk.CompactionConfig{Enabled: true, TriggerTokens: 90000, TargetTokens: 40000, PreserveRecentItems: 3, PreserveInitialUserMessages: 1, SummaryBulletLimit: 7}
-					config.CompactionModelResolver = func(context.Context, string) (int, int, bool) { return 0, 0, false }
-				}
-				cfg := BuildRunConfig(config, nil)
-				cfg.MaxTurns = 1
-				m := &instructionModel{}
-				r := agentsdk.NewRunnerWithModel(m)
-				a := &agentsdk.Agent{Name: "agent", Model: model, Instructions: "base"}
-				input := []agentsdk.RunItem{}
-				for i := 0; i < 100; i++ {
-					repeat := 2000
-					if i >= 80 {
-						repeat = 2
+				for _, blankCarry := range []bool{false, true} {
+					config := Config{Model: model, Provider: []string{"", "anthropic", "copilot", "local"}[index], Features: &Features{Runtime: RuntimeFeatures{Compaction: true}}}
+					if blankCarry {
+						config.CompactionCarryForward = func(context.Context) string { return "" }
 					}
-					input = append(input, agentsdk.RunItem{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: fmt.Sprintf("message %03d: ", i) + strings.Repeat("old conversation ", repeat)}})
-				}
-				if streaming {
-					s := r.RunStreamed(context.Background(), a, input, cfg)
-					for range s.Events {
+					modeName, displayName := "", ""
+					if index > 0 {
+						modeName = []string{"", "planner", "unicode", "fallback"}[index]
+						displayName = []string{"", " Planning ", "Δ", ""}[index]
+						config.ModeSnapshot = &sdkmode.TemplateSpec{Name: modeName, DisplayName: displayName}
 					}
-					if s.FinalResult().FinalText() != "done" {
-						t.Fatal("missing streamed answer")
+					if custom {
+						config.WorkingStateText = " custom state \nΔ "
+						config.CompactionConfig = &agentsdk.CompactionConfig{Enabled: true, TriggerTokens: 90000, TargetTokens: 40000, PreserveRecentItems: 3, PreserveInitialUserMessages: 1, SummaryBulletLimit: 7}
+						config.CompactionModelResolver = func(context.Context, string) (int, int, bool) { return 0, 0, false }
 					}
-				} else {
-					out, err := r.Run(context.Background(), a, input, cfg)
-					if err != nil || out.FinalText() != "done" {
-						t.Fatalf("compaction run: %v", err)
+					cfg := BuildRunConfig(config, nil)
+					cfg.MaxTurns = 1
+					m := &instructionModel{}
+					r := agentsdk.NewRunnerWithModel(m)
+					a := &agentsdk.Agent{Name: "agent", Model: model, Instructions: "base"}
+					input := []agentsdk.RunItem{}
+					for i := 0; i < 100; i++ {
+						repeat := 2000
+						if i >= 80 {
+							repeat = 2
+						}
+						input = append(input, agentsdk.RunItem{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: fmt.Sprintf("message %03d: ", i) + strings.Repeat("old conversation ", repeat)}})
 					}
-				}
-				if len(m.requests) != 1 {
-					t.Fatal("unexpected compaction requests")
-				}
-				texts := []string{}
-				for _, item := range m.requests[0].Input {
-					if item.Message == nil {
-						t.Fatal("unexpected nonmessage")
+					if streaming {
+						s := r.RunStreamed(context.Background(), a, input, cfg)
+						for range s.Events {
+						}
+						if s.FinalResult().FinalText() != "done" {
+							t.Fatal("missing streamed answer")
+						}
+					} else {
+						out, err := r.Run(context.Background(), a, input, cfg)
+						if err != nil || out.FinalText() != "done" {
+							t.Fatalf("compaction run: %v", err)
+						}
 					}
-					texts = append(texts, fmt.Sprintf("%x", sha256.Sum256([]byte(item.Message.Text))))
+					if len(m.requests) != 1 {
+						t.Fatal("unexpected compaction requests")
+					}
+					texts := []string{}
+					for _, item := range m.requests[0].Input {
+						if item.Message == nil {
+							t.Fatal("unexpected nonmessage")
+						}
+						texts = append(texts, fmt.Sprintf("%x", sha256.Sum256([]byte(item.Message.Text))))
+					}
+					compactions = append(compactions, map[string]any{"model": model, "provider": config.Provider, "mode_name": modeName, "mode_display_name": displayName, "blank_carry": blankCarry, "custom": custom, "streaming": streaming, "policy": cfg.CompactionConfig, "working_state_text": config.WorkingStateText, "text_sha256": texts})
 				}
-				compactions = append(compactions, map[string]any{"model": model, "custom": custom, "streaming": streaming, "policy": cfg.CompactionConfig, "text_sha256": texts})
 			}
 		}
 	}

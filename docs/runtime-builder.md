@@ -630,9 +630,14 @@ threshold settings are preserved; feature selection still controls enablement.
 Direct runtime defaults remain twelve recent items/four bullets. The SDK's
 explicit compaction-config enablement override is not yet mapped by the builder.
 
-The SDK builder's default dynamic carry-forward callback (provider/mode text)
-is not yet automatically installed by the Rust builder. Hosts can supply
-`compaction_carry_forward`; this remaining composition gap is not a parity claim.
+Unless the host supplies `compaction_carry_forward`, full builds install the SDK
+default `Runtime state: provider=<configured provider>, mode=<mode label>`.
+Provider defaults to `openai`; the label uses snapshot display name, snapshot
+name, configured active mode, then `chat`, independently of mode instructions.
+This snapshot callback is deterministic and has a durable identity. As in the
+SDK, its nonblank result takes precedence over static/primed working-state text.
+Supply a callback returning blank text to use the static fallback instead, or a
+host callback for current state. Tool-only construction installs no callback.
 
 The eight task tools, six memory tools and `prime_context` use owned composition,
 not `ExtraTools`. Duplicate detection, role views and read-only execution policy

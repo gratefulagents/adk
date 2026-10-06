@@ -191,6 +191,13 @@ async fn builder_maps_run_instruction_sections_without_changing_agent_text() {
     }
 }
 
+struct BlankCarry;
+impl adk::runtime::CompactionCarryForward for BlankCarry {
+    fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async { Ok(String::new()) })
+    }
+}
+
 #[tokio::test]
 async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compaction() {
     use adk::runtime::compaction::LocalCompactionPolicy;
@@ -217,6 +224,7 @@ async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compactio
         )
         .runner_config(RunnerConfig {
             working_state_context: case["working_state_text"].as_str().unwrap().into(),
+            compaction_carry_forward: Some(Arc::new(BlankCarry)),
             local_compaction: LocalCompactionPolicy {
                 trigger_tokens: 30_000,
                 target_tokens: 20_000,
@@ -294,12 +302,6 @@ async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compactio
 async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_policy() {
     use adk::runtime::compaction::LocalCompactionPolicy;
     use sha2::{Digest, Sha256};
-    struct BlankCarry;
-    impl adk::runtime::CompactionCarryForward for BlankCarry {
-        fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
-            Box::pin(async { Ok(String::new()) })
-        }
-    }
     let fixture: serde_json::Value = serde_json::from_str(include_str!(
         "../../../../fixtures/run-instructions/observations.json"
     ))
@@ -307,9 +309,12 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
     for case in fixture["compaction_cases"].as_array().unwrap() {
         let model = Arc::new(RecordingModel::default());
         let mut runner = RunnerConfig {
-            compaction_carry_forward: Some(Arc::new(BlankCarry)),
+            working_state_context: case["working_state_text"].as_str().unwrap().into(),
             ..Default::default()
         };
+        if case["blank_carry"] == true {
+            runner.compaction_carry_forward = Some(Arc::new(BlankCarry));
+        }
         if case["custom"] == true {
             runner.local_compaction = LocalCompactionPolicy {
                 enabled: true,
@@ -320,19 +325,34 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
                 summary_bullet_limit: 7,
             };
         }
-        let mut bundle = builder(
-            Config {
-                model: case["model"].as_str().unwrap().into(),
-                instructions: "base".into(),
-                work_dir: "".into(),
-                features: Some(Features {
-                    compaction: true,
-                    ..Default::default()
-                }),
+        let provider = match case["provider"].as_str().unwrap() {
+            "" => None,
+            name => Some(name.parse::<Kind>().unwrap()),
+        };
+        let mode_name = case["mode_name"].as_str().unwrap();
+        let mut bundle = Builder::new(Config {
+            provider,
+            mode_snapshot: (!mode_name.is_empty()).then(|| ModeSpec {
+                name: mode_name.into(),
+                display_name: case["mode_display_name"].as_str().unwrap().into(),
+                tool_access: "full".into(),
                 ..Default::default()
-            },
-            &model,
+            }),
+            model: case["model"].as_str().unwrap().into(),
+            instructions: "base".into(),
+            work_dir: "".into(),
+            features: Some(Features {
+                compaction: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .model(
+            provider.unwrap_or(Kind::OpenAi).name(),
+            provider.unwrap_or(Kind::OpenAi),
+            model.clone(),
         )
+        .unwrap()
         .runner_config(runner)
         .build(&context())
         .await

@@ -3355,6 +3355,28 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-94B3809F696E07F6": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "RunConfig.WorkingStateContext",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::RunnerConfig",
+        "crates/adk-runtime/src/runner.rs::apply_compaction_carry_forward"
+      ],
+      "rust_test_identifiers": [
+        "workspace_context_composition::working_state_fallback_matches_sdk_and_is_only_injected_after_compaction",
+        "workspace_context_composition::builder_compaction_matches_pinned_requests_for_model_defaults_and_host_policy",
+        "carry_forward_only_after_compaction_dynamic_precedence_fallback_and_deduplication",
+        "durable_local_compaction_policy_is_bound_and_normalized"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildRunConfigHonorsHostOverrides",
+      "rationale": "Only the UTF-8 static working-state field and its carry-forward role are closed. Pinned BuildRunConfig observations preserve blank, explicit and Unicode field values; 32 independently executed normal/streamed requests compare all compacted message digests with default or explicit Unicode static state and default/nonblank versus explicitly blank carry callbacks. Native tests require no initial-input injection, nonblank dynamic precedence, blank-callback static fallback, trimming, carry deduplication, guardrail checks and aligned provenance. Builder fallback and default callback remain distinct. This does not claim whole compaction algorithms, arbitrary Go byte strings, provider metadata resolution, or whole RunConfig parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "builder",
+        "observability"
+      ]
     }
   }
 }

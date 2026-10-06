@@ -785,6 +785,16 @@ impl Cancellation for SessionCancellation {
     }
 }
 
+struct DefaultCarryForward(String);
+impl adk_runtime::CompactionCarryForward for DefaultCarryForward {
+    fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async { Ok(self.0.clone()) })
+    }
+    fn durable_key(&self) -> Option<&str> {
+        Some(&self.0)
+    }
+}
+
 /// Construction is credential-free; registering a route never reads its store.
 pub struct Builder {
     config: Config,
@@ -1184,22 +1194,28 @@ impl Builder {
         let base_settings = settings.clone();
         let mut policy = self.config.policy.clone();
         let mut instructions = vec![self.config.instructions.trim().to_owned()];
+        let label = mode
+            .as_ref()
+            .and_then(|mode| {
+                [&mode.display_name, &mode.name]
+                    .into_iter()
+                    .find(|s| !s.is_empty())
+                    .map(String::as_str)
+            })
+            .or_else(|| {
+                self.config
+                    .active_mode
+                    .as_deref()
+                    .filter(|s| !s.trim().is_empty())
+            })
+            .unwrap_or("chat");
+        if self.runner.compaction_carry_forward.is_none() {
+            self.runner.compaction_carry_forward = Some(Arc::new(DefaultCarryForward(format!(
+                "Runtime state: provider={}, mode={label}",
+                self.config.provider.unwrap_or(Kind::OpenAi).name(),
+            ))));
+        }
         if features.mode_instructions {
-            let label = mode
-                .as_ref()
-                .and_then(|mode| {
-                    [&mode.display_name, &mode.name]
-                        .into_iter()
-                        .find(|s| !s.is_empty())
-                        .map(String::as_str)
-                })
-                .or_else(|| {
-                    self.config
-                        .active_mode
-                        .as_deref()
-                        .filter(|s| !s.trim().is_empty())
-                })
-                .unwrap_or("chat");
             instructions.push(format!("Active mode: {label}"));
         }
         if let Some(mode) = &mode {

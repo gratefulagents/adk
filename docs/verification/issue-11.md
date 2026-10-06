@@ -2,16 +2,30 @@
 
 ## Current continuation evidence
 
+### Default builder carry-forward callback
+
+Full builds install deterministic configured-provider/mode carry-forward text
+only when the host has not supplied a callback. The expanded fixture now checks
+32 normal/streamed compacted requests, default versus explicit-blank callbacks,
+default versus custom policies, four provider/model combinations, display-name
+whitespace/Unicode and fallback-name labels. Every compacted message digest
+matches independent pinned SDK execution. Static working-state fallback tests
+explicitly provide a blank callback, matching the SDK's precedence contract;
+neither priming nor static text silently displaces a nonblank callback.
+The bounded static-field mapping `SDK-94B3809F696E07F6`
+(`RunConfig.WorkingStateContext`) is verified from these executed requests and
+native carry-forward regressions; whole compaction/config parity is not claimed.
+
 ### Builder local-compaction defaults
 
 Default full-builder policies use ten recent items/five summary bullets while
 resolving thresholds per active model; explicit nondefault host policies retain
 their settings. Sixteen actual pinned normal/streamed requests across four model
 families and default/custom policies compare every compacted message by SHA-256.
-Both harnesses use an explicitly blank carry callback to isolate policy and
-static fallback behavior. The initial comparison revealed the SDK builder's
-additional default provider/mode carry callback, which remains an open native
-composition gap, not a silently normalized difference. No new ledger IDs closed.
+The initial sixteen-case harness used an explicitly blank carry callback to
+isolate policy/static fallback behavior. Its first comparison revealed the SDK
+builder's default provider/mode carry callback, subsequently implemented and
+covered above. No new ledger IDs closed.
 
 ### Durable local-compaction identity
 

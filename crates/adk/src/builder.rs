@@ -938,6 +938,137 @@ impl Builder {
         self
     }
 
+    /// Assemble tool resources without provider construction, config-source loading,
+    /// mode/role resolution, runtime priming, handoffs or scheduler setup.
+    pub async fn build_tools(mut self, context: &Context) -> Result<ToolRuntime, Error> {
+        let result = self.assemble_tool_runtime(context).await;
+        #[cfg(feature = "mcp")]
+        if result.is_err()
+            && let Some(mcp) = &self.owned_mcp
+        {
+            let _ = mcp.close().await;
+        }
+        if result.is_err()
+            && let Some(session) = &mut self.owned_session
+        {
+            session.close().await?;
+        }
+        result
+    }
+
+    async fn assemble_tool_runtime(&mut self, context: &Context) -> Result<ToolRuntime, Error> {
+        context.check_active()?;
+        let features = self.config.resolved_features();
+        self.validate_integrations(&features)?;
+        let policy = self.config.policy.tools.clone();
+        let config = self.tool_config(&features, &policy);
+        #[cfg(feature = "project-state")]
+        if features.project_state.active() {
+            let store = project_state::open(
+                self.project_state_store.take(),
+                self.project_state_host.take(),
+                &self.config,
+            )
+            .await?;
+            self.owned_project_state = Some(project_state::Owner::new(
+                store,
+                project_state::actor(&self.config),
+            ));
+        }
+        let tools = self
+            .assemble_tools(context, &features, config, policy)
+            .await?;
+        Ok(ToolRuntime {
+            tools,
+            session: self.session.take(),
+            owned_session: self.owned_session.take(),
+            #[cfg(feature = "mcp")]
+            owned_mcp: self.owned_mcp.take(),
+            #[cfg(feature = "project-state")]
+            owned_project_state: self.owned_project_state.take(),
+        })
+    }
+
+    fn tool_config(&self, features: &Features, policy: &ToolPolicy) -> adk_tools::Config {
+        let mut tool_config = self.config.tool_options.clone();
+        tool_config.features = match &self.config.features {
+            Some(_) => adk_tools::Features::Strict(features.tools.clone()),
+            None => adk_tools::Features::Legacy(self.config.legacy_tools.clone()),
+        };
+        if let adk_tools::Features::Legacy(legacy) = &mut tool_config.features {
+            legacy.enable_project_state = false;
+        }
+        tool_config.access = policy.access;
+        tool_config.allowed_mutating_tools = policy.allowed_mutating_tools.clone();
+        tool_config
+    }
+
+    fn validate_integrations(&self, features: &Features) -> Result<(), Error> {
+        #[cfg(not(feature = "project-state"))]
+        if features.project_state.active() {
+            return Err(invalid(
+                "project-state selection requires the project-state Cargo feature",
+            ));
+        }
+        #[cfg(not(feature = "mcp"))]
+        if features.mcp.active() {
+            return Err(invalid("MCP selection requires the mcp Cargo feature"));
+        }
+        #[cfg(feature = "mcp")]
+        if features.mcp.active() && self.mcp.is_none() {
+            return Err(invalid(
+                "MCP selection requires explicit configuration and host authority",
+            ));
+        }
+        Ok(())
+    }
+
+    async fn assemble_tools(
+        &mut self,
+        context: &Context,
+        features: &Features,
+        tool_config: adk_tools::Config,
+        policy: ToolPolicy,
+    ) -> Result<ToolBundle, Error> {
+        let mut tool_builder = BundleBuilder::new(tool_config)
+            .implementations(std::mem::take(&mut self.implementations))
+            .extra_tools(std::mem::take(&mut self.extra_tools));
+        if features.mcp.active() {
+            #[cfg(feature = "mcp")]
+            {
+                let owned = mcp::assemble(
+                    self.mcp.take().expect("preflight MCP input"),
+                    &features.mcp,
+                    &self.config.work_dir,
+                    context,
+                )
+                .await?;
+                let composed = adk_mcp::tools::build_tools(Arc::new(owned.handle()));
+                self.owned_mcp = Some(owned);
+                tool_builder = tool_builder.composed_tools(composed);
+            }
+        }
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            tool_builder = tool_builder.composed_tools(owner.tools(&features.project_state));
+        }
+        if let Some(config) = self.shell.take() {
+            tool_builder = tool_builder.shell(config);
+        }
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        if let Some(config) = self.lsp.take() {
+            tool_builder = tool_builder.lsp(config);
+        }
+        #[cfg(any(target_os = "linux", target_os = "macos"))]
+        if let Some(config) = self.browser.take() {
+            tool_builder = tool_builder.browser(config);
+        }
+        context.check_active()?;
+        tool_builder
+            .build(policy)
+            .map_err(|e| invalid("tool bundle construction failed").with_source(e))
+    }
+
     pub async fn build(mut self, context: &Context) -> Result<Bundle, Error> {
         let result = self.assemble(context).await;
         #[cfg(feature = "mcp")]
@@ -956,22 +1087,7 @@ impl Builder {
     async fn assemble(&mut self, context: &Context) -> Result<Bundle, Error> {
         context.check_active()?;
         let features = self.config.resolved_features();
-        #[cfg(not(feature = "project-state"))]
-        if features.project_state.active() {
-            return Err(invalid(
-                "project-state selection requires the project-state Cargo feature",
-            ));
-        }
-        #[cfg(not(feature = "mcp"))]
-        if features.mcp.active() {
-            return Err(invalid("MCP selection requires the mcp Cargo feature"));
-        }
-        #[cfg(feature = "mcp")]
-        if features.mcp.active() && self.mcp.is_none() {
-            return Err(invalid(
-                "MCP selection requires explicit configuration and host authority",
-            ));
-        }
+        self.validate_integrations(&features)?;
         let host = match &self.source {
             Some(source) => source.load(context).await?,
             None => HostConfig::default(),
@@ -1289,16 +1405,7 @@ impl Builder {
             .into_iter()
             .map(str::to_owned)
             .collect();
-        let mut tool_config = self.config.tool_options.clone();
-        tool_config.features = match &self.config.features {
-            Some(_) => adk_tools::Features::Strict(features.tools.clone()),
-            None => adk_tools::Features::Legacy(self.config.legacy_tools.clone()),
-        };
-        if let adk_tools::Features::Legacy(legacy) = &mut tool_config.features {
-            legacy.enable_project_state = false;
-        }
-        tool_config.access = policy.tools.access;
-        tool_config.allowed_mutating_tools = policy.tools.allowed_mutating_tools.clone();
+        let mut tool_config = self.tool_config(&features, &policy.tools);
         if features.subagents.enabled() {
             let children = session
                 .subagents
@@ -1374,40 +1481,9 @@ impl Builder {
                 project_state::actor(&self.config),
             ));
         }
-        let mut tool_builder = BundleBuilder::new(tool_config)
-            .implementations(std::mem::take(&mut self.implementations))
-            .extra_tools(std::mem::take(&mut self.extra_tools));
-        #[cfg(feature = "mcp")]
-        if features.mcp.active() {
-            let owned = mcp::assemble(
-                self.mcp.take().expect("preflight MCP input"),
-                &features.mcp,
-                &self.config.work_dir,
-                context,
-            )
+        let mut tools = self
+            .assemble_tools(context, &features, tool_config, policy.tools.clone())
             .await?;
-            let composed = adk_mcp::tools::build_tools(Arc::new(owned.handle()));
-            self.owned_mcp = Some(owned);
-            tool_builder = tool_builder.composed_tools(composed);
-        }
-        #[cfg(feature = "project-state")]
-        if let Some(owner) = &self.owned_project_state {
-            tool_builder = tool_builder.composed_tools(owner.tools(&features.project_state));
-        }
-        if let Some(config) = self.shell.take() {
-            tool_builder = tool_builder.shell(config);
-        }
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        if let Some(config) = self.lsp.take() {
-            tool_builder = tool_builder.lsp(config);
-        }
-        #[cfg(any(target_os = "linux", target_os = "macos"))]
-        if let Some(config) = self.browser.take() {
-            tool_builder = tool_builder.browser(config);
-        }
-        let mut tools = tool_builder
-            .build(policy.tools.clone())
-            .map_err(|e| invalid("tool bundle construction failed").with_source(e))?;
         let prepared = tools.prepared();
         policy.tools = prepared.policy;
         agent.tools = prepared.tools;
@@ -1722,6 +1798,71 @@ impl Bundle {
         let result = tools.and(session);
         #[cfg(feature = "mcp")]
         let result = result.and(mcp);
+        result
+    }
+}
+
+/// Provider-free tool composition owner. Close before shutting down the executor.
+pub struct ToolRuntime {
+    tools: ToolBundle,
+    session: Option<SessionHandle>,
+    owned_session: Option<SessionState>,
+    #[cfg(feature = "mcp")]
+    owned_mcp: Option<adk_mcp::session::OwnedMcpSession>,
+    #[cfg(feature = "project-state")]
+    owned_project_state: Option<project_state::Owner>,
+}
+impl ToolRuntime {
+    pub fn prepared(&self) -> adk_tools::PreparedTools {
+        self.tools.prepared()
+    }
+    pub fn context(&self, context: &Context) -> Context {
+        match &self.session {
+            Some(session) => self.tools.context(&session.context(context)),
+            None => self.tools.context(context),
+        }
+    }
+    #[cfg(feature = "mcp")]
+    pub fn mcp_catalog(&self) -> Vec<adk_mcp::client::CatalogEntry> {
+        self.owned_mcp
+            .as_ref()
+            .map_or_else(Vec::new, |mcp| mcp.catalog())
+    }
+    #[cfg(feature = "mcp")]
+    pub fn mcp_servers(&self) -> BTreeMap<String, adk_mcp::client::Capabilities> {
+        self.owned_mcp
+            .as_ref()
+            .map_or_else(BTreeMap::new, |mcp| mcp.connected_servers().clone())
+    }
+    pub async fn close(&mut self) -> Result<(), Error> {
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            owner.begin_close();
+        }
+        #[cfg(feature = "mcp")]
+        if let Some(owner) = &self.owned_mcp {
+            owner.begin_close();
+        }
+        let result =
+            self.tools.close().await.map_err(|e| {
+                Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
+            });
+        let result = result.and(match &mut self.owned_session {
+            Some(session) => session.close().await,
+            None => Ok(()),
+        });
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            owner.close().await;
+        }
+        #[cfg(feature = "mcp")]
+        let result = result.and(match &self.owned_mcp {
+            Some(owner) => owner
+                .close()
+                .await
+                .map_err(|e| Error::new(ErrorCategory::Host, "MCP teardown failed").with_source(e)),
+            None => Ok(()),
+        });
         result
     }
 }

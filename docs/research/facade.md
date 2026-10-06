@@ -135,6 +135,7 @@ process-environment discovery during composition and enabling `ExtraTools` as
 a side effect. Raw initialization/priming errors are not exposed because they
 can contain private paths or store contents. These are native host-boundary
 choices, not claims that SDK failure diagnostics or teardown behavior match.
-The independent sixteen-case pinned full-builder fixture checks only store
-creation, selected tool names and working-state text; it does not prove a
-tool-only facade or all project-state contracts.
+The independent sixteen-case pinned builder fixture checks only store creation,
+selected tool names and full-builder working-state text. Tool-only observations
+execute the SDK's separate BuildToolBundle path; neither proves all project-state
+contracts.

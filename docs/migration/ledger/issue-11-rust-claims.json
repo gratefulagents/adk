@@ -3303,6 +3303,24 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-2C0AABA943E7BF8D": {
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::active"
+      ],
+      "rationale": "Only the four-boolean needs-store predicate is closed. Independent execution of the pinned SDK full builder and BuildToolBundle records all sixteen PrimeContext/TaskTools/MemoryTools/PrimeTool combinations. Native comparators check every combination against observed filesystem creation and selected tool names; all-off creates no store and each nonempty selection creates one, including priming-only tool-only construction. This exhausts the predicate truth table. It does not claim complete feature serialization, all priming/store/tool semantics, failure diagnostics, automatic environment discovery, lifecycle equivalence or whole-builder parity.",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::tool_only_project_state_matches_pinned_selection_without_a_provider"
+      ],
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.needsStore",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "project-state"
+      ]
     }
   }
 }

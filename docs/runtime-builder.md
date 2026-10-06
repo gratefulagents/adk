@@ -628,6 +628,24 @@ Go's simple Unicode lowercase behavior.
 Verification: `scripts/project-state-runtime-reference/run.py --check` executes
 the pinned SDK full builder independently for sixteen feature combinations;
 Rust compares store creation, tool names and working-state text. This bounded
-fixture does not establish whole-builder parity, tool-only facade parity,
-provider-network behavior or target-wide support. The general-purpose SDK
-tool-only builder facade remains an unresolved composition requirement.
+fixture does not establish whole-builder parity, provider-network behavior or
+target-wide support. Its tool-only observations also exercise `BuildToolBundle`.
+
+## Provider-free tool assembly
+
+`Builder::build_tools(&context).await` returns a non-cloneable `ToolRuntime`.
+It uses the same registry, typed shell/LSP/browser resources, project-state and
+MCP assembly paths as a full build, but does not construct providers or runners,
+load a runtime `ConfigSource`, resolve modes/roles, prime working state, generate
+handoffs or create a scheduler. Runtime-only feature switches are not tool
+selection. Pass the intended tool policy directly through `Config.policy.tools`.
+A priming-only project-state selection still opens a store; it does not prime it.
+
+Use `prepared()` for owner-bound tools and their matching dispatch policy,
+`context()` for a cancellation scope, and `close().await` before executor shutdown.
+An explicitly supplied owned session remains alive until tool-runtime teardown;
+a borrowed session remains caller-owned. Build failures join owned sessions and
+roll back acquired MCP processes. Retained handles are revoked on close/drop.
+`mcp_catalog()` and `mcp_servers()` expose selected discovery metadata when MCP
+is compiled in. Offline comparisons cover the sixteen project-state selections
+and twelve MCP selections independently against the pinned SDK tool builder.

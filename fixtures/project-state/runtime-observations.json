@@ -3,18 +3,33 @@
     {
       "bits": 0,
       "created": false,
+      "tool_only_created": false,
+      "tool_only_tools": [],
       "tools": [],
       "working_state": " existing marker "
     },
     {
       "bits": 1,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [],
       "tools": [],
       "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
     },
     {
       "bits": 2,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "task_claim",
         "task_close",
@@ -30,6 +45,17 @@
     {
       "bits": 3,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "task_claim",
         "task_close",
@@ -45,6 +71,15 @@
     {
       "bits": 4,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -58,6 +93,15 @@
     {
       "bits": 5,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -71,6 +115,23 @@
     {
       "bits": 6,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -92,6 +153,23 @@
     {
       "bits": 7,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -113,6 +191,10 @@
     {
       "bits": 8,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context"
+      ],
       "tools": [
         "prime_context"
       ],
@@ -121,6 +203,10 @@
     {
       "bits": 9,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context"
+      ],
       "tools": [
         "prime_context"
       ],
@@ -129,6 +215,18 @@
     {
       "bits": 10,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "prime_context",
         "task_claim",
@@ -145,6 +243,18 @@
     {
       "bits": 11,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "prime_context",
         "task_claim",
@@ -161,6 +271,16 @@
     {
       "bits": 12,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -175,6 +295,16 @@
     {
       "bits": 13,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -189,6 +319,24 @@
     {
       "bits": 14,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -211,6 +359,24 @@
     {
       "bits": 15,
       "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
       "tools": [
         "memory_delete",
         "memory_list",
@@ -235,7 +401,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/project-state-runtime-reference/reference_test.go": "d780d781a3fd78c346308ef0b09ee0e4efe73b4198b3ddaaaeb8cdd2f7a84e56",
+      "scripts/project-state-runtime-reference/reference_test.go": "75b43fc8e934fb196c6c6e27cc84e2ba0a339c9081933847f753e084e43b4497",
       "scripts/project-state-runtime-reference/run.py": "670c1f072b38cf70ff7e6ab5cc6732f9d534f75cd8ed281e4f5ebe6bd4122482"
     },
     "launchPolicy": "Offline builder construction only; dummy provider key is never used for requests. Explicit disabled SDK command sandbox; no tools executed. No sandbox or provider-I/O parity claim.",

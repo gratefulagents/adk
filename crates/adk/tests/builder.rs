@@ -1046,3 +1046,52 @@ async fn project_state_requested_without_input_or_cargo_support_is_explicit() {
     assert!(bundle.agent().tools.is_empty());
     bundle.close().await.unwrap();
 }
+
+struct UnusedConfigSource;
+impl ConfigSource for UnusedConfigSource {
+    fn load<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<HostConfig, Error>> {
+        panic!("tool-only builds must not load runtime configuration")
+    }
+}
+#[tokio::test]
+async fn tool_only_builder_needs_no_provider_or_runtime_configuration() {
+    let mut bundle = Builder::new(Config {
+        model: "unregistered/model".into(),
+        active_mode: Some("unknown mode".into()),
+        features: Some(Features::default()),
+        ..Default::default()
+    })
+    .source(Arc::new(UnusedConfigSource))
+    .build_tools(&context())
+    .await
+    .unwrap();
+    assert!(bundle.prepared().tools.is_empty());
+    let scoped = bundle.context(&context());
+    bundle.close().await.unwrap();
+    assert_eq!(category(scoped.check_active()), ErrorCategory::Cancelled);
+    bundle.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn tool_only_builder_preserves_explicit_session_ownership() {
+    let owner = SessionState::new();
+    let handle = owner.handle();
+    let mut tools = Builder::new(Config::default())
+        .owned_session(owner)
+        .build_tools(&context())
+        .await
+        .unwrap();
+    assert!(!handle.is_closed());
+    tools.close().await.unwrap();
+    assert!(handle.is_closed());
+    let mut owner = SessionState::new();
+    let handle = owner.handle();
+    let mut tools = Builder::new(Config::default())
+        .session(handle.clone())
+        .build_tools(&context())
+        .await
+        .unwrap();
+    tools.close().await.unwrap();
+    assert!(!handle.is_closed());
+    owner.close().await.unwrap();
+}

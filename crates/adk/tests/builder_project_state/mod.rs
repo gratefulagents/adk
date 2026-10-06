@@ -229,3 +229,67 @@ async fn legacy_project_state_and_read_only_policy_use_composed_registration() {
     assert!(!names.contains(&"memory_remember"));
     bundle.close().await.unwrap();
 }
+
+#[tokio::test]
+async fn tool_only_project_state_matches_pinned_selection_without_a_provider() {
+    let oracle: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/project-state/runtime-observations.json"
+    ))
+    .unwrap();
+    for case in oracle["cases"].as_array().unwrap() {
+        let dir = tempfile::tempdir().unwrap();
+        let mut bundle = Builder::new(config(dir.path(), case["bits"].as_u64().unwrap() as u8))
+            .project_state_host(host(dir.path()))
+            .build_tools(&context())
+            .await
+            .unwrap();
+        assert_eq!(
+            dir.path().join("state").exists(),
+            case["tool_only_created"].as_bool().unwrap()
+        );
+        let mut names: Vec<_> = bundle
+            .prepared()
+            .tools
+            .iter()
+            .map(|t| t.definition().name.clone())
+            .collect();
+        names.sort();
+        assert_eq!(serde_json::json!(names), case["tool_only_tools"]);
+        bundle.close().await.unwrap();
+    }
+}
+#[tokio::test]
+async fn tool_only_builder_initializes_but_does_not_prime() {
+    let dir = tempfile::tempdir().unwrap();
+    let store = Arc::new(
+        ProjectStore::filesystem(FilesystemOptions {
+            state_dir: dir.path().join("injected"),
+            store: StoreOptions {
+                project_id: "injected".into(),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .unwrap(),
+    );
+    let invalid = "private invalid JSON\nsecond invalid record\n";
+    let events = dir.path().join("injected/events.jsonl");
+    std::fs::write(&events, invalid).unwrap();
+    let mut bundle = Builder::new(config(dir.path(), 1))
+        .project_state_store(store)
+        .build_tools(&context())
+        .await
+        .unwrap();
+    assert!(bundle.prepared().tools.is_empty());
+    assert_eq!(std::fs::read_to_string(events).unwrap(), invalid);
+    bundle.close().await.unwrap();
+    let invalid_path = dir.path().join("state");
+    std::fs::write(invalid_path, "not a directory").unwrap();
+    assert!(
+        Builder::new(config(dir.path(), 1))
+            .project_state_host(host(dir.path()))
+            .build_tools(&context())
+            .await
+            .is_err()
+    );
+}

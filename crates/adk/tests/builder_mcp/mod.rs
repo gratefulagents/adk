@@ -617,3 +617,78 @@ async fn cancelled_and_timed_out_multiserver_builds_cleanup_every_acquired_proce
         reaped(&b).await;
     }
 }
+
+#[tokio::test]
+async fn tool_only_selection_matches_pinned_sdk_builder_observations() {
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../fixtures/mcp");
+    let inputs: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(root.join("runtime-inputs.json")).unwrap()).unwrap();
+    let expected: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(root.join("runtime-observations.json")).unwrap())
+            .unwrap();
+    let mut actual = vec![];
+    for case in inputs.as_array().unwrap() {
+        let flag = |name: &str| case[name].as_bool().unwrap_or(false);
+        let names = |name: &str| -> BTreeSet<String> {
+            case[name]
+                .as_array()
+                .map(|items| {
+                    items
+                        .iter()
+                        .map(|v| v.as_str().unwrap().to_owned())
+                        .collect()
+                })
+                .unwrap_or_default()
+        };
+        let features = McpFeatures {
+            enabled: flag("enabled"),
+            allow_all_servers: flag("all_servers"),
+            allowed_servers: names("servers"),
+            allow_all_tools: flag("all_tools"),
+            allowed_tools: names("tools"),
+            resource_tools: flag("resources"),
+        };
+        let dir = tempfile::tempdir().unwrap();
+        let mut bundle = Builder::new(config(dir.path(), features))
+            .mcp(input(dir.path(), &[("chosen", "ok"), ("other", "ok")]))
+            .build_tools(&context())
+            .await
+            .unwrap();
+        let mut tools: Vec<_> = bundle
+            .prepared()
+            .tools
+            .iter()
+            .map(|tool| tool.definition().name.clone())
+            .collect();
+        tools.sort();
+        let catalog: Vec<_> = bundle.mcp_catalog().into_iter().map(|entry| json!({"name":entry.definition.name,"server":entry.server_name,"raw":entry.tool_name})).collect();
+        actual.push(json!({"name":case["name"],"servers":bundle.mcp_servers().keys().cloned().collect::<Vec<_>>(),"tools":tools,"catalog":catalog}));
+        bundle.close().await.unwrap();
+    }
+    assert_eq!(serde_json::Value::Array(actual), expected["cases"]);
+}
+
+#[tokio::test]
+async fn tool_only_owner_closes_mcp_and_revokes_retained_tools() {
+    let dir = tempfile::tempdir().unwrap();
+    let mut bundle = Builder::new(config(dir.path(), enabled()))
+        .mcp(input(dir.path(), &[("chosen", "ok")]))
+        .build_tools(&context())
+        .await
+        .unwrap();
+    let prepared = bundle.prepared();
+    let tool = prepared
+        .tools
+        .iter()
+        .find(|t| t.definition().name == "mcp__chosen__a_b")
+        .unwrap()
+        .clone();
+    let op = operation(dir.path(), prepared.policy);
+    let process = pid(dir.path(), "chosen").await;
+    bundle.close().await.unwrap();
+    assert_eq!(
+        category(tool.execute(&op, call("mcp__chosen__a_b", json!({}))).await),
+        ErrorCategory::Cancelled
+    );
+    reaped(&process).await;
+}

@@ -29,7 +29,7 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['pkg/agentsdk/providers/openai/compaction.go', 'pkg/agentsdk/providers/openai/compaction_test.go', 'internal/openai/model_metadata.go', 'pkg/agentsdk/runtime/builder.go', 'go.mod', 'go.sum']
+        paths = ['pkg/agentsdk/providers/openai/compaction.go', 'pkg/agentsdk/providers/openai/compaction_test.go', 'internal/openai/model_metadata.go', 'pkg/agentsdk/runtime/builder.go', 'internal/agent/run_config.go', 'internal/agent/run_config_test.go', 'internal/agent/multi_provider.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA,
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
@@ -39,6 +39,7 @@ def main():
         output = source / 'observations.json'
         env['METADATA_OUTPUT'] = str(output)
         subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeMetadataReference|TestCompactionDefaultsFromModelMetadata.*)$', './pkg/agentsdk/providers/openai'], cwd=source, env=env, check=True)
+        subprocess.run([go, 'test', '-count=1', '-v', '-run', '^TestCompactionDefaultsForModel$', './internal/agent'], cwd=source, env=env, check=True)
         result = dict(provenance=provenance, **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/metadata-compaction/observations.json'

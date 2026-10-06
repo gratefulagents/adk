@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Static compaction model defaults
+
+The pinned public helper now supplies 45 independently executed observations,
+including all 24 upstream regression inputs. These cover budget branches,
+small-model precedence, provider-prefix splitting and Unicode casing. The new
+native comparator initially failed for `gpt-5.6-MİNI`: Rust's expanding lowercase
+did not select the SDK's conservative small-model budget. Static selection now
+uses the same Unicode-15 simple casing as metadata lookup, and all cases pass.
+The unchanged upstream `TestCompactionDefaultsForModel` also passes freshly.
+
+Only the static helper's four identities are closed: `SDK-FB58C46A3648E533`,
+`SDK-06D324BF5C65AF00`, `SDK-33021DA02BCEB247`, and `SDK-71470C3083345121`.
+Rust exposes `LocalCompactionPolicy::for_model` and its threshold fields rather
+than a mutable Go function alias; custom defaults use explicit host resolver
+injection. No additional metadata lifecycle or complete compaction-policy
+closure is asserted. The ledger is **210 verified / 8,681 unresolved / 251
+excluded**; the immutable baseline inventories are unchanged.
+
+Fresh full workspace verification: **1,220 passed, 0 failed, 30 ignored**;
+the focused followup suite passes all **14 tests**. Strict Clippy, Rustfmt and
+all-feature documentation checks pass on Rust 1.88 / Linux x86_64. Live provider
+credentials and other targets remain unverified. The feature matrix and external
+standalone consumer pass, including the platform-free dependency check. All 20
+feature scenarios and the owned host-session example pass offline; source locks
+and all 18 ledger-validator tests pass. Issue #11 remains incomplete.
+
 ### Explicit-session metadata compaction
 
 The provider runtime adapter now lazily loads an authenticated catalog, shares

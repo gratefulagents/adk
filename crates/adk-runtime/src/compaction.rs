@@ -44,7 +44,18 @@ impl LocalCompactionPolicy {
             .split_once('/')
             .map_or(model.trim(), |(_, name)| name)
             .trim()
-            .to_lowercase();
+            .chars()
+            .map(|ch| {
+                // Preserve Go Unicode 15 simple casing, including dotted capital I.
+                if unicode_general_category::get_general_category(ch)
+                    == unicode_general_category::GeneralCategory::Unassigned
+                {
+                    ch
+                } else {
+                    ch.to_lowercase().next().unwrap()
+                }
+            })
+            .collect::<String>();
         let (trigger_tokens, target_tokens) = if ["spark", "nano", "mini", "lite", "flash"]
             .iter()
             .any(|part| model.contains(part))

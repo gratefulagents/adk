@@ -17,6 +17,9 @@ signed bounds, integer -0, overflow, Unicode labels and picker ordering.
 A separate 219-case direct-helper grid covers signed threshold arithmetic and
 the exact three upstream compaction-default regression inputs; those upstream
 tests also execute freshly.
+Forty-five static model-default observations call the public SDK helper, including
+all 24 upstream regression inputs, branch precedence, first-slash prefixes and
+dotted capital I. The upstream static-default regression executes separately.
 Source and harness digests are embedded in the observations. No live-provider claim.
 
 Native tests additionally check lazy construction, shared concurrent fetches,

@@ -189,6 +189,12 @@ independent pinned Go scalar digest failed until characters unassigned in Unicod
 15 were preserved. Use simple, non-expanding lowercase for assigned characters.
 The corrected implementation matches all 1,112,064 Unicode scalar observations.
 
+Apply the same simple casing to static model-default selection. Forty-five
+observations from the [pinned public helper](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go#L199)
+(GPL-3.0-only) exposed expanding lowercase selecting an unsafe larger budget for
+`gpt-5.6-MİNI`. Keep Rust's associated constructor and explicit resolver injection
+rather than reproducing Go's mutable public function-variable alias.
+
 Adopt an explicit session-owned async resolver and cancellable single-flight
 cache instead of process-global credential discovery or a blocking Go mutex.
 Preserve successful-fetch lifetime, failed-fetch 30-second cooldown and the

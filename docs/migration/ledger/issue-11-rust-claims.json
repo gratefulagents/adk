@@ -3457,6 +3457,70 @@
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
       ]
+    },
+    "SDK-FB58C46A3648E533": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "CompactionDefaultsForModel",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy::for_model"
+      ],
+      "rust_test_identifiers": [
+        "model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel",
+      "rationale": "Only the pure static model-threshold helper is closed. Forty-five independently executed public SDK helper observations include all 24 upstream regression inputs, every budget branch, small-model precedence, provider-prefix splitting, whitespace, unknown names and Unicode simple casing. The upstream regression also executes unchanged. Native LocalCompactionPolicy::for_model exposes trigger/target fields rather than a Go function-variable alias; explicit host resolver injection supplies customization rather than global alias mutation. No metadata fetch/cache, automatic builder composition or whole compaction-policy parity is asserted.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-06D324BF5C65AF00": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "CompactionDefaultsForModel",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy::for_model"
+      ],
+      "rust_test_identifiers": [
+        "model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel",
+      "rationale": "Only the pure static model-threshold helper is closed. Forty-five independently executed public SDK helper observations include all 24 upstream regression inputs, every budget branch, small-model precedence, provider-prefix splitting, whitespace, unknown names and Unicode simple casing. The upstream regression also executes unchanged. Native LocalCompactionPolicy::for_model exposes trigger/target fields rather than a Go function-variable alias; explicit host resolver injection supplies customization rather than global alias mutation. No metadata fetch/cache, automatic builder composition or whole compaction-policy parity is asserted.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-33021DA02BCEB247": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "CompactionDefaultsForModel",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy::for_model"
+      ],
+      "rust_test_identifiers": [
+        "model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel",
+      "rationale": "Only the pure static model-threshold helper is closed. Forty-five independently executed public SDK helper observations include all 24 upstream regression inputs, every budget branch, small-model precedence, provider-prefix splitting, whitespace, unknown names and Unicode simple casing. The upstream regression also executes unchanged. Native LocalCompactionPolicy::for_model exposes trigger/target fields rather than a Go function-variable alias; explicit host resolver injection supplies customization rather than global alias mutation. No metadata fetch/cache, automatic builder composition or whole compaction-policy parity is asserted.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-71470C3083345121": {
+      "source": "internal/agent/run_config_test.go",
+      "source_name": "TestCompactionDefaultsForModel",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy::for_model"
+      ],
+      "rust_test_identifiers": [
+        "model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel",
+      "rationale": "Only the pure static model-threshold helper is closed. Forty-five independently executed public SDK helper observations include all 24 upstream regression inputs, every budget branch, small-model precedence, provider-prefix splitting, whitespace, unknown names and Unicode simple casing. The upstream regression also executes unchanged. Native LocalCompactionPolicy::for_model exposes trigger/target fields rather than a Go function-variable alias; explicit host resolver injection supplies customization rather than global alias mutation. No metadata fetch/cache, automatic builder composition or whole compaction-policy parity is asserted.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

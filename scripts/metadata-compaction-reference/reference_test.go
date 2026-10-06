@@ -7,6 +7,7 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	sdk "github.com/gratefulagents/sdk/pkg/agentsdk"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -80,6 +81,24 @@ func nativeThresholdObservations() []map[string]any {
 	return out
 }
 
+func nativeStaticObservations() []map[string]any {
+	models := []string{
+		"gpt-6-astra", "openai/gpt-6-astra", "gpt-5.6", "gpt-5.6-sol", "openai/gpt-5.6-terra", "gpt-5.6-luna",
+		"gpt-5.5", "openai/gpt-5.5", "gpt-5.4", "openai/gpt-5.4", "gpt-5.4-mini", "openai/gpt-5.4-mini", "gpt-5.4-nano",
+		"gpt-5.3-codex", "gpt-5.3-codex-spark", "gpt-5.2-codex", "gpt-5.2", "gpt-5.1", "claude-opus-4-6",
+		"anthropic/claude-opus-4-6", "claude-sonnet-4-6", "claude-haiku-4-5", "unknown-model", "",
+		"gpt-5.6-MİNI", "gpt-5.6-LİTE", "fable-MİNI", "openai/ GPT-5.6-MİNI ", "claude-fable-5", "FABLE-flash",
+		"gpt-6-fable", " gpt-6 ", "arbitrary/ gpt-6 ", "proxy/team/gpt-6", "/gpt-6", "gpt-6/", "gpt-5.3",
+		"nano", "spark", "mini", "lite", "flash", "fable", "GPT-6-NANO", "gpt-5.6/unknown",
+	}
+	var out []map[string]any
+	for _, model := range models {
+		trigger, target := sdk.CompactionDefaultsForModel(model)
+		out = append(out, map[string]any{"model": model, "trigger": trigger, "target": target})
+	}
+	return out
+}
+
 func TestNativeMetadataReference(t *testing.T) {
 	const catalog = `{"models":[{"slug":"GPT-CUSTOM","context_window":10000},{"slug":"vendor/gpt-custom","context_window":20000},{"slug":"Δ","context_window":4000},{"slug":"İ","context_window":6000},{"slug":"no-context"}]}`
 	var requests atomic.Int32
@@ -134,7 +153,7 @@ func TestNativeMetadataReference(t *testing.T) {
 		hash.Write([]byte(key))
 		count++
 	}
-	out := map[string]any{"threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
+	out := map[string]any{"static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
 	data, err := json.Marshal(out)
 	if err != nil {
 		t.Fatal(err)

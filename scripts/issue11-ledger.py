@@ -75,6 +75,8 @@ RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo
                "crates/adk-providers/src/metadata.rs", "crates/adk-providers/src/runtime.rs",
                "crates/adk-providers/tests/metadata_compaction/mod.rs",
                "crates/adk-providers/tests/routes_cost_parity.rs",
+               "crates/adk-runtime/src/compaction.rs", "crates/adk-runtime/tests/followup.rs",
+               "fixtures/compaction.json",
                "fixtures/metadata-compaction/observations.json",
                "scripts/metadata-compaction-reference/run.py",
                "scripts/metadata-compaction-reference/reference_test.go",
@@ -282,7 +284,7 @@ def verify_rust() -> None:
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
-               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime"]
+               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
                             env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")

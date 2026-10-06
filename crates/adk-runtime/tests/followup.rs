@@ -942,3 +942,22 @@ async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
     assert!(model.requests.lock().unwrap()[0].tools.is_empty());
     assert!(target_model.requests.lock().unwrap().is_empty());
 }
+
+#[test]
+fn model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/metadata-compaction/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["static_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 45);
+    for case in cases {
+        let model = case["model"].as_str().unwrap();
+        let policy = LocalCompactionPolicy::for_model(model);
+        assert_eq!(
+            json!([policy.trigger_tokens, policy.target_tokens]),
+            json!([case["trigger"], case["target"]]),
+            "{model}"
+        );
+    }
+}

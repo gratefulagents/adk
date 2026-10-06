@@ -709,5 +709,26 @@ the previous fingerprint representation.
 Forty independently executed pinned SDK normal/streamed request fixtures cover
 base whitespace, blank extras, Unicode and all eight builder section selections.
 Native tests also cover handoff propagation and durable mismatch rejection.
-MCP prompt metadata and deprecated-field fallback precedence are not covered by
-this mapping.
+Deprecated-field fallback precedence is not covered by this mapping.
+
+## MCP request context
+
+`AgentConfig::mcp_servers` supplies request-only server metadata. Full builder
+composition populates it from **connected** owned MCP sessions, after selection
+and successful assembly; merely configured or disabled servers are not listed.
+Specialists do not automatically inherit the parent's names. Standalone runtime
+users can supply metadata without enabling the MCP transport crate. Handoffs use
+the active target's list, and nonempty lists participate in durable agent identity.
+
+The SDK prompt block follows additional instructions and structured-output
+context. Names retain order and duplicates; each is trimmed, whitespace runs
+collapse to a single ASCII space, and control/nonprintable characters are removed.
+The result is trimmed and capped at 64 Unicode scalar values (not UTF-8 bytes).
+Empty names are omitted. Classification is deliberately pinned to Unicode 15.0,
+matching the SDK, rather than changing with Rust compiler Unicode tables.
+
+Fifty-six actual pinned normal/streamed requests and an exhaustive scalar digest
+verify the formatter; builder tests verify selection and provider delivery.
+Prompt names describe connections, not sandbox/tool authority or a guarantee of
+resistance to arbitrary natural-language prompt injection. Invalid-UTF8 Go strings
+have no direct native `String` representation and are outside this mapping.

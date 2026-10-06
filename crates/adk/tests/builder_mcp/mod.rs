@@ -167,6 +167,10 @@ async fn runtime_selection_matches_pinned_sdk_builder_observations() {
             .collect();
         tools.sort();
         let catalog: Vec<_> = bundle.mcp_catalog().into_iter().map(|entry| json!({"name":entry.definition.name,"server":entry.server_name,"raw":entry.tool_name})).collect();
+        assert_eq!(
+            bundle.agent().mcp_servers,
+            bundle.mcp_servers().keys().cloned().collect::<Vec<_>>()
+        );
         actual.push(json!({"name":case["name"],"servers":bundle.mcp_servers().keys().cloned().collect::<Vec<_>>(),"tools":tools,"catalog":catalog}));
         bundle.close().await.unwrap();
     }
@@ -201,6 +205,7 @@ async fn selected_raw_and_final_names_route_without_enabling_extra_tools() {
                 .collect::<Vec<_>>(),
             ["chosen"]
         );
+        assert_eq!(bundle.agent().mcp_servers, ["chosen"]);
         assert!(!dir.path().join("unselected.pid").exists());
         assert_eq!(bundle.mcp_catalog()[0].tool_name, "a b");
         assert_eq!(bundle.agent().tools.len(), 1);
@@ -218,6 +223,13 @@ async fn selected_raw_and_final_names_route_without_enabling_extra_tools() {
             .await
             .unwrap();
         assert_eq!(model.requests.lock().unwrap()[0].tools.len(), 1);
+        bundle
+            .stream(context(), vec![], Arc::new(TestHost))
+            .finish()
+            .await
+            .unwrap();
+        assert!(model.requests.lock().unwrap().iter().all(|request| request.instructions.ends_with("# MCP Servers\n\nConnected MCP servers: chosen\n\nMCP tools are prefixed as mcp__<server>__<tool>.")));
+
         let process = pid(dir.path(), "chosen").await;
         bundle.close().await.unwrap();
         bundle.close().await.unwrap();

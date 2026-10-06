@@ -19,6 +19,7 @@ pub mod hooks;
 pub mod tracing;
 pub use hooks::{CompositeHooks, HookErrors};
 pub mod compat;
+mod mcp_prompt;
 pub mod output;
 pub mod runner;
 pub mod settings;

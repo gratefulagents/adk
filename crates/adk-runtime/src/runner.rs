@@ -108,6 +108,7 @@ pub trait OutputParser: Send + Sync {
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
+    pub mcp_servers: Vec<String>,
     pub model: ModelBinding,
     pub fallbacks: Vec<ModelBinding>,
     pub tools: Vec<Arc<dyn Tool>>,
@@ -129,6 +130,7 @@ impl AgentConfig {
         Self {
             name: name.into(),
             instructions: String::new(),
+            mcp_servers: Vec::new(),
             model,
             fallbacks: vec![],
             tools: vec![],
@@ -1860,6 +1862,13 @@ impl Engine {
                 ""
             };
             instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+        }
+        let mcp_context = crate::mcp_prompt::context(&self.agent.mcp_servers);
+        if !mcp_context.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(&mcp_context);
         }
         self.summary_turn = self.final_summary_required();
         if self.summary_turn {

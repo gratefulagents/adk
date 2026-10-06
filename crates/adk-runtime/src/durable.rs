@@ -702,6 +702,9 @@ impl Runner {
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
             });
+            if !agent.mcp_servers.is_empty() {
+                entry["mcp_servers"] = serde_json::json!(agent.mcp_servers);
+            }
             if let Some(ceiling) = agent.tool_access_ceiling {
                 entry["tool_access_ceiling"] = serde_json::json!(ceiling);
             }

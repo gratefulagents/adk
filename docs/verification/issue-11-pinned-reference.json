@@ -16,10 +16,19 @@
       "./internal/agent",
       "-run",
       "^(TestRunnerInputGuardrailTripwire|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerRecoversFromPanickingInputGuardrail|TestModeReasoningSettings|TestResolveRoleModeRouting)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./internal/agent",
+      "-run",
+      "^(TestBuildMCPPromptContextSanitizesServerNames|TestBuildMCPPromptContextEmpty|TestSanitizeMCPServerName)$"
     ]
   ],
   "counts": {
-    "pass": 743,
+    "pass": 746,
     "skip": 5
   },
   "exit_code": 0,
@@ -63,8 +72,10 @@
   },
   "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
-  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n",
+  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\nfailed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n",
   "tests": {
+    "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextEmpty": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/high": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/low": "pass",
@@ -79,6 +90,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestSanitizeMCPServerName": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestApprovedSubagentSharesParentContext": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsIdenticalCallLoop": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall": "pass",

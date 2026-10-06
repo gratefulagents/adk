@@ -158,3 +158,24 @@ whitespace. Reject copying an unverified summary of those helpers: this revision
 uses `\n\n---\n\n`, not just blank lines between run-level sections.
 MCP context has a separate Unicode-printability contract and remains separate
 from this additional-instructions mapping.
+
+## MCP Unicode prompt metadata
+
+Adopt `unicode-general-category` **0.6.0**, Apache-2.0, no dependencies/no_std,
+with an exact compatibility pin. The
+[registry version metadata](https://crates.io/api/v1/crates/unicode-general-category/0.6.0)
+confirms the unyanked release/license; the
+[versioned source](https://docs.rs/unicode-general-category/0.6.0/src/unicode_general_category/lib.rs.html)
+reports Unicode **15.0.0**, matching the pinned SDK's Go toolchain. The maintained
+[upstream repository](https://github.com/yeslogic/unicode-general-category)
+has newer Unicode releases, deliberately not adopted for this compatibility rule.
+Cargo source checksum: `2281c8c1d221438e373249e065ca4989c4c36952c211ff21a0ee91c44a3869e7`.
+No platform service or process dependency is added.
+
+Reject `char::escape_debug`, ASCII-only control filtering, and a newer Unicode
+category table: they do not implement Go's `unicode.IsPrint` contract. Exhaustive
+scalar observations include code points printable in newer Unicode but unassigned
+in the pinned version. The source's comment says bytes, but its actual truncation
+uses runes; retain 64 scalar values and verify multibyte boundaries independently.
+The native formatter preserves list order/duplicates; it is not a registration
+policy or prompt-injection security boundary.

@@ -3338,6 +3338,23 @@
         "x86_64-unknown-linux-gnu",
         "builder"
       ]
+    },
+    "SDK-9BC0FD01C9F477BB": {
+      "source": "internal/agent/mcp_prompt.go",
+      "source_name": "buildMCPPromptContext",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::unicode_sanitizer_matches_every_pinned_go_scalar_and_context_fixture",
+        "mcp_prompt_matches_pinned_normal_streamed_and_structured_requests"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames",
+      "rationale": "Only UTF-8 MCP prompt formatting is closed. Independently execute the pinned SDK helper and actual normal/streamed requests in 56 cases spanning empty, duplicate and ordered names, whitespace/control/nonprintable characters, multibyte 64-rune boundaries and output-schema/additional-instruction ordering. A length-framed SHA256 comparison exhausts all 1,112,064 valid Unicode scalars between printable sentinels against the source sanitizer; native classification is pinned to the SDK's Unicode 15.0 tables, not the compiler's printability rules. Invalid-UTF8 Go strings, server transport behavior, registration/order outside the supplied list, and prompt-injection resistance or sandbox authority are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

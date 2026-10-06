@@ -2650,6 +2650,7 @@ async fn additional_instructions_survive_checkpoint_and_config_is_bound() {
     let (_, model, tool) = setup(vec![call("denied")], false, false);
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.tools.push(tool.clone());
+    agent.mcp_servers = vec!["connected".into()];
     let runner = Runner::new(
         agent.clone(),
         RunnerConfig {
@@ -2680,6 +2681,34 @@ async fn additional_instructions_survive_checkpoint_and_config_is_bound() {
         true
     );
     req.input.clear();
+    let mut changed_agent = agent.clone();
+    changed_agent.mcp_servers.clear();
+    let changed_mcp = Runner::new(
+        changed_agent,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            additional_instructions: "run-wide".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mismatch = changed_mcp
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint.clone())),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        mismatch
+            .error
+            .info
+            .message
+            .contains("configuration or security policy changed")
+    );
     let changed = Runner::new(
         agent,
         RunnerConfig {

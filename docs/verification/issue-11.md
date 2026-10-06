@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Connected MCP prompt metadata
+
+`AgentConfig::mcp_servers` now feeds request context after additional/schema
+sections. Full composition copies only connected server names after MCP assembly;
+handoffs use target metadata and durable identities bind nonempty lists. Unicode
+classification is pinned to the SDK's Unicode 15.0 rather than compiler tables.
+Fifty-six independently executed SDK requests and a digest covering all
+**1,112,064 valid Unicode scalars** match native output. This closes only
+`SDK-9BC0FD01C9F477BB` for native UTF-8 names, not whole MCP behavior or a general
+prompt-injection security guarantee. The dependency's Apache-2.0 license and
+versioned source are recorded in the research and fixture notice.
+
+Focused tests first caught metadata copied before connection assembly; that
+ordering was corrected before the fresh passing full run. The new source helper
+claim initially failed the ledger gate because its original SDK regression was
+not in the reference report. Executing all three pinned MCP-prompt source tests
+added real pass records (746 passing source test/subtest records, 5 skipped),
+after which overlay generation and all eighteen validators passed. No baseline
+inventory or source-lock files changed. Current local logs are under
+`/workspace/scratch/issue11-mcp-prompt-*`.
+
 ### Run-wide instruction composition
 
 The runtime now applies `additional_instructions` to each active agent request,
@@ -44,13 +65,14 @@ exclude denied/mutating tools in read-only mode. Legacy fixed tool/path prose is
 compatibility guidance, not actual execution authority; strict selection names
 only prepared tools. Non-UTF8 native full-builder paths fail explicitly.
 
-Latest local verification: **1,199 workspace tests passed, 0 failed, 30 ignored**;
+Latest local verification: **1,201 workspace tests passed, 0 failed, 30 ignored**;
 strict all-target Clippy, rustdoc, formatting, source locks, facade matrix,
 platform-free external consumer, twenty offline examples plus host session and
 **18 evidence-validator tests** passed. The immutable inventory is untouched.
-The ledger is **199 verified / 8,692 unresolved / 251 excluded**. Only the
-exhaustive project-state needs-store predicate and the bounded legacy workspace
-formatter were newly closed; no whole-builder or whole-SDK claim is made.
+The ledger is **200 verified / 8,691 unresolved / 251 excluded**. Only the
+exhaustive project-state needs-store predicate, bounded legacy workspace formatter
+and UTF-8 MCP prompt formatter were newly closed; no whole-builder or whole-SDK
+claim is made.
 
 An earlier separate project-state evidence attempt hit the unchanged paused-time
 `tool_policy_timeout_preserves_managed_pending_results` regression: a child

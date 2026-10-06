@@ -1512,6 +1512,11 @@ impl Builder {
         let prepared = tools.prepared();
         policy.tools = prepared.policy;
         agent.tools = prepared.tools;
+        #[cfg(feature = "mcp")]
+        if let Some(mcp) = &self.owned_mcp {
+            agent.mcp_servers = mcp.connected_servers().keys().cloned().collect();
+        }
+
         let composed = (|| -> Result<BTreeMap<String, Arc<AgentConfig>>, Error> {
             let mut specialists = BTreeMap::new();
             let mut graph_names: BTreeSet<_> = agent

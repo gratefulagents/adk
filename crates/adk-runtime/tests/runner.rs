@@ -887,6 +887,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     let mut target = agent(target_model.clone());
     target.name = "target".into();
     target.instructions = "target instructions".into();
+    target.mcp_servers = vec!["target server".into()];
     let mut a = agent(source);
     a.tools = vec![effect.clone()];
     a.handoffs = vec![Handoff {
@@ -925,7 +926,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     let requests = target_model.requests.lock().unwrap();
     assert_eq!(
         requests[0].instructions,
-        "target instructions\n\n---\n\nrun-wide"
+        "target instructions\n\n---\n\nrun-wide\n\n---\n\n# MCP Servers\n\nConnected MCP servers: target server\n\nMCP tools are prefixed as mcp__<server>__<tool>."
     );
     assert_eq!(requests[0].input_provenance[0], ItemProvenance::Unknown);
     assert_eq!(&requests[0].input_provenance[1..], expected);
@@ -4356,6 +4357,54 @@ async fn additional_instructions_match_pinned_normal_and_streamed_requests() {
             a,
             RunnerConfig {
                 additional_instructions: case["extra"].as_str().unwrap().into(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if case["streaming"].as_bool().unwrap() {
+            r.stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            r.run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            model.requests.lock().unwrap()[0].instructions,
+            case["instructions"].as_str().unwrap(),
+            "{case}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn mcp_prompt_matches_pinned_normal_streamed_and_structured_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mcp-prompt/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["observations"]["cases"].as_array().unwrap().len(),
+        56
+    );
+    for case in fixture["observations"]["cases"].as_array().unwrap() {
+        let model = TestModel::with(vec![Ok(answer("{}"))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer("{}"),
+        })]]
+        .into();
+        let mut a = agent(model.clone());
+        a.instructions = "base".into();
+        a.mcp_servers = serde_json::from_value(case["names"].clone()).unwrap();
+        if case["schema"].as_bool().unwrap() {
+            a.output_schema = Some(json!({"type":"object"}).try_into().unwrap());
+        }
+        let r = Runner::new(
+            a,
+            RunnerConfig {
+                additional_instructions: " extra ".into(),
                 ..Default::default()
             },
         )

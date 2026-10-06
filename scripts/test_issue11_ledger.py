@@ -24,7 +24,9 @@ class EvidenceTests(unittest.TestCase):
 
     def test_builder_fixture_execution_markers_are_required(self):
         original = self.evidence["reference_fixture_check"]
-        for marker in ("Pinned SDK workspace context observations reproduced exactly",
+        for marker in ("Pinned SDK MCP prompt observations reproduced exactly",
+                       "Pinned SDK run instructions observations reproduced exactly",
+                       "Pinned SDK workspace context observations reproduced exactly",
                        "Pinned SDK project-state runtime observations reproduced exactly"):
             with self.subTest(marker=marker):
                 self.evidence["reference_fixture_check"] = original.replace(marker, "")

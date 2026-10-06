@@ -91,42 +91,30 @@ func TestRunInstructionsReference(t *testing.T) {
 					}
 					cfg := BuildRunConfig(config, nil)
 					cfg.MaxTurns = 1
-					m := &instructionModel{}
-					r := agentsdk.NewRunnerWithModel(m)
-					a := &agentsdk.Agent{Name: "agent", Model: model, Instructions: "base"}
-					input := []agentsdk.RunItem{}
-					for i := 0; i < 100; i++ {
-						repeat := 2000
-						if i >= 80 {
-							repeat = 2
-						}
-						input = append(input, agentsdk.RunItem{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: fmt.Sprintf("message %03d: ", i) + strings.Repeat("old conversation ", repeat)}})
-					}
-					if streaming {
-						s := r.RunStreamed(context.Background(), a, input, cfg)
-						for range s.Events {
-						}
-						if s.FinalResult().FinalText() != "done" {
-							t.Fatal("missing streamed answer")
-						}
-					} else {
-						out, err := r.Run(context.Background(), a, input, cfg)
-						if err != nil || out.FinalText() != "done" {
-							t.Fatalf("compaction run: %v", err)
-						}
-					}
-					if len(m.requests) != 1 {
-						t.Fatal("unexpected compaction requests")
-					}
-					texts := []string{}
-					for _, item := range m.requests[0].Input {
-						if item.Message == nil {
-							t.Fatal("unexpected nonmessage")
-						}
-						texts = append(texts, fmt.Sprintf("%x", sha256.Sum256([]byte(item.Message.Text))))
-					}
+					texts := observeCompaction(t, model, cfg, streaming, 2000)
 					compactions = append(compactions, map[string]any{"model": model, "provider": config.Provider, "mode_name": modeName, "mode_display_name": displayName, "blank_carry": blankCarry, "custom": custom, "streaming": streaming, "policy": cfg.CompactionConfig, "working_state_text": config.WorkingStateText, "text_sha256": texts})
 				}
+			}
+		}
+	}
+	for _, enabled := range []bool{false, true} {
+		for _, override := range []int{-1, 0, 1, 2} {
+			for _, streaming := range []bool{false, true} {
+				config := Config{Model: "gpt-5-mini", Features: &Features{Runtime: RuntimeFeatures{Compaction: enabled}}}
+				var explicit any
+				if override >= 0 {
+					explicit = override > 0
+					config.CompactionConfig = &agentsdk.CompactionConfig{Enabled: override > 0, TriggerTokens: 90000, TargetTokens: 40000, PreserveRecentItems: 3, PreserveInitialUserMessages: 1, SummaryBulletLimit: 7}
+				}
+				repeat := 2000
+				if override == 2 {
+					config.CompactionConfig = &agentsdk.CompactionConfig{Enabled: true, TriggerTokens: 180000, TargetTokens: 100000, PreserveRecentItems: 12, PreserveInitialUserMessages: 2, SummaryBulletLimit: 4}
+					repeat = 400
+				}
+				cfg := BuildRunConfig(config, nil)
+				cfg.MaxTurns = 1
+				texts := observeCompaction(t, config.Model, cfg, streaming, repeat)
+				compactions = append(compactions, map[string]any{"model": config.Model, "provider": "", "mode_name": "", "mode_display_name": "", "blank_carry": false, "custom": false, "streaming": streaming, "policy": cfg.CompactionConfig, "working_state_text": "", "feature_enabled": enabled, "explicit_policy": explicit, "default_policy": override == 2, "input_repeat": repeat, "text_sha256": texts})
 			}
 		}
 	}
@@ -164,4 +152,43 @@ func observeInstructions(t *testing.T, base string, cfg agentsdk.RunConfig, stre
 	}
 	result["instructions"] = m.requests[0].Instructions
 	return result
+}
+
+func observeCompaction(t *testing.T, model string, cfg agentsdk.RunConfig, streaming bool, inputRepeat int) []string {
+	t.Helper()
+	m := &instructionModel{}
+	r := agentsdk.NewRunnerWithModel(m)
+	a := &agentsdk.Agent{Name: "agent", Model: model, Instructions: "base"}
+	input := []agentsdk.RunItem{}
+	for i := 0; i < 100; i++ {
+		repeat := inputRepeat
+		if i >= 80 {
+			repeat = 2
+		}
+		input = append(input, agentsdk.RunItem{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: fmt.Sprintf("message %03d: ", i) + strings.Repeat("old conversation ", repeat)}})
+	}
+	if streaming {
+		s := r.RunStreamed(context.Background(), a, input, cfg)
+		for range s.Events {
+		}
+		if s.FinalResult().FinalText() != "done" {
+			t.Fatal("missing streamed answer")
+		}
+	} else {
+		out, err := r.Run(context.Background(), a, input, cfg)
+		if err != nil || out.FinalText() != "done" {
+			t.Fatalf("compaction run: %v", err)
+		}
+	}
+	if len(m.requests) != 1 {
+		t.Fatal("unexpected compaction requests")
+	}
+	texts := []string{}
+	for _, item := range m.requests[0].Input {
+		if item.Message == nil {
+			t.Fatal("unexpected nonmessage")
+		}
+		texts = append(texts, fmt.Sprintf("%x", sha256.Sum256([]byte(item.Message.Text))))
+	}
+	return texts
 }

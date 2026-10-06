@@ -142,6 +142,8 @@ pub struct Config {
     pub features: Option<Features>,
     pub legacy_tools: adk_tools::LegacyFeatures,
     pub enable_compaction: bool,
+    /// Explicit host policy overrides compaction feature enablement.
+    pub local_compaction: Option<adk_runtime::compaction::LocalCompactionPolicy>,
     pub enable_retry: bool,
     pub enable_approval: bool,
     pub enable_guardrails: bool,
@@ -180,6 +182,7 @@ impl Default for Config {
             features: None,
             legacy_tools: Default::default(),
             enable_compaction: false,
+            local_compaction: None,
             enable_retry: false,
             enable_approval: false,
             enable_guardrails: false,
@@ -1677,16 +1680,21 @@ impl Builder {
             self.runner.retry.initial_delay = Duration::from_millis(250);
             self.runner.retry.max_delay = Duration::from_millis(2000);
         }
-        if features.compaction
-            && self.runner.local_compaction
-                == adk_runtime::compaction::LocalCompactionPolicy::default()
-        {
-            self.runner.local_compaction.preserve_recent_items = 10;
-            self.runner.local_compaction.summary_bullet_limit = 5;
-            self.runner.compaction_model_defaults = true;
+        if let Some(policy) = self.config.local_compaction {
+            self.runner.local_compaction = policy;
+            self.runner.compaction_model_defaults = Some(features.compaction);
+        } else {
+            if features.compaction
+                && self.runner.local_compaction
+                    == adk_runtime::compaction::LocalCompactionPolicy::default()
+            {
+                self.runner.local_compaction.preserve_recent_items = 10;
+                self.runner.local_compaction.summary_bullet_limit = 5;
+                self.runner.compaction_model_defaults = Some(true);
+            }
+            self.runner.local_compaction.enabled = features.compaction;
         }
-        self.runner.local_compaction.enabled = features.compaction;
-        if !features.compaction {
+        if !self.runner.local_compaction.enabled {
             self.runner.compaction = None;
         }
         if self.runner.cost_estimator.is_none() {

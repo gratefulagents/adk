@@ -17,12 +17,17 @@ working-state text and the resulting SDK carry-forward default. Native builder
 tests check the recorded result after local compaction in normal and streamed
 requests, and its absence from uncompacted input.
 
-Thirty-two `compaction_cases` record actual normal/streamed model requests across
+Forty-eight `compaction_cases` record actual normal/streamed model requests across
 four model/provider pairs and default/explicit policies. Each message is compared by
 SHA-256, in order; input is deterministic with a large prefix and small recent
 tail to exercise retention and summary rules. Both default provider/mode and
 explicit-blank carry-forward callbacks are covered, including whitespace and
-Unicode mode labels. Explicit policies disable model-threshold resolution.
+Unicode mode labels. The initial custom-policy cases explicitly disable
+model-threshold resolution through a host resolver.
+The additional selection cases distinguish `Config` overrides from native
+runner customization: absent/disabled/enabled/default-valued policies with the
+compaction feature on/off. Their threshold resolution follows the SDK feature;
+default-valued overrides use intermediate-size input to expose that distinction.
 
 SDK-derived fixture text and ported composition retain upstream ownership and
 **GPL-3.0-only** licensing. The original license is retained in

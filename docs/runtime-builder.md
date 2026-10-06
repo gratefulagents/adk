@@ -627,8 +627,27 @@ summary bullets. `RunnerConfig.compaction_model_defaults` resolves token
 thresholds for each active model without resetting those history rules; this
 choice is part of durable resume identity. Explicit nondefault retention and
 threshold settings are preserved; feature selection still controls enablement.
-Direct runtime defaults remain twelve recent items/four bullets. The SDK's
-explicit compaction-config enablement override is not yet mapped by the builder.
+Direct runtime defaults remain twelve recent items/four bullets.
+
+`Config.local_compaction: Some(policy)` is the explicit host override: its
+enabled flag takes precedence over feature selection, including an explicitly
+disabled policy when the compaction feature is enabled. With that feature on,
+thresholds still follow the active model, as in the SDK; with it off, the
+explicit policy's thresholds remain fixed, even when equal to runtime defaults.
+Absent an explicit `Config` policy, existing `runner_config` policy handling is
+unchanged. `RunnerConfig.compaction_model_defaults` distinguishes `Some(true)`
+(resolve per model), `Some(false)` (fixed), and `None` (direct-runtime default
+selection). This choice is fingerprinted for durable recovery.
+
+```rust
+let config = adk::builder::Config {
+    local_compaction: Some(adk::runtime::compaction::LocalCompactionPolicy {
+        enabled: false,
+        ..Default::default()
+    }),
+    ..Default::default()
+};
+```
 
 Unless the host supplies `compaction_carry_forward`, full builds install the SDK
 default `Runtime state: provider=<configured provider>, mode=<mode label>`.

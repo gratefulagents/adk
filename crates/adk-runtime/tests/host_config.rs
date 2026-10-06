@@ -757,27 +757,29 @@ async fn durable_local_compaction_policy_is_bound_and_normalized() {
             }
             assert!(model.requests.lock().unwrap().is_empty());
         }
-        let mut changed = config.clone();
-        changed.compaction_model_defaults = true;
-        let mut durable = DurableRun::new(store.clone());
-        durable.resume = Some(checkpoint.clone());
-        let error = runner(Arc::new(ModelImpl::default()), changed)
-            .run_durable(
-                context("compaction-policy"),
-                request(vec![]),
-                Arc::new(HostImpl),
-                durable,
-            )
-            .await
-            .err()
-            .expect("changed threshold resolution must reject resume");
-        assert!(
-            error
-                .error
-                .info
-                .message
-                .contains("configuration or security policy changed")
-        );
+        for resolve in [false, true] {
+            let mut changed = config.clone();
+            changed.compaction_model_defaults = Some(resolve);
+            let mut durable = DurableRun::new(store.clone());
+            durable.resume = Some(checkpoint.clone());
+            let error = runner(Arc::new(ModelImpl::default()), changed)
+                .run_durable(
+                    context("compaction-policy"),
+                    request(vec![]),
+                    Arc::new(HostImpl),
+                    durable,
+                )
+                .await
+                .err()
+                .expect("changed threshold resolution must reject resume");
+            assert!(
+                error
+                    .error
+                    .info
+                    .message
+                    .contains("configuration or security policy changed")
+            );
+        }
         let mut normalized = *policy;
         if normalized.preserve_recent_items == 12 {
             normalized.preserve_recent_items = 0;

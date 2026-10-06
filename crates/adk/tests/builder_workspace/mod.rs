@@ -330,8 +330,23 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
             name => Some(name.parse::<Kind>().unwrap()),
         };
         let mode_name = case["mode_name"].as_str().unwrap();
+        let explicit_policy = case["explicit_policy"].as_bool().map(|enabled| {
+            if case["default_policy"] == true {
+                LocalCompactionPolicy::default()
+            } else {
+                LocalCompactionPolicy {
+                    enabled,
+                    trigger_tokens: 90000,
+                    target_tokens: 40000,
+                    preserve_recent_items: 3,
+                    preserve_initial_user_messages: 1,
+                    summary_bullet_limit: 7,
+                }
+            }
+        });
         let mut bundle = Builder::new(Config {
             provider,
+            local_compaction: explicit_policy,
             mode_snapshot: (!mode_name.is_empty()).then(|| ModeSpec {
                 name: mode_name.into(),
                 display_name: case["mode_display_name"].as_str().unwrap().into(),
@@ -342,7 +357,7 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
             instructions: "base".into(),
             work_dir: "".into(),
             features: Some(Features {
-                compaction: true,
+                compaction: case["feature_enabled"].as_bool().unwrap_or(true),
                 ..Default::default()
             }),
             ..Default::default()
@@ -364,7 +379,11 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
                     content: vec![Content::Text {
                         text: format!(
                             "message {i:03}: {}",
-                            "old conversation ".repeat(if i >= 80 { 2 } else { 2000 })
+                            "old conversation ".repeat(if i >= 80 {
+                                2
+                            } else {
+                                case["input_repeat"].as_u64().unwrap_or(2000) as usize
+                            })
                         ),
                     }],
                 },

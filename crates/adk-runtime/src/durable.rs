@@ -742,8 +742,8 @@ impl Runner {
             baseline["subagent_max_turns"] = serde_json::json!(limit);
         }
         let compaction = config.local_compaction;
-        if config.compaction_model_defaults {
-            baseline["compaction_model_defaults"] = serde_json::json!(true);
+        if let Some(resolve) = config.compaction_model_defaults {
+            baseline["compaction_model_defaults"] = serde_json::json!(resolve);
         }
         if compaction != LocalCompactionPolicy::default() {
             baseline["local_compaction"] = serde_json::json!({

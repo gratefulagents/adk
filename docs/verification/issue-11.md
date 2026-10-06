@@ -2,6 +2,17 @@
 
 ## Current continuation evidence
 
+### Explicit builder compaction-policy precedence
+
+`Config.local_compaction` is an optional typed host override, distinct from
+feature defaults and legacy `runner_config` customization. Sixteen additional
+pinned normal/streamed requests cover feature on/off with absent, disabled,
+enabled custom and explicitly default-valued policies. The latter use input
+between fixed and model-specific thresholds to distinguish fixed from automatic
+resolution. All 48 compacted/uncompacted request digest arrays match the SDK.
+Both fixed and automatic choices are bound to durable resume identity. No whole
+LLM-summary/provider-metadata resolver parity or new ledger closure is claimed.
+
 ### Default builder carry-forward callback
 
 Full builds install deterministic configured-provider/mode carry-forward text

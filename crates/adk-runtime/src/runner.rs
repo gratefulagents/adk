@@ -488,8 +488,8 @@ pub struct RunnerConfig {
     pub compaction: Option<CompactionConfig>,
     /// Baseline local fallback; independent of the optional provider/custom compactor.
     pub local_compaction: LocalCompactionPolicy,
-    /// Resolve local-compaction token thresholds for each active model, retaining the policy's history rules.
-    pub compaction_model_defaults: bool,
+    /// Resolve thresholds per active model without changing retention. None resolves only an unchanged default policy.
+    pub compaction_model_defaults: Option<bool>,
 }
 
 impl Default for RunnerConfig {
@@ -529,7 +529,7 @@ impl Default for RunnerConfig {
             durable: None,
             compaction: None,
             local_compaction: LocalCompactionPolicy::default(),
-            compaction_model_defaults: false,
+            compaction_model_defaults: None,
         }
     }
 }
@@ -1600,7 +1600,11 @@ impl Engine {
         forced: bool,
     ) -> Result<bool, Error> {
         let mut policy = self.config.local_compaction;
-        if self.config.compaction_model_defaults || policy == LocalCompactionPolicy::default() {
+        if self
+            .config
+            .compaction_model_defaults
+            .unwrap_or(policy == LocalCompactionPolicy::default())
+        {
             let defaults = LocalCompactionPolicy::for_model(&request.model);
             policy.trigger_tokens = defaults.trigger_tokens;
             policy.target_tokens = defaults.target_tokens;

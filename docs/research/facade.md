@@ -117,3 +117,24 @@ Final validation belongs to the parent implementation work. It must attach
 acceptance-ID-specific symbols, Rust test identifiers, features/targets, command
 output, and approved divergences to the overlay. It must also separately report
 offline versus credentialed/live provider and operating-system evidence.
+
+## Project-state blocking lifecycle
+
+Local project-state composition uses explicit owner/revocable tool handles,
+not Go callback/closer aliases. Tokio 1.53.1 (MIT; pinned in `Cargo.lock`) runs
+synchronous operations on its blocking pool. An admitted-operation lease lives
+inside that blocking operation, not inside the waiting future: cancellation
+cannot abandon drain accounting or replay a write. Close revokes admission,
+then drains leases; injected application-owned references remain independent.
+See the pinned crate's `src/task/blocking.rs` documentation and
+<https://docs.rs/tokio/1.53.1/tokio/task/fn.spawn_blocking.html> for the
+non-abortable blocking-task constraint. No new dependency was introduced.
+
+Adopt explicit host path inputs and four independent feature switches. Reject
+process-environment discovery during composition and enabling `ExtraTools` as
+a side effect. Raw initialization/priming errors are not exposed because they
+can contain private paths or store contents. These are native host-boundary
+choices, not claims that SDK failure diagnostics or teardown behavior match.
+The independent sixteen-case pinned full-builder fixture checks only store
+creation, selected tool names and working-state text; it does not prove a
+tool-only facade or all project-state contracts.

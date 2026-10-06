@@ -2,6 +2,9 @@
 #[cfg(all(feature = "mcp", unix))]
 #[path = "builder_mcp/mod.rs"]
 mod mcp_composition;
+#[cfg(feature = "project-state")]
+#[path = "builder_project_state/mod.rs"]
+mod project_state_composition;
 use adk::{
     builder::*,
     core::*,
@@ -1001,4 +1004,45 @@ async fn immediate_input_feature_gate_and_legacy_runner_config_in_run_and_stream
             bundle.close().await.unwrap();
         }
     }
+}
+
+#[tokio::test]
+async fn project_state_requested_without_input_or_cargo_support_is_explicit() {
+    let model = Arc::new(RecordingModel::default());
+    let error = builder(
+        Config {
+            enable_project_state: true,
+            ..Default::default()
+        },
+        &model,
+    )
+    .build(&context())
+    .await
+    .err()
+    .unwrap();
+    assert_eq!(error.info.category, ErrorCategory::InvalidInput);
+    #[cfg(feature = "project-state")]
+    assert!(error.info.message.contains("explicit filesystem host"));
+    #[cfg(not(feature = "project-state"))]
+    assert!(error.info.message.contains("project-state Cargo feature"));
+    let legacy = Config {
+        enable_project_state: true,
+        ..Default::default()
+    }
+    .resolved_features()
+    .project_state;
+    assert!(legacy.prime_context && legacy.task_tools && legacy.memory_tools && legacy.prime_tool);
+    let mut bundle = builder(
+        Config {
+            enable_project_state: true,
+            features: Some(Features::default()),
+            ..Default::default()
+        },
+        &model,
+    )
+    .build(&context())
+    .await
+    .unwrap();
+    assert!(bundle.agent().tools.is_empty());
+    bundle.close().await.unwrap();
 }

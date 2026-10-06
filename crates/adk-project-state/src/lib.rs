@@ -4,6 +4,7 @@ mod contracts;
 mod engine;
 pub mod memory;
 pub mod recall;
+mod resolution;
 mod storage;
 pub mod tools;
 mod types;
@@ -11,6 +12,9 @@ mod types;
 pub use contracts::*;
 pub use engine::*;
 pub use recall::{Embedder, EmbeddingRecall, HybridConfig, LexicalRecall};
+pub use resolution::{
+    FilesystemResolutionHost, ResolvedFilesystemOptions, resolve_filesystem_options,
+};
 pub use storage::{
     FilesystemOptions, SQLiteOptions, StoreOptions, default_state_dir, derive_project_id,
 };

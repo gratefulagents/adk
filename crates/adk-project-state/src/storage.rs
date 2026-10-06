@@ -51,7 +51,12 @@ impl Default for SQLiteOptions {
 }
 pub fn sanitize_project_id(value: &str) -> String {
     let mut out = String::new();
-    for c in value.trim().to_lowercase().chars() {
+    // Go uses simple rune lowercase, not Rust's multi-character expansion of İ.
+    for c in value
+        .trim()
+        .chars()
+        .map(|c| c.to_lowercase().next().unwrap())
+    {
         if c.is_ascii_alphanumeric() {
             out.push(c);
         } else if !out.ends_with('-') {

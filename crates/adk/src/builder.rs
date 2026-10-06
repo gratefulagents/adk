@@ -27,6 +27,8 @@ use std::{
 
 #[cfg(feature = "mcp")]
 mod mcp;
+#[cfg(feature = "project-state")]
+mod project_state;
 #[cfg(feature = "mcp")]
 pub use adk_mcp::session::ConnectionSet as McpInput;
 
@@ -45,6 +47,7 @@ pub struct Features {
     pub approval: bool,
     pub builtin_guardrails: bool,
     pub mcp: McpFeatures,
+    pub project_state: ProjectStateFeatures,
     pub parallel_tool_calls: bool,
     pub untrusted_tool_outputs: bool,
     pub force_final_summary_turn: bool,
@@ -55,6 +58,27 @@ pub struct Features {
     pub handoffs: bool,
     /// Tool-less fallback, only when handoffs are enabled and the catalog is empty.
     pub handoff_generic_fallback: bool,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ProjectStateFeatures {
+    pub prime_context: bool,
+    pub task_tools: bool,
+    pub memory_tools: bool,
+    pub prime_tool: bool,
+}
+impl ProjectStateFeatures {
+    fn active(&self) -> bool {
+        self.prime_context || self.task_tools || self.memory_tools || self.prime_tool
+    }
+}
+#[derive(Clone, Debug, Default)]
+pub struct ProjectStateConfig {
+    pub state_dir: PathBuf,
+    pub project_id: String,
+    pub actor: String,
+    pub run_id: String,
+    pub active_task_id: String,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -116,6 +140,8 @@ pub struct Config {
     pub enable_approval: bool,
     pub enable_guardrails: bool,
     pub enable_mcp: bool,
+    pub enable_project_state: bool,
+    pub project_state: ProjectStateConfig,
     pub tool_options: adk_tools::Config,
 }
 impl Default for Config {
@@ -149,6 +175,8 @@ impl Default for Config {
             enable_approval: false,
             enable_guardrails: false,
             enable_mcp: false,
+            enable_project_state: false,
+            project_state: Default::default(),
             tool_options: Default::default(),
         }
     }
@@ -164,6 +192,12 @@ impl Config {
             retry: self.enable_retry,
             approval: self.enable_approval,
             builtin_guardrails: self.enable_guardrails,
+            project_state: ProjectStateFeatures {
+                prime_context: self.enable_project_state || self.legacy_tools.enable_project_state,
+                task_tools: self.enable_project_state || self.legacy_tools.enable_project_state,
+                memory_tools: self.enable_project_state || self.legacy_tools.enable_project_state,
+                prime_tool: self.enable_project_state || self.legacy_tools.enable_project_state,
+            },
             mcp: McpFeatures {
                 enabled: self.enable_mcp,
                 allow_all_servers: self.enable_mcp,
@@ -754,6 +788,13 @@ pub struct Builder {
     output_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
     implementations: Vec<Arc<dyn Tool>>,
     extra_tools: Vec<Arc<dyn Tool>>,
+    #[cfg(feature = "project-state")]
+    project_state_store: Option<Arc<dyn adk_project_state::Store>>,
+    #[cfg(feature = "project-state")]
+    project_state_host: Option<adk_project_state::FilesystemResolutionHost>,
+    #[cfg(feature = "project-state")]
+    owned_project_state: Option<project_state::Owner>,
+    warnings: Vec<String>,
     #[cfg(feature = "mcp")]
     mcp: Option<McpInput>,
     #[cfg(feature = "mcp")]
@@ -782,6 +823,13 @@ impl Builder {
             output_guardrails: vec![],
             implementations: vec![],
             extra_tools: vec![],
+            #[cfg(feature = "project-state")]
+            project_state_store: None,
+            #[cfg(feature = "project-state")]
+            project_state_host: None,
+            #[cfg(feature = "project-state")]
+            owned_project_state: None,
+            warnings: vec![],
             #[cfg(feature = "mcp")]
             mcp: None,
             #[cfg(feature = "mcp")]
@@ -792,6 +840,16 @@ impl Builder {
             #[cfg(any(target_os = "linux", target_os = "macos"))]
             browser: None,
         }
+    }
+    #[cfg(feature = "project-state")]
+    pub fn project_state_store(mut self, store: Arc<dyn adk_project_state::Store>) -> Self {
+        self.project_state_store = Some(store);
+        self
+    }
+    #[cfg(feature = "project-state")]
+    pub fn project_state_host(mut self, host: adk_project_state::FilesystemResolutionHost) -> Self {
+        self.project_state_host = Some(host);
+        self
     }
     pub fn routes(mut self, routes: Routes) -> Self {
         self.routes = routes;
@@ -898,6 +956,12 @@ impl Builder {
     async fn assemble(&mut self, context: &Context) -> Result<Bundle, Error> {
         context.check_active()?;
         let features = self.config.resolved_features();
+        #[cfg(not(feature = "project-state"))]
+        if features.project_state.active() {
+            return Err(invalid(
+                "project-state selection requires the project-state Cargo feature",
+            ));
+        }
         #[cfg(not(feature = "mcp"))]
         if features.mcp.active() {
             return Err(invalid("MCP selection requires the mcp Cargo feature"));
@@ -1230,6 +1294,9 @@ impl Builder {
             Some(_) => adk_tools::Features::Strict(features.tools.clone()),
             None => adk_tools::Features::Legacy(self.config.legacy_tools.clone()),
         };
+        if let adk_tools::Features::Legacy(legacy) = &mut tool_config.features {
+            legacy.enable_project_state = false;
+        }
         tool_config.access = policy.tools.access;
         tool_config.allowed_mutating_tools = policy.tools.allowed_mutating_tools.clone();
         if features.subagents.enabled() {
@@ -1282,6 +1349,31 @@ impl Builder {
                 }
             }
         }
+        #[cfg(feature = "project-state")]
+        if features.project_state.active() {
+            let store = project_state::open(
+                self.project_state_store.take(),
+                self.project_state_host.take(),
+                &self.config,
+            )
+            .await?;
+            if features.project_state.prime_context
+                && project_state::prime(
+                    store.clone(),
+                    &self.config,
+                    &mut self.runner.working_state_context,
+                )
+                .await
+                .is_err()
+            {
+                self.warnings.push("project-state priming failed".into());
+            }
+            context.check_active()?;
+            self.owned_project_state = Some(project_state::Owner::new(
+                store,
+                project_state::actor(&self.config),
+            ));
+        }
         let mut tool_builder = BundleBuilder::new(tool_config)
             .implementations(std::mem::take(&mut self.implementations))
             .extra_tools(std::mem::take(&mut self.extra_tools));
@@ -1297,6 +1389,10 @@ impl Builder {
             let composed = adk_mcp::tools::build_tools(Arc::new(owned.handle()));
             self.owned_mcp = Some(owned);
             tool_builder = tool_builder.composed_tools(composed);
+        }
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            tool_builder = tool_builder.composed_tools(owner.tools(&features.project_state));
         }
         if let Some(config) = self.shell.take() {
             tool_builder = tool_builder.shell(config);
@@ -1444,6 +1540,9 @@ impl Builder {
             owned_session: self.owned_session.take(),
             #[cfg(feature = "mcp")]
             owned_mcp: self.owned_mcp.take(),
+            #[cfg(feature = "project-state")]
+            owned_project_state: self.owned_project_state.take(),
+            warnings: std::mem::take(&mut self.warnings),
         })
     }
 }
@@ -1496,6 +1595,9 @@ fn apply_routing(
 
 /// Keep alive for runs, streams and continuations; close before executor shutdown.
 pub struct Bundle {
+    #[cfg(feature = "project-state")]
+    owned_project_state: Option<project_state::Owner>,
+    warnings: Vec<String>,
     runner: Runner,
     agent: AgentConfig,
     specialists: BTreeMap<String, Arc<AgentConfig>>,
@@ -1507,6 +1609,11 @@ pub struct Bundle {
     owned_mcp: Option<adk_mcp::session::OwnedMcpSession>,
 }
 impl Bundle {
+    /// Sanitized nonfatal construction diagnostics; raw store errors are never exposed.
+    pub fn warnings(&self) -> &[String] {
+        &self.warnings
+    }
+
     #[cfg(feature = "mcp")]
     pub fn mcp_catalog(&self) -> Vec<adk_mcp::client::CatalogEntry> {
         self.owned_mcp
@@ -1584,6 +1691,11 @@ impl Bundle {
         )
     }
     pub async fn close(&mut self) -> Result<(), Error> {
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            owner.begin_close();
+        }
+
         #[cfg(feature = "mcp")]
         if let Some(mcp) = &self.owned_mcp {
             mcp.begin_close();
@@ -1603,6 +1715,10 @@ impl Bundle {
             }),
             None => Ok(()),
         };
+        #[cfg(feature = "project-state")]
+        if let Some(owner) = &self.owned_project_state {
+            owner.close().await;
+        }
         let result = tools.and(session);
         #[cfg(feature = "mcp")]
         let result = result.and(mcp);

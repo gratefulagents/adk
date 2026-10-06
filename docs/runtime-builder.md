@@ -581,3 +581,53 @@ name ordering rather than injected host order. Native strict catalog validation,
 independent handoff gating, explicit-empty fallback clearing and handoff-only
 parent guidance are not normalized into SDK parity claims. Exact-case signal
 stripping leaves differently cased host names such as `Finish` intact.
+
+## Owned project-state composition
+
+Enable both `builder` and `project-state` Cargo features. The four
+`Features.project_state` switches (`prime_context`, `task_tools`, `memory_tools`,
+`prime_tool`) are independent; any one requires a store. Legacy
+`Config.enable_project_state` or `legacy_tools.enable_project_state` selects all
+four. An explicit `Features` value overrides legacy selection. Missing Cargo
+support is an error, not a silently disabled capability.
+
+Supply `Builder::project_state_store(Arc<dyn Store>)` to borrow an application
+store, or `Builder::project_state_host(FilesystemResolutionHost { cwd, home })`
+for automatic filesystem construction. An injected store takes precedence.
+Host paths must be absolute; configuration paths resolve lexically relative to
+that explicit cwd without reading process environment. `Config.project_state`
+supplies the state directory, project ID, actor, run ID and active-task ID;
+`Config.work_dir` supplies the workspace. A home is required only for the default
+`.gratefulagents/projects/<id>/state` directory. Resolution does not bypass
+private-file or symlink checks.
+
+Full builds prime once with ready/memory limits of eight. Actor selection uses
+the first nonblank configured actor, agent name, or `agent`; the active-task ID
+is forwarded unchanged and never causes a claim. Nonblank prime text is appended
+with two newlines to `RunnerConfig.working_state_context`, preserving existing
+nonblank content. This is compaction carry-forward state, **not initial prompt
+injection**. Priming failure is nonfatal and appears in `Bundle::warnings()` as a
+sanitized diagnostic; initialization failure fails construction. Raw store
+errors and private paths are not included in these diagnostics.
+
+The eight task tools, six memory tools and `prime_context` use owned composition,
+not `ExtraTools`. Duplicate detection, role views and read-only execution policy
+still apply. Synchronous storage runs on Tokio's blocking pool. Closing or
+dropping the bundle revokes retained tools; explicit `close().await` also waits
+for admitted blocking operations. Cancelling a caller or close waiter cannot
+terminate an in-progress synchronous write or replay it. Keep the executor alive
+until close finishes. Caller-owned references to an injected store are not
+revoked or closed by the bundle.
+
+`FilesystemOptions::resolve(&host)` also supports standalone store construction.
+It preserves the original configured project ID while resolving paths: passing
+a derived ID through explicit-ID sanitization again can change punctuation-only
+workspace identities. Resolver/store-open regressions cover this boundary and
+Go's simple Unicode lowercase behavior.
+
+Verification: `scripts/project-state-runtime-reference/run.py --check` executes
+the pinned SDK full builder independently for sixteen feature combinations;
+Rust compares store creation, tool names and working-state text. This bounded
+fixture does not establish whole-builder parity, tool-only facade parity,
+provider-network behavior or target-wide support. The general-purpose SDK
+tool-only builder facade remains an unresolved composition requirement.

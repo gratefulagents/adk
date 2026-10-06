@@ -156,7 +156,13 @@ async fn default_threshold_selection_changes_first_request_without_provider_usag
         let model = Script::new(vec![Ok(answer())]);
         let runner = Runner::new(
             AgentConfig::new("agent", ModelBinding::complete(name, model.clone())),
-            RunnerConfig::default(),
+            RunnerConfig {
+                local_compaction: LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
         )
         .unwrap();
         let history = vec![
@@ -195,6 +201,10 @@ async fn forced_overflow_compacts_once_retries_same_model_and_preserves_transien
             let hooks = Arc::new(Hooks::default());
             let transient = message(Role::Developer, "private turn-only hint");
             let config = RunnerConfig {
+                local_compaction: LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                },
                 transient_context: vec![transient.clone()],
                 hooks: Some(hooks.clone()),
                 prompt_cache_key: Some("key".into()),
@@ -467,6 +477,7 @@ async fn automatic_compaction_uses_and_replaces_marker_journal_without_rewriting
     agent.tools = vec![tool.clone()];
     let hooks = Arc::new(Hooks::default());
     let policy = LocalCompactionPolicy {
+        use_llm_summary: false,
         trigger_tokens: 27000,
         target_tokens: 26000,
         preserve_recent_items: 1,

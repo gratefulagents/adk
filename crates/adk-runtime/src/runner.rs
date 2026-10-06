@@ -41,9 +41,9 @@ use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_provenance,
-    estimate_history_tokens, estimate_history_tokens_with_approvals,
-    estimate_request_overhead_tokens, finalize_with_provenance, output_reserve_tokens,
+    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, estimate_history_tokens,
+    estimate_history_tokens_with_approvals, estimate_request_overhead_tokens,
+    finalize_with_provenance, output_reserve_tokens, plan_with_provenance,
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
@@ -1661,6 +1661,7 @@ impl Engine {
         &mut self,
         request: &mut ModelRequest,
         forced: bool,
+        binding: &ModelBinding,
     ) -> Result<bool, Error> {
         let mut policy = self.config.local_compaction;
         if policy.enabled && self.config.compaction_model_resolver.is_some() {
@@ -1678,7 +1679,7 @@ impl Engine {
             && self
                 .config
                 .compaction_model_defaults
-                .unwrap_or(policy == LocalCompactionPolicy::default())
+                .unwrap_or(policy.uses_default_thresholds())
         {
             let defaults = LocalCompactionPolicy::for_model(&request.model);
             policy.trigger_tokens = defaults.trigger_tokens;
@@ -1707,7 +1708,7 @@ impl Engine {
             target_tokens: policy.target_tokens,
         })
         .await?;
-        let outcome = compact_with_provenance(
+        let mut plan = plan_with_provenance(
             &self.result.history,
             &markers,
             &self.result.history_provenance,
@@ -1718,20 +1719,84 @@ impl Engine {
                 overhead.min(i64::MAX as u64) as i64
             },
         );
-        if !outcome.changed {
-            if !matches!(outcome.reason, "disabled" | "below-threshold") {
+        if !plan.outcome.changed {
+            if !matches!(plan.outcome.reason, "disabled" | "below-threshold") {
                 self.observe(Observation::CompactionFailed {
                     error: ErrorInfo {
                         category: ErrorCategory::ModelBehavior,
-                        message: outcome.reason.into(),
+                        message: plan.outcome.reason.into(),
                     },
                 })
                 .await?;
             }
             return Ok(false);
         }
+        if policy.use_llm_summary
+            && let Some(summary_request) = plan.summary_request(binding.name())
+        {
+            let timeout = self
+                .config
+                .model_idle_timeout
+                .filter(|d| !d.is_zero())
+                .unwrap_or(Duration::from_secs(120));
+            let mut summary_context = self.context.clone();
+            let deadline = std::time::Instant::now() + timeout;
+            summary_context.deadline = Some(
+                summary_context
+                    .deadline
+                    .map_or(deadline, |d| d.min(deadline)),
+            );
+            let response = match binding {
+                ModelBinding::Complete { model, .. } => {
+                    bounded(
+                        &self.context,
+                        Some(timeout),
+                        model.complete(&summary_context, summary_request),
+                    )
+                    .await
+                }
+                ModelBinding::Streaming { model, .. } => {
+                    bounded(
+                        &self.context,
+                        Some(timeout),
+                        model.complete(&summary_context, summary_request),
+                    )
+                    .await
+                }
+            };
+            let applied = if let Ok(response) = response {
+                let cost = self
+                    .config
+                    .cost_estimator
+                    .as_ref()
+                    .map_or(0.0, |estimator| {
+                        estimator.cost(binding.name(), &response.usage)
+                    });
+                self.account_usage(&response.usage, cost)?;
+                self.charge_child_usage().await?;
+                self.observe(Observation::Usage {
+                    usage: self.result.usage.clone(),
+                    cost: self.cost,
+                })
+                .await?;
+                let applied = plan.apply_summary(&response);
+                self.check_budget()?;
+                applied
+            } else {
+                false
+            };
+            self.context.check_active()?;
+            if !applied {
+                self.observe(Observation::CompactionFailed {
+                    error: ErrorInfo {
+                        category: ErrorCategory::ModelBehavior,
+                        message: "LLM compaction summary unavailable or ineffective; keeping deterministic summary".into(),
+                    },
+                }).await?;
+            }
+        }
         let (mut history, mut markers, mut history_provenance) = finalize_with_provenance(
-            &outcome,
+            &plan.outcome,
             &self.result.history,
             &markers,
             &self.result.history_provenance,
@@ -1996,7 +2061,14 @@ impl Engine {
             output_schema_strict: self.agent.output_schema_strict,
             settings,
         };
-        self.compact_local(&mut request, false).await?;
+        let binding = self
+            .fallbacks
+            .get(&(Arc::as_ptr(&self.agent) as usize))
+            .map_or_else(
+                || self.agent.model.clone(),
+                |(index, _)| self.agent.fallbacks[index - 1].clone(),
+            );
+        self.compact_local(&mut request, false, &binding).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
         let Some((response, model, streamed, cost)) =
             self.model_response(request, declared_tool_timeouts).await?
@@ -2327,11 +2399,11 @@ impl Engine {
                     request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
                     request.tools.clear();
                     declared_tool_timeouts.clear();
-                    self.compact_local(&mut request, false).await?;
+                    self.compact_local(&mut request, false, binding).await?;
                 }
                 if self.config.compaction_model_resolver.is_some() {
                     request.model = binding.name().into();
-                    self.compact_local(&mut request, false).await?;
+                    self.compact_local(&mut request, false, binding).await?;
                 }
                 self.turns += 1;
                 self.observe(Observation::AgentStarted {
@@ -2347,7 +2419,7 @@ impl Engine {
                 .await?;
                 if request.model != binding.name() {
                     request.model = binding.name().into();
-                    self.compact_local(&mut request, false).await?;
+                    self.compact_local(&mut request, false, binding).await?;
                 }
                 let markers = self
                     .approval_journal
@@ -2510,7 +2582,7 @@ impl Engine {
                         let message = error.info.message.to_lowercase();
                         if (message.contains("context_length_exceeded")
                             || message.contains("exceeds the context window"))
-                            && self.compact_local(&mut request, true).await?
+                            && self.compact_local(&mut request, true, binding).await?
                         {
                             continue;
                         }

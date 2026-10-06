@@ -226,6 +226,7 @@ async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compactio
             working_state_context: case["working_state_text"].as_str().unwrap().into(),
             compaction_carry_forward: Some(Arc::new(BlankCarry)),
             local_compaction: LocalCompactionPolicy {
+                use_llm_summary: false,
                 trigger_tokens: 30_000,
                 target_tokens: 20_000,
                 preserve_recent_items: 1,
@@ -310,6 +311,10 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
         let model = Arc::new(RecordingModel::default());
         let mut runner = RunnerConfig {
             working_state_context: case["working_state_text"].as_str().unwrap().into(),
+            local_compaction: LocalCompactionPolicy {
+                use_llm_summary: false,
+                ..Default::default()
+            },
             ..Default::default()
         };
         if case["blank_carry"] == true {
@@ -318,6 +323,7 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
         if case["custom"] == true {
             runner.local_compaction = LocalCompactionPolicy {
                 enabled: true,
+                use_llm_summary: false,
                 trigger_tokens: 90000,
                 target_tokens: 40000,
                 preserve_recent_items: 3,
@@ -332,10 +338,14 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
         let mode_name = case["mode_name"].as_str().unwrap();
         let explicit_policy = case["explicit_policy"].as_bool().map(|enabled| {
             if case["default_policy"] == true {
-                LocalCompactionPolicy::default()
+                LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                }
             } else {
                 LocalCompactionPolicy {
                     enabled,
+                    use_llm_summary: false,
                     trigger_tokens: 90000,
                     target_tokens: 40000,
                     preserve_recent_items: 3,
@@ -418,6 +428,62 @@ async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_
                 })
                 .collect::<Vec<_>>();
             assert_eq!(json!(hashes), case["text_sha256"], "{case}");
+        }
+        bundle.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn builder_defaults_to_llm_summary_and_respects_explicit_false() {
+    use adk::runtime::compaction::{LocalCompactionPolicy, extract_summary};
+    for enabled in [true, false] {
+        let model = Arc::new(RecordingModel::default());
+        let mut bundle = builder(
+            Config {
+                model: "gpt-6-mini".into(),
+                local_compaction: (!enabled).then(|| LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                }),
+                features: Some(Features {
+                    compaction: true,
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+            &model,
+        )
+        .build(&context())
+        .await
+        .unwrap();
+        let message = |role, text| RunItem::Message {
+            message: Message {
+                role,
+                content: vec![Content::Text { text }],
+            },
+        };
+        bundle
+            .run(
+                context(),
+                vec![
+                    message(Role::User, "task".into()),
+                    message(Role::Assistant, "old content ".repeat(80_000)),
+                    message(Role::Assistant, "latest".into()),
+                ],
+                Arc::new(TestHost),
+            )
+            .await
+            .unwrap();
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), if enabled { 2 } else { 1 });
+            let summary = extract_summary(&requests.last().unwrap().input);
+            assert!(!summary.is_empty());
+            assert_eq!(summary.ends_with("offline"), enabled);
+            if enabled {
+                assert!(requests[0].instructions.starts_with("You are compacting"));
+                assert_eq!(requests[0].settings["max_tokens"], 2048);
+            }
         }
         bundle.close().await.unwrap();
     }

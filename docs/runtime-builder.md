@@ -629,6 +629,13 @@ choice is part of durable resume identity. Explicit nondefault retention and
 threshold settings are preserved; feature selection still controls enablement.
 Direct runtime defaults remain twelve recent items/four bullets.
 
+Both builder and direct runtime policies default to model-written local summaries
+(`LocalCompactionPolicy.use_llm_summary = true`). A changed local plan can make
+an additional billed call to the active model; `false` keeps deterministic
+summaries while retaining model-specific thresholds. Pure planner helpers remain
+provider-free. See [model-summary calls](local-compaction.md#runner-model-summary-calls)
+for fallback, usage, timeout, tracing and durable-resume behavior.
+
 `Config.local_compaction: Some(policy)` is the explicit host override: its
 enabled flag takes precedence over feature selection, including an explicitly
 disabled policy when the compaction feature is enabled. With that feature on,
@@ -651,11 +658,12 @@ provider dispatch; unavailable metadata should instead return `Ok(None)`.
 Durable use requires a nonempty key covering deterministic, replay-safe behavior
 and configuration; network discovery must not opt into that contract.
 
-Provider catalog fetching/caching and automatic metadata resolver assembly are
-still host-owned, not automatically wired by the builder. The existing
-`adk::providers::metadata::ModelMetadata::compaction_defaults` helper can supply
-thresholds for an explicitly loaded catalog. This does not claim the SDK's
-automatic authenticated `/models` lookup/default cache behavior.
+Provider metadata resolution requires an explicitly supplied authenticated
+adapter through `Builder::compaction_metadata`; see [Explicit provider metadata
+for compaction](#explicit-provider-metadata-for-compaction) below. The builder
+does not discover credentials implicitly. The pure
+`adk::providers::metadata::ModelMetadata::compaction_defaults` helper also supplies
+thresholds for an explicitly loaded catalog.
 
 ```rust
 let config = adk::builder::Config {

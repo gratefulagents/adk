@@ -72,6 +72,7 @@ fn policy(case: &Value) -> LocalCompactionPolicy {
     let get = |key, default| case["policy"][key].as_u64().unwrap_or(default);
     LocalCompactionPolicy {
         enabled: !case["disabled"].as_bool().unwrap(),
+        use_llm_summary: true,
         trigger_tokens: get("trigger_tokens", default.trigger_tokens),
         target_tokens: get("target_tokens", default.target_tokens),
         preserve_recent_items: get(
@@ -486,7 +487,7 @@ fn run_context(token: Arc<CancellationToken>) -> Context {
     }
 }
 #[tokio::test]
-async fn default_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items()
+async fn deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items()
  {
     let case = inputs()
         .into_iter()
@@ -515,6 +516,10 @@ async fn default_runner_compacts_first_request_and_preserves_cache_transients_an
     );
     agent.instructions = "stable instructions".into();
     let config = runner::RunnerConfig {
+        local_compaction: LocalCompactionPolicy {
+            use_llm_summary: false,
+            ..Default::default()
+        },
         cache_prefix: "stable prefix".into(),
         prompt_cache_key: Some("logical".into()),
         prompt_cache_namespace: Some("namespace".into()),
@@ -617,6 +622,10 @@ async fn recoverable_custom_compactor_failures_fall_back_to_local_or_noop() {
             });
             let observations = Arc::new(CompactionObservations::default());
             let config = runner::RunnerConfig {
+                local_compaction: LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                },
                 compaction: Some(runner::CompactionConfig {
                     trigger_tokens: 2,
                     target_tokens: 1,

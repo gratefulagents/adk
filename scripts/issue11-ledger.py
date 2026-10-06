@@ -76,6 +76,10 @@ RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo
                "crates/adk-providers/tests/metadata_compaction/mod.rs",
                "crates/adk-providers/tests/routes_cost_parity.rs",
                "crates/adk-runtime/src/compaction.rs", "crates/adk-runtime/tests/followup.rs",
+               "crates/adk-runtime/src/compaction/llm.rs", "crates/adk-runtime/src/compaction/llm/tests.rs",
+               "crates/adk-runtime/tests/llm_compaction.rs", "crates/adk-runtime/tests/local_compaction.rs",
+               "fixtures/llm-summary/observations.json", "scripts/llm-summary-reference/run.py",
+               "scripts/llm-summary-reference/reference_test.go",
                "fixtures/compaction.json",
                "fixtures/metadata-compaction/observations.json",
                "scripts/metadata-compaction-reference/run.py",
@@ -268,6 +272,8 @@ def verify_rust() -> None:
                                     cwd=ROOT, text=True, capture_output=True, check=True)
     metadata_check = subprocess.run([sys.executable, str(ROOT / "scripts/metadata-compaction-reference/run.py"), "--check"],
                                    cwd=ROOT, text=True, capture_output=True, check=True)
+    llm_summary_check = subprocess.run([sys.executable, str(ROOT / "scripts/llm-summary-reference/run.py"), "--check"],
+                                      cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
@@ -284,7 +290,7 @@ def verify_rust() -> None:
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
-               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup"]
+               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup", "--test", "llm_compaction", "--test", "local_compaction"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
                             env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")
@@ -306,7 +312,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -342,7 +348,8 @@ def apply_rust_evidence(entries, records, reference):
                    "Pinned SDK run instructions observations reproduced exactly",
                    "Pinned SDK workspace context observations reproduced exactly",
                    "Pinned SDK project-state runtime observations reproduced exactly",
-                       "Pinned metadata compaction observations reproduced exactly"):
+                   "Pinned metadata compaction observations reproduced exactly",
+                   "Pinned LLM summary observations reproduced exactly"):
         if marker not in evidence.get("reference_fixture_check", ""):
             raise SystemExit("Rust builder evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":

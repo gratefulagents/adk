@@ -752,6 +752,8 @@ impl Runner {
         if let Some(resolver) = &config.compaction_model_resolver {
             baseline["compaction_model_resolver"] = serde_json::json!(resolver.durable_key());
         }
+        // Default-on summaries must also invalidate legacy deterministic-default checkpoints.
+        baseline["use_llm_summary"] = serde_json::json!(compaction.use_llm_summary);
         if compaction != LocalCompactionPolicy::default() {
             baseline["local_compaction"] = serde_json::json!({
                 "enabled": compaction.enabled,

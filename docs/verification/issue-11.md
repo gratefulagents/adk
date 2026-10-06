@@ -2,6 +2,46 @@
 
 ## Current continuation evidence
 
+### Model-written compaction summaries
+
+The runner now implements the SDK-default model-summary phase after successful
+local planning, in both normal and forced-overflow paths. It uses the actual
+active binding (including same-name fallback models), records returned usage and
+cost even for rejected summaries, and preserves approval boundaries, historical
+provenance, append-only outputs and transient-context isolation. Explicit
+`use_llm_summary: false` preserves deterministic behavior without disabling
+model-specific thresholds. Pure planners and `LocalCompactor` remain provider-free.
+
+The independently executed pinned oracle records 52 byte-truncation, 44
+transcript, 18 summary-call and nine plan observations; 12 unchanged upstream
+tests also pass. Native fixture comparisons cover all truncation cases, 39
+representable transcripts, 13 pure request/body cases and all nine plans.
+Runtime regressions separately cover successful/empty/error/oversized summaries,
+usage and cost, default/explicit timeout, cancellation, deadline, streaming,
+fallback selection, disabled/no-op behavior and budget exhaustion. Five transcript
+cases require arbitrary non-JSON tool-input bytes and remain source-only because
+native tool arguments are JSON values. This is not whole-helper parity closure.
+
+Only explicitly attributed `context-summary` messages get the longer retention
+limit; a marker cannot upgrade unknown/unattributed authorship. Summary failures
+produce redacted host diagnostics rather than raw provider-error logs. Summary
+calls intentionally remain outside ordinary generation spans and turn counts,
+matching the SDK's out-of-band behavior. The summary setting is unconditionally
+fingerprinted; legacy deterministic-default native checkpoints are rejected
+rather than silently acquiring additional model calls on resume.
+
+Fresh Rust 1.88/Linux workspace verification: **1,236 passed, 0 failed, 30
+ignored**. Strict Clippy, Rustfmt and all-feature documentation builds pass.
+The feature matrix and platform-free standalone consumer pass; all 20 feature
+scenarios and the owned host-session example pass offline. Source locks, refreshed
+independent fixture/evidence checks and all 18 ledger-validator tests pass.
+Independent read-only review found no blocking issue; its local check launcher
+was environment-blocked, while the parent successfully ran checks with the direct
+compiler/Clippy binaries. No additional acceptance-ID closure is claimed here:
+the ledger remains **210 verified / 8,681 unresolved / 251 excluded**. Live
+provider credentials and non-Linux targets remain unverified; issue #11 and draft
+PR #33 are not complete or ready for release.
+
 ### Static compaction model defaults
 
 The pinned public helper now supplies 45 independently executed observations,

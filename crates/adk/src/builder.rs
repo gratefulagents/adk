@@ -1695,10 +1695,7 @@ impl Builder {
             self.runner.local_compaction = policy;
             self.runner.compaction_model_defaults = Some(features.compaction);
         } else {
-            if features.compaction
-                && self.runner.local_compaction
-                    == adk_runtime::compaction::LocalCompactionPolicy::default()
-            {
+            if features.compaction && self.runner.local_compaction.uses_default_thresholds() {
                 self.runner.local_compaction.preserve_recent_items = 10;
                 self.runner.local_compaction.summary_bullet_limit = 5;
                 self.runner.compaction_model_defaults = Some(true);

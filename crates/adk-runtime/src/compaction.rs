@@ -11,6 +11,8 @@ use std::{
     sync::Arc,
 };
 
+mod llm;
+
 pub const SUMMARY_MARKER: &str = "[COMPACTED HISTORY SUMMARY]";
 pub const CARRY_FORWARD_MARKER: &str = "[COMPACTION CARRY-FORWARD]";
 pub const DEFAULT_OUTPUT_RESERVE: u64 = 16_384;
@@ -19,6 +21,7 @@ pub const REQUEST_SAFETY_BUFFER: u64 = 8_192;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LocalCompactionPolicy {
     pub enabled: bool,
+    pub use_llm_summary: bool,
     pub trigger_tokens: u64,
     pub target_tokens: u64,
     pub preserve_recent_items: usize,
@@ -29,6 +32,7 @@ impl Default for LocalCompactionPolicy {
     fn default() -> Self {
         Self {
             enabled: true,
+            use_llm_summary: true,
             trigger_tokens: 180_000,
             target_tokens: 100_000,
             preserve_recent_items: 12,
@@ -38,6 +42,12 @@ impl Default for LocalCompactionPolicy {
     }
 }
 impl LocalCompactionPolicy {
+    pub fn uses_default_thresholds(self) -> bool {
+        Self {
+            use_llm_summary: true,
+            ..self
+        } == Self::default()
+    }
     pub fn for_model(model: &str) -> Self {
         let model = model
             .trim()
@@ -559,22 +569,72 @@ pub fn extract_summary(items: &[RunItem]) -> String {
     extract_mixed_summary(&mixed_history(items, &[]))
 }
 
+pub(crate) struct LocalCompactionPlan {
+    pub outcome: LocalCompactionOutcome,
+    source: Vec<HistoryItem>,
+    protected: HashSet<usize>,
+    removed: Vec<usize>,
+    summary: String,
+}
+
+pub(crate) fn plan_with_provenance(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    provenance: &[ItemProvenance],
+    policy: LocalCompactionPolicy,
+    overhead: i64,
+) -> LocalCompactionPlan {
+    let mut plan = plan_mixed(
+        &mixed_history_with_provenance(items, markers, provenance),
+        policy,
+        overhead,
+    );
+    if plan.outcome.changed {
+        let (history, markers, history_provenance) = split_history(rebuild_attributed(
+            &plan.source,
+            &plan.protected,
+            &plan.summary,
+            ItemProvenance::Agent {
+                name: "context-summary".into(),
+            },
+        ));
+        plan.outcome.history = history;
+        plan.outcome.markers = markers;
+        plan.outcome.history_provenance = history_provenance;
+    }
+    plan
+}
+
 fn compact_mixed(
     items: &[HistoryItem],
     policy: LocalCompactionPolicy,
     overhead: i64,
 ) -> LocalCompactionOutcome {
+    plan_mixed(items, policy, overhead).outcome
+}
+
+fn plan_mixed(
+    items: &[HistoryItem],
+    policy: LocalCompactionPolicy,
+    overhead: i64,
+) -> LocalCompactionPlan {
     let policy = policy.normalized();
     let unchanged = |tokens, reason| {
         let (history, markers, history_provenance) = split_history(items.to_vec());
-        LocalCompactionOutcome {
-            history_provenance,
-            history,
-            markers,
-            before_tokens: tokens,
-            after_tokens: tokens,
-            changed: false,
-            reason,
+        LocalCompactionPlan {
+            source: items.to_vec(),
+            protected: (0..items.len()).collect(),
+            removed: Vec::new(),
+            summary: String::new(),
+            outcome: LocalCompactionOutcome {
+                history_provenance,
+                history,
+                markers,
+                before_tokens: tokens,
+                after_tokens: tokens,
+                changed: false,
+                reason,
+            },
         }
     };
     if !policy.enabled || items.is_empty() {
@@ -633,11 +693,8 @@ fn compact_mixed(
             after = estimate_mixed_tokens(&history);
         }
         if after > adjusted.target_tokens {
-            history = rebuild(
-                items,
-                &protected,
-                "[COMPACTED HISTORY SUMMARY]\nEarlier context compacted.",
-            );
+            summary = "[COMPACTED HISTORY SUMMARY]\nEarlier context compacted.".into();
+            history = rebuild(items, &protected, &summary);
             after = estimate_mixed_tokens(&history);
         }
         if after >= before - overhead {
@@ -658,9 +715,17 @@ fn compact_mixed(
         };
         if best
             .as_ref()
-            .is_none_or(|b: &LocalCompactionOutcome| outcome.after_tokens < b.after_tokens)
+            .is_none_or(|b: &LocalCompactionPlan| outcome.after_tokens < b.outcome.after_tokens)
         {
-            best = Some(outcome);
+            best = Some(LocalCompactionPlan {
+                outcome,
+                source: items.to_vec(),
+                removed: (0..items.len())
+                    .filter(|i| !protected.contains(i))
+                    .collect(),
+                protected,
+                summary,
+            });
         }
         if after <= adjusted.target_tokens {
             return best.expect("candidate selected");
@@ -739,6 +804,18 @@ fn summary_item(text: &str) -> HistoryItem {
     )
 }
 fn rebuild(items: &[HistoryItem], protected: &HashSet<usize>, summary: &str) -> Vec<HistoryItem> {
+    rebuild_attributed(items, protected, summary, ItemProvenance::Unattributed)
+}
+fn rebuild_attributed(
+    items: &[HistoryItem],
+    protected: &HashSet<usize>,
+    summary: &str,
+    provenance: ItemProvenance,
+) -> Vec<HistoryItem> {
+    let mut inserted_summary = summary_item(summary);
+    if let HistoryItem::Native(_, source) = &mut inserted_summary {
+        *source = provenance;
+    }
     let first_removed = (0..items.len()).find(|i| !protected.contains(i));
     let first_protected = (0..items.len()).find(|i| protected.contains(i));
     let defer = first_protected.filter(|p| {
@@ -751,11 +828,11 @@ fn rebuild(items: &[HistoryItem], protected: &HashSet<usize>, summary: &str) -> 
         if protected.contains(&i) {
             out.push(item.clone());
             if defer == Some(i) && !inserted {
-                out.push(summary_item(summary));
+                out.push(inserted_summary.clone());
                 inserted = true;
             }
         } else if !inserted && defer.is_none_or(|d| i > d) {
-            out.push(summary_item(summary));
+            out.push(inserted_summary.clone());
             inserted = true;
         }
     }

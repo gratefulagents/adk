@@ -97,7 +97,10 @@ async fn resolver_requests_and_call_frequency_match_pinned_sdk() {
             model: "gpt-5-mini".into(),
             instructions: "base".into(),
             work_dir: "".into(),
-            local_compaction: Some(LocalCompactionPolicy::default()),
+            local_compaction: Some(LocalCompactionPolicy {
+                use_llm_summary: false,
+                ..Default::default()
+            }),
             features: Some(Features {
                 compaction: case["feature"].as_bool().unwrap(),
                 ..Default::default()

@@ -204,3 +204,17 @@ embedding host instead of copying Go's global stderr logging. Mutable remote
 metadata deliberately has no durable key. Reference:
 [pinned resolver source](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/providers/openai/compaction.go),
 GPL-3.0-only, executed by `scripts/metadata-compaction-reference/run.py`.
+
+## Model-written local summaries
+
+Adopt a native owned compaction plan with explicit protected/removed indices,
+rather than rediscovering source identity by comparing message values. Repeated
+messages can have different authors or approval boundaries. Keep pure planning
+provider-free and perform optional summary calls in the runner, where active
+model selection, cancellation, usage budgets and lifecycle are already owned.
+Preserve the pinned SDK's default-on setting and out-of-band complete-call
+semantics; reject process-global logging in favor of a redacted host observation.
+Include the setting even at its default in durable identity, so an older
+deterministic-only checkpoint cannot silently acquire new model-call behavior.
+Reference: [SDK summary helper](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/compaction_llm.go),
+GPL-3.0-only, independently executed by `scripts/llm-summary-reference/run.py`.

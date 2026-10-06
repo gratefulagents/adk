@@ -249,6 +249,7 @@ async fn local_compaction_injects_static_context_and_keeps_provenance_aligned() 
     let config = RunnerConfig {
         working_state_context: " local state ".into(),
         local_compaction: LocalCompactionPolicy {
+            use_llm_summary: false,
             trigger_tokens: 1000,
             target_tokens: 500,
             preserve_recent_items: 1,
@@ -700,13 +701,14 @@ async fn replacing_carry_forward_preserves_approval_markers_and_item_sources() {
 
 #[tokio::test]
 async fn durable_local_compaction_policy_is_bound_and_normalized() {
-    let mut policies = vec![LocalCompactionPolicy::default(); 7];
+    let mut policies = vec![LocalCompactionPolicy::default(); 8];
     policies[1].enabled = false;
     policies[2].trigger_tokens += 1;
     policies[3].target_tokens -= 1;
     policies[4].preserve_recent_items += 1;
     policies[5].preserve_initial_user_messages += 1;
     policies[6].summary_bullet_limit += 1;
+    policies[7].use_llm_summary = false;
     for policy in &policies {
         let config = RunnerConfig {
             local_compaction: *policy,
@@ -1135,4 +1137,74 @@ async fn disabled_local_compaction_does_not_consult_resolver() {
     .unwrap();
     assert!(resolver.models.lock().unwrap().is_empty());
     assert_eq!(model.requests.lock().unwrap().len(), 1);
+}
+
+#[tokio::test]
+async fn legacy_deterministic_default_fingerprint_cannot_resume_under_new_summary_policy() {
+    use sha2::{Digest, Sha256};
+    let config = RunnerConfig::default();
+    let agent = AgentConfig::new(
+        "agent",
+        ModelBinding::complete("test", Arc::new(ModelImpl::default())),
+    );
+    let baseline = json!({
+        "catalog": [{"name": agent.name, "instructions": agent.instructions, "model": "test", "fallbacks": [], "settings": agent.settings, "schema": agent.output_schema, "schema_name": agent.output_schema_name, "strict": agent.output_schema_strict, "tools": [], "handoffs": []}],
+        "work_dir": config.work_dir, "max_tokens": config.limits.max_tokens,
+        "max_cost": config.limits.max_cost, "output_cap": config.output.max_bytes,
+        "untrusted": config.output.untrusted, "validate": config.validate_tool_arguments,
+        "approve_mutating": config.approve_mutating_tools, "cache_prefix": config.cache_prefix,
+        "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
+        "tool_error_limit": config.consecutive_tool_error_limit,
+    });
+    let legacy_fingerprint = format!(
+        "{:x}",
+        Sha256::digest(serde_json::to_vec(&baseline).unwrap())
+    );
+    let store = Arc::new(Store::default());
+    runner(Arc::new(ModelImpl::default()), config.clone())
+        .run_durable(
+            context("legacy-summary"),
+            request(vec![message("task")]),
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone()),
+        )
+        .await
+        .unwrap();
+    let mut checkpoint = serde_json::to_value(store.0.lock().unwrap().as_ref().unwrap()).unwrap();
+    let mut current_baseline = baseline;
+    current_baseline["use_llm_summary"] = json!(true);
+    assert_eq!(
+        checkpoint["runtime"]["fingerprint"],
+        format!(
+            "{:x}",
+            Sha256::digest(serde_json::to_vec(&current_baseline).unwrap())
+        )
+    );
+    assert_ne!(checkpoint["runtime"]["fingerprint"], legacy_fingerprint);
+    checkpoint["runtime"]["fingerprint"] = json!(legacy_fingerprint);
+    for use_llm_summary in [true, false] {
+        let model = Arc::new(ModelImpl::default());
+        let mut durable = DurableRun::new(store.clone());
+        durable.resume = Some(serde_json::from_value(checkpoint.clone()).unwrap());
+        let mut config = config.clone();
+        config.local_compaction.use_llm_summary = use_llm_summary;
+        let error = runner(model.clone(), config)
+            .run_durable(
+                context("legacy-summary"),
+                request(vec![]),
+                Arc::new(HostImpl),
+                durable,
+            )
+            .await
+            .err()
+            .unwrap();
+        assert!(
+            error
+                .error
+                .info
+                .message
+                .contains("configuration or security policy changed")
+        );
+        assert!(model.requests.lock().unwrap().is_empty());
+    }
 }

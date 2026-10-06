@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Run-wide instruction composition
+
+The runtime now applies `additional_instructions` to each active agent request,
+including handoffs, before structured-output context. The builder maps feature
+summary, mode directives and final-check instructions without mutating agent
+instructions. Forty actual normal/streamed pinned SDK request observations match
+native tests, including all eight builder combinations. Durable regression
+coverage rejects a changed run-wide instruction value while accepting the
+unchanged configuration. No deprecated-field fallback or MCP prompt claim is
+made, and no ledger entries are newly closed by this slice.
+
+The full suite, direct strict Clippy, rustdoc and feature matrix passed. The
+example script's cargo-clippy launcher failed because this worker lacks
+`/proc/self/exe`; equivalent direct-driver lint/build plus all twenty scenarios
+and host-session execution passed. The first evidence invocation omitted
+`GOROOT` and failed in its Go fixture launcher; the corrected explicit Go
+installation environment passed all fixtures and eighteen ledger validators.
+Failure logs were retained, rather than counted as successful checks.
+
 ### Owned composition and workspace prompts
 
 Full builds now own host-authorized MCP sessions and project-state composition;
@@ -25,7 +44,7 @@ exclude denied/mutating tools in read-only mode. Legacy fixed tool/path prose is
 compatibility guidance, not actual execution authority; strict selection names
 only prepared tools. Non-UTF8 native full-builder paths fail explicitly.
 
-Latest local verification: **1,195 workspace tests passed, 0 failed, 30 ignored**;
+Latest local verification: **1,199 workspace tests passed, 0 failed, 30 ignored**;
 strict all-target Clippy, rustdoc, formatting, source locks, facade matrix,
 platform-free external consumer, twenty offline examples plus host session and
 **18 evidence-validator tests** passed. The immutable inventory is untouched.

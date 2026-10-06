@@ -126,6 +126,9 @@ pub struct Config {
     pub fallback_models: Vec<String>,
     pub agent_name: String,
     pub instructions: String,
+    pub feature_summary: String,
+    pub mode_directive_text: String,
+    pub final_check_instructions: String,
     pub reasoning: String,
     pub verbosity: String,
     pub settings: Map<String, Value>,
@@ -156,6 +159,9 @@ impl Default for Config {
             fallback_models: vec![],
             agent_name: "agent".into(),
             instructions: String::new(),
+            feature_summary: String::new(),
+            mode_directive_text: String::new(),
+            final_check_instructions: String::new(),
             reasoning: "medium".into(),
             verbosity: "medium".into(),
             settings: Map::new(),
@@ -1596,6 +1602,25 @@ impl Builder {
                 return Err(error);
             }
         };
+        let summary = if self.config.feature_summary.trim().is_empty() {
+            String::new()
+        } else {
+            format!("Runtime surface: {}", self.config.feature_summary)
+        };
+        let additional = [
+            summary.as_str(),
+            &self.config.mode_directive_text,
+            &self.config.final_check_instructions,
+        ]
+        .into_iter()
+        .filter(|s| !s.trim().is_empty())
+        .collect::<Vec<_>>()
+        .join("\n\n")
+        .trim()
+        .to_owned();
+        if !additional.is_empty() {
+            self.runner.additional_instructions = additional;
+        }
         self.runner.work_dir = self.config.work_dir.clone();
         self.runner.output.work_dir = Some(self.config.work_dir.clone());
         self.runner.output.untrusted = features.untrusted_tool_outputs;

@@ -2644,3 +2644,86 @@ async fn immediate_signal_durable_refund_restores_but_dispatch_requires_reconcil
     assert_eq!(wake.calls.load(Ordering::SeqCst), 2);
     assert_eq!(poller.calls.load(Ordering::SeqCst), 2);
 }
+
+#[tokio::test]
+async fn additional_instructions_survive_checkpoint_and_config_is_bound() {
+    let (_, model, tool) = setup(vec![call("denied")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool.clone());
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            force_final_summary_turn: true,
+            additional_instructions: "run-wide".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let error = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(store.clone(), None),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    let checkpoint = store.latest();
+    assert_eq!(
+        serde_json::to_value(&checkpoint).unwrap()["runtime"]["summary_turn"],
+        true
+    );
+    req.input.clear();
+    let changed = Runner::new(
+        agent,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = changed
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint.clone())),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        error
+            .error
+            .info
+            .message
+            .contains("configuration or security policy changed")
+    );
+    let error = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint)),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert!(
+        error
+            .partial
+            .unwrap()
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert!(tool.keys.lock().unwrap().is_empty());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}

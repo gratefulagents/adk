@@ -687,3 +687,27 @@ are compared for the representable, registry-ordered inputs, including the legac
 `Active mode: chat` default. Native comparisons additionally verify normal/streamed
 requests and policy-filtered names; they do not equate native registry ordering,
 mode/role composition or sandbox behavior with the SDK.
+
+## Run-wide instructions
+
+`RunnerConfig::additional_instructions` is appended to each active agent's
+instructions, including handoff targets, before structured-output guidance.
+Blank sections are omitted, nonblank agent text is preserved, and the run-wide
+section is trimmed. Sections use the SDK separator `\n\n---\n\n`.
+The deprecated Go `ModeInstructions` alias maps to this same native field; there
+is no second alias or fallback field.
+
+Full builder configuration composes `feature_summary` (prefixed with
+`Runtime surface: `), `mode_directive_text`, and `final_check_instructions` in
+that order, separated by blank lines and with the aggregate trimmed. A nonblank
+aggregate replaces `RunnerConfig::additional_instructions`; an empty aggregate
+preserves the supplied runner value. These sections do not mutate agent text or
+create instructions in a tool-only build. Durable checkpoints bind the effective
+trimmed run-wide text, rejecting resumes that change it; empty defaults retain
+the previous fingerprint representation.
+
+Forty independently executed pinned SDK normal/streamed request fixtures cover
+base whitespace, blank extras, Unicode and all eight builder section selections.
+Native tests also cover handoff propagation and durable mismatch rejection.
+MCP prompt metadata and deprecated-field fallback precedence are not covered by
+this mapping.

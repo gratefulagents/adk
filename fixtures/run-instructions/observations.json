@@ -1,0 +1,353 @@
+{
+  "cases": [
+    {
+      "base": "",
+      "builder": false,
+      "extra": "",
+      "instructions": "",
+      "streaming": false
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": "",
+      "instructions": "",
+      "streaming": true
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": " \t",
+      "instructions": "",
+      "streaming": false
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": " \t",
+      "instructions": "",
+      "streaming": true
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": "extra",
+      "streaming": false
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": "extra",
+      "streaming": true
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": "\u0394\nnext",
+      "streaming": false
+    },
+    {
+      "base": "",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": "\u0394\nnext",
+      "streaming": true
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": "",
+      "instructions": "",
+      "streaming": false
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": "",
+      "instructions": "",
+      "streaming": true
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": " \t",
+      "instructions": "",
+      "streaming": false
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": " \t",
+      "instructions": "",
+      "streaming": true
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": "extra",
+      "streaming": false
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": "extra",
+      "streaming": true
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": "\u0394\nnext",
+      "streaming": false
+    },
+    {
+      "base": " \n\t",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": "\u0394\nnext",
+      "streaming": true
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": "",
+      "instructions": " base\n ",
+      "streaming": false
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": "",
+      "instructions": " base\n ",
+      "streaming": true
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": " \t",
+      "instructions": " base\n ",
+      "streaming": false
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": " \t",
+      "instructions": " base\n ",
+      "streaming": true
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": " base\n \n\n---\n\nextra",
+      "streaming": false
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": " extra ",
+      "instructions": " base\n \n\n---\n\nextra",
+      "streaming": true
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": " base\n \n\n---\n\n\u0394\nnext",
+      "streaming": false
+    },
+    {
+      "base": " base\n ",
+      "builder": false,
+      "extra": "\u0394\nnext",
+      "instructions": " base\n \n\n---\n\n\u0394\nnext",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "",
+      "feature_summary": "",
+      "final_check_instructions": "",
+      "instructions": "base",
+      "mode_directive_text": "",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "",
+      "feature_summary": "",
+      "final_check_instructions": "",
+      "instructions": "base",
+      "mode_directive_text": "",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled",
+      "mode_directive_text": "",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled",
+      "mode_directive_text": "",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "mode directive",
+      "feature_summary": "",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nmode directive",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "mode directive",
+      "feature_summary": "",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nmode directive",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n \nmode directive",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n \nmode directive",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": "",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "final check",
+      "feature_summary": "",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nfinal check",
+      "mode_directive_text": "",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "final check",
+      "feature_summary": "",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nfinal check",
+      "mode_directive_text": "",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n final check",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n final check",
+      "mode_directive_text": "",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n final check",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n final check",
+      "mode_directive_text": "",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "mode directive \t\n\n final check",
+      "feature_summary": "",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nmode directive \t\n\n final check",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "mode directive \t\n\n final check",
+      "feature_summary": "",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nmode directive \t\n\n final check",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": true
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": false
+    },
+    {
+      "base": "base",
+      "builder": true,
+      "extra": "Runtime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
+      "feature_summary": "  tools enabled \n",
+      "final_check_instructions": " final check \n",
+      "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
+      "mode_directive_text": " \nmode directive \t",
+      "streaming": true
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/run-instructions-reference/reference_test.go": "e4928c699a1696ee259346b79162e89d782155f44d219e1d0b9d31252ef7427c",
+      "scripts/run-instructions-reference/run.py": "9ddd1f8814ec5e2d61298b9cb7118fc7ab68ff02ed9bfd64dea2d1059ad9581b"
+    },
+    "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",
+    "normalization": "No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. No deprecated alias, output schema or MCP claim.",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/mcp_prompt.go": "6f9936978e4d8feaabb900c6b5ab6f83493b4ad3a5c2c2ef6a92bb29214bf197",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
+      "pkg/agentsdk/runtime/builder_test.go": "0c557ad7d463f635b81adae340a30a8dcd4c46d83965f4f74b41f13664e98803",
+      "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",
+      "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0"
+    }
+  }
+}

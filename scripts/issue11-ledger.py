@@ -28,7 +28,8 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_runtime.rs",
+RUST_INPUTS = ["fixtures/run-instructions/observations.json", "scripts/run-instructions-reference/run.py",
+               "scripts/run-instructions-reference/reference_test.go","crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_runtime.rs",
                "crates/adk/examples/features.rs", "crates/adk-runtime/src/guardrails.rs", "crates/adk-runtime/tests/guardrails.rs",
                "crates/adk/src/tracing.rs", "crates/adk/tests/tracing.rs",
                "crates/adk/tests/tracing_sinks.rs", "crates/adk/src/lib.rs", "Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore.rs",
@@ -246,6 +247,8 @@ def verify_rust() -> None:
                               cwd=ROOT, text=True, capture_output=True, check=True)
     project_state_check = subprocess.run([sys.executable, str(ROOT / "scripts/project-state-runtime-reference/run.py"), "--check"],
                                         cwd=ROOT, text=True, capture_output=True, check=True)
+    instructions_check = subprocess.run([sys.executable, str(ROOT / "scripts/run-instructions-reference/run.py"), "--check"],
+                                    cwd=ROOT, text=True, capture_output=True, check=True)
     workspace_check = subprocess.run([sys.executable, str(ROOT / "scripts/workspace-context-reference/run.py"), "--check"],
                                     cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
@@ -286,7 +289,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -318,7 +321,8 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust immediate signal evidence requires independently executed pinned fixtures")
     if f"builtin guardrails reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust builtin guardrail evidence requires independently executed pinned fixtures")
-    for marker in ("Pinned SDK workspace context observations reproduced exactly",
+    for marker in ("Pinned SDK run instructions observations reproduced exactly",
+                   "Pinned SDK workspace context observations reproduced exactly",
                    "Pinned SDK project-state runtime observations reproduced exactly"):
         if marker not in evidence.get("reference_fixture_check", ""):
             raise SystemExit("Rust builder evidence requires independently executed pinned fixtures")

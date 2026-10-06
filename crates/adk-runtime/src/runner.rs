@@ -456,6 +456,8 @@ pub struct RunnerConfig {
     pub model_idle_timeout: Option<Duration>,
     /// Stable instructions preceding the agent's instructions in every request.
     pub cache_prefix: String,
+    /// Run-wide text appended after each active agent's instructions, including handoffs.
+    pub additional_instructions: String,
     /// Hashed with the namespace (run ID by default) before reaching providers.
     pub prompt_cache_key: Option<String>,
     pub prompt_cache_namespace: Option<String>,
@@ -502,6 +504,7 @@ impl Default for RunnerConfig {
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
             cache_prefix: String::new(),
+            additional_instructions: String::new(),
             prompt_cache_key: None,
             prompt_cache_namespace: None,
             return_tool_output: false,
@@ -1831,6 +1834,16 @@ impl Engine {
         } else {
             format!("{}\n{}", self.config.cache_prefix, self.agent.instructions)
         };
+        if instructions.trim().is_empty() {
+            instructions.clear();
+        }
+        let extra = self.config.additional_instructions.trim();
+        if !extra.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(extra);
+        }
         if let Some(schema) = &self.agent.output_schema {
             if !instructions.trim().is_empty() {
                 instructions.push_str("\n\n---\n\n");

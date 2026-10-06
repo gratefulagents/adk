@@ -886,6 +886,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     let definition = TestTool::new("transfer", false, false).definition.clone();
     let mut target = agent(target_model.clone());
     target.name = "target".into();
+    target.instructions = "target instructions".into();
     let mut a = agent(source);
     a.tools = vec![effect.clone()];
     a.handoffs = vec![Handoff {
@@ -898,6 +899,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
         a,
         RunnerConfig {
             hooks: Some(hooks.clone()),
+            additional_instructions: " run-wide ".into(),
             ..Default::default()
         },
     )
@@ -921,6 +923,10 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
         }
     );
     let requests = target_model.requests.lock().unwrap();
+    assert_eq!(
+        requests[0].instructions,
+        "target instructions\n\n---\n\nrun-wide"
+    );
     assert_eq!(requests[0].input_provenance[0], ItemProvenance::Unknown);
     assert_eq!(&requests[0].input_provenance[1..], expected);
     let committed: Vec<_> = hooks
@@ -4329,4 +4335,45 @@ async fn immediate_signal_and_child_steering_share_one_rebuilt_request() {
     assert_eq!(model.drops.load(Ordering::SeqCst), 2);
     assert_eq!(signal.drops.load(Ordering::SeqCst), 2);
     owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn additional_instructions_match_pinned_normal_and_streamed_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 40);
+    for case in fixture["cases"].as_array().unwrap() {
+        let model = TestModel::with(vec![Ok(answer("done"))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer("done"),
+        })]]
+        .into();
+        let mut a = agent(model.clone());
+        a.instructions = case["base"].as_str().unwrap().into();
+        let r = Runner::new(
+            a,
+            RunnerConfig {
+                additional_instructions: case["extra"].as_str().unwrap().into(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if case["streaming"].as_bool().unwrap() {
+            r.stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            r.run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            model.requests.lock().unwrap()[0].instructions,
+            case["instructions"].as_str().unwrap(),
+            "{case}"
+        );
+    }
 }

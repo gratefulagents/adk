@@ -738,6 +738,10 @@ impl Runner {
         if let Some(limit) = config.subagent_max_turns {
             baseline["subagent_max_turns"] = serde_json::json!(limit);
         }
+        if !config.additional_instructions.trim().is_empty() {
+            baseline["additional_instructions"] =
+                serde_json::json!(config.additional_instructions.trim());
+        }
         if !config.working_state_context.is_empty() {
             baseline["working_state_context"] = serde_json::json!(config.working_state_context);
         }

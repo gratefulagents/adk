@@ -139,3 +139,22 @@ The independent sixteen-case pinned builder fixture checks only store creation,
 selected tool names and full-builder working-state text. Tool-only observations
 execute the SDK's separate BuildToolBundle path; neither proves all project-state
 contracts.
+
+## Run-wide instruction composition
+
+Adopt a single owned `RunnerConfig::additional_instructions` string, rather
+than Go's deprecated `ModeInstructions` alias and callback-style mutation.
+Composing at each model request is necessary: prepending text to the parent
+agent loses the run-wide instruction after a handoff. Effective trimmed text is
+also part of durable compatibility identity; changing it cannot resume a saved
+request under different instructions. No dependency or platform host is needed.
+
+The source contract is the GPL-3.0-only pinned SDK's
+[`buildRunInstructions`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/runner.go)
+and runtime builder's
+[`additionalInstructions`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go).
+Independent actual-run fixtures retain the exact separator and builder aggregate
+whitespace. Reject copying an unverified summary of those helpers: this revision
+uses `\n\n---\n\n`, not just blank lines between run-level sections.
+MCP context has a separate Unicode-printability contract and remains separate
+from this additional-instructions mapping.

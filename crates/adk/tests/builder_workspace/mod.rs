@@ -146,3 +146,47 @@ async fn workspace_prompt_rejects_non_utf8_paths_without_lossy_instructions() {
     assert_eq!(error.info.category, ErrorCategory::InvalidInput);
     assert_eq!(error.info.message, "workspace prompt path must be UTF-8");
 }
+
+#[tokio::test]
+async fn builder_maps_run_instruction_sections_without_changing_agent_text() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|c| c["builder"] == true)
+    {
+        let model = Arc::new(RecordingModel::default());
+        let config = Config {
+            instructions: "base".into(),
+            work_dir: "".into(),
+            features: Some(Features::default()),
+            feature_summary: case["feature_summary"].as_str().unwrap().into(),
+            mode_directive_text: case["mode_directive_text"].as_str().unwrap().into(),
+            final_check_instructions: case["final_check_instructions"].as_str().unwrap().into(),
+            ..Default::default()
+        };
+        let mut bundle = builder(config, &model).build(&context()).await.unwrap();
+        assert_eq!(bundle.agent().instructions, "base");
+        if case["streaming"].as_bool().unwrap() {
+            bundle
+                .stream(context(), vec![], Arc::new(TestHost))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            bundle
+                .run(context(), vec![], Arc::new(TestHost))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            model.requests.lock().unwrap()[0].instructions,
+            case["instructions"].as_str().unwrap()
+        );
+        bundle.close().await.unwrap();
+    }
+}

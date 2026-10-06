@@ -822,3 +822,13 @@ replay-stable configuration. Durable runners reject it before dispatch; hosts th
 need durability should supply a deterministic keyed resolver with pinned thresholds.
 The metadata reference fixture verifies lookup/cache cases and all Unicode scalar
 lookup keys against Go Unicode 15 on Rust 1.88, not full provider/runtime parity.
+
+Provider catalog decoding keeps Codex `models`/`slug` separate from OpenAI or
+Copilot `data`/`id`; fields belonging to the other shape are ignored, not merged.
+Nullable records and optional labels follow the pinned decoder's behavior. Raw
+`ModelMetadata` numeric fields are signed `i64` values, preserving reported
+negative values rather than rejecting an otherwise usable catalog. Resolved
+positive windows and valid compaction thresholds remain `u64`. Threshold
+calculation follows the pinned 64-bit SDK arithmetic, including its overflow
+behavior; the fixtures exercise those boundaries. JSON integer `-0` is accepted,
+while fractional/exponent notation and out-of-range integers are rejected.

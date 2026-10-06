@@ -83,12 +83,552 @@
     }
   ],
   "catalog": "{\"models\":[{\"slug\":\"GPT-CUSTOM\",\"context_window\":10000},{\"slug\":\"vendor/gpt-custom\",\"context_window\":20000},{\"slug\":\"\u0394\",\"context_window\":4000},{\"slug\":\"\u0130\",\"context_window\":6000},{\"slug\":\"no-context\"}]}",
+  "catalog_cases": [
+    {
+      "body": "{\"models\":[{\"slug\":\"exponent\",\"context_window\":1e0}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "exponent-integer",
+      "picker": []
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"\u0392\",\"priority\":1},{\"slug\":\"\u03b1\",\"priority\":1},{\"slug\":\"hidden\",\"visibility\":\" H\u0130DE \"},{\"slug\":\"first\",\"priority\":2}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        },
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        },
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        },
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "first",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 2,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        },
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "hidden",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": "hide"
+        },
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "\u03b1",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 1,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        },
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "\u0392",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 1,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "unicode-picker",
+      "picker": [
+        "\u03b1",
+        "\u0392",
+        "first"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"signed\",\"context_window\":-1,\"max_context_window\":10000,\"auto_compact_token_limit\":-5,\"effective_context_window_percent\":-7,\"priority\":-3}]}",
+      "defaults": [
+        {
+          "target": 5000,
+          "trigger": 9000,
+          "valid": true
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": -5,
+          "ContextWindow": -1,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": -7,
+          "ID": "signed",
+          "MaxContextWindow": 10000,
+          "MaxOutputTokens": 0,
+          "Priority": -3,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "signed-codex",
+      "picker": [
+        "signed"
+      ]
+    },
+    {
+      "body": "{\"data\":[{\"id\":\"signed\",\"capabilities\":{\"limits\":{\"max_context_window_tokens\":-1,\"max_prompt_tokens\":10000,\"max_output_tokens\":-20}}}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": -1,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "signed",
+          "MaxContextWindow": -1,
+          "MaxOutputTokens": -20,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "signed-data",
+      "picker": [
+        "signed"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"max\",\"context_window\":9223372036854775807},{\"slug\":\"overflow-negative\",\"context_window\":1152921504606846976},{\"slug\":\"min\",\"context_window\":-9223372036854775808}]}",
+      "defaults": [
+        {
+          "target": 461168601842738789,
+          "trigger": 922337203685477579,
+          "valid": true
+        },
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        },
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 9223372036854775807,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "max",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        },
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": -9223372036854775808,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "min",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        },
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 1152921504606846976,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "overflow-negative",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "integer-boundaries",
+      "picker": [
+        "max",
+        "min",
+        "overflow-negative"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"overflow\",\"context_window\":9223372036854775808}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "integer-overflow",
+      "picker": []
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"zero\",\"context_window\":-0,\"priority\":-0}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "zero",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "negative-zero",
+      "picker": [
+        "zero"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"fractional\",\"context_window\":1.0}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "fractional-integer",
+      "picker": []
+    },
+    {
+      "body": "{\"data\":[{\"id\":\"plain\",\"context_window\":10000,\"auto_compact_token_limit\":5000,\"display_name\":\"foreign\",\"visibility\":\"hide\",\"priority\":7,\"default_reasoning_level\":\"high\"}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "plain",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "plain-foreign-fields",
+      "picker": [
+        "plain"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"codex\",\"id\":42,\"max_output_tokens\":\"ignored\",\"capabilities\":42}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "codex",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "codex-foreign-fields",
+      "picker": [
+        "codex"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"id\":\"wrong\"}],\"data\":[{\"id\":\"fallback\"}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "codex-wrong-id",
+      "picker": []
+    },
+    {
+      "body": "{\"data\":[{\"slug\":\"wrong\"}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "plain-wrong-id",
+      "picker": []
+    },
+    {
+      "body": "{\"models\":[null,{\"slug\":\"valid\",\"display_name\":null,\"description\":null,\"visibility\":null,\"default_reasoning_level\":null,\"supported_reasoning_levels\":[null,{}, {\"effort\":null},{\"effort\":\" \u0130 \"}],\"upgrade\":{\"model\":null}}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "valid",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": [
+            "i"
+          ],
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "codex-nulls",
+      "picker": [
+        "valid"
+      ]
+    },
+    {
+      "body": "{\"models\":[],\"data\":[null,{\"id\":\" plain \",\"capabilities\":null}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "plain",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "empty-codex-fallback",
+      "picker": [
+        "plain"
+      ]
+    },
+    {
+      "body": "{\"data\":[{\"id\":\"plain\",\"capabilities\":{\"limits\":null}}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "plain",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "null-limits",
+      "picker": [
+        "plain"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"x\",\"visibility\":\" H\u0130DE \",\"default_reasoning_level\":\" \u0130 \",\"supported_reasoning_levels\":[{\"effort\":\" \u0130 \"}]}]}",
+      "defaults": [
+        {
+          "target": 0,
+          "trigger": 0,
+          "valid": false
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 0,
+          "DefaultReasoningLevel": "i",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "x",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": [
+            "i"
+          ],
+          "UpgradeModel": "",
+          "Visibility": "hide"
+        }
+      ],
+      "name": "unicode-labels",
+      "picker": []
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"\u0394\",\"context_window\":4000},{\"slug\":\"\u03b4\",\"context_window\":8000}]}",
+      "defaults": [
+        {
+          "target": 2000,
+          "trigger": 3600,
+          "valid": true
+        }
+      ],
+      "error": false,
+      "models": [
+        {
+          "AutoCompactTokenLimit": 0,
+          "ContextWindow": 4000,
+          "DefaultReasoningLevel": "",
+          "Description": "",
+          "DisplayName": "",
+          "EffectiveContextWindowPercent": 0,
+          "ID": "\u0394",
+          "MaxContextWindow": 0,
+          "MaxOutputTokens": 0,
+          "Priority": 0,
+          "SupportedReasoningLevels": null,
+          "UpgradeModel": "",
+          "Visibility": ""
+        }
+      ],
+      "name": "unicode-first-duplicate",
+      "picker": [
+        "\u0394"
+      ]
+    },
+    {
+      "body": "{\"models\":[{\"slug\":\"valid\"}],\"data\":[{\"id\":7}]}",
+      "defaults": null,
+      "error": true,
+      "models": null,
+      "name": "inactive-schema-validation",
+      "picker": []
+    }
+  ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/metadata-compaction-reference/reference_test.go": "4530c2e1f7cac6f7e4cc5c3f1e077b98c51b73283ca025253dcaac9b3e360ead",
-      "scripts/metadata-compaction-reference/run.py": "4ddd084320135df5b0d241794a95c7144ea302e989c7184a0b77c73bb47c211a"
+      "scripts/metadata-compaction-reference/reference_test.go": "739517e0cb4d42bb36a35f24e97b1e9e99fc91c15c8161c4d01dcd6161566dde",
+      "scripts/metadata-compaction-reference/run.py": "3e010e9714059e0f6cfd9421ab7dc87ec502bc6a17278a6ad6da803a332544ef"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -97,6 +637,7 @@
       "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
       "internal/openai/model_metadata.go": "d2ae46ab9cf265461eff77e8bc3290c8aaf0af49bb68b7f1d52ee0abd9c9ea82",
       "pkg/agentsdk/providers/openai/compaction.go": "e3438c86765f775fd9f64597a2535a08132942a6b24f1823b9c68396a5009ffb",
+      "pkg/agentsdk/providers/openai/compaction_test.go": "7e1b936b1fef80f91fb67ed0742611453420517191c87291d875b054d7696767",
       "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a"
     }
   },
@@ -111,5 +652,2197 @@
   },
   "scalar_count": 1112064,
   "scalar_sha256": "f25c584f4232efda9b29d48c5ec2f534d6adf1bd8d862907a40f53b4a95be632",
+  "threshold_cases": [
+    {
+      "auto_limit": 0,
+      "context": 272000,
+      "id": "gpt-5.5",
+      "max_context": 272000,
+      "percent": 0,
+      "target": 136000,
+      "trigger": 244800,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 372000,
+      "id": "gpt-5.6-sol",
+      "max_context": 372000,
+      "percent": 0,
+      "target": 186000,
+      "trigger": 334800,
+      "valid": true
+    },
+    {
+      "auto_limit": 950,
+      "context": 1000,
+      "id": "gpt-test",
+      "max_context": 0,
+      "percent": 0,
+      "target": 500,
+      "trigger": 900,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 0,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 0,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 0,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 2,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 2,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 2,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 3,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 3,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 3,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -1,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 0,
+      "percent": 95,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 10000,
+      "percent": 95,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    }
+  ],
   "unicode_version": "15.0.0"
 }

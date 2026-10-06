@@ -23,13 +23,26 @@ exhaustive scalar regression first failed under Rust's newer Unicode table, then
 passed after preserving Unicode-15-unassigned characters. All **1,112,064** scalar
 lookup keys match the independent pinned Go digest on Rust 1.88.
 
-Fresh workspace verification: **1,218 passed, 0 failed, 30 ignored**. Strict
+The catalog decoder now uses separate Codex and OpenAI/Copilot schemas. Eighteen
+executed catalog fixtures exposed and now cover foreign-field leakage, wrong ID
+keys, null records/labels, Unicode picker ordering, signed numeric metadata and
+JSON integer `-0`. Raw signed limits are retained; threshold arithmetic follows
+the pinned 64-bit SDK, including overflow. A separate 219-case direct-helper grid
+includes the exact three upstream regression inputs and signed boundary branches.
+Those upstream Go tests also execute freshly in the reference harness.
+
+Five ledger IDs are closed only for `CompactionDefaultsFromModelMetadata` and its
+three regressions: `SDK-138AC0F3C11197C5`, `SDK-254D8EF33463B127`,
+`SDK-2C743BBA75D3D99D`, `SDK-7228DB6E1027BBFE`, and `SDK-7EE10C4D8D92C468`.
+This is not a closure claim for the complete catalog parser or resolver lifecycle.
+
+Fresh workspace verification: **1,220 passed, 0 failed, 30 ignored**. Strict
 Clippy, documentation build, source locks and the 18 ledger-validator tests pass.
 The facade feature matrix and standalone consumer pass; all 20 feature examples
 and the owned host-session example pass offline. The example script's cargo-clippy
 launcher cannot find `/proc/self/exe` here, so its equivalent checks were executed
 with the direct Clippy driver, followed by the same offline build/run commands.
-The ledger remains **201 verified / 8,690 unresolved / 251 excluded**. No broad
+The ledger is **206 verified / 8,685 unresolved / 251 excluded**. No broad
 provider/runtime acceptance entry is closed by this bounded continuation, and
 credential-dependent live tests remain unverified.
 

@@ -99,11 +99,11 @@ pub async fn fetch_model_metadata(
 pub struct ModelMetadata {
     #[serde(alias = "slug")]
     pub id: String,
-    pub context_window: Option<u64>,
-    pub max_context_window: Option<u64>,
-    pub max_output_tokens: Option<u64>,
-    pub auto_compact_token_limit: Option<u64>,
-    pub effective_context_window_percent: Option<u64>,
+    pub context_window: Option<i64>,
+    pub max_context_window: Option<i64>,
+    pub max_output_tokens: Option<i64>,
+    pub auto_compact_token_limit: Option<i64>,
+    pub effective_context_window_percent: Option<i64>,
     pub display_name: String,
     pub description: String,
     pub visibility: String,
@@ -122,26 +122,38 @@ impl ModelMetadata {
         self.context_window
             .filter(|v| *v > 0)
             .or(self.max_context_window.filter(|v| *v > 0))
+            .map(|value| value as u64)
     }
     /// Baseline compaction trigger and target, in tokens.
     pub fn compaction_defaults(&self) -> Option<(u64, u64)> {
         let mut trigger = self.auto_compact_token_limit.unwrap_or(0);
         let mut target = trigger / 2;
         if let Some(context) = self.resolved_context_window() {
-            let limit = (u128::from(context) * 9 / 10) as u64;
-            if trigger == 0 || trigger > limit {
+            // Preserve the pinned 64-bit SDK arithmetic for reported metadata limits.
+            let limit = (context as i64).wrapping_mul(9) / 10;
+            if trigger <= 0 || trigger > limit {
                 trigger = limit;
             }
-            target = context / 2;
+            target = context as i64 / 2;
         }
-        if trigger == 0 {
+        if trigger <= 0 {
             return None;
         }
-        if target == 0 || target >= trigger {
+        if target <= 0 || target >= trigger {
             target = trigger / 2;
         }
-        Some((trigger, target))
+        Some((trigger as u64, target as u64))
     }
+}
+
+// Raw JSON preserves integer -0 without admitting fractions or exponent notation.
+fn metadata_integer<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<i64>, D::Error> {
+    use serde::Deserialize;
+    Option::<Box<serde_json::value::RawValue>>::deserialize(deserializer)?
+        .map(|raw| raw.get().parse().map_err(serde::de::Error::custom))
+        .transpose()
 }
 
 /// Decode the pinned OpenAI, Codex, or Copilot catalog shape. First duplicate
@@ -151,36 +163,55 @@ pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
     #[derive(Default, serde::Deserialize)]
     #[serde(default)]
     struct Limits {
-        max_context_window_tokens: Option<u64>,
-        max_prompt_tokens: Option<u64>,
-        max_output_tokens: Option<u64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        max_context_window_tokens: Option<i64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        max_prompt_tokens: Option<i64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        max_output_tokens: Option<i64>,
     }
     #[derive(Default, serde::Deserialize)]
     #[serde(default)]
     struct Capabilities {
-        limits: Limits,
+        limits: Option<Limits>,
     }
     #[derive(serde::Deserialize)]
     struct Effort {
-        effort: String,
+        effort: Option<String>,
     }
     #[derive(serde::Deserialize)]
     struct Upgrade {
-        model: String,
+        model: Option<String>,
     }
     #[derive(serde::Deserialize)]
-    struct Entry {
-        #[serde(flatten)]
-        metadata: ModelMetadata,
-        #[serde(default)]
-        capabilities: Capabilities,
-        supported_reasoning_levels: Option<Vec<Effort>>,
+    struct CodexEntry {
+        slug: Option<String>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        context_window: Option<i64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        max_context_window: Option<i64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        auto_compact_token_limit: Option<i64>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        effective_context_window_percent: Option<i64>,
+        display_name: Option<String>,
+        description: Option<String>,
+        visibility: Option<String>,
+        #[serde(default, deserialize_with = "metadata_integer")]
+        priority: Option<i64>,
+        default_reasoning_level: Option<String>,
+        supported_reasoning_levels: Option<Vec<Option<Effort>>>,
         upgrade: Option<Upgrade>,
     }
     #[derive(serde::Deserialize)]
+    struct DataEntry {
+        id: Option<String>,
+        capabilities: Option<Capabilities>,
+    }
+    #[derive(serde::Deserialize)]
     struct Catalog {
-        models: Option<Vec<Entry>>,
-        data: Option<Vec<Entry>>,
+        models: Option<Vec<Option<CodexEntry>>>,
+        data: Option<Vec<Option<DataEntry>>>,
     }
     if body.len() > 8 * 1024 * 1024 {
         return Err(crate::invalid("model metadata exceeds response limit"));
@@ -188,40 +219,69 @@ pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
     let catalog: Catalog = serde_json::from_slice(body)
         .map_err(|_| crate::invalid("invalid model metadata response"))?;
     let models = catalog.models.unwrap_or_default();
-    let codex = !models.is_empty();
-    let entries = if codex {
+    let entries: Vec<ModelMetadata> = if !models.is_empty() {
         models
+            .into_iter()
+            .flatten()
+            .map(|entry| ModelMetadata {
+                id: entry.slug.unwrap_or_default(),
+                context_window: entry.context_window,
+                max_context_window: entry.max_context_window,
+                auto_compact_token_limit: entry.auto_compact_token_limit,
+                effective_context_window_percent: entry.effective_context_window_percent,
+                display_name: entry.display_name.unwrap_or_default().trim().to_owned(),
+                description: entry.description.unwrap_or_default().trim().to_owned(),
+                visibility: metadata_key(&entry.visibility.unwrap_or_default()),
+                priority: entry.priority,
+                default_reasoning_level: metadata_key(
+                    &entry.default_reasoning_level.unwrap_or_default(),
+                ),
+                supported_reasoning_levels: entry
+                    .supported_reasoning_levels
+                    .unwrap_or_default()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|level| {
+                        let effort = metadata_key(&level.effort.unwrap_or_default());
+                        (!effort.is_empty()).then_some(effort)
+                    })
+                    .collect(),
+                upgrade_model: entry
+                    .upgrade
+                    .map(|upgrade| upgrade.model.unwrap_or_default().trim().to_owned()),
+                ..Default::default()
+            })
+            .collect()
     } else {
-        catalog.data.unwrap_or_default()
+        catalog
+            .data
+            .unwrap_or_default()
+            .into_iter()
+            .flatten()
+            .map(|entry| {
+                let limits = entry
+                    .capabilities
+                    .unwrap_or_default()
+                    .limits
+                    .unwrap_or_default();
+                ModelMetadata {
+                    id: entry.id.unwrap_or_default(),
+                    context_window: limits
+                        .max_context_window_tokens
+                        .filter(|v| *v != 0)
+                        .or(limits.max_prompt_tokens),
+                    max_context_window: limits.max_context_window_tokens,
+                    max_output_tokens: limits.max_output_tokens,
+                    ..Default::default()
+                }
+            })
+            .collect()
     };
     let mut unique = BTreeMap::new();
-    for entry in entries {
-        let mut meta = entry.metadata;
+    for mut meta in entries {
         meta.id = meta.id.trim().to_owned();
         if meta.id.is_empty() {
             continue;
-        }
-        if codex {
-            meta.display_name = meta.display_name.trim().to_owned();
-            meta.description = meta.description.trim().to_owned();
-            meta.visibility = meta.visibility.trim().to_ascii_lowercase();
-            meta.default_reasoning_level = meta.default_reasoning_level.trim().to_ascii_lowercase();
-            meta.supported_reasoning_levels = entry
-                .supported_reasoning_levels
-                .unwrap_or_default()
-                .into_iter()
-                .map(|level| level.effort.trim().to_ascii_lowercase())
-                .filter(|level| !level.is_empty())
-                .collect();
-            meta.upgrade_model = entry.upgrade.map(|upgrade| upgrade.model.trim().to_owned());
-        } else {
-            let limits = entry.capabilities.limits;
-            meta.context_window = limits
-                .max_context_window_tokens
-                .filter(|v| *v > 0)
-                .or(limits.max_prompt_tokens);
-            meta.max_context_window = limits.max_context_window_tokens;
-            meta.max_output_tokens = limits.max_output_tokens;
         }
         unique.entry(metadata_key(&meta.id)).or_insert(meta);
     }
@@ -250,8 +310,12 @@ pub fn model_metadata_by_id(models: &[ModelMetadata]) -> BTreeMap<String, ModelM
 }
 
 pub(crate) fn metadata_key(id: &str) -> String {
+    metadata_lower(id.trim())
+}
+
+fn metadata_lower(value: &str) -> String {
     // The pinned Go uses Unicode 15 simple mappings, not Rust's expanding lowercase.
-    id.trim()
+    value
         .chars()
         .map(|c| {
             if unicode_general_category::get_general_category(c)
@@ -275,7 +339,7 @@ pub fn picker_model_metadata(models: &[ModelMetadata]) -> Vec<ModelMetadata> {
         (
             meta.priority.filter(|priority| *priority > 0).is_none(),
             meta.priority.filter(|priority| *priority > 0).unwrap_or(0),
-            meta.id.to_ascii_lowercase(),
+            metadata_lower(&meta.id),
         )
     });
     models

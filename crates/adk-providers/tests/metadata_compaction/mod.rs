@@ -218,3 +218,83 @@ async fn independent_session_scopes_never_share_catalogs() {
     server_a.join().unwrap();
     server_b.join().unwrap();
 }
+
+#[test]
+fn catalog_shapes_and_nullable_fields_match_pinned_sdk() {
+    for case in fixture()["catalog_cases"].as_array().unwrap() {
+        let result = parse_model_metadata(case["body"].as_str().unwrap().as_bytes());
+        assert_eq!(
+            result.is_err(),
+            case["error"].as_bool().unwrap(),
+            "{}",
+            case["name"]
+        );
+        if case["error"] == true {
+            continue;
+        }
+        let models = result.unwrap();
+        let picker: Vec<_> = picker_model_metadata(&models)
+            .into_iter()
+            .map(|model| model.id)
+            .collect();
+        assert_eq!(json!(picker), case["picker"], "{}", case["name"]);
+        let expected = case["models"].as_array().unwrap();
+        assert_eq!(models.len(), expected.len(), "{}", case["name"]);
+        let defaults = case["defaults"].as_array().unwrap();
+        assert_eq!(expected.len(), defaults.len());
+        for ((model, expected), defaults) in models.iter().zip(expected).zip(defaults) {
+            let actual = json!({
+                "ID": model.id,
+                "ContextWindow": model.context_window.unwrap_or(0),
+                "MaxContextWindow": model.max_context_window.unwrap_or(0),
+                "MaxOutputTokens": model.max_output_tokens.unwrap_or(0),
+                "AutoCompactTokenLimit": model.auto_compact_token_limit.unwrap_or(0),
+                "EffectiveContextWindowPercent": model.effective_context_window_percent.unwrap_or(0),
+                "DisplayName": model.display_name,
+                "Description": model.description,
+                "Visibility": model.visibility,
+                "Priority": model.priority.unwrap_or(0),
+                "DefaultReasoningLevel": model.default_reasoning_level,
+                "SupportedReasoningLevels": (!model.supported_reasoning_levels.is_empty()).then_some(&model.supported_reasoning_levels),
+                "UpgradeModel": model.upgrade_model.as_deref().unwrap_or(""),
+            });
+            assert_eq!(&actual, expected, "{}", case["name"]);
+            let expected_defaults = defaults["valid"].as_bool().unwrap().then(|| {
+                (
+                    defaults["trigger"].as_u64().unwrap(),
+                    defaults["target"].as_u64().unwrap(),
+                )
+            });
+            assert_eq!(
+                model.compaction_defaults(),
+                expected_defaults,
+                "{}",
+                case["name"]
+            );
+        }
+    }
+}
+
+#[test]
+fn metadata_thresholds_match_pinned_sdk_signed_boundary_grid() {
+    let fixture = fixture();
+    let cases = fixture["threshold_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 219);
+    for case in cases {
+        let metadata = ModelMetadata {
+            id: case["id"].as_str().unwrap().into(),
+            context_window: Some(case["context"].as_i64().unwrap()),
+            max_context_window: Some(case["max_context"].as_i64().unwrap()),
+            auto_compact_token_limit: Some(case["auto_limit"].as_i64().unwrap()),
+            effective_context_window_percent: Some(case["percent"].as_i64().unwrap()),
+            ..Default::default()
+        };
+        let expected = case["valid"].as_bool().unwrap().then(|| {
+            (
+                case["trigger"].as_u64().unwrap(),
+                case["target"].as_u64().unwrap(),
+            )
+        });
+        assert_eq!(metadata.compaction_defaults(), expected, "{case}");
+    }
+}

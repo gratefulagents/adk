@@ -11,6 +11,12 @@ It checks full-name precedence, first-slash aliases, case folding (including Δ 
 oracle changes only the test resolver's timestamp; it does not patch SDK code.
 A length-prefixed UTF-8 SHA-256 digest checks the first normalized lookup key for
 all 1,112,064 Unicode scalar values using the pinned Go Unicode 15 tables.
+Eighteen additional catalog cases execute the SDK fetch/decode path and compare
+all metadata fields and derived thresholds: separate shapes, unknown fields, nulls,
+signed bounds, integer -0, overflow, Unicode labels and picker ordering.
+A separate 219-case direct-helper grid covers signed threshold arithmetic and
+the exact three upstream compaction-default regression inputs; those upstream
+tests also execute freshly.
 Source and harness digests are embedded in the observations. No live-provider claim.
 
 Native tests additionally check lazy construction, shared concurrent fetches,

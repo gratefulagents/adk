@@ -339,7 +339,8 @@ def apply_rust_evidence(entries, records, reference):
     for marker in ("Pinned SDK MCP prompt observations reproduced exactly",
                    "Pinned SDK run instructions observations reproduced exactly",
                    "Pinned SDK workspace context observations reproduced exactly",
-                   "Pinned SDK project-state runtime observations reproduced exactly"):
+                   "Pinned SDK project-state runtime observations reproduced exactly",
+                       "Pinned metadata compaction observations reproduced exactly"):
         if marker not in evidence.get("reference_fixture_check", ""):
             raise SystemExit("Rust builder evidence requires independently executed pinned fixtures")
     if evidence.get("environment", {}).get("ADK_TEST_GO") != "1":

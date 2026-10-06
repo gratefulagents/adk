@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Host model-compaction resolver
+
+The native async resolver API and builder gate now match 48 pinned request/call
+observations for feature selection, misses, zero/valid trigger values, target
+normalization, single/continuing runs and complete/streamed providers. Four
+additional executed cases verify retry/fallback model names and callback counts.
+The first fallback comparison failed because the Go fixture used the single-model
+constructor (which does not switch models); it now uses an explicit recording
+provider, matching the native named-model graph rather than changing expected
+names by hand. Native regressions additionally cover disabled local compaction,
+shared custom/local resolution, cancellation, host failure, and durable key
+requirements/change rejection/terminal non-replay. Automatic provider metadata
+fetch/cache composition remains open. No additional ledger closure is asserted.
+
 ### Explicit builder compaction-policy precedence
 
 `Config.local_compaction` is an optional typed host override, distinct from

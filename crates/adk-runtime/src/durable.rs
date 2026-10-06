@@ -651,6 +651,10 @@ impl Runner {
                 .chain(&config.tool_output_guardrails)
                 .any(|g| g.durable_key().is_none_or(str::is_empty))
             || config.compaction.is_some()
+            || config
+                .compaction_model_resolver
+                .as_ref()
+                .is_some_and(|resolver| resolver.durable_key().is_none_or(str::is_empty))
             || config.turn_context.is_some()
             || config
                 .compaction_carry_forward
@@ -667,7 +671,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, or replay-unsafe immediate input or carry-forward callbacks, guardrails, stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -744,6 +748,9 @@ impl Runner {
         let compaction = config.local_compaction;
         if let Some(resolve) = config.compaction_model_defaults {
             baseline["compaction_model_defaults"] = serde_json::json!(resolve);
+        }
+        if let Some(resolver) = &config.compaction_model_resolver {
+            baseline["compaction_model_resolver"] = serde_json::json!(resolver.durable_key());
         }
         if compaction != LocalCompactionPolicy::default() {
             baseline["local_compaction"] = serde_json::json!({

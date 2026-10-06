@@ -15,12 +15,33 @@ import (
 
 type instructionModel struct {
 	blockingModel
-	requests []agentsdk.ModelRequest
+	requests     []agentsdk.ModelRequest
+	continueOnce bool
+	failOnce     bool
 }
+
+type instructionProvider struct{ model *instructionModel }
+
+func (p *instructionProvider) GetModel(string) (agentsdk.Model, error) { return p.model, nil }
+func (p *instructionProvider) Close() error                            { return nil }
 
 func (m *instructionModel) GetResponse(_ context.Context, req agentsdk.ModelRequest) (*agentsdk.ModelResponse, error) {
 	m.requests = append(m.requests, req)
-	return &agentsdk.ModelResponse{Items: []agentsdk.RunItem{{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: "done"}}}}, nil
+	if m.failOnce && len(m.requests) == 1 {
+		return nil, fmt.Errorf("overloaded")
+	}
+	response := &agentsdk.ModelResponse{Items: []agentsdk.RunItem{{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: "done"}}}}
+	if m.continueOnce && len(m.requests) == 1 {
+		end := false
+		response.EndTurn = &end
+	}
+	return response, nil
+}
+func (m *instructionModel) GetRetryAdvice(error) *agentsdk.ModelRetryAdvice {
+	if m.failOnce {
+		return &agentsdk.ModelRetryAdvice{ShouldRetry: true, Reason: "overloaded"}
+	}
+	return nil
 }
 func (m *instructionModel) StreamResponse(ctx context.Context, req agentsdk.ModelRequest) (*agentsdk.ModelStream, error) {
 	response, err := m.GetResponse(ctx, req)
@@ -123,6 +144,100 @@ func TestRunInstructionsReference(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err = os.WriteFile(os.Getenv("RUN_COMPACTION_OUTPUT"), data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	resolvers := []map[string]any{}
+	for _, feature := range []bool{false, true} {
+		for _, thresholds := range [][3]int{{0, 0, 0}, {0, 10, 1}, {300000, 150000, 1}, {90000, 40000, 1}, {90000, 0, 1}, {90000, 180000, 1}} {
+			for _, streaming := range []bool{false, true} {
+				for _, continuing := range []bool{false, true} {
+					calls := []string{}
+					config := Config{Model: "gpt-5-mini", Features: &Features{Runtime: RuntimeFeatures{Compaction: feature}},
+						CompactionConfig: &agentsdk.CompactionConfig{Enabled: true, TriggerTokens: 180000, TargetTokens: 100000, PreserveRecentItems: 12, PreserveInitialUserMessages: 2, SummaryBulletLimit: 4},
+						CompactionModelResolver: func(_ context.Context, model string) (int, int, bool) {
+							calls = append(calls, model)
+							return thresholds[0], thresholds[1], thresholds[2] == 1
+						},
+					}
+					cfg := BuildRunConfig(config, nil)
+					cfg.MaxTurns = 3
+					m := &instructionModel{continueOnce: continuing}
+					r := agentsdk.NewRunnerWithModel(m)
+					a := &agentsdk.Agent{Name: "agent", Model: config.Model, Instructions: "base"}
+					input := []agentsdk.RunItem{}
+					for i := 0; i < 100; i++ {
+						repeat := 400
+						if i >= 80 {
+							repeat = 2
+						}
+						input = append(input, agentsdk.RunItem{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: fmt.Sprintf("message %03d: ", i) + strings.Repeat("old conversation ", repeat)}})
+					}
+					if streaming {
+						s := r.RunStreamed(context.Background(), a, input, cfg)
+						for range s.Events {
+						}
+						if s.FinalResult().FinalText() != "done" {
+							t.Fatal("missing streamed answer")
+						}
+					} else {
+						out, err := r.Run(context.Background(), a, input, cfg)
+						if err != nil || out.FinalText() != "done" {
+							t.Fatalf("resolver run: %v", err)
+						}
+					}
+					digests := []string{}
+					for _, req := range m.requests {
+						h := sha256.New()
+						for _, item := range req.Input {
+							if item.Message == nil {
+								t.Fatal("unexpected nonmessage")
+							}
+							fmt.Fprintf(h, "%d:%s", len(item.Message.Text), item.Message.Text)
+						}
+						digests = append(digests, fmt.Sprintf("%x", h.Sum(nil)))
+					}
+					resolvers = append(resolvers, map[string]any{"feature": feature, "thresholds": thresholds, "streaming": streaming, "continuing": continuing, "models": calls, "text_digests": digests})
+				}
+			}
+		}
+	}
+	for _, fallback := range []bool{false, true} {
+		for _, streaming := range []bool{false, true} {
+			calls := []string{}
+			cfg := agentsdk.RunConfig{MaxTurns: 3, CompactionConfig: agentsdk.CompactionConfig{Enabled: true, TriggerTokens: 180000, TargetTokens: 100000}, CompactionModelResolver: func(_ context.Context, model string) (int, int, bool) {
+				calls = append(calls, model)
+				return 0, 0, false
+			}}
+			if fallback {
+				cfg.FallbackModels = []string{"gpt-6"}
+			}
+			m := &instructionModel{failOnce: true}
+			r := agentsdk.NewRunnerWithModel(m)
+			if fallback {
+				r = agentsdk.NewRunnerWithProvider(&instructionProvider{model: m})
+			}
+			a := &agentsdk.Agent{Name: "agent", Model: "gpt-5-mini"}
+			if streaming {
+				s := r.RunStreamed(context.Background(), a, nil, cfg)
+				for range s.Events {
+				}
+				if s.FinalResult().FinalText() != "done" {
+					t.Fatal("missing retry streamed answer")
+				}
+			} else {
+				out, err := r.Run(context.Background(), a, nil, cfg)
+				if err != nil || out.FinalText() != "done" {
+					t.Fatalf("retry run: %v", err)
+				}
+			}
+			resolvers = append(resolvers, map[string]any{"retry": true, "fallback": fallback, "streaming": streaming, "models": calls})
+		}
+	}
+	data, err = json.Marshal(resolvers)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.WriteFile(os.Getenv("RUN_RESOLVER_OUTPUT"), data, 0600); err != nil {
 		t.Fatal(err)
 	}
 }

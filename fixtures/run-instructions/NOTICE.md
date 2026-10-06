@@ -29,6 +29,14 @@ runner customization: absent/disabled/enabled/default-valued policies with the
 compaction feature on/off. Their threshold resolution follows the SDK feature;
 default-valued overrides use intermediate-size input to expose that distinction.
 
+`resolver_cases` adds 48 actual request/callback observations and four
+retry/fallback observations. Request digests frame each message as its byte
+length, a colon, then exact text, preserving ordering without storing large
+synthetic histories. Misses, zero triggers, valid thresholds, target
+normalization, continuing turns and feature gates are exercised. Fallback cases
+use an explicit recording `ModelProvider`; the SDK's single-model constructor
+intentionally cannot switch models. No external metadata service is consulted.
+
 SDK-derived fixture text and ported composition retain upstream ownership and
 **GPL-3.0-only** licensing. The original license is retained in
 [`../licenses/SDK-GPL-3.0.txt`](../licenses/SDK-GPL-3.0.txt).

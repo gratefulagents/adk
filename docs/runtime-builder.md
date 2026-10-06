@@ -639,6 +639,24 @@ unchanged. `RunnerConfig.compaction_model_defaults` distinguishes `Some(true)`
 (resolve per model), `Some(false)` (fixed), and `None` (direct-runtime default
 selection). This choice is fingerprinted for durable recovery.
 
+`RunnerConfig.compaction_model_resolver` accepts a host-owned async
+`CompactionModelResolver`. A positive trigger overrides token thresholds for
+the active model; `None` or zero trigger retains the configured policy, without
+falling through to model defaults. Zero/oversized targets normalize normally.
+The same resolution is shared by local and custom compaction within an attempt;
+new attempts, continuing turns and fallback models resolve again. The builder
+retains this callback only when the compaction feature is selected, as in the SDK.
+Resolution honors cancellation/deadlines. Native callback errors abort before
+provider dispatch; unavailable metadata should instead return `Ok(None)`.
+Durable use requires a nonempty key covering deterministic, replay-safe behavior
+and configuration; network discovery must not opt into that contract.
+
+Provider catalog fetching/caching and automatic metadata resolver assembly are
+still host-owned, not automatically wired by the builder. The existing
+`adk::providers::metadata::ModelMetadata::compaction_defaults` helper can supply
+thresholds for an explicitly loaded catalog. This does not claim the SDK's
+automatic authenticated `/models` lookup/default cache behavior.
+
 ```rust
 let config = adk::builder::Config {
     local_compaction: Some(adk::runtime::compaction::LocalCompactionPolicy {

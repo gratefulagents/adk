@@ -1697,6 +1697,9 @@ impl Builder {
         if !self.runner.local_compaction.enabled {
             self.runner.compaction = None;
         }
+        if !features.compaction {
+            self.runner.compaction_model_resolver = None;
+        }
         if self.runner.cost_estimator.is_none() {
             self.runner.cost_estimator =
                 Some(Arc::new(adk_providers::runtime::BaselineCosts(routes)));

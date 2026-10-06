@@ -809,3 +809,330 @@ async fn durable_local_compaction_policy_is_bound_and_normalized() {
         .unwrap();
     }
 }
+
+#[derive(Default)]
+struct ThresholdResolver {
+    value: Option<(u64, u64)>,
+    key: Option<&'static str>,
+    models: Mutex<Vec<String>>,
+    fail: bool,
+}
+impl CompactionModelResolver for ThresholdResolver {
+    fn thresholds<'a>(
+        &'a self,
+        _: &'a Context,
+        model: &'a str,
+    ) -> BoxFuture<'a, Result<Option<(u64, u64)>, Error>> {
+        Box::pin(async move {
+            self.models.lock().unwrap().push(model.into());
+            if self.fail {
+                Err(Error::new(ErrorCategory::Host, "resolver failed"))
+            } else {
+                Ok(self.value)
+            }
+        })
+    }
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+}
+#[tokio::test]
+async fn resolver_failures_and_unsafe_durable_callbacks_prevent_model_dispatch() {
+    for key in [None, Some("")] {
+        let model = Arc::new(ModelImpl::default());
+        let resolver = Arc::new(ThresholdResolver {
+            key,
+            ..Default::default()
+        });
+        let error = runner(
+            model.clone(),
+            RunnerConfig {
+                compaction_model_resolver: Some(resolver.clone()),
+                ..Default::default()
+            },
+        )
+        .run_durable(
+            context("resolver"),
+            request(vec![]),
+            Arc::new(HostImpl),
+            DurableRun::new(Arc::new(Store::default())),
+        )
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+        assert!(resolver.models.lock().unwrap().is_empty());
+        assert!(model.requests.lock().unwrap().is_empty());
+    }
+    let model = Arc::new(ModelImpl::default());
+    let error = runner(
+        model.clone(),
+        RunnerConfig {
+            compaction_model_resolver: Some(Arc::new(ThresholdResolver {
+                fail: true,
+                ..Default::default()
+            })),
+            ..Default::default()
+        },
+    )
+    .run(context("failure"), request(vec![]), Arc::new(HostImpl))
+    .await
+    .err()
+    .unwrap();
+    assert_eq!(error.error.info.message, "resolver failed");
+    assert!(model.requests.lock().unwrap().is_empty());
+}
+#[tokio::test]
+async fn resolver_durable_identity_is_bound_and_terminal_recovery_does_not_replay() {
+    let store = Arc::new(Store::default());
+    let resolver = Arc::new(ThresholdResolver {
+        key: Some("thresholds-v1"),
+        ..Default::default()
+    });
+    let config = RunnerConfig {
+        compaction_model_resolver: Some(resolver.clone()),
+        ..Default::default()
+    };
+    runner(Arc::new(ModelImpl::default()), config.clone())
+        .run_durable(
+            context("resolver"),
+            request(vec![]),
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone()),
+        )
+        .await
+        .unwrap();
+    let checkpoint = store.0.lock().unwrap().clone().unwrap();
+    for changed in [None, Some("thresholds-v2"), Some("thresholds-v1")] {
+        let mut next = config.clone();
+        next.compaction_model_resolver = changed.map(|key| {
+            Arc::new(ThresholdResolver {
+                key: Some(key),
+                ..Default::default()
+            }) as Arc<dyn CompactionModelResolver>
+        });
+        let model = Arc::new(ModelImpl::default());
+        let mut durable = DurableRun::new(store.clone());
+        durable.resume = Some(checkpoint.clone());
+        let result = runner(model.clone(), next)
+            .run_durable(
+                context("resolver"),
+                request(vec![]),
+                Arc::new(HostImpl),
+                durable,
+            )
+            .await;
+        if changed == Some("thresholds-v1") {
+            result.unwrap();
+        } else {
+            assert!(
+                result
+                    .err()
+                    .unwrap()
+                    .error
+                    .info
+                    .message
+                    .contains("configuration or security policy changed")
+            );
+        }
+        assert!(model.requests.lock().unwrap().is_empty());
+    }
+    assert_eq!(resolver.models.lock().unwrap().len(), 1);
+}
+struct PendingResolver(Arc<tokio::sync::Notify>);
+impl CompactionModelResolver for PendingResolver {
+    fn thresholds<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+    ) -> BoxFuture<'a, Result<Option<(u64, u64)>, Error>> {
+        Box::pin(async move {
+            self.0.notify_one();
+            std::future::pending().await
+        })
+    }
+}
+#[tokio::test]
+async fn cancellation_drops_pending_resolver_before_model_dispatch() {
+    let started = Arc::new(tokio::sync::Notify::new());
+    let token = Arc::new(CancellationToken::new());
+    let model = Arc::new(ModelImpl::default());
+    let run = runner(
+        model.clone(),
+        RunnerConfig {
+            compaction_model_resolver: Some(Arc::new(PendingResolver(started.clone()))),
+            ..Default::default()
+        },
+    );
+    let ctx = Context {
+        cancellation: token.clone(),
+        ..context("cancel-resolver")
+    };
+    let task = tokio::spawn(async move { run.run(ctx, request(vec![]), Arc::new(HostImpl)).await });
+    started.notified().await;
+    token.cancel();
+    assert_eq!(
+        task.await.unwrap().err().unwrap().error.info.category,
+        ErrorCategory::Cancelled
+    );
+    assert!(model.requests.lock().unwrap().is_empty());
+}
+struct TargetCompactor(Mutex<Vec<u64>>);
+impl Compactor for TargetCompactor {
+    fn compact<'a>(
+        &'a self,
+        _: &'a Context,
+        request: CompactionRequest,
+    ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push(request.target_tokens);
+            Ok(CompactedHistory {
+                history: request.history,
+                history_provenance: request.history_provenance,
+                context_tokens: 1,
+                usage: Usage::default(),
+                cost: 0.0,
+            })
+        })
+    }
+}
+#[tokio::test]
+async fn resolver_is_shared_by_local_and_custom_compaction_once_per_turn() {
+    let resolver = Arc::new(ThresholdResolver {
+        value: Some((60, 30)),
+        ..Default::default()
+    });
+    let compactor = Arc::new(TargetCompactor(Mutex::new(vec![])));
+    let model = Arc::new(ModelImpl {
+        responses: Mutex::new(vec![response(false), response(true)].into()),
+        ..Default::default()
+    });
+    runner(
+        model,
+        RunnerConfig {
+            compaction_model_resolver: Some(resolver.clone()),
+            compaction: Some(CompactionConfig {
+                trigger_tokens: 50,
+                target_tokens: 10,
+                compactor: compactor.clone(),
+            }),
+            ..Default::default()
+        },
+    )
+    .run(
+        context("custom-resolver"),
+        request(vec![]),
+        Arc::new(HostImpl),
+    )
+    .await
+    .unwrap();
+    assert_eq!(*compactor.0.lock().unwrap(), vec![30]);
+    assert_eq!(resolver.models.lock().unwrap().len(), 2);
+}
+
+struct RetryModel(AtomicUsize);
+impl Model for RetryModel {
+    fn provider(&self) -> &str {
+        "offline"
+    }
+    fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+        Some(ModelRetryAdvice {
+            should_retry: true,
+            retry_after: std::time::Duration::ZERO,
+            reason: "overloaded".into(),
+        })
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            if self.0.fetch_add(1, Ordering::SeqCst) == 0 {
+                Err(Error::new(ErrorCategory::Provider, "overloaded"))
+            } else {
+                Ok(response(true))
+            }
+        })
+    }
+}
+#[tokio::test]
+async fn resolver_retry_and_fallback_models_match_pinned_sdk() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["resolver_cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|case| case["retry"] == true)
+    {
+        let model = Arc::new(RetryModel(AtomicUsize::new(0)));
+        let resolver = Arc::new(ThresholdResolver::default());
+        let mut agent =
+            AgentConfig::new("agent", ModelBinding::complete("gpt-5-mini", model.clone()));
+        if case["fallback"] == true {
+            agent
+                .fallbacks
+                .push(ModelBinding::complete("gpt-6", model.clone()));
+        }
+        let run = Runner::new(
+            agent,
+            RunnerConfig {
+                compaction_model_resolver: Some(resolver.clone()),
+                retry: RetryPolicy {
+                    initial_delay: std::time::Duration::ZERO,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if case["streaming"] == true {
+            run.stream(context("retry"), request(vec![]), Arc::new(HostImpl))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            run.run(context("retry"), request(vec![]), Arc::new(HostImpl))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            json!(*resolver.models.lock().unwrap()),
+            case["models"],
+            "{case}"
+        );
+        assert_eq!(model.0.load(Ordering::SeqCst), 2);
+    }
+}
+
+#[tokio::test]
+async fn disabled_local_compaction_does_not_consult_resolver() {
+    let resolver = Arc::new(ThresholdResolver {
+        fail: true,
+        ..Default::default()
+    });
+    let model = Arc::new(ModelImpl::default());
+    runner(
+        model.clone(),
+        RunnerConfig {
+            compaction_model_resolver: Some(resolver.clone()),
+            local_compaction: LocalCompactionPolicy {
+                enabled: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .run(
+        context("disabled-resolver"),
+        request(vec![]),
+        Arc::new(HostImpl),
+    )
+    .await
+    .unwrap();
+    assert!(resolver.models.lock().unwrap().is_empty());
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
+}

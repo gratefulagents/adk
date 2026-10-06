@@ -16,6 +16,11 @@ with a nondefault local-compaction policy did not record that policy in their
 identity; they cannot establish that recovery uses the original configuration.
 There is no automatic migration for those checkpoints.
 
+Host model-threshold resolvers require an explicit nonempty `durable_key` and
+must be deterministic and replay-safe. Recovery binds that key; a changed or
+removed resolver rejects resume. Terminal recovery does not invoke the resolver.
+Network-dependent or mutable catalog lookup must not claim replay safety.
+
 ## Entry points
 
 | Capability | Public API | Detail |

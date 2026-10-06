@@ -440,6 +440,19 @@ pub trait CompactionCarryForward: Send + Sync {
     }
 }
 
+/// Host-owned model thresholds. A miss or zero trigger leaves configured thresholds unchanged.
+pub trait CompactionModelResolver: Send + Sync {
+    fn thresholds<'a>(
+        &'a self,
+        context: &'a Context,
+        model: &'a str,
+    ) -> BoxFuture<'a, Result<Option<(u64, u64)>, Error>>;
+    /// Opt in only for deterministic, replay-safe resolution; include all configuration in the key.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+}
+
 #[derive(Clone)]
 pub struct RunnerConfig {
     pub immediate_input_poller: Option<Arc<dyn ImmediateInputPoller>>,
@@ -490,6 +503,7 @@ pub struct RunnerConfig {
     pub local_compaction: LocalCompactionPolicy,
     /// Resolve thresholds per active model without changing retention. None resolves only an unchanged default policy.
     pub compaction_model_defaults: Option<bool>,
+    pub compaction_model_resolver: Option<Arc<dyn CompactionModelResolver>>,
 }
 
 impl Default for RunnerConfig {
@@ -530,6 +544,7 @@ impl Default for RunnerConfig {
             compaction: None,
             local_compaction: LocalCompactionPolicy::default(),
             compaction_model_defaults: None,
+            compaction_model_resolver: None,
         }
     }
 }
@@ -869,6 +884,7 @@ impl Runner {
             committed_cursor: 0,
             committed_markers: 0,
             calibration: EstimateCalibration::default(),
+            resolved_compaction: None,
             fallbacks: HashMap::new(),
             cost: 0.0,
             tool_pause: false,
@@ -914,6 +930,12 @@ struct ExecutedTool {
     hook_error: Option<Error>,
 }
 
+struct ResolvedCompaction {
+    turn: u32,
+    model: String,
+    thresholds: Option<(u64, u64)>,
+}
+
 struct Engine {
     started: Instant,
     last_model: Option<String>,
@@ -942,6 +964,7 @@ struct Engine {
     committed_cursor: usize,
     committed_markers: usize,
     calibration: EstimateCalibration,
+    resolved_compaction: Option<ResolvedCompaction>,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
     tool_pause: bool,
@@ -1504,10 +1527,57 @@ impl Engine {
         }
         Ok(())
     }
+    async fn resolve_compaction(
+        &mut self,
+        model: &str,
+        turn: u32,
+    ) -> Result<Option<(u64, u64)>, Error> {
+        let Some(resolver) = self.config.compaction_model_resolver.clone() else {
+            return Ok(None);
+        };
+        if let Some(resolved) = &self.resolved_compaction
+            && resolved.turn == turn
+            && resolved.model == model
+        {
+            return Ok(resolved.thresholds);
+        }
+        let thresholds = bounded(
+            &self.context,
+            None,
+            resolver.thresholds(&self.context, model),
+        )
+        .await?
+        .filter(|(trigger, _)| *trigger > 0);
+        self.resolved_compaction = Some(ResolvedCompaction {
+            turn,
+            model: model.into(),
+            thresholds,
+        });
+        Ok(thresholds)
+    }
     async fn compact(&mut self) -> Result<(), Error> {
-        let Some(config) = &self.config.compaction else {
+        let Some(mut config) = self.config.compaction.clone() else {
             return Ok(());
         };
+        let model = self
+            .fallbacks
+            .get(&(Arc::as_ptr(&self.agent) as usize))
+            .map_or_else(
+                || self.agent.model.name(),
+                |(index, _)| self.agent.fallbacks[index - 1].name(),
+            )
+            .to_owned();
+        if let Some((trigger, target)) = self
+            .resolve_compaction(&model, self.turns.saturating_add(1))
+            .await?
+        {
+            config.trigger_tokens = trigger;
+            config.target_tokens = if target == 0 || target >= trigger {
+                (trigger / 2).max(1)
+            } else {
+                target
+            };
+        }
         let Some(tokens) = self.result.usage.context_tokens else {
             return Ok(());
         };
@@ -1517,14 +1587,7 @@ impl Engine {
         let before_items = self.result.history.len();
         let request = CompactionRequest {
             agent: self.agent.name.clone(),
-            model: self
-                .fallbacks
-                .get(&(Arc::as_ptr(&self.agent) as usize))
-                .map_or_else(
-                    || self.agent.model.name(),
-                    |(index, _)| self.agent.fallbacks[index - 1].name(),
-                )
-                .into(),
+            model,
             history: self.result.history.clone(),
             history_provenance: self.result.history_provenance.clone(),
             context_tokens: tokens,
@@ -1600,10 +1663,22 @@ impl Engine {
         forced: bool,
     ) -> Result<bool, Error> {
         let mut policy = self.config.local_compaction;
-        if self
-            .config
-            .compaction_model_defaults
-            .unwrap_or(policy == LocalCompactionPolicy::default())
+        if policy.enabled && self.config.compaction_model_resolver.is_some() {
+            let turn = if forced {
+                self.turns
+            } else {
+                self.turns.saturating_add(1)
+            };
+            if let Some((trigger, target)) = self.resolve_compaction(&request.model, turn).await? {
+                policy.trigger_tokens = trigger;
+                policy.target_tokens = target;
+                policy = policy.normalized();
+            }
+        } else if self.config.compaction_model_resolver.is_none()
+            && self
+                .config
+                .compaction_model_defaults
+                .unwrap_or(policy == LocalCompactionPolicy::default())
         {
             let defaults = LocalCompactionPolicy::for_model(&request.model);
             policy.trigger_tokens = defaults.trigger_tokens;
@@ -2252,6 +2327,10 @@ impl Engine {
                     request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
                     request.tools.clear();
                     declared_tool_timeouts.clear();
+                    self.compact_local(&mut request, false).await?;
+                }
+                if self.config.compaction_model_resolver.is_some() {
+                    request.model = binding.name().into();
                     self.compact_local(&mut request, false).await?;
                 }
                 self.turns += 1;

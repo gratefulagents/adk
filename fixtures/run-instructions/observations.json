@@ -2643,8 +2643,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "6c0236b4f001d3a4b89c21236aa271bb06def636abce7bdbf69d0f4c257c3089",
-      "scripts/run-instructions-reference/run.py": "091ac69fde7bcbd16f6f8a7a05a80973e91cc6d29cd749bb5d0597b338f082fb"
+      "scripts/run-instructions-reference/reference_test.go": "7f22dc4bba34e44ea10f4fa304e741efb5f4b00f1e5c825800ce06d41abc1c43",
+      "scripts/run-instructions-reference/run.py": "0cb9a3565ff16fedad687149813b15ac03e007f14579af12eef7e402f84fafb0"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",
     "normalization": "No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. No deprecated alias, output schema or MCP claim.",
@@ -2660,5 +2660,799 @@
       "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",
       "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0"
     }
-  }
+  },
+  "resolver_cases": [
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": false,
+      "models": [],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        0,
+        10,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "ae8cc45deb27aefb77e89a285f8e5e7ca78bb49e0fbb76afab7837d9b1fac624",
+        "8483b94f26beb9da004ef675712636177ddc9240ceb415b0c9f0c7ac5577e5f9"
+      ],
+      "thresholds": [
+        300000,
+        150000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        40000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        0,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": false,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": false,
+      "feature": true,
+      "models": [
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "continuing": true,
+      "feature": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "streaming": true,
+      "text_digests": [
+        "f30cb36dd3dc8918b67976c23aeceb1b905485668f6d0984fd351285de8275ec",
+        "af880962fa275361de31bc340c48bdcd75a4710aa224bbb1f16b550e2a4413e9"
+      ],
+      "thresholds": [
+        90000,
+        180000,
+        1
+      ]
+    },
+    {
+      "fallback": false,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "retry": true,
+      "streaming": false
+    },
+    {
+      "fallback": false,
+      "models": [
+        "gpt-5-mini",
+        "gpt-5-mini"
+      ],
+      "retry": true,
+      "streaming": true
+    },
+    {
+      "fallback": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-6"
+      ],
+      "retry": true,
+      "streaming": false
+    },
+    {
+      "fallback": true,
+      "models": [
+        "gpt-5-mini",
+        "gpt-6"
+      ],
+      "retry": true,
+      "streaming": true
+    }
+  ]
 }

@@ -1,4 +1,7 @@
 #![cfg(feature = "builder")]
+#[cfg(feature = "observability")]
+#[path = "builder_compaction_resolver/mod.rs"]
+mod compaction_resolver_composition;
 #[cfg(all(feature = "mcp", unix))]
 #[path = "builder_mcp/mod.rs"]
 mod mcp_composition;

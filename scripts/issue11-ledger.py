@@ -69,6 +69,7 @@ RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo
                "crates/adk-runtime/tests/settings.rs", "crates/adk/src/builder.rs",
                "crates/adk/tests/builder.rs", "crates/adk/tests/catalog_handoffs.rs",
                "crates/adk/src/builder/workspace.rs", "crates/adk/tests/builder_workspace/mod.rs",
+               "crates/adk/tests/builder_compaction_resolver/mod.rs",
                "fixtures/workspace-context/observations.json", "scripts/workspace-context-reference/run.py",
                "scripts/workspace-context-reference/reference_test.go",
                "crates/adk/src/builder/project_state.rs", "crates/adk/tests/builder_project_state/mod.rs",

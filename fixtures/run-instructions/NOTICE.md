@@ -12,6 +12,10 @@ The disposable archive leaves the SDK checkout untouched. Source/harness hashes
 are recorded. Forty synthetic cases preserve exact text without normalization.
 No external providers, tool execution, credentials or platform services are used.
 No output-schema, MCP-context or deprecated-field fallback parity is asserted.
+Builder observations also record empty, whitespace-only, explicit and Unicode
+working-state text and the resulting SDK carry-forward default. Native builder
+tests check the recorded result after local compaction in normal and streamed
+requests, and its absence from uncompacted input.
 
 SDK-derived fixture text and ported composition retain upstream ownership and
 **GPL-3.0-only** licensing. The original license is retained in

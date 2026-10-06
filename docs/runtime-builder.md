@@ -615,6 +615,12 @@ injection**. Priming failure is nonfatal and appears in `Bundle::warnings()` as 
 sanitized diagnostic; initialization failure fails construction. Raw store
 errors and private paths are not included in these diagnostics.
 
+After priming, a full builder replaces blank working-state text with
+`Runtime state is maintained by the host adapter.` (the SDK default).
+Explicit nonblank host text and successful priming take precedence. The default
+is also injected only after compaction; direct `RunnerConfig::default()` remains
+empty, and tool-only construction does not prime or add working-state context.
+
 The eight task tools, six memory tools and `prime_context` use owned composition,
 not `ExtraTools`. Duplicate detection, role views and read-only execution policy
 still apply. Synchronous storage runs on Tokio's blocking pool. Closing or

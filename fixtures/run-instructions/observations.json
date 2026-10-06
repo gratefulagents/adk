@@ -176,7 +176,9 @@
       "final_check_instructions": "",
       "instructions": "base",
       "mode_directive_text": "",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": ""
     },
     {
       "base": "base",
@@ -186,7 +188,9 @@
       "final_check_instructions": "",
       "instructions": "base",
       "mode_directive_text": "",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": ""
     },
     {
       "base": "base",
@@ -196,7 +200,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled",
       "mode_directive_text": "",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": " \n\t"
     },
     {
       "base": "base",
@@ -206,7 +212,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled",
       "mode_directive_text": "",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": " \n\t"
     },
     {
       "base": "base",
@@ -216,7 +224,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nmode directive",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": " host state ",
+      "working_state_text": " host state "
     },
     {
       "base": "base",
@@ -226,7 +236,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nmode directive",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": " host state ",
+      "working_state_text": " host state "
     },
     {
       "base": "base",
@@ -236,7 +248,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "\u0394\nnext",
+      "working_state_text": "\u0394\nnext"
     },
     {
       "base": "base",
@@ -246,7 +260,9 @@
       "final_check_instructions": "",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "\u0394\nnext",
+      "working_state_text": "\u0394\nnext"
     },
     {
       "base": "base",
@@ -256,7 +272,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nfinal check",
       "mode_directive_text": "",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": ""
     },
     {
       "base": "base",
@@ -266,7 +284,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nfinal check",
       "mode_directive_text": "",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": ""
     },
     {
       "base": "base",
@@ -276,7 +296,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n final check",
       "mode_directive_text": "",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": " \n\t"
     },
     {
       "base": "base",
@@ -286,7 +308,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n final check",
       "mode_directive_text": "",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "Runtime state is maintained by the host adapter.",
+      "working_state_text": " \n\t"
     },
     {
       "base": "base",
@@ -296,7 +320,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nmode directive \t\n\n final check",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": " host state ",
+      "working_state_text": " host state "
     },
     {
       "base": "base",
@@ -306,7 +332,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nmode directive \t\n\n final check",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": " host state ",
+      "working_state_text": " host state "
     },
     {
       "base": "base",
@@ -316,7 +344,9 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": false
+      "streaming": false,
+      "working_state_context": "\u0394\nnext",
+      "working_state_text": "\u0394\nnext"
     },
     {
       "base": "base",
@@ -326,14 +356,16 @@
       "final_check_instructions": " final check \n",
       "instructions": "base\n\n---\n\nRuntime surface:   tools enabled \n\n\n \nmode directive \t\n\n final check",
       "mode_directive_text": " \nmode directive \t",
-      "streaming": true
+      "streaming": true,
+      "working_state_context": "\u0394\nnext",
+      "working_state_text": "\u0394\nnext"
     }
   ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "e4928c699a1696ee259346b79162e89d782155f44d219e1d0b9d31252ef7427c",
+      "scripts/run-instructions-reference/reference_test.go": "21ff7162e133cdb0455276fc8c256a922add9aae50581dc3d36c7d41ba56bd30",
       "scripts/run-instructions-reference/run.py": "9ddd1f8814ec5e2d61298b9cb7118fc7ab68ff02ed9bfd64dea2d1059ad9581b"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",

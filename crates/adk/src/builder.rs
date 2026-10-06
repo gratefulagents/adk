@@ -1626,6 +1626,10 @@ impl Builder {
         if !additional.is_empty() {
             self.runner.additional_instructions = additional;
         }
+        if self.runner.working_state_context.trim().is_empty() {
+            self.runner.working_state_context =
+                "Runtime state is maintained by the host adapter.".into();
+        }
         self.runner.work_dir = self.config.work_dir.clone();
         self.runner.output.work_dir = Some(self.config.work_dir.clone());
         self.runner.output.untrusted = features.untrusted_tool_outputs;

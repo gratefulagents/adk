@@ -190,3 +190,101 @@ async fn builder_maps_run_instruction_sections_without_changing_agent_text() {
         bundle.close().await.unwrap();
     }
 }
+
+#[tokio::test]
+async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compaction() {
+    use adk::runtime::compaction::LocalCompactionPolicy;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|c| c["builder"] == true)
+    {
+        let model = Arc::new(RecordingModel::default());
+        let mut bundle = builder(
+            Config {
+                features: Some(Features {
+                    compaction: true,
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+            &model,
+        )
+        .runner_config(RunnerConfig {
+            working_state_context: case["working_state_text"].as_str().unwrap().into(),
+            local_compaction: LocalCompactionPolicy {
+                trigger_tokens: 30_000,
+                target_tokens: 20_000,
+                preserve_recent_items: 1,
+                preserve_initial_user_messages: 1,
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .build(&context())
+        .await
+        .unwrap();
+        let message = |text: String| RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text { text }],
+            },
+        };
+        let history = (0..20)
+            .map(|_| message("old conversation ".repeat(5000)))
+            .collect();
+        if case["streaming"] == true {
+            bundle
+                .stream(context(), vec![message("hello".into())], Arc::new(TestHost))
+                .finish()
+                .await
+                .unwrap();
+            bundle
+                .stream(context(), history, Arc::new(TestHost))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            bundle
+                .run(context(), vec![message("hello".into())], Arc::new(TestHost))
+                .await
+                .unwrap();
+            bundle
+                .run(context(), history, Arc::new(TestHost))
+                .await
+                .unwrap();
+        }
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            let expected = case["working_state_context"].as_str().unwrap().trim();
+            assert_eq!(requests[0].input, vec![message("hello".into())]);
+            assert!(!requests[0].instructions.contains(expected));
+            let carry = requests[1]
+                .input
+                .iter()
+                .filter_map(|item| match item {
+                    RunItem::Message { message } => {
+                        message.content.iter().find_map(|content| match content {
+                            Content::Text { text }
+                                if text.starts_with("[COMPACTION CARRY-FORWARD]") =>
+                            {
+                                Some(text)
+                            }
+                            _ => None,
+                        })
+                    }
+                    _ => None,
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(carry.len(), 1, "{case}");
+            assert!(carry[0].ends_with(expected), "{case}: {:?}", carry[0]);
+        }
+        bundle.close().await.unwrap();
+    }
+}

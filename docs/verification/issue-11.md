@@ -2,6 +2,15 @@
 
 ## Current continuation evidence
 
+### Builder working-state fallback
+
+Full builds now select the SDK host-adapter working-state fallback only after
+project-state priming, when no nonblank text remains. Sixteen pinned builder
+observations include blank/explicit/Unicode state; native normal and streaming
+tests verify carry-forward after local compaction and absence before compaction.
+Direct runtime defaults and provider-free tool construction are unchanged. No
+new ledger closure is claimed by this bounded composition fix.
+
 ### Connected MCP prompt metadata
 
 `AgentConfig::mcp_servers` now feeds request context after additional/schema

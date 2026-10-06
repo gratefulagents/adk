@@ -42,7 +42,7 @@ func TestRunInstructionsReference(t *testing.T) {
 		}
 	}
 	for mask := 0; mask < 8; mask++ {
-		config := Config{}
+		config := Config{WorkingStateText: []string{"", " \n\t", " host state ", "Δ\nnext"}[mask%4]}
 		if mask&1 != 0 {
 			config.FeatureSummary = "  tools enabled \n"
 		}
@@ -55,7 +55,7 @@ func TestRunInstructionsReference(t *testing.T) {
 		for _, streaming := range []bool{false, true} {
 			cfg := BuildRunConfig(config, nil)
 			cfg.MaxTurns = 1
-			cases = append(cases, observeInstructions(t, "base", cfg, streaming, map[string]any{"base": "base", "extra": cfg.AdditionalInstructions, "builder": true, "streaming": streaming, "feature_summary": config.FeatureSummary, "mode_directive_text": config.ModeDirectiveText, "final_check_instructions": config.FinalCheckInstructions}))
+			cases = append(cases, observeInstructions(t, "base", cfg, streaming, map[string]any{"base": "base", "extra": cfg.AdditionalInstructions, "builder": true, "streaming": streaming, "feature_summary": config.FeatureSummary, "mode_directive_text": config.ModeDirectiveText, "final_check_instructions": config.FinalCheckInstructions, "working_state_text": config.WorkingStateText, "working_state_context": cfg.WorkingStateContext}))
 		}
 	}
 	data, err := json.Marshal(cases)

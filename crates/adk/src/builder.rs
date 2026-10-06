@@ -806,6 +806,7 @@ pub struct Builder {
     session: Option<SessionHandle>,
     owned_session: Option<SessionState>,
     runner: RunnerConfig,
+    compaction_metadata: Option<Arc<adk_providers::runtime::MetadataCompactionResolver>>,
     input_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
     output_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
     implementations: Vec<Arc<dyn Tool>>,
@@ -841,6 +842,7 @@ impl Builder {
             session: None,
             owned_session: None,
             runner: RunnerConfig::default(),
+            compaction_metadata: None,
             input_guardrails: vec![],
             output_guardrails: vec![],
             implementations: vec![],
@@ -929,6 +931,15 @@ impl Builder {
     }
     pub fn implementations(mut self, tools: impl IntoIterator<Item = Arc<dyn Tool>>) -> Self {
         self.implementations.extend(tools);
+        self
+    }
+    /// Supply an explicit credential-scoped metadata resolver without performing I/O.
+    /// A host runner resolver takes precedence; the compaction feature gates both.
+    pub fn compaction_metadata(
+        mut self,
+        resolver: Arc<adk_providers::runtime::MetadataCompactionResolver>,
+    ) -> Self {
+        self.compaction_metadata = Some(resolver);
         self
     }
     pub fn extra_tools(mut self, tools: impl IntoIterator<Item = Arc<dyn Tool>>) -> Self {
@@ -1699,6 +1710,11 @@ impl Builder {
         }
         if !features.compaction {
             self.runner.compaction_model_resolver = None;
+        } else if self.runner.compaction_model_resolver.is_none() {
+            self.runner.compaction_model_resolver = self
+                .compaction_metadata
+                .take()
+                .map(|resolver| resolver as Arc<dyn adk_runtime::CompactionModelResolver>);
         }
         if self.runner.cost_estimator.is_none() {
             self.runner.cost_estimator =

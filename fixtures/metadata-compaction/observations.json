@@ -1,0 +1,95 @@
+{
+  "cases": [
+    {
+      "found": true,
+      "model": " GPT-CUSTOM ",
+      "requests": 1,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "found": true,
+      "model": "vendor/gpt-custom",
+      "requests": 1,
+      "target": 10000,
+      "trigger": 18000,
+      "valid": true
+    },
+    {
+      "found": true,
+      "model": "other/GPT-CUSTOM",
+      "requests": 1,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "found": true,
+      "model": "other/\u0394",
+      "requests": 1,
+      "target": 2000,
+      "trigger": 3600,
+      "valid": true
+    },
+    {
+      "found": true,
+      "model": "i",
+      "requests": 1,
+      "target": 3000,
+      "trigger": 5400,
+      "valid": true
+    },
+    {
+      "found": false,
+      "model": "missing",
+      "requests": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "found": false,
+      "model": "missing",
+      "requests": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "found": false,
+      "model": "nested/other/gpt-custom",
+      "requests": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    }
+  ],
+  "catalog": "{\"models\":[{\"slug\":\"GPT-CUSTOM\",\"context_window\":10000},{\"slug\":\"vendor/gpt-custom\",\"context_window\":20000},{\"slug\":\"\u0394\",\"context_window\":4000},{\"slug\":\"\u0130\",\"context_window\":6000}]}",
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/metadata-compaction-reference/reference_test.go": "e95ed425313e6acd1dfe428e969e4aa1e0cdbbe57cc697b353be9cb95c527ec5",
+      "scripts/metadata-compaction-reference/run.py": "6729b892673503bc9dbf74c867c18ed6dfd58362fbc656e1c5508eda0ee2f45d"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/openai/model_metadata.go": "d2ae46ab9cf265461eff77e8bc3290c8aaf0af49bb68b7f1d52ee0abd9c9ea82",
+      "pkg/agentsdk/providers/openai/compaction.go": "e3438c86765f775fd9f64597a2535a08132942a6b24f1823b9c68396a5009ffb",
+      "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a"
+    }
+  },
+  "retry": {
+    "found": [
+      false,
+      false,
+      true
+    ],
+    "requests_after_cooldown": 2,
+    "requests_before_cooldown": 1
+  }
+}

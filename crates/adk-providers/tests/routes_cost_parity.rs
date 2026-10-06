@@ -14,6 +14,9 @@ use adk_runtime::CancellationToken;
 use serde_json::json;
 use std::sync::{Arc, Mutex};
 
+#[cfg(feature = "runtime")]
+mod metadata_compaction;
+
 fn context() -> Context {
     Context {
         run_id: "routes-fixture".into(),

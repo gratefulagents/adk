@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Explicit-session metadata compaction
+
+The provider runtime adapter now lazily loads an authenticated catalog, shares
+concurrent fetches, caches successes, and retries failures after a 30-second
+cooldown. Builder injection is explicit; host resolvers take precedence and the
+compaction feature gates metadata access. Lookup is bounded to 15 seconds with
+static threshold fallback, while caller cancellation remains an error. Mutable
+catalogs intentionally do not provide a durable replay key. Diagnostics are
+structured/redacted for the embedding host rather than ambient stderr logging.
+
+Eight independent pinned SDK lookup observations plus a failed-fetch/cooldown
+sequence reproduce byte-for-byte. Native tests also cover concurrency, separate
+session scopes, timeout/cancellation, zero construction I/O and four builder
+selection combinations. The fixtures caught an initial test catalog using the
+plain OpenAI shape instead of Codex metadata; the corrected oracle uses `models`
+and `slug`. Unicode Δ and İ lookup/dedup keys no longer use ASCII-only folding;
+exhaustive Unicode-version equivalence is not claimed.
+
+Fresh workspace verification: **1,217 passed, 0 failed, 30 ignored**. Strict
+Clippy, documentation build, source locks and the 18 ledger-validator tests pass.
+The facade feature matrix and standalone consumer pass; all 20 feature examples
+and the owned host-session example pass offline. The example script's cargo-clippy
+launcher cannot find `/proc/self/exe` here, so its equivalent checks were executed
+with the direct Clippy driver, followed by the same offline build/run commands.
+The ledger remains **201 verified / 8,690 unresolved / 251 excluded**. No broad
+provider/runtime acceptance entry is closed by this bounded continuation, and
+credential-dependent live tests remain unverified.
+
 ### Host model-compaction resolver
 
 The native async resolver API and builder gate now match 48 pinned request/call
@@ -13,8 +41,9 @@ constructor (which does not switch models); it now uses an explicit recording
 provider, matching the native named-model graph rather than changing expected
 names by hand. Native regressions additionally cover disabled local compaction,
 shared custom/local resolution, cancellation, host failure, and durable key
-requirements/change rejection/terminal non-replay. Automatic provider metadata
-fetch/cache composition remains open. No additional ledger closure is asserted.
+requirements/change rejection/terminal non-replay. The explicit-session provider
+metadata continuation above adds fetch/cache composition without implicit route
+credential discovery. No additional ledger closure is asserted.
 
 ### Explicit builder compaction-policy precedence
 

@@ -223,7 +223,7 @@ pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
             meta.max_context_window = limits.max_context_window_tokens;
             meta.max_output_tokens = limits.max_output_tokens;
         }
-        unique.entry(meta.id.to_ascii_lowercase()).or_insert(meta);
+        unique.entry(metadata_key(&meta.id)).or_insert(meta);
     }
     if unique.is_empty() {
         return Err(crate::invalid("provider returned no models"));
@@ -245,7 +245,15 @@ pub fn model_metadata_by_id(models: &[ModelMetadata]) -> BTreeMap<String, ModelM
     models
         .iter()
         .filter(|meta| !meta.id.trim().is_empty())
-        .map(|meta| (meta.id.trim().to_ascii_lowercase(), meta.clone()))
+        .map(|meta| (metadata_key(&meta.id), meta.clone()))
+        .collect()
+}
+
+pub(crate) fn metadata_key(id: &str) -> String {
+    // Go strings.ToLower uses simple mappings, not expanding lowercase (e.g. İ).
+    id.trim()
+        .chars()
+        .map(|c| c.to_lowercase().next().unwrap())
         .collect()
 }
 

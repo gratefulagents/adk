@@ -793,3 +793,27 @@ verify the formatter; builder tests verify selection and provider delivery.
 Prompt names describe connections, not sandbox/tool authority or a guarantee of
 resistance to arbitrary natural-language prompt injection. Invalid-UTF8 Go strings
 have no direct native `String` representation and are outside this mapping.
+
+### Explicit provider metadata for compaction
+
+`Builder::compaction_metadata(Arc<providers::runtime::MetadataCompactionResolver>)`
+accepts a resolver constructed with an explicit `Arc<providers::auth::Session>`.
+Retain the resolver Arc to inspect its deduplicated `warnings()` diagnostics.
+Construction and bundle assembly do not read credentials or fetch metadata; the
+first active compaction attempt lazily loads the authenticated catalog. No route's
+credentials are implicitly borrowed. A host `RunnerConfig.compaction_model_resolver`
+wins, and disabling the compaction feature suppresses both resolvers.
+
+Successful catalogs are cached for the resolver lifetime; failed attempts have a
+30-second cooldown. Lookup tries the full model ID, then the suffix after the first
+slash. A lookup is bounded to 15 seconds; unavailable/invalid metadata falls back
+to static model thresholds. Explicit caller cancellation/deadline remains an error.
+Failures expose a generic diagnostic, not provider bodies, tokens or credential
+store details. Diagnostics are returned to the embedding host, not written to
+ambient process stderr. Separate resolver instances never share mutable catalogs.
+
+This resolver intentionally has no durable key: a mutable remote catalog is not a
+replay-stable configuration. Durable runners reject it before dispatch; hosts that
+need durability should supply a deterministic keyed resolver with pinned thresholds.
+The metadata reference fixture verifies a bounded set of lookup/cache cases, not
+exhaustive Unicode-version equivalence or full provider/runtime parity.

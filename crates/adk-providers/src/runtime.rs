@@ -4,6 +4,9 @@ use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest, Streaming
 use adk_runtime::{CompactedHistory, CompactionRequest, Compactor, CostEstimator};
 use std::sync::Arc;
 
+mod metadata;
+pub use metadata::{MetadataCompactionResolver, MetadataCompactionWarning};
+
 /// Baseline USD accounting for the runner's actual selected binding, including
 /// named routes and fallbacks. The runner requires a number: unknown prices use
 /// zero, as in baseline CalculateCost. Use Routes::estimate_cost to retain the

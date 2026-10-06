@@ -2,6 +2,8 @@ use super::*;
 use adk::runtime::{CompactionModelResolver, compaction::LocalCompactionPolicy};
 use sha2::{Digest, Sha256};
 
+mod metadata;
+
 struct Resolver {
     value: Option<(u64, u64)>,
     models: Mutex<Vec<String>>,

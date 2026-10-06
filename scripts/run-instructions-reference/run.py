@@ -39,7 +39,7 @@ def main():
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
         runtime = source / 'pkg/agentsdk/runtime'
-        sources = sorted(runtime.glob('*.go')) + [source / 'internal/agent/runner.go', source / 'internal/agent/mcp_prompt.go'] + [source / 'go.mod', source / 'go.sum']
+        sources = sorted(runtime.glob('*.go')) + [source / 'internal/agent/runner.go', source / 'internal/agent/mcp_prompt.go', source / 'internal/agent/history_compaction.go'] + [source / 'go.mod', source / 'go.sum']
         harness = [Path(__file__).resolve(), ROOT / 'scripts/run-instructions-reference/reference_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA, 'goVersion': version,
@@ -50,10 +50,11 @@ def main():
         }
         shutil.copyfile(ROOT / 'scripts/run-instructions-reference/reference_test.go', runtime / 'native_reference_test.go')
         output = source / 'observations.json'
-        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output))
+        compactions = source / 'compactions.json'
+        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output), RUN_COMPACTION_OUTPUT=str(compactions))
         command = [go, 'test', '-count=1', '-run', '^TestRunInstructionsReference$', '-v', './pkg/agentsdk/runtime']
         subprocess.run(command, cwd=source, env=env, check=True)
-        result = {'provenance': provenance, 'cases': json.loads(output.read_text())}
+        result = {'provenance': provenance, 'cases': json.loads(output.read_text()), 'compaction_cases': json.loads(compactions.read_text())}
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/run-instructions/observations.json'
         destination.parent.mkdir(parents=True, exist_ok=True)

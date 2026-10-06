@@ -288,3 +288,98 @@ async fn working_state_fallback_matches_sdk_and_is_only_injected_after_compactio
         bundle.close().await.unwrap();
     }
 }
+
+#[cfg(feature = "observability")]
+#[tokio::test]
+async fn builder_compaction_matches_pinned_requests_for_model_defaults_and_host_policy() {
+    use adk::runtime::compaction::LocalCompactionPolicy;
+    use sha2::{Digest, Sha256};
+    struct BlankCarry;
+    impl adk::runtime::CompactionCarryForward for BlankCarry {
+        fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+            Box::pin(async { Ok(String::new()) })
+        }
+    }
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["compaction_cases"].as_array().unwrap() {
+        let model = Arc::new(RecordingModel::default());
+        let mut runner = RunnerConfig {
+            compaction_carry_forward: Some(Arc::new(BlankCarry)),
+            ..Default::default()
+        };
+        if case["custom"] == true {
+            runner.local_compaction = LocalCompactionPolicy {
+                enabled: true,
+                trigger_tokens: 90000,
+                target_tokens: 40000,
+                preserve_recent_items: 3,
+                preserve_initial_user_messages: 1,
+                summary_bullet_limit: 7,
+            };
+        }
+        let mut bundle = builder(
+            Config {
+                model: case["model"].as_str().unwrap().into(),
+                instructions: "base".into(),
+                work_dir: "".into(),
+                features: Some(Features {
+                    compaction: true,
+                    ..Default::default()
+                }),
+                ..Default::default()
+            },
+            &model,
+        )
+        .runner_config(runner)
+        .build(&context())
+        .await
+        .unwrap();
+        let history = (0..100)
+            .map(|i| RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: format!(
+                            "message {i:03}: {}",
+                            "old conversation ".repeat(if i >= 80 { 2 } else { 2000 })
+                        ),
+                    }],
+                },
+            })
+            .collect();
+        if case["streaming"] == true {
+            bundle
+                .stream(context(), history, Arc::new(TestHost))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            bundle
+                .run(context(), history, Arc::new(TestHost))
+                .await
+                .unwrap();
+        }
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 1);
+            let hashes = requests[0]
+                .input
+                .iter()
+                .map(|item| {
+                    let RunItem::Message { message } = item else {
+                        panic!("unexpected nonmessage")
+                    };
+                    let [Content::Text { text }] = message.content.as_slice() else {
+                        panic!("unexpected content")
+                    };
+                    format!("{:x}", Sha256::digest(text.as_bytes()))
+                })
+                .collect::<Vec<_>>();
+            assert_eq!(json!(hashes), case["text_sha256"], "{case}");
+        }
+        bundle.close().await.unwrap();
+    }
+}

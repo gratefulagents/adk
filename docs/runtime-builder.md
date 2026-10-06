@@ -621,6 +621,19 @@ Explicit nonblank host text and successful priming take precedence. The default
 is also injected only after compaction; direct `RunnerConfig::default()` remains
 empty, and tool-only construction does not prime or add working-state context.
 
+With compaction enabled and an unchanged default local policy, full composition
+uses the SDK builder's ten recent items, two initial user messages and five
+summary bullets. `RunnerConfig.compaction_model_defaults` resolves token
+thresholds for each active model without resetting those history rules; this
+choice is part of durable resume identity. Explicit nondefault retention and
+threshold settings are preserved; feature selection still controls enablement.
+Direct runtime defaults remain twelve recent items/four bullets. The SDK's
+explicit compaction-config enablement override is not yet mapped by the builder.
+
+The SDK builder's default dynamic carry-forward callback (provider/mode text)
+is not yet automatically installed by the Rust builder. Hosts can supply
+`compaction_carry_forward`; this remaining composition gap is not a parity claim.
+
 The eight task tools, six memory tools and `prime_context` use owned composition,
 not `ExtraTools`. Duplicate detection, role views and read-only execution policy
 still apply. Synchronous storage runs on Tokio's blocking pool. Closing or

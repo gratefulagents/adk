@@ -2,6 +2,17 @@
 
 ## Current continuation evidence
 
+### Builder local-compaction defaults
+
+Default full-builder policies use ten recent items/five summary bullets while
+resolving thresholds per active model; explicit nondefault host policies retain
+their settings. Sixteen actual pinned normal/streamed requests across four model
+families and default/custom policies compare every compacted message by SHA-256.
+Both harnesses use an explicitly blank carry callback to isolate policy and
+static fallback behavior. The initial comparison revealed the SDK builder's
+additional default provider/mode carry callback, which remains an open native
+composition gap, not a silently normalized difference. No new ledger IDs closed.
+
 ### Durable local-compaction identity
 
 Durable resumes now bind all six normalized local-compaction policy fields.

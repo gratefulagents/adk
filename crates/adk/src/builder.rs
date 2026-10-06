@@ -1661,6 +1661,14 @@ impl Builder {
             self.runner.retry.initial_delay = Duration::from_millis(250);
             self.runner.retry.max_delay = Duration::from_millis(2000);
         }
+        if features.compaction
+            && self.runner.local_compaction
+                == adk_runtime::compaction::LocalCompactionPolicy::default()
+        {
+            self.runner.local_compaction.preserve_recent_items = 10;
+            self.runner.local_compaction.summary_bullet_limit = 5;
+            self.runner.compaction_model_defaults = true;
+        }
         self.runner.local_compaction.enabled = features.compaction;
         if !features.compaction {
             self.runner.compaction = None;

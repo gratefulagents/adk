@@ -40,7 +40,14 @@ impl MetadataCompactionResolver {
     pub fn warnings(&self) -> Vec<MetadataCompactionWarning> {
         self.warnings.lock().unwrap().iter().cloned().collect()
     }
-    async fn lookup(&self, context: &Context, model: &str) -> Result<Option<ModelMetadata>, Error> {
+    /// Return cached metadata, or `None` on a missing model or failed fetch.
+    /// Caller cancellation/deadline is an error; fetch diagnostics are available via `warnings`.
+    /// Unlike runtime `thresholds`, this does not apply static defaults or a 15-second budget.
+    pub async fn lookup(
+        &self,
+        context: &Context,
+        model: &str,
+    ) -> Result<Option<ModelMetadata>, Error> {
         context.check_active()?;
         let mut cache = crate::active(context, self.cache.lock()).await?;
         if cache.catalog.is_none()

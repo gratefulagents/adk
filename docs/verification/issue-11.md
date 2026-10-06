@@ -12,15 +12,18 @@ static threshold fallback, while caller cancellation remains an error. Mutable
 catalogs intentionally do not provide a durable replay key. Diagnostics are
 structured/redacted for the embedding host rather than ambient stderr logging.
 
-Eight independent pinned SDK lookup observations plus a failed-fetch/cooldown
+Nine independent pinned SDK lookup observations plus a failed-fetch/cooldown
 sequence reproduce byte-for-byte. Native tests also cover concurrency, separate
 session scopes, timeout/cancellation, zero construction I/O and four builder
 selection combinations. The fixtures caught an initial test catalog using the
 plain OpenAI shape instead of Codex metadata; the corrected oracle uses `models`
-and `slug`. Unicode Δ and İ lookup/dedup keys no longer use ASCII-only folding;
-exhaustive Unicode-version equivalence is not claimed.
+and `slug`. Standalone consumers now have public cached `lookup` returning raw metadata;
+raw misses/fetch failures and runtime static fallback remain distinct. The
+exhaustive scalar regression first failed under Rust's newer Unicode table, then
+passed after preserving Unicode-15-unassigned characters. All **1,112,064** scalar
+lookup keys match the independent pinned Go digest on Rust 1.88.
 
-Fresh workspace verification: **1,217 passed, 0 failed, 30 ignored**. Strict
+Fresh workspace verification: **1,218 passed, 0 failed, 30 ignored**. Strict
 Clippy, documentation build, source locks and the 18 ledger-validator tests pass.
 The facade feature matrix and standalone consumer pass; all 20 feature examples
 and the owned host-session example pass offline. The example script's cargo-clippy

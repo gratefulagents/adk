@@ -179,3 +179,22 @@ in the pinned version. The source's comment says bytes, but its actual truncatio
 uses runes; retain 64 scalar values and verify multibyte boundaries independently.
 The native formatter preserves list order/duplicates; it is not a registration
 policy or prompt-injection security boundary.
+
+## Metadata compaction composition and Unicode lookup
+
+Adopt the same pinned Unicode 15 category table for model-ID normalization. The
+local 0.6.0 package manifest/license and Cargo checksum were rechecked; no new
+package version is introduced. Reject raw Rust `char::to_lowercase` alone: the
+independent pinned Go scalar digest failed until characters unassigned in Unicode
+15 were preserved. Use simple, non-expanding lowercase for assigned characters.
+The corrected implementation matches all 1,112,064 Unicode scalar observations.
+
+Adopt an explicit session-owned async resolver and cancellable single-flight
+cache instead of process-global credential discovery or a blocking Go mutex.
+Preserve successful-fetch lifetime, failed-fetch 30-second cooldown and the
+builder's 15-second lookup bound. Expose raw cached lookup separately from runtime
+threshold/static fallback, and return structured redacted diagnostics to the
+embedding host instead of copying Go's global stderr logging. Mutable remote
+metadata deliberately has no durable key. Reference:
+[pinned resolver source](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/providers/openai/compaction.go),
+GPL-3.0-only, executed by `scripts/metadata-compaction-reference/run.py`.

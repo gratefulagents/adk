@@ -20,10 +20,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    env = dict(os.environ, GOROOT='/usr/local/go', GOTOOLCHAIN='local', GOTELEMETRY='off', GOWORK='off', GOFLAGS='-mod=readonly')
+    env = dict(os.environ, GOROOT=os.environ.get('GOROOT', '/usr/local/go'), GOTOOLCHAIN='local', GOTELEMETRY='off', GOWORK='off', GOFLAGS='-mod=readonly')
     env.setdefault('GOCACHE', '/workspace/scratch/go-cache')
     env.setdefault('GOMODCACHE', '/workspace/scratch/go/pkg/mod')
-    go = '/usr/local/go/bin/go'
+    go = str(Path(env['GOROOT']) / 'bin/go')
     with tempfile.TemporaryDirectory() as temp:
         source = Path(temp)
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')

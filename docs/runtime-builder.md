@@ -805,8 +805,13 @@ credentials are implicitly borrowed. A host `RunnerConfig.compaction_model_resol
 wins, and disabling the compaction feature suppresses both resolvers.
 
 Successful catalogs are cached for the resolver lifetime; failed attempts have a
-30-second cooldown. Lookup tries the full model ID, then the suffix after the first
-slash. A lookup is bounded to 15 seconds; unavailable/invalid metadata falls back
+30-second cooldown. Standalone consumers can call `resolver.lookup(context, model).await`
+to obtain `Result<Option<ModelMetadata>, Error>` without constructing a runner.
+A missing model or failed fetch returns `None`; cancellation/deadline returns an
+error. This raw API neither applies static defaults nor adds the runtime budget;
+it uses the caller's context and the authenticated fetcher's existing bound.
+Lookup tries the full model ID, then the suffix after the first slash.
+Runtime threshold resolution is bounded to 15 seconds; unavailable/invalid metadata falls back
 to static model thresholds. Explicit caller cancellation/deadline remains an error.
 Failures expose a generic diagnostic, not provider bodies, tokens or credential
 store details. Diagnostics are returned to the embedding host, not written to
@@ -815,5 +820,5 @@ ambient process stderr. Separate resolver instances never share mutable catalogs
 This resolver intentionally has no durable key: a mutable remote catalog is not a
 replay-stable configuration. Durable runners reject it before dispatch; hosts that
 need durability should supply a deterministic keyed resolver with pinned thresholds.
-The metadata reference fixture verifies a bounded set of lookup/cache cases, not
-exhaustive Unicode-version equivalence or full provider/runtime parity.
+The metadata reference fixture verifies lookup/cache cases and all Unicode scalar
+lookup keys against Go Unicode 15 on Rust 1.88, not full provider/runtime parity.

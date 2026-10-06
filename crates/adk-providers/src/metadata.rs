@@ -250,10 +250,18 @@ pub fn model_metadata_by_id(models: &[ModelMetadata]) -> BTreeMap<String, ModelM
 }
 
 pub(crate) fn metadata_key(id: &str) -> String {
-    // Go strings.ToLower uses simple mappings, not expanding lowercase (e.g. İ).
+    // The pinned Go uses Unicode 15 simple mappings, not Rust's expanding lowercase.
     id.trim()
         .chars()
-        .map(|c| c.to_lowercase().next().unwrap())
+        .map(|c| {
+            if unicode_general_category::get_general_category(c)
+                == unicode_general_category::GeneralCategory::Unassigned
+            {
+                c
+            } else {
+                c.to_lowercase().next().unwrap()
+            }
+        })
         .collect()
 }
 
@@ -271,4 +279,32 @@ pub fn picker_model_metadata(models: &[ModelMetadata]) -> Vec<ModelMetadata> {
         )
     });
     models
+}
+
+#[cfg(test)]
+mod tests {
+    use super::metadata_key;
+    use sha2::{Digest, Sha256};
+
+    #[test]
+    fn lookup_keys_match_every_pinned_go_scalar() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/metadata-compaction/observations.json"
+        ))
+        .unwrap();
+        assert_eq!(fixture["unicode_version"], "15.0.0");
+        let mut hash = Sha256::new();
+        let mut count = 0u64;
+        for ch in (0..=0x10ffff).filter_map(char::from_u32) {
+            let key = metadata_key(&ch.to_string());
+            hash.update((key.len() as u32).to_le_bytes());
+            hash.update(key.as_bytes());
+            count += 1;
+        }
+        assert_eq!(count, fixture["scalar_count"].as_u64().unwrap());
+        assert_eq!(
+            format!("{:x}", hash.finalize()),
+            fixture["scalar_sha256"].as_str().unwrap()
+        );
+    }
 }

@@ -9,10 +9,12 @@ source in a disposable archive, using loopback HTTP and fixture credentials only
 It checks full-name precedence, first-slash aliases, case folding (including Δ and
 İ), misses, successful-fetch caching, failed-fetch cooldown and retry. The cooldown
 oracle changes only the test resolver's timestamp; it does not patch SDK code.
+A length-prefixed UTF-8 SHA-256 digest checks the first normalized lookup key for
+all 1,112,064 Unicode scalar values using the pinned Go Unicode 15 tables.
 Source and harness digests are embedded in the observations. No live-provider claim.
 
 Native tests additionally check lazy construction, shared concurrent fetches,
 cancellation before fetching, static fallback, redacted diagnostics, and builder
 feature/host-resolver precedence. These checks do not close the entire provider or
-builder ledger. Exhaustive Unicode-version compatibility is not established by
-these two non-ASCII fixtures.
+builder ledger. The scalar digest establishes lookup-key normalization on the recorded Rust
+1.88 target, not all metadata parsing or picker behavior.

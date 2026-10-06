@@ -122,6 +122,7 @@ dependencies = [
  "thiserror",
  "time",
  "tokio",
+ "unicode-general-category",
 ]
 
 [[package]]

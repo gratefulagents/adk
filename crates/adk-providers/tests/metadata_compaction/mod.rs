@@ -52,6 +52,15 @@ async fn lookup_matches_pinned_sdk_and_success_is_cached() {
     assert!(resolver.durable_key().is_none());
     for case in fixture["cases"].as_array().unwrap() {
         let model = case["model"].as_str().unwrap();
+        let metadata = resolver.lookup(&context(), model).await.unwrap();
+        assert_eq!(metadata.is_some(), case["found"].as_bool().unwrap());
+        if let Some(metadata) = metadata {
+            assert_eq!(metadata.id, case["id"].as_str().unwrap());
+            assert_eq!(
+                metadata.compaction_defaults().is_some(),
+                case["valid"].as_bool().unwrap()
+            );
+        }
         let expected = if case["valid"] == true {
             (
                 case["trigger"].as_u64().unwrap(),
@@ -95,6 +104,13 @@ async fn failed_fetch_cools_down_then_retries_without_leaking_error_body() {
             .as_u64()
             .unwrap() as usize
     );
+    assert!(
+        resolver
+            .lookup(&context(), "gpt-custom")
+            .await
+            .unwrap()
+            .is_none()
+    );
     tokio::time::pause();
     tokio::time::advance(Duration::from_secs(31)).await;
     tokio::time::resume();
@@ -127,6 +143,15 @@ async fn concurrent_calls_share_fetch_and_cancelled_call_does_not_poison_cache()
         ..context()
     };
     assert!(resolver.thresholds(&cancelled, "gpt-custom").await.is_err());
+    assert_eq!(
+        resolver
+            .lookup(&cancelled, "gpt-custom")
+            .await
+            .unwrap_err()
+            .info
+            .category,
+        ErrorCategory::Cancelled
+    );
     assert_eq!(calls.load(Ordering::SeqCst), 0);
     let ctx = context();
     let (a, b) = tokio::join!(

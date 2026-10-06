@@ -2,6 +2,7 @@
   "cases": [
     {
       "found": true,
+      "id": "GPT-CUSTOM",
       "model": " GPT-CUSTOM ",
       "requests": 1,
       "target": 5000,
@@ -10,6 +11,7 @@
     },
     {
       "found": true,
+      "id": "vendor/gpt-custom",
       "model": "vendor/gpt-custom",
       "requests": 1,
       "target": 10000,
@@ -18,6 +20,7 @@
     },
     {
       "found": true,
+      "id": "GPT-CUSTOM",
       "model": "other/GPT-CUSTOM",
       "requests": 1,
       "target": 5000,
@@ -26,6 +29,7 @@
     },
     {
       "found": true,
+      "id": "\u0394",
       "model": "other/\u0394",
       "requests": 1,
       "target": 2000,
@@ -34,6 +38,7 @@
     },
     {
       "found": true,
+      "id": "\u0130",
       "model": "i",
       "requests": 1,
       "target": 3000,
@@ -41,7 +46,17 @@
       "valid": true
     },
     {
+      "found": true,
+      "id": "no-context",
+      "model": "no-context",
+      "requests": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
       "found": false,
+      "id": "",
       "model": "missing",
       "requests": 1,
       "target": 0,
@@ -50,6 +65,7 @@
     },
     {
       "found": false,
+      "id": "",
       "model": "missing",
       "requests": 1,
       "target": 0,
@@ -58,6 +74,7 @@
     },
     {
       "found": false,
+      "id": "",
       "model": "nested/other/gpt-custom",
       "requests": 1,
       "target": 0,
@@ -65,13 +82,13 @@
       "valid": false
     }
   ],
-  "catalog": "{\"models\":[{\"slug\":\"GPT-CUSTOM\",\"context_window\":10000},{\"slug\":\"vendor/gpt-custom\",\"context_window\":20000},{\"slug\":\"\u0394\",\"context_window\":4000},{\"slug\":\"\u0130\",\"context_window\":6000}]}",
+  "catalog": "{\"models\":[{\"slug\":\"GPT-CUSTOM\",\"context_window\":10000},{\"slug\":\"vendor/gpt-custom\",\"context_window\":20000},{\"slug\":\"\u0394\",\"context_window\":4000},{\"slug\":\"\u0130\",\"context_window\":6000},{\"slug\":\"no-context\"}]}",
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/metadata-compaction-reference/reference_test.go": "e95ed425313e6acd1dfe428e969e4aa1e0cdbbe57cc697b353be9cb95c527ec5",
-      "scripts/metadata-compaction-reference/run.py": "6729b892673503bc9dbf74c867c18ed6dfd58362fbc656e1c5508eda0ee2f45d"
+      "scripts/metadata-compaction-reference/reference_test.go": "4530c2e1f7cac6f7e4cc5c3f1e077b98c51b73283ca025253dcaac9b3e360ead",
+      "scripts/metadata-compaction-reference/run.py": "4ddd084320135df5b0d241794a95c7144ea302e989c7184a0b77c73bb47c211a"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -91,5 +108,8 @@
     ],
     "requests_after_cooldown": 2,
     "requests_before_cooldown": 1
-  }
+  },
+  "scalar_count": 1112064,
+  "scalar_sha256": "f25c584f4232efda9b29d48c5ec2f534d6adf1bd8d862907a40f53b4a95be632",
+  "unicode_version": "15.0.0"
 }

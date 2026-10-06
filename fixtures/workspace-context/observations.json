@@ -2,6 +2,7 @@
   "cases": [
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": "",
@@ -9,6 +10,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -19,6 +21,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -29,6 +32,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": "",
@@ -36,6 +40,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -46,6 +51,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -56,6 +62,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": " \t ",
@@ -63,6 +70,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -73,6 +81,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -83,6 +92,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": " \t ",
@@ -90,6 +100,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -100,6 +111,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  \t \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -110,6 +122,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": ".",
@@ -117,6 +130,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -127,6 +141,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -137,6 +152,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": ".",
@@ -144,6 +160,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -154,6 +171,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -164,6 +182,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": " /repo/\u0130Project ",
@@ -171,6 +190,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -181,6 +201,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -191,6 +212,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": " /repo/\u0130Project ",
@@ -198,6 +220,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -208,6 +231,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -218,6 +242,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": "relative/path",
@@ -225,6 +250,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -235,6 +261,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: full (read + write + shell)\nAvailable tools include: Bash, Edit, Write, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -245,6 +272,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [],
       "work_dir": "relative/path",
@@ -252,6 +280,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "a_read",
@@ -262,6 +291,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths (e.g., \"internal/foo.go\") instead of absolute paths.\nCRITICAL: Never use /workspace/... absolute paths in tool calls. Always use relative paths from the working directory. Absolute paths outside this directory will be rejected.\nTool access: read-only\nAvailable tools include: read-only Bash, list_files, read_file, glob, grep. Use Bash to run rg, fd, cat, and other CLI tools when available.\n</environment>",
       "strict": false,
       "tools": [
         "z_read",
@@ -272,6 +302,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [],
       "work_dir": "",
@@ -279,6 +310,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "a_read",
@@ -289,6 +321,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "z_read",
@@ -299,6 +332,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [],
       "work_dir": "",
@@ -306,6 +340,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "a_read",
@@ -316,6 +351,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "z_read",
@@ -326,6 +362,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [],
       "work_dir": " \t ",
@@ -333,6 +370,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "a_read",
@@ -343,6 +381,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "z_read",
@@ -353,6 +392,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [],
       "work_dir": " \t ",
@@ -360,6 +400,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "a_read",
@@ -370,6 +411,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions",
       "strict": true,
       "tools": [
         "z_read",
@@ -380,6 +422,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": ".",
@@ -387,6 +430,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -397,6 +441,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -407,6 +452,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": ".",
@@ -414,6 +460,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -424,6 +471,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -434,6 +482,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": " /repo/\u0130Project ",
@@ -441,6 +490,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -451,6 +501,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -461,6 +512,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": " /repo/\u0130Project ",
@@ -468,6 +520,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -478,6 +531,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory:  /repo/\u0130Project \nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -488,6 +542,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": "relative/path",
@@ -495,6 +550,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -505,6 +561,7 @@
     },
     {
       "access": "full",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -515,6 +572,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: none.\n</environment>",
       "strict": true,
       "tools": [],
       "work_dir": "relative/path",
@@ -522,6 +580,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: a_read, z_read.\n</environment>",
       "strict": true,
       "tools": [
         "a_read",
@@ -532,6 +591,7 @@
     },
     {
       "access": "read-only",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: z_read, a_read.\n</environment>",
       "strict": true,
       "tools": [
         "z_read",
@@ -539,13 +599,147 @@
       ],
       "work_dir": "relative/path",
       "workspace": "<environment>\nWorking directory: relative/path\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: read-only\nAvailable tools include: z_read, a_read.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": false,
+      "mode_snapshot": null,
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": false,
+      "mode_snapshot": {
+        "display_name": "Reviewed",
+        "name": "review"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "manual",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": false,
+      "mode_snapshot": {
+        "display_name": "",
+        "name": ""
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": false,
+      "mode_snapshot": {
+        "display_name": "",
+        "name": "named"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": false,
+      "mode_snapshot": {
+        "display_name": "  ",
+        "name": "named"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\nActive mode: chat\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": true,
+      "mode_snapshot": null,
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\nActive mode: Reviewed\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": true,
+      "mode_snapshot": {
+        "display_name": "Reviewed",
+        "name": "review"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "manual",
+      "instructions": "host instructions\n\nActive mode: manual\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": true,
+      "mode_snapshot": {
+        "display_name": "",
+        "name": ""
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\nActive mode: named\n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": true,
+      "mode_snapshot": {
+        "display_name": "",
+        "name": "named"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
+    },
+    {
+      "access": "full",
+      "active_mode": "",
+      "instructions": "host instructions\n\nActive mode:   \n\n<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>",
+      "mode_instructions": true,
+      "mode_snapshot": {
+        "display_name": "  ",
+        "name": "named"
+      },
+      "strict": true,
+      "tools": [],
+      "work_dir": ".",
+      "workspace": "<environment>\nWorking directory: .\nAll file paths are relative to this directory. Use relative paths instead of absolute paths.\nTool access: full\nAvailable tools include: none.\n</environment>"
     }
   ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/workspace-context-reference/reference_test.go": "14bd1f4236f92a99b8f8470b4907d78996822dc4718fd4c63d42d680d38efca8",
+      "scripts/workspace-context-reference/reference_test.go": "526df96b465f34b8e289c2801a34671580ad6aa991348127c6f026e8de6d7506",
       "scripts/workspace-context-reference/run.py": "161138ffd9f7e1395c1b066a5545e54ebcc46909ab47f1b249d9a2aba0829e27"
     },
     "launchPolicy": "Pure prompt construction; no provider, file store, subprocess or tool execution. Prompt text grants no execution authority.",

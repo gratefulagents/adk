@@ -1178,18 +1178,28 @@ impl Builder {
         let base_settings = settings.clone();
         let mut policy = self.config.policy.clone();
         let mut instructions = vec![self.config.instructions.trim().to_owned()];
+        if features.mode_instructions {
+            let label = mode
+                .as_ref()
+                .and_then(|mode| {
+                    [&mode.display_name, &mode.name]
+                        .into_iter()
+                        .find(|s| !s.is_empty())
+                        .map(String::as_str)
+                })
+                .or_else(|| {
+                    self.config
+                        .active_mode
+                        .as_deref()
+                        .filter(|s| !s.trim().is_empty())
+                })
+                .unwrap_or("chat");
+            instructions.push(format!("Active mode: {label}"));
+        }
         if let Some(mode) = &mode {
             policy.tools.access =
                 narrow_access(policy.tools.access, parse_access(&mode.tool_access)?);
             if features.mode_instructions {
-                instructions.push(format!(
-                    "Mode: {}",
-                    if mode.display_name.is_empty() {
-                        &mode.name
-                    } else {
-                        &mode.display_name
-                    }
-                ));
                 instructions.push(mode.instructions.trim().into());
             }
             if let Some(constraints) = &mode.constraints {

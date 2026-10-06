@@ -374,7 +374,12 @@ these documents.
    source overrides built-ins by name.
 3. Enabled mode routing replaces nonempty model/reasoning/verbosity fields and
    merges setting keys. An absent fallback list inherits; an explicit empty
-   list clears fallbacks. Mode instructions append to base instructions.
+   list clears fallbacks. Mode instructions append to base instructions. Enabled
+   mode guidance begins with `Active mode: <label>`, preferring the resolved
+   snapshot's display name, then name, configured active mode, and finally `chat`.
+   This default label is present even without a selected mode in legacy builds;
+   explicit `mode_instructions: false` suppresses it. Snapshot label whitespace
+   is preserved, matching the SDK formatter.
 4. The active role appends instructions, supplies its nonempty model override
    and optional programmatic fallback override, and narrows access. Explicit `Config::roles` override source roles by name.
 5. Enabled per-role mode routing wins over the role model and general mode
@@ -676,7 +681,9 @@ are unchanged; this block belongs to the parent agent.
 
 `python3 scripts/workspace-context-reference/run.py --check` independently
 executes the pinned SDK formatter and checks its position in full-agent
-instructions. Sixty strict/legacy cases preserve exact text, tool order,
-whitespace and Unicode. Native comparisons additionally verify normal/streamed
+instructions. Sixty strict/legacy workspace cases and ten mode-label cases
+preserve exact text, tool order, whitespace and Unicode. Full parent instructions
+are compared for the representable, registry-ordered inputs, including the legacy
+`Active mode: chat` default. Native comparisons additionally verify normal/streamed
 requests and policy-filtered names; they do not equate native registry ordering,
 mode/role composition or sandbox behavior with the SDK.

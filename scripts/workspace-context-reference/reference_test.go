@@ -8,6 +8,7 @@ import (
  "testing"
 
  "github.com/gratefulagents/sdk/pkg/agentsdk"
+ sdkmode "github.com/gratefulagents/sdk/pkg/agentsdk/mode"
 )
 
 func TestWorkspaceContextReference(t *testing.T) {
@@ -24,9 +25,27 @@ func TestWorkspaceContextReference(t *testing.T) {
      instructions := agent.InstructionsFn(nil, agent)
      block := runtimeWorkspaceContext(cfg.normalized(), tools, resolveFeatures(cfg))
      if block != "" && !strings.HasSuffix(instructions, block) { t.Fatal("workspace block not appended") }
-     observations = append(observations, map[string]any{"strict":strict, "work_dir":work, "access":access, "tools":names, "workspace":block})
+     observations = append(observations, map[string]any{"strict":strict, "work_dir":work, "access":access, "tools":names, "workspace":block, "instructions":instructions})
     }
    }
+  }
+ }
+ for _, enabled := range []bool{false, true} {
+  for _, mode := range []struct { active string; snapshot *sdkmode.TemplateSpec }{
+   {"", nil},
+   {"", &sdkmode.TemplateSpec{Name:"review", DisplayName:"Reviewed", ToolAccess:"full"}},
+   {"manual", &sdkmode.TemplateSpec{ToolAccess:"full"}},
+   {"", &sdkmode.TemplateSpec{Name:"named", ToolAccess:"full"}},
+   {"", &sdkmode.TemplateSpec{Name:"named", DisplayName:"  ", ToolAccess:"full"}},
+  } {
+   cfg := Config{WorkDir:".", ToolAccess:agentsdk.ToolAccessLevelFull, Instructions:"host instructions", ActiveMode:mode.active, ModeSnapshot:mode.snapshot,
+    Features:&Features{Modes:ModeFeatures{Instructions:enabled}}}
+   agent, _ := BuildAgent(cfg, nil, ToolBundle{})
+   var snapshot any
+   if mode.snapshot != nil { snapshot = map[string]any{"name":mode.snapshot.Name, "display_name":mode.snapshot.DisplayName} }
+   observations = append(observations, map[string]any{"strict":true, "work_dir":".", "access":"full", "tools":[]string{},
+    "mode_instructions":enabled, "active_mode":mode.active, "mode_snapshot":snapshot,
+    "workspace":runtimeWorkspaceContext(cfg.normalized(), nil, resolveFeatures(cfg)), "instructions":agent.InstructionsFn(nil, agent)})
   }
  }
  data, err := json.MarshalIndent(observations, "", "  ")

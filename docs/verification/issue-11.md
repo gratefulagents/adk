@@ -15,8 +15,11 @@ selections and twelve MCP selections. Project-state priming populates compaction
 carry-forward state, not initial instructions.
 
 The missing parent workspace prompt block is now composed after policy-prepared
-tools and delegation guidance. Sixty independently executed SDK cases compare
-strict/legacy text, whitespace, Unicode paths, access labels and tool ordering.
+tools and delegation guidance. Sixty independently executed SDK workspace cases
+and ten mode-label cases compare strict/legacy text, whitespace, Unicode paths,
+access labels and tool ordering. Full parent instructions now include the SDK's
+legacy `Active mode: chat` default and `Active mode:` label spelling; snapshot
+display-name/name/active-mode precedence is independently checked.
 Native normal/streaming request tests preserve the block, and policy regressions
 exclude denied/mutating tools in read-only mode. Legacy fixed tool/path prose is
 compatibility guidance, not actual execution authority; strict selection names

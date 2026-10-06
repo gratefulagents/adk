@@ -321,7 +321,7 @@ async fn strict_empty_overrides_legacy_tools_and_mode_instructions_not_access() 
     config.features = Some(Features::default());
     let mut strict = builder(config, &model).build(&context()).await.unwrap();
     assert!(strict.agent().tools.is_empty());
-    assert!(!strict.agent().instructions.contains("Mode:"));
+    assert!(!strict.agent().instructions.contains("Active mode:"));
     assert!(
         strict
             .agent()
@@ -428,7 +428,7 @@ async fn mode_and_role_overrides_apply_in_order_and_only_narrow_access_and_turns
         bundle
             .agent()
             .instructions
-            .starts_with("host instructions\n\nMode: review")
+            .starts_with("host instructions\n\nActive mode: review")
     );
     assert!(
         bundle

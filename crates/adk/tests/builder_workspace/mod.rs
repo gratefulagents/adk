@@ -45,6 +45,7 @@ async fn prepared_workspace_blocks_match_pinned_sdk_and_reach_run_and_stream_req
             work_dir: case["work_dir"].as_str().unwrap().into(),
             features: strict.then(|| Features {
                 tools: ["ExtraTools".into()].into(),
+                mode_instructions: case["mode_instructions"].as_bool().unwrap_or(false),
                 ..Default::default()
             }),
             legacy_tools: adk::tools::LegacyFeatures {
@@ -53,6 +54,18 @@ async fn prepared_workspace_blocks_match_pinned_sdk_and_reach_run_and_stream_req
             },
             ..Default::default()
         };
+        config.active_mode = case["active_mode"]
+            .as_str()
+            .filter(|s| !s.is_empty())
+            .map(str::to_owned);
+        if let Some(snapshot) = case["mode_snapshot"].as_object() {
+            config.mode_snapshot = Some(ModeSpec {
+                name: snapshot["name"].as_str().unwrap().into(),
+                display_name: snapshot["display_name"].as_str().unwrap().into(),
+                tool_access: "full".into(),
+                ..Default::default()
+            });
+        }
         config.policy.tools.access = access;
         let model = Arc::new(RecordingModel::default());
         let mut bundle = builder(config, &model)
@@ -60,14 +73,10 @@ async fn prepared_workspace_blocks_match_pinned_sdk_and_reach_run_and_stream_req
             .build(&context())
             .await
             .unwrap();
-        let block = case["workspace"].as_str().unwrap();
         assert_eq!(
             bundle.agent().instructions,
-            if block.is_empty() {
-                "host instructions".to_owned()
-            } else {
-                format!("host instructions\n\n{block}")
-            }
+            case["instructions"].as_str().unwrap(),
+            "{case}"
         );
         bundle
             .run(context(), vec![], Arc::new(TestHost))

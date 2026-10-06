@@ -3321,6 +3321,23 @@
         "builder",
         "project-state"
       ]
+    },
+    "SDK-EE554F0337A2E891": {
+      "source": "internal/agent/subagent_registry.go",
+      "source_name": "BuildWorkspaceContext",
+      "implementation_symbols": [
+        "crates/adk/src/builder/workspace.rs::workspace_context"
+      ],
+      "rust_test_identifiers": [
+        "builder::workspace::tests::workspace_helpers_match_all_pinned_sdk_observations",
+        "workspace_context_composition::prepared_workspace_blocks_match_pinned_sdk_and_reach_run_and_stream_requests"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderBuildsRunnableBundleShape",
+      "rationale": "Only the legacy workspace-context formatter for native UTF-8 workdirs and typed access modes is closed. Independently executed pinned SDK helper and full-agent instruction composition preserve exact bytes for blank, whitespace-only, dot, relative and Unicode/whitespace workdirs, full/read-only access and empty/sorted/reversed tool lists. Native tests compare all 60 strict/legacy observations, with FullAccess and WorkspaceWrite mapped to SDK full, and verify prepared full-builder blocks reach normal and streaming provider requests. Legacy fixed capability/path prose is preserved as compatibility guidance, not a grant or guarantee of actual tool availability or sandbox enforcement. Native strict registry ordering, mode/role prompts, target instructions, non-UTF8 Go strings, arbitrary string access parsing and whole-builder parity are outside this closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
     }
   }
 }

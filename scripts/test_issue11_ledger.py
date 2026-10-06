@@ -22,6 +22,15 @@ class EvidenceTests(unittest.TestCase):
         with patch.object(ledger, "read_json", side_effect=[self.claims, self.evidence]):
             ledger.apply_rust_evidence(self.entries, self.records, self.reference)
 
+    def test_builder_fixture_execution_markers_are_required(self):
+        original = self.evidence["reference_fixture_check"]
+        for marker in ("Pinned SDK workspace context observations reproduced exactly",
+                       "Pinned SDK project-state runtime observations reproduced exactly"):
+            with self.subTest(marker=marker):
+                self.evidence["reference_fixture_check"] = original.replace(marker, "")
+                with self.assertRaisesRegex(SystemExit, "builder evidence requires"):
+                    self.apply()
+
     def test_only_explicit_claims_are_verified(self):
         self.entries["unrelated"] = {"scope": "in_scope", "disposition": "unresolved"}
         self.apply()

@@ -25,6 +25,9 @@ use std::{
     time::Duration,
 };
 
+mod workspace;
+pub use workspace::workspace_context;
+
 #[cfg(feature = "mcp")]
 mod mcp;
 #[cfg(feature = "project-state")]
@@ -1088,6 +1091,12 @@ impl Builder {
         context.check_active()?;
         let features = self.config.resolved_features();
         self.validate_integrations(&features)?;
+        let workspace_dir = self
+            .config
+            .work_dir
+            .to_str()
+            .ok_or_else(|| invalid("workspace prompt path must be UTF-8"))?
+            .to_owned();
         let host = match &self.source {
             Some(source) => source.load(context).await?,
             None => HostConfig::default(),
@@ -1546,6 +1555,25 @@ impl Builder {
                 }
                 agent.instructions.push_str("Delegate by transferring the conversation to an available specialist. A transfer gives that specialist ownership of the response; it does not run a nested task or return control.\n");
                 agent.instructions.push_str(&available.join("\n"));
+            }
+            let workspace = if self.config.features.is_some() {
+                workspace::selected_workspace_context(
+                    &workspace_dir,
+                    policy.tools.access,
+                    &agent
+                        .tools
+                        .iter()
+                        .map(|t| t.definition().name.clone())
+                        .collect::<Vec<_>>(),
+                )
+            } else {
+                workspace_context(&workspace_dir, policy.tools.access)
+            };
+            if !workspace.is_empty() {
+                if !agent.instructions.is_empty() {
+                    agent.instructions.push_str("\n\n");
+                }
+                agent.instructions.push_str(&workspace);
             }
             Ok(specialists)
         })();

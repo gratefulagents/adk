@@ -2,6 +2,43 @@
 
 ## Current continuation evidence
 
+### Owned composition and workspace prompts
+
+Full builds now own host-authorized MCP sessions and project-state composition;
+`Builder::build_tools` provides a provider-free tool-runtime owner using the same
+resource assembly. Four project-state switches independently select priming,
+task tools, memory tools and the prime tool. Injected stores take precedence over
+automatic filesystem construction with explicit host paths. Blocking operations
+retain drain leases across cancelled callers; close/drop revokes escaped handles.
+Independent pinned SDK execution covers sixteen full/tool-only project-state
+selections and twelve MCP selections. Project-state priming populates compaction
+carry-forward state, not initial instructions.
+
+The missing parent workspace prompt block is now composed after policy-prepared
+tools and delegation guidance. Sixty independently executed SDK cases compare
+strict/legacy text, whitespace, Unicode paths, access labels and tool ordering.
+Native normal/streaming request tests preserve the block, and policy regressions
+exclude denied/mutating tools in read-only mode. Legacy fixed tool/path prose is
+compatibility guidance, not actual execution authority; strict selection names
+only prepared tools. Non-UTF8 native full-builder paths fail explicitly.
+
+Latest local verification: **1,195 workspace tests passed, 0 failed, 30 ignored**;
+strict all-target Clippy, rustdoc, formatting, source locks, facade matrix,
+platform-free external consumer, twenty offline examples plus host session and
+**18 evidence-validator tests** passed. The immutable inventory is untouched.
+The ledger is **199 verified / 8,692 unresolved / 251 excluded**. Only the
+exhaustive project-state needs-store predicate and the bounded legacy workspace
+formatter were newly closed; no whole-builder or whole-SDK claim is made.
+
+An earlier separate project-state evidence attempt hit the unchanged paused-time
+`tool_policy_timeout_preserves_managed_pending_results` regression: a child
+completed before its expected timeout observation. Its failed log was retained;
+subsequent unchanged full and sequential evidence runs passed. It was not waived
+or weakened. Current-head CI and credentialed live provider/OAuth/collector tests
+are separate evidence; unavailable live credentials remain **unverified**.
+
+Older checkpoint summaries below are historical, not current aggregate counts.
+
 ### Opt-in built-in tool guardrails
 
 The public facade now assembles built-in input/output tool guards before custom

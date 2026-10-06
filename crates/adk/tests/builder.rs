@@ -5,6 +5,8 @@ mod mcp_composition;
 #[cfg(feature = "project-state")]
 #[path = "builder_project_state/mod.rs"]
 mod project_state_composition;
+#[path = "builder_workspace/mod.rs"]
+mod workspace_context_composition;
 use adk::{
     builder::*,
     core::*,
@@ -319,7 +321,13 @@ async fn strict_empty_overrides_legacy_tools_and_mode_instructions_not_access() 
     config.features = Some(Features::default());
     let mut strict = builder(config, &model).build(&context()).await.unwrap();
     assert!(strict.agent().tools.is_empty());
-    assert!(strict.agent().instructions.is_empty());
+    assert!(!strict.agent().instructions.contains("Mode:"));
+    assert!(
+        strict
+            .agent()
+            .instructions
+            .contains("Available tools include: none.")
+    );
     assert_eq!(strict.policy().tools.access, AccessMode::ReadOnly);
     assert_eq!(strict.agent().settings["parallel_tool_calls"], false);
     strict.close().await.unwrap();
@@ -422,7 +430,12 @@ async fn mode_and_role_overrides_apply_in_order_and_only_narrow_access_and_turns
             .instructions
             .starts_with("host instructions\n\nMode: review")
     );
-    assert!(bundle.agent().instructions.ends_with("role instructions"));
+    assert!(
+        bundle
+            .agent()
+            .instructions
+            .contains("role instructions\n\n<environment>")
+    );
     bundle
         .run(context(), vec![], Arc::new(TestHost))
         .await
@@ -550,7 +563,12 @@ async fn file_source_is_used_for_active_mode_and_role() {
         .build(&context())
         .await
         .unwrap();
-    assert!(bundle.agent().instructions.ends_with("Review safely."));
+    assert!(
+        bundle
+            .agent()
+            .instructions
+            .contains("Review safely.\n\n<environment>")
+    );
     assert_eq!(bundle.policy().tools.access, AccessMode::ReadOnly);
     bundle.close().await.unwrap();
 }

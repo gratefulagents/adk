@@ -529,8 +529,8 @@ Go `Config` wire codec or a claim of full Go runtime parity.
 | Files | YAML/YML/JSON mode specs and CRD-shaped envelopes; Markdown/YAML role frontmatter; built-in chat/plan and deterministic overrides. Unsupported fields and invalid/zero turn limits fail rather than silently falling back. |
 | Constraints | `maxTurns` caps parent turns; `subAgentMaxTurns` narrows child turns; `maxRetries` sets retries. `maxConcurrentSubAgents` validates the injected scheduler's immutable concurrency ceiling without mutating a shared owner. `maxRuntimeMinutes` is retained as metadata, matching the pinned SDK's lack of enforcement; hosts supply actual deadlines through `Context`. |
 | Roles | Active-parent role routing plus opt-in parent-to-catalog handoffs and tool-less empty-catalog fallback. Native handoff gating is independent of subagents; no agent-as-tool generation, nested graph, or scheduler registration. |
-| Runtime adapters | No automatic MCP discovery, project-state priming/store discovery, security guardrail installation, forced final summary, polling, tracing/event writer, or persistent ChatLoop. Supply explicit tools, native runner hooks, and native `Host` callbacks. Unsupported runtime features are not represented as inert booleans. |
-| Lifecycle | Explicit ownership improves on Go's warn-and-continue tool setup: construction errors fail closed. Shared state is not accidentally closed by a turn bundle. No detached background cleanup is introduced. |
+| Runtime adapters | Host-authorized MCP and project-state composition, opt-in built-in guardrails, final-summary selection and host-supplied immediate-input callbacks are available. MCP has no implicit repository/credential discovery. Tracing/event sinks still require explicit native observer/host composition; the persistent host-session API is separate from the runtime bundle. |
+| Lifecycle | Construction errors fail closed rather than returning partially configured tool resources. Borrowed state is not closed by a turn bundle. MCP cleanup is retained across cancellation; admitted synchronous project-state writes drain on explicit close. Keep the executor alive until close completes. |
 
 ## Offline verification
 
@@ -649,3 +649,34 @@ roll back acquired MCP processes. Retained handles are revoked on close/drop.
 `mcp_catalog()` and `mcp_servers()` expose selected discovery metadata when MCP
 is compiled in. Offline comparisons cover the sixteen project-state selections
 and twelve MCP selections independently against the pinned SDK tool builder.
+
+## Workspace instruction context
+
+Full builds append the pinned SDK workspace block after parent instructions and
+delegation guidance. With explicit `Features`, the block uses the actual
+policy-prepared tool names (in native registry order), the narrowed access level,
+and the configured working directory verbatim. A blank/whitespace-only directory
+omits that strict block. An explicit empty feature selection still supplies the
+environment block with `Available tools include: none.` when the directory is
+nonblank: disabling capabilities does not disable workspace context.
+
+Legacy selection uses the SDK's fixed workspace text, including its historical
+tool list and path guidance, even for an empty directory. This wording is
+compatibility prompt text, **not an assertion that those tools are installed or
+that a particular sandbox is active**. Real registered tools, dispatch policy
+and sandbox backends remain authoritative. Hosts that require guidance limited
+to the actual tool surface should use explicit `Features`. Native workspace-write
+and full-access permissions both map to the SDK's `full` prompt label; read-only
+uses `read-only`. No execution permission is broadened by this label.
+
+`builder::workspace_context(&str, AccessMode)` exposes the legacy formatter for
+standalone embedding. Full-builder paths must be UTF-8 rather than producing
+lossy prompt text. Tool-only builds have no prompt. Specialist target instructions
+are unchanged; this block belongs to the parent agent.
+
+`python3 scripts/workspace-context-reference/run.py --check` independently
+executes the pinned SDK formatter and checks its position in full-agent
+instructions. Sixty strict/legacy cases preserve exact text, tool order,
+whitespace and Unicode. Native comparisons additionally verify normal/streamed
+requests and policy-filtered names; they do not equate native registry ordering,
+mode/role composition or sandbox behavior with the SDK.

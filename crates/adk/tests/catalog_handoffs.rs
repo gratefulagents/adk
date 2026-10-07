@@ -1,4 +1,6 @@
 #![cfg(feature = "builder")]
+#[path = "builder_subagents/mod.rs"]
+mod automatic_subagents;
 use adk::{
     builder::*,
     core::*,
@@ -716,6 +718,7 @@ async fn managed_subagent_feature_matrix_matches_pinned_public_builder() {
     assert_eq!(cases.len(), 8);
     for (mask, case) in cases.iter().enumerate() {
         let selection = SubagentFeatures {
+            generic_fallback: false,
             task: case["selection"]["task"].as_bool().unwrap(),
             status: case["selection"]["status"].as_bool().unwrap(),
             control: case["selection"]["control"].as_bool().unwrap(),
@@ -777,6 +780,7 @@ async fn managed_subagent_selection_never_bypasses_host_name_policy() {
     ] {
         let mut c = config();
         c.features.as_mut().unwrap().subagents = SubagentFeatures {
+            generic_fallback: false,
             status: true,
             control: true,
             ..Default::default()
@@ -822,6 +826,7 @@ async fn signal_and_managed_scheduler_tools_are_parent_only_and_shared_session_s
     let model = Script::new(vec![]);
     let mut c = config();
     c.features.as_mut().unwrap().subagents = SubagentFeatures {
+        generic_fallback: false,
         task: true,
         status: true,
         control: true,

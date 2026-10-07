@@ -9,6 +9,7 @@ import (
 	"github.com/gratefulagents/sdk/pkg/agentsdk"
 	sdkmode "github.com/gratefulagents/sdk/pkg/agentsdk/mode"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 )
@@ -126,7 +127,76 @@ func observeBuilderOutputSchemas(t *testing.T) []map[string]any {
 	return result
 }
 
+func observeAutomaticSubagents(t *testing.T) []map[string]any {
+	t.Helper()
+	out := []map[string]any{}
+	for index := 0; index < 12; index++ {
+		mask := index
+		roles := agentsdk.RoleCatalog{{Name: "reviewer", Instructions: "Review only.", ModelOverride: "openai/child", ToolAccess: "read-only"}}
+		generic, handoffs := false, false
+		if index >= 8 {
+			mask = 7
+			roles = nil
+			generic = index >= 9
+			handoffs = index == 10
+		}
+		if index == 11 {
+			roles = agentsdk.RoleCatalog{{Name: "zeta", Instructions: "Work as zeta."}, {Name: "agent", Instructions: "Work as agent."}}
+		}
+		selected := SubAgentFeatures{GenericFallback: generic, Async: AsyncSubAgentFeatures{Task: mask&1 != 0, Status: mask&2 != 0, Control: mask&4 != 0}}
+		cfg := Config{Model: "openai/base", RoleCatalog: roles, WorkDir: ".", Features: &Features{SubAgents: selected, Handoffs: HandoffFeatures{Enabled: handoffs, GenericFallback: handoffs}}}
+		model := &instructionModel{}
+		runner := agentsdk.NewRunnerWithModel(model)
+		parent, tools, specialists := BuildAgentWithSpecialists(cfg, runner, ToolBundle{})
+		state := NewSessionState()
+		tools = attachAsyncSubAgentTools(cfg, state, runner, nil, nil, parent, tools, specialists)
+		definitions := []string{}
+		for _, tool := range tools {
+			definitions = append(definitions, tool.Name())
+		}
+		sort.Strings(definitions)
+		agents := map[string]any{}
+		for name, agent := range specialists {
+			description := agent.HandoffDescription
+			if description == "" {
+				description = "Specialist sub-agent"
+			}
+			line := fmt.Sprintf("- %s: %s", name, description)
+			if !strings.Contains(parent.GetInstructions(nil), line) {
+				t.Fatal("missing SDK delegation guide entry")
+			}
+			agents[name] = map[string]any{"model": agent.Model, "instructions": agent.GetInstructions(nil), "tools": len(agent.Tools), "guide_line": line}
+		}
+		taskAgent, taskStatus := "", ""
+		for _, tool := range tools {
+			if tool.Name() == "subagent" {
+				result, err := tool.Execute(context.Background(), json.RawMessage(`{"message":"delegate","mode":"sync"}`), "fixture-call")
+				if err != nil || result.IsError {
+					t.Fatalf("child run: %v %#v", err, result)
+				}
+				tasks := state.SubAgentScheduler().ListTasks()
+				if len(tasks) != 1 {
+					t.Fatal("expected one task")
+				}
+				taskAgent, taskStatus = tasks[0].AgentName, string(tasks[0].Status)
+			}
+		}
+		out = append(out, map[string]any{"index": index, "mask": mask, "generic": generic, "handoffs": handoffs, "roles": roles, "tools": definitions, "agents": agents, "scheduler": state.SubAgentScheduler() != nil, "task_agent": taskAgent, "task_status": taskStatus, "requests": len(model.requests)})
+		if err := state.Close(); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return out
+}
+
 func TestRunInstructionsReference(t *testing.T) {
+	children, childErr := json.Marshal(observeAutomaticSubagents(t))
+	if childErr != nil {
+		t.Fatal(childErr)
+	}
+	if err := os.WriteFile(os.Getenv("RUN_AUTO_SUBAGENTS_OUTPUT"), children, 0600); err != nil {
+		t.Fatal(err)
+	}
 	schemas, schemaErr := json.Marshal(observeBuilderOutputSchemas(t))
 	if schemaErr != nil {
 		t.Fatal(schemaErr)

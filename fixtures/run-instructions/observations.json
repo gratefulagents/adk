@@ -1,4 +1,365 @@
 {
+  "auto_subagent_cases": [
+    {
+      "agents": {},
+      "generic": false,
+      "handoffs": false,
+      "index": 0,
+      "mask": 0,
+      "requests": 0,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": false,
+      "task_agent": "",
+      "task_status": "",
+      "tools": []
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 1,
+      "mask": 1,
+      "requests": 1,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "reviewer",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 2,
+      "mask": 2,
+      "requests": 0,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "",
+      "task_status": "",
+      "tools": [
+        "subagent_status"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 3,
+      "mask": 3,
+      "requests": 1,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "reviewer",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_status",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 4,
+      "mask": 4,
+      "requests": 0,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "",
+      "task_status": "",
+      "tools": [
+        "subagent_control"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 5,
+      "mask": 5,
+      "requests": 1,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "reviewer",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_control",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 6,
+      "mask": 6,
+      "requests": 0,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "",
+      "task_status": "",
+      "tools": [
+        "subagent_control",
+        "subagent_status"
+      ]
+    },
+    {
+      "agents": {
+        "reviewer": {
+          "guide_line": "- reviewer: Specialist sub-agent",
+          "instructions": "Review only.",
+          "model": "openai/child",
+          "tools": 0
+        }
+      },
+      "generic": false,
+      "handoffs": false,
+      "index": 7,
+      "mask": 7,
+      "requests": 1,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Review only.",
+          "ModelOverride": "openai/child",
+          "Name": "reviewer",
+          "ToolAccess": "read-only"
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "reviewer",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_control",
+        "subagent_status",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {},
+      "generic": false,
+      "handoffs": false,
+      "index": 8,
+      "mask": 7,
+      "requests": 0,
+      "roles": null,
+      "scheduler": false,
+      "task_agent": "",
+      "task_status": "",
+      "tools": []
+    },
+    {
+      "agents": {
+        "agent": {
+          "guide_line": "- agent: Generic sub-agent. Instructions come entirely from the parent's prompt.",
+          "instructions": "",
+          "model": "openai/base",
+          "tools": 0
+        }
+      },
+      "generic": true,
+      "handoffs": false,
+      "index": 9,
+      "mask": 7,
+      "requests": 1,
+      "roles": null,
+      "scheduler": true,
+      "task_agent": "agent",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_control",
+        "subagent_status",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {
+        "agent": {
+          "guide_line": "- agent: Generic sub-agent. Instructions come entirely from the parent's prompt.",
+          "instructions": "",
+          "model": "openai/base",
+          "tools": 0
+        }
+      },
+      "generic": true,
+      "handoffs": true,
+      "index": 10,
+      "mask": 7,
+      "requests": 1,
+      "roles": null,
+      "scheduler": true,
+      "task_agent": "agent",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_control",
+        "subagent_status",
+        "subagent_wait"
+      ]
+    },
+    {
+      "agents": {
+        "agent": {
+          "guide_line": "- agent: Specialist sub-agent",
+          "instructions": "Work as agent.",
+          "model": "openai/base",
+          "tools": 0
+        },
+        "zeta": {
+          "guide_line": "- zeta: Specialist sub-agent",
+          "instructions": "Work as zeta.",
+          "model": "openai/base",
+          "tools": 0
+        }
+      },
+      "generic": true,
+      "handoffs": false,
+      "index": 11,
+      "mask": 7,
+      "requests": 1,
+      "roles": [
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Work as zeta.",
+          "ModelOverride": "",
+          "Name": "zeta",
+          "ToolAccess": ""
+        },
+        {
+          "Description": "",
+          "FallbackModels": null,
+          "Instructions": "Work as agent.",
+          "ModelOverride": "",
+          "Name": "agent",
+          "ToolAccess": ""
+        }
+      ],
+      "scheduler": true,
+      "task_agent": "agent",
+      "task_status": "completed",
+      "tools": [
+        "subagent",
+        "subagent_control",
+        "subagent_status",
+        "subagent_wait"
+      ]
+    }
+  ],
   "cases": [
     {
       "base": "",
@@ -2911,8 +3272,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "0d26c0105b97bdd333355ffe353ad06d98d376c6a419bc8fc212bdb0c402a713",
-      "scripts/run-instructions-reference/run.py": "81e648ed05244e72b45238e3956fdf8339693ce19dc79529fed6d1c31c43fd85"
+      "scripts/run-instructions-reference/reference_test.go": "88270df7e95ec414e228c722f9dbb761678df28c6040c6701c0203f367d83d33",
+      "scripts/run-instructions-reference/run.py": "a65e71b1435648ac66fba87b2adc6ea1b14cc6555dae7e0a426ef90b9b431edc"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",
     "normalization": "No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. Output-schema cases compare parent-only placement, request fields and parsed results; schema diagnostics and provider bytes are not compared. No deprecated alias or MCP claim.",
@@ -2926,10 +3287,13 @@
       "internal/agent/output_schema.go": "c980f3b8e006eb63fc0eaf155f4cc9c1067bab81c73342bdeb4f7b7affa8948f",
       "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
       "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/subagent_registry.go": "5268a1220de5744f41a6bd30bcd46f03150e96dd716e75e0f1e4aa76c29fd712",
       "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
       "pkg/agentsdk/runtime/builder_test.go": "0c557ad7d463f635b81adae340a30a8dcd4c46d83965f4f74b41f13664e98803",
       "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",
-      "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0"
+      "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0",
+      "pkg/agentsdk/specialists.go": "3f0bfe8d9e686ef00b16c709e9b3e71659389caf8fb3275c4958b05804b61e59",
+      "pkg/agentsdk/subagent_tools.go": "67bd233b459cf4884c3a10eaf95103efea1c856ce680617b19dd457c1260e022"
     }
   },
   "resolver_cases": [

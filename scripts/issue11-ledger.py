@@ -67,6 +67,8 @@ RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo
                "crates/adk-runtime/Cargo.toml", "crates/adk-runtime/src/lib.rs",
                "crates/adk-runtime/tests/error_contracts.rs", "crates/adk-runtime/src/settings.rs",
                "crates/adk-runtime/tests/settings.rs", "crates/adk/src/builder.rs",
+               "crates/adk/src/builder/subagents.rs", "crates/adk/tests/builder_subagents/mod.rs",
+               "crates/adk/tests/builder_subagents/lifecycle.rs",
                "crates/adk/tests/builder.rs", "crates/adk/tests/catalog_handoffs.rs",
                "crates/adk/src/builder/workspace.rs", "crates/adk/tests/builder_workspace/mod.rs",
                "crates/adk/tests/builder_compaction_resolver/mod.rs",

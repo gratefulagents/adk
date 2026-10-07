@@ -25,6 +25,7 @@ use std::{
     time::Duration,
 };
 
+mod subagents;
 mod workspace;
 pub use workspace::workspace_context;
 
@@ -55,7 +56,7 @@ pub struct Features {
     pub untrusted_tool_outputs: bool,
     pub force_final_summary_turn: bool,
     pub immediate_input_polling: bool,
-    /// Requires an explicitly supplied session with an owned scheduler.
+    /// Uses an injected scheduler or automatic assembly with `Builder::subagent_host`.
     pub subagents: SubagentFeatures,
     /// Catalog transfers, independent of scheduler-backed subagents.
     pub handoffs: bool,
@@ -104,6 +105,7 @@ impl McpFeatures {
 
 #[derive(Clone, Debug, Default)]
 pub struct SubagentFeatures {
+    pub generic_fallback: bool,
     /// Spawn tasks and wait for their completion.
     pub task: bool,
     /// Inspect tasks without enabling spawn or control.
@@ -813,6 +815,7 @@ pub struct Builder {
     source: Option<Arc<dyn ConfigSource>>,
     session: Option<SessionHandle>,
     owned_session: Option<SessionState>,
+    subagent_host: Option<Arc<dyn Host>>,
     runner: RunnerConfig,
     compaction_metadata: Option<Arc<adk_providers::runtime::MetadataCompactionResolver>>,
     input_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
@@ -849,6 +852,7 @@ impl Builder {
             source: None,
             session: None,
             owned_session: None,
+            subagent_host: None,
             runner: RunnerConfig::default(),
             compaction_metadata: None,
             input_guardrails: vec![],
@@ -912,6 +916,11 @@ impl Builder {
     pub fn session(mut self, session: SessionHandle) -> Self {
         self.session = Some(session);
         self.owned_session = None;
+        self
+    }
+    /// Child tasks can outlive a parent turn, so their host must be owned rather than borrowed.
+    pub fn subagent_host(mut self, host: Arc<dyn Host>) -> Self {
+        self.subagent_host = Some(host);
         self
     }
     pub fn owned_session(mut self, session: SessionState) -> Self {
@@ -1325,7 +1334,7 @@ impl Builder {
             self.session = Some(state.handle());
             self.owned_session = Some(state);
         }
-        let session = self.session.as_ref().unwrap().clone();
+        let mut session = self.session.as_ref().unwrap().clone();
         if session.is_closed() {
             return Err(Error::new(ErrorCategory::Cancelled, "session is closed"));
         }
@@ -1365,12 +1374,29 @@ impl Builder {
             features.parallel_tool_calls.into(),
         );
         agent.settings = settings;
+        let automatic_subagents = features.subagents.enabled()
+            && session.subagents.is_none()
+            && self.subagent_host.is_some();
+        if automatic_subagents && self.owned_session.is_none() {
+            return Err(invalid("automatic subagents require an owned session"));
+        }
+        let mut target_roles = roles.clone();
+        if automatic_subagents && target_roles.is_empty() && features.subagents.generic_fallback {
+            target_roles.push(RoleSpec {
+                name: "agent".into(),
+                description: "Generic sub-agent. Instructions come entirely from the parent's prompt.".into(),
+                tool_access: "full".into(),
+                ..Default::default()
+            });
+        }
+        let catalog_names: BTreeSet<_> =
+            target_roles.iter().map(|role| role.name.clone()).collect();
         let mut targets = Vec::new();
-        if features.handoffs {
+        if features.handoffs || automatic_subagents {
             let mut names = BTreeSet::new();
-            for role in &roles {
+            for role in &target_roles {
                 let transfer = format!("transfer_to_{}", sanitize_handoff_name(&role.name));
-                if !names.insert(transfer.clone()) {
+                if features.handoffs && !names.insert(transfer.clone()) {
                     return Err(invalid(format!("duplicate handoff name: {transfer}")));
                 }
                 let mut model = self.config.model.trim().to_owned();
@@ -1442,9 +1468,14 @@ impl Builder {
                 } else {
                     role.description.trim().to_owned()
                 };
-                targets.push((transfer, description, target));
+                targets.push((
+                    transfer,
+                    description,
+                    target,
+                    features.handoffs && !roles.is_empty(),
+                ));
             }
-            if roles.is_empty() && features.handoff_generic_fallback {
+            if features.handoffs && roles.is_empty() && features.handoff_generic_fallback {
                 let mut model = self.config.model.trim().to_owned();
                 let (_, resolved) = routes.resolve(&model)?;
                 if model.is_empty() {
@@ -1465,19 +1496,61 @@ impl Builder {
                     "transfer_to_specialist".into(),
                     "Transfer to a specialist agent.".into(),
                     target,
+                    true,
                 ));
             }
         }
+        let pending_children = if automatic_subagents && !catalog_names.is_empty() {
+            let executor = Arc::new(subagents::PendingExecutor::default());
+            let security = adk_runtime::subagent::SecurityBaseline {
+                tools: policy.tools.clone(),
+                untrusted_tool_outputs: features.untrusted_tool_outputs,
+                max_output_bytes: self.runner.output.max_bytes,
+                ..Default::default()
+            };
+            let mut config = adk_runtime::subagent::SchedulerConfig {
+                agents: targets
+                    .iter()
+                    .filter(|(_, _, target, _)| catalog_names.contains(&target.name))
+                    .map(|(_, _, target, _)| {
+                        let mut child = security.clone();
+                        child.tools.access = target.tool_access_ceiling.unwrap();
+                        (target.name.clone(), child)
+                    })
+                    .collect(),
+                security,
+                ..Default::default()
+            };
+            if let Some(limit) = mode
+                .as_ref()
+                .and_then(|m| m.constraints.as_ref())
+                .and_then(|c| c.max_concurrent_subagents)
+            {
+                config.max_concurrency = limit.get() as usize;
+            }
+            if let Some(limit) = self.runner.subagent_max_turns {
+                config.max_turns = limit;
+            }
+            let scheduler =
+                Scheduler::new(session.context(context), config, executor.clone(), None)?;
+            let owner = self.owned_session.as_mut().unwrap();
+            owner.handle.subagents = Some(Arc::new(SubagentSession::new(scheduler.handle())));
+            owner.scheduler = Some(scheduler);
+            session = owner.handle();
+            self.session = Some(session.clone());
+            Some(executor)
+        } else {
+            None
+        };
         let mut excluded: BTreeSet<String> = ["finish", "present_plan", "AskUserQuestion"]
             .into_iter()
             .map(str::to_owned)
             .collect();
         let mut tool_config = self.tool_config(&features, &policy.tools);
-        if features.subagents.enabled() {
-            let children = session
-                .subagents
-                .clone()
-                .ok_or_else(|| invalid("subagents require a session-owned scheduler"))?;
+        if features.subagents.enabled() && !(automatic_subagents && catalog_names.is_empty()) {
+            let children = session.subagents.clone().ok_or_else(|| {
+                invalid("subagents require a session-owned scheduler or an explicit child host")
+            })?;
             self.runner.subagents = Some(children.clone());
             // Managed tools use ExtraTools registration, but cannot enable other extensions.
             let default_agent = children
@@ -1519,11 +1592,12 @@ impl Builder {
             adk_tools::Features::Legacy(f) => f.enable_tools || f.enable_subagents,
         };
         if extras_enabled {
-            for (name, _, _) in &targets {
-                if self
-                    .extra_tools
-                    .iter()
-                    .any(|t| t.definition().name == *name)
+            for (name, _, _, handoff) in &targets {
+                if *handoff
+                    && self
+                        .extra_tools
+                        .iter()
+                        .any(|t| t.definition().name == *name)
                     && tool_config
                         .allowed_names
                         .as_ref()
@@ -1578,13 +1652,13 @@ impl Builder {
                 .iter()
                 .map(|t| t.definition().name.clone())
                 .collect();
-            for (name, description, mut target) in targets {
-                if graph_names.contains(&name) {
+            for (name, description, mut target, handoff) in targets {
+                if handoff && graph_names.contains(&name) {
                     return Err(invalid(format!(
                         "handoff collides with parent tool: {name}"
                     )));
                 }
-                if !roles.is_empty() {
+                if catalog_names.contains(&target.name) {
                     let view = tools
                         .role_view(target.tool_access_ceiling.unwrap(), &excluded)
                         .map_err(|e| {
@@ -1593,9 +1667,12 @@ impl Builder {
                     target.tools = view.tools;
                     graph_names.extend(target.tools.iter().map(|t| t.definition().name.clone()));
                 }
-                graph_names.insert(name.clone());
                 let target = Arc::new(target);
                 specialists.insert(target.name.clone(), target.clone());
+                if !handoff {
+                    continue;
+                }
+                graph_names.insert(name.clone());
                 agent.handoffs.push(Handoff {
                     definition: ToolDefinition {
                         name, description,
@@ -1618,6 +1695,38 @@ impl Builder {
                         .is_none_or(|allowed| allowed.contains(name))
             });
             policy.tools.allowed_tools = Some(graph_names);
+            if pending_children.is_some()
+                && agent.tools.iter().any(|tool| {
+                    tool.definition().name == "subagent"
+                        && policy.tools.decision(tool.definition()) != adk_core::ToolDecision::Deny
+                })
+            {
+                let available: BTreeMap<_, _> = target_roles
+                    .iter()
+                    .map(|role| {
+                        (
+                            role.name.as_str(),
+                            if role.description.is_empty() {
+                                "Specialist sub-agent"
+                            } else {
+                                role.description.as_str()
+                            },
+                        )
+                    })
+                    .collect();
+                if !agent.instructions.is_empty() {
+                    agent.instructions.push_str("\n\n");
+                }
+                agent.instructions.push_str("Available specialist sub-agents (delegate via the subagent tool, agent_name=<name>):\n");
+                agent.instructions.push_str(
+                    &available
+                        .into_iter()
+                        .map(|(name, description)| format!("- {name}: {description}"))
+                        .collect::<Vec<_>>()
+                        .join("\n"),
+                );
+                agent.instructions.push_str("\n\nBy default, only message is sent to the child. Set share_parent_context=true only when needed; sharing can disclose unrelated context. Use mode=\"sync\" to wait or mode=\"background\" for independent work; completed results are delivered automatically. Assign parallel children disjoint file ownership.");
+            }
             let available: Vec<_> = agent
                 .handoffs
                 .iter()
@@ -1740,6 +1849,28 @@ impl Builder {
         if self.runner.cost_estimator.is_none() {
             self.runner.cost_estimator =
                 Some(Arc::new(adk_providers::runtime::BaselineCosts(routes)));
+        }
+        if let Some(executor) = pending_children {
+            let children = specialists
+                .iter()
+                .filter(|(name, _)| catalog_names.contains(*name))
+                .map(|(name, agent)| {
+                    Runner::new(
+                        agent.as_ref().clone(),
+                        subagents::runner_config(&self.runner),
+                    )
+                    .map(|runner| (name.clone(), runner))
+                })
+                .collect::<Result<_, _>>();
+            match children {
+                Ok(children) => executor.initialize(children, self.subagent_host.take().unwrap()),
+                Err(error) => {
+                    tools.close().await.map_err(|e| {
+                        Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
+                    })?;
+                    return Err(error);
+                }
+            }
         }
         let runner = match Runner::new(agent.clone(), std::mem::take(&mut self.runner)) {
             Ok(runner) => runner,

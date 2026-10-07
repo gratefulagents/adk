@@ -399,13 +399,16 @@ async fn cancellation_and_deadline_during_summary_do_not_dispatch_next_generatio
                 },
                 forced,
             );
+            let runner = runner(model.clone(), config(forced));
+            let request = request();
             let mut context = context();
             context.cancellation = model.cancel.clone();
             if !cancel {
-                context.deadline = Some(std::time::Instant::now() + Duration::from_millis(30));
+                // Leave planning time before the wall-clock deadline reaches the waiting model.
+                context.deadline = Some(std::time::Instant::now() + Duration::from_secs(1));
             }
-            let error = runner(model.clone(), config(forced))
-                .run(context, request(), Arc::new(HostImpl))
+            let error = runner
+                .run(context, request, Arc::new(HostImpl))
                 .await
                 .err()
                 .unwrap();

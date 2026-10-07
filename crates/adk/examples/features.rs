@@ -590,6 +590,46 @@ async fn handoffs_subagents() {
         bundle.close().await.unwrap();
     }
 
+    {
+        use adk::builder::{Builder, Config, Features, SubagentFeatures};
+        let model = Scripted::new(vec![
+            tool_response("subagent", json!({"message":"investigate", "mode":"sync"})),
+            answer("automatic child evidence"),
+            answer("automatic synthesis"),
+        ]);
+        let host = Arc::new(RecordingHost::default());
+        let mut bundle = Builder::new(Config {
+            model: "mock/base".into(),
+            features: Some(Features {
+                subagents: SubagentFeatures {
+                    task: true,
+                    generic_fallback: true,
+                    ..Default::default()
+                },
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, model)
+        .unwrap()
+        .subagent_host(host.clone())
+        .build(&context())
+        .await
+        .unwrap();
+        let result = bundle.run(context(), request().input, host).await.unwrap();
+        assert_eq!(
+            result.result.final_output,
+            Some(json!("automatic synthesis"))
+        );
+        let session = bundle.session();
+        let tasks = session.subagents().unwrap().scheduler.list();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].agent_name, "agent");
+        assert_eq!(tasks[0].result, "automatic child evidence");
+        bundle.close().await.unwrap();
+        assert!(session.is_closed());
+    }
+
     use subagent::{Scheduler, SchedulerConfig, SecurityBaseline};
     let child = Scripted::new(vec![answer("child evidence")]);
     let host = Arc::new(RecordingHost::default());

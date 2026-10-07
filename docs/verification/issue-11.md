@@ -2,6 +2,35 @@
 
 ## Current continuation evidence
 
+### Automatic owned child assembly
+
+`Builder::subagent_host` now assembles child runners and an owned scheduler from
+catalog roles, with optional generic fallback. Existing schedulers take precedence;
+borrowed sessions cannot be mutated into scheduler owners. Role access ceilings,
+mode concurrency/turn limits, filtered delegation guidance and parent-only output
+schemas are preserved. Child configurations omit parent admission/session state
+to avoid ownership cycles. Explicit close and drop cancel active children, including
+when handles escape the bundle; construction failures release owned resources.
+
+Twelve independently executed pinned SDK assembly observations compare tool-group
+selection, generic fallback, roles, handoffs and child calls. Six native regressions
+cover those observations plus security, ownership, rollback and cancellation.
+The offline handoffs/subagents scenario now runs an automatically built child.
+The SDK runtime discards the named tools returned by its specialist helper and
+attaches managed task tools instead: automatic named/nested tool graphs are not
+a missing runtime-builder requirement. Native explicit composition remains available.
+
+An initial full run exposed a wall-clock test deadline expiring during planning,
+before the summary model could be dispatched. The test now constructs its runner
+and request before arming a one-second deadline; all original cancellation and
+request-count assertions remain. Fresh final Rust 1.88 Linux verification:
+**1,246 passed, 0 failed, 30 ignored**; strict Clippy, rustdoc, formatting, full
+facade feature matrix, standalone consumer, all 20 offline scenarios and host-session
+example pass. Independent fixture reproduction, hash-bound evidence, 18 ledger
+validator tests and immutable source/license locks pass. No new ledger IDs are
+claimed: **210 verified / 8,681 unresolved / 251 excluded**. Live credentials and
+non-Linux execution remain unverified; this is not issue-wide completion.
+
 ### Builder structured-output composition
 
 The facade builder now forwards the runtime's typed output schema, schema name,

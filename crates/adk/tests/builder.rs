@@ -704,6 +704,7 @@ async fn owned_scheduler_is_joined_on_build_failure_and_shared_scheduler_survive
     let config = Config {
         features: Some(Features {
             subagents: SubagentFeatures {
+                generic_fallback: false,
                 task: true,
                 status: true,
                 control: true,
@@ -742,6 +743,7 @@ async fn subagents_require_an_owned_session_scheduler() {
     let config = Config {
         features: Some(Features {
             subagents: SubagentFeatures {
+                generic_fallback: false,
                 task: true,
                 status: true,
                 control: true,

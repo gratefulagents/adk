@@ -118,16 +118,17 @@ Go `ModelSettings::Merge` codec.
   without required runtime dependencies fail construction.
 * `subagents: SubagentFeatures` independently selects `task` (`subagent` and
   `subagent_wait`), `status` (`subagent_status`), and `control`
-  (`subagent_control`). All three default off. Any enabled group requires a
-  session containing an existing owned scheduler, including status-only and
-  control-only builds. Managed tools do not enable unrelated ExtraTools, bypass
-  host allow/deny lists, or enter handoff specialist tool views. Legacy
-  `enable_subagents` in `legacy_tools` retains the registry's signal/extra-tool
-  behavior; it does **not** automatically create a scheduler. To migrate from
-  the former `subagents: true`, set all three fields to true; replace false with
-  `SubagentFeatures::default()`. The grouping follows pinned SDK
-  `runtime/builder.go::asyncSubAgentToolNames`; native scheduler ownership stays
-  explicit rather than allocating a hidden scheduler.
+  (`subagent_control`). All three default off. Supply an existing owned scheduler
+  or call `Builder::subagent_host(Arc<dyn Host>)` for automatic owned assembly.
+  `generic_fallback` (default false) permits an instruction-free `agent` child
+  when the automatic catalog is empty; it does not enable task/status/control by
+  itself. Without roles or generic fallback, automatic assembly exposes no child
+  tools and allocates no scheduler, matching the SDK selection. Managed tools
+  do not enable unrelated ExtraTools, bypass host allow/deny lists, or enter
+  specialist tool views. Legacy `enable_subagents` in `legacy_tools` retains the
+  registry's signal/extra-tool behavior; select the native `subagents` groups
+  explicitly. The grouping follows pinned SDK
+  `runtime/builder.go::asyncSubAgentToolNames`.
 * `handoffs` and `handoff_generic_fallback` are separate opt-ins, both off in
   strict and legacy defaults. They neither require nor enable `subagents`, a
   scheduler, or `ExtraTools`.
@@ -542,6 +543,47 @@ matching the runtime contract. Fourteen independent pinned builder/runner cases
 compare schema placement, request fields and final values, not schema diagnostic
 messages, raw schema whitespace or provider wire formats.
 
+## Automatic owned subagents
+
+Call `Builder::subagent_host(host)` with an owned `Arc<dyn Host>` alongside the
+selected `SubagentFeatures`. The builder resolves role models/settings/access,
+prepares isolated tool views, creates child runners, and registers them with a
+session-owned native scheduler. Parent guidance lists the available role names
+and descriptions only when the spawn tool survives host policy. It retains the
+isolated-context warning and sync/background distinction in concise native prose,
+not the SDK's complete unconditional guide text. The child host is explicit because background
+tasks may outlive a borrowed parent-turn host. The `handoffs_subagents` offline
+example demonstrates this path alongside manual scheduler/agent-as-tool setup.
+
+Child views exclude parent signal and managed scheduler tools. Output schema,
+parent immediate-input callbacks, transient/additional prompt context, stop gates
+and parent durable state are not inherited. Children retain selected tool
+security/guardrails, output policy, retry/cost settings, hooks/observers and
+compaction policy/resolver. Their own scheduler provides steering and joins.
+Mode concurrency limits configure the new scheduler; child-turn limits are
+inherited. Native default ceilings are four concurrent tasks, 256 total tasks,
+depth four and 100 child turns. Use an injected `Scheduler` for custom shared
+budgets, limits or persistent `SchedulerStore` ownership; automatic assembly is
+in-memory, not a durable scheduler factory.
+
+Existing injected schedulers take precedence over `subagent_host`; they are not
+reconfigured. A borrowed session with no scheduler is rejected rather than
+silently mutated. An owned empty session may be initialized; use the resulting
+`bundle.session()` for subsequent builds (earlier handle clones retain their
+previous scheduler snapshot). Construction does not dispatch children. Failure
+closes the owned session; explicit bundle close cancels and joins active child
+work. Drop aborts the owner even when tool/session/scheduler handles escape.
+The executor is initialized once before any handle is exposed, with no mutable
+runtime registration or parent-session reference cycle.
+
+Twelve pinned SDK compositions compare selected tools, registered child names,
+model/instruction definitions, empty/generic choices and actual synchronous child
+completion. Native tests additionally cover normal/streamed parents, sync and
+background children, read-only role views, mode limits, rollback and close/drop.
+These are bounded composition/lifecycle claims, not full SDK scheduler/event or
+checkpoint-format equivalence. Named agent-as-tool and nested graphs remain
+available through explicit native runtime composition, not synthesized here.
+
 ## Source mapping and explicit gaps
 
 Reviewed mappings are `repos/sdk/pkg/agentsdk/runtime/{builder,features}.go` and
@@ -556,7 +598,7 @@ Go `Config` wire codec or a claim of full Go runtime parity.
 | Compaction | Explicitly gated; otherwise retains native runner policy/custom compactor. No Go provider metadata discovery or synthesized handoff-history policy. |
 | Files | YAML/YML/JSON mode specs and CRD-shaped envelopes; Markdown/YAML role frontmatter; built-in chat/plan and deterministic overrides. Unsupported fields and invalid/zero turn limits fail rather than silently falling back. |
 | Constraints | `maxTurns` caps parent turns; `subAgentMaxTurns` narrows child turns; `maxRetries` sets retries. `maxConcurrentSubAgents` validates the injected scheduler's immutable concurrency ceiling without mutating a shared owner. `maxRuntimeMinutes` is retained as metadata, matching the pinned SDK's lack of enforcement; hosts supply actual deadlines through `Context`. |
-| Roles | Active-parent role routing plus opt-in parent-to-catalog handoffs and tool-less empty-catalog fallback. Native handoff gating is independent of subagents; no agent-as-tool generation, nested graph, or scheduler registration. |
+| Roles | Active-parent role routing, opt-in catalog handoffs and tool-less handoff fallback; automatic child runners/scheduler registration with explicit child-host ownership and optional generic child fallback. Native handoff gating is independent of subagents. Named agent-as-tool and nested graphs require explicit runtime composition. |
 | Runtime adapters | Host-authorized MCP and project-state composition, opt-in built-in guardrails, final-summary selection and host-supplied immediate-input callbacks are available. MCP has no implicit repository/credential discovery. Tracing/event sinks still require explicit native observer/host composition; the persistent host-session API is separate from the runtime bundle. |
 | Lifecycle | Construction errors fail closed rather than returning partially configured tool resources. Borrowed state is not closed by a turn bundle. MCP cleanup is retained across cancellation; admitted synchronous project-state writes drain on explicit close. Keep the executor alive until close completes. |
 

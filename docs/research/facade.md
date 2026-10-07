@@ -235,6 +235,27 @@ child. The disposable runtime reference harness executes eleven catalog cases;
 native tests exercise the actual managed tool and scheduler plus explicit-name
 overrides. Automatic owned scheduler construction remains separate work.
 
+## Automatic child assembly
+
+Adopt explicit owned child-host injection and an immutable per-session registry,
+rather than the SDK's mutable scheduler reconfiguration. The embedding host may
+supply an existing scheduler; borrowed owners are never changed. A private
+`OnceLock<RunnerChildExecutor>` resolves tool/scheduler construction order and
+is populated before the bundle exposes its handles. Child runners deliberately
+omit parent session/admission callbacks, preventing an ownership cycle and
+consumption of the parent's input queue. Keep native scheduler safety ceilings
+and explicit persistent-store injection instead of copying unlimited defaults.
+
+The pinned GPL-3.0-only [runtime assembly](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go),
+[specialist construction](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/specialists.go)
+and [child run configuration](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/subagent_registry.go)
+are hashed in the disposable oracle. Twelve cases execute real SDK composition
+and synchronous child calls; native tests compare selection/registration and
+exercise additional safety/lifecycle guarantees. Generated named specialist tools
+are not attached by the SDK runtime builder: it uses the managed task tools.
+Do not claim missing automatic named/nested tools solely because the native
+builder also leaves those to explicit composition.
+
 ## Builder structured output
 
 Forward the existing native `AgentConfig` schema/name/strict/parser fields through

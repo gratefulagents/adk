@@ -815,9 +815,12 @@ wins, and disabling the compaction feature suppresses both resolvers.
 Successful catalogs are cached for the resolver lifetime; failed attempts have a
 30-second cooldown. Standalone consumers can call `resolver.lookup(context, model).await`
 to obtain `Result<Option<ModelMetadata>, Error>` without constructing a runner.
-A missing model or failed fetch returns `None`; cancellation/deadline returns an
-error. This raw API neither applies static defaults nor adds the runtime budget;
-it uses the caller's context and the authenticated fetcher's existing bound.
+A missing model or failed fetch returns `None`, including a cancelled or expired
+fetch. Such failures enter the same cooldown. Cached results are returned even
+for cancelled/expired callers, matching the SDK public lookup. This raw API waits
+for an in-progress catalog fetch; it neither applies static defaults nor adds
+the runtime budget. Network fetching uses the caller's context and the
+authenticated fetcher's existing bound.
 Lookup tries the full model ID, then the suffix after the first slash.
 Runtime threshold resolution is bounded to 15 seconds; unavailable/invalid metadata falls back
 to static model thresholds. Explicit caller cancellation/deadline remains an error.

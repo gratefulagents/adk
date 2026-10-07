@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Metadata lookup cancellation and cached reads
+
+Twelve independent observations from the unchanged pinned SDK now cover cancelled
+and expired contexts through cold lookup, failed-fetch cooldown, retry, warm hit,
+warm miss and subsequent active lookup. The new native regression failed before
+the fix because public lookup rejected a cancelled context before consulting the
+cache. Public `MetadataCompactionResolver::lookup` now serves cached results
+regardless of context state and treats cancelled/expired fetches as misses with
+the existing 30-second cooldown. The runner-facing `thresholds` adapter retains
+pre-dispatch checks, cancellable waiting, the 15-second bound and cancellation
+errors; it does not adopt the public raw-lookup cancellation semantics.
+
+All eight metadata tests pass, including the twelve fixture observations, cache
+isolation, shared fetches, timeout and runner cancellation. Fresh Rust 1.88 Linux
+workspace verification: **1,237 passed, 0 failed, 30 ignored**. Strict Clippy and
+all-feature documentation builds pass. The platform-free standalone consumer,
+all 20 offline feature scenarios, owned host-session example, pinned fixture
+reproduction, source locks and all 18 ledger-validator tests pass. This bounded
+correction does not establish whole resolver/builder parity or close additional
+capability IDs. Credentialed
+live providers and non-Linux execution remain unverified. Issue #11 is incomplete;
+PR33 must not merge; the CLI/evaluation/Terminal-Bench exclusions are unchanged.
+
 ### Model-written compaction summaries
 
 The runner now implements the SDK-default model-summary phase after successful

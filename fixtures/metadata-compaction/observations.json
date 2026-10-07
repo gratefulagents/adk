@@ -623,11 +623,109 @@
       "picker": []
     }
   ],
+  "lifecycle_cases": [
+    {
+      "context": "cancelled",
+      "found": false,
+      "id": "",
+      "model": "cached",
+      "requests": 0,
+      "stage": "cold"
+    },
+    {
+      "context": "cancelled",
+      "found": false,
+      "id": "",
+      "model": "cached",
+      "requests": 0,
+      "stage": "cooldown"
+    },
+    {
+      "context": "cancelled",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "retry"
+    },
+    {
+      "context": "cancelled",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "warm"
+    },
+    {
+      "context": "cancelled",
+      "found": false,
+      "id": "",
+      "model": "missing",
+      "requests": 1,
+      "stage": "warm-missing"
+    },
+    {
+      "context": "cancelled",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "warm-again"
+    },
+    {
+      "context": "expired",
+      "found": false,
+      "id": "",
+      "model": "cached",
+      "requests": 0,
+      "stage": "cold"
+    },
+    {
+      "context": "expired",
+      "found": false,
+      "id": "",
+      "model": "cached",
+      "requests": 0,
+      "stage": "cooldown"
+    },
+    {
+      "context": "expired",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "retry"
+    },
+    {
+      "context": "expired",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "warm"
+    },
+    {
+      "context": "expired",
+      "found": false,
+      "id": "",
+      "model": "missing",
+      "requests": 1,
+      "stage": "warm-missing"
+    },
+    {
+      "context": "expired",
+      "found": true,
+      "id": "cached",
+      "model": "cached",
+      "requests": 1,
+      "stage": "warm-again"
+    }
+  ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/metadata-compaction-reference/reference_test.go": "1e226510ef34e600605d344ab32dedb0316b5e394f832679a0127e6e797cf14e",
+      "scripts/metadata-compaction-reference/reference_test.go": "8d77a2eb4809cc0274353df87ef7375463175535642001c576eaf17ffb2fe70d",
       "scripts/metadata-compaction-reference/run.py": "4a31146bf2897207ad3dcb31c9446eb099726c092cd2ad43f9cbaefbb304948d"
     },
     "license": "GPL-3.0-only",

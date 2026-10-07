@@ -41,15 +41,15 @@ impl MetadataCompactionResolver {
         self.warnings.lock().unwrap().iter().cloned().collect()
     }
     /// Return cached metadata, or `None` on a missing model or failed fetch.
-    /// Caller cancellation/deadline is an error; fetch diagnostics are available via `warnings`.
+    /// Cached results ignore caller cancellation/deadline. Failed fetches, including
+    /// cancelled fetches, return `None` and enter the retry cooldown; see `warnings`.
     /// Unlike runtime `thresholds`, this does not apply static defaults or a 15-second budget.
     pub async fn lookup(
         &self,
         context: &Context,
         model: &str,
     ) -> Result<Option<ModelMetadata>, Error> {
-        context.check_active()?;
-        let mut cache = crate::active(context, self.cache.lock()).await?;
+        let mut cache = self.cache.lock().await;
         if cache.catalog.is_none()
             && cache
                 .last_attempt
@@ -66,7 +66,6 @@ impl MetadataCompactionResolver {
                 }
             }
         }
-        context.check_active()?;
         let Some(catalog) = &cache.catalog else {
             return Ok(None);
         };
@@ -91,19 +90,22 @@ impl CompactionModelResolver for MetadataCompactionResolver {
         model: &'a str,
     ) -> BoxFuture<'a, Result<Option<(u64, u64)>, Error>> {
         Box::pin(async move {
-            let metadata =
-                match tokio::time::timeout(Duration::from_secs(15), self.lookup(context, model))
-                    .await
-                {
-                    Ok(result) => result?,
-                    Err(_) => {
-                        self.warnings
-                            .lock()
-                            .unwrap()
-                            .insert(MetadataCompactionWarning::FetchFailed);
-                        None
-                    }
-                };
+            context.check_active()?;
+            let metadata = match tokio::time::timeout(
+                Duration::from_secs(15),
+                crate::active(context, self.lookup(context, model)),
+            )
+            .await
+            {
+                Ok(result) => result??,
+                Err(_) => {
+                    self.warnings
+                        .lock()
+                        .unwrap()
+                        .insert(MetadataCompactionWarning::FetchFailed);
+                    None
+                }
+            };
             context.check_active()?;
             if let Some(thresholds) = metadata.and_then(|metadata| metadata.compaction_defaults()) {
                 return Ok(Some(thresholds));

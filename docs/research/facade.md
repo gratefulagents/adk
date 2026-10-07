@@ -195,7 +195,7 @@ observations from the [pinned public helper](https://github.com/gratefulagents/s
 `gpt-5.6-MİNI`. Keep Rust's associated constructor and explicit resolver injection
 rather than reproducing Go's mutable public function-variable alias.
 
-Adopt an explicit session-owned async resolver and cancellable single-flight
+Adopt an explicit session-owned async resolver and single-flight
 cache instead of process-global credential discovery or a blocking Go mutex.
 Preserve successful-fetch lifetime, failed-fetch 30-second cooldown and the
 builder's 15-second lookup bound. Expose raw cached lookup separately from runtime
@@ -204,6 +204,11 @@ embedding host instead of copying Go's global stderr logging. Mutable remote
 metadata deliberately has no durable key. Reference:
 [pinned resolver source](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/providers/openai/compaction.go),
 GPL-3.0-only, executed by `scripts/metadata-compaction-reference/run.py`.
+Twelve additional cold/warm cancelled/expired-context observations establish
+that public lookup serves cached metadata regardless of context state and caches
+failed fetches for the cooldown. Adopt those public lookup semantics; keep
+cancellable waiting and pre-dispatch cancellation enforcement in the native
+runner-facing threshold adapter instead of applying them to raw cached reads.
 
 ## Model-written local summaries
 

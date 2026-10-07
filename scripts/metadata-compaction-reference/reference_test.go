@@ -99,6 +99,39 @@ func nativeStaticObservations() []map[string]any {
 	return out
 }
 
+func nativeLifecycleObservations() []map[string]any {
+	var out []map[string]any
+	for _, expired := range []bool{false, true} {
+		var requests atomic.Int32
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			requests.Add(1)
+			w.Write([]byte(`{"models":[{"slug":"cached","context_window":10000}]}`))
+		}))
+		resolver := NewCompactionMetadataResolver(server.URL, NewAPIKeyAuthSession("fixture-token"))
+		inactive, cancel := context.WithCancel(context.Background())
+		kind := "cancelled"
+		if expired {
+			cancel()
+			inactive, cancel = context.WithDeadline(context.Background(), time.Now().Add(-time.Second))
+			kind = "expired"
+		}
+		cancel()
+		observe := func(stage string, ctx context.Context, model string) {
+			meta, found := resolver.Lookup(ctx, model)
+			out = append(out, map[string]any{"context": kind, "stage": stage, "model": model, "found": found, "id": meta.ID, "requests": requests.Load()})
+		}
+		observe("cold", inactive, "cached")
+		observe("cooldown", context.Background(), "cached")
+		resolver.lastAttempt = time.Now().Add(-31 * time.Second)
+		observe("retry", context.Background(), "cached")
+		observe("warm", inactive, "cached")
+		observe("warm-missing", inactive, "missing")
+		observe("warm-again", context.Background(), "cached")
+		server.Close()
+	}
+	return out
+}
+
 func TestNativeMetadataReference(t *testing.T) {
 	const catalog = `{"models":[{"slug":"GPT-CUSTOM","context_window":10000},{"slug":"vendor/gpt-custom","context_window":20000},{"slug":"Δ","context_window":4000},{"slug":"İ","context_window":6000},{"slug":"no-context"}]}`
 	var requests atomic.Int32
@@ -153,7 +186,7 @@ func TestNativeMetadataReference(t *testing.T) {
 		hash.Write([]byte(key))
 		count++
 	}
-	out := map[string]any{"static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
+	out := map[string]any{"lifecycle_cases": nativeLifecycleObservations(), "static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
 	data, err := json.Marshal(out)
 	if err != nil {
 		t.Fatal(err)

@@ -143,15 +143,6 @@ async fn concurrent_calls_share_fetch_and_cancelled_call_does_not_poison_cache()
         ..context()
     };
     assert!(resolver.thresholds(&cancelled, "gpt-custom").await.is_err());
-    assert_eq!(
-        resolver
-            .lookup(&cancelled, "gpt-custom")
-            .await
-            .unwrap_err()
-            .info
-            .category,
-        ErrorCategory::Cancelled
-    );
     assert_eq!(calls.load(Ordering::SeqCst), 0);
     let ctx = context();
     let (a, b) = tokio::join!(
@@ -296,5 +287,84 @@ fn metadata_thresholds_match_pinned_sdk_signed_boundary_grid() {
             )
         });
         assert_eq!(metadata.compaction_defaults(), expected, "{case}");
+    }
+}
+
+#[tokio::test]
+async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
+    let fixture = fixture();
+    for kind in ["cancelled", "expired"] {
+        let (session, calls, server) = server(vec![(
+            200,
+            r#"{"models":[{"slug":"cached","context_window":10000}]}"#.into(),
+        )]);
+        let resolver = MetadataCompactionResolver::new(session);
+        let mut inactive = context();
+        if kind == "cancelled" {
+            let token = Arc::new(CancellationToken::new());
+            token.cancel();
+            inactive.cancellation = token;
+        } else {
+            inactive.deadline = Some(std::time::Instant::now() - Duration::from_secs(1));
+        }
+        for case in fixture["lifecycle_cases"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter(|case| case["context"] == kind)
+        {
+            let stage = case["stage"].as_str().unwrap();
+            if stage == "retry" {
+                tokio::time::pause();
+                tokio::time::advance(Duration::from_secs(31)).await;
+                tokio::time::resume();
+            }
+            let active = context();
+            let ctx = if matches!(stage, "cold" | "warm" | "warm-missing") {
+                &inactive
+            } else {
+                &active
+            };
+            let result = resolver
+                .lookup(ctx, case["model"].as_str().unwrap())
+                .await
+                .unwrap();
+            assert_eq!(
+                result.is_some(),
+                case["found"].as_bool().unwrap(),
+                "{kind}/{stage}"
+            );
+            assert_eq!(
+                result.map(|m| m.id).unwrap_or_default(),
+                case["id"].as_str().unwrap(),
+                "{kind}/{stage}"
+            );
+            assert_eq!(
+                calls.load(Ordering::SeqCst),
+                case["requests"].as_u64().unwrap() as usize,
+                "{kind}/{stage}"
+            );
+        }
+        assert_eq!(
+            resolver.warnings(),
+            vec![
+                MetadataCompactionWarning::FetchFailed,
+                MetadataCompactionWarning::MissingModel("missing".into())
+            ]
+        );
+        assert_eq!(
+            resolver
+                .thresholds(&inactive, "cached")
+                .await
+                .unwrap_err()
+                .info
+                .category,
+            if kind == "cancelled" {
+                ErrorCategory::Cancelled
+            } else {
+                ErrorCategory::DeadlineExceeded
+            }
+        );
+        server.join().unwrap();
     }
 }

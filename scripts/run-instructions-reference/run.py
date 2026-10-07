@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-only
-"""Execute pinned SDK BuildRunConfig and actual runner requests in a disposable archive, never the checkout."""
+"""Execute pinned SDK builder defaults, BuildRunConfig and actual runner requests in a disposable archive, never the checkout."""
 import argparse
 import hashlib
 import io
@@ -52,10 +52,11 @@ def main():
         output = source / 'observations.json'
         compactions = source / 'compactions.json'
         resolvers = source / 'resolvers.json'
-        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output), RUN_COMPACTION_OUTPUT=str(compactions), RUN_RESOLVER_OUTPUT=str(resolvers))
+        subagent_defaults = source / 'subagent-defaults.json'
+        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output), RUN_COMPACTION_OUTPUT=str(compactions), RUN_RESOLVER_OUTPUT=str(resolvers), RUN_SUBAGENT_DEFAULT_OUTPUT=str(subagent_defaults))
         command = [go, 'test', '-count=1', '-run', '^TestRunInstructionsReference$', '-v', './pkg/agentsdk/runtime']
         subprocess.run(command, cwd=source, env=env, check=True)
-        result = {'provenance': provenance, 'cases': json.loads(output.read_text()), 'compaction_cases': json.loads(compactions.read_text()), 'resolver_cases': json.loads(resolvers.read_text())}
+        result = {'provenance': provenance, 'cases': json.loads(output.read_text()), 'compaction_cases': json.loads(compactions.read_text()), 'resolver_cases': json.loads(resolvers.read_text()), 'subagent_default_cases': json.loads(subagent_defaults.read_text())}
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/run-instructions/observations.json'
         destination.parent.mkdir(parents=True, exist_ok=True)

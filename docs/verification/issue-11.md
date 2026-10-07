@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Managed subagent default selection
+
+The builder no longer routes omitted `agent_name` to the parent's identity. It
+uses immutable scheduler registrations: exact `agent` first, otherwise lexical
+first nonblank name, or an empty default for an empty eligible catalog. Eleven
+independent executions of the pinned `defaultAsyncSubAgent` helper are recorded
+in the disposable runtime reference fixture. Native managed-tool/scheduler tests
+compare the selected names and completed task records, explicit overrides and
+empty-catalog rejection; the single-worker case failed before the correction.
+Borrowed session ownership is preserved. This is a bounded default-selection
+claim, not automatic scheduler allocation or complete SDK task-tool parity.
+
+Fresh Rust 1.88 Linux workspace: **1,238 passed, 0 failed, 30 ignored**. Strict
+Clippy, all-feature documentation, formatting, independent fixture reproduction,
+hash-bound evidence, all 18 ledger validators and source locks pass. No new
+capability IDs are closed; issue #11 remains incomplete.
+
 ### Metadata lookup cancellation and cached reads
 
 Twelve independent observations from the unchanged pinned SDK now cover cancelled

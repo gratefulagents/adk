@@ -562,6 +562,17 @@ original SDK ordering; Rust's registry ordering is intentionally not compared.
 Explicit native scheduler ownership and host-policy/exclusion checks remain
 separate lifecycle assertions rather than claims of automatic SDK allocation.
 
+When a managed `subagent` call omits `agent_name`, the builder selects from the
+session scheduler's registered names: exact `agent` first, otherwise the first
+nonblank name in lexical order, or an empty default when none exists. The
+parent agent name and the separate handoff catalog do not choose the child.
+An explicit `agent_name` still overrides this default. `SchedulerHandle::agent_names`
+exposes the immutable registration names without allowing registration changes.
+Eleven independently executed pinned `defaultAsyncSubAgent` cases verify this
+selection through the native managed tool and actual child scheduler. This does
+not establish automatic scheduler construction or full SDK task-tool parity.
+
+
 ### Bounded catalog oracle comparison
 
 `bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle` reads

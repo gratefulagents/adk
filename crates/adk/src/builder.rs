@@ -1468,7 +1468,19 @@ impl Builder {
                 .ok_or_else(|| invalid("subagents require a session-owned scheduler"))?;
             self.runner.subagents = Some(children.clone());
             // Managed tools use ExtraTools registration, but cannot enable other extensions.
-            let mut managed = adk_runtime::build_subagent_task_tools(children, agent.name.clone());
+            let default_agent = children
+                .scheduler
+                .agent_names()
+                .find(|name| *name == "agent")
+                .or_else(|| {
+                    children
+                        .scheduler
+                        .agent_names()
+                        .find(|name| !name.trim().is_empty())
+                })
+                .unwrap_or_default()
+                .to_owned();
+            let mut managed = adk_runtime::build_subagent_task_tools(children, default_agent);
             excluded.extend(managed.iter().map(|tool| tool.definition().name.clone()));
             managed.retain(|tool| match tool.definition().name.as_str() {
                 "subagent" | "subagent_wait" => features.subagents.task,

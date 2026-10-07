@@ -650,6 +650,10 @@ impl Drop for Scheduler {
 }
 
 impl SchedulerHandle {
+    pub fn agent_names(&self) -> impl Iterator<Item = &str> {
+        self.inner.config.agents.keys().map(String::as_str)
+    }
+
     /// The owner's immutable global concurrency ceiling, shared by all scopes.
     /// Reading it grants no authority to resize an existing scheduler.
     pub fn max_concurrency(&self) -> usize {

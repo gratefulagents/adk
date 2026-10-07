@@ -2643,8 +2643,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "7f22dc4bba34e44ea10f4fa304e741efb5f4b00f1e5c825800ce06d41abc1c43",
-      "scripts/run-instructions-reference/run.py": "0cb9a3565ff16fedad687149813b15ac03e007f14579af12eef7e402f84fafb0"
+      "scripts/run-instructions-reference/reference_test.go": "363e8798096f86a6880fa8b06dd537ba142fc7f9e23c63367e0a751427c520f5",
+      "scripts/run-instructions-reference/run.py": "618e7fb968970d7fdad12225c5a04720652b2c986593ffc2bf89ea0404dfdfe0"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",
     "normalization": "No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. No deprecated alias, output schema or MCP claim.",
@@ -3453,6 +3453,82 @@
       ],
       "retry": true,
       "streaming": true
+    }
+  ],
+  "subagent_default_cases": [
+    {
+      "default": "",
+      "names": null
+    },
+    {
+      "default": "",
+      "names": []
+    },
+    {
+      "default": "worker",
+      "names": [
+        "worker"
+      ]
+    },
+    {
+      "default": "alpha",
+      "names": [
+        "zeta",
+        "alpha"
+      ]
+    },
+    {
+      "default": "agent",
+      "names": [
+        "alpha",
+        "agent",
+        "zeta"
+      ]
+    },
+    {
+      "default": "Agent",
+      "names": [
+        "Agent",
+        "alpha"
+      ]
+    },
+    {
+      "default": "",
+      "names": [
+        "",
+        " ",
+        "\t\n"
+      ]
+    },
+    {
+      "default": "worker",
+      "names": [
+        "",
+        " ",
+        "worker"
+      ]
+    },
+    {
+      "default": "Z",
+      "names": [
+        "\u0394",
+        "\u03b1",
+        "Z"
+      ]
+    },
+    {
+      "default": " agent ",
+      "names": [
+        " agent ",
+        "worker"
+      ]
+    },
+    {
+      "default": "agent",
+      "names": [
+        "agent",
+        ""
+      ]
     }
   ]
 }

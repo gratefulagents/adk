@@ -57,6 +57,21 @@ func (m *instructionModel) StreamResponse(ctx context.Context, req agentsdk.Mode
 	return agentsdk.NewModelStream(events, done), nil
 }
 func TestRunInstructionsReference(t *testing.T) {
+	defaults := []map[string]any{}
+	for _, names := range [][]string{nil, {}, {"worker"}, {"zeta", "alpha"}, {"alpha", "agent", "zeta"}, {"Agent", "alpha"}, {"", " ", "\t\n"}, {"", " ", "worker"}, {"Δ", "α", "Z"}, {" agent ", "worker"}, {"agent", ""}} {
+		agents := map[string]*agentsdk.Agent{}
+		for _, name := range names {
+			agents[name] = &agentsdk.Agent{Name: name}
+		}
+		defaults = append(defaults, map[string]any{"names": names, "default": defaultAsyncSubAgent(agents)})
+	}
+	defaultsData, err := json.Marshal(defaults)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("RUN_SUBAGENT_DEFAULT_OUTPUT"), defaultsData, 0600); err != nil {
+		t.Fatal(err)
+	}
 	cases := []map[string]any{}
 	for _, base := range []string{"", " \n\t", " base\n "} {
 		for _, extra := range []string{"", " \t", " extra ", "Δ\nnext"} {

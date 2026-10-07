@@ -223,3 +223,14 @@ Include the setting even at its default in durable identity, so an older
 deterministic-only checkpoint cannot silently acquire new model-call behavior.
 Reference: [SDK summary helper](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/compaction_llm.go),
 GPL-3.0-only, independently executed by `scripts/llm-summary-reference/run.py`.
+
+## Default managed child selection
+
+Adopt the [pinned runtime's `defaultAsyncSubAgent` selection](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go#L802)
+(GPL-3.0-only): prefer exact `agent`, otherwise lexical first nonblank name.
+Use the native session scheduler's immutable registrations as the authoritative
+catalog, not the parent name or separately configured handoff targets. Reject
+implicit parent-to-child identity coupling: the parent need not be a registered
+child. The disposable runtime reference harness executes eleven catalog cases;
+native tests exercise the actual managed tool and scheduler plus explicit-name
+overrides. Automatic owned scheduler construction remains separate work.

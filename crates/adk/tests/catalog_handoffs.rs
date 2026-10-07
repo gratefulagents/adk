@@ -1185,3 +1185,101 @@ async fn bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle
     }
     assert_eq!(compared, selected.len());
 }
+
+struct CompletedChild;
+impl ChildExecutor for CompletedChild {
+    fn execute<'a>(
+        &'a self,
+        invocation: ChildInvocation,
+        _: ChildControl,
+    ) -> BoxFuture<'a, Result<ChildOutcome, Error>> {
+        Box::pin(async move { Ok(ChildOutcome::completed(invocation.agent_name)) })
+    }
+}
+
+#[tokio::test]
+async fn managed_subagent_default_uses_registered_catalog_not_parent_identity() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["subagent_default_cases"].as_array().unwrap() {
+        let names: Vec<_> = case["names"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .map(|name| name.as_str().unwrap())
+            .collect();
+        let expected = case["default"].as_str().unwrap();
+        for explicit in [None, names.iter().copied().find(|name| !name.is_empty())] {
+            let scheduler = Scheduler::new(
+                context(),
+                SchedulerConfig {
+                    agents: names
+                        .iter()
+                        .map(|name| ((*name).to_owned(), SecurityBaseline::default()))
+                        .collect(),
+                    ..Default::default()
+                },
+                Arc::new(CompletedChild),
+                None,
+            )
+            .unwrap();
+            let mut owner = SessionState::with_scheduler(scheduler);
+            let handle = owner.handle();
+            let model = Script::new(vec![]);
+            let mut c = config();
+            c.agent_name = "not-a-registered-child".into();
+            c.features.as_mut().unwrap().subagents.task = true;
+            let mut bundle = builder(c, &model)
+                .session(handle.clone())
+                .build(&context())
+                .await
+                .unwrap();
+            let tool = bundle
+                .agent()
+                .tools
+                .iter()
+                .find(|tool| tool.definition().name == "subagent")
+                .unwrap();
+            let mut arguments = json!({"message":"delegate", "mode":"sync"});
+            if let Some(name) = explicit {
+                arguments["agent_name"] = name.into();
+            }
+            let result = tool
+                .execute(
+                    &ToolContext {
+                        operation: context(),
+                        work_dir: ".".into(),
+                        policy: ToolPolicy::default(),
+                        idempotency_key: None,
+                    },
+                    ToolCall {
+                        id: "delegate".into(),
+                        name: "subagent".into(),
+                        arguments,
+                    },
+                )
+                .await;
+            let expected = explicit.unwrap_or(expected);
+            let tasks = handle.subagents().unwrap().scheduler.list();
+            if names.contains(&expected) {
+                assert!(
+                    !result
+                        .unwrap_or_else(|e| panic!("{case:?}: {e:?}"))
+                        .is_error
+                );
+                assert_eq!(tasks.len(), 1, "{case:?}");
+                assert_eq!(tasks[0].agent_name, expected, "{case:?}");
+                assert_eq!(tasks[0].status, TaskStatus::Completed);
+                assert_eq!(tasks[0].result, expected);
+            } else {
+                assert!(result.is_err(), "{case:?}");
+                assert!(tasks.is_empty());
+            }
+            bundle.close().await.unwrap();
+            assert!(!handle.is_closed());
+            owner.close().await.unwrap();
+        }
+    }
+}

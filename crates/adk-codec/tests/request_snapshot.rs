@@ -2,6 +2,28 @@ use adk_codec::snapshots::{ModelSettings, RequestSnapshot};
 use serde_json::Value;
 
 #[test]
+fn request_snapshot_field_records_match_independent_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["request_record_cases"].as_array().unwrap() {
+        let input = case["input"].as_str().unwrap();
+        let decoded = serde_json::from_str::<RequestSnapshot>(input);
+        assert_eq!(
+            decoded.is_ok(),
+            case["accepted"].as_bool().unwrap(),
+            "{input}: {decoded:?}"
+        );
+        if let Ok(snapshot) = decoded {
+            assert_eq!(
+                adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                case["encoded"].as_str().unwrap().as_bytes(),
+                "{input}"
+            );
+        }
+    }
+}
+
+#[test]
 fn pinned_writer_request_bytes_round_trip_without_reordering_fields() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

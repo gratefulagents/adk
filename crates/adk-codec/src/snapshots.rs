@@ -1,6 +1,6 @@
 //! Analysis-oriented request documents; executable tool callbacks never serialize.
 
-use crate::dto::{RawJson, RunItemSnapshot, null_default};
+use crate::dto::{RawJson, RunItemSnapshot, null_default, null_default_elements};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -33,7 +33,7 @@ pub struct ModelSettings {
     #[serde(deserialize_with = "null_default")]
     pub text_verbosity: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default")]
+    #[serde(deserialize_with = "null_default_elements")]
     pub stop_sequences: Vec<String>,
 }
 fn is_zero(value: &i64) -> bool {
@@ -53,10 +53,10 @@ pub struct RequestSnapshot {
     #[serde(deserialize_with = "null_default")]
     pub instructions: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default")]
+    #[serde(deserialize_with = "null_default_elements")]
     pub input_items: Vec<RunItemSnapshot>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default")]
+    #[serde(deserialize_with = "null_default_elements")]
     pub tools: Vec<ToolSnapshot>,
     #[serde(deserialize_with = "null_default")]
     pub settings: ModelSettings,

@@ -269,6 +269,20 @@ registration aliases distinguish named-only projections from managed ones.
 Preserve native pending/failed-task envelopes and scheduler panic containment;
 those stronger lifecycle/error contracts are not claimed byte-compatible.
 
+## Analysis-record nulls and open labels
+
+The [pinned snapshot records](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/llm_snapshot.go)
+and [model settings](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/model_settings.go)
+(GPL-3.0-only) use Go zero-valued slice elements and a string item label.
+Independently executed decoding/encoding matrices cover 54 response and 34 request
+records. Adopt Serde optional-element decoding followed by zero-value conversion,
+not dropping nulls or writing a second JSON parser. Reject a closed Rust enum for
+analysis labels: preserve opaque strings in `Other(String)` and represent the
+empty label explicitly. Keep strict known-kind admission at executable recovery
+and transcript boundaries, where accepting opaque labels would fabricate state.
+These fixtures close field representation claims, not every decoder behavior or
+provider response profile.
+
 ## Builder structured output
 
 Forward the existing native `AgentConfig` schema/name/strict/parser fields through

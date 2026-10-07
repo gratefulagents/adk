@@ -240,7 +240,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -261,7 +262,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -282,7 +284,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -303,7 +306,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -324,7 +328,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -345,7 +350,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -366,7 +372,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -387,7 +394,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -408,7 +416,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -429,7 +438,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -450,7 +460,8 @@
         "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
         "json_null_scalars_and_collections_follow_go_zero_values",
         "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
       "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
@@ -3537,6 +3548,520 @@
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "builder"
+      ]
+    },
+    "SDK-2A95E37F19F85E47": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.Items",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::items"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered typed item-list transport, including absent/null/empty arrays and null elements becoming zero-valued records. Nested item labels are preserved rather than coerced to executable messages. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C0CBDEB29F7E126A": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.Usage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::usage"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "The non-omitted usage record retains signed 64-bit counters, zero defaults and null-to-zero field decoding; fractional counters are rejected. This is record transport, not native unsigned run-accounting conversion. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-59516FC096E571BB": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.Texts",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::texts"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered text arrays preserve empty and escaped strings and convert null elements to empty strings; absent/null/empty arrays omit the field. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F15AA4D9D533EB64": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.Reasoning",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::reasoning"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered reasoning-record arrays preserve recorded fields and convert null elements to zero-valued records; absent/null/empty arrays omit the field. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1DCED8B049CFB07B": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.ReasoningTexts",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::reasoning_texts"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered reasoning text arrays retain exact values and null-to-empty element semantics, with absent/null/empty arrays omitted. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE11555EA52B5335": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.ThinkingTexts",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::thinking_texts"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered legacy thinking text arrays remain distinct from reasoning_texts, with null-to-empty elements and absent/null/empty array omission. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5515DBF3A5F2A9F7": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.ToolCalls",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Ordered tool-call snapshot records retain typed id/name plus opaque input JSON, with null elements becoming zero records and absent/null/empty arrays omitted. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4EEB203939521382": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.Raw",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::raw"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Missing raw differs from explicit JSON null. Opaque scalar/array/object input retains numeric spelling, duplicate keys and key order; compatible output applies Go HTML escaping without interpreting provider-specific data. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B6F560D95CE7F095": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.RawAvailable",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::raw_available"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "The required boolean is retained independently of raw content, including false/default/null-to-false and true; wrong JSON types are rejected. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-03481137BAFF7E06": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot.RawError",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot::raw_error"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "native_response_snapshot_bytes_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "An independently set diagnostic string is preserved and Go-escaped; absent/null/empty strings omit the field and wrong JSON types are rejected. This does not claim automatic generation of provider-marshalling errors. Exact bytes and input acceptance are compared with independently executed pinned Go field-record observations; the populated and empty BuildLLMResponseSnapshot fixtures additionally exercise production assembly. Only this field representation is closed, not whole-decoder semantics, provider normalization, all nested DTOs or native executable conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E3DF4765CC6384F2": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.Type",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SnapshotType",
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::kind"
+      ],
+      "rust_test_identifiers": [
+        "response_snapshot_field_records_match_independent_pinned_go",
+        "typed_schemas_describe_go_names_enum_precision_and_utf8",
+        "opaque_snapshot_kinds_cannot_enter_executable_go_recovery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "The snapshot label is an open string, not an executable enum. Independent pinned records verify absent/null/empty labels and opaque future labels; known native exports retain their existing names. JSON Schema describes a string without a closed enum. Runtime checkpoint migration and transcript persistence still reject unspecified/unknown/future labels before execution. Only the label field is closed, not every item payload or recovery path.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime"
+      ]
+    },
+    "SDK-A8A191832CB10F65": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::name"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.Name is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9C508D8778C9ED13": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.Description",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::description"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.Description is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4C29C54DE18431B5": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::input_schema"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.InputSchema is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4F5786F82976966A": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.ReadOnly",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::read_only"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.ReadOnly is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DBDDD3AFC21C0FDF": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::needs_approval"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.NeedsApproval is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-693251FB7C64049E": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot::timeout_seconds"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMToolSnapshot.TimeoutSeconds is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-82DD2F11C870E0EA": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMOutputSchema.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::OutputSchema::name"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMOutputSchema.Name is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-16BF49580838D9AF": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMOutputSchema.Schema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::OutputSchema::schema"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMOutputSchema.Schema is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E9FE54B65CE4E6C7": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMOutputSchema.Strict",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::OutputSchema::strict"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of LLMOutputSchema.Strict is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3583000397427AED": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.Temperature",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::temperature"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.Temperature is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-13223AB39CB16DD7": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.MaxTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::max_tokens"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.MaxTokens is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-56290EF5D64E176F": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.TopP",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::top_p"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.TopP is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-71DCFC5085421665": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.ToolChoice",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::tool_choice"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.ToolChoice is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0CAF9A10855873CA": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.ParallelToolCalls",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::parallel_tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.ParallelToolCalls is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-076D49004102000E": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.ThinkingBudget",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::thinking_budget"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.ThinkingBudget is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-82F6AB2FEF03AD69": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.ReasoningEffort",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::reasoning_effort"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.ReasoningEffort is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B14F46DDDCF78A3E": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::text_verbosity"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.TextVerbosity is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4E89491A45CBD72E": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.StopSequences",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::stop_sequences"
+      ],
+      "rust_test_identifiers": [
+        "request_snapshot_field_records_match_independent_pinned_go",
+        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Only the analysis-record representation of ModelSettings.StopSequences is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
       ]
     }
   }

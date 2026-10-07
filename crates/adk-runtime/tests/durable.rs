@@ -652,6 +652,22 @@ fn verified() -> GoRecovery {
         final_output: None,
     }
 }
+#[test]
+fn opaque_snapshot_kinds_cannot_enter_executable_go_recovery() {
+    let original = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    for kind in ["", "unknown", "future_kind"] {
+        let mut checkpoint = original.clone();
+        checkpoint.history[0].kind = kind.to_owned().into();
+        let error = runner
+            .migrate_go_checkpoint(checkpoint, verified())
+            .err()
+            .unwrap();
+        assert_eq!(error.info.category, ErrorCategory::Unsupported);
+    }
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+}
+
 #[tokio::test]
 async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() {
     let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();

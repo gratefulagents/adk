@@ -293,7 +293,7 @@ fn estimate_items(items: &[RunItemSnapshot]) -> Result<i64, BridgeError> {
                 ],
                 None => vec![],
             },
-            SnapshotType::Unknown => vec![8],
+            SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => vec![8],
         };
         for value in values {
             total = total

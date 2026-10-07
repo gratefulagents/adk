@@ -77,6 +77,28 @@ fn response() -> ModelResponse {
 }
 
 #[test]
+fn response_snapshot_field_records_match_independent_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["response_record_cases"].as_array().unwrap() {
+        let input = case["input"].as_str().unwrap();
+        let decoded = serde_json::from_str::<ResponseSnapshot>(input);
+        assert_eq!(
+            decoded.is_ok(),
+            case["accepted"].as_bool().unwrap(),
+            "{input}: {decoded:?}"
+        );
+        if let Ok(snapshot) = decoded {
+            assert_eq!(
+                to_go_json(&snapshot).unwrap(),
+                case["encoded"].as_str().unwrap().as_bytes(),
+                "{input}"
+            );
+        }
+    }
+}
+
+#[test]
 fn native_response_snapshot_bytes_match_independent_pinned_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

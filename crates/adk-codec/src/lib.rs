@@ -117,7 +117,7 @@ pub fn snapshot_items(items: &[RunItem]) -> Vec<RunItemSnapshot> {
                         approved: v.approved,
                     })
                 }
-                SnapshotType::Unknown => {}
+                SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => {}
             }
             out
         })

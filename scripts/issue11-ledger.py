@@ -42,6 +42,7 @@ RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo
                "scripts/trace-reference/go.mod", "scripts/trace-reference/go.sum",
                "crates/adk-codec/Cargo.toml", "crates/adk-codec/src/snapshots.rs",
                "crates/adk-codec/src/dto.rs", "crates/adk-codec/src/lib.rs",
+               "crates/adk-codec/tests/baseline.rs", "crates/adk-platform/src/codec.rs",
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
                "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
                "scripts/trace-reference/request.go", "scripts/trace-reference/nonfinite.go",
@@ -276,7 +277,7 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     llm_summary_check = subprocess.run([sys.executable, str(ROOT / "scripts/llm-summary-reference/run.py"), "--check"],
                                       cwd=ROOT, text=True, capture_output=True, check=True)
-    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "-p", "adk-runtime",
+    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "baseline", "-p", "adk-platform", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host,mcp,project-state", "--test", "resolution", "--test", "host", "--test", "host_config", "--test", "host_rules",

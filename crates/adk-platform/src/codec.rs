@@ -64,11 +64,14 @@ pub fn replay(operation: &str, input: &Value) -> Result<Value, Error> {
     }
     let mut items = Vec::with_capacity(source.items.len());
     for item in source.items {
-        if item.kind == SnapshotType::Unknown {
+        if matches!(
+            item.kind,
+            SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_)
+        ) {
             return Err(Error::UnknownItem);
         }
         let mut out = PersistedRunItem {
-            kind: item.kind,
+            kind: item.kind.clone(),
             agent: if item.agent_name.is_empty() {
                 None
             } else {
@@ -122,7 +125,9 @@ pub fn replay(operation: &str, input: &Value) -> Result<Value, Error> {
                     approved: v.approved,
                 })
             }
-            SnapshotType::Unknown => unreachable!(),
+            SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => {
+                unreachable!()
+            }
         }
         items.push(out);
     }
@@ -156,13 +161,24 @@ mod tests {
     #[test]
     fn rejects_unknown_types_and_strips_message_images() {
         let envelope = |items: Value| serde_json::json!({"version":1,"floor_message_id":0,"seen_message_id":0,"self_assistant_message_id":0,"items":items});
-        assert!(
-            replay(
-                "persist_transcript",
-                &envelope(serde_json::json!([{"type":"future"}]))
-            )
-            .is_err()
-        );
+        for kind in [
+            serde_json::Value::Null,
+            serde_json::json!(""),
+            serde_json::json!("unknown"),
+            serde_json::json!("future"),
+        ] {
+            assert!(matches!(
+                replay(
+                    "persist_transcript",
+                    &envelope(serde_json::json!([{"type":kind}]))
+                ),
+                Err(Error::UnknownItem)
+            ));
+        }
+        assert!(matches!(
+            replay("persist_transcript", &envelope(serde_json::json!([{}]))),
+            Err(Error::UnknownItem)
+        ));
         let result = replay("persist_transcript", &envelope(serde_json::json!([{"type":"message","message_images":[{"data":"abc","media_type":"image/png"}]}]))).unwrap();
         assert_eq!(
             result["items"][0]["message"],

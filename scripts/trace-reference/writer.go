@@ -11,6 +11,96 @@ import (
 	"github.com/gratefulagents/sdk/pkg/agentsdk/tracestore"
 )
 
+func responseRecordCases() []map[string]any {
+	cases := []map[string]any{}
+	fields := []struct {
+		name   string
+		values []string
+	}{
+		{"items", []string{`[]`, `null`, `[null]`, `[{}]`, `[{"type":null}]`, `[{"type":""}]`, `[{"type":"future_kind"}]`, `[{"type":1}]`, `[{"type":"message","agent_name":"worker","message_text":"text","message_phase":"commentary"}]`, `[{"type":"message","message_images":[null,{"media_type":"image/png","data":"AA=="}]}]`, `1`}},
+		{"usage", []string{`{}`, `null`, `{"requests":3,"input_tokens":9223372036854775807,"output_tokens":-7,"cache_read_tokens":2,"cache_create_tokens":1}`, `{"requests":null}`, `{"requests":1.5}`}},
+		{"end_turn", []string{`null`, `false`, `true`, `"true"`}},
+		{"texts", []string{`[]`, `null`, `[null,"","text <>&"]`, `[1]`}},
+		{"reasoning", []string{`[]`, `null`, `[null,{"id":"r","text":"reason","signature":"sig","redacted_data":"opaque","encrypted_content":"encrypted"}]`, `true`}},
+		{"reasoning_texts", []string{`[]`, `null`, `[null,"first","second"]`, `{}`}},
+		{"thinking_texts", []string{`[]`, `null`, `[null,"thought"]`, `2`}},
+		{"tool_calls", []string{`[]`, `null`, `[null,{"id":"call","name":"lookup","input":{"q":1}}]`, `"bad"`}},
+		{"raw", []string{`null`, `false`, `1e+02`, `{"z":1,"z":2,"html":"<>&"}`, `[1,null,"text"]`}},
+		{"raw_available", []string{`null`, `false`, `true`, `1`}},
+		{"raw_error", []string{`null`, `""`, `"cannot encode <value>"`, `[]`}},
+	}
+	inputs := []string{`{}`}
+	for _, field := range fields {
+		for _, value := range field.values {
+			inputs = append(inputs, `{"`+field.name+`":`+value+`}`)
+		}
+	}
+	for _, input := range inputs {
+		var snapshot agent.LLMResponseSnapshot
+		err := json.Unmarshal([]byte(input), &snapshot)
+		item := map[string]any{"input": input, "accepted": err == nil}
+		if err == nil {
+			encoded, err := json.Marshal(snapshot)
+			must(err)
+			item["encoded"] = string(encoded)
+		}
+		cases = append(cases, item)
+	}
+	return cases
+}
+
+func requestRecordCases() []map[string]any {
+	inputs := []string{
+		`{}`,
+		`{"agent_name":null,"model":null,"instructions":null,"input_items":null,"tools":null,"settings":null,"output_schema":null,"input_token_estimate":null,"request_overhead_token_estimate":null,"total_token_estimate":null}`,
+		`{"input_items":[null,{}, {"type":"future_kind"}]}`,
+		`{"input_items":[1]}`,
+		`{"tools":[null,{}]}`,
+		`{"tools":[{"name":null,"description":null,"input_schema":null,"read_only":null,"needs_approval":null,"timeout_seconds":null}]}`,
+		`{"tools":[{"name":"tool","description":"<read>","input_schema":{"z":1,"z":2},"read_only":true,"needs_approval":true,"timeout_seconds":-7}]}`,
+		`{"tools":[{"timeout_seconds":9223372036854775807}]}`,
+		`{"tools":[{"timeout_seconds":1.5}]}`,
+		`{"tools":[{"name":1}]}`,
+		`{"tools":[{"description":false}]}`,
+		`{"tools":[{"read_only":1}]}`,
+		`{"tools":[{"needs_approval":1}]}`,
+		`{"tools":{}}`,
+		`{"settings":{"temperature":null,"max_tokens":null,"top_p":null,"tool_choice":null,"parallel_tool_calls":null,"thinking_budget":null,"reasoning_effort":null,"text_verbosity":null,"stop_sequences":null}}`,
+		`{"settings":{"temperature":0,"top_p":0,"parallel_tool_calls":false,"stop_sequences":[null,"stop"]}}`,
+		`{"settings":{"temperature":-1.25,"max_tokens":-9,"top_p":0.5,"tool_choice":"<tool>","parallel_tool_calls":true,"thinking_budget":9223372036854775807,"reasoning_effort":"custom","text_verbosity":"custom","stop_sequences":["","stop"]}}`,
+		`{"settings":{"temperature":1e309}}`,
+		`{"settings":{"temperature":"1"}}`,
+		`{"settings":{"top_p":true}}`,
+		`{"settings":{"max_tokens":1.5}}`,
+		`{"settings":{"thinking_budget":1.5}}`,
+		`{"settings":{"tool_choice":1}}`,
+		`{"settings":{"reasoning_effort":1}}`,
+		`{"settings":{"text_verbosity":1}}`,
+		`{"settings":{"parallel_tool_calls":1}}`,
+		`{"settings":{"stop_sequences":[1]}}`,
+		`{"output_schema":{}}`,
+		`{"output_schema":{"name":null,"schema":null,"strict":null}}`,
+		`{"output_schema":{"name":"result","schema":false,"strict":true}}`,
+		`{"output_schema":{"name":1}}`,
+		`{"output_schema":{"strict":1}}`,
+		`{"input_token_estimate":-1,"request_overhead_token_estimate":9223372036854775807,"total_token_estimate":-9223372036854775808}`,
+		`{"total_token_estimate":1.5}`,
+	}
+	cases := []map[string]any{}
+	for _, input := range inputs {
+		var snapshot agent.LLMRequestSnapshot
+		err := json.Unmarshal([]byte(input), &snapshot)
+		item := map[string]any{"input": input, "accepted": err == nil}
+		if err == nil {
+			encoded, err := json.Marshal(snapshot)
+			must(err)
+			item["encoded"] = string(encoded)
+		}
+		cases = append(cases, item)
+	}
+	return cases
+}
+
 func writerFixture() {
 	root, err := os.MkdirTemp("", "adk-writer-reference-")
 	must(err)
@@ -129,6 +219,8 @@ func writerFixture() {
 	must(err)
 	responseVariants = append(responseVariants, string(emptyResponse))
 	result["native_response_variants"] = responseVariants
+	result["response_record_cases"] = responseRecordCases()
+	result["request_record_cases"] = requestRecordCases()
 	finished := true
 	automaticResponse, err := json.Marshal(agent.BuildLLMResponseSnapshot(&agent.ModelResponse{
 		Items:   []agent.RunItem{{Type: agent.RunItemMessage, Message: &agent.MessageOutput{Text: "done"}}},

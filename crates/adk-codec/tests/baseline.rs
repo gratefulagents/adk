@@ -235,12 +235,11 @@ fn typed_schemas_describe_go_names_enum_precision_and_utf8() {
     assert_eq!(kind["type"], "integer");
     let snapshot_kind = serde_json::to_value(schema::<SnapshotType>()).unwrap();
     assert_eq!(snapshot_kind["type"], "string");
-    assert!(
-        snapshot_kind["enum"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("reasoning"))
-    );
+    assert!(snapshot_kind.get("enum").is_none());
+    for kind in ["", "reasoning", "future_kind"] {
+        let decoded: SnapshotType = serde_json::from_value(json!(kind)).unwrap();
+        assert_eq!(serde_json::to_value(decoded).unwrap(), json!(kind));
+    }
     assert_eq!(
         serde_json::to_value(schema::<GoTimestamp>()).unwrap()["format"],
         "date-time"

@@ -2,6 +2,38 @@
 
 ## Current continuation evidence
 
+### Snapshot field transport and execution boundaries
+
+Independent pinned decoding/encoding now covers **54 response and 34 request
+records**, including each field, typed malformed inputs, nulls, signed-width
+counters, opaque raw JSON and nested settings/tool/schema values. Both new native
+comparators initially failed on null array elements. The codec now preserves
+Go zero-valued elements instead of rejecting or dropping them. The observations
+also exposed snapshot labels defaulting to `message` and rejecting opaque strings:
+`SnapshotType` now represents empty and future labels without inventing a message.
+Its schema is an open string and it is cloneable rather than copyable.
+
+This does not grant execution authority to opaque records. Native checkpoint
+migration and platform transcript persistence reject unspecified/unknown/future
+labels before constructing executable state; dedicated regressions verify that
+boundary without model dispatch. Existing source fixture data is unchanged; the
+new independent records are additive.
+
+The ledger adds **29 field-only closures**: ten remaining response fields, the
+item label, nine model-setting fields, six tool-snapshot fields and three
+output-schema fields. Existing request claims now include the new record test.
+No whole-decoder, settings-merge, provider-profile or executable-conversion claim
+is inferred. The first evidence pass correctly failed because its selected test
+command did not run the newly claimed schema regression; the command now actually
+runs codec baseline and platform boundary tests rather than waiving the check.
+
+Fresh final Rust 1.88 Linux workspace: **1,251 passed, 0 failed, 30 ignored**.
+Strict Clippy, rustdoc, changed-file formatting, full facade matrix, platform-free
+consumer, all 20 offline scenarios, host-session example, independent fixture
+reproduction, 18 ledger validators and source/license locks pass. The overlay is
+**240 verified / 8,651 unresolved / 251 excluded**. Credentialed services and
+non-Linux execution remain unverified. Full issue acceptance is still open.
+
 ### Named specialist output and extraction
 
 Successful named `AgentAsTool` calls now return final text instead of a task JSON

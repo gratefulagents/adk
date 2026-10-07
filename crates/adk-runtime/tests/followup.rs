@@ -1686,3 +1686,209 @@ async fn critic_refutation_revises_parent_once_and_cancellation_prevents_dispatc
     assert_eq!(error.info.category, ErrorCategory::Cancelled);
     assert_eq!(critic_model.requests.lock().unwrap().len(), 1);
 }
+
+struct DynamicInstructions {
+    blank: bool,
+    calls: Mutex<Vec<String>>,
+}
+impl InstructionProvider for DynamicInstructions {
+    fn instructions<'a>(
+        &'a self,
+        ctx: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            let text = format!(
+                "dynamic:{}:{}:{}",
+                ctx.agent.name, ctx.snapshot.usage.input_tokens, ctx.snapshot.usage.output_tokens
+            );
+            self.calls.lock().unwrap().push(text.clone());
+            Ok(if self.blank { String::new() } else { text })
+        })
+    }
+}
+
+#[tokio::test]
+async fn dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/dynamic-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let streamed = case["streamed"].as_bool().unwrap();
+        let mut replies = vec![];
+        if matches!(name, "progress" | "handoff") {
+            let mut first = response(
+                vec![if name == "progress" {
+                    message(Role::Assistant, "progress")
+                } else {
+                    RunItem::ToolCall {
+                        call: ToolCall {
+                            id: "transfer".into(),
+                            name: "transfer_to_child".into(),
+                            arguments: json!({}),
+                        },
+                    }
+                }],
+                false,
+            );
+            first.usage.input_tokens = 7;
+            first.usage.output_tokens = 3;
+            replies.push(Ok(first));
+        }
+        if matches!(name, "retry" | "summary_retry") {
+            replies.push(Err(Error::new(ErrorCategory::Provider, "transient")));
+        }
+        replies.push(Ok(answer()));
+        let model = Script::new(replies);
+        let binding = if streamed {
+            ModelBinding::streaming("offline", model.clone())
+        } else {
+            ModelBinding::complete("offline", model.clone())
+        };
+        let provider = Arc::new(DynamicInstructions {
+            blank: name == "blank",
+            calls: Mutex::new(vec![]),
+        });
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        agent.instructions = "static fallback".into();
+        if name != "static" {
+            agent.instruction_provider = Some(provider.clone());
+        }
+        let mut config = RunnerConfig::default();
+        if matches!(name, "retry" | "summary_retry") {
+            config.retry.max_retries = 1;
+            config.retry.initial_delay = Duration::from_millis(1);
+        }
+        if name == "compose" {
+            config.additional_instructions = " additional instructions ".into();
+            agent.mcp_servers = vec!["files".into()];
+        }
+        if name == "handoff" {
+            let mut child = AgentConfig::new("child", binding);
+            child.instructions = "child fallback".into();
+            child.instruction_provider = Some(provider.clone());
+            agent.handoffs.push(Handoff {
+                definition: ToolDefinition {
+                    name: "transfer_to_child".into(),
+                    description: String::new(),
+                    input_schema: schemars::json_schema!({}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                target: Arc::new(child),
+                input_filter: HandoffInputFilter::Preserve,
+            });
+        }
+        if name == "summary_retry" {
+            config.force_final_summary_turn = true;
+        }
+        let turns = if name == "summary_retry" { 2 } else { 4 };
+        let runner = Runner::new(agent, config).unwrap();
+        let outcome = if streamed {
+            runner
+                .stream(context(), request(vec![], turns), Arc::new(Quiet))
+                .finish()
+                .await
+                .unwrap()
+        } else {
+            runner
+                .run(context(), request(vec![], turns), Arc::new(Quiet))
+                .await
+                .unwrap()
+        };
+        assert_eq!(
+            outcome.result.final_text(),
+            case["final"],
+            "{name}/{streamed}"
+        );
+        assert_eq!(
+            json!(*provider.calls.lock().unwrap()),
+            case["calls"],
+            "{name}/{streamed}"
+        );
+        assert_eq!(
+            json!(
+                model
+                    .requests
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .map(|r| &r.instructions)
+                    .collect::<Vec<_>>()
+            ),
+            case["instructions"],
+            "{name}/{streamed}"
+        );
+    }
+}
+
+struct PendingInstructions {
+    entered: tokio::sync::Notify,
+    dropped: AtomicUsize,
+    fail: bool,
+}
+impl InstructionProvider for PendingInstructions {
+    fn instructions<'a>(
+        &'a self,
+        _: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            struct DropProbe<'a>(&'a AtomicUsize);
+            impl Drop for DropProbe<'_> {
+                fn drop(&mut self) {
+                    self.0.fetch_add(1, Ordering::SeqCst);
+                }
+            }
+            let _probe = DropProbe(&self.dropped);
+            self.entered.notify_one();
+            if self.fail {
+                return Err(Error::new(ErrorCategory::Host, "instructions unavailable"));
+            }
+            std::future::pending().await
+        })
+    }
+}
+#[tokio::test]
+async fn dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_model() {
+    for mode in ["fail", "cancel", "drop"] {
+        let provider = Arc::new(PendingInstructions {
+            entered: tokio::sync::Notify::new(),
+            dropped: AtomicUsize::new(0),
+            fail: mode == "fail",
+        });
+        let model = Script::new(vec![]);
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("offline", model.clone()));
+        agent.instruction_provider = Some(provider.clone());
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let cancellation = Arc::new(CancellationToken::new());
+        let ctx = Context {
+            cancellation: cancellation.clone(),
+            ..context()
+        };
+        let mut future = Box::pin(runner.run(ctx, request(vec![], 1), Arc::new(Quiet)));
+        if mode == "fail" {
+            assert_eq!(
+                future.await.err().unwrap().error.info.message,
+                "instructions unavailable"
+            );
+        } else {
+            tokio::select! {
+                biased;
+                _ = &mut future => panic!("unexpected completion"),
+                _ = provider.entered.notified() => {}
+            }
+            if mode == "cancel" {
+                cancellation.cancel();
+                assert_eq!(
+                    future.await.err().unwrap().error.info.category,
+                    ErrorCategory::Cancelled
+                );
+            } else {
+                drop(future);
+            }
+        }
+        assert_eq!(provider.dropped.load(Ordering::SeqCst), 1);
+        assert!(model.requests.lock().unwrap().is_empty());
+    }
+}

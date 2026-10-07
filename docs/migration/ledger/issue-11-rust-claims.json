@@ -4192,6 +4192,26 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-0BEA773E395BDD25": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.InstructionsFn",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::InstructionProvider",
+        "crates/adk-runtime/src/runner.rs::InstructionContext",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::instruction_provider"
+      ],
+      "rust_test_identifiers": [
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff",
+        "dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_model",
+        "durable_dynamic_instructions_require_pure_identity_and_bind_recovery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic",
+      "rationale": "Sixteen independently executed pinned SDK normal/streamed cases verify static fallback, dynamic/blank precedence, unchanged original instructions, additional/MCP composition, accumulated usage, destination handoff and retry re-resolution. Rust deliberately adopts an async fallible owned provider with borrowed context, cancellation/deadline bounds and no detached work (docs/research/facade.md). Durable registration requires deterministic effect-free identity, binds changes on recovery, and preserves already committed model output without redispatch. This closes the dynamic instruction capability, not complete Go RunContext, Agent, host or scheduler composition.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

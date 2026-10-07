@@ -52,10 +52,19 @@
       "./internal/agent",
       "-run",
       "^TestFinalAnswerVerifierSingleRefutationRound$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./internal/agent",
+      "-run",
+      "^TestAgentGetInstructions_(Static|Dynamic)$"
     ]
   ],
   "counts": {
-    "pass": 774,
+    "pass": 776,
     "skip": 5
   },
   "exit_code": 0,
@@ -101,6 +110,8 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\nfailed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\nfailed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\nfailed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\nfailed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n",
   "tests": {
+    "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextEmpty": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel": "pass",

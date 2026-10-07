@@ -104,10 +104,30 @@ pub trait OutputParser: Send + Sync {
     fn parse(&self, raw: &str) -> Result<Value, Error>;
 }
 
+pub struct InstructionContext<'a> {
+    pub operation: &'a Context,
+    pub agent: &'a AgentConfig,
+    pub snapshot: &'a RunResult,
+    pub config: &'a RunnerConfig,
+    pub policy: &'a RunPolicy,
+}
+
+pub trait InstructionProvider: Send + Sync {
+    /// Stable identity of a deterministic, effect-free provider and its configuration.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn instructions<'a>(
+        &'a self,
+        context: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>>;
+}
+
 #[derive(Clone)]
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
+    pub instruction_provider: Option<Arc<dyn InstructionProvider>>,
     pub mcp_servers: Vec<String>,
     pub model: ModelBinding,
     pub fallbacks: Vec<ModelBinding>,
@@ -130,6 +150,7 @@ impl AgentConfig {
         Self {
             name: name.into(),
             instructions: String::new(),
+            instruction_provider: None,
             mcp_servers: Vec::new(),
             model,
             fallbacks: vec![],
@@ -2018,48 +2039,9 @@ impl Engine {
             })
             .map(|(definition, timeout)| (definition.clone(), timeout))
             .unzip();
-        let mut instructions = if self.config.cache_prefix.is_empty() {
-            self.agent.instructions.clone()
-        } else {
-            format!("{}\n{}", self.config.cache_prefix, self.agent.instructions)
-        };
-        if instructions.trim().is_empty() {
-            instructions.clear();
-        }
-        let extra = self.config.additional_instructions.trim();
-        if !extra.is_empty() {
-            if !instructions.is_empty() {
-                instructions.push_str("\n\n---\n\n");
-            }
-            instructions.push_str(extra);
-        }
-        if let Some(schema) = &self.agent.output_schema {
-            if !instructions.trim().is_empty() {
-                instructions.push_str("\n\n---\n\n");
-            }
-            let name = self.agent.output_schema_name.trim();
-            let name = if name.is_empty() {
-                "final_output"
-            } else {
-                name
-            };
-            let strict = if self.agent.output_schema_strict {
-                "\nStrict mode: do not include prose, markdown fences, or fields outside the schema."
-            } else {
-                ""
-            };
-            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
-        }
-        let mcp_context = crate::mcp_prompt::context(&self.agent.mcp_servers);
-        if !mcp_context.is_empty() {
-            if !instructions.is_empty() {
-                instructions.push_str("\n\n---\n\n");
-            }
-            instructions.push_str(&mcp_context);
-        }
         self.summary_turn = self.final_summary_required();
+        let instructions = self.build_instructions().await?;
         if self.summary_turn {
-            instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
             tools.clear();
             declared_tool_timeouts.clear();
         }
@@ -2468,6 +2450,68 @@ impl Engine {
         self.result.responses.push(response);
         accounting
     }
+    async fn build_instructions(&self) -> Result<String, Error> {
+        let resolved = if let Some(provider) = &self.agent.instruction_provider {
+            bounded(
+                &self.context,
+                None,
+                provider.instructions(InstructionContext {
+                    operation: &self.context,
+                    agent: &self.agent,
+                    snapshot: &self.result,
+                    config: &self.config,
+                    policy: &self.policy,
+                }),
+            )
+            .await?
+        } else {
+            self.agent.instructions.clone()
+        };
+        let mut instructions = if self.config.cache_prefix.is_empty() {
+            resolved
+        } else {
+            format!("{}\n{resolved}", self.config.cache_prefix)
+        };
+        if instructions.trim().is_empty() {
+            instructions.clear();
+        }
+        let extra = self.config.additional_instructions.trim();
+        if !extra.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(extra);
+        }
+        if let Some(schema) = &self.agent.output_schema {
+            if !instructions.trim().is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            let name = self.agent.output_schema_name.trim();
+            let name = if name.is_empty() {
+                "final_output"
+            } else {
+                name
+            };
+            let strict = if self.agent.output_schema_strict {
+                "\nStrict mode: do not include prose, markdown fences, or fields outside the schema."
+            } else {
+                ""
+            };
+            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+        }
+        let mcp_context = crate::mcp_prompt::context(&self.agent.mcp_servers);
+        if !mcp_context.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(&mcp_context);
+        }
+        if self.summary_turn {
+            instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+        }
+        Ok(instructions)
+    }
+
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
@@ -2479,6 +2523,7 @@ impl Engine {
         let agent_key = Arc::as_ptr(&self.agent) as usize;
         let start = self.fallbacks.get(&agent_key).map_or(0, |state| state.0);
         let mut attempt = 0;
+        let mut refresh_instructions = false;
         for (index, binding) in candidates.iter().enumerate().skip(start) {
             loop {
                 if self.turns >= self.policy.max_turns.get() {
@@ -2487,13 +2532,24 @@ impl Engine {
                         "maximum model turns exceeded",
                     ));
                 }
-                if !self.summary_turn && self.final_summary_required() {
+                let force_summary = !self.summary_turn && self.final_summary_required();
+                let refresh = refresh_instructions && self.agent.instruction_provider.is_some();
+                if force_summary {
                     self.summary_turn = true;
-                    request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+                    if !refresh {
+                        request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+                    }
                     request.tools.clear();
                     declared_tool_timeouts.clear();
+                }
+                if refresh {
+                    request.instructions = self.build_instructions().await?;
+                    request.model = binding.name().into();
+                }
+                if force_summary || refresh {
                     self.compact_local(&mut request, false, binding).await?;
                 }
+                refresh_instructions = true;
                 if self.config.compaction_model_resolver.is_some() {
                     request.model = binding.name().into();
                     self.compact_local(&mut request, false, binding).await?;

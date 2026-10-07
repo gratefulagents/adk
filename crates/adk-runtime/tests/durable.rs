@@ -3062,3 +3062,55 @@ fn go_verifier_recovery_requires_verified_invocation_state_and_budget() {
         true
     );
 }
+
+struct PureInstructions(Option<&'static str>);
+impl InstructionProvider for PureInstructions {
+    fn durable_key(&self) -> Option<&str> {
+        self.0
+    }
+    fn instructions<'a>(
+        &'a self,
+        ctx: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            Ok(format!(
+                "{}:{}",
+                ctx.agent.name, ctx.snapshot.usage.input_tokens
+            ))
+        })
+    }
+}
+#[tokio::test]
+async fn durable_dynamic_instructions_require_pure_identity_and_bind_recovery() {
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    for key in [None, Some("")] {
+        agent.instruction_provider = Some(Arc::new(PureInstructions(key)));
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        assert!(
+            run(&runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    agent.instruction_provider = Some(Arc::new(PureInstructions(Some("pure-v1"))));
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let saved = store.latest();
+    assert_eq!(model.requests.lock().unwrap()[0].instructions, "agent:0");
+    agent.instruction_provider = Some(Arc::new(PureInstructions(Some("pure-v2"))));
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(saved.clone()))
+            .await
+            .is_err()
+    );
+    let result = run(&runner, Arc::new(Store::default()), Some(saved))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_text(), "done");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}

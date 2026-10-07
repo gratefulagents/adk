@@ -1168,3 +1168,25 @@ Only the critic constructor and default-instruction obligations are newly closed
 **247 verified / 8,644 unresolved / 251 excluded**. Credentialed live-provider
 checks remain unverified. No excluded CLI/evaluation/Terminal-Bench contracts,
 production default changes or release work were added. Issue #11 is incomplete.
+
+### Dynamic agent instructions
+
+`AgentConfig::instruction_provider` resolves host-owned instructions before each
+model attempt, including retries and destination-agent handoffs. Sixteen pinned
+SDK normal/streamed observations cover fallback/dynamic/blank precedence,
+additional/MCP composition, cumulative usage, retries and forced-summary retries.
+Native tests cover errors before dispatch, cancellation/drop of pending futures,
+and pure identity/fingerprint checks across durable recovery. The ordinary Go
+static/dynamic source regressions also passed and are recorded in pinned evidence.
+
+Fresh locked Linux Rust 1.88.0 workspace/all-features/all-targets:
+**1,270 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, Rustfmt, facade matrix, platform-free consumer, all 20 offline scenarios
+and host-session example passed. Source oracles, 18 ledger validators, immutable
+source locks, Python compilation, Go formatting and whitespace checks passed.
+The first ledger generation correctly rejected a missing reference-test entry;
+the source tests were executed as JSON and recorded, then all gates rerun.
+Only the dynamic-instruction field capability is newly closed:
+**248 verified / 8,643 unresolved / 251 excluded**. Full issue #11 remains open.
+No new credentialed live checks, excluded CLI/evaluation contracts, release work
+or production default changes were performed.

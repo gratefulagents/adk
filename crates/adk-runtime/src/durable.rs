@@ -704,12 +704,16 @@ impl Runner {
                     .any(|g| g.durable_key().is_none_or(str::is_empty))
                 || agent.output_parser.is_some()
                 || agent
+                    .instruction_provider
+                    .as_ref()
+                    .is_some_and(|provider| provider.durable_key().is_none_or(str::is_empty))
+                || agent
                     .hooks
                     .as_ref()
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names, no custom parsers, and replay-safe guardrails and hooks",
+                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, guardrails and hooks",
                 ));
             }
             let mut entry = serde_json::json!({
@@ -720,6 +724,9 @@ impl Runner {
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
             });
+            if let Some(provider) = &agent.instruction_provider {
+                entry["instruction_provider"] = serde_json::json!(provider.durable_key());
+            }
             if !agent.mcp_servers.is_empty() {
                 entry["mcp_servers"] = serde_json::json!(agent.mcp_servers);
             }

@@ -1022,3 +1022,31 @@ Twenty-nine offline source observations compare feedback, exact prompts,
 instructions, tool lists, forced summary, denial of forged mutation calls,
 and child limits. Run `python3 scripts/critic-reference/run.py --check` and
 `cargo test --locked -p adk-runtime --test followup critic_`.
+
+### Dynamic instructions
+
+Set `AgentConfig::instruction_provider` to an `Arc<dyn InstructionProvider>`
+for host-owned, per-attempt instructions. The provider takes a borrowed
+`InstructionContext` containing the cancellation/deadline context, current
+agent, committed result/usage, runner configuration and run policy. Its output
+replaces the agent's static instructions even when empty. Additional runner
+instructions, structured-output directives, MCP context and final-summary
+restrictions are still appended normally. Handoffs use the destination agent's
+provider. Retries and fallbacks resolve again; a model call never outlives its
+instruction future. Provider errors abort before dispatch; cancellation or
+owner drop drops a pending future rather than spawning detached work.
+
+Unlike Go's synchronous function field, the native trait permits cancellable
+async host work and explicit errors. It does not mutate the agent's static text.
+Configuration files do not serialize callbacks. Durable runners reject providers
+without a nonempty `durable_key()` and bind that identity into every registered
+agent's configuration fingerprint. Opting in requires deterministic, effect-free
+instructions derived from persisted inputs, not time, cancellation state or
+external mutable services. Pre-checkpoint evaluation can repeat after recovery.
+
+Sixteen pinned source observations cover static fallback, dynamic precedence,
+blank output, prompt composition, accumulated usage, handoffs and retry
+re-resolution in normal and streamed runs. Reproduce with
+`python3 scripts/dynamic-instructions-reference/run.py --check`; native tests are
+in `followup` and `durable`. This does not imply complete Go `RunContext` mapping
+or automatic platform/scheduler composition.

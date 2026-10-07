@@ -351,3 +351,19 @@ The source/version/license and file hashes are independently recorded in
 `1dc92b73900fac74dc357a938e4b5eee6392b418`, GPL-3.0-only,
 https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/verifier.go).
 The helper is advisory, never an authorization or evidence-authentication gate.
+
+### Per-attempt instruction providers
+
+Adopt an owned `InstructionProvider` trait and borrowed `InstructionContext`
+rather than the Go `func(*RunContext, *Agent) string` field. An async fallible
+boundary supports host cancellation/deadlines without detached callback work;
+static fallback and dynamic precedence remain exact. Re-evaluate after retries
+and on destination-agent handoffs, not just once per run. Compose policy and
+structured-output directives after resolving the base prompt. Require explicit
+pure-provider identity for durable execution and include it in the agent catalog
+fingerprint; do not pretend arbitrary dynamic services are replay-safe.
+Source: SDK GPL-3.0-only at
+https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/agent.go
+and `internal/agent/runner.go`; pinned file/version/license provenance and 16
+independent normal/streamed observations are in
+`fixtures/dynamic-instructions/observations.json`.

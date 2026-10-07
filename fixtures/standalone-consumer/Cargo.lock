@@ -22,6 +22,7 @@ dependencies = [
  "opentelemetry_sdk",
  "regex",
  "rustix",
+ "schemars",
  "serde",
  "serde_json",
  "serde_yaml_ng",

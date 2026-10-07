@@ -17,6 +17,7 @@ type instructionModel struct {
 	blockingModel
 	requests     []agentsdk.ModelRequest
 	continueOnce bool
+	answer       string
 	failOnce     bool
 }
 
@@ -30,7 +31,11 @@ func (m *instructionModel) GetResponse(_ context.Context, req agentsdk.ModelRequ
 	if m.failOnce && len(m.requests) == 1 {
 		return nil, fmt.Errorf("overloaded")
 	}
-	response := &agentsdk.ModelResponse{Items: []agentsdk.RunItem{{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: "done"}}}}
+	answer := m.answer
+	if answer == "" {
+		answer = "done"
+	}
+	response := &agentsdk.ModelResponse{Items: []agentsdk.RunItem{{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: answer}}}}
 	if m.continueOnce && len(m.requests) == 1 {
 		end := false
 		response.EndTurn = &end
@@ -56,7 +61,79 @@ func (m *instructionModel) StreamResponse(ctx context.Context, req agentsdk.Mode
 	close(done)
 	return agentsdk.NewModelStream(events, done), nil
 }
+func observeBuilderOutputSchemas(t *testing.T) []map[string]any {
+	t.Helper()
+	result := []map[string]any{}
+	for _, item := range []struct {
+		name, schema, answer, parser string
+		strict                       bool
+	}{
+		{"absent", "", "plain", "", false},
+		{"result", `{"properties":{"n":{"type":"integer"}},"type":"object"}`, `{"n":1}`, "", true},
+		{"  ", `{"type":"object"}`, `{"n":-1}`, "", false},
+		{" boolean ", `true`, `42`, "", true},
+		{"bad-json", `{"type":"object"}`, "not json", "", true},
+		{"custom", `{"type":"object"}`, "custom text", "accept", false},
+		{"custom-error", `{"type":"object"}`, "custom text", "reject", true},
+	} {
+		for _, streaming := range []bool{false, true} {
+			model := &instructionModel{answer: item.answer}
+			runner := agentsdk.NewRunnerWithModel(model)
+			cfg := Config{Model: "offline", RoleCatalog: agentsdk.RoleCatalog{{Name: "reviewer"}}, Features: &Features{Handoffs: HandoffFeatures{Enabled: true}, SubAgents: SubAgentFeatures{Async: AsyncSubAgentFeatures{Task: true}}}}
+			parserCalls := 0
+			if item.schema != "" {
+				cfg.OutputSchema = &agentsdk.OutputSchema{Name: item.name, Schema: json.RawMessage(item.schema), Strict: item.strict}
+				if item.parser != "" {
+					cfg.OutputSchema.ParseFn = func(raw string) (any, error) {
+						parserCalls++
+						if item.parser == "reject" {
+							return nil, fmt.Errorf("parser rejected output")
+						}
+						return map[string]any{"parsed": raw}, nil
+					}
+				}
+			}
+			parent, _, specialists := BuildAgentWithSpecialists(cfg, runner, ToolBundle{})
+			var output any
+			if streaming {
+				stream := runner.RunStreamed(context.Background(), parent, nil, agentsdk.RunConfig{MaxTurns: 1})
+				for range stream.Events {
+				}
+				output = stream.FinalResult().FinalOutput
+			} else {
+				run, err := runner.Run(context.Background(), parent, nil, agentsdk.RunConfig{MaxTurns: 1})
+				if err != nil {
+					t.Fatal(err)
+				}
+				output = run.FinalOutput
+			}
+			if len(model.requests) != 1 {
+				t.Fatal("unexpected schema model requests")
+			}
+			request := model.requests[0]
+			var schema any
+			name := ""
+			strict := false
+			if request.OutputSchema != nil {
+				if err := json.Unmarshal(request.OutputSchema.Schema, &schema); err != nil {
+					t.Fatal(err)
+				}
+				name, strict = request.OutputSchema.Name, request.OutputSchema.Strict
+			}
+			result = append(result, map[string]any{"name": item.name, "schema_json": item.schema, "strict": item.strict, "answer": item.answer, "parser": item.parser, "streaming": streaming, "parent_has_schema": parent.OutputType != nil, "specialist_has_schema": specialists["reviewer"].OutputType != nil, "handoff_has_schema": parent.Handoffs[0].Agent.OutputType != nil, "request_schema": schema, "request_name": name, "request_strict": strict, "final_output": output, "parser_calls": parserCalls})
+		}
+	}
+	return result
+}
+
 func TestRunInstructionsReference(t *testing.T) {
+	schemas, schemaErr := json.Marshal(observeBuilderOutputSchemas(t))
+	if schemaErr != nil {
+		t.Fatal(schemaErr)
+	}
+	if err := os.WriteFile(os.Getenv("RUN_OUTPUT_SCHEMA_OUTPUT"), schemas, 0600); err != nil {
+		t.Fatal(err)
+	}
 	defaults := []map[string]any{}
 	for _, names := range [][]string{nil, {}, {"worker"}, {"zeta", "alpha"}, {"alpha", "agent", "zeta"}, {"Agent", "alpha"}, {"", " ", "\t\n"}, {"", " ", "worker"}, {"Δ", "α", "Z"}, {" agent ", "worker"}, {"agent", ""}} {
 		agents := map[string]*agentsdk.Agent{}

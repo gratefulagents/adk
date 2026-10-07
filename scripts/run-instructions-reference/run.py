@@ -39,24 +39,25 @@ def main():
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
         runtime = source / 'pkg/agentsdk/runtime'
-        sources = sorted(runtime.glob('*.go')) + [source / 'internal/agent/runner.go', source / 'internal/agent/mcp_prompt.go', source / 'internal/agent/history_compaction.go'] + [source / 'go.mod', source / 'go.sum']
+        sources = sorted(runtime.glob('*.go')) + [source / 'internal/agent/runner.go', source / 'internal/agent/mcp_prompt.go', source / 'internal/agent/history_compaction.go', source / 'internal/agent/output_schema.go', source / 'internal/agent/model.go', source / 'internal/agent/run_result.go'] + [source / 'go.mod', source / 'go.sum']
         harness = [Path(__file__).resolve(), ROOT / 'scripts/run-instructions-reference/reference_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA, 'goVersion': version,
             'launchPolicy': 'Offline recording model; actual normal and streamed runner calls, no external providers or tools.',
             'sourceSHA256': {str(p.relative_to(source)): digest(p) for p in sources},
             'harnessSHA256': {str(p.relative_to(ROOT)): digest(p) for p in harness},
-            'normalization': 'No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. No deprecated alias, output schema or MCP claim.',
+            'normalization': 'No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. Output-schema cases compare parent-only placement, request fields and parsed results; schema diagnostics and provider bytes are not compared. No deprecated alias or MCP claim.',
         }
         shutil.copyfile(ROOT / 'scripts/run-instructions-reference/reference_test.go', runtime / 'native_reference_test.go')
         output = source / 'observations.json'
         compactions = source / 'compactions.json'
         resolvers = source / 'resolvers.json'
         subagent_defaults = source / 'subagent-defaults.json'
-        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output), RUN_COMPACTION_OUTPUT=str(compactions), RUN_RESOLVER_OUTPUT=str(resolvers), RUN_SUBAGENT_DEFAULT_OUTPUT=str(subagent_defaults))
+        output_schemas = source / 'output-schemas.json'
+        env.update(RUN_INSTRUCTIONS_OUTPUT=str(output), RUN_COMPACTION_OUTPUT=str(compactions), RUN_RESOLVER_OUTPUT=str(resolvers), RUN_SUBAGENT_DEFAULT_OUTPUT=str(subagent_defaults), RUN_OUTPUT_SCHEMA_OUTPUT=str(output_schemas))
         command = [go, 'test', '-count=1', '-run', '^TestRunInstructionsReference$', '-v', './pkg/agentsdk/runtime']
         subprocess.run(command, cwd=source, env=env, check=True)
-        result = {'provenance': provenance, 'cases': json.loads(output.read_text()), 'compaction_cases': json.loads(compactions.read_text()), 'resolver_cases': json.loads(resolvers.read_text()), 'subagent_default_cases': json.loads(subagent_defaults.read_text())}
+        result = {'provenance': provenance, 'cases': json.loads(output.read_text()), 'compaction_cases': json.loads(compactions.read_text()), 'resolver_cases': json.loads(resolvers.read_text()), 'subagent_default_cases': json.loads(subagent_defaults.read_text()), 'output_schema_cases': json.loads(output_schemas.read_text())}
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/run-instructions/observations.json'
         destination.parent.mkdir(parents=True, exist_ok=True)

@@ -132,6 +132,10 @@ pub struct Config {
     pub reasoning: String,
     pub verbosity: String,
     pub settings: Map<String, Value>,
+    pub output_schema: Option<schemars::Schema>,
+    pub output_schema_name: String,
+    pub output_schema_strict: bool,
+    pub output_parser: Option<Arc<dyn adk_runtime::OutputParser>>,
     pub work_dir: PathBuf,
     pub policy: RunPolicy,
     pub active_mode: Option<String>,
@@ -167,6 +171,10 @@ impl Default for Config {
             reasoning: "medium".into(),
             verbosity: "medium".into(),
             settings: Map::new(),
+            output_schema: None,
+            output_schema_name: "final_output".into(),
+            output_schema_strict: true,
+            output_parser: None,
             work_dir: PathBuf::from("."),
             policy: RunPolicy {
                 tools: ToolPolicy {
@@ -1337,6 +1345,10 @@ impl Builder {
             if name.is_empty() { "agent" } else { name },
             ModelBinding::streaming(model, routes.clone()),
         );
+        agent.output_schema = self.config.output_schema.clone();
+        agent.output_schema_name = self.config.output_schema_name.clone();
+        agent.output_schema_strict = self.config.output_schema_strict;
+        agent.output_parser = self.config.output_parser.clone();
         agent.input_guardrails = self.input_guardrails.clone();
         agent.output_guardrails = self.output_guardrails.clone();
         agent.instructions = instructions

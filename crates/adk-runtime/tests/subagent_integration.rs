@@ -388,11 +388,26 @@ async fn sync_timeout_keeps_child_alive_across_runs_and_status_can_reread() {
 
 #[tokio::test(start_paused = true)]
 async fn tool_policy_timeout_preserves_managed_pending_results() {
+    struct GatedChild(Arc<tokio::sync::Notify>);
+    impl Model for GatedChild {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                self.0.notified().await;
+                Ok(answer("late policy evidence"))
+            })
+        }
+    }
     for name in ["subagent", "subagent_wait", "specialist"] {
-        let child = FakeModel::new(
-            vec![answer("late policy evidence")],
-            Duration::from_millis(50),
-        );
+        // Core deadlines use wall time, which can advance while Tokio time is paused.
+        let release = Arc::new(tokio::sync::Notify::new());
+        let child = Arc::new(GatedChild(release.clone()));
         let (owner, session) = session(child).await;
         let arguments = if name == "subagent_wait" {
             owner
@@ -464,6 +479,7 @@ async fn tool_policy_timeout_preserves_managed_pending_results() {
                 .status
                 .is_terminal()
         );
+        release.notify_one();
         owner
             .handle()
             .wait(&[task_id.to_owned()], WaitMode::All, None)

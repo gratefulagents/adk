@@ -15,6 +15,14 @@ fn main() {
         policy: RunPolicy::default(),
     };
     assert_eq!(request.input.len(), 1);
+    let config = adk::builder::Config {
+        output_schema: Some(true.into()),
+        ..Default::default()
+    };
+    assert!(config.output_schema.is_some());
+    assert_eq!(config.output_schema_name, "final_output");
+    assert!(config.output_schema_strict);
+    assert!(config.output_parser.is_none());
     assert!(!adk::runtime::CancellationToken::new().is_cancelled());
     let cursor = adk::host::Cursor::default();
     assert_eq!(cursor.message_id, 0);

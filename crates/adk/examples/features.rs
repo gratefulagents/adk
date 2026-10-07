@@ -714,19 +714,25 @@ async fn guardrails() {
 }
 async fn structured_output() {
     for (raw, valid) in [(r#"{"answer":42}"#, true), (r#"{"answer":"wrong"}"#, false)] {
-        let mut a = agent(Scripted::new(vec![answer(raw)]));
-        a.output_schema = Some(json!({"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"],"additionalProperties":false}).try_into().unwrap());
         let hooks = Arc::new(Hooks::default());
-        let r = Runner::new(
-            a,
-            RunnerConfig {
-                hooks: Some(hooks.clone()),
-                ..Default::default()
-            },
-        )
+        let mut bundle = adk::builder::Builder::new(adk::builder::Config {
+            model: "mock/base".into(),
+            output_schema: Some(json!({"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"],"additionalProperties":false}).try_into().unwrap()),
+            output_schema_name: "answer".into(),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, Scripted::new(vec![answer(raw)]))
+        .unwrap()
+        .runner_config(RunnerConfig { hooks: Some(hooks.clone()), ..Default::default() })
+        .build(&context())
+        .await
         .unwrap();
-        let result = r
-            .run(context(), request(), Arc::new(RecordingHost::default()))
+        let result = bundle
+            .run(
+                context(),
+                request().input,
+                Arc::new(RecordingHost::default()),
+            )
             .await
             .unwrap();
         assert_eq!(
@@ -741,6 +747,7 @@ async fn structured_output() {
             .filter(|o| matches!(o, Observation::OutputValidationFailed { .. }))
             .count();
         assert_eq!(violations, usize::from(!valid));
+        bundle.close().await.unwrap();
     }
 }
 async fn streaming() {

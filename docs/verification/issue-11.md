@@ -2,6 +2,40 @@
 
 ## Current continuation evidence
 
+### Builder structured-output composition
+
+The facade builder now forwards the runtime's typed output schema, schema name,
+strict flag and custom parser through `Config`. These apply only to the parent;
+catalog and generic handoff targets retain their independent output contracts.
+The existing `structured_output` offline example now uses the builder and closes
+its owned bundle. The standalone consumer compiles the schema fields without
+requiring a direct schema-library import. No new crate version was introduced;
+`schemars` is an existing workspace dependency enabled on the facade's builder
+feature only.
+
+Fourteen pinned SDK builder/runner observations cover absent, object and boolean
+schemas, blank names, strict/non-strict behavior, invalid JSON, custom parsing
+and parser failure in normal and streamed runs. Native tests compare parent-only
+placement, request fields, parser call counts and parsed final values. Invalid
+schema construction also verifies owned-session cleanup without model dispatch;
+tool-only builds ignore agent output schemas. Native schema-validation diagnostics
+remain deliberately stronger than the SDK's JSON-syntax fallback; no diagnostic
+or provider wire-format equivalence is asserted.
+
+The first full run and isolated follow-up exposed an unchanged paused-clock
+subagent timeout test racing wall-clock deadline construction against a 50ms
+virtual child delay. Its child now waits on an explicit release signal until
+after the pending-result assertions. No production timeout behavior changed.
+The isolated regression and all 23 child integration tests then passed.
+
+Fresh final Rust 1.88 Linux workspace: **1,240 passed, 0 failed, 30 ignored**.
+Strict Clippy, documentation, formatting, the complete facade feature matrix,
+platform-free standalone consumer, all twenty offline feature scenarios and
+host-session example pass. Independent pinned fixtures, hash-bound evidence,
+source locks and all 18 ledger-validator tests pass. The ledger remains
+**210 verified / 8,681 unresolved / 251 excluded**. This is not full issue closure;
+automatic specialist/scheduler assembly and other acceptance work remain open.
+
 ### Managed subagent default selection
 
 The builder no longer routes omitted `agent_name` to the parent's identity. It

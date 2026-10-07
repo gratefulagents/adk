@@ -234,3 +234,14 @@ implicit parent-to-child identity coupling: the parent need not be a registered
 child. The disposable runtime reference harness executes eleven catalog cases;
 native tests exercise the actual managed tool and scheduler plus explicit-name
 overrides. Automatic owned scheduler construction remains separate work.
+
+## Builder structured output
+
+Forward the existing native `AgentConfig` schema/name/strict/parser fields through
+`builder::Config`, rather than replicating Go's function field or adding a second
+parser abstraction. Keep the [pinned builder's parent-only placement](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go#L699)
+and [custom-parser precedence](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/output_schema.go)
+(GPL-3.0-only). Retain native construction-time schema checks and observational
+schema diagnostics; do not pretend Go's JSON-syntax fallback performs JSON Schema
+validation. Fourteen normal/streamed pinned observations compare composed schema
+placement, request fields and parsed final values, including parser failure.

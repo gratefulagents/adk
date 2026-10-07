@@ -519,6 +519,29 @@ snapshot's size and digest. Host redaction/capture policy remains necessary.
 Native durable payload v2 preserves attribution; v1 payloads resume with unknown
 attribution because their historical agent names were not reliable.
 
+## Structured output
+
+`Config::output_schema` accepts a typed `schemars::Schema` (object or boolean).
+`output_schema_name` defaults to `final_output`; `output_schema_strict` defaults
+to `true`. Set `output_parser` to an `Arc<dyn runtime::OutputParser>` for custom
+parsing. These fields forward the existing runtime contracts to the **parent**
+agent only; catalog specialists and generic handoff targets do not inherit them.
+Schema selection is independent of runtime/tool feature switches.
+
+Normal and streamed runs carry the schema/name/strict flag in `ModelRequest` and
+return parsed `RunResult::final_output`. The `structured_output` offline feature
+example demonstrates builder configuration, observational validation and explicit
+bundle closure. Invalid schema definitions fail build and close owned resources;
+tool-only construction does not inspect an agent's output schema.
+
+Validation remains observational, not fail-closed: invalid JSON or parser failure
+retains the original text and emits `OutputValidationFailed`. Without a custom
+parser, native runtime also reports JSON Schema violations; the pinned SDK's
+fallback only validates JSON syntax. A custom parser replaces default validation,
+matching the runtime contract. Fourteen independent pinned builder/runner cases
+compare schema placement, request fields and final values, not schema diagnostic
+messages, raw schema whitespace or provider wire formats.
+
 ## Source mapping and explicit gaps
 
 Reviewed mappings are `repos/sdk/pkg/agentsdk/runtime/{builder,features}.go` and

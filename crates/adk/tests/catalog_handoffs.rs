@@ -1283,3 +1283,135 @@ async fn managed_subagent_default_uses_registered_catalog_not_parent_identity() 
         }
     }
 }
+
+struct SchemaParser {
+    reject: bool,
+    calls: AtomicUsize,
+}
+impl adk::runtime::OutputParser for SchemaParser {
+    fn parse(&self, raw: &str) -> Result<serde_json::Value, Error> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        if self.reject {
+            Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "parser rejected output",
+            ))
+        } else {
+            Ok(json!({"parsed":raw}))
+        }
+    }
+}
+
+#[tokio::test]
+async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["output_schema_cases"].as_array().unwrap() {
+        let schema = case["schema_json"].as_str().unwrap();
+        let parser = Arc::new(SchemaParser {
+            reject: case["parser"] == "reject",
+            calls: AtomicUsize::new(0),
+        });
+        let model = Script::new(vec![response(vec![message(
+            case["answer"].as_str().unwrap(),
+        )])]);
+        let mut c = config();
+        c.output_schema = if schema.is_empty() {
+            None
+        } else {
+            Some(serde_json::from_str(schema).unwrap())
+        };
+        c.output_schema_name = case["name"].as_str().unwrap().into();
+        c.output_schema_strict = case["strict"].as_bool().unwrap();
+        if case["parser"] != "" {
+            c.output_parser = Some(parser.clone());
+        }
+        let mut bundle = builder(c, &model).build(&context()).await.unwrap();
+        assert_eq!(
+            bundle.agent().output_schema.is_some(),
+            case["parent_has_schema"].as_bool().unwrap()
+        );
+        assert_eq!(
+            bundle.specialists()["reviewer"].output_schema.is_some(),
+            case["specialist_has_schema"].as_bool().unwrap()
+        );
+        assert_eq!(
+            bundle.agent().handoffs[0].target.output_schema.is_some(),
+            case["handoff_has_schema"].as_bool().unwrap()
+        );
+        assert!(bundle.specialists()["reviewer"].output_parser.is_none());
+        let host = Arc::new(TestHost::default());
+        let result = if case["streaming"] == true {
+            bundle
+                .stream(context(), vec![], host)
+                .finish()
+                .await
+                .unwrap()
+        } else {
+            bundle.run(context(), vec![], host).await.unwrap()
+        };
+        assert_eq!(
+            result.result.final_output,
+            Some(case["final_output"].clone()),
+            "{case:?}"
+        );
+        assert_eq!(
+            parser.calls.load(Ordering::SeqCst),
+            case["parser_calls"].as_u64().unwrap() as usize
+        );
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 1);
+            let request = &requests[0];
+            assert_eq!(
+                request.output_schema.as_ref().map(|s| s.as_value()),
+                (!case["request_schema"].is_null()).then_some(&case["request_schema"])
+            );
+            if request.output_schema.is_some() {
+                assert_eq!(
+                    request.output_schema_name,
+                    case["request_name"].as_str().unwrap()
+                );
+                assert_eq!(
+                    request.output_schema_strict,
+                    case["request_strict"].as_bool().unwrap()
+                );
+                assert!(request.instructions.contains("<structured_output>"));
+                assert_eq!(
+                    request.instructions.contains("Strict mode:"),
+                    request.output_schema_strict
+                );
+            } else {
+                assert!(!request.instructions.contains("<structured_output>"));
+            }
+        }
+        bundle.close().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn builder_invalid_output_schema_closes_owned_session_without_dispatch() {
+    let model = Script::new(vec![]);
+    let owner = SessionState::new();
+    let handle = owner.handle();
+    let mut c = config();
+    c.output_schema = Some(json!({"type":27}).try_into().unwrap());
+    let error = invalid(
+        builder(c.clone(), &model)
+            .owned_session(owner)
+            .build(&context())
+            .await,
+    );
+    assert!(error.info.message.contains("invalid JSON schema"));
+    assert!(handle.is_closed());
+    assert!(model.requests.lock().unwrap().is_empty());
+    builder(c, &model)
+        .build_tools(&context())
+        .await
+        .unwrap()
+        .close()
+        .await
+        .unwrap();
+}

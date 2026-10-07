@@ -73,6 +73,8 @@ pub struct RuntimeCheckpoint {
     base_turn_limit: Option<std::num::NonZeroU32>,
     #[serde(default)]
     stop_gate_blocks: usize,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pending_completion: bool,
     phase: Phase,
     calls: VecDeque<ToolCall>,
     turns: u32,
@@ -433,8 +435,10 @@ impl Runner {
             }
             let mut original_policy = saved.policy.clone();
             original_policy.max_turns = saved.base_turn_limit.unwrap_or(saved.policy.max_turns);
-            if (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
+            if (!self.config.require_completion_confirmation && saved.pending_completion)
+                || (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
                 || (self.config.stop_gate.is_none()
+                    && !self.config.require_completion_confirmation
                     && self.config.subagents.is_none()
                     && self.config.immediate_input_signal.is_none()
                     && self.config.immediate_input_finalizer.is_none()
@@ -565,6 +569,7 @@ impl Runner {
             engine.policy = saved.policy;
             engine.base_turn_limit = original_policy.max_turns;
             engine.stop_gate_blocks = saved.stop_gate_blocks;
+            engine.pending_completion = saved.pending_completion;
             engine.turns = saved.turns;
             engine.last_model = saved.last_model;
             engine.applied_child_messages = saved.applied_child_messages;
@@ -782,6 +787,9 @@ impl Runner {
         }
         if let Some(callback) = &config.immediate_input_finalizer {
             baseline["immediate_input_finalizer"] = serde_json::json!(callback.durable_key());
+        }
+        if config.require_completion_confirmation {
+            baseline["require_completion_confirmation"] = serde_json::json!(true);
         }
         if config.force_final_summary_turn {
             baseline["force_final_summary_turn"] = serde_json::json!(true);
@@ -1019,6 +1027,7 @@ impl Engine {
                 policy: self.policy.clone(),
                 base_turn_limit: Some(self.base_turn_limit),
                 stop_gate_blocks: self.stop_gate_blocks,
+                pending_completion: self.pending_completion,
                 phase: self.phase,
                 calls: self.calls.clone(),
                 turns: self.turns,
@@ -1058,6 +1067,9 @@ pub struct GoRecovery {
     pub policy: RunPolicy,
     /// Required when a stop gate is configured: Go does not persist these values.
     pub stop_gate_blocks: Option<usize>,
+    /// Required when completion confirmation is enabled; Go does not persist this state.
+    pub pending_completion: Option<bool>,
+    /// Required for either a stop gate or completion confirmation.
     pub effective_max_turns: Option<std::num::NonZeroU32>,
     pub turns: u32,
     pub usage: Usage,
@@ -1251,6 +1263,24 @@ impl Runner {
         } else {
             0
         };
+        let pending_completion = if self.config.require_completion_confirmation {
+            let pending = recovery.pending_completion.ok_or_else(|| {
+                invalid("Go completion confirmation migration requires verified pending state")
+            })?;
+            policy.max_turns = recovery.effective_max_turns.ok_or_else(|| {
+                invalid(
+                    "Go completion confirmation migration requires verified effective turn limit",
+                )
+            })?;
+            if policy.max_turns < base_turn_limit {
+                return Err(invalid(
+                    "invalid verified Go completion confirmation turn limit",
+                ));
+            }
+            pending
+        } else {
+            false
+        };
         checkpoint.runtime = Some(RuntimeCheckpoint {
             version: 2,
             boundary: checkpoint.boundary.clone(),
@@ -1277,6 +1307,7 @@ impl Runner {
             },
             base_turn_limit: Some(base_turn_limit),
             stop_gate_blocks,
+            pending_completion,
             policy,
             phase: if completed {
                 Phase::Finish

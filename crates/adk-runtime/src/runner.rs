@@ -460,6 +460,8 @@ pub struct RunnerConfig {
     pub immediate_input_finalizer: Option<Arc<dyn ImmediateInputFinalizer>>,
     /// Reserve the last model attempt for a no-tool summary, unless children still need joining.
     pub force_final_summary_turn: bool,
+    /// Require two consecutive final answers while tools remain available.
+    pub require_completion_confirmation: bool,
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
@@ -513,6 +515,7 @@ impl Default for RunnerConfig {
             immediate_input_signal: None,
             immediate_input_finalizer: None,
             force_final_summary_turn: false,
+            require_completion_confirmation: false,
             work_dir: PathBuf::from("."),
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
@@ -681,6 +684,7 @@ impl Continuation {
             self.engine.turns = 0;
             self.engine.policy.max_turns = self.engine.base_turn_limit;
             self.engine.stop_gate_blocks = 0;
+            self.engine.pending_completion = false;
             self.engine.consecutive_tool_errors = 0;
             self.engine.tool_error_escalated = false;
             self.engine.fallbacks.clear();
@@ -880,6 +884,7 @@ impl Runner {
             consecutive_tool_errors: 0,
             tool_error_escalated: false,
             stop_gate_blocks: 0,
+            pending_completion: false,
             turns: 0,
             committed_cursor: 0,
             committed_markers: 0,
@@ -960,6 +965,7 @@ struct Engine {
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
     stop_gate_blocks: usize,
+    pending_completion: bool,
     turns: u32,
     committed_cursor: usize,
     committed_markers: usize,
@@ -975,6 +981,13 @@ struct Engine {
     spills: Vec<Arc<SpillFile>>,
     result: RunResult,
 }
+
+const COMPLETION_CONFIRMATION_PROMPT: &str = r#"[SYSTEM] Before this answer is accepted as final: verify your work now.
+- Re-read the original task and confirm every requirement is satisfied.
+- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.
+- Confirm any files or artifacts the task requires actually exist with the expected content.
+If anything is unverified or incomplete, continue working instead of finalizing.
+If you are certain the task is complete, provide your final answer again."#;
 
 const FINAL_SUMMARY_DIRECTIVE: &str = "\n\n<final_turn>\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n</final_turn>";
 
@@ -1870,6 +1883,9 @@ impl Engine {
         }
         let provenance = normalize_provenance(batch.items.len(), &batch.provenance)?;
         let admitted = !batch.items.is_empty();
+        if admitted {
+            self.pending_completion = false;
+        }
         let mut candidate = self.result.history.clone();
         candidate.extend(batch.items.iter().cloned());
         validate_history_pairs(&candidate)?;
@@ -2133,6 +2149,7 @@ impl Engine {
             self.calls.push_front(handoff);
         }
         if !self.calls.is_empty() {
+            self.pending_completion = false;
             self.stop_gate_blocks = 0;
             self.tool_turn_start = Some(self.result.new_items.len());
             self.tool_pause = false;
@@ -2140,6 +2157,7 @@ impl Engine {
             self.tools_prepared = false;
             self.phase = Phase::Tools;
         } else if response.end_turn == Some(false) {
+            self.pending_completion = false;
             self.stop_gate_blocks = 0;
             self.phase = Phase::Model;
         } else {
@@ -2157,7 +2175,8 @@ impl Engine {
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
             if self.durable_state.is_some()
-                && (self.config.stop_gate.is_some()
+                && (self.config.require_completion_confirmation
+                    || self.config.stop_gate.is_some()
                     || self.config.subagents.is_some()
                     || self.config.immediate_input_finalizer.is_some())
             {
@@ -2220,14 +2239,33 @@ impl Engine {
                 return Ok(());
             }
         }
-        if let Some(gate) = &self.config.stop_gate {
-            let has_tools =
-                self.tools_for_access()
+        let has_tools =
+            (self.config.require_completion_confirmation || self.config.stop_gate.is_some())
+                && (self
+                    .tools_for_access()
                     .iter()
                     .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
                     || self.agent.handoffs.iter().any(|handoff| {
                         self.tool_decision(&handoff.definition) != ToolDecision::Deny
-                    });
+                    }));
+        if self.config.require_completion_confirmation && !self.pending_completion && has_tools {
+            self.pending_completion = true;
+            self.append_unattributed(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: COMPLETION_CONFIRMATION_PROMPT.into(),
+                    }],
+                },
+            });
+            self.publish_committed().await?;
+            if self.turns >= self.policy.max_turns.get() {
+                self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+            }
+            self.phase = Phase::Model;
+            return Ok(());
+        }
+        if let Some(gate) = &self.config.stop_gate {
             if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
                 if let Some(mut feedback) =
                     bounded(&self.context, None, gate.check(&self.context, &output)).await?
@@ -3185,6 +3223,7 @@ impl Engine {
             }
             let from = self.agent.name.clone();
             self.agent = handoff.target.clone();
+            self.pending_completion = false;
             self.result.last_agent = Some(self.agent.name.clone());
             self.observe(Observation::Handoff {
                 from,

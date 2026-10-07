@@ -34,6 +34,7 @@ fn signed_sentinels_roundtrip_without_normalizing_original() {
     for n in [i64::MIN, -81, -1, 0, 1, 49, 100, u32::MAX as i64] {
         for untrusted in [None, Some(false), Some(true)] {
             let wire = RunConfigSentinels {
+                require_completion_confirmation: true,
                 max_turns: n,
                 sub_agent_max_turns: n,
                 max_concurrent_sub_agents: n,

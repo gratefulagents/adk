@@ -4111,6 +4111,29 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-3D58F0F27ED8A284": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "RunConfig.RequireCompletionConfirmation",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::RunnerConfig::require_completion_confirmation",
+        "crates/adk-runtime/src/durable.rs::RuntimeCheckpoint::pending_completion",
+        "crates/adk-codec/src/config.rs::RunConfigSentinels::require_completion_confirmation"
+      ],
+      "rust_test_identifiers": [
+        "completion_confirmation_matches_pinned_normal_and_streamed_sdk",
+        "completion_confirmation_scalar_codec_defaults_roundtrips_and_applies",
+        "completion_confirmation_cannot_restore_denied_tools_or_exhausted_token_budget",
+        "completion_confirmation_survives_every_candidate_checkpoint_without_repeating_calls",
+        "go_confirmation_migration_requires_verified_pending_state_and_extended_budget",
+        "confirmation_feedback_is_published_before_the_next_input_poll"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRequireCompletionConfirmation",
+      "rationale": "Eighteen independently executed pinned normal/streamed runs compare exact confirmation/gate prompts, final output, model/tool availability and admission counters. Covers default-off, unavailable tools, forced summary, tool/nonfinal/poller/finalizer resets, gate ordering and turn-budget extension. Native recovery preserves the candidate, pending flag and extended budget without repeating model calls, binds configuration, and requires verified host state for Go imports. Token/authorization boundaries remain enforced. This field does not claim FinalAnswerVerifier or critic helper implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

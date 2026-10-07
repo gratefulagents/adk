@@ -91,6 +91,7 @@ pub fn apply_go_config(
         .is_some_and(|p| p.approval_required);
     config.consecutive_tool_error_limit = effective.consecutive_tool_error_limit;
     config.stop_gate_max_blocks = effective.stop_gate_max_blocks;
+    config.require_completion_confirmation = effective.require_completion_confirmation;
     config.subagent_max_turns = Some(effective.sub_agent_max_turns);
     policy.max_turns = effective.max_turns;
     config.output.max_bytes = effective.max_tool_output_bytes;

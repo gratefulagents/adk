@@ -637,6 +637,7 @@ fn verified() -> GoRecovery {
     GoRecovery {
         policy: RunPolicy::default(),
         stop_gate_blocks: None,
+        pending_completion: None,
         effective_max_turns: None,
         turns: 2,
         usage: Usage {
@@ -2771,4 +2772,133 @@ async fn additional_instructions_survive_checkpoint_and_config_is_bound() {
     );
     assert!(tool.keys.lock().unwrap().is_empty());
     assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn completion_confirmation_survives_every_candidate_checkpoint_without_repeating_calls() {
+    let baseline: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/confirmation/observations.json"
+    ))
+    .unwrap();
+    let expected = baseline["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| case["name"] == "double" && case["streamed"] == false)
+        .unwrap();
+    let (_, model, tool) = setup(vec![], false, false);
+    *model.responses.lock().unwrap() = VecDeque::from([
+        response(vec![message(Role::Assistant, "first")]),
+        response(vec![message(Role::Assistant, "final")]),
+    ]);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            require_completion_confirmation: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let mut checkpoint = None;
+    let mut finished = None;
+    let mut saw_pending = false;
+    for _ in 0..8 {
+        match runner
+            .run_durable(
+                context(),
+                req.clone(),
+                Arc::new(HostImpl),
+                durable(store.clone(), checkpoint),
+            )
+            .await
+        {
+            Ok(outcome) => {
+                finished = Some(outcome.result);
+                break;
+            }
+            Err(error) => assert_eq!(error.error.info.message, "injected persistence failure"),
+        }
+        let saved = store.latest();
+        let value = serde_json::to_value(&saved).unwrap();
+        if value["runtime"]["pending_completion"] == true {
+            saw_pending = true;
+            assert_eq!(value["runtime"]["policy"]["max_turns"], 2);
+        }
+        let changed = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let mut resume = req.clone();
+        resume.input.clear();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    resume,
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(saved.clone()))
+                )
+                .await
+                .is_err()
+        );
+        checkpoint = Some(saved);
+        req.input.clear();
+    }
+    assert!(saw_pending);
+    let result = finished.expect("confirmation must finish after recovery");
+    assert_eq!(result.final_text(), expected["final"]);
+    assert_eq!(json!(model.calls.load(Ordering::SeqCst)), expected["calls"]);
+    let feedback: Vec<_> = result
+        .history
+        .iter()
+        .filter_map(|item| match item {
+            RunItem::Message { message } => {
+                message.content.iter().find_map(|content| match content {
+                    Content::Text { text } if text.starts_with("[SYSTEM]") => Some(text.clone()),
+                    _ => None,
+                })
+            }
+            _ => None,
+        })
+        .collect();
+    assert_eq!(json!(feedback), expected["feedback"]);
+}
+
+#[test]
+fn go_confirmation_migration_requires_verified_pending_state_and_extended_budget() {
+    let (_, model, tool) = setup(vec![], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            require_completion_confirmation: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    assert!(
+        runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .is_err()
+    );
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    assert!(runner.migrate_go_checkpoint(cp.clone(), state).is_err());
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    state.effective_max_turns = Some(std::num::NonZeroU32::new(1).unwrap());
+    assert!(runner.migrate_go_checkpoint(cp.clone(), state).is_err());
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    state.effective_max_turns = Some(state.policy.max_turns.saturating_add(1));
+    let migrated = runner.migrate_go_checkpoint(cp, state).unwrap();
+    assert_eq!(
+        serde_json::to_value(migrated).unwrap()["runtime"]["pending_completion"],
+        true
+    );
 }

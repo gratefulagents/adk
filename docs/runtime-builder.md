@@ -919,3 +919,37 @@ positive windows and valid compaction thresholds remain `u64`. Threshold
 calculation follows the pinned 64-bit SDK arithmetic, including its overflow
 behavior; the fixtures exercise those boundaries. JSON integer `-0` is accepted,
 while fractional/exponent notation and out-of-range integers are rejected.
+
+### Completion confirmation
+
+Configure `adk::runtime::RunnerConfig::require_completion_confirmation` directly,
+or pass that configuration to `Builder::runner_config`. It defaults to `false`,
+as in the pinned SDK. This is a run-level policy, not a new tool, model call
+adapter, or Cargo feature.
+
+When enabled and tools remain available, the first candidate final answer is
+followed by the SDK's exact verification prompt. A second consecutive final answer
+can finish. Tool calls, handoffs, explicit `end_turn=false`, and accepted immediate
+input reset the confirmation. The confirmation runs before the stop gate; it can
+extend the ordinary turn allowance by one at its boundary, but cannot restore
+denied tools or bypass token/cost/cancellation limits. Tool-less runs and forced
+no-tool summary turns do not bounce. Auto-assembled children retain their own
+(default-off) confirmation policy rather than inheriting this parent completion policy.
+
+The pending flag, candidate output and extended budget survive native durable
+recovery, with configuration fingerprinting. Go checkpoint imports require
+verified host-supplied pending state and effective turn allowance; see the
+[recovery matrix](durable-recovery-matrix.md). This is distinct from the SDK's
+`FinalAnswerVerifier`/critic callback, which is not implemented by this flag.
+
+Eighteen independent normal/streamed SDK scenarios compare exact feedback,
+results, available tools, model call counts and immediate-input counters:
+
+```sh
+python3 scripts/confirmation-reference/run.py --check
+cargo test --locked -p adk-runtime --test followup --test durable
+```
+
+Reference: [`RunConfig.RequireCompletionConfirmation`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go)
+and the same pinned revision's `internal/agent/runner.go`, GPL-3.0-only. Source and
+harness hashes are retained in `fixtures/confirmation/observations.json`.

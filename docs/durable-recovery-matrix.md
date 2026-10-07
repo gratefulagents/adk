@@ -13,7 +13,9 @@ usage/attempt/tool/cost counters, original start/deadline, registered agent, and
 complete call/result pairs. `GoRecovery` makes the missing metadata explicit;
 counters cannot decrease recorded Go usage. When a stop gate is configured, the
 host must also supply `GoRecovery::stop_gate_blocks` and `effective_max_turns`;
-Go does not persist those values. Terminal migration also requires the
+Go does not persist those values. Completion confirmation similarly requires
+`GoRecovery::pending_completion` and `effective_max_turns`; neither is inferred
+from prompt text. Terminal migration also requires the
 verified final output (Go's checkpoint does not store the parsed result).
 
 | Go boundary/state | Pinned Go behavior | Rust migration/recovery |
@@ -63,6 +65,7 @@ SDK-derived GPL-3.0-only; see `fixtures/licenses/SDK-GPL-3.0.txt`.
 | Go lifecycle callbacks | Supported through `GoCallbackAdapter`. Delivery is observational and can be missing/repeated across crash; callbacks must not be used as an exactly-once effect boundary |
 | Native observational hooks | Explicit `RunHooks::durable_observer()` opt-in. Default false; opting in asserts replay-tolerant observation, not permission to perform non-replayable effects |
 | Local compaction | Supported by existing deterministic engine and approval-journal anchoring |
+| Completion confirmation | Supported: candidate output is checkpointed before confirmation, and pending state plus original/effective turn budgets are retained afterward. Configuration changes fail closed; recovery does not repeat a committed model call. |
 | Deterministic/replay-safe stop gate | Supported through `StopGate::durable_key()`: a stable identity/version covering gate behavior and configuration. Candidate final output is persisted in `Finalize` before invoking the gate; recovery can rerun this pure check without replaying the model. Block count, original/effective turn limits and post-gate next phase are persisted. Identity/cap/policy changes fail closed. Go-compatible block-cap bypass, tool-progress reset and turn-limit extension are tested against actual Go output |
 | Stop gate without replay-safe opt-in | Rejected before dispatch: the host has not asserted deterministic, side-effect-free behavior. This is not a blanket rejection of the baseline Go stop-gate mode |
 | Custom compactor, dynamic turn context, output parser, legacy durable hook, or non-opted-in hook | Rejected before dispatch. These function-valued extensions have no durable effect protocol here; they are separate from the supported Go observers and deterministic stop gates |

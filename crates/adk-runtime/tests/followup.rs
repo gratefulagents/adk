@@ -972,3 +972,319 @@ fn model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence() {
         );
     }
 }
+
+struct ConfirmationGate(AtomicUsize);
+impl StopGate for ConfirmationGate {
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a serde_json::Value,
+    ) -> BoxFuture<'a, Result<Option<String>, Error>> {
+        Box::pin(async move {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(Some("check".into()))
+        })
+    }
+}
+struct ConfirmationInput {
+    calls: AtomicUsize,
+    at: usize,
+}
+impl ConfirmationInput {
+    fn take(&self) -> ImmediateInputBatch {
+        if self.calls.fetch_add(1, Ordering::SeqCst) + 1 == self.at {
+            ImmediateInputBatch {
+                items: vec![message(Role::User, "steering")],
+                provenance: vec![ItemProvenance::Unattributed],
+            }
+        } else {
+            ImmediateInputBatch::default()
+        }
+    }
+}
+impl ImmediateInputPoller for ConfirmationInput {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move { Ok(self.take()) })
+    }
+}
+impl ImmediateInputFinalizer for ConfirmationInput {
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move { Ok(self.take()) })
+    }
+}
+
+#[tokio::test]
+async fn completion_confirmation_matches_pinned_normal_and_streamed_sdk() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/confirmation/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let streaming = case["streamed"].as_bool().unwrap();
+        let reply = |text: &str| response(vec![message(Role::Assistant, text)], true);
+        let mut turns = 1;
+        let replies = match name {
+            "tools" => {
+                turns = 3;
+                vec![
+                    reply("first"),
+                    response(vec![call("read")], true),
+                    reply("again"),
+                    reply("final"),
+                ]
+            }
+            "end_turn" => {
+                turns = 3;
+                vec![
+                    reply("first"),
+                    response(vec![message(Role::Assistant, "progress")], false),
+                    reply("again"),
+                    reply("final"),
+                ]
+            }
+            "gate" | "poll" => vec![reply("first"), reply("again"), reply("final")],
+            "finalize" => vec![
+                reply("first"),
+                reply("again"),
+                reply("after input"),
+                reply("final"),
+            ],
+            _ => vec![reply("first"), reply("final")],
+        };
+        let model = Script::new(replies.into_iter().map(Ok).collect());
+        let binding = if streaming {
+            ModelBinding::streaming("fake", model.clone())
+        } else {
+            ModelBinding::complete("fake", model.clone())
+        };
+        let mut agent = AgentConfig::new("agent", binding);
+        if name != "no_tools" {
+            agent
+                .tools
+                .push(TestTool::new("read", true, false, false, false));
+        }
+        let gate = Arc::new(ConfirmationGate(AtomicUsize::new(0)));
+        let poller = Arc::new(ConfirmationInput {
+            calls: AtomicUsize::new(0),
+            at: 2,
+        });
+        let finalizer = Arc::new(ConfirmationInput {
+            calls: AtomicUsize::new(0),
+            at: 1,
+        });
+        let mut config = RunnerConfig {
+            require_completion_confirmation: name != "off",
+            force_final_summary_turn: name == "summary",
+            ..Default::default()
+        };
+        if name == "gate" {
+            config.stop_gate = Some(gate.clone());
+            config.stop_gate_max_blocks = 1;
+        }
+        if name == "poll" {
+            config.immediate_input_poller = Some(poller.clone());
+        }
+        if name == "finalize" {
+            config.immediate_input_finalizer = Some(finalizer.clone());
+        }
+        let runner = Runner::new(agent, config).unwrap();
+        let outcome = if streaming {
+            runner
+                .stream(context(), request(vec![], turns), Arc::new(Quiet))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(vec![], turns), Arc::new(Quiet))
+                .await
+        }
+        .unwrap();
+        assert_eq!(outcome.result.final_text(), case["final"], "{name}");
+        let feedback: Vec<_> = outcome
+            .result
+            .new_items
+            .iter()
+            .filter_map(|item| match item {
+                RunItem::Message { message } => {
+                    message.content.iter().find_map(|content| match content {
+                        Content::Text { text } if text.starts_with("[SYSTEM]") => {
+                            Some(text.clone())
+                        }
+                        _ => None,
+                    })
+                }
+                _ => None,
+            })
+            .collect();
+        assert_eq!(json!(feedback), case["feedback"], "{name}");
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(json!(requests.len()), case["calls"], "{name}");
+        assert_eq!(
+            json!(
+                requests
+                    .iter()
+                    .map(|request| request.tools.len())
+                    .collect::<Vec<_>>()
+            ),
+            case["tools"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(gate.0.load(Ordering::SeqCst)),
+            case["gate_calls"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(poller.calls.load(Ordering::SeqCst)),
+            case["poll_calls"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(finalizer.calls.load(Ordering::SeqCst)),
+            case["finalizer_calls"],
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn completion_confirmation_scalar_codec_defaults_roundtrips_and_applies() {
+    for (json, expected) in [
+        ("{}", false),
+        (r#"{"RequireCompletionConfirmation":null}"#, false),
+        (r#"{"RequireCompletionConfirmation":false}"#, false),
+        (r#"{"RequireCompletionConfirmation":true}"#, true),
+    ] {
+        let wire: RunConfigSentinels = serde_json::from_str(json).unwrap();
+        let effective = wire.resolve().unwrap();
+        assert_eq!(effective.require_completion_confirmation, expected);
+        assert_eq!(
+            RunConfigSentinels::from_effective(&effective)
+                .unwrap()
+                .require_completion_confirmation,
+            expected
+        );
+        let mut config = RunnerConfig {
+            require_completion_confirmation: !expected,
+            ..Default::default()
+        };
+        apply_go_config(&wire, &mut config, &mut RunPolicy::default()).unwrap();
+        assert_eq!(config.require_completion_confirmation, expected);
+    }
+}
+
+#[tokio::test]
+async fn completion_confirmation_cannot_restore_denied_tools_or_exhausted_token_budget() {
+    for deny in [false, true] {
+        let mut first = response(vec![message(Role::Assistant, "first")], true);
+        first.usage.input_tokens = 1;
+        let model = Script::new(vec![Ok(first)]);
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("fake", model.clone()));
+        agent
+            .tools
+            .push(TestTool::new("read", true, false, false, false));
+        let config = RunnerConfig {
+            require_completion_confirmation: true,
+            limits: Limits {
+                max_tokens: (!deny).then_some(1),
+                ..Default::default()
+            },
+            ..Default::default()
+        };
+        let runner = Runner::new(agent, config).unwrap();
+        let mut req = request(vec![], 1);
+        if deny {
+            req.policy.tools.denied_tools.insert("read".into());
+        }
+        let outcome = runner.run(context(), req, Arc::new(Quiet)).await;
+        if deny {
+            assert_eq!(outcome.unwrap().result.final_text(), "first");
+        } else {
+            assert_eq!(
+                outcome.err().unwrap().error.info.message,
+                "run token budget exhausted"
+            );
+        }
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+    }
+}
+
+#[derive(Default)]
+struct ConfirmationOrdering {
+    confirmations: AtomicUsize,
+    polls: AtomicUsize,
+}
+impl RunHooks for ConfirmationOrdering {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if let Observation::CommittedItems { items, .. } = event {
+                for item in items {
+                    if let RunItem::Message { message } = item {
+                        if message.content.iter().any(|content| matches!(content,Content::Text {text} if text.contains("verify your work now"))) {
+                            self.confirmations.fetch_add(1,Ordering::SeqCst);
+                        }
+                    }
+                }
+            }
+            Ok(())
+        })
+    }
+}
+impl ImmediateInputPoller for ConfirmationOrdering {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            if self.polls.fetch_add(1, Ordering::SeqCst) == 1 {
+                assert_eq!(
+                    self.confirmations.load(Ordering::SeqCst),
+                    1,
+                    "confirmation must be published before the next admission callback"
+                );
+            }
+            Ok(ImmediateInputBatch::default())
+        })
+    }
+}
+#[tokio::test]
+async fn confirmation_feedback_is_published_before_the_next_input_poll() {
+    for streaming in [false, true] {
+        let model = Script::new(vec![Ok(answer()), Ok(answer())]);
+        let binding = if streaming {
+            ModelBinding::streaming("fake", model)
+        } else {
+            ModelBinding::complete("fake", model)
+        };
+        let mut agent = AgentConfig::new("agent", binding);
+        agent
+            .tools
+            .push(TestTool::new("read", true, false, false, false));
+        let ordering = Arc::new(ConfirmationOrdering::default());
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                require_completion_confirmation: true,
+                hooks: Some(ordering.clone()),
+                immediate_input_poller: Some(ordering.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if streaming {
+            runner
+                .stream(context(), request(vec![], 1), Arc::new(Quiet))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            runner
+                .run(context(), request(vec![], 1), Arc::new(Quiet))
+                .await
+                .unwrap();
+        }
+        assert_eq!(ordering.confirmations.load(Ordering::SeqCst), 1);
+    }
+}

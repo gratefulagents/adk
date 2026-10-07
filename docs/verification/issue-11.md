@@ -1090,3 +1090,31 @@ Only the encoding helper and turn-cap prompt ledger functions are newly closed:
 **243 verified / 8,648 unresolved / 251 excluded**. This is not full issue #11
 completion or a claim that unresolved records each represent a missing feature.
 No new credentialed live-service checks were run; ignored checks remain unverified.
+
+## Completion-confirmation continuation
+
+Added the default-off `RunnerConfig::require_completion_confirmation`, scalar
+Go configuration mapping, exact SDK confirmation prompt, tool/nonfinal/steering
+resets, stop-gate ordering and ordinary-turn extension. Eighteen independently
+executed SDK normal/streamed cases compare results, feedback, tool availability
+and admission/model counters. Native tests also cover denied tools, exhausted
+token budgets, checkpoint recovery across every candidate boundary, configuration
+binding and Go migration's required pending state/effective turn budget.
+
+An initially failing regression showed the new confirmation prompt was delivered
+after the next immediate-input callback. It now publishes before admission; the
+normal/streamed ordering regression passes. The existing stop gate already skips
+forced no-tool summaries through `effective_tool_policy`; no stop-gate correction
+was needed. This does not implement `FinalAnswerVerifier` or its critic helper.
+
+Fresh locked Linux Rust 1.88.0 workspace/all-features/all-targets:
+**1,260 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy with
+`-D warnings`, strict rustdoc, changed-file Rustfmt, full facade matrix and
+platform-free consumer, all 20 offline scenarios and the host-session example
+passed. All pinned oracles, 18 ledger-validator tests, both source locks, Python
+compilation, Go formatting and whitespace checks passed. The two actual SDK
+completion-confirmation source tests passed independently and were added to the
+reference evidence report. Only the exact configuration-field obligation is
+newly closed: **244 verified / 8,647 unresolved / 251 excluded**. Immutable
+inventories and source locks remain untouched. No new credentialed live checks
+were run. Issue #11 is still incomplete; this is not a release/default switch.

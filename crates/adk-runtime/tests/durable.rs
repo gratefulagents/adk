@@ -638,6 +638,7 @@ fn verified() -> GoRecovery {
         policy: RunPolicy::default(),
         stop_gate_blocks: None,
         pending_completion: None,
+        verifier_ran: None,
         effective_max_turns: None,
         turns: 2,
         usage: Usage {
@@ -2899,6 +2900,165 @@ fn go_confirmation_migration_requires_verified_pending_state_and_extended_budget
     let migrated = runner.migrate_go_checkpoint(cp, state).unwrap();
     assert_eq!(
         serde_json::to_value(migrated).unwrap()["runtime"]["pending_completion"],
+        true
+    );
+}
+
+struct ReplaySafeVerifier {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+}
+impl FinalAnswerVerifier for ReplaySafeVerifier {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn verify<'a>(&'a self, _: &'a Context, _: &'a Value) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok("fix this".into())
+        })
+    }
+}
+#[tokio::test]
+async fn durable_verifier_invocation_state_survives_checkpoints_and_binds_configuration() {
+    let (_, model, tool) = setup(vec![], false, false);
+    *model.responses.lock().unwrap() = VecDeque::from([
+        response(vec![message(Role::Assistant, "first")]),
+        response(vec![message(Role::Assistant, "final")]),
+    ]);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool);
+    for key in [None, Some("")] {
+        let unsafe_runner = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                    key,
+                    calls: AtomicUsize::new(0),
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(
+            run(&unsafe_runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    let verifier = Arc::new(ReplaySafeVerifier {
+        key: Some("pure-v1"),
+        calls: AtomicUsize::new(0),
+    });
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            final_answer_verifier: Some(verifier.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let mut checkpoint = None;
+    let mut result = None;
+    for iteration in 0..8 {
+        match runner
+            .run_durable(
+                context(),
+                req.clone(),
+                Arc::new(HostImpl),
+                durable(store.clone(), checkpoint),
+            )
+            .await
+        {
+            Ok(outcome) => {
+                result = Some(outcome.result);
+                break;
+            }
+            Err(error) => assert_eq!(error.error.info.message, "injected persistence failure"),
+        }
+        let saved = store.latest();
+        if iteration == 0 {
+            assert_eq!(verifier.calls.load(Ordering::SeqCst), 0);
+        } else {
+            assert_eq!(
+                serde_json::to_value(&saved).unwrap()["runtime"]["verifier_ran"],
+                true
+            );
+        }
+        let changed = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                    key: Some("pure-v2"),
+                    calls: AtomicUsize::new(0),
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut resume = req.clone();
+        resume.input.clear();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    resume,
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(saved.clone()))
+                )
+                .await
+                .is_err()
+        );
+        checkpoint = Some(saved);
+        req.input.clear();
+    }
+    let result = result.expect("verifier must finish after recovery");
+    assert_eq!(result.final_text(), "final");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(verifier.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(result.history.iter().filter(|item|matches!(item,RunItem::Message {message} if message.content.iter().any(|content| matches!(content,Content::Text {text} if text.contains("An independent reviewer"))))).count(),1);
+}
+
+#[test]
+fn go_verifier_recovery_requires_verified_invocation_state_and_budget() {
+    let (_, model, tool) = setup(vec![], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                key: Some("pure-v1"),
+                calls: AtomicUsize::new(0),
+            })),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    assert!(
+        runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .is_err()
+    );
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    assert!(runner.migrate_go_checkpoint(cp.clone(), evidence).is_err());
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    evidence.effective_max_turns = Some(std::num::NonZeroU32::new(1).unwrap());
+    assert!(runner.migrate_go_checkpoint(cp.clone(), evidence).is_err());
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    evidence.effective_max_turns = Some(evidence.policy.max_turns.saturating_add(1));
+    let migrated = runner.migrate_go_checkpoint(cp, evidence).unwrap();
+    assert_eq!(
+        serde_json::to_value(migrated).unwrap()["runtime"]["verifier_ran"],
         true
     );
 }

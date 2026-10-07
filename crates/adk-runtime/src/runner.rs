@@ -192,6 +192,9 @@ pub trait CostEstimator: Send + Sync {
 
 #[derive(Debug, Clone)]
 pub enum Observation {
+    FinalAnswerVerificationFailed {
+        error: ErrorInfo,
+    },
     ImmediateInputPollFailed {
         error: ErrorInfo,
     },
@@ -431,6 +434,20 @@ pub trait StopGate: Send + Sync {
         output: &'a Value,
     ) -> BoxFuture<'a, Result<Option<String>, Error>>;
 }
+/// One independent review per run, after the stop gate. Blank feedback accepts.
+/// Callback failures are diagnostic, not authorization or guardrail decisions.
+pub trait FinalAnswerVerifier: Send + Sync {
+    /// Opt in only for a deterministic, replay-safe verifier without external effects.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn verify<'a>(
+        &'a self,
+        context: &'a Context,
+        output: &'a Value,
+    ) -> BoxFuture<'a, Result<String, Error>>;
+}
+
 /// Host-maintained state consulted only after compaction. A nonblank result
 /// supersedes the static working-state context; blank results fall back to it.
 pub trait CompactionCarryForward: Send + Sync {
@@ -487,6 +504,7 @@ pub struct RunnerConfig {
     pub approve_mutating_tools: bool,
     pub consecutive_tool_error_limit: Option<usize>,
     pub stop_gate: Option<Arc<dyn StopGate>>,
+    pub final_answer_verifier: Option<Arc<dyn FinalAnswerVerifier>>,
     pub stop_gate_max_blocks: usize,
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Session-owned children survive individual runs; the scheduler owner closes them.
@@ -535,6 +553,7 @@ impl Default for RunnerConfig {
             approve_mutating_tools: false,
             consecutive_tool_error_limit: Some(3),
             stop_gate: None,
+            final_answer_verifier: None,
             stop_gate_max_blocks: 8,
             turn_context: None,
             subagents: None,
@@ -685,6 +704,7 @@ impl Continuation {
             self.engine.policy.max_turns = self.engine.base_turn_limit;
             self.engine.stop_gate_blocks = 0;
             self.engine.pending_completion = false;
+            self.engine.verifier_ran = false;
             self.engine.consecutive_tool_errors = 0;
             self.engine.tool_error_escalated = false;
             self.engine.fallbacks.clear();
@@ -885,6 +905,7 @@ impl Runner {
             tool_error_escalated: false,
             stop_gate_blocks: 0,
             pending_completion: false,
+            verifier_ran: false,
             turns: 0,
             committed_cursor: 0,
             committed_markers: 0,
@@ -966,6 +987,7 @@ struct Engine {
     tool_error_escalated: bool,
     stop_gate_blocks: usize,
     pending_completion: bool,
+    verifier_ran: bool,
     turns: u32,
     committed_cursor: usize,
     committed_markers: usize,
@@ -2175,7 +2197,8 @@ impl Engine {
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
             if self.durable_state.is_some()
-                && (self.config.require_completion_confirmation
+                && (self.config.final_answer_verifier.is_some()
+                    || self.config.require_completion_confirmation
                     || self.config.stop_gate.is_some()
                     || self.config.subagents.is_some()
                     || self.config.immediate_input_finalizer.is_some())
@@ -2240,7 +2263,9 @@ impl Engine {
             }
         }
         let has_tools =
-            (self.config.require_completion_confirmation || self.config.stop_gate.is_some())
+            (self.config.require_completion_confirmation
+                || self.config.stop_gate.is_some()
+                || self.config.final_answer_verifier.is_some())
                 && (self
                     .tools_for_access()
                     .iter()
@@ -2284,6 +2309,36 @@ impl Engine {
                     return Ok(());
                 }
                 self.stop_gate_blocks = 0;
+            }
+        }
+        if let Some(verifier) = &self.config.final_answer_verifier {
+            if !self.verifier_ran && has_tools {
+                self.verifier_ran = true;
+                match bounded(&self.context, None, verifier.verify(&self.context, &output)).await {
+                    Ok(feedback) if !feedback.trim().is_empty() => {
+                        self.pending_completion = false;
+                        self.append_unattributed(RunItem::Message { message: Message {
+                            role: Role::User,
+                            content: vec![Content::Text { text: format!("[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\n{feedback}") }],
+                        }});
+                        self.publish_committed().await?;
+                        if self.turns >= self.policy.max_turns.get() {
+                            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                        }
+                        self.phase = Phase::Model;
+                        return Ok(());
+                    }
+                    Ok(_) => {}
+                    Err(error) => {
+                        self.context.check_active()?;
+                        let _ = self
+                            .observe(Observation::FinalAnswerVerificationFailed {
+                                error: error.info,
+                            })
+                            .await;
+                        self.context.check_active()?;
+                    }
+                }
             }
         }
         if self.apply_child_messages(true).await? {

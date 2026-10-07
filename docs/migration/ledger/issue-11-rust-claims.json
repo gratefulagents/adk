@@ -4134,6 +4134,30 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-AF9BD77B0901AE35": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "RunConfig.FinalAnswerVerifier",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::FinalAnswerVerifier",
+        "crates/adk-runtime/src/runner.rs::RunnerConfig::final_answer_verifier",
+        "crates/adk-runtime/src/durable.rs::RuntimeCheckpoint::verifier_ran",
+        "crates/adk/src/observability.rs::Observability"
+      ],
+      "rust_test_identifiers": [
+        "final_verifier_matches_pinned_sdk_once_after_gate_normal_and_streamed",
+        "verifier_failure_never_swallows_parent_cancellation",
+        "durable_verifier_invocation_state_survives_checkpoints_and_binds_configuration",
+        "go_verifier_recovery_requires_verified_invocation_state_and_budget",
+        "verifier_failure_diagnostics_respect_capture_policy_and_event_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestFinalAnswerVerifierSingleRefutationRound",
+      "rationale": "Twenty-eight pinned normal/streamed observations verify once-per-run invocation after gate/confirmation, exact feedback, whitespace/error acceptance, tool/nonfinal progress, no-tool summaries and parsed output. Native adaptation deliberately borrows JSON rather than Go callback text and emits capture-policy-safe host diagnostics instead of process-global stderr; parent cancellation remains authoritative (docs/research/facade.md). Durable use requires pure replay-safe identity, preserves committed invocation state and rejects changed configuration; Go import requires verified invocation/budget state. This does not claim the distinct NewCriticVerifier helper or full RunConfig parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "observability"
+      ]
     }
   }
 }

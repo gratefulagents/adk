@@ -1,0 +1,458 @@
+{
+  "cases": [
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "approve",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "approve",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "blank",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "blank",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 2,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "reject",
+      "streamed": false,
+      "tools": [
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 2,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "reject",
+      "streamed": true,
+      "tools": [
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "error",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "error",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "no_tools",
+      "streamed": false,
+      "tools": [
+        0
+      ],
+      "verifier_inputs": []
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "no_tools",
+      "streamed": true,
+      "tools": [
+        0
+      ],
+      "verifier_inputs": []
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "summary",
+      "streamed": false,
+      "tools": [
+        0
+      ],
+      "verifier_inputs": []
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "first",
+      "gate_calls": 0,
+      "name": "summary",
+      "streamed": true,
+      "tools": [
+        0
+      ],
+      "verifier_inputs": []
+    },
+    {
+      "calls": 4,
+      "feedback": [
+        "[SYSTEM] Before this answer is accepted as final: verify your work now.\n- Re-read the original task and confirm every requirement is satisfied.\n- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.\n- Confirm any files or artifacts the task requires actually exist with the expected content.\nIf anything is unverified or incomplete, continue working instead of finalizing.\nIf you are certain the task is complete, provide your final answer again.",
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this",
+        "[SYSTEM] Before this answer is accepted as final: verify your work now.\n- Re-read the original task and confirm every requirement is satisfied.\n- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.\n- Confirm any files or artifacts the task requires actually exist with the expected content.\nIf anything is unverified or incomplete, continue working instead of finalizing.\nIf you are certain the task is complete, provide your final answer again."
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "confirmation",
+      "streamed": false,
+      "tools": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "confirmed"
+      ]
+    },
+    {
+      "calls": 4,
+      "feedback": [
+        "[SYSTEM] Before this answer is accepted as final: verify your work now.\n- Re-read the original task and confirm every requirement is satisfied.\n- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.\n- Confirm any files or artifacts the task requires actually exist with the expected content.\nIf anything is unverified or incomplete, continue working instead of finalizing.\nIf you are certain the task is complete, provide your final answer again.",
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this",
+        "[SYSTEM] Before this answer is accepted as final: verify your work now.\n- Re-read the original task and confirm every requirement is satisfied.\n- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.\n- Confirm any files or artifacts the task requires actually exist with the expected content.\nIf anything is unverified or incomplete, continue working instead of finalizing.\nIf you are certain the task is complete, provide your final answer again."
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "confirmation",
+      "streamed": true,
+      "tools": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "confirmed"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] Final answer blocked by the completion gate (1/1):\ncheck",
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 1,
+      "name": "gate",
+      "streamed": false,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "second"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] Final answer blocked by the completion gate (1/1):\ncheck",
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 1,
+      "name": "gate",
+      "streamed": true,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "second"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "tools",
+      "streamed": false,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "tools",
+      "streamed": true,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "end_turn",
+      "streamed": false,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 3,
+      "feedback": [
+        "[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\nfix this"
+      ],
+      "final_output": "final",
+      "gate_calls": 0,
+      "name": "end_turn",
+      "streamed": true,
+      "tools": [
+        1,
+        1,
+        1
+      ],
+      "verifier_inputs": [
+        "first"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": {
+        "a": 1,
+        "z": "<&>"
+      },
+      "gate_calls": 0,
+      "name": "object",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "{\"a\":1,\"z\":\"\\u003c\\u0026\\u003e\"}"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": {
+        "a": 1,
+        "z": "<&>"
+      },
+      "gate_calls": 0,
+      "name": "object",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "{\"a\":1,\"z\":\"\\u003c\\u0026\\u003e\"}"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": 42,
+      "gate_calls": 0,
+      "name": "number",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "42"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": 42,
+      "gate_calls": 0,
+      "name": "number",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "42"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": null,
+      "gate_calls": 0,
+      "name": "null",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        ""
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": null,
+      "gate_calls": 0,
+      "name": "null",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        ""
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "decoded",
+      "gate_calls": 0,
+      "name": "string",
+      "streamed": false,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "decoded"
+      ]
+    },
+    {
+      "calls": 1,
+      "feedback": [],
+      "final_output": "decoded",
+      "gate_calls": 0,
+      "name": "string",
+      "streamed": true,
+      "tools": [
+        1
+      ],
+      "verifier_inputs": [
+        "decoded"
+      ]
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/verifier-reference/reference_test.go": "dee57941b42e6632f7bddfcd83cf585610abe7930c3475f40724231411df7fee",
+      "scripts/verifier-reference/run.py": "f37d081906c2170981efa930c0ccdd3b29d902576cdd2597159de6b3b50ab2cc"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/run_config.go": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/runner_reliability_test.go": "a717006f99d0c4a1dc30cbb445385ebcc5c14e3ed544d087a67dcf644d7cc571",
+      "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
+    }
+  }
+}

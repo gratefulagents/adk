@@ -28,7 +28,9 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["crates/adk-codec/src/config.rs", "crates/adk-codec/tests/runner_codecs.rs",
+RUST_INPUTS = ["fixtures/verifier/observations.json", "scripts/verifier-reference/run.py",
+               "scripts/verifier-reference/reference_test.go",
+               "crates/adk-codec/src/config.rs", "crates/adk-codec/tests/runner_codecs.rs",
                "fixtures/confirmation/observations.json", "scripts/confirmation-reference/run.py",
                "scripts/confirmation-reference/reference_test.go",
                "crates/adk-codec/src/userinput.rs", "crates/adk-codec/tests/userinput.rs",
@@ -283,6 +285,8 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     llm_summary_check = subprocess.run([sys.executable, str(ROOT / "scripts/llm-summary-reference/run.py"), "--check"],
                                       cwd=ROOT, text=True, capture_output=True, check=True)
+    verifier_check = subprocess.run([sys.executable, str(ROOT / "scripts/verifier-reference/run.py"), "--check"],
+                                   cwd=ROOT, text=True, capture_output=True, check=True)
     confirmation_check = subprocess.run([sys.executable, str(ROOT / "scripts/confirmation-reference/run.py"), "--check"],
                                        cwd=ROOT, text=True, capture_output=True, check=True)
     userinput_check = subprocess.run([sys.executable, str(ROOT / "scripts/userinput-reference/run.py"), "--check"],
@@ -325,7 +329,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},

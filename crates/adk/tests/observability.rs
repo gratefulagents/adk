@@ -1263,3 +1263,39 @@ async fn immediate_poll_failure_is_nonterminal_and_respects_capture_policy() {
         );
     }
 }
+
+#[tokio::test]
+async fn verifier_failure_diagnostics_respect_capture_policy_and_event_order() {
+    for mode in [CaptureMode::Metadata, CaptureMode::Full] {
+        let (pipeline, records) = pipeline(mode);
+        pipeline
+            .observe(
+                &context(),
+                Observation::FinalAnswerVerificationFailed {
+                    error: Error::new(ErrorCategory::Host, "private verifier failure").info,
+                },
+            )
+            .await
+            .unwrap();
+        pipeline
+            .observe(
+                &context(),
+                Observation::TextDelta {
+                    delta: "continued".into(),
+                },
+            )
+            .await
+            .unwrap();
+        let records = records.0.lock().unwrap();
+        assert_eq!(records[0].kind, "final_answer_verification_failed");
+        assert_eq!(records[0].data["category"], "host");
+        assert_eq!(
+            records[0]
+                .data
+                .to_string()
+                .contains("private verifier failure"),
+            mode == CaptureMode::Full
+        );
+        assert!(records[1].sequence > records[0].sequence);
+    }
+}

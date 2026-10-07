@@ -940,7 +940,7 @@ The pending flag, candidate output and extended budget survive native durable
 recovery, with configuration fingerprinting. Go checkpoint imports require
 verified host-supplied pending state and effective turn allowance; see the
 [recovery matrix](durable-recovery-matrix.md). This is distinct from the SDK's
-`FinalAnswerVerifier`/critic callback, which is not implemented by this flag.
+`FinalAnswerVerifier` callback; see the independent-verification policy below.
 
 Eighteen independent normal/streamed SDK scenarios compare exact feedback,
 results, available tools, model call counts and immediate-input counters:
@@ -953,3 +953,47 @@ cargo test --locked -p adk-runtime --test followup --test durable
 Reference: [`RunConfig.RequireCompletionConfirmation`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/run_config.go)
 and the same pinned revision's `internal/agent/runner.go`, GPL-3.0-only. Source and
 harness hashes are retained in `fixtures/confirmation/observations.json`.
+
+### Independent final-answer verification
+
+`RunnerConfig::final_answer_verifier` accepts an owned `Arc<dyn FinalAnswerVerifier>`;
+the default is `None`. The native async trait borrows the parsed
+`serde_json::Value`, instead of serializing it into Go callback text. A host can
+inspect structured output without reparsing JSON. Return a nonblank string to
+request a revision; empty or whitespace-only feedback accepts.
+
+The verifier runs once per run after the completion-confirmation and stop-gate
+checks. Feedback preserves the SDK prefix and caller whitespace, is published
+before the next input callback, resets confirmation, and grants one ordinary
+turn when needed. Tool calls and steering do not reset the verifier's invocation
+flag. A new non-durable approval-continuation segment starts a new verification
+allowance, matching the existing Go chat-helper run boundary. Tool-less and
+forced-summary turns skip verification.
+
+Verifier errors are diagnostic and do not reject the answer. Unlike a guardrail,
+a verifier is not an authorization boundary. Rust emits
+`Observation::FinalAnswerVerificationFailed` to host-owned hooks rather than
+writing process-global Go stderr logs. The observability pipeline exposes
+`final_answer_verification_failed`, respecting metadata/full capture policy.
+Parent cancellation and deadlines still abort execution even when a verifier
+fails; dropping a run drops its verifier future without detaching it.
+
+Durable execution accepts only a deterministic, effect-free verifier with a
+nonempty `durable_key()`. The key must identify its behavior/configuration. A
+crash before the callback result is committed can replay this pure check; a
+committed `verifier_ran` flag prevents another invocation. Live/model-backed
+critics must not claim this replay-safe contract. Go migration requires verified
+`GoRecovery::verifier_ran` and the effective turn allowance. These restrictions
+are explicit; this is not an exactly-once protocol for arbitrary callbacks.
+
+The SDK `NewCriticVerifier` convenience constructor is still a separate missing
+helper; this callback does not implicitly create a critic agent. Twenty-eight
+pinned normal/streamed SDK cases cover blank/accepted/rejected/error reviews,
+gate and confirmation ordering, tool/nonfinal progress, forced/no-tool runs and
+structured outputs (`object`, `number`, `null`, `string`).
+
+```sh
+python3 scripts/verifier-reference/run.py --check
+cargo test --locked -p adk-runtime --test followup --test durable
+cargo test --locked -p adk --features observability --test observability
+```

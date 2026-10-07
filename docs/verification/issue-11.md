@@ -1118,3 +1118,31 @@ reference evidence report. Only the exact configuration-field obligation is
 newly closed: **244 verified / 8,647 unresolved / 251 excluded**. Immutable
 inventories and source locks remain untouched. No new credentialed live checks
 were run. Issue #11 is still incomplete; this is not a release/default switch.
+
+## Independent final-answer verifier continuation
+
+Added the owned async `FinalAnswerVerifier`, default-off runner registration,
+once-per-run state after stop-gate/confirmation checks, exact SDK feedback and
+confirmation reset/turn extension. Twenty-eight independently executed pinned
+normal/streamed cases cover acceptance, whitespace, rejection, callback failure,
+tool/nonfinal progress, forced/no-tool turns, gate ordering and structured output.
+Native adaptations are explicit: borrowed JSON instead of callback-text encoding,
+host-owned capture-policy-safe diagnostics instead of global stderr, and parent
+cancellation/deadlines remain authoritative. These are not authorization checks.
+
+Durable execution requires an explicitly identified pure/replay-safe verifier.
+Committed invocation state and extended budget survive recovery; configuration
+changes and missing Go recovery evidence fail closed. Uncommitted pure reviews
+may replay; this is not an exactly-once adapter for live critic model calls. The
+separate SDK `NewCriticVerifier` constructor remains unimplemented at this checkpoint.
+
+Fresh locked Rust 1.88.0 Linux workspace/all-features/all-targets:
+**1,265 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, full facade matrix/platform-free consumer, all 20
+offline scenarios and the host-session example passed. Pinned oracle/evidence
+checks, 18 ledger-validator tests, source locks, Python compilation, Go formatting
+and whitespace checks passed. The actual SDK single-refutation source test also
+passed freshly. Only the specific verifier configuration-field obligation is
+newly closed: **245 verified / 8,646 unresolved / 251 excluded**. No new
+credentialed live-service checks were run. The broader issue remains incomplete;
+no CLI/evaluation/Terminal-Bench, release or production-default switch was added.

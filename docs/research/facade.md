@@ -317,3 +317,21 @@ field/array updates because Go's repeated-key slice reuse is observably differen
 from replacing a Serde vector. Do not generalize this private decoder to unrelated
 SDK types without independent evidence. See [usage, limits and pinned source
 provenance](../user-input.md) and the 51-case independently executed fixture.
+
+## Final-answer verifier ownership
+
+Adopt an async, owned `FinalAnswerVerifier` trait with borrowed JSON output and
+host-owned diagnostics, rather than copying a Go `func(context.Context, string)`
+callback and process-global logger. This preserves structured output without a
+serialize/parse round trip, and keeps private error text behind the existing
+capture-policy boundary. The SDK's invocation order, once-per-run guard, blank
+feedback, error acceptance, confirmation reset and feedback prompt remain
+independently tested. Parent cancellation remains authoritative in Rust.
+
+For durable use, adopt the existing stop-gate contract: explicit stable identity
+and pure/replay-safe behavior. Persist the invocation flag, but reject claims of
+exactly-once execution before a result checkpoint commits. A live critic is not a
+pure callback. Source: pinned SDK `internal/agent/runner.go` and
+`internal/agent/run_config.go`; hashes, version and GPL-3.0-only provenance are in
+`fixtures/verifier/observations.json`. These changes do not close the separate
+`NewCriticVerifier` helper or the full `RunConfig` ledger obligation.

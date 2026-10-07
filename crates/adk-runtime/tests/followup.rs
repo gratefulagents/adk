@@ -1288,3 +1288,217 @@ async fn confirmation_feedback_is_published_before_the_next_input_poll() {
         assert_eq!(ordering.confirmations.load(Ordering::SeqCst), 1);
     }
 }
+
+struct VerifierProbe {
+    inputs: Mutex<Vec<serde_json::Value>>,
+    feedback: String,
+    fail: bool,
+}
+impl FinalAnswerVerifier for VerifierProbe {
+    fn verify<'a>(
+        &'a self,
+        _: &'a Context,
+        output: &'a serde_json::Value,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.inputs.lock().unwrap().push(output.clone());
+            if self.fail {
+                Err(Error::new(ErrorCategory::Host, "private verifier failure"))
+            } else {
+                Ok(self.feedback.clone())
+            }
+        })
+    }
+}
+
+#[tokio::test]
+async fn final_verifier_matches_pinned_sdk_once_after_gate_normal_and_streamed() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/verifier/observations.json")).unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let streamed = case["streamed"].as_bool().unwrap();
+        let reply = |text: &str| response(vec![message(Role::Assistant, text)], true);
+        let mut turns = 1;
+        let replies = match name {
+            "confirmation" => vec![
+                reply("first"),
+                reply("confirmed"),
+                reply("revised"),
+                reply("final"),
+            ],
+            "gate" => vec![reply("first"), reply("second"), reply("final")],
+            "tools" => {
+                turns = 3;
+                vec![
+                    reply("first"),
+                    response(vec![call("read")], true),
+                    reply("final"),
+                ]
+            }
+            "end_turn" => {
+                turns = 3;
+                vec![
+                    reply("first"),
+                    response(vec![message(Role::Assistant, "progress")], false),
+                    reply("final"),
+                ]
+            }
+            "object" => vec![reply(r#"{"z":"<&>","a":1}"#)],
+            "number" => vec![reply("42")],
+            "null" => vec![reply("null")],
+            "string" => vec![reply(r#""decoded""#)],
+            _ => vec![reply("first"), reply("final")],
+        };
+        let model = Script::new(replies.into_iter().map(Ok).collect());
+        let binding = if streamed {
+            ModelBinding::streaming("fake", model.clone())
+        } else {
+            ModelBinding::complete("fake", model.clone())
+        };
+        let mut agent = AgentConfig::new("agent", binding);
+        if name != "no_tools" {
+            agent
+                .tools
+                .push(TestTool::new("read", true, false, false, false));
+        }
+        if matches!(name, "object" | "number" | "null" | "string") {
+            agent.output_schema = Some(schemars::json_schema!(true));
+        }
+        let verifier = Arc::new(VerifierProbe {
+            inputs: Mutex::new(vec![]),
+            feedback: match name {
+                "approve" | "object" | "number" | "null" | "string" => "",
+                "blank" => " \n",
+                _ => "fix this",
+            }
+            .into(),
+            fail: name == "error",
+        });
+        let gate = Arc::new(ConfirmationGate(AtomicUsize::new(0)));
+        let hooks = Arc::new(Hooks::default());
+        let mut config = RunnerConfig {
+            final_answer_verifier: Some(verifier.clone()),
+            require_completion_confirmation: name == "confirmation",
+            force_final_summary_turn: name == "summary",
+            hooks: Some(hooks.clone()),
+            ..Default::default()
+        };
+        if name == "gate" {
+            config.stop_gate = Some(gate.clone());
+            config.stop_gate_max_blocks = 1;
+        }
+        let runner = Runner::new(agent, config).unwrap();
+        let outcome = if streamed {
+            runner
+                .stream(context(), request(vec![], turns), Arc::new(Quiet))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(vec![], turns), Arc::new(Quiet))
+                .await
+        }
+        .unwrap();
+        assert_eq!(
+            outcome.result.final_output.as_ref().unwrap(),
+            &case["final_output"],
+            "{name}"
+        );
+        let feedback: Vec<_> = outcome
+            .result
+            .new_items
+            .iter()
+            .filter_map(|item| match item {
+                RunItem::Message { message } => {
+                    message.content.iter().find_map(|content| match content {
+                        Content::Text { text } if text.starts_with("[SYSTEM]") => {
+                            Some(text.clone())
+                        }
+                        _ => None,
+                    })
+                }
+                _ => None,
+            })
+            .collect();
+        assert_eq!(json!(feedback), case["feedback"], "{name}");
+        let inputs: Vec<_> = verifier
+            .inputs
+            .lock()
+            .unwrap()
+            .iter()
+            .map(|value| match value {
+                serde_json::Value::Null => String::new(),
+                serde_json::Value::String(text) => text.clone(),
+                _ => String::from_utf8(adk_codec::snapshots::to_go_json(value).unwrap()).unwrap(),
+            })
+            .collect();
+        assert_eq!(json!(inputs), case["verifier_inputs"], "{name}");
+        assert_eq!(
+            json!(gate.0.load(Ordering::SeqCst)),
+            case["gate_calls"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(model.requests.lock().unwrap().len()),
+            case["calls"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(
+                model
+                    .requests
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .map(|req| req.tools.len())
+                    .collect::<Vec<_>>()
+            ),
+            case["tools"],
+            "{name}"
+        );
+        assert_eq!(hooks.events.lock().unwrap().iter().filter(|event|matches!(event,Observation::FinalAnswerVerificationFailed {error} if error.message=="private verifier failure")).count(),usize::from(name=="error"));
+    }
+}
+
+struct CancellingVerifier(Arc<CancellationToken>);
+impl FinalAnswerVerifier for CancellingVerifier {
+    fn verify<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a serde_json::Value,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.0.cancel();
+            Err(Error::new(ErrorCategory::Host, "verification stopped"))
+        })
+    }
+}
+#[tokio::test]
+async fn verifier_failure_never_swallows_parent_cancellation() {
+    let token = Arc::new(CancellationToken::new());
+    let ctx = Context {
+        cancellation: token.clone(),
+        ..context()
+    };
+    let model = Script::new(vec![Ok(answer())]);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("fake", model.clone()));
+    agent
+        .tools
+        .push(TestTool::new("read", true, false, false, false));
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            final_answer_verifier: Some(Arc::new(CancellingVerifier(token))),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .run(ctx, request(vec![], 1), Arc::new(Quiet))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Cancelled);
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
+}

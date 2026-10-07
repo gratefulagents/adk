@@ -75,6 +75,8 @@ pub struct RuntimeCheckpoint {
     stop_gate_blocks: usize,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pending_completion: bool,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    verifier_ran: bool,
     phase: Phase,
     calls: VecDeque<ToolCall>,
     turns: u32,
@@ -435,9 +437,11 @@ impl Runner {
             }
             let mut original_policy = saved.policy.clone();
             original_policy.max_turns = saved.base_turn_limit.unwrap_or(saved.policy.max_turns);
-            if (!self.config.require_completion_confirmation && saved.pending_completion)
+            if (self.config.final_answer_verifier.is_none() && saved.verifier_ran)
+                || (!self.config.require_completion_confirmation && saved.pending_completion)
                 || (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
                 || (self.config.stop_gate.is_none()
+                    && self.config.final_answer_verifier.is_none()
                     && !self.config.require_completion_confirmation
                     && self.config.subagents.is_none()
                     && self.config.immediate_input_signal.is_none()
@@ -570,6 +574,7 @@ impl Runner {
             engine.base_turn_limit = original_policy.max_turns;
             engine.stop_gate_blocks = saved.stop_gate_blocks;
             engine.pending_completion = saved.pending_completion;
+            engine.verifier_ran = saved.verifier_ran;
             engine.turns = saved.turns;
             engine.last_model = saved.last_model;
             engine.applied_child_messages = saved.applied_child_messages;
@@ -666,6 +671,10 @@ impl Runner {
                 .as_ref()
                 .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
             || config
+                .final_answer_verifier
+                .as_ref()
+                .is_some_and(|verifier| verifier.durable_key().is_none_or(str::is_empty))
+            || config
                 .stop_gate
                 .as_ref()
                 .is_some_and(|gate| gate.durable_key().is_none_or(str::is_empty))
@@ -676,7 +685,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates, final answer verifiers or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -796,6 +805,9 @@ impl Runner {
         }
         if config.subagents.is_some() {
             baseline["subagents"] = serde_json::json!({"version": 1});
+        }
+        if let Some(verifier) = &config.final_answer_verifier {
+            baseline["final_answer_verifier"] = serde_json::json!(verifier.durable_key());
         }
         if let Some(gate) = &config.stop_gate {
             baseline["stop_gate"] = serde_json::json!({"key":gate.durable_key(), "max_blocks":config.stop_gate_max_blocks});
@@ -1028,6 +1040,7 @@ impl Engine {
                 base_turn_limit: Some(self.base_turn_limit),
                 stop_gate_blocks: self.stop_gate_blocks,
                 pending_completion: self.pending_completion,
+                verifier_ran: self.verifier_ran,
                 phase: self.phase,
                 calls: self.calls.clone(),
                 turns: self.turns,
@@ -1069,7 +1082,9 @@ pub struct GoRecovery {
     pub stop_gate_blocks: Option<usize>,
     /// Required when completion confirmation is enabled; Go does not persist this state.
     pub pending_completion: Option<bool>,
-    /// Required for either a stop gate or completion confirmation.
+    /// Required when a final answer verifier is configured; Go does not persist this state.
+    pub verifier_ran: Option<bool>,
+    /// Required for a stop gate, completion confirmation, or final answer verifier.
     pub effective_max_turns: Option<std::num::NonZeroU32>,
     pub turns: u32,
     pub usage: Usage,
@@ -1281,6 +1296,20 @@ impl Runner {
         } else {
             false
         };
+        let verifier_ran = if self.config.final_answer_verifier.is_some() {
+            let ran = recovery.verifier_ran.ok_or_else(|| {
+                invalid("Go verifier migration requires verified invocation state")
+            })?;
+            policy.max_turns = recovery.effective_max_turns.ok_or_else(|| {
+                invalid("Go verifier migration requires verified effective turn limit")
+            })?;
+            if policy.max_turns < base_turn_limit {
+                return Err(invalid("invalid verified Go verifier turn limit"));
+            }
+            ran
+        } else {
+            false
+        };
         checkpoint.runtime = Some(RuntimeCheckpoint {
             version: 2,
             boundary: checkpoint.boundary.clone(),
@@ -1308,6 +1337,7 @@ impl Runner {
             base_turn_limit: Some(base_turn_limit),
             stop_gate_blocks,
             pending_completion,
+            verifier_ran,
             policy,
             phase: if completed {
                 Phase::Finish

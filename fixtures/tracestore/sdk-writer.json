@@ -985,6 +985,188 @@
       "input": "{\"raw_error\":[]}"
     }
   ],
+  "merged_settings_cases": [
+    {
+      "base": "{}",
+      "merged": "{}",
+      "override": "{}"
+    },
+    {
+      "base": "{}",
+      "merged": "{}",
+      "override": "{\"temperature\":null,\"max_tokens\":null,\"top_p\":null,\"tool_choice\":null,\"parallel_tool_calls\":null,\"thinking_budget\":null,\"reasoning_effort\":null,\"text_verbosity\":null,\"stop_sequences\":null}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"temperature\":0,\"top_p\":0,\"parallel_tool_calls\":false}",
+      "override": "{\"temperature\":0,\"max_tokens\":0,\"top_p\":0,\"tool_choice\":\"\",\"parallel_tool_calls\":false,\"thinking_budget\":0,\"reasoning_effort\":\"\",\"text_verbosity\":\"\",\"stop_sequences\":[]}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"temperature\":-0.5,\"top_p\":-0.1}",
+      "override": "{\"temperature\":-0.5,\"max_tokens\":-1,\"top_p\":-0.1,\"thinking_budget\":-1}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}",
+      "override": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"temperature\":0}",
+      "override": "{\"temperature\":0}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"parallel_tool_calls\":false}",
+      "override": "{\"parallel_tool_calls\":false}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"top_p\":0}",
+      "override": "{\"top_p\":0}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"max_tokens\":1,\"thinking_budget\":1}",
+      "override": "{\"max_tokens\":1,\"thinking_budget\":1}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"tool_choice\":\" \",\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \"}",
+      "override": "{\"tool_choice\":\" \",\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \"}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"stop_sequences\":[\"\",\"new\"]}",
+      "override": "{\"stop_sequences\":[\"\",\"new\"]}"
+    },
+    {
+      "base": "{}",
+      "merged": "{\"stop_sequences\":[\"\"]}",
+      "override": "{\"stop_sequences\":[null]}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"temperature\":null,\"max_tokens\":null,\"top_p\":null,\"tool_choice\":null,\"parallel_tool_calls\":null,\"thinking_budget\":null,\"reasoning_effort\":null,\"text_verbosity\":null,\"stop_sequences\":null}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":1000,\"top_p\":0,\"tool_choice\":\"auto\",\"parallel_tool_calls\":false,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"temperature\":0,\"max_tokens\":0,\"top_p\":0,\"tool_choice\":\"\",\"parallel_tool_calls\":false,\"thinking_budget\":0,\"reasoning_effort\":\"\",\"text_verbosity\":\"\",\"stop_sequences\":[]}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":-0.5,\"max_tokens\":1000,\"top_p\":-0.1,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"temperature\":-0.5,\"max_tokens\":-1,\"top_p\":-0.1,\"thinking_budget\":-1}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}",
+      "override": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"temperature\":0}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":false,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"parallel_tool_calls\":false}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"top_p\":0}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":1,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"max_tokens\":1,\"thinking_budget\":1}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\" \",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"base\"]}",
+      "override": "{\"tool_choice\":\" \",\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \"}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"\",\"new\"]}",
+      "override": "{\"stop_sequences\":[\"\",\"new\"]}"
+    },
+    {
+      "base": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"base\"]}",
+      "merged": "{\"temperature\":0.75,\"max_tokens\":1000,\"top_p\":0.9,\"tool_choice\":\"auto\",\"parallel_tool_calls\":true,\"thinking_budget\":500,\"reasoning_effort\":\"high\",\"text_verbosity\":\"low\",\"stop_sequences\":[\"\"]}",
+      "override": "{\"stop_sequences\":[null]}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"temperature\":null,\"max_tokens\":null,\"top_p\":null,\"tool_choice\":null,\"parallel_tool_calls\":null,\"thinking_budget\":null,\"reasoning_effort\":null,\"text_verbosity\":null,\"stop_sequences\":null}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"temperature\":0,\"max_tokens\":0,\"top_p\":0,\"tool_choice\":\"\",\"parallel_tool_calls\":false,\"thinking_budget\":0,\"reasoning_effort\":\"\",\"text_verbosity\":\"\",\"stop_sequences\":[]}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":-0.5,\"max_tokens\":-10,\"top_p\":-0.1,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"temperature\":-0.5,\"max_tokens\":-1,\"top_p\":-0.1,\"thinking_budget\":-1}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}",
+      "override": "{\"temperature\":0.25,\"max_tokens\":20,\"top_p\":0.2,\"tool_choice\":\"none\",\"parallel_tool_calls\":false,\"thinking_budget\":10,\"reasoning_effort\":\"low\",\"text_verbosity\":\"high\",\"stop_sequences\":[\"override\"]}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"temperature\":0}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"parallel_tool_calls\":false}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"top_p\":0}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":1,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":1,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"max_tokens\":1,\"thinking_budget\":1}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"tool_choice\":\" \",\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \"}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\",\"new\"]}",
+      "override": "{\"stop_sequences\":[\"\",\"new\"]}"
+    },
+    {
+      "base": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "merged": "{\"temperature\":0,\"max_tokens\":-10,\"top_p\":0,\"tool_choice\":\" \",\"parallel_tool_calls\":false,\"thinking_budget\":-2,\"reasoning_effort\":\"\\t\",\"text_verbosity\":\" \",\"stop_sequences\":[\"\"]}",
+      "override": "{\"stop_sequences\":[null]}"
+    }
+  ],
   "routing_settings": {
     "builder_defaults": {
       "blank": {

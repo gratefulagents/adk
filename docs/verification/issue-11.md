@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Owned model-settings merge
+
+`snapshots::ModelSettings::merge` now matches the pinned helper's value-selection
+rules across 36 independently executed cases. Explicit optional zero/false values
+override; integer budgets override only when positive; nonempty strings and stop
+sequences replace their base values. Rust retains independent ownership rather
+than Go pointer/slice aliasing. The offline settings/routing example passes the
+merged settings through the builder to an actual scripted provider request.
+
+Fresh Rust 1.88 Linux workspace results: **1,252 passed, 0 failed, 30 ignored**.
+Strict Clippy, rustdoc, formatting, the facade matrix, platform-free consumer,
+20 offline scenarios, host-session example, independent reference reproduction,
+18 ledger validators and source/license locks pass. The helper closes one exact
+record: **241 verified / 8,650 unresolved / 251 excluded**. Full issue acceptance
+remains open; unresolved records are not a count of missing features.
+
+Separately, pushed head `dbc39c37b4b81829408b0df1c84ef1d5783f6629` has
+46 successful GitHub checks, including Linux/macOS execution-backend jobs and
+real PostgreSQL verification. These CI results do not establish whole-SDK
+cross-platform parity or credentialed provider/remote-collector behavior.
+
 ### Snapshot field transport and execution boundaries
 
 Independent pinned decoding/encoding now covers **54 response and 34 request

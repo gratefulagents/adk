@@ -22,6 +22,19 @@ unspecified, unknown and future labels before constructing executable state.
 open string. This does not claim all snapshot-decoder edge cases or provider
 response conversion are equivalent.
 
+## Settings composition
+
+With the facade's `compat` feature, `adk::codec::snapshots::ModelSettings::merge`
+returns owned settings using the pinned SDK's value-precedence rules. Present
+`temperature`, `top_p` and `parallel_tool_calls` override even with zero/false;
+`max_tokens` and `thinking_budget` override only when positive. Nonempty strings
+(including whitespace) and nonempty stop lists override. Null/absent optionals,
+empty strings/lists and nonpositive integer overrides preserve the base values.
+Neither input is mutated; returned strings and lists do not alias either input.
+This helper does not validate provider-specific ranges or change builder policy.
+The `settings_routing` offline example feeds merged settings into a real builder
+request and then verifies mode/role precedence.
+
 ## Configuration integration
 
 `adk_codec::config::RunConfigSentinels` is a **bounded scalar projection**, not

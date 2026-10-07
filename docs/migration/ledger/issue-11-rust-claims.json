@@ -4063,6 +4063,22 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-B50F8E188B7F058D": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings.Merge",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge"
+      ],
+      "rust_test_identifiers": [
+        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Thirty-six independently executed pinned Merge calls compare exact resulting settings bytes across empty, populated and negative/zero bases and twelve override sets. Present optionals override even with zero/false; integers override only when positive; strings/lists only when nonempty, without whitespace normalization. Inputs remain unchanged. Native results own their data rather than reproducing Go pointer/slice aliasing, as documented in facade research; this is the value-composition helper, not builder precedence or provider validation. The executed trace-writer regression is an integration anchor; direct Merge evidence is in merged_settings_cases.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

@@ -18,8 +18,8 @@
     "by_category": {
       "apis": {
         "excluded": 81,
-        "unresolved": 5567,
-        "verified": 211
+        "unresolved": 5566,
+        "verified": 212
       },
       "artifacts": {
         "excluded": 16,
@@ -90,8 +90,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8651,
-    "verified": 240
+    "unresolved": 8650,
+    "verified": 241
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -15144,7 +15144,7 @@
     "SDK-B4FAEFB27CB6D0C0": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/mcp.BreakGlassSink.RequestMCPBreakGlass@pkg/agentsdk/mcp/breakglass_tool.go", "proposed_rust_module": "sdk::mcp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/mcp/breakglass_tool.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::mcp", "verification_status": "not_run"},
     "SDK-B4FFF44269146B4F": {"approved_divergence_reference": null, "category": "files", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "files:pkg/agentsdk/tools/internal/pathutil/confined_other.go", "proposed_rust_module": "sdk::tools::fs::confinement", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/internal/pathutil/confined_other.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::fs::confinement", "verification_status": "not_run"},
     "SDK-B508270E52F1FEEC": {"approved_divergence_reference": null, "category": "files", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "files:pkg/agentsdk/policy/mapping.go", "proposed_rust_module": "sdk::policy", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/policy/mapping.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::policy", "verification_status": "not_run"},
-    "SDK-B50F8E188B7F058D": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.ModelSettings.Merge@internal/agent/model_settings.go", "proposed_rust_module": "sdk::model", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/model_settings.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::model", "verification_status": "not_run"},
+    "SDK-B50F8E188B7F058D": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Thirty-six independently executed pinned Merge calls compare exact resulting settings bytes across empty, populated and negative/zero bases and twelve override sets. Present optionals override even with zero/false; integers override only when positive; strings/lists only when nonempty, without whitespace normalization. Inputs remain unchanged. Native results own their data rather than reproducing Go pointer/slice aliasing, as documented in facade research; this is the value-composition helper, not builder precedence or provider validation. The executed trace-writer regression is an integration anchor; direct Merge evidence is in merged_settings_cases.", "implementation_symbols": ["crates/adk-codec/src/snapshots.rs::ModelSettings::merge"], "ledger_record_id": "apis:internal/agent.ModelSettings.Merge@internal/agent/model_settings.go", "proposed_rust_module": "sdk::model", "rust_test_identifiers": ["model_settings_merge_matches_pinned_sdk_without_aliasing_inputs"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/agent/model_settings.go", "target_features": ["x86_64-unknown-linux-gnu", "compat"], "upstream_regression_reference_group": "verification_groups:sdk::model", "verification_status": "passed"},
     "SDK-B511F9F08C9BE9EC": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/mode.Constraints.MaxTurns@pkg/agentsdk/mode/types.go", "proposed_rust_module": "sdk::mode", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/mode/types.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::mode", "verification_status": "not_run"},
     "SDK-B51E9838F928F4FC": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/anthropic.ContentBlock.Type@internal/anthropic/types.go", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/types.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
     "SDK-B5217D50C666E124": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/anthropic/client_test.go:TestRequestErrorRetryAfterMSCapsHugeProviderDelay", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/client_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},

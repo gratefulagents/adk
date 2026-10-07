@@ -1,9 +1,45 @@
 package main
 
 import (
+	"encoding/json"
+
 	agent "github.com/gratefulagents/sdk/pkg/agentsdk"
 	"github.com/gratefulagents/sdk/pkg/agentsdk/runtime"
 )
+
+func mergedSettingsCases() []map[string]any {
+	bases := []string{
+		`{}`,
+		`{"temperature":0.75,"max_tokens":1000,"top_p":0.9,"tool_choice":"auto","parallel_tool_calls":true,"thinking_budget":500,"reasoning_effort":"high","text_verbosity":"low","stop_sequences":["base"]}`,
+		`{"temperature":0,"max_tokens":-10,"top_p":0,"tool_choice":" ","parallel_tool_calls":false,"thinking_budget":-2,"reasoning_effort":"\t","text_verbosity":" ","stop_sequences":[""]}`,
+	}
+	overrides := []string{
+		`{}`,
+		`{"temperature":null,"max_tokens":null,"top_p":null,"tool_choice":null,"parallel_tool_calls":null,"thinking_budget":null,"reasoning_effort":null,"text_verbosity":null,"stop_sequences":null}`,
+		`{"temperature":0,"max_tokens":0,"top_p":0,"tool_choice":"","parallel_tool_calls":false,"thinking_budget":0,"reasoning_effort":"","text_verbosity":"","stop_sequences":[]}`,
+		`{"temperature":-0.5,"max_tokens":-1,"top_p":-0.1,"thinking_budget":-1}`,
+		`{"temperature":0.25,"max_tokens":20,"top_p":0.2,"tool_choice":"none","parallel_tool_calls":false,"thinking_budget":10,"reasoning_effort":"low","text_verbosity":"high","stop_sequences":["override"]}`,
+		`{"temperature":0}`,
+		`{"parallel_tool_calls":false}`,
+		`{"top_p":0}`,
+		`{"max_tokens":1,"thinking_budget":1}`,
+		`{"tool_choice":" ","reasoning_effort":"\t","text_verbosity":" "}`,
+		`{"stop_sequences":["","new"]}`,
+		`{"stop_sequences":[null]}`,
+	}
+	cases := []map[string]any{}
+	for _, baseJSON := range bases {
+		for _, overrideJSON := range overrides {
+			var base, override agent.ModelSettings
+			must(json.Unmarshal([]byte(baseJSON), &base))
+			must(json.Unmarshal([]byte(overrideJSON), &override))
+			encoded, err := json.Marshal(base.Merge(override))
+			must(err)
+			cases = append(cases, map[string]any{"base": baseJSON, "override": overrideJSON, "merged": string(encoded)})
+		}
+	}
+	return cases
+}
 
 func routingSettingsCases() map[string]any {
 	var labels []any

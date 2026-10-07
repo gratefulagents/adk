@@ -221,6 +221,7 @@ func writerFixture() {
 	result["native_response_variants"] = responseVariants
 	result["response_record_cases"] = responseRecordCases()
 	result["request_record_cases"] = requestRecordCases()
+	result["merged_settings_cases"] = mergedSettingsCases()
 	finished := true
 	automaticResponse, err := json.Marshal(agent.BuildLLMResponseSnapshot(&agent.ModelResponse{
 		Items:   []agent.RunItem{{Type: agent.RunItemMessage, Message: &agent.MessageOutput{Text: "done"}}},

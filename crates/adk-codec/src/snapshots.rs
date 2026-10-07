@@ -36,6 +36,42 @@ pub struct ModelSettings {
     #[serde(deserialize_with = "null_default_elements")]
     pub stop_sequences: Vec<String>,
 }
+impl ModelSettings {
+    pub fn merge(&self, overrides: &Self) -> Self {
+        let mut merged = self.clone();
+        if overrides.temperature.is_some() {
+            merged.temperature = overrides.temperature;
+        }
+        if overrides.max_tokens > 0 {
+            merged.max_tokens = overrides.max_tokens;
+        }
+        if overrides.top_p.is_some() {
+            merged.top_p = overrides.top_p;
+        }
+        if !overrides.tool_choice.is_empty() {
+            merged.tool_choice.clone_from(&overrides.tool_choice);
+        }
+        if overrides.parallel_tool_calls.is_some() {
+            merged.parallel_tool_calls = overrides.parallel_tool_calls;
+        }
+        if overrides.thinking_budget > 0 {
+            merged.thinking_budget = overrides.thinking_budget;
+        }
+        if !overrides.reasoning_effort.is_empty() {
+            merged
+                .reasoning_effort
+                .clone_from(&overrides.reasoning_effort);
+        }
+        if !overrides.text_verbosity.is_empty() {
+            merged.text_verbosity.clone_from(&overrides.text_verbosity);
+        }
+        if !overrides.stop_sequences.is_empty() {
+            merged.stop_sequences.clone_from(&overrides.stop_sequences);
+        }
+        merged
+    }
+}
+
 fn is_zero(value: &i64) -> bool {
     *value == 0
 }

@@ -24,6 +24,33 @@ fn request_snapshot_field_records_match_independent_pinned_go() {
 }
 
 #[test]
+fn model_settings_merge_matches_pinned_sdk_without_aliasing_inputs() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["merged_settings_cases"].as_array().unwrap() {
+        let mut base: ModelSettings = serde_json::from_str(case["base"].as_str().unwrap()).unwrap();
+        let mut overrides: ModelSettings =
+            serde_json::from_str(case["override"].as_str().unwrap()).unwrap();
+        let original_base = base.clone();
+        let original_overrides = overrides.clone();
+        let merged = base.merge(&overrides);
+        assert_eq!(base, original_base);
+        assert_eq!(overrides, original_overrides);
+        assert_eq!(
+            adk_codec::snapshots::to_go_json(&merged).unwrap(),
+            case["merged"].as_str().unwrap().as_bytes(),
+            "{case}"
+        );
+        base.stop_sequences.push("changed base".into());
+        overrides.stop_sequences.push("changed override".into());
+        assert_eq!(
+            adk_codec::snapshots::to_go_json(&merged).unwrap(),
+            case["merged"].as_str().unwrap().as_bytes()
+        );
+    }
+}
+
+#[test]
 fn pinned_writer_request_bytes_round_trip_without_reordering_fields() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

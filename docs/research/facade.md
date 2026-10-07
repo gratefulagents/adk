@@ -283,6 +283,18 @@ and transcript boundaries, where accepting opaque labels would fabricate state.
 These fixtures close field representation claims, not every decoder behavior or
 provider response profile.
 
+## Settings merge helper
+
+Expose value composition on the existing typed compatibility settings record,
+without changing native builder precedence. The pinned `ModelSettings.Merge`
+uses present optionals, positive integer limits and nonempty strings/lists;
+whitespace strings are not normalized. Thirty-six independent source executions
+cover three bases and twelve override sets. Adopt an owned Rust result with no
+input mutation or pointer/slice aliases; reproducing Go aliasing would undermine
+safe standalone composition without improving the value contract. Provider range
+validation remains separate from merging. The executable settings/routing example
+passes the resulting map through actual builder mode and role routing.
+
 ## Builder structured output
 
 Forward the existing native `AgentConfig` schema/name/strict/parser fields through

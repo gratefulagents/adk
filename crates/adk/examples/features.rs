@@ -854,10 +854,30 @@ async fn context_compaction() {
 }
 async fn settings_routing() {
     use adk::builder::{Builder, Config, Features, ModeSpec, ModelRouting, RoleRouting, RoleSpec};
+    use adk::codec::snapshots::ModelSettings;
+    let settings = ModelSettings {
+        max_tokens: 100,
+        parallel_tool_calls: Some(true),
+        ..Default::default()
+    }
+    .merge(&ModelSettings {
+        temperature: Some(0.0),
+        max_tokens: 0,
+        parallel_tool_calls: Some(false),
+        ..Default::default()
+    });
+    assert_eq!(settings.temperature, Some(0.0));
+    assert_eq!(settings.max_tokens, 100);
+    assert_eq!(settings.parallel_tool_calls, Some(false));
     for role in [None, Some("writer")] {
         let model = Scripted::new(vec![answer("configured")]);
         let config = Config {
             model: "mock/base".into(),
+            settings: serde_json::to_value(&settings)
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .clone(),
             active_role: role.map(str::to_owned),
             roles: vec![RoleSpec {
                 name: "writer".into(),
@@ -915,6 +935,7 @@ async fn settings_routing() {
                 if role.is_some() { "writer" } else { "planner" }
             );
             assert_eq!(requests[0].settings["temperature"], json!(0.2));
+            assert_eq!(requests[0].settings["max_tokens"], 100);
             assert_eq!(requests[0].settings["reasoning_effort"], "high");
             assert_eq!(requests[0].settings["thinking_budget"], 8192);
             assert_eq!(

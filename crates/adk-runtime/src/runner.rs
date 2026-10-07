@@ -3588,6 +3588,7 @@ impl Runner {
         mut invocation: crate::subagent::ChildInvocation,
         control: crate::subagent::ChildControl,
         host: Arc<dyn Host>,
+        output_extractor: Option<&crate::subagent_tools::ChildOutputExtractor>,
     ) -> Result<crate::subagent::ChildOutcome, Error> {
         use crate::subagent::{ChildOutcome, TaskStatus};
         let child_agent_name = invocation.agent_name.clone();
@@ -3697,38 +3698,49 @@ impl Runner {
                 (*snapshot, status, Some(message))
             }
         };
+        let extracted = output_extractor
+            .filter(|_| status == TaskStatus::Completed)
+            .map(|extract| extract(&snapshot))
+            .filter(|text| !text.is_empty());
         Ok(ChildOutcome {
             status,
-            result: snapshot
-                .final_output
-                .map(|value| match value {
-                    Value::String(text) => text,
-                    value => value.to_string(),
+            result: if status == TaskStatus::Completed {
+                extracted.unwrap_or_else(|| match snapshot.final_text() {
+                    "" => "(no output)".into(),
+                    text => text.to_owned(),
                 })
-                .unwrap_or_else(|| {
-                    let progress = snapshot
-                        .new_items
-                        .iter()
-                        .filter_map(|item| match item {
-                            RunItem::Message { message }
-                            | RunItem::PhasedMessage { message, .. }
-                                if message.role == Role::Assistant =>
-                            {
-                                Some(text(&message.content))
-                            }
-                            _ => None,
-                        })
-                        .collect::<Vec<_>>()
-                        .join("\n");
-                    progress
-                        .chars()
-                        .rev()
-                        .take(4096)
-                        .collect::<Vec<_>>()
-                        .into_iter()
-                        .rev()
-                        .collect()
-                }),
+            } else {
+                snapshot
+                    .final_output
+                    .map(|value| match value {
+                        Value::String(text) => text,
+                        value => value.to_string(),
+                    })
+                    .unwrap_or_else(|| {
+                        let progress = snapshot
+                            .new_items
+                            .iter()
+                            .filter_map(|item| match item {
+                                RunItem::Message { message }
+                                | RunItem::PhasedMessage { message, .. }
+                                    if message.role == Role::Assistant =>
+                                {
+                                    Some(text(&message.content))
+                                }
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        progress
+                            .chars()
+                            .rev()
+                            .take(4096)
+                            .collect::<Vec<_>>()
+                            .into_iter()
+                            .rev()
+                            .collect()
+                    })
+            },
             error,
             usage: control.usage(),
         })

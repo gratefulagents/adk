@@ -256,6 +256,19 @@ are not attached by the SDK runtime builder: it uses the managed task tools.
 Do not claim missing automatic named/nested tools solely because the native
 builder also leaves those to explicit composition.
 
+## Named child output projection
+
+Adopt the [pinned SDK agent-tool success contract](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/agent_tool.go)
+(GPL-3.0-only): successful named calls return final text, empty extraction falls
+back to final text, and empty final text becomes `(no output)`. Thirty-six actual
+SDK calls cover raw/empty/whitespace/JSON/Unicode text and parsed structured results
+with absent, empty, final-text and full-value extraction. Use an explicit per-registration `Arc<ChildOutputExtractor>`
+in `RunnerChildExecutor` rather than a second unmanaged execution path. The
+callback receives the full native `RunResult`, only on completion; host-selected
+registration aliases distinguish named-only projections from managed ones.
+Preserve native pending/failed-task envelopes and scheduler panic containment;
+those stronger lifecycle/error contracts are not claimed byte-compatible.
+
 ## Builder structured output
 
 Forward the existing native `AgentConfig` schema/name/strict/parser fields through

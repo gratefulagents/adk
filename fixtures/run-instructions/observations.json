@@ -1,4 +1,330 @@
 {
+  "agent_tool_cases": [
+    {
+      "answer": "plain result",
+      "content": "plain result",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "plain result",
+      "content": "plain result",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "plain result",
+      "content": "extracted:plain result",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "plain result",
+      "content": "json:\"plain result\"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "",
+      "content": "(no output)",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "",
+      "content": "(no output)",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "",
+      "content": "extracted:",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "",
+      "content": "json:\"\"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "  ",
+      "content": "  ",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "  ",
+      "content": "  ",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "  ",
+      "content": "extracted:  ",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "  ",
+      "content": "json:\"  \"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "{\"n\":1}",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "{\"n\":1}",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "extracted:{\"n\":1}",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "json:\"{\\\"n\\\":1}\"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "line one\n\u7b2c\u4e8c\u884c",
+      "content": "line one\n\u7b2c\u4e8c\u884c",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "line one\n\u7b2c\u4e8c\u884c",
+      "content": "line one\n\u7b2c\u4e8c\u884c",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "line one\n\u7b2c\u4e8c\u884c",
+      "content": "extracted:line one\n\u7b2c\u4e8c\u884c",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "line one\n\u7b2c\u4e8c\u884c",
+      "content": "json:\"line one\\n\u7b2c\u4e8c\u884c\"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": false
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "(no output)",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "(no output)",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "extracted:",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "{\"n\":1}",
+      "content": "json:{\"n\":1}",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "42",
+      "content": "(no output)",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "42",
+      "content": "(no output)",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "42",
+      "content": "extracted:",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "42",
+      "content": "json:42",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "null",
+      "content": "(no output)",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "null",
+      "content": "(no output)",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "null",
+      "content": "extracted:",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "null",
+      "content": "json:null",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "\"decoded string\"",
+      "content": "decoded string",
+      "extractor": "none",
+      "extractor_calls": 0,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "\"decoded string\"",
+      "content": "decoded string",
+      "extractor": "empty",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "\"decoded string\"",
+      "content": "extracted:decoded string",
+      "extractor": "prefix",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    },
+    {
+      "answer": "\"decoded string\"",
+      "content": "json:\"decoded string\"",
+      "extractor": "json",
+      "extractor_calls": 1,
+      "is_error": false,
+      "requests": 1,
+      "structured": true
+    }
+  ],
   "auto_subagent_cases": [
     {
       "agents": {},
@@ -3272,8 +3598,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/run-instructions-reference/reference_test.go": "88270df7e95ec414e228c722f9dbb761678df28c6040c6701c0203f367d83d33",
-      "scripts/run-instructions-reference/run.py": "a65e71b1435648ac66fba87b2adc6ea1b14cc6555dae7e0a426ef90b9b431edc"
+      "scripts/run-instructions-reference/reference_test.go": "1e9bf83d9beb250eec3bbf5a5ba78e275305c76ca96c632b3c63740a2be73962",
+      "scripts/run-instructions-reference/run.py": "80efc96135c070d24955e6435454af6869785720a6319ffad215cc72d99d6601"
     },
     "launchPolicy": "Offline recording model; actual normal and streamed runner calls, no external providers or tools.",
     "normalization": "No text normalization. Preserve base whitespace and SDK separator. Builder cases execute BuildRunConfig; direct cases exercise AdditionalInstructions. Output-schema cases compare parent-only placement, request fields and parsed results; schema diagnostics and provider bytes are not compared. No deprecated alias or MCP claim.",
@@ -3281,6 +3607,7 @@
     "sourceSHA256": {
       "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
       "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/agent_tool.go": "de75139a43f0528386d076d70af3ee14da39fe625364f9cb34668cd424a5b1a2",
       "internal/agent/history_compaction.go": "768d579b677788eccc1d01887904cff7c3b772258dd26cdfd65b69d898679563",
       "internal/agent/mcp_prompt.go": "6f9936978e4d8feaabb900c6b5ab6f83493b4ad3a5c2c2ef6a92bb29214bf197",
       "internal/agent/model.go": "2bb06a0b3ceb1329a2a703b37a12adce7e9b7d17bf53057f99c9a1b9861712f1",
@@ -3288,6 +3615,7 @@
       "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
       "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
       "internal/agent/subagent_registry.go": "5268a1220de5744f41a6bd30bcd46f03150e96dd716e75e0f1e4aa76c29fd712",
+      "internal/agent/subagent_run.go": "5652b1433ed2c7900dff53a6c94f784cd1a17b4d2eda4d73b8447531273ec81b",
       "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
       "pkg/agentsdk/runtime/builder_test.go": "0c557ad7d463f635b81adae340a30a8dcd4c46d83965f4f74b41f13664e98803",
       "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",

@@ -19,6 +19,7 @@ type instructionModel struct {
 	requests     []agentsdk.ModelRequest
 	continueOnce bool
 	answer       string
+	allowEmpty   bool
 	failOnce     bool
 }
 
@@ -33,7 +34,7 @@ func (m *instructionModel) GetResponse(_ context.Context, req agentsdk.ModelRequ
 		return nil, fmt.Errorf("overloaded")
 	}
 	answer := m.answer
-	if answer == "" {
+	if answer == "" && !m.allowEmpty {
 		answer = "done"
 	}
 	response := &agentsdk.ModelResponse{Items: []agentsdk.RunItem{{Type: agentsdk.RunItemMessage, Message: &agentsdk.MessageOutput{Text: answer}}}}
@@ -62,6 +63,52 @@ func (m *instructionModel) StreamResponse(ctx context.Context, req agentsdk.Mode
 	close(done)
 	return agentsdk.NewModelStream(events, done), nil
 }
+func observeAgentToolOutput(t *testing.T) []map[string]any {
+	t.Helper()
+	result := []map[string]any{}
+	for _, item := range []struct {
+		answer     string
+		structured bool
+	}{
+		{"plain result", false}, {"", false}, {"  ", false}, {"{\"n\":1}", false}, {"line one\n第二行", false},
+		{"{\"n\":1}", true}, {"42", true}, {"null", true}, {"\"decoded string\"", true},
+	} {
+		for _, extractor := range []string{"none", "empty", "prefix", "json"} {
+			answer := item.answer
+			model := &instructionModel{answer: answer, allowEmpty: true}
+			agent := &agentsdk.Agent{Name: "worker", Model: "offline"}
+			if item.structured {
+				agent.OutputType = &agentsdk.OutputSchema{Schema: json.RawMessage(`true`)}
+			}
+			calls := 0
+			opts := []agentsdk.AsToolOption{}
+			if extractor != "none" {
+				opts = append(opts, agentsdk.WithAsToolOutputExtractor(func(run *agentsdk.RunResult) string {
+					calls++
+					if extractor == "empty" {
+						return ""
+					}
+					if extractor == "json" {
+						encoded, err := json.Marshal(run.FinalOutput)
+						if err != nil {
+							t.Fatal(err)
+						}
+						return "json:" + string(encoded)
+					}
+					return "extracted:" + run.FinalText()
+				}))
+			}
+			tool := agent.AsTool(agentsdk.NewRunnerWithModel(model), opts...)
+			output, err := tool.Execute(context.Background(), json.RawMessage(`{"message":"work"}`), "")
+			if err != nil {
+				t.Fatal(err)
+			}
+			result = append(result, map[string]any{"answer": answer, "structured": item.structured, "extractor": extractor, "extractor_calls": calls, "content": output.Content, "is_error": output.IsError, "requests": len(model.requests)})
+		}
+	}
+	return result
+}
+
 func observeBuilderOutputSchemas(t *testing.T) []map[string]any {
 	t.Helper()
 	result := []map[string]any{}
@@ -190,6 +237,13 @@ func observeAutomaticSubagents(t *testing.T) []map[string]any {
 }
 
 func TestRunInstructionsReference(t *testing.T) {
+	named, namedErr := json.Marshal(observeAgentToolOutput(t))
+	if namedErr != nil {
+		t.Fatal(namedErr)
+	}
+	if err := os.WriteFile(os.Getenv("RUN_AGENT_TOOL_OUTPUT"), named, 0600); err != nil {
+		t.Fatal(err)
+	}
 	children, childErr := json.Marshal(observeAutomaticSubagents(t))
 	if childErr != nil {
 		t.Fatal(childErr)

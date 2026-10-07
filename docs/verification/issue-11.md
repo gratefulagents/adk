@@ -2,6 +2,36 @@
 
 ## Current continuation evidence
 
+### Named specialist output and extraction
+
+Successful named `AgentAsTool` calls now return final text instead of a task JSON
+envelope. The shared runner adapter uses the SDK's textual result contract:
+empty or parsed non-string final output becomes `(no output)` rather than an
+implicit JSON serialization. `RunnerChildExecutor::with_output_extractor` receives
+the full successful native `RunResult`; nonempty projections replace final text,
+while empty projections preserve its default. Projection is explicitly scoped to
+an executor registration and therefore applies to named and managed calls to that
+registration. Child history, checkpoints and usage are not replaced.
+
+Thirty-six independent pinned SDK calls cover empty/whitespace/raw JSON/Unicode
+text and parsed objects, numbers, null and strings, each with absent, empty,
+final-text and full-value extraction. Native tests compare exact outputs, callback
+counts, full-result access and retained task results. A separate regression proves
+failed children skip extraction and an extractor panic does not exhaust a single
+scheduler slot. Existing timeout/steering/guardrail/durable child tests remain
+applicable; native pending and failed-task envelopes are intentionally preserved.
+The offline named-specialist example now demonstrates explicit extraction.
+
+Fresh final Rust 1.88 Linux workspace: **1,248 passed, 0 failed, 30 ignored**.
+Strict Clippy, rustdoc, changed-file formatting, the feature matrix, standalone
+consumer, all 20 scenarios, host-session example, independent fixture reproduction,
+18 evidence validators and source/license locks pass. The ledger now closes only
+one additional exact obligation: registered default child-name selection, backed
+by eleven pinned helper observations and actual native dispatch. Totals:
+**211 verified / 8,680 unresolved / 251 excluded**. The output/extractor fixtures
+are not a claim of complete child-engine or provider parity. Live credentials and
+non-Linux execution remain unverified.
+
 ### Automatic owned child assembly
 
 `Builder::subagent_host` now assembles child runners and an owned scheduler from

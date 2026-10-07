@@ -38,6 +38,25 @@ child execution are rejected.
 
 ## Model-facing tools
 
+`AgentAsTool::new` exposes a named synchronous specialist. A completed successful
+call returns the child's final text directly, or `(no output)` for an empty result;
+JSON-looking text is not wrapped or re-encoded. Parsed non-string structured
+outputs have no final text; use an extractor to return a textual projection.
+The parent output policy still
+applies untrusted markers and size limits. In contrast, `subagent` retains its
+structured task envelope. Native timeout/failed-task envelopes are retained for
+managed recovery; timeout never hides the still-active task identity.
+
+Use `RunnerChildExecutor::with_output_extractor(agent_name, Arc::new(|result| ...))`
+to transform a successful child's full `RunResult` before its task result is
+stored and returned. Empty extraction falls back to the original final output.
+The callback is scoped to an executor registration, not a tool wrapper, so both
+named and managed delegation to that registration receive the transformed result.
+Use separate registrations when only a named tool should transform output.
+Failed/cancelled runs never invoke it; scheduler panic containment still applies.
+Extractors should be deterministic: durable completion recovery may run the
+projection again. They do not change child history, usage or checkpoint contents.
+
 - `subagent`: exactly one `message` or nonempty keyed `tasks` DAG. `mode` defaults
   to `sync`; `background` returns IDs immediately. DAG keys are local to the call,
   and `task_ids_by_key` maps them to retained task IDs. Dependencies may refer to

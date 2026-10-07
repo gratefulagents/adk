@@ -632,6 +632,213 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
 }
 
 #[tokio::test]
+async fn agent_as_tool_completed_output_matches_pinned_sdk() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["agent_tool_cases"].as_array().unwrap() {
+        let child = FakeModel::new(
+            vec![answer(case["answer"].as_str().unwrap())],
+            Duration::ZERO,
+        );
+        let mut child_agent =
+            AgentConfig::new("worker", ModelBinding::complete("fake", child.clone()));
+        if case["structured"].as_bool().unwrap() {
+            child_agent.output_schema = Some(json!(true).try_into().unwrap());
+        }
+        let child_runner = Runner::new(child_agent, RunnerConfig::default()).unwrap();
+        let mut executor = RunnerChildExecutor::new(
+            [("worker".into(), child_runner)].into_iter().collect(),
+            Arc::new(TestHost),
+        );
+        let calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let extractor = case["extractor"].as_str().unwrap().to_owned();
+        if extractor != "none" {
+            let calls = calls.clone();
+            executor = executor.with_output_extractor(
+                "worker",
+                Arc::new(move |run| {
+                    calls.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                    assert_eq!(run.status, RunStatus::Completed);
+                    assert_eq!(run.last_agent.as_deref(), Some("worker"));
+                    assert!(!run.history.is_empty());
+                    match extractor.as_str() {
+                        "empty" => String::new(),
+                        "json" => {
+                            format!("json:{}", serde_json::to_string(&run.final_output).unwrap())
+                        }
+                        _ => format!("extracted:{}", run.final_text()),
+                    }
+                }),
+            );
+        }
+        let baseline = SecurityBaseline::default();
+        let owner = Scheduler::new(
+            context(),
+            SchedulerConfig {
+                security: baseline.clone(),
+                agents: [("worker".into(), baseline)].into_iter().collect(),
+                ..Default::default()
+            },
+            Arc::new(executor),
+            None,
+        )
+        .unwrap();
+        let session = Arc::new(SubagentSession::new(owner.handle()));
+        let model = FakeModel::new(
+            vec![call("specialist", json!({"message":"work"}))],
+            Duration::ZERO,
+        );
+        let mut agent = AgentConfig::new("parent", ModelBinding::complete("fake", model));
+        agent.tools = vec![Arc::new(AgentAsTool::new(
+            "specialist",
+            "specialist task",
+            "worker",
+            session.clone(),
+        ))];
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                subagents: Some(session),
+                output: adk_runtime::output::OutputPolicy {
+                    untrusted: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut req = request();
+        req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        let result = runner
+            .run(context(), req, Arc::new(TestHost))
+            .await
+            .unwrap();
+        let output = result
+            .result
+            .history
+            .iter()
+            .find_map(|item| match item {
+                RunItem::ToolResult { output, .. } => Some(output),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(
+            output.content,
+            vec![Content::Text {
+                text: case["content"].as_str().unwrap().into(),
+            }],
+            "{case}"
+        );
+        assert_eq!(
+            output.is_error,
+            case["is_error"].as_bool().unwrap(),
+            "{case}"
+        );
+        assert_eq!(
+            child.requests.lock().unwrap().len() as u64,
+            case["requests"].as_u64().unwrap()
+        );
+        assert_eq!(
+            calls.load(std::sync::atomic::Ordering::SeqCst) as u64,
+            case["extractor_calls"].as_u64().unwrap()
+        );
+        assert_eq!(owner.handle().list().len(), 1);
+        assert_eq!(owner.handle().list()[0].status, TaskStatus::Completed);
+        assert_eq!(
+            owner.handle().list()[0].result,
+            case["content"].as_str().unwrap()
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn child_output_extractors_skip_failures_and_contain_panics() {
+    struct DeniedModel;
+    impl Model for DeniedModel {
+        fn provider(&self) -> &str {
+            "denied"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::PermissionDenied, "denied child")) })
+        }
+    }
+    let child = FakeModel::new(vec![answer("first"), answer("second")], Duration::ZERO);
+    let calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let observed = calls.clone();
+    let executor = RunnerChildExecutor::new(
+        [
+            ("worker".into(), runner("worker", child)),
+            ("denied".into(), runner("denied", Arc::new(DeniedModel))),
+        ]
+        .into_iter()
+        .collect(),
+        Arc::new(TestHost),
+    )
+    .with_output_extractor(
+        "denied",
+        Arc::new(|_| panic!("failed child reached extractor")),
+    )
+    .with_output_extractor(
+        "worker",
+        Arc::new(move |run| {
+            if observed.fetch_add(1, std::sync::atomic::Ordering::SeqCst) == 0 {
+                panic!("extractor failure");
+            }
+            format!("extracted:{}", run.final_text())
+        }),
+    );
+    let baseline = SecurityBaseline::default();
+    let owner = Scheduler::new(
+        context(),
+        SchedulerConfig {
+            max_concurrency: 1,
+            security: baseline.clone(),
+            agents: [
+                ("worker".into(), baseline.clone()),
+                ("denied".into(), baseline),
+            ]
+            .into_iter()
+            .collect(),
+            ..Default::default()
+        },
+        Arc::new(executor),
+        None,
+    )
+    .unwrap();
+    let handle = owner.handle();
+    for (agent, status, expected) in [
+        ("denied", TaskStatus::Failed, "denied child"),
+        ("worker", TaskStatus::Failed, "child executor panicked"),
+        ("worker", TaskStatus::Completed, "extracted:second"),
+    ] {
+        let id = handle.submit(Submission::new(agent, "work")).await.unwrap();
+        let tasks = tokio::time::timeout(
+            Duration::from_secs(2),
+            handle.wait(&[id], WaitMode::All, None),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+        assert_eq!(tasks[0].status, status);
+        let text = if status == TaskStatus::Completed {
+            &tasks[0].result
+        } else {
+            tasks[0].error.as_ref().unwrap()
+        };
+        assert!(text.contains(expected), "{text}");
+    }
+    assert_eq!(calls.load(std::sync::atomic::Ordering::SeqCst), 2);
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
 async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired() {
     let child = FakeModel::new(vec![answer("first"), answer("second")], Duration::ZERO);
     let (owner, session) = session(child.clone()).await;

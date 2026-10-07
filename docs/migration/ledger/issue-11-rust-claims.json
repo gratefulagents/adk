@@ -3521,6 +3521,23 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-D80B45BAE0094DFB": {
+      "source": "pkg/agentsdk/runtime/builder.go",
+      "source_name": "defaultAsyncSubAgent",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::Builder::build",
+        "crates/adk-runtime/src/subagent.rs::SchedulerHandle::agent_names"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_default_uses_registered_catalog_not_parent_identity"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Only default child-name selection is closed: exact agent wins, otherwise lexical first nonblank registration, otherwise empty. Eleven independent executions of pinned defaultAsyncSubAgent in the disposable runtime oracle cover empty, whitespace, exact-agent and sorted catalogs. Native tests compare actual dispatch and explicit-name override using the immutable scheduler registry, independent of parent identity. The upstream session-builder regression is an executed integration anchor, not evidence of native mutable scheduler reconfiguration or whole-builder parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
     }
   }
 }

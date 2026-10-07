@@ -638,6 +638,10 @@ async fn handoffs_subagents() {
             .into_iter()
             .collect(),
         host,
+    )
+    .with_output_extractor(
+        "child",
+        Arc::new(|result| format!("summary: {}", result.final_text())),
     );
     let baseline = SecurityBaseline::default();
     let owner = Scheduler::new(
@@ -678,7 +682,7 @@ async fn handoffs_subagents() {
     assert!(
         serde_json::to_string(&parent.requests.lock().unwrap()[1].input)
             .unwrap()
-            .contains("child evidence")
+            .contains("summary: child evidence")
     );
     assert_eq!(child.requests.lock().unwrap().len(), 1);
     owner.shutdown().await.unwrap();

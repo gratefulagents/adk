@@ -344,6 +344,8 @@ pub struct RunResult {
     pub metrics: Option<RunMetrics>,
     pub status: RunStatus,
     pub final_output: Option<Value>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub final_output_is_raw_json: bool,
     pub new_items: Vec<RunItem>,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub new_items_provenance: Vec<ItemProvenance>,
@@ -361,6 +363,9 @@ pub struct RunResult {
 impl RunResult {
     /// Borrow the final text, or an empty string for structured/missing output.
     pub fn final_text(&self) -> &str {
+        if self.final_output_is_raw_json {
+            return "";
+        }
         self.final_output
             .as_ref()
             .and_then(Value::as_str)

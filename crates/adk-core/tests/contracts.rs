@@ -90,6 +90,7 @@ fn partial_run_retains_history_usage_and_cause() {
         },
     };
     let partial = RunResult {
+        final_output_is_raw_json: false,
         metrics: None,
         history_provenance: Vec::new(),
         new_items_provenance: Vec::new(),

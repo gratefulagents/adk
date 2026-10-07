@@ -652,6 +652,7 @@ fn verified() -> GoRecovery {
         started_at: chrono::Utc::now(),
         deadline_at: None,
         final_output: None,
+        final_output_is_raw_json: false,
     }
 }
 #[test]
@@ -3112,5 +3113,64 @@ async fn durable_dynamic_instructions_require_pure_identity_and_bind_recovery() 
         .await
         .unwrap();
     assert_eq!(result.result.final_text(), "done");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch() {
+    let (_, model, tool) = setup(vec![call("id")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool.clone());
+    agent.stop_at_tools.insert("effect".into());
+    agent.tool_final_output = Some(ToolFinalOutput::Json(json!("quoted")));
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("tool_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let saved = store.latest();
+    assert_eq!(
+        serde_json::to_value(&saved).unwrap()["runtime"]["matched_stop_tool"],
+        true
+    );
+    agent.stop_at_tools.clear();
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(saved.clone()))
+            .await
+            .is_err()
+    );
+    let completed = Arc::new(Store::default());
+    let outcome = run(&runner, completed.clone(), Some(saved)).await.unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("quoted")));
+    assert!(outcome.result.final_output_is_raw_json);
+    assert_eq!(outcome.result.final_text(), "");
+    let result = run(
+        &runner,
+        Arc::new(Store::default()),
+        Some(completed.latest()),
+    )
+    .await
+    .unwrap();
+    assert!(result.result.final_output_is_raw_json);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+    let mut source =
+        RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    source.boundary = "tool_completed".into();
+    assert!(
+        runner
+            .migrate_go_checkpoint(source.clone(), verified())
+            .is_err()
+    );
+    source.boundary = "run_completed".into();
+    let mut evidence = verified();
+    evidence.final_output = Some(json!("quoted"));
+    evidence.final_output_is_raw_json = true;
+    let migrated = runner.migrate_go_checkpoint(source, evidence).unwrap();
+    let recovered = run(&runner, Arc::new(Store::default()), Some(migrated))
+        .await
+        .unwrap();
+    assert_eq!(recovered.result.final_text(), "");
+    assert!(recovered.result.final_output_is_raw_json);
     assert_eq!(model.calls.load(Ordering::SeqCst), 1);
 }

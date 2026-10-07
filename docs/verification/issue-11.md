@@ -1190,3 +1190,26 @@ Only the dynamic-instruction field capability is newly closed:
 **248 verified / 8,643 unresolved / 251 excluded**. Full issue #11 remains open.
 No new credentialed live checks, excluded CLI/evaluation contracts, release work
 or production default changes were performed.
+
+### Per-agent tool stopping and explicit output
+
+Per-agent stop-all, exact-name stop sets and first-tool/explicit-JSON output now
+have native counterparts. Thirty-four pinned normal/streamed observations verify
+case/whitespace-sensitive membership, continue/disabled selection, batch output
+selection, raw JSON strings/null/false, model-schema bypass, null/output
+validation and tripwire, steering, handoff and pause precedence. Raw-JSON result
+origin preserves the SDK text-helper distinction and survives serialization.
+Native recovery preserves the stop decision and output origin without repeating
+effects; configuration changes are rejected. Ambiguous Go post-tool stopping
+requires finalization reconciliation; terminal Go migration accepts verified
+output and origin. Three existing SDK source regressions passed independently.
+
+Fresh locked Linux Rust 1.88.0 workspace/all-features/all-targets:
+**1,273 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, facade matrix, platform-free consumer, 20 offline
+scenarios and host-session example passed. Pinned source/fixture reproduction,
+18 ledger validators, source locks, Python compilation, Go formatting and
+whitespace checks passed. Three agent-field obligations are newly verified:
+**251 verified / 8,640 unresolved / 251 excluded**. Full issue #11 remains open;
+credentialed live checks remain unverified. No excluded CLI/evaluation adapters,
+release work or production-default switch was added.

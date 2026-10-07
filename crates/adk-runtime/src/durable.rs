@@ -88,6 +88,8 @@ pub struct RuntimeCheckpoint {
     #[serde(default)]
     summary_turn: bool,
     tool_final: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    matched_stop_tool: bool,
     tool_turn_start: Option<usize>,
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
@@ -582,6 +584,7 @@ impl Runner {
             engine.tool_pause = saved.tool_pause;
             engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
+            engine.matched_stop_tool = saved.matched_stop_tool;
             engine.tool_turn_start = saved.tool_turn_start;
             engine.consecutive_tool_errors = saved.consecutive_tool_errors;
             engine.tool_error_escalated = saved.tool_error_escalated;
@@ -724,6 +727,12 @@ impl Runner {
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
             });
+            if agent.tool_use != ToolUseBehavior::Continue
+                || !agent.stop_at_tools.is_empty()
+                || agent.tool_final_output.is_some()
+            {
+                entry["tool_stopping"] = serde_json::json!({"behavior": agent.tool_use, "names": agent.stop_at_tools, "output": agent.tool_final_output});
+            }
             if let Some(provider) = &agent.instruction_provider {
                 entry["instruction_provider"] = serde_json::json!(provider.durable_key());
             }
@@ -1057,6 +1066,7 @@ impl Engine {
                 tool_pause: self.tool_pause,
                 summary_turn: self.summary_turn,
                 tool_final: self.tool_final.clone(),
+                matched_stop_tool: self.matched_stop_tool,
                 tool_turn_start: self.tool_turn_start,
                 consecutive_tool_errors: self.consecutive_tool_errors,
                 tool_error_escalated: self.tool_error_escalated,
@@ -1102,6 +1112,7 @@ pub struct GoRecovery {
     /// Go checkpoints do not persist a parsed final result; terminal migration
     /// requires the host to supply its verified result rather than invent one.
     pub final_output: Option<Value>,
+    pub final_output_is_raw_json: bool,
 }
 
 impl Runner {
@@ -1263,6 +1274,25 @@ impl Runner {
             });
         }
         validate_history_pairs(&history)?;
+        if checkpoint.boundary == "tool_completed" {
+            let mut agents = vec![self.initial.clone()];
+            let mut seen = HashSet::new();
+            while let Some(agent) = agents.pop() {
+                if !seen.insert(Arc::as_ptr(&agent) as usize) {
+                    continue;
+                }
+                if agent.name == checkpoint.agent_name
+                    && (recovery.policy.tool_use == ToolUseBehavior::StopAfterTool
+                        || agent.tool_use == ToolUseBehavior::StopAfterTool
+                        || !agent.stop_at_tools.is_empty())
+                {
+                    return Err(unsupported(
+                        "Go post-tool stopping requires reconciled finalization; its checkpoint does not preserve the turn decision or original final output",
+                    ));
+                }
+                agents.extend(agent.handoffs.iter().map(|handoff| handoff.target.clone()));
+            }
+        }
         let completed = checkpoint.boundary == "run_completed";
         if completed && recovery.final_output.is_none() {
             return Err(invalid(
@@ -1333,6 +1363,7 @@ impl Runner {
                     RunStatus::Incomplete
                 },
                 final_output: recovery.final_output,
+                final_output_is_raw_json: recovery.final_output_is_raw_json,
                 new_items: vec![],
                 history,
                 responses: vec![],
@@ -1359,6 +1390,7 @@ impl Runner {
             tool_pause: false,
             summary_turn: false,
             tool_final: None,
+            matched_stop_tool: false,
             tool_turn_start: None,
             consecutive_tool_errors: 0,
             tool_error_escalated: false,

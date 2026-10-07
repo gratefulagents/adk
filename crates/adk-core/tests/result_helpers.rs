@@ -3,6 +3,7 @@ use serde_json::json;
 
 fn result() -> RunResult {
     RunResult {
+        final_output_is_raw_json: false,
         metrics: None,
         status: RunStatus::Completed,
         final_output: None,
@@ -114,4 +115,15 @@ fn result_views_borrow_only_new_items_and_unified_approvals() {
         result.new_items.as_slice()
     ));
     assert_ne!(result.to_input_list(), result.history);
+}
+
+#[test]
+fn raw_json_string_is_not_ordinary_final_text_and_roundtrips_its_origin() {
+    let mut value = result();
+    value.final_output = Some(json!("quoted"));
+    value.final_output_is_raw_json = true;
+    assert_eq!(value.final_text(), "");
+    let restored: RunResult = serde_json::from_value(serde_json::to_value(value).unwrap()).unwrap();
+    assert_eq!(restored.final_output, Some(json!("quoted")));
+    assert_eq!(restored.final_text(), "");
 }

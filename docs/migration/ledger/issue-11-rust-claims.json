@@ -4212,6 +4212,66 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-4B6764AB61936629": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.StopAtTools",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::stop_at_tools",
+        "crates/adk-runtime/src/runner.rs::ToolFinalOutput",
+        "crates/adk-core/src/types.rs::RunResult::final_output_is_raw_json"
+      ],
+      "rust_test_identifiers": [
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails",
+        "named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch",
+        "raw_json_string_is_not_ordinary_final_text_and_roundtrips_its_origin"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopAtToolsRunsOutputGuardrails",
+      "rationale": "Thirty-four independently executed pinned normal/streamed observations verify exact-name membership, disabled/continue and whole-batch stops, first-result selection even for a later matched tool, explicit JSON including strings/null/false, ignored disabled output, output-schema bypass, null/output guardrails and tripwire, steering, pause precedence and handoff. Native result origin metadata preserves Go raw-JSON FinalText behavior. Durable recovery preserves the stop decision, origin and config fingerprint without redispatch. Ambiguous Go tool_completed migration is deliberately rejected until finalization is reconciled; terminal recovery requires verified output/origin. This does not assert whole Agent or arbitrary Go callback parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C19BAC6BD6D37F2C": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.ToolUseBehavior",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_use",
+        "crates/adk-runtime/src/runner.rs::ToolFinalOutput",
+        "crates/adk-core/src/types.rs::RunResult::final_output_is_raw_json"
+      ],
+      "rust_test_identifiers": [
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails",
+        "named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch",
+        "raw_json_string_is_not_ordinary_final_text_and_roundtrips_its_origin"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopAtToolsRunsOutputGuardrails",
+      "rationale": "Thirty-four independently executed pinned normal/streamed observations verify exact-name membership, disabled/continue and whole-batch stops, first-result selection even for a later matched tool, explicit JSON including strings/null/false, ignored disabled output, output-schema bypass, null/output guardrails and tripwire, steering, pause precedence and handoff. Native result origin metadata preserves Go raw-JSON FinalText behavior. Durable recovery preserves the stop decision, origin and config fingerprint without redispatch. Ambiguous Go tool_completed migration is deliberately rejected until finalization is reconciled; terminal recovery requires verified output/origin. This does not assert whole Agent or arbitrary Go callback parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-500C337A48DFA676": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.ToolsToFinalOutput",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_final_output",
+        "crates/adk-runtime/src/runner.rs::ToolFinalOutput",
+        "crates/adk-core/src/types.rs::RunResult::final_output_is_raw_json"
+      ],
+      "rust_test_identifiers": [
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails",
+        "named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch",
+        "raw_json_string_is_not_ordinary_final_text_and_roundtrips_its_origin"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopAtToolsRunsOutputGuardrails",
+      "rationale": "Thirty-four independently executed pinned normal/streamed observations verify exact-name membership, disabled/continue and whole-batch stops, first-result selection even for a later matched tool, explicit JSON including strings/null/false, ignored disabled output, output-schema bypass, null/output guardrails and tripwire, steering, pause precedence and handoff. Native result origin metadata preserves Go raw-JSON FinalText behavior. Durable recovery preserves the stop decision, origin and config fingerprint without redispatch. Ambiguous Go tool_completed migration is deliberately rejected until finalization is reconciled; terminal recovery requires verified output/origin. This does not assert whole Agent or arbitrary Go callback parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

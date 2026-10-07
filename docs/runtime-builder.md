@@ -1050,3 +1050,30 @@ re-resolution in normal and streamed runs. Reproduce with
 `python3 scripts/dynamic-instructions-reference/run.py --check`; native tests are
 in `followup` and `durable`. This does not imply complete Go `RunContext` mapping
 or automatic platform/scheduler composition.
+
+### Per-agent tool stopping
+
+`AgentConfig::tool_use = ToolUseBehavior::StopAfterTool` stops after the complete
+batch, not after its first invocation. `stop_at_tools` instead stops when any
+called tool name exactly matches the set (case and whitespace are significant).
+A host run-wide `RunPolicy::tool_use` stop remains effective regardless of the
+agent setting. Handoffs transfer control rather than finalizing the old agent.
+
+By default stopping returns no final value. Set `tool_final_output` to
+`Some(ToolFinalOutput::FirstTool)` for the first tool result, even when a later
+tool triggered the stop; use `Some(ToolFinalOutput::Json(value))` for explicit JSON.
+Selection alone does not enable stopping. Explicit per-agent selection follows
+SDK post-tool semantics: output guardrails run, but the model's output schema,
+completion confirmation and independent verifier are not reapplied. Guardrails
+also receive null for default no-output stopping. The older host-wide
+`RunnerConfig::return_tool_output` fallback retains its native validation behavior.
+
+Explicit JSON output carries `RunResult::final_output_is_raw_json`, preserving
+SDK `FinalText()` behavior even for a quoted JSON string. `final_output` still
+contains the JSON value; `final_text()` is empty for raw JSON. This origin flag is
+native snapshot metadata, not an added field in SDK wire records. Native durable
+checkpoints preserve both the stop decision and output origin and bind agent
+selection changes. Go `tool_completed` recovery with an enabled stop policy
+requires reconciled finalization, because that checkpoint does not establish the
+turn's stop decision or original raw tool output. Terminal Go recovery requires
+host-verified output and its `final_output_is_raw_json` origin.

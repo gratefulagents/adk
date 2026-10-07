@@ -367,3 +367,20 @@ https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b
 and `internal/agent/runner.go`; pinned file/version/license provenance and 16
 independent normal/streamed observations are in
 `fixtures/dynamic-instructions/observations.json`.
+
+### Per-agent tool-result finalization
+
+Retain SDK exact-name stopping and first-result selection after a complete batch.
+Use `BTreeSet<String>` and `ToolFinalOutput::{FirstTool, Json(Value)}` rather than
+nullable Go structs containing a boolean and potentially invalid raw bytes.
+Do not infer stopping merely from an output selection. Preserve the observable
+raw-JSON versus text distinction with explicit result-origin metadata: Go
+`json.RawMessage("\"quoted\"")` serializes as a JSON string but is not a Go string
+for `FinalText()`. Treating all JSON strings as ordinary text would be wrong.
+Keep output guardrails on the stop path, including a null final value, without
+reapplying model output-schema parsing to explicit tool-result selection.
+Native checkpoints preserve the turn decision; reject ambiguous Go post-tool
+recovery rather than infer it from lossy history. Source is GPL-3.0-only SDK
+`internal/agent/agent.go`, `runner.go`, and `run_result.go` at
+`1dc92b73900fac74dc357a938e4b5eee6392b418`; the 34 normal/streamed observations and
+source hashes are in `fixtures/tool-stopping/observations.json`.

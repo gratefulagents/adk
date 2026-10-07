@@ -1892,3 +1892,189 @@ async fn dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_mod
         assert!(model.requests.lock().unwrap().is_empty());
     }
 }
+
+struct StopTool(ToolDefinition);
+impl Tool for StopTool {
+    fn definition(&self) -> &ToolDefinition {
+        &self.0
+    }
+    fn execute<'a>(
+        &'a self,
+        _: &'a ToolContext,
+        _: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            Ok(ToolOutput {
+                content: vec![Content::Text {
+                    text: format!("{}-output", self.0.name),
+                }],
+                is_error: false,
+                should_pause: self.0.name == "present_plan",
+            })
+        })
+    }
+}
+struct StopGuard {
+    values: Mutex<Vec<serde_json::Value>>,
+    trip: bool,
+}
+impl Guardrail for StopGuard {
+    fn name(&self) -> &str {
+        "check"
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        input: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            let GuardrailInput::Output(output) = input else {
+                panic!("wrong guardrail phase")
+            };
+            self.values.lock().unwrap().push(output.clone());
+            Ok(Some(GuardrailResult {
+                tripwire_triggered: self.trip,
+                ..Default::default()
+            }))
+        })
+    }
+}
+#[tokio::test]
+async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/tool-stopping/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let streamed = case["streamed"].as_bool().unwrap();
+        let called = match name {
+            "pause" => "present_plan",
+            "handoff" => "transfer_to_child",
+            _ => "read",
+        };
+        let mut items = vec![call(called)];
+        if name == "second_named" {
+            items.push(call("other"));
+        }
+        let model = Script::new(vec![Ok(response(items, true)), Ok(answer())]);
+        let mut agent = AgentConfig::new(
+            "agent",
+            if streamed {
+                ModelBinding::streaming("offline", model.clone())
+            } else {
+                ModelBinding::complete("offline", model.clone())
+            },
+        );
+        agent.tools = [
+            if name == "pause" {
+                "present_plan"
+            } else {
+                "read"
+            },
+            "other",
+        ]
+        .into_iter()
+        .map(|name| {
+            Arc::new(StopTool(ToolDefinition {
+                name: name.into(),
+                description: String::new(),
+                input_schema: schemars::json_schema!({}),
+                read_only: true,
+                requires_approval: false,
+            })) as Arc<dyn Tool>
+        })
+        .collect();
+        let guard = Arc::new(StopGuard {
+            values: Mutex::new(vec![]),
+            trip: name == "guardrail",
+        });
+        agent.output_guardrails.push(guard.clone());
+        agent.stop_at_tools.insert(
+            match name {
+                "case_miss" => "READ",
+                "space_miss" => " read ",
+                "second_named" => "other",
+                _ => called,
+            }
+            .into(),
+        );
+        if matches!(name, "continue" | "stop_all") {
+            agent.stop_at_tools.clear();
+        }
+        if name == "stop_all" {
+            agent.tool_use = ToolUseBehavior::StopAfterTool;
+        }
+        if matches!(
+            name,
+            "first" | "second_named" | "schema" | "continue" | "steering"
+        ) {
+            agent.tool_final_output = Some(ToolFinalOutput::FirstTool);
+        }
+        if name == "schema" {
+            agent.output_schema = Some(schemars::json_schema!({"type":"object"}));
+        }
+        if matches!(name, "object" | "string" | "null" | "false") {
+            agent.tool_final_output = Some(ToolFinalOutput::Json(case["output"].clone()));
+        }
+        if name == "handoff" {
+            agent.handoffs.push(Handoff {
+                definition: ToolDefinition {
+                    name: "transfer_to_child".into(),
+                    description: String::new(),
+                    input_schema: schemars::json_schema!({}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                target: Arc::new(AgentConfig::new("child", agent.model.clone())),
+                input_filter: HandoffInputFilter::Preserve,
+            });
+        }
+        let mut config = RunnerConfig::default();
+        if name == "steering" {
+            config.immediate_input_finalizer = Some(Arc::new(ConfirmationInput {
+                at: 1,
+                calls: AtomicUsize::new(0),
+            }));
+        }
+        let runner = Runner::new(agent, config).unwrap();
+        let result = if streamed {
+            runner
+                .stream(context(), request(vec![], 3), Arc::new(Quiet))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(vec![], 3), Arc::new(Quiet))
+                .await
+        };
+        assert_eq!(result.is_err(), case["error"], "{name}/{streamed}");
+        if let Ok(result) = result {
+            assert_eq!(
+                json!(result.result.final_output),
+                case["output"],
+                "{name}/{streamed}"
+            );
+            assert_eq!(
+                result.result.final_text(),
+                case["text"],
+                "{name}/{streamed}"
+            );
+            assert_eq!(
+                result.result.final_output_is_raw_json,
+                matches!(name, "object" | "string" | "null" | "false")
+            );
+        }
+        assert_eq!(
+            json!(*guard.values.lock().unwrap()),
+            case["guards"],
+            "{name}/{streamed}"
+        );
+        assert_eq!(
+            model.requests.lock().unwrap().len(),
+            case["requests"].as_u64().unwrap() as usize,
+            "{name}/{streamed}"
+        );
+    }
+}

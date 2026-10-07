@@ -123,11 +123,20 @@ pub trait InstructionProvider: Send + Sync {
     ) -> BoxFuture<'a, Result<String, Error>>;
 }
 
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub enum ToolFinalOutput {
+    FirstTool,
+    Json(Value),
+}
+
 #[derive(Clone)]
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
     pub instruction_provider: Option<Arc<dyn InstructionProvider>>,
+    pub tool_use: ToolUseBehavior,
+    pub stop_at_tools: std::collections::BTreeSet<String>,
+    pub tool_final_output: Option<ToolFinalOutput>,
     pub mcp_servers: Vec<String>,
     pub model: ModelBinding,
     pub fallbacks: Vec<ModelBinding>,
@@ -151,6 +160,9 @@ impl AgentConfig {
             name: name.into(),
             instructions: String::new(),
             instruction_provider: None,
+            tool_use: ToolUseBehavior::Continue,
+            stop_at_tools: Default::default(),
+            tool_final_output: None,
             mcp_servers: Vec::new(),
             model,
             fallbacks: vec![],
@@ -937,6 +949,7 @@ impl Runner {
             tool_pause: false,
             summary_turn: false,
             tool_final: None,
+            matched_stop_tool: false,
             streaming: false,
             sender: None,
             spills: vec![],
@@ -950,6 +963,7 @@ impl Runner {
                 new_items_provenance: Vec::new(),
                 status: RunStatus::Incomplete,
                 final_output: None,
+                final_output_is_raw_json: false,
                 new_items: vec![],
                 history: request.input,
                 responses: vec![],
@@ -1019,6 +1033,7 @@ struct Engine {
     tool_pause: bool,
     summary_turn: bool,
     tool_final: Option<String>,
+    matched_stop_tool: bool,
     streaming: bool,
     sender: Option<mpsc::Sender<RunEvent>>,
     spills: Vec<Arc<SpillFile>>,
@@ -1412,10 +1427,28 @@ impl Engine {
                                 .await?;
                         }
                         return Ok(RunStatus::Paused);
-                    } else if self.policy.tool_use == ToolUseBehavior::StopAfterTool
+                    } else if (self.policy.tool_use == ToolUseBehavior::StopAfterTool
+                        || self.agent.tool_use == ToolUseBehavior::StopAfterTool
+                        || self.matched_stop_tool)
                         && self.tool_final.is_some()
                     {
                         self.settle_tool_turn();
+                        if let Some(selection) = self.agent.tool_final_output.clone() {
+                            if self.finalize_immediate_input().await? {
+                                continue;
+                            }
+                            let (output, raw_json) = match selection {
+                                ToolFinalOutput::FirstTool => {
+                                    (Value::String(self.tool_final.take().unwrap()), false)
+                                }
+                                ToolFinalOutput::Json(value) => (value, true),
+                            };
+                            self.check_output_guardrails(&output).await?;
+                            self.result.final_output = Some(output);
+                            self.result.final_output_is_raw_json = raw_json;
+                            self.phase = Phase::Finish;
+                            continue;
+                        }
                         if (!self.config.return_tool_output
                             || (self.config.subagents.is_none() && self.child_control.is_none()))
                             && self.finalize_immediate_input().await?
@@ -1437,6 +1470,8 @@ impl Engine {
                             }
                             self.check_output_guardrails(&output).await?;
                             self.result.final_output = Some(output);
+                        } else {
+                            self.check_output_guardrails(&Value::Null).await?;
                         }
                         self.phase = Phase::Finish;
                     } else {
@@ -2158,6 +2193,10 @@ impl Engine {
             self.tool_turn_start = Some(self.result.new_items.len());
             self.tool_pause = false;
             self.tool_final = None;
+            self.matched_stop_tool = self
+                .calls
+                .iter()
+                .any(|call| self.agent.stop_at_tools.contains(&call.name));
             self.tools_prepared = false;
             self.phase = Phase::Tools;
         } else if response.end_turn == Some(false) {
@@ -3334,6 +3373,7 @@ impl Engine {
             }
             let from = self.agent.name.clone();
             self.agent = handoff.target.clone();
+            self.matched_stop_tool = false;
             self.pending_completion = false;
             self.result.last_agent = Some(self.agent.name.clone());
             self.observe(Observation::Handoff {

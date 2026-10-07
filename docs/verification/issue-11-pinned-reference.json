@@ -61,10 +61,19 @@
       "./internal/agent",
       "-run",
       "^TestAgentGetInstructions_(Static|Dynamic)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./internal/agent",
+      "-run",
+      "^(TestRunnerStopOnFirstTool|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal)$"
     ]
   ],
   "counts": {
-    "pass": 776,
+    "pass": 779,
     "skip": 5
   },
   "exit_code": 0,
@@ -153,6 +162,9 @@
     "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerRecoversFromPanickingInputGuardrail": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopAtToolsRunsOutputGuardrails": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopAtToolsUsesToolOutputAsFinal": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopOnFirstTool": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace": "pass",

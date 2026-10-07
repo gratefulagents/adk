@@ -1146,3 +1146,25 @@ passed freshly. Only the specific verifier configuration-field obligation is
 newly closed: **245 verified / 8,646 unresolved / 251 excluded**. No new
 credentialed live-service checks were run. The broader issue remains incomplete;
 no CLI/evaluation/Terminal-Bench, release or production-default switch was added.
+
+### Owned read-only critic helper
+
+The native `CriticVerifier` owns its runner, critic agent, host and original task.
+Twenty-nine independently executed pinned SDK cases compare exact prompts and
+instructions, verdict parsing, structured output, model errors, read-only tool
+advertisement and execution, forged mutation denial, child limits and the forced
+twelfth summary turn. Native integration verifies a single parent revision and
+cancellation before dispatch. Live critics deliberately remain unsupported in
+durable callback registration; no replay-safe identity is fabricated.
+
+Fresh locked Linux Rust 1.88.0 workspace/all-features/all-targets:
+**1,267 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, facade feature matrix, platform-free standalone
+consumer, 20 offline scenarios and host-session example passed. The ordinary
+Clippy launcher remains unusable without `/proc/self/exe`; the equivalent
+strict direct-driver checks passed. Source oracle reproduction, 18 ledger tests,
+source locks, Python compilation, Go formatting and whitespace checks passed.
+Only the critic constructor and default-instruction obligations are newly closed:
+**247 verified / 8,644 unresolved / 251 excluded**. Credentialed live-provider
+checks remain unverified. No excluded CLI/evaluation/Terminal-Bench contracts,
+production default changes or release work were added. Issue #11 is incomplete.

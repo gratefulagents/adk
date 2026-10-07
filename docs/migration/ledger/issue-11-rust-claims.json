@@ -4158,6 +4158,40 @@
         "runtime",
         "observability"
       ]
+    },
+    "SDK-AC72999B4FC08896": {
+      "source": "pkg/agentsdk/verifier.go",
+      "source_name": "DefaultCriticInstructions",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/verifier.rs::DEFAULT_CRITIC_INSTRUCTIONS"
+      ],
+      "rust_test_identifiers": [
+        "critic_matches_pinned_sdk_verdicts_prompts_and_read_only_turn_limits",
+        "critic_refutation_revises_parent_once_and_cancellation_prevents_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewCriticVerifierApprovedAndRejected",
+      "rationale": "Twenty-nine independently executed pinned SDK observations compare default/custom instructions, candidate prompt, strict verdict recognition, rejection/inconclusive feedback, structured output, model errors, read-only advertised tools and forged mutation denial, the forced twelfth summary turn and child limits. Rust owns a dedicated runner/agent/host instead of nullable Go pointers, exposes borrowed JSON candidate adaptation, shares cancellation, and deliberately rejects durable replay registration for a live critic (docs/research/facade.md). Native integration verifies one parent revision and cancellation before dispatch. This does not close whole-agent or builder parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3785ECECF559970D": {
+      "source": "pkg/agentsdk/verifier.go",
+      "source_name": "NewCriticVerifier",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/verifier.rs::CriticVerifier"
+      ],
+      "rust_test_identifiers": [
+        "critic_matches_pinned_sdk_verdicts_prompts_and_read_only_turn_limits",
+        "critic_refutation_revises_parent_once_and_cancellation_prevents_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewCriticVerifierApprovedAndRejected",
+      "rationale": "Twenty-nine independently executed pinned SDK observations compare default/custom instructions, candidate prompt, strict verdict recognition, rejection/inconclusive feedback, structured output, model errors, read-only advertised tools and forged mutation denial, the forced twelfth summary turn and child limits. Rust owns a dedicated runner/agent/host instead of nullable Go pointers, exposes borrowed JSON candidate adaptation, shares cancellation, and deliberately rejects durable replay registration for a live critic (docs/research/facade.md). Native integration verifies one parent revision and cancellation before dispatch. This does not close whole-agent or builder parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

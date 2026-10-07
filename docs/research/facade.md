@@ -335,3 +335,19 @@ pure callback. Source: pinned SDK `internal/agent/runner.go` and
 `internal/agent/run_config.go`; hashes, version and GPL-3.0-only provenance are in
 `fixtures/verifier/observations.json`. These changes do not close the separate
 `NewCriticVerifier` helper or the full `RunConfig` ledger obligation.
+
+
+### Owned critic helper
+
+Adopt a dedicated owned runner plus host and original task, rather than a Go
+closure retaining nullable runner/agent pointers. Rust ownership eliminates the
+nil-pointer configuration state and prevents mutation of the caller's agent.
+Retain the pinned default prompt, verdict parser, read-only tool policy,
+12-turn limits and forced summary. Reject automatic durable replay identity for
+a live critic; read-only model calls are not deterministic pure checks.
+The inherited cancellation token bounds critic work without a detached task.
+The source/version/license and file hashes are independently recorded in
+`fixtures/critic/observations.json` (SDK commit
+`1dc92b73900fac74dc357a938e4b5eee6392b418`, GPL-3.0-only,
+https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/verifier.go).
+The helper is advisory, never an authorization or evidence-authentication gate.

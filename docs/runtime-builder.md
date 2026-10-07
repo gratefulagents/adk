@@ -986,8 +986,7 @@ critics must not claim this replay-safe contract. Go migration requires verified
 `GoRecovery::verifier_ran` and the effective turn allowance. These restrictions
 are explicit; this is not an exactly-once protocol for arbitrary callbacks.
 
-The SDK `NewCriticVerifier` convenience constructor is still a separate missing
-helper; this callback does not implicitly create a critic agent. Twenty-eight
+Twenty-eight
 pinned normal/streamed SDK cases cover blank/accepted/rejected/error reviews,
 gate and confirmation ordering, tool/nonfinal progress, forced/no-tool runs and
 structured outputs (`object`, `number`, `null`, `string`).
@@ -997,3 +996,29 @@ python3 scripts/verifier-reference/run.py --check
 cargo test --locked -p adk-runtime --test followup --test durable
 cargo test --locked -p adk --features observability --test observability
 ```
+
+### Read-only critic
+
+`adk::runtime::CriticVerifier::new(critic, original_task, host)` owns a separate
+critic runner and implements `FinalAnswerVerifier`. Register it as
+`RunnerConfig::final_answer_verifier: Some(Arc::new(critic))`. Blank instructions
+use `DEFAULT_CRITIC_INSTRUCTIONS`; custom instructions remain unchanged. The
+critic runs read-only, with a 12-turn budget, a 12-turn child ceiling, and a
+forced tool-free final summary. It does not recursively install a verifier.
+
+Approval requires an exact recognized approval line and no rejection line.
+Missing verdicts produce the pinned inconclusive feedback; rejections retain the
+whole reply. This parser is compatibility behavior, not a security boundary:
+it does not authenticate model evidence or ignore verdict lines in code fences.
+Errors propagate to the parent verifier diagnostic path. Cancellation remains
+shared. This live/model-backed verifier intentionally has no durable key, so
+it cannot be registered with durable execution. Tools must honestly declare
+read-only behavior; authorization does not sandbox arbitrary host code.
+
+The native callback accepts JSON output: strings are passed unchanged, null is
+empty, and structured candidates use SDK-compatible JSON serialization. The
+critic's own structured output follows `RunResult::final_text()` semantics.
+Twenty-nine offline source observations compare feedback, exact prompts,
+instructions, tool lists, forced summary, denial of forged mutation calls,
+and child limits. Run `python3 scripts/critic-reference/run.py --check` and
+`cargo test --locked -p adk-runtime --test followup critic_`.

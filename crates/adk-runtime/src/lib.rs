@@ -23,6 +23,8 @@ mod mcp_prompt;
 pub mod output;
 pub mod runner;
 pub mod settings;
+mod verifier;
+pub use verifier::{CriticVerifier, DEFAULT_CRITIC_INSTRUCTIONS};
 pub mod subagent;
 pub mod subagent_tools;
 pub use runner::*;

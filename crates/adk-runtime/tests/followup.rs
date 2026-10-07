@@ -1502,3 +1502,187 @@ async fn verifier_failure_never_swallows_parent_cancellation() {
     assert_eq!(error.error.info.category, ErrorCategory::Cancelled);
     assert_eq!(model.requests.lock().unwrap().len(), 1);
 }
+
+struct CriticReadTool {
+    definition: ToolDefinition,
+    turns: Mutex<Vec<u32>>,
+}
+impl Tool for CriticReadTool {
+    fn definition(&self) -> &ToolDefinition {
+        &self.definition
+    }
+    fn execute<'a>(
+        &'a self,
+        ctx: &'a ToolContext,
+        _: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            assert_eq!(ctx.policy.access, AccessMode::ReadOnly);
+            self.turns
+                .lock()
+                .unwrap()
+                .push(ctx.policy.max_child_turns.unwrap().get());
+            Ok(ToolOutput {
+                content: vec![Content::Text { text: "ok".into() }],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+
+#[tokio::test]
+async fn critic_matches_pinned_sdk_verdicts_prompts_and_read_only_turn_limits() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/critic/observations.json")).unwrap();
+    assert_eq!(DEFAULT_CRITIC_INSTRUCTIONS, fixture["default_instructions"]);
+    for case in fixture["cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let mut replies = vec![];
+        if matches!(name, "read" | "write" | "turn_cap") {
+            for i in 0..if name == "turn_cap" { 11 } else { 1 } {
+                replies.push(Ok(response(
+                    vec![RunItem::ToolCall {
+                        call: ToolCall {
+                            id: format!("call_{i}"),
+                            name: if name == "write" { "write" } else { "read" }.into(),
+                            arguments: json!({}),
+                        },
+                    }],
+                    false,
+                )));
+            }
+        }
+        replies.push(if name == "error" {
+            Err(Error::new(ErrorCategory::Provider, "no more responses"))
+        } else {
+            Ok(response(
+                vec![message(Role::Assistant, case["reply"].as_str().unwrap())],
+                true,
+            ))
+        });
+        let model = Script::new(replies);
+        let read = Arc::new(CriticReadTool {
+            definition: ToolDefinition {
+                name: "read".into(),
+                description: String::new(),
+                input_schema: schemars::json_schema!({}),
+                read_only: true,
+                requires_approval: false,
+            },
+            turns: Mutex::new(vec![]),
+        });
+        let write = TestTool::new("write", false, false, false, false);
+        let mut agent =
+            AgentConfig::new("critic", ModelBinding::complete("offline", model.clone()));
+        agent.instructions = case["instructions"].as_str().unwrap().into();
+        agent.tools = vec![read.clone(), write.clone()];
+        if case["structured"] == true {
+            agent.output_schema = Some(schemars::json_schema!(true));
+            agent.output_schema_strict = false;
+        }
+        let critic =
+            CriticVerifier::new(agent, case["task"].as_str().unwrap(), Arc::new(Quiet)).unwrap();
+        assert!(critic.durable_key().is_none());
+        let result = critic.verify(&context(), &case["candidate"]).await;
+        assert_eq!(result.is_err(), case["error"], "{name}");
+        if let Ok(feedback) = result {
+            assert_eq!(feedback, case["feedback"], "{name}");
+        }
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(
+            requests.len(),
+            case["requests"].as_u64().unwrap() as usize,
+            "{name}"
+        );
+        assert_eq!(
+            json!(requests.iter().map(|r| &r.instructions).collect::<Vec<_>>()),
+            case["request_instructions"],
+            "{name}"
+        );
+        assert_eq!(
+            json!(
+                requests
+                    .iter()
+                    .map(|r| r.tools.iter().map(|t| &t.name).collect::<Vec<_>>())
+                    .collect::<Vec<_>>()
+            ),
+            case["request_tools"],
+            "{name}"
+        );
+        assert_eq!(
+            requests[0].input[0],
+            message(Role::User, case["prompt"].as_str().unwrap()),
+            "{name}"
+        );
+        assert_eq!(
+            json!(*read.turns.lock().unwrap()),
+            case["nested_turns"],
+            "{name}"
+        );
+        assert_eq!(
+            read.turns.lock().unwrap().len(),
+            case["read_calls"].as_u64().unwrap() as usize,
+            "{name}"
+        );
+        assert_eq!(write.calls.load(Ordering::SeqCst), 0, "{name}");
+    }
+}
+
+#[tokio::test]
+async fn critic_refutation_revises_parent_once_and_cancellation_prevents_dispatch() {
+    let critic_model = Script::new(vec![Ok(response(
+        vec![message(
+            Role::Assistant,
+            "VERDICT: REJECTED\n1. Missing evidence",
+        )],
+        true,
+    ))]);
+    let critic = Arc::new(
+        CriticVerifier::new(
+            AgentConfig::new(
+                "critic",
+                ModelBinding::complete("offline", critic_model.clone()),
+            ),
+            "task",
+            Arc::new(Quiet),
+        )
+        .unwrap(),
+    );
+    let model = Script::new(vec![
+        Ok(answer()),
+        Ok(response(vec![message(Role::Assistant, "revised")], true)),
+    ]);
+    let mut parent = AgentConfig::new("parent", ModelBinding::complete("offline", model.clone()));
+    parent
+        .tools
+        .push(TestTool::new("read", true, false, false, false));
+    let runner = Runner::new(
+        parent,
+        RunnerConfig {
+            final_answer_verifier: Some(critic.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let outcome = runner
+        .run(
+            context(),
+            request(vec![message(Role::User, "task")], 1),
+            Arc::new(Quiet),
+        )
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.final_text(), "revised");
+    assert_eq!(critic_model.requests.lock().unwrap().len(), 1);
+    assert_eq!(model.requests.lock().unwrap().len(), 2);
+    let cancellation = Arc::new(CancellationToken::new());
+    cancellation.cancel();
+    let ctx = Context {
+        cancellation,
+        ..context()
+    };
+    let error = critic.verify(&ctx, &json!("candidate")).await.unwrap_err();
+    assert_eq!(error.info.category, ErrorCategory::Cancelled);
+    assert_eq!(critic_model.requests.lock().unwrap().len(), 1);
+}

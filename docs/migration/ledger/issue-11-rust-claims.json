@@ -4079,6 +4079,38 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-82683BD2584D86E1": {
+      "source": "pkg/agentsdk/userinput.go",
+      "source_name": "BuildAutoTurnCapPrompt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_auto_turn_cap_prompt"
+      ],
+      "rust_test_identifiers": [
+        "pinned_userinput_helpers"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAutoTurnCapPrompt",
+      "rationale": "Seven pinned Go integer cases including zero, negative values and signed 64-bit endpoints compare complete prompt text. Rust uses explicit i64; the verified target is 64-bit Linux.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-52D3CA8612E8C001": {
+      "source": "pkg/agentsdk/userinput.go",
+      "source_name": "MarshalQuickActions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::marshal_quick_actions"
+      ],
+      "rust_test_identifiers": [
+        "pinned_userinput_helpers"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestQuickActionHelpers",
+      "rationale": "Independent pinned Go action bytes compare populated/empty strings, HTML/Unicode escaping, field order, omitted empty style and null action elements, plus explicit nil versus empty variadic slices. Rust exposes the nil-versus-empty distinction as Option<&[QuickAction]>. This closes encoding only, not arbitrary malformed input decoding.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

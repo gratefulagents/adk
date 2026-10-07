@@ -1058,3 +1058,35 @@ Go stdout JSON format, complete span attributes and trace-ID callbacks are not
 implemented. Higher-level runtime/session/guardrail helper parity and complete
 acceptance-ID Rust closure remain unfinished implementation, not external
 blockers. This continuation must not be represented as completion of #11.
+
+## Public user-input helper continuation
+
+Added `adk::codec::userinput` with quick-action encoding, question/choice/plan
+extraction, ordered pause detection and the auto-turn-cap prompt. The independent
+pinned SDK oracle executes **51 raw-input cases / 306 pause observations**, plus
+nil/empty action encoding and seven signed turn-cap cases. Byte comparisons cover
+Go field order/escaping, malformed inputs, repeated-key slice backing-element
+reuse, Unicode field folding and malformed Unicode replacement. See
+[`docs/user-input.md`](../user-input.md) for native representation limits and the
+explicitly non-executing host API. No worker CLI or evaluation adapter was added.
+
+Fresh Rust 1.88.0 Linux checks: **1,254 passed, 0 failed, 30 ignored** for the locked
+workspace/all-features/all-targets; direct Clippy driver with `-D warnings`, strict
+rustdoc, changed-file Rustfmt and whitespace checks passed. The facade feature
+matrix and platform-free external consumer passed; a separate compat-only
+consumer ran the documentation's user-input example. All 20 offline feature
+scenarios and the host-session example passed. The new oracle, all existing
+pinned evidence checks, 18 ledger-validator tests and both source locks passed.
+Python files compile and the Go harness is gofmt-clean.
+
+The first evidence invocation lacked `GOROOT`; rerunning with the established Go
+environment fixed it. Invalid-UTF-8 oracle cases then exposed undecodable Go log
+output in the Python capture, not a Rust mismatch. The harness now prints those
+bytes with backslash escapes (without discarding logs); fresh evidence passes.
+The examples script's `cargo clippy` entrypoint cannot resolve `/proc/self/exe`
+on this worker; equivalent direct-driver checks, builds and runs passed instead.
+
+Only the encoding helper and turn-cap prompt ledger functions are newly closed:
+**243 verified / 8,648 unresolved / 251 excluded**. This is not full issue #11
+completion or a claim that unresolved records each represent a missing feature.
+No new credentialed live-service checks were run; ignored checks remain unverified.

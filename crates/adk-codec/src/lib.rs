@@ -6,6 +6,7 @@ pub mod request_native;
 pub mod snapshots;
 mod state;
 pub mod timestamp;
+pub mod userinput;
 
 use dto::*;
 use schemars::{JsonSchema, Schema};

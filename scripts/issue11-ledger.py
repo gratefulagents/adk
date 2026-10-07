@@ -28,7 +28,10 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo.toml",
+RUST_INPUTS = ["crates/adk-codec/src/userinput.rs", "crates/adk-codec/tests/userinput.rs",
+               "scripts/userinput-reference/run.py", "scripts/userinput-reference/reference_test.go",
+               "fixtures/userinput/observations.json",
+               "crates/adk-runtime/src/mcp_prompt.rs", "crates/adk-runtime/Cargo.toml",
                "fixtures/mcp-prompt/observations.json", "scripts/mcp-prompt-reference/run.py",
                "scripts/mcp-prompt-reference/reference_test.go","fixtures/run-instructions/observations.json", "scripts/run-instructions-reference/run.py",
                "scripts/run-instructions-reference/reference_test.go","crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_runtime.rs",
@@ -277,7 +280,9 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     llm_summary_check = subprocess.run([sys.executable, str(ROOT / "scripts/llm-summary-reference/run.py"), "--check"],
                                       cwd=ROOT, text=True, capture_output=True, check=True)
-    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "baseline", "-p", "adk-platform", "-p", "adk-runtime",
+    userinput_check = subprocess.run([sys.executable, str(ROOT / "scripts/userinput-reference/run.py"), "--check"],
+                                    cwd=ROOT, text=True, capture_output=True, check=True)
+    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "baseline", "--test", "userinput", "-p", "adk-platform", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host,mcp,project-state", "--test", "resolution", "--test", "host", "--test", "host_config", "--test", "host_rules",
@@ -315,7 +320,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},

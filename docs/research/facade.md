@@ -305,3 +305,15 @@ and [custom-parser precedence](https://github.com/gratefulagents/sdk/blob/1dc92b
 schema diagnostics; do not pretend Go's JSON-syntax fallback performs JSON Schema
 validation. Fourteen normal/streamed pinned observations compare composed schema
 placement, request fields and parsed final values, including parser failure.
+
+## User-input helper composition
+
+Expose the pinned SDK's inspection helpers under `adk::codec::userinput`, rather
+than introducing Go callbacks or a CLI-owned pause loop. Hosts retain the decision
+to pause. Owned `QuickAction` strings and `Option<Vec<u8>>` preserve the distinction
+between absent actions and present JSON `null`; `marshal_quick_actions` accepts an
+optional slice to retain nil-versus-empty encoding. The decoder uses in-place
+field/array updates because Go's repeated-key slice reuse is observably different
+from replacing a Serde vector. Do not generalize this private decoder to unrelated
+SDK types without independent evidence. See [usage, limits and pinned source
+provenance](../user-input.md) and the 51-case independently executed fixture.

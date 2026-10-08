@@ -38,6 +38,7 @@ async fn call(root: &Path, access: AccessMode, args: Value) -> ToolOutput {
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: "Edit".into(),
                 arguments: args,
@@ -151,6 +152,7 @@ async fn confinement_hardlinks_file_limits_and_cancellation_preserve_content() {
             .execute(
                 &ctx,
                 ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "Edit".into(),
                     arguments: json!({"file_path":"hard","old_string":"secret","new_string":"bad"})

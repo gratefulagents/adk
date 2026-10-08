@@ -1,19 +1,36 @@
 //! Opt-in execution engine and explicitly owned Tokio lifecycle primitives.
 //!
+//! Immediate input is host-owned boundary polling with optional atomic admission
+//! finalization and pre-output wake signals. Committed streams are never replayed. Durable
+//! admission interrupted after its dispatch checkpoint requires reconciliation.
+//!
 //! [`TaskGroup`] never detaches tasks: drop cancels and requests abortion;
 //! [`TaskGroup::shutdown`] additionally joins every task before returning.
 //! Abortion only takes effect when a task yields. Non-yielding work can prevent
 //! shutdown; blocking processes/threads need their own owner and termination API.
 
 pub mod compaction;
+pub mod guardrails;
+pub use guardrails::{
+    Guardrail, GuardrailInput, GuardrailOutcome, GuardrailResult, GuardrailTripwire,
+    run_guardrails, run_tool_output_guardrails,
+};
+pub mod hooks;
+pub mod tracing;
+pub use hooks::{CompositeHooks, HookErrors};
 pub mod compat;
+mod mcp_prompt;
 pub mod output;
 pub mod runner;
+pub mod settings;
+mod verifier;
+pub use verifier::{CriticVerifier, DEFAULT_CRITIC_INSTRUCTIONS};
 pub mod subagent;
 pub mod subagent_tools;
 pub use runner::*;
 pub use subagent_tools::{
-    AgentAsTool, RunnerChildExecutor, SubagentSession, build_subagent_task_tools,
+    AgentAsTool, ChildOutputExtractor, RunnerChildExecutor, SubagentSession,
+    build_subagent_task_tools,
 };
 
 use std::future::Future;

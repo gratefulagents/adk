@@ -16,7 +16,7 @@ use std::{
 /// the host explicitly closes the session with `Scheduler::shutdown`.
 pub struct SubagentSession {
     pub scheduler: SchedulerHandle,
-    parent: Mutex<Vec<RunItem>>,
+    parent: Mutex<(Vec<RunItem>, Vec<ItemProvenance>)>,
     staged_delivery: Mutex<HashSet<String>>,
     parent_task: Option<String>,
 }
@@ -25,7 +25,7 @@ impl SubagentSession {
     pub fn new(scheduler: SchedulerHandle) -> Self {
         Self {
             scheduler,
-            parent: Mutex::new(Vec::new()),
+            parent: Mutex::new((Vec::new(), Vec::new())),
             staged_delivery: Mutex::new(HashSet::new()),
             parent_task: None,
         }
@@ -37,7 +37,7 @@ impl SubagentSession {
         session
     }
 
-    pub(crate) fn update_parent(&self, history: &[RunItem]) {
+    pub(crate) fn update_parent(&self, history: &[RunItem], provenance: &[ItemProvenance]) {
         let completed: HashSet<_> = history
             .iter()
             .filter_map(|item| match item {
@@ -49,12 +49,13 @@ impl SubagentSession {
             .collect();
         *self.parent.lock().unwrap() = history
             .iter()
-            .filter(|item| match item {
+            .zip(provenance)
+            .filter(|(item, _)| match item {
                 RunItem::ToolCall { call } => completed.contains(call.id.as_str()),
                 _ => true,
             })
-            .cloned()
-            .collect();
+            .map(|(item, source)| (item.clone(), source.clone()))
+            .unzip();
     }
 }
 
@@ -352,7 +353,7 @@ impl Tool for SubagentTool {
                 ToolKind::Spawn => match parse::<SpawnInput>(call.arguments) {
                     Ok(input) => {
                         self.session
-                            .spawn(context, input, &self.default_agent)
+                            .spawn(context, input, &self.default_agent, false)
                             .await
                     }
                     Err(error) => Err(error),
@@ -484,6 +485,7 @@ impl Tool for AgentAsTool {
                         ..Default::default()
                     },
                     &self.agent,
+                    true,
                 )
                 .await
         })
@@ -573,6 +575,14 @@ impl SubagentSession {
             })
             .collect())
     }
+    pub(crate) fn has_pending_final_join(&self) -> bool {
+        !self.pending_ids().is_empty()
+            || self
+                .scheduler
+                .list()
+                .iter()
+                .any(|task| !task.status.is_terminal())
+    }
     pub(crate) async fn join(&self, context: &Context) -> Result<Vec<RunItem>, Error> {
         let mut ids = self.pending_ids();
         // A direct child may intentionally end a no-output turn while its own
@@ -610,6 +620,7 @@ impl SubagentSession {
         context: &ToolContext,
         input: SpawnInput,
         default_agent: &str,
+        final_text: bool,
     ) -> Result<ToolOutput, Error> {
         let background = match input.mode.trim().to_ascii_lowercase().as_str() {
             "" | "sync" => false,
@@ -685,11 +696,18 @@ impl SubagentSession {
                 }
             };
             submission.include_dependency_results = task.include_dependency_results.unwrap_or(true);
-            submission.parent_history = task
+            if task
                 .share_parent_context
                 .unwrap_or(input.share_parent_context)
-                .then(|| self.parent.lock().unwrap().clone());
+            {
+                let (history, provenance) = self.parent.lock().unwrap().clone();
+                submission.parent_history = Some(history);
+                submission.parent_history_provenance = provenance;
+            }
             submission.policy.tools = narrowed(policy.clone(), &task.tool_access)?;
+            if let Some(limit) = policy.max_child_turns {
+                submission.policy.max_turns = limit;
+            }
             if !single {
                 let mut summary =
                     json!({"key":task.key,"task_id":submission.id,"agent":submission.agent_name});
@@ -723,6 +741,18 @@ impl SubagentSession {
         let failed = tasks
             .iter()
             .any(|task| matches!(task.status, TaskStatus::Failed | TaskStatus::Cancelled));
+        if final_text && !timed_out && tasks[0].status == TaskStatus::Completed {
+            let text = if tasks[0].result.is_empty() {
+                "(no output)".into()
+            } else {
+                tasks[0].result.clone()
+            };
+            return Ok(ToolOutput {
+                content: vec![Content::Text { text }],
+                is_error: false,
+                should_pause: false,
+            });
+        }
         let mut response = if single {
             joined_task(&tasks[0])
         } else {
@@ -963,14 +993,32 @@ impl SubagentSession {
     }
 }
 
+/// Post-processes a successful child result; an empty string preserves the final output.
+pub type ChildOutputExtractor = dyn Fn(&RunResult) -> String + Send + Sync;
+
 /// Registered runners share one child execution implementation across both tool surfaces.
 pub struct RunnerChildExecutor {
     runners: HashMap<String, Runner>,
     host: Arc<dyn Host>,
+    output_extractors: HashMap<String, Arc<ChildOutputExtractor>>,
 }
 impl RunnerChildExecutor {
     pub fn new(runners: HashMap<String, Runner>, host: Arc<dyn Host>) -> Self {
-        Self { runners, host }
+        Self {
+            runners,
+            host,
+            output_extractors: HashMap::new(),
+        }
+    }
+
+    /// Applies to this registration on both named and managed delegation surfaces.
+    pub fn with_output_extractor(
+        mut self,
+        agent_name: impl Into<String>,
+        extractor: Arc<ChildOutputExtractor>,
+    ) -> Self {
+        self.output_extractors.insert(agent_name.into(), extractor);
+        self
     }
 }
 impl ChildExecutor for RunnerChildExecutor {
@@ -984,8 +1032,12 @@ impl ChildExecutor for RunnerChildExecutor {
                 .runners
                 .get(&invocation.agent_name)
                 .ok_or_else(|| invalid("unknown child runner"))?;
+            let extractor = self
+                .output_extractors
+                .get(&invocation.agent_name)
+                .map(Arc::as_ref);
             runner
-                .run_child(invocation, control, self.host.clone())
+                .run_child(invocation, control, self.host.clone(), extractor)
                 .await
         })
     }

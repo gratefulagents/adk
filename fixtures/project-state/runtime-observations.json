@@ -1,0 +1,431 @@
+{
+  "cases": [
+    {
+      "bits": 0,
+      "created": false,
+      "tool_only_created": false,
+      "tool_only_tools": [],
+      "tools": [],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 1,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [],
+      "tools": [],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 2,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 3,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 4,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 5,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 6,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 7,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 8,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context"
+      ],
+      "tools": [
+        "prime_context"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 9,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context"
+      ],
+      "tools": [
+        "prime_context"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 10,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 11,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 12,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 13,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    },
+    {
+      "bits": 14,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker "
+    },
+    {
+      "bits": 15,
+      "created": true,
+      "tool_only_created": true,
+      "tool_only_tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "tools": [
+        "memory_delete",
+        "memory_list",
+        "memory_recall",
+        "memory_remember",
+        "memory_stats",
+        "memory_update",
+        "prime_context",
+        "task_claim",
+        "task_close",
+        "task_comment",
+        "task_create",
+        "task_link",
+        "task_ready",
+        "task_show",
+        "task_update"
+      ],
+      "working_state": " existing marker \n\n## Durable Project State\nProject: offline\nWorkspace: /fixture"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/project-state-runtime-reference/reference_test.go": "75b43fc8e934fb196c6c6e27cc84e2ba0a339c9081933847f753e084e43b4497",
+      "scripts/project-state-runtime-reference/run.py": "670c1f072b38cf70ff7e6ab5cc6732f9d534f75cd8ed281e4f5ebe6bd4122482"
+    },
+    "launchPolicy": "Offline builder construction only; dummy provider key is never used for requests. Explicit disabled SDK command sandbox; no tools executed. No sandbox or provider-I/O parity claim.",
+    "normalization": "Sort tool names; replace temporary workdir with /fixture in working state. No expected outputs read by Go. Explicit native filesystem authority, redacted diagnostics and draining lifecycle are intentional differences.",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "pkg/agentsdk/projectstate/doc.go": "6056646dd195a1785c255852c3bde3f643e3715c8ccd248e4e0890c67dee9f32",
+      "pkg/agentsdk/projectstate/embedder_openai.go": "9d5f96f2283359213da78a19e79287958d81a513f972b944156aa81cca4c6339",
+      "pkg/agentsdk/projectstate/embedding.go": "340ffdff4508336617194b0d363cd58c202b4f9be3bf711835a22d5e54654fc2",
+      "pkg/agentsdk/projectstate/embedding_test.go": "809b99bc4a6f0c8ec7dbe4f18e986b18b1e948c2b9bd1670af3af2e0e80a1dc7",
+      "pkg/agentsdk/projectstate/embedstore.go": "2da65398a0a65b3d0573c987f77be6a0c875aba7260a9cb50a4fe0610209a6c8",
+      "pkg/agentsdk/projectstate/engine.go": "a33162d6812b35d4a01b160d416664f3073664b84eade8db5c4c7d22a0e48ec0",
+      "pkg/agentsdk/projectstate/filesystem.go": "b1830fa93420040c74e8ae3fab02ad91bc1c8fdc25ccfb25a58abdcdbe7295c2",
+      "pkg/agentsdk/projectstate/filesystem_test.go": "314e45098b24386b37464ac0ef645d292930fd10efd9b7a525479f0b8ce82831",
+      "pkg/agentsdk/projectstate/prime.go": "8b179aae0e2b5636acf12da7cb8274e11fc4b41ba2ee65bec39073d35060d749",
+      "pkg/agentsdk/projectstate/sqlite.go": "54f386479b9d038ec933397f21ff48d49f937dae46fb6f8fbd6c7de858d98818",
+      "pkg/agentsdk/projectstate/sqlite_test.go": "27fbbf7541ab279c826200238c89db0a20919ad43ea12e3ea17ecece5125308d",
+      "pkg/agentsdk/projectstate/types.go": "42323e4d412e2bc29bc8037d117561c8834fab912d9349bc0eddbf20ef07b56b",
+      "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
+      "pkg/agentsdk/runtime/builder_test.go": "0c557ad7d463f635b81adae340a30a8dcd4c46d83965f4f74b41f13664e98803",
+      "pkg/agentsdk/runtime/features.go": "11bd25b8b3c90af41a9bebb0142c87a845b37c20a690c9df0adc018295218877",
+      "pkg/agentsdk/runtime/session_state_test.go": "c63f98375106bf2cf2a20f7f13cfb915e76ef6fcdf482f9f49b124550bc3e6c0"
+    }
+  }
+}

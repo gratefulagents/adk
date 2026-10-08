@@ -86,6 +86,9 @@ impl Model for ControlledModel {
                 return Err(Error::new(ErrorCategory::Provider, "controlled failure"));
             }
             Ok(ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items: vec![RunItem::Message {
                     message: Message {
                         role: Role::Assistant,
@@ -229,6 +232,7 @@ async fn run_case(case: &Value) -> Value {
             .execute(
                 &context(),
                 ToolCall {
+                    raw_arguments: None,
                     id: step["name"].as_str().unwrap().into(),
                     name: name.into(),
                     arguments,

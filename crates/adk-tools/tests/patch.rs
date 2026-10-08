@@ -42,6 +42,7 @@ async fn call(root: &Path, arguments: Value) -> ToolOutput {
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "test".into(),
                 name: "ApplyPatch".into(),
                 arguments,
@@ -332,13 +333,14 @@ async fn full_access_remains_confined_and_cancellation_precedes_mutation() {
     let registry = registry(AccessMode::FullAccess);
     let tool = registry.get("ApplyPatch").unwrap();
     let mut ctx = context(root.path());
-    let output = tool.execute(&ctx,ToolCall {id:"test".into(),name:"ApplyPatch".into(),arguments:json!({"patch":"*** Begin Patch\n*** Add File: ../escape\n+x\n*** End Patch"})}).await.unwrap();
+    let output = tool.execute(&ctx,ToolCall {raw_arguments: None,id:"test".into(),name:"ApplyPatch".into(),arguments:json!({"patch":"*** Begin Patch\n*** Add File: ../escape\n+x\n*** End Patch"})}).await.unwrap();
     assert!(output.is_error);
     ctx.operation.deadline = Some(std::time::Instant::now());
     let result = tool
         .execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "test".into(),
                 name: "ApplyPatch".into(),
                 arguments: json!({"patch":"*** Begin Patch\n*** Add File: new\n+x\n*** End Patch"}),

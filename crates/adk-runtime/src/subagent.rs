@@ -128,6 +128,7 @@ impl SecurityBaseline {
                     ApprovalPolicy::RequiredByTool
                 },
                 timeout: min_limit(a.timeout, b.timeout),
+                max_child_turns: min_limit(a.max_child_turns, b.max_child_turns),
             },
             input_guardrails: self
                 .input_guardrails
@@ -159,6 +160,7 @@ impl SecurityBaseline {
                 .is_subset(&a.allowed_mutating_tools)
             && (a.approval != ApprovalPolicy::All || b.approval == ApprovalPolicy::All)
             && narrower_limit(a.timeout, b.timeout)
+            && narrower_limit(a.max_child_turns, b.max_child_turns)
             && self.input_guardrails.is_subset(&current.input_guardrails)
             && self.output_guardrails.is_subset(&current.output_guardrails)
             && (!self.untrusted_tool_outputs || current.untrusted_tool_outputs)
@@ -267,6 +269,8 @@ pub struct Submission {
     pub include_dependency_results: bool,
     /// Explicitly copied history. None means a fresh conversation, never ambient history.
     pub parent_history: Option<Vec<RunItem>>,
+    #[serde(default)]
+    pub parent_history_provenance: Vec<adk_core::ItemProvenance>,
     pub security: Option<SecurityBaseline>,
     pub policy: RunPolicy,
 }
@@ -280,6 +284,7 @@ impl Submission {
             dependency_policy: DependencyPolicy::AllSuccess,
             include_dependency_results: true,
             parent_history: None,
+            parent_history_provenance: Vec::new(),
             security: None,
             policy: RunPolicy::default(),
         }
@@ -645,6 +650,16 @@ impl Drop for Scheduler {
 }
 
 impl SchedulerHandle {
+    pub fn agent_names(&self) -> impl Iterator<Item = &str> {
+        self.inner.config.agents.keys().map(String::as_str)
+    }
+
+    /// The owner's immutable global concurrency ceiling, shared by all scopes.
+    /// Reading it grants no authority to resize an existing scheduler.
+    pub fn max_concurrency(&self) -> usize {
+        self.inner.config.max_concurrency
+    }
+
     fn close(&self) {
         self.inner.closed.store(true, Ordering::SeqCst);
         for token in self.inner.cancellations.lock().unwrap().values() {
@@ -821,6 +836,10 @@ impl SchedulerHandle {
             }
             let mut ids = Vec::new();
             for mut submission in requests {
+                submission.parent_history_provenance = adk_core::normalize_provenance(
+                    submission.parent_history.as_ref().map_or(0, Vec::len),
+                    &submission.parent_history_provenance,
+                )?;
                 if submission.message.trim().is_empty() {
                     return Err(invalid("empty child message"));
                 }
@@ -1197,6 +1216,14 @@ impl SchedulerHandle {
 fn validate_graph(records: &[CheckpointRecord]) -> Result<(), Error> {
     let mut remaining = BTreeMap::new();
     for record in records {
+        adk_core::normalize_provenance(
+            record
+                .submission
+                .parent_history
+                .as_ref()
+                .map_or(0, Vec::len),
+            &record.submission.parent_history_provenance,
+        )?;
         let id = &record.task.id;
         if id.is_empty()
             || remaining
@@ -1462,6 +1489,22 @@ impl ChildControl {
             .await
     }
 
+    pub(crate) async fn reopen_message_admission(&self) -> Result<(), Error> {
+        self.handle
+            .transact(|state| {
+                let record = record_mut(state, &self.id)?;
+                if record.task.status != TaskStatus::Running {
+                    return Err(invalid("child is not running"));
+                }
+                if self.handle.token(&self.id).is_cancelled() {
+                    return Err(Error::new(ErrorCategory::Cancelled, "child cancelled"));
+                }
+                record.accepting_messages = true;
+                Ok(())
+            })
+            .await
+    }
+
     /// In-flight messages precede new messages. Retry with the same IDs is safe;
     /// acknowledgement must follow committing their application to child history.
     pub async fn take_messages(&self) -> Result<Vec<SteeringMessage>, Error> {
@@ -1638,6 +1681,9 @@ async fn execute_once(
         })
         .collect();
     let mut input = record.submission.parent_history.clone().unwrap_or_default();
+    let mut input_provenance =
+        adk_core::normalize_provenance(input.len(), &record.submission.parent_history_provenance)
+            .expect("validated submission provenance");
     if record.submission.include_dependency_results && !dependencies.is_empty() {
         let context =
             serde_json::to_string(&dependencies).expect("serializable dependency results");
@@ -1646,6 +1692,7 @@ async fn execute_once(
         )));
     }
     input.push(user_message(record.submission.message.clone()));
+    input_provenance.resize(input.len(), adk_core::ItemProvenance::Unattributed);
     let context = Context {
         run_id: format!("{}/{}", handle.inner.context.run_id, id),
         cancellation: Arc::new(token.clone()),
@@ -1656,6 +1703,7 @@ async fn execute_once(
         agent_name: record.task.agent_name,
         context,
         request: RunRequest {
+            input_provenance,
             input,
             policy: RunPolicy {
                 tools: record.security_baseline.tools.clone(),

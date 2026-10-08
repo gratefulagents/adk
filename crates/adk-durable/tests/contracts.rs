@@ -45,10 +45,18 @@ fn go_fixtures_migration_full_types_and_recovery() {
     let migrated = decode_document(&fixture("v1.json")).unwrap();
     let expected = decode_document(&fixture("v1-migrated.json")).unwrap();
     assert_eq!(migrated, expected);
+    assert_eq!(
+        serde_json::from_slice::<Value>(&encode_document(&migrated).unwrap()).unwrap(),
+        serde_json::from_slice::<Value>(&fixture("v1-migrated.json")).unwrap(),
+    );
     assert_eq!(migrated.snapshot.cumulative_budget.input_tokens, 123);
     assert_eq!(migrated.events[0].sequence, 1);
     assert_eq!(migrated.snapshot.status, RunStatus::Pending);
     let doc = decode_document(&fixture("v2.json")).unwrap();
+    assert_eq!(
+        serde_json::from_slice::<Value>(&encode_document(&doc).unwrap()).unwrap(),
+        serde_json::from_slice::<Value>(&fixture("v2.json")).unwrap(),
+    );
     assert_eq!(
         decode_document(&encode_document(&doc).unwrap()).unwrap(),
         doc
@@ -102,7 +110,12 @@ fn schema_and_effects_fail_closed() {
     ));
     value["snapshot"]["schema_version"] = json!(2);
     value["snapshot"]["effects"][0]["classification"] = json!("future-danger");
-    assert!(decode_document(&serde_json::to_vec(&value).unwrap()).is_err());
+    let unknown = decode_document(&serde_json::to_vec(&value).unwrap()).unwrap();
+    assert_eq!(
+        recover_effect(&unknown.snapshot.effects[0]).action,
+        RecoveryAction::None
+    );
+    assert!(!recover_effect(&unknown.snapshot.effects[0]).automatic);
     use EffectState::*;
     for initial in [Prepared, Dispatched, Succeeded, Failed, OutcomeUnknown] {
         for next in [Prepared, Dispatched, Succeeded, Failed, OutcomeUnknown] {
@@ -111,10 +124,10 @@ fn schema_and_effects_fail_closed() {
                 EffectClassification::NonReplayable,
                 Utc::now(),
             );
-            effect.state = initial;
+            effect.state = initial.clone();
             let before = effect.clone();
             let valid = matches!(
-                (initial, next),
+                (&initial, &next),
                 (Prepared, Dispatched | Failed)
                     | (Dispatched, Succeeded | Failed | OutcomeUnknown)
                     | (OutcomeUnknown, Succeeded | Failed)
@@ -248,7 +261,7 @@ fn store_contract(store: &dyn RunStore, tenant: &str) {
         ("forever", None),
     ] {
         let mut snap = snapshot(t.as_str(), name);
-        snap.retain_until = deadline;
+        snap.retain_until = deadline.map(|time| time.fixed_offset());
         store.create(snap).unwrap();
     }
     assert_eq!(
@@ -360,7 +373,7 @@ fn fault_contract(store: &dyn RunStore, fail: &AtomicBool, tenant: &str) {
     for state in [EffectState::Dispatched, EffectState::Succeeded] {
         let mut next = snap.clone();
         next.revision += 1;
-        transition_effect(&mut next.effects[0], state, Utc::now()).unwrap();
+        transition_effect(&mut next.effects[0], state.clone(), Utc::now()).unwrap();
         fail.store(true, Ordering::SeqCst);
         assert!(
             store
@@ -1109,5 +1122,58 @@ mod pg {
         assert_eq!(winners, 1);
         assert_eq!(s.load(&lease.tenant_id, &lease.run_id).unwrap().1.len(), 1);
         cleanup(&url, &schema);
+    }
+}
+
+#[test]
+fn fixed_offsets_survive_filesystem_persistence() {
+    let cases: Vec<Value> = serde_json::from_slice(&fixture("records.json")).unwrap();
+    let expected = &cases
+        .iter()
+        .find(|c| c["record"] == "RunSnapshot" && c["case"] == "timestamp_01")
+        .unwrap()["expected"];
+    for options in [StoreOptions::default(), encrypted()] {
+        let dir = tempfile::tempdir().unwrap();
+        let store = FilesystemStore::new(dir.path(), options).unwrap();
+        let mut snapshot: RunSnapshot = serde_json::from_value(expected.clone()).unwrap();
+        store.create(snapshot.clone()).unwrap();
+        let (loaded, _) = store.load(&snapshot.tenant_id, &snapshot.run_id).unwrap();
+        assert_eq!(serde_json::to_value(loaded).unwrap(), *expected);
+        let lease = store
+            .acquire_lease(
+                &snapshot.tenant_id,
+                &snapshot.run_id,
+                "worker",
+                Duration::from_secs(60),
+            )
+            .unwrap();
+        let revision = snapshot.revision;
+        snapshot.revision += 1;
+        let event = Event {
+            at: snapshot.updated_at,
+            ..Event::default()
+        };
+        store
+            .append(
+                &lease,
+                revision,
+                vec![event, Event::default()],
+                snapshot.clone(),
+            )
+            .unwrap();
+        let (loaded, events) = store.load(&snapshot.tenant_id, &snapshot.run_id).unwrap();
+        snapshot.event_sequence += 2;
+        assert_eq!(
+            serde_json::to_value(loaded).unwrap(),
+            serde_json::to_value(snapshot).unwrap()
+        );
+        assert_eq!(
+            serde_json::to_value(&events[0]).unwrap()["at"],
+            "2025-01-02T03:04:05.1+05:45"
+        );
+        assert_eq!(
+            serde_json::to_value(&events[1]).unwrap()["at"],
+            "2025-01-01T21:19:05.1Z"
+        );
     }
 }

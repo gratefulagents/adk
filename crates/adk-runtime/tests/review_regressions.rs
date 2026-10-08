@@ -23,6 +23,9 @@ fn text(value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(true),
@@ -46,6 +49,7 @@ fn policy() -> RunPolicy {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: policy(),
     }
@@ -256,6 +260,7 @@ async fn conversation_can_adopt_failed_resume_and_continue_without_repeated_effe
         vec![
             Ok(response(vec![RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "approved-call".into(),
                     name: "count".into(),
                     arguments: json!({}),

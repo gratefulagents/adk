@@ -1,0 +1,1034 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "name": "poll_before_first_request",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-2"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "poll_before_first_request",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-2"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "poll_after_tool_response",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-2"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    },
+    {
+      "name": "poll_after_tool_response",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "polled-2"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "polled-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    },
+    {
+      "name": "poll_error_best_effort",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "poll_error_best_effort",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "finalizer_late_input",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": "oracle",
+              "message": "answer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "late"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    },
+    {
+      "name": "finalizer_late_input",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": "oracle",
+              "message": "answer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "late"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    },
+    {
+      "name": "empty_finalizer_ends",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "empty_finalizer_ends",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": "answer-1",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "finalizer_error_propagated",
+      "streaming": false,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": null,
+      "error": "finalizer_error",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "finalizer_error_propagated",
+      "streaming": true,
+      "max_turns": 3,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 1,
+      "finalizer_calls": 1,
+      "tool_calls": 0,
+      "output": null,
+      "error": "finalizer_error",
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        }
+      ]
+    },
+    {
+      "name": "max_turns_finalizer_extends",
+      "streaming": false,
+      "max_turns": 1,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "late"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    },
+    {
+      "name": "max_turns_finalizer_extends",
+      "streaming": true,
+      "max_turns": 1,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "late"
+            }
+          ]
+        }
+      ],
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "late"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ]
+    }
+  ]
+}

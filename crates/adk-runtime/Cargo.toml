@@ -19,7 +19,11 @@ futures-util = { version = "0.3", default-features = false, features = ["std"] }
 serde_json.workspace = true
 schemars.workspace = true
 sha2 = "0.10"
+# Match the pinned SDK's Unicode 15 printability contract.
+unicode-general-category = "=0.6.0"
 jsonschema = { version = "0.33", default-features = false }
+
+uuid = { version = "1", features = ["v4"] }
 
 [dev-dependencies]
 tempfile = "3"

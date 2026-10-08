@@ -59,7 +59,8 @@ fn fixture_history(items: &Value) -> (Vec<RunItem>, Vec<ApprovalMarkerBoundary>)
                     item["agent"]
                         .as_str()
                         .map(|name| AgentRef { name: name.into() }),
-                ),
+                )
+                .unwrap(),
             });
         } else {
             history.push(serde_json::from_value(item.clone()).unwrap());
@@ -72,6 +73,7 @@ fn policy(case: &Value) -> LocalCompactionPolicy {
     let get = |key, default| case["policy"][key].as_u64().unwrap_or(default);
     LocalCompactionPolicy {
         enabled: !case["disabled"].as_bool().unwrap(),
+        use_llm_summary: true,
         trigger_tokens: get("trigger_tokens", default.trigger_tokens),
         target_tokens: get("target_tokens", default.target_tokens),
         preserve_recent_items: get(
@@ -216,6 +218,7 @@ fn identical_wire_markers_retain_distinct_phases_and_missing_input() {
 
 fn model_request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "scripted".into(),
         instructions: "instructions".into(),
         input: vec![],
@@ -300,6 +303,7 @@ async fn compactor_adapter_is_local_zero_usage_and_cost() {
         deadline: None,
     };
     let request = runner::CompactionRequest {
+        history_provenance: Vec::new(),
         agent: "assistant".into(),
         model: "never-called".into(),
         context_tokens: estimate_history_tokens(&history) + 500,
@@ -318,6 +322,7 @@ async fn compactor_adapter_is_local_zero_usage_and_cost() {
         .compact(
             &context,
             runner::CompactionRequest {
+                history_provenance: Vec::new(),
                 agent: "assistant".into(),
                 model: "never-called".into(),
                 history: history.clone(),
@@ -449,6 +454,9 @@ fn msg(role: Role, text: impl Into<String>) -> RunItem {
 }
 fn reply(items: Vec<RunItem>, end: bool, context_tokens: Option<u64>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 100,
@@ -463,6 +471,7 @@ fn reply(items: Vec<RunItem>, end: bool, context_tokens: Option<u64>) -> ModelRe
 }
 fn run_request(input: Vec<RunItem>) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input,
         policy: RunPolicy {
             max_turns: std::num::NonZeroU32::new(3).unwrap(),
@@ -479,7 +488,7 @@ fn run_context(token: Arc<CancellationToken>) -> Context {
     }
 }
 #[tokio::test]
-async fn default_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items()
+async fn deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items()
  {
     let case = inputs()
         .into_iter()
@@ -508,6 +517,10 @@ async fn default_runner_compacts_first_request_and_preserves_cache_transients_an
     );
     agent.instructions = "stable instructions".into();
     let config = runner::RunnerConfig {
+        local_compaction: LocalCompactionPolicy {
+            use_llm_summary: false,
+            ..Default::default()
+        },
         cache_prefix: "stable prefix".into(),
         prompt_cache_key: Some("logical".into()),
         prompt_cache_namespace: Some("namespace".into()),
@@ -610,6 +623,10 @@ async fn recoverable_custom_compactor_failures_fall_back_to_local_or_noop() {
             });
             let observations = Arc::new(CompactionObservations::default());
             let config = runner::RunnerConfig {
+                local_compaction: LocalCompactionPolicy {
+                    use_llm_summary: false,
+                    ..Default::default()
+                },
                 compaction: Some(runner::CompactionConfig {
                     trigger_tokens: 2,
                     target_tokens: 1,
@@ -752,6 +769,7 @@ fn compaction_preserves_phased_multimodal_items_tool_pairs_and_provider_origins(
         },
         RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "images".into(),
                 name: "inspect".into(),
                 arguments: json!({}),
@@ -860,4 +878,101 @@ fn phased_text_has_the_same_local_compaction_semantics_as_plain_text() {
         })
         .collect();
     assert_eq!(unphased, expected.history);
+}
+
+#[tokio::test]
+async fn identical_messages_retain_source_positions_and_summaries_are_unattributed() {
+    let message = |role, text: String| RunItem::Message {
+        message: Message {
+            role,
+            content: vec![Content::Text { text }],
+        },
+    };
+    let mut history = vec![message(Role::User, "task".into())];
+    for _ in 0..16 {
+        history.push(message(Role::Assistant, "old detail ".repeat(100)));
+    }
+    // The first duplicate is removed and the second retained. Content lookup would choose A.
+    history.push(message(Role::Assistant, "identical".into()));
+    for _ in 0..8 {
+        history.push(message(Role::Assistant, "other detail ".repeat(100)));
+    }
+    history.push(message(Role::Assistant, "identical".into()));
+    let mut provenance = vec![ItemProvenance::Agent { name: "A".into() }; history.len()];
+    *provenance.last_mut().unwrap() = ItemProvenance::Agent { name: "B".into() };
+    let compactor = LocalCompactor {
+        policy: LocalCompactionPolicy {
+            trigger_tokens: 1000,
+            target_tokens: 700,
+            preserve_recent_items: 1,
+            preserve_initial_user_messages: 1,
+            ..Default::default()
+        },
+    };
+    let output = compactor
+        .compact(
+            &Context {
+                run_id: "identity".into(),
+                cancellation: Arc::new(CancellationToken::new()),
+                deadline: None,
+            },
+            runner::CompactionRequest {
+                agent: "current".into(),
+                model: "model".into(),
+                context_tokens: estimate_history_tokens(&history),
+                target_tokens: 700,
+                history: history.clone(),
+                history_provenance: provenance,
+            },
+        )
+        .await
+        .unwrap();
+    assert!(output.history.len() < history.len());
+    assert_eq!(output.history.len(), output.history_provenance.len());
+    assert_eq!(output.history.last(), history.last());
+    assert_eq!(
+        output.history_provenance.last(),
+        Some(&ItemProvenance::Agent { name: "B".into() })
+    );
+    let summary = output.history.iter().position(|item| matches!(item, RunItem::Message { message } if matches!(&message.content[0], Content::Text { text } if text.starts_with(SUMMARY_MARKER)))).unwrap();
+    assert_eq!(
+        output.history_provenance[summary],
+        ItemProvenance::Unattributed
+    );
+}
+
+#[test]
+fn raw_argument_estimates_and_handoff_pairs_survive_local_compaction() {
+    let raw = format!("{{\"n\":{}1}}", " ".repeat(128));
+    let call = ToolCall {
+        id: "transfer".into(),
+        name: "transfer_to_target".into(),
+        arguments: serde_json::from_str(&raw).unwrap(),
+        raw_arguments: Some(raw.clone()),
+    };
+    let item = RunItem::ToolCall { call: call.clone() };
+    let marker = ApprovalMarkerBoundary {
+        before_item: 1,
+        marker: ApprovalMarker::from_call(&call, ApprovalPhase::Approved, None).unwrap(),
+    };
+    assert_eq!(
+        estimate_history_tokens_with_approvals(
+            std::slice::from_ref(&item),
+            std::slice::from_ref(&marker)
+        ),
+        2 * (estimate_string_tokens(&call.name) + estimate_string_tokens(&raw)) + 24
+    );
+    let handoff = RunItem::Handoff {
+        call_id: call.id.clone(),
+        agent: "target".into(),
+    };
+    let history = vec![item.clone(), handoff.clone()];
+    assert_eq!(
+        finalize_local_history(std::slice::from_ref(&handoff), &history),
+        history
+    );
+    assert_eq!(
+        finalize_local_history(std::slice::from_ref(&item), &history),
+        history
+    );
 }

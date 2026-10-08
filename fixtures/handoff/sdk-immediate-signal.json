@@ -1,0 +1,1294 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "name": "before_visible_max_turns_3",
+      "streaming": false,
+      "max_turns": 3,
+      "signal_after": "pending_model_attempt",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": true,
+      "retry_advice_calls": 1,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [],
+      "consumed_stream_deltas": []
+    },
+    {
+      "name": "before_visible_max_turns_3",
+      "streaming": true,
+      "max_turns": 3,
+      "signal_after": "pending_model_attempt",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": true,
+      "retry_advice_calls": 1,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": []
+    },
+    {
+      "name": "before_visible_max_turns_1",
+      "streaming": false,
+      "max_turns": 1,
+      "signal_after": "pending_model_attempt",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": true,
+      "retry_advice_calls": 1,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [],
+      "consumed_stream_deltas": []
+    },
+    {
+      "name": "before_visible_max_turns_1",
+      "streaming": true,
+      "max_turns": 1,
+      "signal_after": "pending_model_attempt",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": true,
+      "retry_advice_calls": 1,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": []
+    },
+    {
+      "name": "after_visible_text_finalizer_max_turns_1",
+      "streaming": true,
+      "max_turns": 1,
+      "signal_after": "host_received_model.delta",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": "oracle",
+              "message": "answer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": false,
+      "retry_advice_calls": 0,
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "finalizer",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-1"
+          }
+        ],
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": [
+        {
+          "name": "model.delta",
+          "text": "visible-first-attempt"
+        }
+      ]
+    },
+    {
+      "name": "after_visible_text_tool_boundary",
+      "streaming": true,
+      "max_turns": 3,
+      "signal_after": "host_received_model.delta",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": false,
+      "retry_advice_calls": 0,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "tool_call",
+            "agent": "oracle",
+            "tool_call": {
+              "id": "call-1",
+              "name": "inspect",
+              "input": {}
+            }
+          }
+        ],
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": [
+        {
+          "name": "model.delta",
+          "text": "visible-first-attempt"
+        }
+      ]
+    },
+    {
+      "name": "after_visible_reasoning_finalizer_max_turns_1",
+      "streaming": true,
+      "max_turns": 1,
+      "signal_after": "host_received_model.reasoning_delta",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "message",
+              "agent": "oracle",
+              "message": "answer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": false,
+      "retry_advice_calls": 0,
+      "poll_calls": 2,
+      "finalizer_calls": 2,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "finalizer",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-1"
+          }
+        ],
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": [
+        {
+          "name": "model.reasoning_delta",
+          "text": "visible-first-attempt"
+        }
+      ]
+    },
+    {
+      "name": "after_visible_reasoning_tool_boundary",
+      "streaming": true,
+      "max_turns": 3,
+      "signal_after": "host_received_model.reasoning_delta",
+      "request_count": 2,
+      "requests": [
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            }
+          ]
+        },
+        {
+          "input": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "initial"
+            },
+            {
+              "type": "tool_call",
+              "agent": "oracle",
+              "tool_call": {
+                "id": "call-1",
+                "name": "inspect",
+                "input": {}
+              }
+            },
+            {
+              "type": "tool_output",
+              "agent": "oracle",
+              "tool_output": {
+                "call_id": "call-1",
+                "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+              }
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        }
+      ],
+      "first_attempt_canceled": false,
+      "retry_advice_calls": 0,
+      "poll_calls": 2,
+      "finalizer_calls": 1,
+      "callbacks": [
+        {
+          "name": "poll",
+          "items": []
+        },
+        {
+          "name": "poll",
+          "items": [
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-1"
+            },
+            {
+              "type": "message",
+              "agent": null,
+              "message": "steer-2"
+            }
+          ]
+        },
+        {
+          "name": "finalizer",
+          "items": []
+        }
+      ],
+      "tool_calls": 1,
+      "output": "answer-2",
+      "error": "none",
+      "accepted_responses": [
+        [
+          {
+            "type": "tool_call",
+            "agent": "oracle",
+            "tool_call": {
+              "id": "call-1",
+              "name": "inspect",
+              "input": {}
+            }
+          }
+        ],
+        [
+          {
+            "type": "message",
+            "agent": "oracle",
+            "message": "answer-2"
+          }
+        ]
+      ],
+      "new_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "history": [
+        {
+          "type": "message",
+          "agent": null,
+          "message": "initial"
+        },
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool result\nEND UNTRUSTED TOOL OUTPUT"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_items": [
+        {
+          "type": "tool_call",
+          "agent": "oracle",
+          "tool_call": {
+            "id": "call-1",
+            "name": "inspect",
+            "input": {}
+          }
+        },
+        {
+          "type": "tool_output",
+          "agent": "oracle",
+          "tool_output": {
+            "call_id": "call-1",
+            "content": "tool result"
+          }
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-1"
+        },
+        {
+          "type": "message",
+          "agent": null,
+          "message": "steer-2"
+        },
+        {
+          "type": "message",
+          "agent": "oracle",
+          "message": "answer-2"
+        }
+      ],
+      "consumed_stream_deltas": [
+        {
+          "name": "model.reasoning_delta",
+          "text": "visible-first-attempt"
+        }
+      ]
+    }
+  ]
+}

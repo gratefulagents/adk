@@ -48,6 +48,7 @@ fn scope(mode: AuthMode) -> Scope {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "fixture-model".into(),
         instructions: "Be precise".into(),
         input: Vec::new(),
@@ -897,6 +898,31 @@ fn executed_go_cost_catalog_and_retry_goldens_match() {
 }
 
 #[test]
+fn anthropic_ignores_sdk_verbosity_without_losing_reasoning_budget() {
+    let mut input = request();
+    input.model = "claude-sonnet-4-6".into();
+    input.settings = adk_runtime::settings::routing_settings("medium", "medium");
+    let body = wire::request(&input, Protocol::Anthropic, false).unwrap();
+    assert!(body.get("text_verbosity").is_none());
+    assert!(body.get("text").is_none());
+    assert_eq!(
+        body["thinking"],
+        json!({"type":"enabled", "budget_tokens":4096})
+    );
+    input.settings.insert("text_verbosity".into(), json!(7));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_err());
+    input
+        .settings
+        .insert("text_verbosity".into(), json!("invalid"));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_ok());
+    for key in ["model_fallbacks", "compaction_threshold"] {
+        let mut invalid = input.clone();
+        invalid.settings.insert(key.into(), json!(1));
+        assert!(wire::request(&invalid, Protocol::Anthropic, false).is_err());
+    }
+}
+
+#[test]
 fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     let mut input = request();
     input.settings.insert(
@@ -944,6 +970,19 @@ fn executed_go_chat_stream_matches_at_every_chunk_boundary() {
     let source = golden["chat_sse"].as_str().unwrap().as_bytes();
     let mut expected = wire::response(&golden["chat_sse_response"], Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "chat-fixture",
+        "choices": [{"finish_reason": "tool_calls", "message": {
+            "content": "héllo", "reasoning_content": "why ", "reasoning_details": null,
+            "reasoning_opaque": null, "tool_calls": [{"id": "call-fixture", "type": "function",
+                "function": {"name": "lookup", "arguments": "{\"q\":1}"}}]
+        }}],
+        "usage": {"prompt_tokens": 100, "completion_tokens": 20,
+            "prompt_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     for split in 0..=source.len() {
         let mut decoder = Decoder::default();
         let mut stream = StreamState::new(Protocol::Chat);
@@ -1049,6 +1088,20 @@ fn executed_go_sparse_responses_stream_retains_deltas_at_every_boundary() {
     let reference = &golden["responses_sparse_sse_response"];
     let mut expected = wire::response(reference, Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "responses-fixture", "model": "gpt-5.6", "end_turn": false, "status": "completed",
+        "output": [
+            {"type": "reasoning", "id": "reasoning-fixture", "encrypted_content": "opaque",
+                "summary": [{"type": "summary_text", "text": "why"}]},
+            {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "héllo"}]},
+            {"type": "function_call", "id": "item-fixture", "call_id": "call-fixture", "name": "lookup", "arguments": "{\"q\":1}"}
+        ],
+        "usage": {"input_tokens": 100, "output_tokens": 20,
+            "input_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     let adk_core::RunItem::Reasoning { reasoning } = &mut expected.items[0] else {
         panic!()
     };
@@ -1203,4 +1256,103 @@ fn compatible_chat_multipart_narration_and_truncated_tool_arguments_match_refere
         assert_eq!(call.id, "call_0");
         assert_eq!(call.arguments, json!({}));
     }
+}
+
+#[test]
+fn provider_response_retains_whole_body_not_just_metadata() {
+    for (protocol, mut body) in [
+        (
+            Protocol::Chat,
+            json!({"choices": [{"message": {"content": "answer"}, "finish_reason": "stop"}]}),
+        ),
+        (
+            Protocol::Responses,
+            json!({"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": "answer"}]}]}),
+        ),
+        (
+            Protocol::Anthropic,
+            json!({"content": [{"type": "text", "text": "answer"}], "stop_reason": "end_turn"}),
+        ),
+    ] {
+        body["metadata"] = json!({"key": "value"});
+        body["provider_extension"] = json!({"nested": [null, false, "extra"]});
+        let response = wire::response(&body, protocol).unwrap();
+        assert_eq!(response.usage.requests, 1);
+        assert_eq!(response.raw.as_ref(), Some(&body));
+        assert_eq!(
+            response.metadata,
+            body["metadata"].as_object().unwrap().clone()
+        );
+        assert_eq!(
+            serde_json::from_value::<adk_core::ModelResponse>(
+                serde_json::to_value(&response).unwrap()
+            )
+            .unwrap(),
+            response
+        );
+    }
+}
+
+#[test]
+fn tool_argument_text_survives_provider_normalization_and_request_replay() {
+    for raw in [" { \"n\":1e0, \"n\":2 } ", " ", "{", "null", "[1,2]"] {
+        let response=wire::response(&json!({"choices":[{"message":{"tool_calls":[{"id":"c","function":{"name":"transfer","arguments":raw}}]},"finish_reason":"tool_calls"}]}),Protocol::Chat).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!("expected call")
+        };
+        let normalized = if serde_json::from_str::<serde_json::Value>(raw).is_ok() {
+            raw.trim()
+        } else {
+            "{}"
+        };
+        assert_eq!(call.argument_text(), normalized);
+        call.validate_argument_projection().unwrap();
+        let mut req = request();
+        req.instructions.clear();
+        req.input = response.items;
+        let replay = wire::request(&req, Protocol::Chat, false).unwrap();
+        assert_eq!(
+            replay["messages"][0]["tool_calls"][0]["function"]["arguments"],
+            normalized
+        );
+        let replay = wire::request(&req, Protocol::Responses, false).unwrap();
+        assert_eq!(replay["input"][0]["arguments"], normalized);
+    }
+    let mut chat = StreamState::new(Protocol::Chat);
+    let streamed_raw = r#" { "n":1e0, "n":2 } "#;
+    chat.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"c","function":{"name":"transfer","arguments":streamed_raw}}]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+    let events = chat.event("[DONE]").unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), streamed_raw);
+    let response=wire::response_json(br#"{"content":[{"type":"tool_use","id":"c","name":"transfer","input":{ "n":1e0, "n":2 }}],"stop_reason":"tool_use"}"#,Protocol::Anthropic).unwrap();
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
+    let mut state = StreamState::new(Protocol::Anthropic);
+    for event in [
+        json!({"type":"message_start","message":{"id":"m","usage":{}}}),
+        json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"c","name":"transfer","input":{}}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{ \"n\":1e0,"}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":" \"n\":2 }"}}),
+        json!({"type":"content_block_stop","index":0}),
+        json!({"type":"message_delta","delta":{"stop_reason":"tool_use"},"usage":{"output_tokens":2}}),
+    ] {
+        state.event(&event.to_string()).unwrap();
+    }
+    let events = state.event(r#"{"type":"message_stop"}"#).unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
 }

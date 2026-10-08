@@ -52,6 +52,7 @@ fn input_items(items: &Value, role: Role) -> Vec<RunItem> {
             },
             "tool_call" => RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: item["id"].as_str().unwrap().into(),
                     name: item["name"].as_str().unwrap().into(),
                     arguments: item["arguments"].clone(),
@@ -84,6 +85,9 @@ impl ScriptModel {
             return Err(Error::new(ErrorCategory::Provider, error));
         }
         let response = ModelResponse {
+            snapshot_raw: None,
+            snapshot_projection: None,
+            raw: None,
             items: input_items(&script["items"], Role::Assistant),
             usage: Usage {
                 input_tokens: script["input_tokens"].as_u64().unwrap(),
@@ -332,6 +336,11 @@ async fn replay(script: &Value) -> Value {
         let mut target = AgentConfig::new("target", binding);
         target.instructions = "Follow the replay script.".into();
         agent.handoffs = vec![adk_runtime::Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            input_filter: Default::default(),
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "Transfer".into(),
@@ -407,6 +416,7 @@ async fn replay(script: &Value) -> Value {
         deadline: None,
     };
     let request = RunRequest {
+        input_provenance: Vec::new(),
         input: input_items(&script["input"], Role::User),
         policy: RunPolicy {
             max_turns: match script["max_turns"].as_i64().unwrap() {

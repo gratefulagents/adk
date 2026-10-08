@@ -34,6 +34,7 @@ async fn call(root: &Path, access: AccessMode, arguments: Value) -> ToolOutput {
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "test".into(),
                 name: "Write".into(),
                 arguments,
@@ -243,6 +244,7 @@ async fn cancelled_write_and_special_files_never_change_contents() {
             .execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "Write".into(),
                     arguments: json!({"file_path":"a","content":"bad"}),

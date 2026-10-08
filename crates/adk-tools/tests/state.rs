@@ -47,6 +47,7 @@ async fn invoke_expected(
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments,

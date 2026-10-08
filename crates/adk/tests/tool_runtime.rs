@@ -66,6 +66,7 @@ impl Model for TestModel {
                     .into_iter()
                     .map(|name| RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: None,
                             id: name.into(),
                             name: name.into(),
                             arguments: Default::default(),
@@ -76,6 +77,9 @@ impl Model for TestModel {
                 vec![]
             };
             Ok(ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items,
                 usage: Usage::default(),
                 end_turn: Some(requests.len() > 1),
@@ -107,6 +111,7 @@ fn context() -> Context {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: RunPolicy::default(),
     }

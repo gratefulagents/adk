@@ -61,6 +61,7 @@ async fn invoke(tools: &[Arc<dyn Tool>], name: &str, id: &str, arguments: Value)
         .execute(
             &context(),
             ToolCall {
+                raw_arguments: None,
                 id: id.into(),
                 name: name.into(),
                 arguments,

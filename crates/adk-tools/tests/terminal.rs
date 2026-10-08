@@ -39,6 +39,7 @@ async fn execute(bundle: &shell::ShellBundle, ctx: &ToolContext, args: Value) ->
     tool.execute(
         ctx,
         ToolCall {
+            raw_arguments: None,
             id: "term".into(),
             name: "Terminal".into(),
             arguments: args,

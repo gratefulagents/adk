@@ -30,6 +30,7 @@ fn definition() -> ToolDefinition {
 }
 fn call(command: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call-1".into(),
         name: "shell".into(),
         arguments: json!({"command": command}),
@@ -70,6 +71,30 @@ fn composition_clamps_all_axes() {
     assert_eq!(a.compose(&a), a);
     assert_eq!(normalize_access("fulll"), AccessMode::ReadOnly);
     assert_eq!(normalize_access(""), AccessMode::ReadOnly);
+}
+
+#[test]
+fn child_turn_limits_compose_without_widening() {
+    for left in [
+        None,
+        std::num::NonZeroU32::new(2),
+        std::num::NonZeroU32::new(8),
+    ] {
+        for right in [
+            None,
+            std::num::NonZeroU32::new(3),
+            std::num::NonZeroU32::new(10),
+        ] {
+            let mut a = SecurityPolicy::default();
+            let mut b = SecurityPolicy::default();
+            a.tools.max_child_turns = left;
+            b.tools.max_child_turns = right;
+            let expected = left.into_iter().chain(right).min();
+            assert_eq!(a.compose(&b).tools.max_child_turns, expected);
+            assert_eq!(b.compose(&a).tools.max_child_turns, expected);
+            assert_eq!(a.for_child(&b).tools.max_child_turns, expected);
+        }
+    }
 }
 
 #[test]

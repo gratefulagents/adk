@@ -1,0 +1,1839 @@
+{
+  "Event": {
+    "empty": {
+      "expected": {
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T04:05:06.123456789Z",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T04:05:06.123456789Z",
+        "type": "task.created"
+      }
+    },
+    "nondefault": {
+      "expected": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T04:05:06.123456789Z",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T04:05:06.123456789Z",
+        "type": "task.created"
+      }
+    },
+    "null": {
+      "expected": {
+        "event_id": "",
+        "payload": null,
+        "project_id": "",
+        "seq": 0,
+        "time": "0001-01-01T00:00:00Z",
+        "type": ""
+      },
+      "input": {
+        "actor": null,
+        "event_id": null,
+        "payload": null,
+        "project_id": null,
+        "run_id": null,
+        "seq": null,
+        "time": null,
+        "type": null
+      }
+    },
+    "offset": {
+      "expected": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T09:35:06.123456789+05:30",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-03T09:35:06.123456789+05:30",
+        "type": "task.created"
+      }
+    },
+    "offset_integral": {
+      "expected": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-05T11:37:08+05:30",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-05T11:37:08+05:30",
+        "type": "task.created"
+      }
+    },
+    "offset_negative": {
+      "expected": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-04T01:36:07.12-03:30",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-04T01:36:07.12-03:30",
+        "type": "task.created"
+      }
+    },
+    "offset_zero": {
+      "expected": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-05T06:07:08Z",
+        "type": "task.created"
+      },
+      "input": {
+        "actor": "agent-proof",
+        "event_id": "event-proof",
+        "payload": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "project_id": "project-proof",
+        "run_id": "run-proof",
+        "seq": 9223372036854775807,
+        "time": "2025-02-05T06:07:08+00:00",
+        "type": "task.created"
+      }
+    },
+    "omitted": {
+      "expected": {
+        "event_id": "",
+        "payload": null,
+        "project_id": "",
+        "seq": 0,
+        "time": "0001-01-01T00:00:00Z",
+        "type": ""
+      },
+      "input": {}
+    }
+  },
+  "Memory": {
+    "empty": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "memory-proof",
+        "kind": "episodic",
+        "scope": "task",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": null,
+        "scope": "task",
+        "source_run": "",
+        "tags": [],
+        "task_ids": [],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_empty": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": {},
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": {},
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_false": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": false,
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": false,
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_null": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": null,
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": null,
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "nondefault": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "null": {
+      "expected": {
+        "content": "",
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "kind": "",
+        "scope": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {
+        "content": null,
+        "created_at": null,
+        "file_paths": null,
+        "id": null,
+        "kind": null,
+        "last_read_at": null,
+        "scope": null,
+        "source_run": null,
+        "tags": null,
+        "task_ids": null,
+        "updated_at": null
+      }
+    },
+    "offset": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-03T09:35:06.123456789+05:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-03T09:35:06.123456789+05:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      }
+    },
+    "offset_integral": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T11:37:08+05:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T11:37:08+05:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      }
+    },
+    "offset_negative": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-04T01:36:07.12-03:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-04T01:36:07.12-03:30",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      }
+    },
+    "offset_zero": {
+      "expected": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-05T06:07:08Z",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08Z",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T06:07:08Z"
+      },
+      "input": {
+        "content": "Persisted record proof",
+        "created_at": "2025-02-05T06:07:08+00:00",
+        "file_paths": [
+          "src/proof.rs"
+        ],
+        "id": "memory-proof",
+        "kind": "episodic",
+        "last_read_at": "2025-02-05T06:07:08+00:00",
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "scope": "task",
+        "source_run": "run-proof",
+        "tags": [
+          "proof",
+          "codec"
+        ],
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T06:07:08+00:00"
+      }
+    },
+    "omitted": {
+      "expected": {
+        "content": "",
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "kind": "",
+        "scope": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {}
+    }
+  },
+  "SessionSummary": {
+    "empty": {
+      "expected": {
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "session-proof",
+        "summary": "Record codecs checked",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "session-proof",
+        "run_id": "",
+        "summary": "Record codecs checked",
+        "task_ids": [],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "nondefault": {
+      "expected": {
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "null": {
+      "expected": {
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "summary": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {
+        "created_at": null,
+        "id": null,
+        "run_id": null,
+        "summary": null,
+        "task_ids": null,
+        "updated_at": null
+      }
+    },
+    "offset": {
+      "expected": {
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      },
+      "input": {
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      }
+    },
+    "offset_integral": {
+      "expected": {
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      },
+      "input": {
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      }
+    },
+    "offset_negative": {
+      "expected": {
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      },
+      "input": {
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      }
+    },
+    "offset_zero": {
+      "expected": {
+        "created_at": "2025-02-05T06:07:08Z",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T06:07:08Z"
+      },
+      "input": {
+        "created_at": "2025-02-05T06:07:08+00:00",
+        "id": "session-proof",
+        "run_id": "run-proof",
+        "summary": "Record codecs checked",
+        "task_ids": [
+          "task-proof"
+        ],
+        "updated_at": "2025-02-05T06:07:08+00:00"
+      }
+    },
+    "omitted": {
+      "expected": {
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "summary": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {}
+    }
+  },
+  "Task": {
+    "empty": {
+      "expected": {
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "task-proof",
+        "priority": 3,
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "",
+        "blocks": [],
+        "closed_at": null,
+        "comments": [],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [],
+        "description": "",
+        "id": "task-proof",
+        "labels": [],
+        "priority": 3,
+        "source_run": "",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_empty": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {},
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {},
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_false": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": false,
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": false,
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "metadata_null": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": null,
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": null,
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "nondefault": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    },
+    "null": {
+      "expected": {
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "priority": 0,
+        "status": "",
+        "title": "",
+        "type": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {
+        "assignee": null,
+        "blocks": null,
+        "closed_at": null,
+        "comments": null,
+        "created_at": null,
+        "depends_on": null,
+        "description": null,
+        "id": null,
+        "labels": null,
+        "priority": null,
+        "source_run": null,
+        "status": null,
+        "title": null,
+        "type": null,
+        "updated_at": null
+      }
+    },
+    "offset": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-03T09:35:06.123456789+05:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T09:35:06.123456789+05:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-03T09:35:06.123456789+05:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T09:35:06.123456789+05:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-03T09:35:06.123456789+05:30"
+      }
+    },
+    "offset_integral": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T11:37:08+05:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-05T11:37:08+05:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T11:37:08+05:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-05T11:37:08+05:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-05T11:37:08+05:30"
+      }
+    },
+    "offset_negative": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-04T01:36:07.12-03:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-04T01:36:07.12-03:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-04T01:36:07.12-03:30",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-04T01:36:07.12-03:30",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T01:36:07.12-03:30"
+      }
+    },
+    "offset_zero": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-05T06:07:08Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-05T06:07:08Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-05T06:07:08Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08+00:00",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-05T06:07:08+00:00",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-05T06:07:08+00:00",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 3,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-05T06:07:08+00:00"
+      }
+    },
+    "omitted": {
+      "expected": {
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": "",
+        "priority": 0,
+        "status": "",
+        "title": "",
+        "type": "",
+        "updated_at": "0001-01-01T00:00:00Z"
+      },
+      "input": {}
+    },
+    "wide_priority": {
+      "expected": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 9007199254740993,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      },
+      "input": {
+        "assignee": "owner-proof",
+        "blocks": [
+          "task-after"
+        ],
+        "closed_at": "2025-02-05T06:07:08Z",
+        "comments": [
+          {
+            "actor": "reviewer",
+            "body": "Reviewed\n✓",
+            "created_at": "2025-02-03T04:05:06.123456789Z",
+            "id": "comment-proof"
+          }
+        ],
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "depends_on": [
+          "task-before"
+        ],
+        "description": "Explicit description",
+        "id": "task-proof",
+        "labels": [
+          "proof",
+          "codec"
+        ],
+        "metadata": {
+          "fraction": 0.12345678901234567890123456789,
+          "integer": 18446744073709551615,
+          "nested": [
+            true,
+            null,
+            {
+              "text": "é\\n"
+            }
+          ]
+        },
+        "priority": 9007199254740993,
+        "source_run": "run-proof",
+        "status": "closed",
+        "title": "Record proof",
+        "type": "bug",
+        "updated_at": "2025-02-04T05:06:07.12Z"
+      }
+    }
+  },
+  "TaskComment": {
+    "empty": {
+      "expected": {
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "comment-proof"
+      }
+    },
+    "nondefault": {
+      "expected": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T04:05:06.123456789Z",
+        "id": "comment-proof"
+      }
+    },
+    "null": {
+      "expected": {
+        "body": "",
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": ""
+      },
+      "input": {
+        "actor": null,
+        "body": null,
+        "created_at": null,
+        "id": null
+      }
+    },
+    "offset": {
+      "expected": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-03T09:35:06.123456789+05:30",
+        "id": "comment-proof"
+      }
+    },
+    "offset_integral": {
+      "expected": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-05T11:37:08+05:30",
+        "id": "comment-proof"
+      }
+    },
+    "offset_negative": {
+      "expected": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-04T01:36:07.12-03:30",
+        "id": "comment-proof"
+      }
+    },
+    "offset_zero": {
+      "expected": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-05T06:07:08Z",
+        "id": "comment-proof"
+      },
+      "input": {
+        "actor": "reviewer",
+        "body": "Reviewed\n✓",
+        "created_at": "2025-02-05T06:07:08+00:00",
+        "id": "comment-proof"
+      }
+    },
+    "omitted": {
+      "expected": {
+        "body": "",
+        "created_at": "0001-01-01T00:00:00Z",
+        "id": ""
+      },
+      "input": {}
+    }
+  }
+}

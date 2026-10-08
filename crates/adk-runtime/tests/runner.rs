@@ -21,6 +21,9 @@ fn message(role: Role, value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>, end_turn: Option<bool>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage {
             input_tokens: 10,
@@ -39,6 +42,7 @@ fn answer(value: &str) -> ModelResponse {
 fn call(id: &str, name: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: id.into(),
             name: name.into(),
             arguments: json!({}),
@@ -54,6 +58,7 @@ fn policy(turns: u32) -> RunPolicy {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "go")],
         policy: policy(turns),
     }
@@ -257,6 +262,192 @@ fn runner(agent: AgentConfig) -> Runner {
 }
 
 #[tokio::test]
+async fn final_summary_turn_is_opt_in_and_request_only_in_run_and_stream() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-final-summary.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    assert_eq!(fixture["schema_version"], 1);
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 8);
+    for enabled in [false, true] {
+        for turns in [1, 2] {
+            for streaming in [false, true] {
+                let mut responses = Vec::new();
+                if turns == 2 {
+                    responses.push(response(vec![call("read", "inspect")], Some(false)));
+                }
+                responses.push(answer("summary"));
+                let model = TestModel::with(responses.iter().cloned().map(Ok).collect());
+                *model.streams.lock().unwrap() = responses
+                    .into_iter()
+                    .map(|response| vec![StreamStep::Event(ModelEvent::Complete { response })])
+                    .collect();
+                let tool = TestTool::new("inspect", false, false);
+                let mut a = agent(model.clone());
+                a.instructions = "stable instructions".into();
+                a.tools.push(tool.clone());
+                let observer = Arc::new(Generations::default());
+                let runner = Runner::new(
+                    a,
+                    RunnerConfig {
+                        force_final_summary_turn: enabled,
+                        generation_observer: Some(observer.clone()),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+                let mut req = request(turns);
+                req.input_provenance = vec![ItemProvenance::Unattributed];
+                let result = if streaming {
+                    runner
+                        .stream(context(), req, Arc::new(TestHost::default()))
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(), req, Arc::new(TestHost::default()))
+                        .await
+                }
+                .unwrap();
+                let expected = fixture["cases"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .find(|case| {
+                        case["enabled"] == enabled
+                            && case["turns"] == turns
+                            && case["streaming"] == streaming
+                    })
+                    .unwrap();
+                assert_eq!(
+                    result.result.final_output.as_ref(),
+                    Some(&expected["output"])
+                );
+                assert_eq!(
+                    tool.calls.load(Ordering::SeqCst) as u64,
+                    expected["tool_calls"].as_u64().unwrap()
+                );
+                let requests = model.requests.lock().unwrap();
+                let projected: Vec<_> = requests.iter().map(|request| json!({"instructions": request.instructions, "tools": request.tools.iter().map(|tool| tool.name.as_str()).collect::<Vec<_>>()})).collect();
+                assert_eq!(json!(projected), expected["requests"]);
+                let generations = observer.records.lock().unwrap();
+                let completed: Vec<_> = generations.iter().filter(|(ended, _)| *ended).collect();
+                assert_eq!(completed.len(), requests.len());
+                for ((_, record), request) in completed.into_iter().zip(requests.iter()) {
+                    assert_eq!(record.request.instructions, request.instructions);
+                    assert_eq!(record.declared_tool_timeouts.len(), request.tools.len());
+                    assert!(
+                        record.request_snapshot.is_ok(),
+                        "{:?}",
+                        record.request_snapshot
+                    );
+                }
+                assert_eq!(requests.len(), turns as usize);
+                for (index, request) in requests.iter().enumerate() {
+                    let final_turn = enabled && index + 1 == turns as usize;
+                    assert_eq!(request.tools.is_empty(), final_turn);
+                    assert_eq!(request.instructions.contains("<final_turn>"), final_turn);
+                    assert!(request.instructions.starts_with("stable instructions"));
+                    assert!(request.input.iter().all(|item| {
+                        !serde_json::to_string(item)
+                            .unwrap()
+                            .contains("<final_turn>")
+                    }));
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn final_summary_turn_denies_hallucinated_tools_and_handoffs_without_approval() {
+    let model = TestModel::with(vec![Ok(response(
+        vec![call("tool", "inspect"), call("handoff", "transfer")],
+        Some(false),
+    ))]);
+    let target = TestModel::with(vec![Ok(answer("not reached"))]);
+    let tool = TestTool::new("inspect", true, false);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    a.handoffs.push(Handoff {
+        on_handoff: None,
+        input_type: None,
+        history_filter: None,
+        is_enabled: None,
+        definition: ToolDefinition {
+            name: "transfer".into(),
+            ..tool.definition().clone()
+        },
+        target: Arc::new(agent(target.clone())),
+        input_filter: HandoffInputFilter::Preserve,
+    });
+    let host = Arc::new(TestHost::default());
+    let error = Runner::new(
+        a,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .run(context(), request(1), host.clone())
+    .await
+    .err()
+    .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(target.completes.load(Ordering::SeqCst), 0);
+    assert!(host.events.lock().unwrap().iter().all(|event| !matches!(
+        event,
+        RunEvent::ApprovalRequired { .. } | RunEvent::ToolStarted { .. }
+    )));
+    let partial = error.partial.unwrap();
+    assert_eq!(
+        partial
+            .new_items
+            .iter()
+            .filter(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+            .count(),
+        2
+    );
+    assert!(model.requests.lock().unwrap()[0].tools.is_empty());
+}
+
+#[tokio::test]
+async fn final_summary_turn_applies_on_the_last_retry_attempt() {
+    let model = TestModel::with(vec![Err(provider_error()), Ok(answer("summary"))]);
+    let mut a = agent(model.clone());
+    a.tools.push(TestTool::new("inspect", false, false));
+    let runner = Runner::new(
+        a,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            retry: RetryPolicy {
+                max_retries: 1,
+                initial_delay: Duration::ZERO,
+                max_delay: Duration::ZERO,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    runner
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0].tools.len(), 1);
+    assert!(requests[1].tools.is_empty());
+    assert_eq!(requests[1].instructions.matches("<final_turn>").count(), 1);
+}
+
+#[tokio::test]
 async fn approval_resume_keeps_cursor_and_completed_effects() {
     let model = TestModel::with(vec![
         Ok(response(
@@ -281,6 +472,8 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .unwrap();
     assert_eq!(paused.result.status, RunStatus::Paused);
     assert_eq!(paused.result.pending_approvals[0].call.id, "2");
+    let paused_metrics = paused.result.metrics.clone().unwrap();
+    assert_eq!(paused_metrics.turns, 1);
     assert_eq!(one.calls.load(Ordering::SeqCst), 1);
     assert_eq!(two.calls.load(Ordering::SeqCst), 0);
     assert_eq!(three.calls.load(Ordering::SeqCst), 1);
@@ -291,6 +484,9 @@ async fn approval_resume_keeps_cursor_and_completed_effects() {
         .await
         .unwrap();
     assert_eq!(done.result.final_output, Some(json!("done")));
+    let completed_metrics = done.result.metrics.as_ref().unwrap();
+    assert_eq!(completed_metrics.turns, 2);
+    assert!(completed_metrics.elapsed_ms >= paused_metrics.elapsed_ms);
     for t in [one, two, three] {
         assert_eq!(t.calls.load(Ordering::SeqCst), 1);
     }
@@ -480,6 +676,9 @@ async fn fallback_precedes_policy_retries_and_each_attempt_spends_a_turn() {
         .await
         .unwrap();
     assert_eq!(result.result.final_output, Some(json!("fallback")));
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.turns, 3);
+    assert_eq!(metrics.model.as_deref(), Some("backup"));
     assert_eq!(primary.completes.load(Ordering::SeqCst), 1);
     assert_eq!(fallback.completes.load(Ordering::SeqCst), 2);
     assert_eq!(fallback.requests.lock().unwrap()[0].model, "backup");
@@ -692,19 +891,70 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     let definition = TestTool::new("transfer", false, false).definition.clone();
     let mut target = agent(target_model.clone());
     target.name = "target".into();
+    target.instructions = "target instructions".into();
+    target.mcp_servers = vec!["target server".into()];
     let mut a = agent(source);
     a.tools = vec![effect.clone()];
     a.handoffs = vec![Handoff {
+        on_handoff: None,
+        input_type: None,
+        history_filter: None,
+        is_enabled: None,
+        input_filter: Default::default(),
         definition,
         target: Arc::new(target),
     }];
-    let result = runner(a)
-        .run(context(), request(3), Arc::new(TestHost::default()))
-        .await
-        .unwrap();
+    let hooks = Arc::new(Observations::default());
+    let result = Runner::new(
+        a,
+        RunnerConfig {
+            hooks: Some(hooks.clone()),
+            additional_instructions: " run-wide ".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap()
+    .run(context(), request(3), Arc::new(TestHost::default()))
+    .await
+    .unwrap();
     assert_eq!(result.result.last_agent.as_deref(), Some("target"));
     assert_eq!(effect.calls.load(Ordering::SeqCst), 0);
-    let history = &target_model.requests.lock().unwrap()[0].input;
+    let expected = vec![
+        ItemProvenance::Agent {
+            name: "test".into()
+        };
+        6
+    ];
+    assert_eq!(&result.result.new_items_provenance[..6], expected);
+    assert_eq!(
+        result.result.new_items_provenance[6],
+        ItemProvenance::Agent {
+            name: "target".into()
+        }
+    );
+    let requests = target_model.requests.lock().unwrap();
+    assert_eq!(
+        requests[0].instructions,
+        "target instructions\n\n---\n\nrun-wide\n\n---\n\n# MCP Servers\n\nConnected MCP servers: target server\n\nMCP tools are prefixed as mcp__<server>__<tool>."
+    );
+    assert_eq!(requests[0].input_provenance[0], ItemProvenance::Unknown);
+    assert_eq!(&requests[0].input_provenance[1..], expected);
+    let committed: Vec<_> = hooks
+        .seen
+        .lock()
+        .unwrap()
+        .iter()
+        .flat_map(|event| match event {
+            Observation::CommittedItems { agents, .. } => agents
+                .iter()
+                .map(|a| a.as_ref().map(|a| a.name.clone()))
+                .collect::<Vec<_>>(),
+            _ => vec![],
+        })
+        .collect();
+    assert_eq!(&committed[..6], vec![Some("test".into()); 6]);
+    assert_eq!(committed[6], Some("target".into()));
+    let history = &requests[0].input;
     for id in ["1", "3"] {
         assert!(history.iter().any(|i| matches!(i, RunItem::ToolResult { call_id, output } if call_id == id && output.is_error)));
     }
@@ -786,6 +1036,7 @@ impl Compactor for Compact {
                     .contains(&message(Role::Developer, "dynamic"))
             );
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage::default(),
@@ -858,6 +1109,23 @@ async fn compaction_replaces_history_and_hints_cache_prefix_are_request_only() {
     );
     assert_eq!(result.result.new_items.len(), 2);
     let requests = model.requests.lock().unwrap();
+    assert_eq!(
+        requests[0].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(
+        requests[1].input_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed
+        ]
+    );
+    assert_eq!(result.result.history_provenance[0], ItemProvenance::Unknown);
     assert_eq!(
         requests[0].settings["prompt_cache_key"],
         requests[1].settings["prompt_cache_key"]
@@ -1157,6 +1425,7 @@ impl Compactor for BilledCompaction {
     ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
         Box::pin(async {
             Ok(CompactedHistory {
+                history_provenance: Vec::new(),
                 history: vec![message(Role::User, "summary")],
                 context_tokens: 4,
                 usage: Usage {
@@ -1206,6 +1475,9 @@ async fn provider_compaction_is_charged_before_the_next_model_turn() {
         let partial = error.partial.unwrap();
         assert_eq!(partial.usage.input_tokens, 30);
         assert_eq!(partial.usage.output_tokens, 7);
+        let metrics = partial.metrics.as_ref().unwrap();
+        assert_eq!(metrics.turns, 1);
+        assert_eq!(metrics.cost_usd, 3.0);
         assert_eq!(partial.history, vec![message(Role::User, "summary")]);
     }
 }
@@ -1268,6 +1540,22 @@ async fn conversation_keeps_failed_spill_history_alive_after_error_is_dropped() 
         .await
         .err()
         .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        error.partial.as_ref().unwrap().history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance,
+        vec![
+            ItemProvenance::Unknown,
+            ItemProvenance::Agent {
+                name: "test".into()
+            },
+            ItemProvenance::Agent {
+                name: "test".into()
+            }
+        ]
+    );
     let serialized = serde_json::to_string(&conversation.history).unwrap();
     assert!(serialized.contains("full output saved to"));
     drop(error);
@@ -1491,6 +1779,11 @@ async fn fallback_state_is_per_agent_identity_not_display_name() {
     assert_eq!(source.name, target.name);
     source.fallbacks = vec![ModelBinding::complete("backup", backup)];
     source.handoffs = vec![Handoff {
+        on_handoff: None,
+        input_type: None,
+        history_filter: None,
+        is_enabled: None,
+        input_filter: Default::default(),
         definition: TestTool::new("transfer", false, false).definition.clone(),
         target: Arc::new(target),
     }];
@@ -1763,5 +2056,2411 @@ async fn error_handler_retry_and_continue_spend_attempt_turns() {
         assert_eq!(result.result.final_output, Some(json!("done")));
         assert_eq!(result.result.responses.len(), 1);
         assert_eq!(model.completes.load(Ordering::SeqCst), 2);
+    }
+}
+
+struct FixedGuard {
+    trip: bool,
+    replacement: Value,
+}
+impl Guardrail for FixedGuard {
+    fn name(&self) -> &str {
+        "policy"
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        _: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            Ok(Some(GuardrailResult {
+                tripwire_triggered: self.trip,
+                replacement_content: self.replacement.as_str().map(str::to_owned),
+                output: self.replacement.clone(),
+            }))
+        })
+    }
+}
+fn fixed_guard(trip: bool, replacement: Value) -> Arc<dyn Guardrail> {
+    Arc::new(FixedGuard { trip, replacement })
+}
+
+#[tokio::test]
+async fn input_tripwire_prevents_provider_and_retains_report() {
+    let model = TestModel::with(vec![Ok(answer("never"))]);
+    let mut a = agent(model.clone());
+    a.input_guardrails.push(fixed_guard(true, json!("blocked")));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+    assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.guardrails.len(), 1);
+    assert!(partial.guardrails[0].tripwire_triggered);
+    assert_eq!(partial.guardrails[0].output, json!("blocked"));
+    let cause = error
+        .error
+        .source
+        .unwrap()
+        .downcast::<GuardrailTripwire>()
+        .unwrap();
+    assert_eq!(cause.phase, GuardrailPhase::Input);
+    assert_eq!(cause.output, json!("blocked"));
+    assert!(partial.final_output.is_none());
+}
+
+#[tokio::test]
+async fn output_tripwire_blocks_final_answer_after_provider_usage() {
+    let model = TestModel::with(vec![Ok(answer("answer"))]);
+    let mut a = agent(model.clone());
+    a.output_guardrails.push(fixed_guard(true, Value::Null));
+    let error = runner(a)
+        .run(context(), request(2), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    let partial = error.partial.unwrap();
+    assert_eq!(model.completes.load(Ordering::SeqCst), 1);
+    assert!(partial.final_output.is_none());
+    assert_eq!(partial.usage.input_tokens, 10);
+    assert_eq!(partial.guardrails[0].phase, GuardrailPhase::Output);
+}
+
+#[tokio::test]
+async fn tool_input_tripwire_is_model_visible_without_executing_tool() {
+    let model = TestModel::with(vec![
+        Ok(response(vec![call("1", "one")], None)),
+        Ok(answer("done")),
+    ]);
+    let tool = TestTool::new("one", false, false);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    let config = RunnerConfig {
+        tool_input_guardrails: vec![fixed_guard(true, Value::Null)],
+        ..Default::default()
+    };
+    let outcome = Runner::new(a, config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    assert!(
+        outcome
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert_eq!(
+        outcome.result.guardrails[0].phase,
+        GuardrailPhase::ToolInput
+    );
+    assert!(outcome.result.guardrails[0].tripwire_triggered);
+    assert_eq!(
+        outcome.result.guardrails[0].tool_name.as_deref(),
+        Some("one")
+    );
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert!(requests[1].input.iter().any(|item| matches!(item,
+        RunItem::ToolResult { output, .. } if output.is_error
+    )));
+}
+
+#[tokio::test]
+async fn tool_output_replacement_reaches_model_and_stop_after_tool_checks_output() {
+    for stop in [false, true] {
+        let model = TestModel::with(vec![
+            Ok(response(vec![call("1", "one")], None)),
+            Ok(answer("done")),
+        ]);
+        let mut a = agent(model.clone());
+        a.tools.push(TestTool::new("one", false, false));
+        if stop {
+            a.output_guardrails.push(fixed_guard(true, Value::Null));
+        }
+        let config = RunnerConfig {
+            tool_output_guardrails: vec![fixed_guard(false, json!("sanitized"))],
+            return_tool_output: true,
+            ..Default::default()
+        };
+        let mut request = request(3);
+        if stop {
+            request.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        }
+        let result = Runner::new(a, config)
+            .unwrap()
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await;
+        let snapshot = if stop {
+            result.err().unwrap().partial.unwrap()
+        } else {
+            Box::new(result.unwrap().result)
+        };
+        assert!(snapshot.history.iter().any(|item| matches!(item, RunItem::ToolResult { output, .. } if format!("{:?}", output.content).contains("sanitized"))));
+        assert!(!format!("{:?}", snapshot.history).contains("raw one"));
+        if !stop {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(format!("{:?}", requests[1].input).contains("sanitized"));
+            assert!(!format!("{:?}", requests[1].input).contains("raw one"));
+        }
+        if stop {
+            assert!(snapshot.final_output.is_none());
+            assert_eq!(
+                snapshot.guardrails.last().unwrap().phase,
+                GuardrailPhase::Output
+            );
+        }
+    }
+}
+
+#[derive(Default)]
+struct Generations {
+    records: Mutex<Vec<(bool, adk_runtime::tracing::GenerationRecord)>>,
+}
+impl adk_runtime::tracing::GenerationObserver for Generations {
+    fn start(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((false, record.clone()));
+    }
+    fn end(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+        self.records.lock().unwrap().push((true, record.clone()));
+    }
+}
+
+#[tokio::test]
+async fn generation_records_capture_actual_requests_final_retry_decisions_and_responses() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::with(vec![Err(provider_error()), Ok(answer("done"))]);
+    let generations = Arc::new(Generations::default());
+    let config = RunnerConfig {
+        generation_observer: Some(generations.clone()),
+        retry: RetryPolicy {
+            max_retries: 1,
+            initial_delay: Duration::ZERO,
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+    let outcome = Runner::new(agent(model.clone()), config)
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 4);
+    assert_eq!(
+        records.iter().map(|(ended, _)| *ended).collect::<Vec<_>>(),
+        vec![false, true, false, true]
+    );
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_ne!(records[0].1.id, records[2].1.id);
+    assert_eq!(records[1].1.status, GenerationStatus::Retrying);
+    assert_eq!(records[1].1.retry_after, Some(Duration::ZERO));
+    assert!(records[1].1.error.is_some());
+    assert_eq!(records[3].1.status, GenerationStatus::Completed);
+    assert_eq!(
+        records[3].1.response.as_ref().unwrap().usage.input_tokens,
+        10
+    );
+    assert_eq!(records[0].1.request, model.requests.lock().unwrap()[0]);
+    assert!(records[0].1.ended_at.is_none());
+    assert!(records[1].1.ended_at.is_some());
+}
+
+#[tokio::test]
+async fn dropping_provider_future_closes_generation_once_without_detached_work() {
+    use adk_runtime::tracing::GenerationStatus;
+    let model = TestModel::streaming(vec![StreamStep::Pending]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut stream = runner.stream(context(), request(3), Arc::new(TestHost::default()));
+    for _ in 0..10 {
+        if tokio::time::timeout(Duration::from_millis(5), stream.next())
+            .await
+            .is_err()
+        {
+            break;
+        }
+    }
+    drop(stream);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(records[1].1.status, GenerationStatus::Interrupted);
+    assert_eq!(records[0].1.id, records[1].1.id);
+    assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn generation_retains_returned_response_when_host_rejects_stream_completion() {
+    struct RejectCompletion;
+    impl Host for RejectCompletion {
+        fn emit<'a>(&'a self, _: &'a Context, event: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(
+                    event,
+                    RunEvent::Model {
+                        event: ModelEvent::Complete { .. }
+                    }
+                ) {
+                    Err(Error::new(ErrorCategory::Host, "completion rejected"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+        fn approve<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ApprovalRequest,
+        ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+            Box::pin(async { panic!("unexpected approval") })
+        }
+    }
+    let model = TestModel::streaming(vec![StreamStep::Event(ModelEvent::Complete {
+        response: answer("returned"),
+    })]);
+    let generations = Arc::new(Generations::default());
+    let runner = Runner::new(
+        agent(model),
+        RunnerConfig {
+            generation_observer: Some(generations.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .stream(context(), request(3), Arc::new(RejectCompletion))
+        .finish()
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Host);
+    let records = generations.records.lock().unwrap();
+    assert_eq!(records.len(), 2);
+    assert_eq!(
+        records[1].1.status,
+        adk_runtime::tracing::GenerationStatus::Failed
+    );
+    assert_eq!(records[1].1.response, Some(answer("returned")));
+    assert_eq!(
+        records[1].1.error.as_ref().unwrap().category,
+        ErrorCategory::Host
+    );
+}
+
+#[tokio::test]
+async fn reported_request_counts_accumulate_without_inference_or_overflow() {
+    for (first, second, total) in [(2, 3, 5), (0, 0, 0), (u64::MAX, 1, u64::MAX)] {
+        let mut continuing = response(vec![message(Role::Assistant, "working")], Some(false));
+        continuing.usage.requests = first;
+        let mut final_response = answer("done");
+        final_response.usage.requests = second;
+        let model = TestModel::with(vec![Ok(continuing), Ok(final_response)]);
+        let result = runner(agent(model.clone()))
+            .run(context(), request(3), Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(model.completes.load(Ordering::SeqCst), 2);
+        assert_eq!(result.result.usage.requests, total);
+    }
+}
+
+#[tokio::test]
+async fn conversation_retains_provenance_across_success_pause_and_resume() {
+    let mut a = agent(TestModel::with(vec![
+        Ok(answer("first")),
+        Ok(response(vec![call("1", "pause")], None)),
+        Ok(answer("resumed")),
+    ]));
+    let mut tool = TestTool::new("pause", true, false);
+    Arc::get_mut(&mut tool).unwrap().output.should_pause = true;
+    a.tools = vec![tool];
+    let runner = runner(a);
+    let mut conversation = Conversation::default();
+    let host = Arc::new(TestHost::default());
+    let first = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "external")],
+            policy(5),
+            host.clone(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        conversation.history_provenance,
+        first.result.history_provenance
+    );
+    assert_eq!(conversation.history_provenance[0], ItemProvenance::Unknown);
+    let mut paused = conversation
+        .run(
+            &runner,
+            context(),
+            vec![message(Role::User, "again")],
+            policy(5),
+            host,
+        )
+        .await
+        .unwrap();
+    assert_eq!(paused.result.status, RunStatus::Paused);
+    assert_eq!(
+        conversation.history_provenance,
+        paused.result.history_provenance
+    );
+    let prior = conversation.history_provenance.clone();
+    let mut resumed = paused
+        .continuation
+        .take()
+        .unwrap()
+        .resume(None)
+        .await
+        .unwrap();
+    conversation.accept(&mut resumed);
+    assert_eq!(&conversation.history_provenance[..prior.len()], prior);
+    assert_eq!(
+        conversation.history_provenance,
+        resumed.result.history_provenance
+    );
+    assert_eq!(
+        conversation.history_provenance.last(),
+        Some(&ItemProvenance::Agent {
+            name: "test".into()
+        })
+    );
+}
+
+#[tokio::test]
+async fn custom_compaction_without_provenance_does_not_guess_retained_authorship() {
+    struct Retain;
+    impl Compactor for Retain {
+        fn compact<'a>(
+            &'a self,
+            _: &'a Context,
+            request: CompactionRequest,
+        ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+            Box::pin(async move {
+                Ok(CompactedHistory {
+                    history: request.history,
+                    history_provenance: vec![],
+                    context_tokens: 4,
+                    usage: Usage::default(),
+                    cost: 0.0,
+                })
+            })
+        }
+    }
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![message(Role::Assistant, "identical")],
+            Some(false),
+        )),
+        Ok(answer("done")),
+    ]);
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            compaction: Some(CompactionConfig {
+                trigger_tokens: 10,
+                target_tokens: 5,
+                compactor: Arc::new(Retain),
+            }),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request(3);
+    req.input = vec![message(Role::Assistant, "identical")];
+    req.input_provenance = vec![ItemProvenance::Agent {
+        name: "prior".into(),
+    }];
+    let result = runner
+        .run(context(), req, Arc::new(TestHost::default()))
+        .await
+        .unwrap()
+        .result;
+    assert_eq!(
+        model.requests.lock().unwrap()[1].input_provenance,
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert_eq!(
+        &result.history_provenance[..2],
+        vec![ItemProvenance::Unknown; 2]
+    );
+    assert!(result.new_items_provenance.iter().all(|source| source
+        == &ItemProvenance::Agent {
+            name: "test".into()
+        }));
+}
+
+#[tokio::test]
+async fn generation_snapshots_use_actual_attempts_and_declared_timeouts_without_guessing() {
+    struct TimedTool(Arc<TestTool>);
+    impl Tool for TimedTool {
+        fn definition(&self) -> &ToolDefinition {
+            self.0.definition()
+        }
+        fn timeout(&self) -> Option<Duration> {
+            Some(Duration::from_secs(7))
+        }
+        fn execute<'a>(
+            &'a self,
+            context: &'a ToolContext,
+            call: ToolCall,
+        ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+            self.0.execute(context, call)
+        }
+    }
+    for known in [true, false] {
+        let primary = TestModel::with(vec![Err(provider_error())]);
+        let backup = TestModel::with(vec![Ok(answer("done"))]);
+        let mut a = AgentConfig::new(
+            "test",
+            ModelBinding::complete(
+                "primary",
+                Arc::new(AdvisedModel {
+                    model: primary,
+                    advice: Some(ModelRetryAdvice {
+                        should_retry: true,
+                        retry_after: Duration::ZERO,
+                        reason: "quota".into(),
+                    }),
+                }),
+            ),
+        );
+        a.fallbacks.push(ModelBinding::complete("backup", backup));
+        a.tools
+            .push(Arc::new(TimedTool(TestTool::new("timed", false, false))));
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut request = request(3);
+        request.policy.tools.timeout = Some(Duration::from_secs(99));
+        if known {
+            request.input_provenance = vec![ItemProvenance::Unattributed];
+        }
+        runner
+            .run(context(), request, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        let records = generations.records.lock().unwrap();
+        assert_eq!(records.len(), 4);
+        for (index, (_, record)) in records.iter().enumerate() {
+            assert_eq!(
+                record.declared_tool_timeouts,
+                vec![Some(Duration::from_secs(7))]
+            );
+            if known {
+                let snapshot = record.request_snapshot.as_ref().unwrap();
+                assert_eq!(snapshot.model, if index < 2 { "primary" } else { "backup" });
+                assert_eq!(snapshot.tools[0].timeout_seconds, 7);
+                assert_eq!(
+                    snapshot.total_token_estimate,
+                    snapshot.input_token_estimate + snapshot.request_overhead_token_estimate
+                );
+                assert!(snapshot.input_token_estimate > 0);
+                assert!(snapshot.input_items[0].agent_name.is_empty());
+                assert_eq!(
+                    snapshot,
+                    &adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                        "test",
+                        &record.request,
+                        &record.declared_tool_timeouts,
+                        &[]
+                    )
+                    .unwrap()
+                );
+            } else {
+                assert!(
+                    record
+                        .request_snapshot
+                        .as_ref()
+                        .unwrap_err()
+                        .0
+                        .contains("provenance is unknown")
+                );
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn handoff_filter_hook_failure_keeps_partial_history_and_journal_coherent() {
+    struct FailFilter(ErrorCategory);
+    impl RunHooks for FailFilter {
+        fn observe<'a>(
+            &'a self,
+            _: &'a Context,
+            event: Observation,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(event, Observation::ApprovalHistoryReplaced { .. }) {
+                    Err(Error::new(self.0, "filter notification failed"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+    }
+    for streaming in [false, true] {
+        for category in [ErrorCategory::Host, ErrorCategory::Cancelled] {
+            let source = TestModel::with(vec![Ok(response(
+                vec![
+                    message(Role::Assistant, "transferring"),
+                    call("transfer", "transfer"),
+                ],
+                None,
+            ))]);
+            source
+                .streams
+                .lock()
+                .unwrap()
+                .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                    response: response(
+                        vec![
+                            message(Role::Assistant, "transferring"),
+                            call("transfer", "transfer"),
+                        ],
+                        None,
+                    ),
+                })]);
+            let target = TestModel::with(vec![Ok(answer("never called"))]);
+            let mut target_agent = agent(target.clone());
+            target_agent.name = "target".into();
+            let mut source_agent = agent(source);
+            source_agent.handoffs.push(Handoff {
+                on_handoff: None,
+                input_type: None,
+                history_filter: None,
+                is_enabled: None,
+                definition: TestTool::new("transfer", true, true).definition.clone(),
+                target: Arc::new(target_agent),
+                input_filter: HandoffInputFilter::RemoveTools,
+            });
+            let journal = Arc::new(compat::ApprovalJournal::default());
+            let runner = Runner::new(
+                source_agent,
+                RunnerConfig {
+                    hooks: Some(Arc::new(CompositeHooks::new([
+                        journal.clone() as Arc<dyn RunHooks>,
+                        Arc::new(FailFilter(category)),
+                    ]))),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let request = RunRequest {
+                input_provenance: vec![ItemProvenance::Unattributed],
+                ..request(3)
+            };
+            let result = if streaming {
+                runner
+                    .stream(context(), request, Arc::new(TestHost::default()))
+                    .finish()
+                    .await
+            } else {
+                runner
+                    .run(context(), request, Arc::new(TestHost::default()))
+                    .await
+            };
+            let error = result.err().expect("hook must fail");
+            let partial = error.partial.unwrap();
+            assert!(target.requests.lock().unwrap().is_empty());
+            assert!(journal.history_markers().unwrap().is_empty());
+            assert!(!journal.entries().is_empty(), "approval audit retained");
+            assert_eq!(
+                partial.history,
+                vec![
+                    message(Role::User, "go"),
+                    message(Role::Assistant, "transferring")
+                ]
+            );
+            assert_eq!(
+                partial.history_provenance,
+                vec![
+                    ItemProvenance::Unattributed,
+                    ItemProvenance::Agent {
+                        name: "test".into()
+                    }
+                ]
+            );
+            assert!(
+                partial
+                    .new_items
+                    .iter()
+                    .any(|i| matches!(i, RunItem::Handoff { .. }))
+            );
+            assert!(
+                partial
+                    .new_items
+                    .iter()
+                    .any(|i| matches!(i, RunItem::ToolCall { .. }))
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn handoff_input_filter_preserves_audit_and_filters_run_stream_and_approval_history() {
+    assert_eq!(HandoffInputFilter::default(), HandoffInputFilter::Preserve);
+    for streaming in [false, true] {
+        for deferred in [false, true] {
+            let mut baseline = None;
+            for input_filter in [
+                HandoffInputFilter::Preserve,
+                HandoffInputFilter::RemoveTools,
+            ] {
+                let phased = RunItem::PhasedMessage {
+                    message: Message {
+                        role: Role::Assistant,
+                        content: vec![Content::Text {
+                            text: "phase".into(),
+                        }],
+                    },
+                    phase: "commentary".into(),
+                };
+                let compacted = RunItem::Compaction {
+                    compaction: Compaction {
+                        content: "summary".into(),
+                        ..Default::default()
+                    },
+                };
+                let reasoning = RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "private".into(),
+                        ..Default::default()
+                    },
+                };
+                let input = vec![
+                    message(Role::User, "go"),
+                    call("old", "effect"),
+                    RunItem::ToolResult {
+                        call_id: "old".into(),
+                        output: TestTool::new("effect", false, false).output.clone(),
+                    },
+                    phased,
+                    reasoning.clone(),
+                    call("old-transfer", "transfer"),
+                    RunItem::Handoff {
+                        call_id: "old-transfer".into(),
+                        agent: "test".into(),
+                    },
+                    compacted,
+                    message(Role::Assistant, "retained"),
+                    message(Role::System, "system retained"),
+                    message(Role::Developer, "developer retained"),
+                ];
+                let input_provenance: Vec<_> = (0..input.len())
+                    .map(|index| match index {
+                        0 => ItemProvenance::Unattributed,
+                        3 => ItemProvenance::Unknown,
+                        _ => ItemProvenance::Agent {
+                            name: format!("prior-{index}"),
+                        },
+                    })
+                    .collect();
+                let current = vec![
+                    message(Role::Assistant, "transferring"),
+                    reasoning,
+                    call("before", "effect"),
+                    call("transfer", "transfer"),
+                    call("after", "effect"),
+                ];
+                let mut source_response = response(current.clone(), None);
+                source_response.usage.context_tokens = Some(100_000);
+                let source = TestModel::with(vec![Ok(source_response.clone())]);
+                source
+                    .streams
+                    .lock()
+                    .unwrap()
+                    .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                        response: source_response,
+                    })]);
+                let target = TestModel::with(vec![Ok(answer("done"))]);
+                target
+                    .streams
+                    .lock()
+                    .unwrap()
+                    .push_back(vec![StreamStep::Event(ModelEvent::Complete {
+                        response: answer("done"),
+                    })]);
+                let mut target_agent = agent(target.clone());
+                target_agent.name = "target".into();
+                let effect = TestTool::new("effect", false, false);
+                let mut source_agent = agent(source);
+                source_agent.tools = vec![effect.clone()];
+                source_agent.handoffs.push(Handoff {
+                    on_handoff: None,
+                    input_type: None,
+                    history_filter: None,
+                    is_enabled: None,
+                    definition: TestTool::new("transfer", true, false).definition.clone(),
+                    target: Arc::new(target_agent),
+                    input_filter,
+                });
+                let journal = Arc::new(compat::ApprovalJournal::default());
+                let observations = Arc::new(Observations::default());
+                let runner = Runner::new(
+                    source_agent,
+                    RunnerConfig {
+                        hooks: Some(Arc::new(CompositeHooks::new([
+                            journal.clone() as Arc<dyn RunHooks>,
+                            observations.clone(),
+                        ]))),
+                        compaction: (input_filter == HandoffInputFilter::RemoveTools).then(|| {
+                            CompactionConfig {
+                                trigger_tokens: 10_000,
+                                target_tokens: 5,
+                                compactor: Arc::new(Compact),
+                            }
+                        }),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+                let req = RunRequest {
+                    input: input.clone(),
+                    input_provenance: input_provenance.clone(),
+                    policy: policy(3),
+                };
+                let host = Arc::new(TestHost::default());
+                if deferred {
+                    host.approvals
+                        .lock()
+                        .unwrap()
+                        .push_back(ApprovalDecision::Defer);
+                }
+                let mut outcome = if streaming {
+                    runner
+                        .stream(context(), req, host.clone())
+                        .finish()
+                        .await
+                        .unwrap()
+                } else {
+                    runner.run(context(), req, host.clone()).await.unwrap()
+                };
+                if deferred {
+                    assert_eq!(outcome.result.status, RunStatus::Paused);
+                    assert!(target.requests.lock().unwrap().is_empty());
+                    assert_eq!(journal.history_markers().unwrap().len(), 1);
+                    let continuation = outcome.continuation.unwrap();
+                    outcome = if streaming {
+                        continuation
+                            .stream(Some(ApprovalDecision::Approve))
+                            .unwrap()
+                            .finish()
+                            .await
+                            .unwrap()
+                    } else {
+                        continuation
+                            .resume(Some(ApprovalDecision::Approve))
+                            .await
+                            .unwrap()
+                    };
+                }
+                let result = outcome.result;
+                let target_requests = target.requests.lock().unwrap();
+                let sent = &target_requests[0];
+                let mut expected_audit = current;
+                for id in ["before", "transfer", "after"] {
+                    expected_audit.push(if id == "transfer" {
+                        RunItem::Handoff { call_id: id.into(), agent: "target".into() }
+                    } else {
+                        RunItem::ToolResult { call_id: id.into(), output: ToolOutput {
+                            content: vec![Content::Text { text: "not executed: the conversation was handed off to target in this turn".into() }],
+                            is_error: true,
+                            should_pause: false,
+                        }}
+                    });
+                }
+                let mut expected_history = input.clone();
+                expected_history.extend(expected_audit.clone());
+                let mut expected_provenance = input_provenance.clone();
+                expected_provenance.extend(vec![
+                    ItemProvenance::Agent {
+                        name: "test".into()
+                    };
+                    expected_audit.len()
+                ]);
+                if input_filter == HandoffInputFilter::RemoveTools {
+                    expected_history = [0, 3, 7, 8, 9, 10]
+                        .map(|index| input[index].clone())
+                        .to_vec();
+                    expected_history.push(message(Role::Assistant, "transferring"));
+                    expected_provenance = [0, 3, 7, 8, 9, 10]
+                        .map(|index| input_provenance[index].clone())
+                        .to_vec();
+                    expected_provenance.push(ItemProvenance::Agent {
+                        name: "test".into(),
+                    });
+                    assert!(journal.history_markers().unwrap().is_empty());
+                    assert!(
+                        journal
+                            .entries()
+                            .iter()
+                            .all(|entry| entry.history_before.is_none())
+                    );
+                } else {
+                    assert_eq!(
+                        journal.history_markers().unwrap().len(),
+                        if deferred { 2 } else { 1 }
+                    );
+                }
+                assert_eq!(sent.input, expected_history);
+                assert_eq!(sent.input_provenance, expected_provenance);
+                expected_history.push(message(Role::Assistant, "done"));
+                expected_provenance.push(ItemProvenance::Agent {
+                    name: "target".into(),
+                });
+                assert_eq!(result.history, expected_history);
+                assert_eq!(result.history_provenance, expected_provenance);
+                expected_audit.push(message(Role::Assistant, "done"));
+                assert_eq!(result.new_items, expected_audit);
+                assert_eq!(effect.calls.load(Ordering::SeqCst), 0);
+                assert_eq!(journal.entries().len(), if deferred { 2 } else { 1 });
+                let committed: Vec<_> = observations
+                    .seen
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .filter_map(|observation| match observation {
+                        Observation::CommittedItems {
+                            items,
+                            agents,
+                            markers,
+                        } => Some(json!([
+                            items,
+                            agents,
+                            markers
+                                .iter()
+                                .map(|marker| (marker.before_item, &marker.marker))
+                                .collect::<Vec<_>>()
+                        ])),
+                        _ => None,
+                    })
+                    .collect();
+                let audit = json!({
+                    "new_items": result.new_items,
+                    "provenance": result.new_items_provenance,
+                    "responses": result.responses,
+                    "events": host.events.lock().unwrap().iter().filter(|event| !matches!(event, RunEvent::Finished { .. })).collect::<Vec<_>>(),
+                    "committed": committed,
+                    "markers": journal.entries().iter().map(|entry| (&entry.marker, entry.new_items_before, &entry.reason)).collect::<Vec<_>>(),
+                });
+                if let Some(baseline) = &baseline {
+                    assert_eq!(&audit, baseline);
+                } else {
+                    baseline = Some(audit);
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn native_handoff_target_history_matches_pinned_go_filter_cases() {
+    use adk_codec::{approval::decode_item, dto};
+    use std::collections::HashSet;
+
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-handoff-filter.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["schema_version"], 1);
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    let mut compared = 0;
+    let mut source_only = 0;
+    for case in fixture["cases"].as_array().unwrap() {
+        if !case["source_only"].as_array().unwrap().is_empty() {
+            source_only += 1;
+            continue;
+        }
+        let decode = |value: &Value| -> (Vec<RunItem>, Vec<ItemProvenance>) {
+            value
+                .as_array()
+                .into_iter()
+                .flatten()
+                .enumerate()
+                .map(|(index, item)| {
+                    let wire: dto::RunItem = serde_json::from_value(item.clone()).unwrap();
+                    let provenance =
+                        wire.agent
+                            .as_ref()
+                            .map_or(ItemProvenance::Unattributed, |agent| {
+                                ItemProvenance::Agent {
+                                    name: agent.name.clone(),
+                                }
+                            });
+                    let native = if wire.kind.0 == 3 {
+                        // SDK handoffs have no call ID; this ID is a native test scaffold, not Go evidence.
+                        RunItem::Handoff {
+                            call_id: format!("oracle-native-handoff-{index}"),
+                            agent: wire.handoff_call.unwrap().to_agent,
+                        }
+                    } else {
+                        decode_item(&wire).unwrap()
+                    };
+                    (native, provenance)
+                })
+                .unzip()
+        };
+        let (input, provenance) = decode(&case["input"]);
+        let (expected, expected_provenance) = decode(&case["output"]);
+        let mut paired = vec![];
+        let mut paired_provenance = vec![];
+        let mut pending = HashSet::new();
+        // Runner input requires paired calls. Added counterparts are all stripped;
+        // retained payloads and attribution remain exactly those in the Go oracle.
+        for (item, provenance) in input.into_iter().zip(provenance) {
+            match &item {
+                RunItem::ToolCall { call } => {
+                    pending.insert(call.id.clone());
+                }
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. } => {
+                    if !pending.remove(call_id) {
+                        paired.push(call(call_id, "oracle-pair"));
+                        paired_provenance.push(ItemProvenance::Unattributed);
+                    }
+                }
+                _ => {}
+            }
+            paired.push(item);
+            paired_provenance.push(provenance);
+        }
+        for call_id in pending {
+            paired.push(RunItem::ToolResult {
+                call_id,
+                output: TestTool::new("oracle-pair", false, false).output.clone(),
+            });
+            paired_provenance.push(ItemProvenance::Unattributed);
+        }
+        let target = TestModel::with(vec![Ok(answer("done"))]);
+        let source = TestModel::with(vec![Ok(response(
+            vec![call("current-transfer", "transfer")],
+            None,
+        ))]);
+        let mut target_agent = agent(target.clone());
+        target_agent.name = "target".into();
+        let mut source_agent = agent(source);
+        source_agent.handoffs.push(Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            definition: TestTool::new("transfer", false, false).definition.clone(),
+            target: Arc::new(target_agent),
+            input_filter: HandoffInputFilter::RemoveTools,
+        });
+        // The SDK helper's independent new_items argument and nil-vs-empty slices
+        // have no native runner equivalent; this comparison covers target history only.
+        let outcome = runner(source_agent)
+            .run(
+                context(),
+                RunRequest {
+                    input: paired,
+                    input_provenance: paired_provenance,
+                    policy: policy(2),
+                },
+                Arc::new(TestHost::default()),
+            )
+            .await
+            .unwrap();
+        let requests = target.requests.lock().unwrap();
+        assert_eq!(requests[0].input, expected, "{}", case["name"]);
+        assert_eq!(
+            requests[0].input_provenance, expected_provenance,
+            "{}",
+            case["name"]
+        );
+        assert_eq!(
+            outcome.result.new_items,
+            vec![
+                call("current-transfer", "transfer"),
+                RunItem::Handoff {
+                    call_id: "current-transfer".into(),
+                    agent: "target".into()
+                },
+                message(Role::Assistant, "done"),
+            ]
+        );
+        compared += 1;
+    }
+    assert_eq!(compared, 15);
+    assert_eq!(source_only, 8);
+}
+
+struct CeilingProbe {
+    definition: ToolDefinition,
+    control_flow: bool,
+    policies: Mutex<Vec<ToolPolicy>>,
+    adaptations: Mutex<Vec<AccessMode>>,
+}
+impl CeilingProbe {
+    fn new(name: &str, read_only: bool, control_flow: bool) -> Arc<Self> {
+        Arc::new(Self {
+            definition: ToolDefinition {
+                name: name.into(),
+                description: name.into(),
+                input_schema: schemars::json_schema!({"type":"object", "additionalProperties":false}),
+                read_only,
+                requires_approval: false,
+            },
+            control_flow,
+            policies: Mutex::new(vec![]),
+            adaptations: Mutex::new(vec![]),
+        })
+    }
+}
+impl Tool for CeilingProbe {
+    fn definition(&self) -> &ToolDefinition {
+        &self.definition
+    }
+    fn is_control_flow(&self) -> bool {
+        self.control_flow
+    }
+    fn for_access(&self, access: AccessMode) -> Option<Arc<dyn Tool>> {
+        self.adaptations.lock().unwrap().push(access);
+        None
+    }
+    fn execute<'a>(
+        &'a self,
+        context: &'a ToolContext,
+        _: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            self.policies.lock().unwrap().push(context.policy.clone());
+            Ok(ToolOutput {
+                content: vec![],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+
+#[tokio::test]
+async fn handoff_tool_ceiling_denies_before_approval_and_preserves_parent_policy_on_reuse() {
+    for approval in [ApprovalPolicy::RequiredByTool, ApprovalPolicy::All] {
+        let parent_model = TestModel::with(
+            (0..2)
+                .flat_map(|_| {
+                    [
+                        Ok(response(vec![call("parent-write", "write")], None)),
+                        Ok(response(vec![call("transfer", "transfer")], None)),
+                    ]
+                })
+                .collect(),
+        );
+        let target_model = TestModel::with(
+            (0..2)
+                .flat_map(|_| {
+                    [
+                        Ok(response(
+                            [
+                                "write",
+                                "control",
+                                "exception",
+                                "escape",
+                                "excluded",
+                                "denied",
+                            ]
+                            .iter()
+                            .map(|name| RunItem::ToolCall {
+                                call: ToolCall {
+                                    raw_arguments: None,
+                                    id: (*name).into(),
+                                    name: (*name).into(),
+                                    arguments: json!({"invalid": true}),
+                                },
+                            })
+                            .collect(),
+                            None,
+                        )),
+                        Ok(response(
+                            vec![call("read-1", "read"), call("read-2", "read")],
+                            None,
+                        )),
+                        Ok(answer("done")),
+                    ]
+                })
+                .collect(),
+        );
+        let parent_write = CeilingProbe::new("write", false, false);
+        let read = CeilingProbe::new("read", true, false);
+        let forbidden = [
+            CeilingProbe::new("write", false, false),
+            CeilingProbe::new("control", false, true),
+            CeilingProbe::new("exception", false, false),
+            CeilingProbe::new("excluded", true, false),
+            CeilingProbe::new("denied", true, false),
+        ];
+        let mut target = agent(target_model.clone());
+        target.name = "readonly".into();
+        target.tool_access_ceiling = Some(AccessMode::ReadOnly);
+        target.tools = vec![read.clone()];
+        target
+            .tools
+            .extend(forbidden.iter().cloned().map(|t| t as Arc<dyn Tool>));
+        target.handoffs.push(Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            definition: ToolDefinition {
+                name: "escape".into(),
+                description: "escape".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: false,
+                requires_approval: true,
+            },
+            target: Arc::new(agent(TestModel::with(vec![]))),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let mut parent = agent(parent_model.clone());
+        parent.tools.push(parent_write.clone());
+        parent.handoffs.push(Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "transfer".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: false,
+                requires_approval: true,
+            },
+            target: Arc::new(target),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let runner = runner(parent);
+        let mut req = request(5);
+        req.policy.tools = ToolPolicy {
+            access: AccessMode::FullAccess,
+            approval,
+            allowed_tools: Some(
+                [
+                    "write",
+                    "read",
+                    "control",
+                    "exception",
+                    "escape",
+                    "transfer",
+                    "denied",
+                ]
+                .map(String::from)
+                .into(),
+            ),
+            denied_tools: ["denied".into()].into(),
+            allowed_mutating_tools: ["exception", "control", "escape"].map(String::from).into(),
+            timeout: Some(Duration::from_secs(30)),
+            max_child_turns: NonZeroU32::new(3),
+        };
+        let mut narrowed = req.policy.tools.clone();
+        narrowed.access = AccessMode::ReadOnly;
+        narrowed.allowed_mutating_tools.clear();
+        for _ in 0..2 {
+            let host = Arc::new(TestHost::default());
+            let outcome = runner
+                .run(context(), req.clone(), host.clone())
+                .await
+                .unwrap();
+            assert_eq!(outcome.result.status, RunStatus::Completed);
+            assert_eq!(outcome.result.last_agent.as_deref(), Some("readonly"));
+            for name in [
+                "write",
+                "control",
+                "exception",
+                "escape",
+                "excluded",
+                "denied",
+            ] {
+                assert!(
+                    outcome.result.new_items.iter().any(|item| matches!(item,
+                    RunItem::ToolResult { call_id, output } if call_id == name && output.is_error))
+                );
+            }
+            let approvals: Vec<_> = host
+                .events
+                .lock()
+                .unwrap()
+                .iter()
+                .filter_map(|event| {
+                    if let RunEvent::ApprovalRequired { request } = event {
+                        Some(request.call.id.clone())
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+            let expected = if approval == ApprovalPolicy::All {
+                vec!["parent-write", "transfer", "read-1", "read-2"]
+            } else {
+                vec!["transfer"]
+            };
+            assert_eq!(approvals, expected);
+        }
+        assert_eq!(
+            *parent_write.policies.lock().unwrap(),
+            vec![req.policy.tools.clone(); 2]
+        );
+        assert_eq!(*read.policies.lock().unwrap(), vec![narrowed; 4]);
+        assert!(
+            read.adaptations
+                .lock()
+                .unwrap()
+                .iter()
+                .all(|access| *access == AccessMode::ReadOnly)
+        );
+        for tool in forbidden {
+            assert!(tool.policies.lock().unwrap().is_empty());
+        }
+        for request in target_model.requests.lock().unwrap().iter() {
+            assert_eq!(
+                request
+                    .tools
+                    .iter()
+                    .map(|tool| tool.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["read"]
+            );
+        }
+        for request in parent_model.requests.lock().unwrap().iter() {
+            assert_eq!(
+                request
+                    .tools
+                    .iter()
+                    .map(|tool| tool.name.as_str())
+                    .collect::<Vec<_>>(),
+                vec!["write", "transfer"]
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn tool_ceiling_intersects_every_host_access_and_none_preserves_exceptions() {
+    for host_access in [
+        AccessMode::ReadOnly,
+        AccessMode::WorkspaceWrite,
+        AccessMode::FullAccess,
+    ] {
+        for ceiling in [
+            None,
+            Some(AccessMode::ReadOnly),
+            Some(AccessMode::WorkspaceWrite),
+            Some(AccessMode::FullAccess),
+        ] {
+            let model = TestModel::with(vec![
+                Ok(response(
+                    vec![call("read", "read"), call("write", "write")],
+                    None,
+                )),
+                Ok(answer("done")),
+            ]);
+            let read = CeilingProbe::new("read", true, false);
+            let write = CeilingProbe::new("write", false, true);
+            let mut a = agent(model.clone());
+            a.tool_access_ceiling = ceiling;
+            a.tools = vec![read.clone(), write.clone()];
+            a.name = "target".into();
+            let mut parent = agent(TestModel::with(vec![Ok(response(
+                vec![call("transfer", "transfer")],
+                None,
+            ))]));
+            parent.handoffs.push(Handoff {
+                on_handoff: None,
+                input_type: None,
+                history_filter: None,
+                is_enabled: None,
+                definition: ToolDefinition {
+                    name: "transfer".into(),
+                    description: "transfer".into(),
+                    input_schema: schemars::json_schema!({"type":"object"}),
+                    read_only: true,
+                    requires_approval: false,
+                },
+                target: Arc::new(a),
+                input_filter: HandoffInputFilter::Preserve,
+            });
+            let mut req = request(3);
+            req.policy.tools.access = host_access;
+            req.policy
+                .tools
+                .allowed_mutating_tools
+                .insert("write".into());
+            req.policy.tools.timeout = Some(Duration::from_secs(30));
+            req.policy.tools.max_child_turns = NonZeroU32::new(2);
+            let mut expected = req.policy.tools.clone();
+            if let Some(ceiling) = ceiling {
+                expected.access = match (host_access, ceiling) {
+                    (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
+                    (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
+                        AccessMode::WorkspaceWrite
+                    }
+                    _ => AccessMode::FullAccess,
+                };
+                expected.allowed_mutating_tools.clear();
+            }
+            let allowed = expected.decision(write.definition()) != ToolDecision::Deny;
+            runner(parent)
+                .run(context(), req, Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+            assert_eq!(*read.policies.lock().unwrap(), vec![expected.clone()]);
+            assert_eq!(
+                *write.policies.lock().unwrap(),
+                if allowed {
+                    vec![expected.clone()]
+                } else {
+                    vec![]
+                }
+            );
+            assert!(
+                read.adaptations
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .all(|access| *access == expected.access)
+            );
+            assert_eq!(
+                model.requests.lock().unwrap()[0].tools.len(),
+                if allowed { 2 } else { 1 }
+            );
+        }
+    }
+}
+
+#[derive(Default)]
+struct ImmediateQueue {
+    polls: Mutex<VecDeque<Result<ImmediateInputBatch, Error>>>,
+    finals: Mutex<VecDeque<Result<ImmediateInputBatch, Error>>>,
+    calls: Mutex<Vec<&'static str>>,
+}
+impl ImmediateInputPoller for ImmediateQueue {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.lock().unwrap().push("poll");
+            self.polls
+                .lock()
+                .unwrap()
+                .pop_front()
+                .unwrap_or_else(|| Ok(ImmediateInputBatch::default()))
+        })
+    }
+}
+impl ImmediateInputFinalizer for ImmediateQueue {
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.lock().unwrap().push("finalize");
+            self.finals
+                .lock()
+                .unwrap()
+                .pop_front()
+                .unwrap_or_else(|| Ok(ImmediateInputBatch::default()))
+        })
+    }
+}
+fn steering(text: &str) -> ImmediateInputBatch {
+    ImmediateInputBatch {
+        items: vec![message(Role::User, text)],
+        provenance: vec![ItemProvenance::Unattributed],
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_order_provenance_finalization_and_summary_in_run_and_stream() {
+    for streaming in [false, true] {
+        let model = TestModel::with(vec![Ok(answer("candidate")), Ok(answer("done"))]);
+        let queue = Arc::new(ImmediateQueue::default());
+        let mut initial = steering("first");
+        initial.items.push(message(Role::Assistant, "forwarded"));
+        initial.provenance.push(ItemProvenance::Agent {
+            name: "other".into(),
+        });
+        queue.polls.lock().unwrap().push_back(Ok(initial));
+        queue.finals.lock().unwrap().push_back(Ok(steering("late")));
+        let hooks = Arc::new(Observations::default());
+        let runner = Runner::new(
+            AgentConfig::new("test", ModelBinding::complete("primary", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue.clone()),
+                force_final_summary_turn: true,
+                hooks: Some(hooks.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let result = if streaming {
+            runner
+                .stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+        }
+        .unwrap()
+        .result;
+        assert_eq!(
+            *queue.calls.lock().unwrap(),
+            ["poll", "finalize", "poll", "finalize"]
+        );
+        assert_eq!(
+            result.new_items,
+            vec![
+                message(Role::User, "first"),
+                message(Role::Assistant, "forwarded"),
+                message(Role::Assistant, "candidate"),
+                message(Role::User, "late"),
+                message(Role::Assistant, "done")
+            ]
+        );
+        assert_eq!(result.new_items_provenance[0], ItemProvenance::Unattributed);
+        assert_eq!(
+            result.new_items_provenance[1],
+            ItemProvenance::Agent {
+                name: "other".into()
+            }
+        );
+        assert_eq!(result.new_items_provenance[3], ItemProvenance::Unattributed);
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(requests[1].input.last(), Some(&message(Role::User, "late")));
+        assert!(
+            requests
+                .iter()
+                .all(|r| r.tools.is_empty() && r.instructions.contains("<final_turn>"))
+        );
+        let seen = hooks.seen.lock().unwrap();
+        let admitted = seen.iter().position(|o| matches!(o, Observation::CommittedItems { items, agents, .. } if items.first() == Some(&message(Role::User, "first")) && agents[0].is_none() && agents[1].as_ref().unwrap().name == "other")).unwrap();
+        let attempted = seen
+            .iter()
+            .position(|o| matches!(o, Observation::ModelAttempt { .. }))
+            .unwrap();
+        assert!(admitted < attempted);
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_errors_are_observed_but_finalizer_and_invalid_batches_fail() {
+    for kind in ["poll", "finalize", "invalid"] {
+        let model = TestModel::with(vec![Ok(answer("done"))]);
+        let queue = Arc::new(ImmediateQueue::default());
+        if kind == "invalid" {
+            queue
+                .polls
+                .lock()
+                .unwrap()
+                .push_back(Ok(ImmediateInputBatch {
+                    items: steering("bad").items,
+                    provenance: vec![],
+                }));
+        } else if kind == "poll" {
+            queue
+                .polls
+                .lock()
+                .unwrap()
+                .push_back(Err(Error::new(ErrorCategory::Host, "queue failure")));
+        } else {
+            queue
+                .finals
+                .lock()
+                .unwrap()
+                .push_back(Err(Error::new(ErrorCategory::Host, "close failure")));
+        }
+        let hooks = Arc::new(Observations::default());
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue),
+                hooks: Some(hooks.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let outcome = runner
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await;
+        if kind == "poll" {
+            assert!(outcome.is_ok());
+            assert!(hooks.seen.lock().unwrap().iter().any(|o| matches!(o, Observation::ImmediateInputPollFailed { error } if error.message == "queue failure")));
+        } else {
+            let error = outcome.err().unwrap();
+            assert_eq!(
+                error.error.info.category,
+                if kind == "invalid" {
+                    ErrorCategory::InvalidInput
+                } else {
+                    ErrorCategory::Host
+                }
+            );
+            assert_eq!(
+                model.completes.load(Ordering::SeqCst),
+                usize::from(kind == "finalize")
+            );
+        }
+    }
+}
+
+struct PendingImmediate {
+    entered: tokio::sync::Notify,
+    drops: AtomicUsize,
+}
+impl ImmediateInputPoller for PendingImmediate {
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            struct Guard<'a>(&'a AtomicUsize);
+            impl Drop for Guard<'_> {
+                fn drop(&mut self) {
+                    self.0.fetch_add(1, Ordering::SeqCst);
+                }
+            }
+            let _guard = Guard(&self.drops);
+            self.entered.notify_one();
+            std::future::pending().await
+        })
+    }
+}
+impl ImmediateInputFinalizer for PendingImmediate {
+    fn finalize<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        self.poll(context)
+    }
+}
+#[tokio::test]
+async fn immediate_input_cancellation_and_stream_drop_drop_callback_future() {
+    for drop_stream in [false, true] {
+        let queue = Arc::new(PendingImmediate {
+            entered: tokio::sync::Notify::new(),
+            drops: AtomicUsize::new(0),
+        });
+        let model = TestModel::with(vec![]);
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let token = CancellationToken::new();
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token.clone());
+        if drop_stream {
+            let mut stream = runner.stream(ctx, request(1), Arc::new(TestHost::default()));
+            assert!(matches!(
+                stream.next().await,
+                Some(RunEvent::Started { .. })
+            ));
+            tokio::select! {
+                biased;
+                _ = stream.next() => panic!("unexpected event"),
+                _ = queue.entered.notified() => {}
+            }
+            drop(stream);
+        } else {
+            let run = runner.run(ctx, request(1), Arc::new(TestHost::default()));
+            let cancel = async {
+                queue.entered.notified().await;
+                token.cancel();
+            };
+            let (result, _) = tokio::join!(run, cancel);
+            assert_eq!(
+                result.err().unwrap().error.info.category,
+                ErrorCategory::Cancelled
+            );
+        }
+        assert_eq!(queue.drops.load(Ordering::SeqCst), 1);
+        assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+    }
+}
+
+#[tokio::test]
+async fn immediate_finalizer_extends_exhausted_budget_then_polls() {
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![message(Role::Assistant, "continue")],
+            Some(false),
+        )),
+        Ok(answer("done")),
+    ]);
+    let queue = Arc::new(ImmediateQueue::default());
+    queue.finals.lock().unwrap().push_back(Ok(steering("last")));
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            immediate_input_poller: Some(queue.clone()),
+            immediate_input_finalizer: Some(queue.clone()),
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let result = runner
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(
+        *queue.calls.lock().unwrap(),
+        ["poll", "finalize", "poll", "finalize"]
+    );
+    assert_eq!(result.result.final_output, Some(json!("done")));
+    assert_eq!(
+        model.requests.lock().unwrap()[1].input.last(),
+        Some(&message(Role::User, "last"))
+    );
+}
+
+mod immediate_input_oracle;
+
+#[tokio::test]
+async fn immediate_finalizer_precedes_stop_after_tool_and_grants_a_turn() {
+    for return_tool_output in [false, true] {
+        let model = TestModel::with(vec![
+            Ok(response(vec![call("one", "read")], None)),
+            Ok(answer("steered")),
+        ]);
+        let tool = TestTool::new("read", false, false);
+        let mut agent = agent(model.clone());
+        agent.tools.push(tool.clone());
+        let queue = Arc::new(ImmediateQueue::default());
+        queue.finals.lock().unwrap().push_back(Ok(steering("late")));
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                immediate_input_finalizer: Some(queue.clone()),
+                return_tool_output,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut req = request(1);
+        req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        let outcome = runner
+            .run(context(), req, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(outcome.result.final_output, Some(json!("steered")));
+        assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+        assert_eq!(*queue.calls.lock().unwrap(), ["finalize", "finalize"]);
+        assert_eq!(
+            model.requests.lock().unwrap()[1].input.last(),
+            Some(&message(Role::User, "late"))
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_batch_is_retained_when_publication_fails() {
+    struct RejectAdmission;
+    impl RunHooks for RejectAdmission {
+        fn observe<'a>(
+            &'a self,
+            _: &'a Context,
+            event: Observation,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if matches!(event, Observation::CommittedItems { .. }) {
+                    Err(Error::new(ErrorCategory::Host, "reject observation"))
+                } else {
+                    Ok(())
+                }
+            })
+        }
+    }
+    let model = TestModel::with(vec![]);
+    let queue = Arc::new(ImmediateQueue::default());
+    queue
+        .polls
+        .lock()
+        .unwrap()
+        .push_back(Ok(steering("retained")));
+    let runner = Runner::new(
+        agent(model.clone()),
+        RunnerConfig {
+            immediate_input_poller: Some(queue),
+            hooks: Some(Arc::new(RejectAdmission)),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = runner
+        .run(context(), request(1), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "reject observation");
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.new_items, vec![message(Role::User, "retained")]);
+    assert_eq!(
+        partial.new_items_provenance,
+        vec![ItemProvenance::Unattributed]
+    );
+    assert_eq!(model.completes.load(Ordering::SeqCst), 0);
+}
+
+#[tokio::test]
+async fn immediate_finalizer_is_deadline_bounded_and_retains_candidate() {
+    let queue = Arc::new(PendingImmediate {
+        entered: tokio::sync::Notify::new(),
+        drops: AtomicUsize::new(0),
+    });
+    let model = TestModel::with(vec![Ok(answer("candidate"))]);
+    let runner = Runner::new(
+        agent(model),
+        RunnerConfig {
+            immediate_input_finalizer: Some(queue.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut ctx = context();
+    ctx.deadline = Some(Instant::now() + Duration::from_millis(100));
+    let error = runner
+        .run(ctx, request(1), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::DeadlineExceeded);
+    assert_eq!(queue.drops.load(Ordering::SeqCst), 1);
+    assert_eq!(
+        error.partial.unwrap().new_items,
+        vec![message(Role::Assistant, "candidate")]
+    );
+}
+
+#[tokio::test]
+async fn malformed_immediate_history_does_not_poison_partial_results() {
+    for finalizing in [false, true] {
+        let queue = Arc::new(ImmediateQueue::default());
+        let batch = ImmediateInputBatch {
+            items: vec![
+                message(Role::User, "not admitted"),
+                call("orphan", "inspect"),
+            ],
+            provenance: vec![ItemProvenance::Unattributed; 2],
+        };
+        if finalizing {
+            queue.finals.lock().unwrap().push_back(Ok(batch));
+        } else {
+            queue.polls.lock().unwrap().push_back(Ok(batch));
+        }
+        let model = TestModel::with(vec![Ok(answer("candidate"))]);
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_finalizer: Some(queue),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let error = runner
+            .run(context(), request(1), Arc::new(TestHost::default()))
+            .await
+            .err()
+            .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+        let partial = error.partial.unwrap();
+        let mut expected = vec![message(Role::User, "go")];
+        if finalizing {
+            expected.push(message(Role::Assistant, "candidate"));
+        }
+        assert_eq!(partial.history, expected);
+        assert_eq!(partial.history.len(), partial.history_provenance.len());
+        assert_eq!(
+            model.completes.load(Ordering::SeqCst),
+            usize::from(finalizing)
+        );
+    }
+}
+
+#[derive(Default)]
+struct WakeSignal {
+    wake: tokio::sync::Notify,
+    consumed: tokio::sync::Notify,
+    drops: AtomicUsize,
+}
+struct WakeDrop<'a>(&'a AtomicUsize);
+impl Drop for WakeDrop<'_> {
+    fn drop(&mut self) {
+        self.0.fetch_add(1, Ordering::SeqCst);
+    }
+}
+impl ImmediateInputSignal for WakeSignal {
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            let _guard = WakeDrop(&self.drops);
+            self.wake.notified().await;
+            self.consumed.notify_one();
+        })
+    }
+}
+#[derive(Default)]
+struct WakeModel {
+    entered: tokio::sync::Notify,
+    release: tokio::sync::Notify,
+    requests: Mutex<Vec<ModelRequest>>,
+    drops: AtomicUsize,
+    visible: Option<ModelEvent>,
+}
+impl Model for WakeModel {
+    fn provider(&self) -> &str {
+        "test"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            let _guard = WakeDrop(&self.drops);
+            let first = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len() == 1
+            };
+            if first {
+                self.entered.notify_one();
+                self.release.notified().await;
+            }
+            Ok(answer("done"))
+        })
+    }
+}
+struct WakeStream<'a> {
+    model: &'a WakeModel,
+    first: bool,
+    step: usize,
+}
+impl Drop for WakeStream<'_> {
+    fn drop(&mut self) {
+        self.model.drops.fetch_add(1, Ordering::SeqCst);
+    }
+}
+impl ModelStream for WakeStream<'_> {
+    fn next(&mut self) -> BoxFuture<'_, Result<Option<ModelEvent>, Error>> {
+        Box::pin(async move {
+            self.step += 1;
+            if self.first && self.step == 1 {
+                if let Some(event) = &self.model.visible {
+                    return Ok(Some(event.clone()));
+                }
+            }
+            if self.first && self.step == 1 + usize::from(self.model.visible.is_some()) {
+                self.model.entered.notify_one();
+                self.model.release.notified().await;
+            }
+            if self.step <= 1 + usize::from(self.first && self.model.visible.is_some()) {
+                Ok(Some(ModelEvent::Complete {
+                    response: answer("done"),
+                }))
+            } else {
+                Ok(None)
+            }
+        })
+    }
+}
+impl StreamingModel for WakeModel {
+    fn stream<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            let first = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len() == 1
+            };
+            Ok(Box::new(WakeStream {
+                model: self,
+                first,
+                step: 0,
+            }) as Box<dyn ModelStream>)
+        })
+    }
+}
+
+#[test]
+fn immediate_signal_requires_poller_even_with_finalizer() {
+    for finalizer in [false, true] {
+        let result = Runner::new(
+            agent(TestModel::default().into()),
+            RunnerConfig {
+                immediate_input_signal: Some(Arc::new(WakeSignal::default())),
+                immediate_input_finalizer: finalizer.then(|| {
+                    Arc::new(ImmediateQueue::default()) as Arc<dyn ImmediateInputFinalizer>
+                }),
+                ..Default::default()
+            },
+        );
+        assert_eq!(
+            result.err().unwrap().info.category,
+            ErrorCategory::InvalidInput
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_rebuilds_run_and_stream_at_one_turn_with_honest_attempts() {
+    for streaming in [false, true] {
+        for summary in [false, true] {
+            let model = Arc::new(WakeModel::default());
+            let queue = Arc::new(ImmediateQueue::default());
+            let signal = Arc::new(WakeSignal::default());
+            let generations = Arc::new(Generations::default());
+            let runner = Runner::new(
+                AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+                RunnerConfig {
+                    immediate_input_poller: Some(queue.clone()),
+                    immediate_input_signal: Some(signal.clone()),
+                    generation_observer: Some(generations.clone()),
+                    force_final_summary_turn: summary,
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let drive = async {
+                if streaming {
+                    runner
+                        .stream(context(), request(1), Arc::new(TestHost::default()))
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(), request(1), Arc::new(TestHost::default()))
+                        .await
+                }
+            };
+            let steer = async {
+                model.entered.notified().await;
+                queue
+                    .polls
+                    .lock()
+                    .unwrap()
+                    .push_back(Ok(steering("new instructions")));
+                signal.wake.notify_one();
+            };
+            let (outcome, _) = tokio::join!(drive, steer);
+            let result = outcome.unwrap().result;
+            assert_eq!(result.metrics.unwrap().turns, 2);
+            assert_eq!(result.responses.len(), 1);
+            assert_eq!(result.usage.input_tokens, 10);
+            assert_eq!(model.drops.load(Ordering::SeqCst), 2);
+            assert_eq!(signal.drops.load(Ordering::SeqCst), 2);
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(
+                !requests[0]
+                    .input
+                    .contains(&message(Role::User, "new instructions"))
+            );
+            assert!(
+                requests[1]
+                    .input
+                    .contains(&message(Role::User, "new instructions"))
+            );
+            for request in requests.iter() {
+                assert_eq!(request.instructions.contains("<final_turn>"), summary);
+                if summary {
+                    assert!(request.tools.is_empty());
+                }
+            }
+            let records = generations.records.lock().unwrap();
+            assert_eq!(records.len(), 4);
+            assert_eq!(
+                records[1].1.status,
+                adk_runtime::tracing::GenerationStatus::Interrupted
+            );
+            assert_eq!(
+                records[3].1.status,
+                adk_runtime::tracing::GenerationStatus::Completed
+            );
+            assert_ne!(records[0].1.id, records[2].1.id);
+            assert_eq!((records[0].1.turn, records[2].1.turn), (1, 2));
+            assert!(records[1].1.response.is_none());
+            assert!(records[1].1.cost_usd.is_none());
+        }
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_never_replays_visible_text_or_reasoning_and_finalizer_drains() {
+    for visible in [
+        ModelEvent::TextDelta {
+            delta: "visible".into(),
+        },
+        ModelEvent::ReasoningDelta {
+            delta: "thinking".into(),
+        },
+    ] {
+        let model = Arc::new(WakeModel {
+            visible: Some(visible.clone()),
+            ..Default::default()
+        });
+        let queue = Arc::new(ImmediateQueue::default());
+        let signal = Arc::new(WakeSignal::default());
+        let host = Arc::new(TestHost::default());
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(queue.clone()),
+                immediate_input_signal: Some(signal.clone()),
+                immediate_input_finalizer: Some(queue.clone()),
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let steer = async {
+            model.entered.notified().await;
+            queue
+                .finals
+                .lock()
+                .unwrap()
+                .push_back(Ok(steering("late input")));
+            signal.wake.notify_one();
+            signal.consumed.notified().await;
+            assert_eq!(model.requests.lock().unwrap().len(), 1);
+            assert_eq!(model.drops.load(Ordering::SeqCst), 0);
+            model.release.notify_one();
+        };
+        let (result, _) = tokio::join!(
+            runner.stream(context(), request(1), host.clone()).finish(),
+            steer
+        );
+        let result = result.unwrap().result;
+        assert_eq!(result.responses.len(), 2);
+        assert!(
+            model.requests.lock().unwrap()[1]
+                .input
+                .contains(&message(Role::User, "late input"))
+        );
+        assert_eq!(
+            host.events
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|event| matches!(event, RunEvent::Model { event } if event == &visible))
+                .count(),
+            1
+        );
+        assert!(
+            generations
+                .records
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|(ended, _)| *ended)
+                .all(|(_, record)| record.status
+                    == adk_runtime::tracing::GenerationStatus::Completed)
+        );
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_parent_cancel_deadline_and_stream_drop_cleanup() {
+    for mode in 0..3 {
+        let model = Arc::new(WakeModel::default());
+        let signal = Arc::new(WakeSignal::default());
+        let generations = Arc::new(Generations::default());
+        let runner = Runner::new(
+            AgentConfig::new("agent", ModelBinding::streaming("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(Arc::new(ImmediateQueue::default())),
+                immediate_input_signal: Some(signal.clone()),
+                generation_observer: Some(generations.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let token = CancellationToken::new();
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token.clone());
+        if mode == 2 {
+            tokio::time::pause();
+            ctx.deadline = Some(Instant::now() + Duration::from_secs(1));
+        }
+        if mode == 1 {
+            let mut stream = runner.stream(ctx, request(1), Arc::new(TestHost::default()));
+            assert!(matches!(
+                stream.next().await,
+                Some(RunEvent::Started { .. })
+            ));
+            tokio::select! {
+                biased;
+                _ = stream.next() => panic!("unexpected output"),
+                _ = model.entered.notified() => {}
+            }
+            drop(stream);
+        } else {
+            let cancel = async {
+                model.entered.notified().await;
+                if mode == 2 {
+                    tokio::time::advance(Duration::from_secs(2)).await;
+                } else {
+                    token.cancel();
+                    signal.wake.notify_one();
+                }
+            };
+            let (result, _) = tokio::join!(
+                runner.run(ctx, request(1), Arc::new(TestHost::default())),
+                cancel
+            );
+            assert_eq!(
+                result.err().unwrap().error.info.category,
+                if mode == 2 {
+                    ErrorCategory::DeadlineExceeded
+                } else {
+                    ErrorCategory::Cancelled
+                }
+            );
+        }
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+        assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+        assert_eq!(signal.drops.load(Ordering::SeqCst), 1);
+        let records = generations.records.lock().unwrap();
+        assert_eq!(records.len(), 2);
+        assert_eq!(records[0].1.id, records[1].1.id);
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_keeps_child_turn_caps_and_shared_budget_charged() {
+    use adk_runtime::subagent::*;
+    for shared_cap in [false, true] {
+        let model = Arc::new(WakeModel::default());
+        let signal = Arc::new(WakeSignal::default());
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("test", model.clone())),
+            RunnerConfig {
+                immediate_input_poller: Some(Arc::new(ImmediateQueue::default())),
+                immediate_input_signal: Some(signal.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let baseline = SecurityBaseline::default();
+        let owner = Scheduler::new(
+            context(),
+            SchedulerConfig {
+                max_turns: NonZeroU32::new(if shared_cap { 3 } else { 1 }).unwrap(),
+                security: baseline.clone(),
+                agents: [("worker".into(), baseline)].into(),
+                budget: BudgetLimits {
+                    turns: shared_cap.then_some(1),
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+            Arc::new(RunnerChildExecutor::new(
+                [("worker".into(), child)].into(),
+                Arc::new(TestHost::default()),
+            )),
+            None,
+        )
+        .unwrap();
+        let handle = owner.handle();
+        let id = handle
+            .submit(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        model.entered.notified().await;
+        signal.wake.notify_one();
+        handle
+            .wait(std::slice::from_ref(&id), WaitMode::All, None)
+            .await
+            .unwrap();
+        let task = handle.status(&id, Detail::Full).unwrap();
+        assert_ne!(task.status, TaskStatus::Completed);
+        assert_eq!(task.usage.turns, 1);
+        assert_eq!(handle.snapshot().usage.turns, 1);
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+        assert_eq!(model.drops.load(Ordering::SeqCst), 1);
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_and_child_steering_share_one_rebuilt_request() {
+    use adk_runtime::subagent::*;
+    let model = Arc::new(WakeModel::default());
+    let signal = Arc::new(WakeSignal::default());
+    let queue = Arc::new(ImmediateQueue::default());
+    let child = Runner::new(
+        AgentConfig::new("worker", ModelBinding::complete("test", model.clone())),
+        RunnerConfig {
+            immediate_input_poller: Some(queue.clone()),
+            immediate_input_signal: Some(signal.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let baseline = SecurityBaseline::default();
+    let owner = Scheduler::new(
+        context(),
+        SchedulerConfig {
+            max_turns: NonZeroU32::new(3).unwrap(),
+            security: baseline.clone(),
+            agents: [("worker".into(), baseline)].into(),
+            ..Default::default()
+        },
+        Arc::new(RunnerChildExecutor::new(
+            [("worker".into(), child)].into(),
+            Arc::new(TestHost::default()),
+        )),
+        None,
+    )
+    .unwrap();
+    let handle = owner.handle();
+    let id = handle
+        .submit(Submission::new("worker", "start"))
+        .await
+        .unwrap();
+    model.entered.notified().await;
+    queue
+        .polls
+        .lock()
+        .unwrap()
+        .push_back(Ok(steering("host wake")));
+    signal.wake.notify_one();
+    handle.steer(&id, "steer-1", "child wake").await.unwrap();
+    handle
+        .wait(std::slice::from_ref(&id), WaitMode::All, None)
+        .await
+        .unwrap();
+    let task = handle.status(&id, Detail::Full).unwrap();
+    assert_eq!(task.status, TaskStatus::Completed);
+    assert_eq!(task.usage.turns, 2);
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        let input = serde_json::to_string(&requests[1].input).unwrap();
+        assert!(input.contains("host wake"));
+        assert!(input.contains("child wake"));
+    }
+    assert_eq!(model.drops.load(Ordering::SeqCst), 2);
+    assert_eq!(signal.drops.load(Ordering::SeqCst), 2);
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn additional_instructions_match_pinned_normal_and_streamed_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 40);
+    for case in fixture["cases"].as_array().unwrap() {
+        let model = TestModel::with(vec![Ok(answer("done"))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer("done"),
+        })]]
+        .into();
+        let mut a = agent(model.clone());
+        a.instructions = case["base"].as_str().unwrap().into();
+        let r = Runner::new(
+            a,
+            RunnerConfig {
+                additional_instructions: case["extra"].as_str().unwrap().into(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if case["streaming"].as_bool().unwrap() {
+            r.stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            r.run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            model.requests.lock().unwrap()[0].instructions,
+            case["instructions"].as_str().unwrap(),
+            "{case}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn mcp_prompt_matches_pinned_normal_streamed_and_structured_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mcp-prompt/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["observations"]["cases"].as_array().unwrap().len(),
+        56
+    );
+    for case in fixture["observations"]["cases"].as_array().unwrap() {
+        let model = TestModel::with(vec![Ok(answer("{}"))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer("{}"),
+        })]]
+        .into();
+        let mut a = agent(model.clone());
+        a.instructions = "base".into();
+        a.mcp_servers = serde_json::from_value(case["names"].clone()).unwrap();
+        if case["schema"].as_bool().unwrap() {
+            a.output_schema = Some(json!({"type":"object"}).try_into().unwrap());
+        }
+        let r = Runner::new(
+            a,
+            RunnerConfig {
+                additional_instructions: " extra ".into(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        if case["streaming"].as_bool().unwrap() {
+            r.stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            r.run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+        }
+        assert_eq!(
+            model.requests.lock().unwrap()[0].instructions,
+            case["instructions"].as_str().unwrap(),
+            "{case}"
+        );
     }
 }

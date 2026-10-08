@@ -151,6 +151,10 @@ pub struct Client {
     discovery_cache_ttl: Duration,
     resources_discovered_at: Option<Instant>,
     prompts_discovered_at: Option<Instant>,
+    catalog_budget: Option<Arc<crate::session::CatalogBudget>>,
+    tools_reservation: Option<crate::session::CatalogReservation>,
+    resources_reservation: Option<crate::session::CatalogReservation>,
+    prompts_reservation: Option<crate::session::CatalogReservation>,
 }
 impl Client {
     pub fn new(
@@ -194,12 +198,29 @@ impl Client {
             discovery_cache_ttl: Duration::from_secs(30),
             resources_discovered_at: None,
             prompts_discovered_at: None,
+            catalog_budget: None,
+            tools_reservation: None,
+            resources_reservation: None,
+            prompts_reservation: None,
         };
         client.check_server()?;
         Ok(client)
     }
     pub fn server_name(&self) -> &str {
         &self.server
+    }
+    pub(crate) fn set_catalog_budget(&mut self, budget: Arc<crate::session::CatalogBudget>) {
+        self.catalog_budget = Some(budget);
+    }
+
+    fn reserve_catalog(
+        &self,
+        count: usize,
+    ) -> Result<Option<crate::session::CatalogReservation>, Error> {
+        self.catalog_budget
+            .as_ref()
+            .map(|budget| budget.reserve(count))
+            .transpose()
     }
     pub fn diagnostics(&self) -> Option<String> {
         self.transport.diagnostics()
@@ -214,6 +235,8 @@ impl Client {
     pub fn invalidate_discovery(&mut self) {
         self.resources = None;
         self.prompts = None;
+        self.resources_reservation = None;
+        self.prompts_reservation = None;
         self.resources_discovered_at = None;
         self.prompts_discovered_at = None;
     }
@@ -410,6 +433,7 @@ impl Client {
         self.transport = fresh_transport;
         self.capabilities = Capabilities::default();
         self.tools = None;
+        self.tools_reservation = None;
         self.invalidate_discovery();
         self.state = State::New;
         self.initialize().await
@@ -514,6 +538,7 @@ impl Client {
                 }
                 tools.push(descriptor);
             }
+            self.tools_reservation = self.reserve_catalog(tools.len())?;
             self.tools = Some(tools);
         }
         let mut tools: Vec<_> = self
@@ -606,6 +631,7 @@ impl Client {
             .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
         {
             self.resources = None;
+            self.resources_reservation = None;
             self.resources_discovered_at = None;
             let discovered_at = Instant::now();
             let items = self.pages("resources/list", "resources").await?;
@@ -624,6 +650,7 @@ impl Client {
                     return Err(Error::Protocol("ambiguous resource URI".into()));
                 }
             }
+            self.resources_reservation = self.reserve_catalog(resources.len())?;
             self.resources = Some(resources);
             self.resources_discovered_at = Some(discovered_at);
         }
@@ -668,6 +695,7 @@ impl Client {
             .is_none_or(|at| at.elapsed() >= self.discovery_cache_ttl)
         {
             self.prompts = None;
+            self.prompts_reservation = None;
             self.prompts_discovered_at = None;
             let discovered_at = Instant::now();
             let items = self.pages("prompts/list", "prompts").await?;
@@ -694,6 +722,7 @@ impl Client {
                     return Err(Error::Protocol("ambiguous prompt name".into()));
                 }
             }
+            self.prompts_reservation = self.reserve_catalog(prompts.len())?;
             self.prompts = Some(prompts);
             self.prompts_discovered_at = Some(discovered_at);
         }
@@ -783,13 +812,57 @@ pub fn qualified_tool_name(server: &str, tool: &str) -> String {
     crate::names::qualified_tool_name(server, tool)
 }
 
+/// Final advertised name and its original protocol routing identity.
+#[derive(Clone, Debug)]
+pub struct CatalogEntry {
+    pub definition: adk_core::ToolDefinition,
+    pub server_name: String,
+    pub tool_name: String,
+}
+
 pub struct ClientManager {
     clients: BTreeMap<String, tokio::sync::Mutex<Client>>,
     definitions: Vec<adk_core::ToolDefinition>,
     routes: BTreeMap<String, (String, String)>,
     resources: bool,
+    capabilities: BTreeMap<String, Capabilities>,
+    resource_access: bool,
 }
 impl ClientManager {
+    /// Narrows an assembled catalog without changing collision-resolved names.
+    pub fn select_tools(
+        mut self,
+        allow_all: bool,
+        allowed: &BTreeSet<String>,
+        resources: bool,
+    ) -> Self {
+        self.routes
+            .retain(|name, (_, raw)| allow_all || allowed.contains(name) || allowed.contains(raw));
+        self.definitions
+            .retain(|definition| self.routes.contains_key(&definition.name));
+        self.resource_access &= resources;
+        self.resources &= resources;
+        self
+    }
+
+    pub fn catalog(&self) -> Vec<CatalogEntry> {
+        self.definitions
+            .iter()
+            .map(|definition| {
+                let (server_name, tool_name) = &self.routes[&definition.name];
+                CatalogEntry {
+                    definition: definition.clone(),
+                    server_name: server_name.clone(),
+                    tool_name: tool_name.clone(),
+                }
+            })
+            .collect()
+    }
+
+    pub fn connected_servers(&self) -> &BTreeMap<String, Capabilities> {
+        &self.capabilities
+    }
+
     pub async fn list_prompts(&self, server: Option<&str>) -> Result<Vec<PromptDescriptor>, Error> {
         if server.is_some_and(|s| !self.clients.contains_key(s)) {
             return Err(Error::Policy("unknown server".into()));
@@ -877,54 +950,69 @@ impl ClientManager {
         }
         Ok(())
     }
-    pub async fn new(mut clients: Vec<Client>) -> Result<Self, Error> {
-        let mut manager = Self {
-            clients: BTreeMap::new(),
-            definitions: Vec::new(),
-            routes: BTreeMap::new(),
-            resources: false,
-        };
-        clients.sort_by(|a, b| a.server.cmp(&b.server));
-        let mut qualified = BTreeSet::new();
-        for mut client in clients {
-            if manager.clients.contains_key(client.server_name()) {
-                return Err(Error::Config("duplicate server name".into()));
+    pub fn new(
+        clients: Vec<Client>,
+    ) -> impl std::future::Future<Output = Result<Self, Error>> + Send {
+        let mut acquired = crate::session::AcquiredClients(clients);
+        async move {
+            let mut manager = Self {
+                clients: BTreeMap::new(),
+                definitions: Vec::new(),
+                routes: BTreeMap::new(),
+                resources: false,
+                capabilities: BTreeMap::new(),
+                resource_access: true,
+            };
+            acquired.0.sort_by(|a, b| a.server.cmp(&b.server));
+            let mut qualified = BTreeSet::new();
+            let mut servers = BTreeSet::new();
+            for client in &acquired.0 {
+                if !servers.insert(client.server.clone()) {
+                    return Err(Error::Config("duplicate server name".into()));
+                }
             }
-            if client.state == State::New {
-                client.initialize().await?;
+            for client in &mut acquired.0 {
+                if client.state == State::New {
+                    client.initialize().await?;
+                }
+                client.list_tools().await?;
+                for tool in client.tools.iter().flatten().filter(|tool| {
+                    client.tool_allowed(&tool.tool_name) && client.remote_read_only(tool)
+                }) {
+                    let name = crate::names::ensure_unique_tool_name(
+                        &qualified_tool_name(&tool.server_name, &tool.tool_name),
+                        &mut qualified,
+                    )
+                    .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
+                    manager.routes.insert(
+                        name.clone(),
+                        (tool.server_name.clone(), tool.tool_name.clone()),
+                    );
+                    manager.definitions.push(adk_core::ToolDefinition {
+                        name,
+                        description: tool.display_description.clone(),
+                        input_schema: tool
+                            .input_schema
+                            .clone()
+                            .try_into()
+                            .map_err(|_| Error::Protocol("invalid tool schema".into()))?,
+                        read_only: tool.read_only,
+                        requires_approval: !tool.read_only,
+                    });
+                }
+                manager.resources |= client.capabilities.resources;
+                manager
+                    .capabilities
+                    .insert(client.server.clone(), client.capabilities);
             }
-            client.list_tools().await?;
-            for tool in client.tools.iter().flatten().filter(|tool| {
-                client.tool_allowed(&tool.tool_name) && client.remote_read_only(tool)
-            }) {
-                let name = crate::names::ensure_unique_tool_name(
-                    &qualified_tool_name(&tool.server_name, &tool.tool_name),
-                    &mut qualified,
-                )
-                .ok_or_else(|| Error::Protocol("ambiguous qualified tool name".into()))?;
-                manager.routes.insert(
-                    name.clone(),
-                    (tool.server_name.clone(), tool.tool_name.clone()),
-                );
-                manager.definitions.push(adk_core::ToolDefinition {
-                    name,
-                    description: tool.display_description.clone(),
-                    input_schema: tool
-                        .input_schema
-                        .clone()
-                        .try_into()
-                        .map_err(|_| Error::Protocol("invalid tool schema".into()))?,
-                    read_only: tool.read_only,
-                    requires_approval: !tool.read_only,
-                });
+            for client in std::mem::take(&mut acquired.0) {
+                manager
+                    .clients
+                    .insert(client.server.clone(), tokio::sync::Mutex::new(client));
             }
-            manager.resources |= client.capabilities.resources;
-            manager
-                .clients
-                .insert(client.server.clone(), tokio::sync::Mutex::new(client));
+            manager.definitions.sort_by(|a, b| a.name.cmp(&b.name));
+            Ok(manager)
         }
-        manager.definitions.sort_by(|a, b| a.name.cmp(&b.name));
-        Ok(manager)
     }
 }
 impl crate::tools::ToolManager for ClientManager {
@@ -952,6 +1040,9 @@ impl crate::tools::ToolManager for ClientManager {
         server: Option<&'a str>,
     ) -> BoxFuture<'a, Result<Value, Error>> {
         Box::pin(async move {
+            if !self.resource_access {
+                return Err(Error::Policy("resources not selected".into()));
+            }
             if server.is_some_and(|s| !self.clients.contains_key(s)) {
                 return Err(Error::Policy("unknown server".into()));
             }
@@ -993,6 +1084,9 @@ impl crate::tools::ToolManager for ClientManager {
         uri: &'a str,
     ) -> BoxFuture<'a, Result<Value, Error>> {
         Box::pin(async move {
+            if !self.resource_access {
+                return Err(Error::Policy("resources not selected".into()));
+            }
             let client = self
                 .clients
                 .get(server)

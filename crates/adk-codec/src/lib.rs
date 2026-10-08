@@ -2,8 +2,11 @@
 pub mod approval;
 pub mod config;
 pub mod dto;
+pub mod request_native;
+pub mod snapshots;
 mod state;
 pub mod timestamp;
+pub mod userinput;
 
 use dto::*;
 use schemars::{JsonSchema, Schema};
@@ -115,7 +118,7 @@ pub fn snapshot_items(items: &[RunItem]) -> Vec<RunItemSnapshot> {
                         approved: v.approved,
                     })
                 }
-                SnapshotType::Unknown => {}
+                SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => {}
             }
             out
         })

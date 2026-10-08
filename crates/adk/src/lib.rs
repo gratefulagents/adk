@@ -35,3 +35,39 @@ pub use adk_security as security;
 /// Lifecycle-owned prepared tool integration with the standalone runner.
 #[cfg(all(feature = "tools", feature = "runtime"))]
 pub mod tool_runtime;
+
+/// Ordered native events, explicit capture policy and host-owned telemetry.
+#[cfg(feature = "observability")]
+pub mod observability;
+
+/// Compatible SDK trace documents and Linux confined category storage.
+#[cfg(feature = "observability")]
+pub mod tracestore;
+
+/// SDK schema-2 trace writer and host-published span records.
+#[cfg(feature = "observability")]
+pub mod tracewriter;
+
+/// Explicitly owned stdout/OTLP exporters and SDK endpoint defaults.
+#[cfg(feature = "otel")]
+pub mod telemetry;
+
+/// Host configuration, provider/tool composition and explicit bundle/session ownership.
+#[cfg(feature = "builder")]
+pub mod builder;
+
+/// Opt-in builtin runtime tool guardrails backed by the shared security policy.
+#[cfg(feature = "builder")]
+pub mod guardrails;
+
+/// Host-owned message ingestion, approvals and session persistence.
+#[cfg(feature = "host")]
+pub mod host;
+
+/// Shared trace ownership, scoped spans and ordered processor composition.
+#[cfg(feature = "observability")]
+pub mod tracing;
+
+/// Explicit runtime hook and generation integration for owned trace scopes.
+#[cfg(feature = "observability")]
+pub mod tracing_runtime;

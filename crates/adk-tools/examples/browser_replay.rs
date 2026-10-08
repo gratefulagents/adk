@@ -65,6 +65,7 @@ mod replay {
                 .execute(
                     &ctx,
                     ToolCall {
+                        raw_arguments: None,
                         id: "b".into(),
                         name: "Browser".into(),
                         arguments: input["arguments"].clone(),

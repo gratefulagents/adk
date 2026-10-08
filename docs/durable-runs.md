@@ -4,6 +4,23 @@ Issue #9 adds persisted state, not a production worker or a database redesign.
 All formats target SDK v0.0.115 (`1dc92b73900fac74dc357a938e4b5eee6392b418`).
 The platform migration remains unchanged; no production data was migrated.
 
+## Local-compaction configuration identity
+
+Recovery binds the normalized local-compaction enabled flag, token thresholds,
+recent-item and initial-user retention counts, and summary-bullet limit.
+Changing any field rejects resume before model/tool execution. Zero-valued
+retention fields normalize to the same defaults as a fresh runner.
+
+Default-policy checkpoint identities are unchanged. Older checkpoints written
+with a nondefault local-compaction policy did not record that policy in their
+identity; they cannot establish that recovery uses the original configuration.
+There is no automatic migration for those checkpoints.
+
+Host model-threshold resolvers require an explicit nonempty `durable_key` and
+must be deterministic and replay-safe. Recovery binds that key; a changed or
+removed resolver rejects resume. Terminal recovery does not invoke the resolver.
+Network-dependent or mutable catalog lookup must not claim replay safety.
+
 ## Entry points
 
 | Capability | Public API | Detail |

@@ -4,6 +4,9 @@ use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest, Streaming
 use adk_runtime::{CompactedHistory, CompactionRequest, Compactor, CostEstimator};
 use std::sync::Arc;
 
+mod metadata;
+pub use metadata::{MetadataCompactionResolver, MetadataCompactionWarning};
+
 /// Baseline USD accounting for the runner's actual selected binding, including
 /// named routes and fallbacks. The runner requires a number: unknown prices use
 /// zero, as in baseline CalculateCost. Use Routes::estimate_cost to retain the
@@ -43,6 +46,7 @@ impl Compactor for NativeCompactor {
             let mut input = self.template.clone();
             input.model = model;
             input.input = request.history;
+            input.input_provenance = request.history_provenance;
             let response = self.provider.compact(context, input).await?;
             let cost = self.costs.cost(&request.model, &response.usage);
             if !cost.is_finite() || cost < 0.0 {
@@ -53,6 +57,9 @@ impl Compactor for NativeCompactor {
             }
             Ok(CompactedHistory {
                 context_tokens: adk_runtime::compaction::estimate_history_tokens(&response.items),
+                // The provider returns replacement history without an attribution
+                // correspondence. Let the runner normalize it to Unknown.
+                history_provenance: Vec::new(),
                 history: response.items,
                 usage: response.usage,
                 cost,

@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "enabled": false,
+      "turns": 1,
+      "streaming": false,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        }
+      ],
+      "tool_calls": 0,
+      "output": "summary"
+    },
+    {
+      "enabled": false,
+      "turns": 1,
+      "streaming": true,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        }
+      ],
+      "tool_calls": 0,
+      "output": "summary"
+    },
+    {
+      "enabled": false,
+      "turns": 2,
+      "streaming": false,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        },
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        }
+      ],
+      "tool_calls": 1,
+      "output": "summary"
+    },
+    {
+      "enabled": false,
+      "turns": 2,
+      "streaming": true,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        },
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        }
+      ],
+      "tool_calls": 1,
+      "output": "summary"
+    },
+    {
+      "enabled": true,
+      "turns": 1,
+      "streaming": false,
+      "requests": [
+        {
+          "instructions": "stable instructions\n\n\u003cfinal_turn\u003e\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n\u003c/final_turn\u003e",
+          "tools": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "summary"
+    },
+    {
+      "enabled": true,
+      "turns": 1,
+      "streaming": true,
+      "requests": [
+        {
+          "instructions": "stable instructions\n\n\u003cfinal_turn\u003e\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n\u003c/final_turn\u003e",
+          "tools": []
+        }
+      ],
+      "tool_calls": 0,
+      "output": "summary"
+    },
+    {
+      "enabled": true,
+      "turns": 2,
+      "streaming": false,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        },
+        {
+          "instructions": "stable instructions\n\n\u003cfinal_turn\u003e\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n\u003c/final_turn\u003e",
+          "tools": []
+        }
+      ],
+      "tool_calls": 1,
+      "output": "summary"
+    },
+    {
+      "enabled": true,
+      "turns": 2,
+      "streaming": true,
+      "requests": [
+        {
+          "instructions": "stable instructions",
+          "tools": [
+            "inspect"
+          ]
+        },
+        {
+          "instructions": "stable instructions\n\n\u003cfinal_turn\u003e\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n\u003c/final_turn\u003e",
+          "tools": []
+        }
+      ],
+      "tool_calls": 1,
+      "output": "summary"
+    }
+  ]
+}

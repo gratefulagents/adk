@@ -1,0 +1,4161 @@
+{
+  "cap": "Auto mode global turn cap (-12) reached.",
+  "caps": [
+    {
+      "text": "Auto mode global turn cap (-9223372036854775808) reached.",
+      "value": -9223372036854775808
+    },
+    {
+      "text": "Auto mode global turn cap (-12) reached.",
+      "value": -12
+    },
+    {
+      "text": "Auto mode global turn cap (-1) reached.",
+      "value": -1
+    },
+    {
+      "text": "Auto mode global turn cap (0) reached.",
+      "value": 0
+    },
+    {
+      "text": "Auto mode global turn cap (1) reached.",
+      "value": 1
+    },
+    {
+      "text": "Auto mode global turn cap (123) reached.",
+      "value": 123
+    },
+    {
+      "text": "Auto mode global turn cap (9223372036854775807) reached.",
+      "value": 9223372036854775807
+    }
+  ],
+  "cases": [
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "",
+      "input_hex": "",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{",
+      "input_hex": "7b",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "null",
+      "input_hex": "6e756c6c",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "null",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "null",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "null",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{}",
+      "input_hex": "7b7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "[]",
+      "input_hex": "5b5d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "[]",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "[]",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "[]",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "42",
+      "input_hex": "3432",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "42",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "42",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "42",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "\"text\"",
+      "input_hex": "227465787422",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\"text\"",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\"text\"",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\"text\"",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"Yes\",\"style\":\"primary\"},{\"id\":\"choice_1\",\"label\":\"No\",\"style\":\"secondary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "Yes",
+          "style": "primary"
+        },
+        {
+          "id": "choice_1",
+          "label": "No",
+          "style": "secondary"
+        }
+      ],
+      "input": "{\"question\":\"Continue?\",\"choices\":[\"Yes\",\"No\"]}",
+      "input_hex": "7b227175657374696f6e223a22436f6e74696e75653f222c2263686f69636573223a5b22596573222c224e6f225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "No",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Continue?",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "No",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Continue?",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "Continue?",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\\u003c\\u0026\\u003e\",\"style\":\"primary\"},{\"id\":\"choice_1\",\"label\":\"\",\"style\":\"secondary\"},{\"id\":\"choice_2\",\"label\":\"\",\"style\":\"secondary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "<&>",
+          "style": "primary"
+        },
+        {
+          "id": "choice_1",
+          "label": "",
+          "style": "secondary"
+        },
+        {
+          "id": "choice_2",
+          "label": "",
+          "style": "secondary"
+        }
+      ],
+      "input": "{\"question\":\" <&>\\u2028 \",\"choices\":[\"<&>\",null,\"\"]}",
+      "input_hex": "7b227175657374696f6e223a22203c263e5c753230323820222c2263686f69636573223a5b223c263e222c6e756c6c2c22225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "<&>",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "",
+                "style": "secondary"
+              },
+              {
+                "id": "choice_2",
+                "label": "",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": " <&>\u2028 ",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "<&>",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "",
+                "style": "secondary"
+              },
+              {
+                "id": "choice_2",
+                "label": "",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": " <&>\u2028 ",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": " <&>\u2028 ",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":null,\"choices\":null}",
+      "input_hex": "7b227175657374696f6e223a6e756c6c2c2263686f69636573223a6e756c6c7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"question\":null,\"choices\":null}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"question\":null,\"choices\":null}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":false,\"choices\":[true]}",
+      "input_hex": "7b227175657374696f6e223a66616c73652c2263686f69636573223a5b747275655d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"question\":false,\"choices\":[true]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"question\":false,\"choices\":[true]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[{\"question\":\"Pick\",\"header\":\"H\",\"options\":[{\"label\":\"A\",\"description\":\"first\"},{\"label\":\"B\"}]}]}",
+      "input_hex": "7b227175657374696f6e73223a5b7b227175657374696f6e223a225069636b222c22686561646572223a2248222c226f7074696f6e73223a5b7b226c6162656c223a2241222c226465736372697074696f6e223a226669727374227d2c7b226c6162656c223a2242227d5d7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "Pick Options: A: first | B",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "Pick Options: A: first | B",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "Pick Options: A: first | B",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[null,{\"question\":\"Next\",\"options\":[null]}]}",
+      "input_hex": "7b227175657374696f6e73223a5b6e756c6c2c7b227175657374696f6e223a224e657874222c226f7074696f6e73223a5b6e756c6c5d7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\nNext Options: ",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\nNext Options: ",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\nNext Options: ",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[{\"question\":\"bad\",\"header\":42}],\"question\":\"simple\"}",
+      "input_hex": "7b227175657374696f6e73223a5b7b227175657374696f6e223a22626164222c22686561646572223a34327d5d2c227175657374696f6e223a2273696d706c65227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "simple",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "simple",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "simple",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[],\"question\":\"simple\"}",
+      "input_hex": "7b227175657374696f6e73223a5b5d2c227175657374696f6e223a2273696d706c65227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "simple",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "simple",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "simple",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"approve\",\"label\":\"Yes\",\"style\":\"primary\"}]",
+      "actions": [
+        {
+          "id": "approve",
+          "label": "Yes",
+          "style": "primary"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"Plan\",\"actions\":[{\"id\":\"approve\",\"label\":\"Yes\",\"mode\":\"build\",\"style\":\"primary\"}],\"recommended\":\"approve\"}",
+      "input_hex": "7b2273756d6d617279223a22506c616e222c22616374696f6e73223a5b7b226964223a22617070726f7665222c226c6162656c223a22596573222c226d6f6465223a226275696c64222c227374796c65223a227072696d617279227d5d2c227265636f6d6d656e646564223a22617070726f7665227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"Plan\",\"actions\":[{\"id\":\"approve\",\"label\":\"Yes\",\"mode\":\"build\",\"style\":\"primary\"}],\"recommended\":\"approve\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "approve",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "approve",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"Plan\",\"actions\":[{\"id\":\"approve\",\"label\":\"Yes\",\"mode\":\"build\",\"style\":\"primary\"}],\"recommended\":\"approve\"}",
+      "summary": "Plan"
+    },
+    {
+      "action_bytes": "[]",
+      "actions": [],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"Plan\",\"actions\":[]}",
+      "input_hex": "7b2273756d6d617279223a22506c616e222c22616374696f6e73223a5b5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"Plan\",\"actions\":[]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"Plan\",\"actions\":[]}",
+      "summary": "Plan"
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"Plan\",\"actions\":null}",
+      "input_hex": "7b2273756d6d617279223a22506c616e222c22616374696f6e73223a6e756c6c7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"Plan\",\"actions\":null}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"Plan\",\"actions\":null}",
+      "summary": "Plan"
+    },
+    {
+      "action_bytes": "[{\"id\":\"\",\"label\":\"\"},{\"id\":\"\",\"label\":\"\"}]",
+      "actions": [
+        {
+          "id": "",
+          "label": ""
+        },
+        {
+          "id": "",
+          "label": ""
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"Plan\",\"actions\":[null,{}]}",
+      "input_hex": "7b2273756d6d617279223a22506c616e222c22616374696f6e73223a5b6e756c6c2c7b7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"Plan\",\"actions\":[null,{}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": ""
+              },
+              {
+                "id": "",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": ""
+              },
+              {
+                "id": "",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "Plan",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"Plan\",\"actions\":[null,{}]}",
+      "summary": "Plan"
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"Plan\",\"recommended\":3}",
+      "input_hex": "7b2273756d6d617279223a22506c616e222c227265636f6d6d656e646564223a337d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"Plan\",\"recommended\":3}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"Plan\",\"recommended\":3}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"\",\"label\":\"\"}]",
+      "actions": [
+        {
+          "id": "",
+          "label": ""
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":null,\"actions\":[{\"id\":null,\"label\":null,\"style\":null}]}",
+      "input_hex": "7b2273756d6d617279223a6e756c6c2c22616374696f6e73223a5b7b226964223a6e756c6c2c226c6162656c223a6e756c6c2c227374796c65223a6e756c6c7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":null,\"actions\":[{\"id\":null,\"label\":null,\"style\":null}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":null,\"actions\":[{\"id\":null,\"label\":null,\"style\":null}]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"Yes\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "Yes",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"QUESTION\":\"Upper\",\"CHOICES\":[\"Yes\"]}",
+      "input_hex": "7b225155455354494f4e223a225570706572222c2243484f49434553223a5b22596573225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Upper",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Upper",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "Upper",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"Yes\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "Yes",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"que\u017ftion\":\"Folded\",\"choice\u017f\":[\"Yes\"]}",
+      "input_hex": "7b22717565c5bf74696f6e223a22466f6c646564222c2263686f696365c5bf223a5b22596573225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Folded",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "Yes",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "Folded",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "Folded",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":\"first\",\"question\":null,\"choices\":[\"one\"],\"choices\":null}",
+      "input_hex": "7b227175657374696f6e223a226669727374222c227175657374696f6e223a6e756c6c2c2263686f69636573223a5b226f6e65225d2c2263686f69636573223a6e756c6c7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "first",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "first",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "first",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"two\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "two",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"question\":\"first\",\"QUESTION\":\"last\",\"choices\":[\"one\"],\"choices\":[\"two\"]}",
+      "input_hex": "7b227175657374696f6e223a226669727374222c225155455354494f4e223a226c617374222c2263686f69636573223a5b226f6e65225d2c2263686f69636573223a5b2274776f225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "two",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "last",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "two",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "last",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "last",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"first\",\"label\":\"last\"}]",
+      "actions": [
+        {
+          "id": "first",
+          "label": "last"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"first\",\"SUMMARY\":null,\"actions\":[{\"id\":\"first\",\"ID\":null,\"label\":\"first\",\"LABEL\":\"last\"}]}",
+      "input_hex": "7b2273756d6d617279223a226669727374222c2253554d4d415259223a6e756c6c2c22616374696f6e73223a5b7b226964223a226669727374222c224944223a6e756c6c2c226c6162656c223a226669727374222c224c4142454c223a226c617374227d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"first\",\"SUMMARY\":null,\"actions\":[{\"id\":\"first\",\"ID\":null,\"label\":\"first\",\"LABEL\":\"last\"}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "first",
+                "label": "last"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "first",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "first",
+                "label": "last"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "first",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"first\",\"SUMMARY\":null,\"actions\":[{\"id\":\"first\",\"ID\":null,\"label\":\"first\",\"LABEL\":\"last\"}]}",
+      "summary": "first"
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"ok\",\"summary\":false,\"summary\":\"last\"}",
+      "input_hex": "7b2273756d6d617279223a226f6b222c2273756d6d617279223a66616c73652c2273756d6d617279223a226c617374227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"ok\",\"summary\":false,\"summary\":\"last\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"ok\",\"summary\":false,\"summary\":\"last\"}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[{\"QUESTION\":\"Upper\",\"OPTIONS\":[{\"LABEL\":\"A\",\"DESCRIPTION\":\"Desc\"}]}]}",
+      "input_hex": "7b227175657374696f6e73223a5b7b225155455354494f4e223a225570706572222c224f5054494f4e53223a5b7b224c4142454c223a2241222c224445534352495054494f4e223a2244657363227d5d7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "Upper Options: A: Desc",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "Upper Options: A: Desc",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "Upper Options: A: Desc",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"a\",\"label\":\"b\"}]",
+      "actions": [
+        {
+          "id": "a",
+          "label": "b"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[{\"label\":\"b\"}]}",
+      "input_hex": "7b22616374696f6e73223a5b7b226964223a2261227d5d2c22616374696f6e73223a5b7b226c6162656c223a2262227d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[{\"label\":\"b\"}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "a",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "a",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[{\"label\":\"b\"}]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"questions\":[{\"question\":\"First\",\"options\":[{\"label\":\"A\"}]}],\"questions\":[{\"options\":[{\"description\":\"B\"}]}]}",
+      "input_hex": "7b227175657374696f6e73223a5b7b227175657374696f6e223a224669727374222c226f7074696f6e73223a5b7b226c6162656c223a2241227d5d7d5d2c227175657374696f6e73223a5b7b226f7074696f6e73223a5b7b226465736372697074696f6e223a2242227d5d7d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "First Options: A: B",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "First Options: A: B",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "First Options: A: B",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"new\",\"style\":\"primary\"},{\"id\":\"choice_1\",\"label\":\"tail\",\"style\":\"secondary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "new",
+          "style": "primary"
+        },
+        {
+          "id": "choice_1",
+          "label": "tail",
+          "style": "secondary"
+        }
+      ],
+      "input": "{\"choices\":[\"old\",\"tail\"],\"choices\":[\"new\"],\"choices\":[null,null]}",
+      "input_hex": "7b2263686f69636573223a5b226f6c64222c227461696c225d2c2263686f69636573223a5b226e6577225d2c2263686f69636573223a5b6e756c6c2c6e756c6c5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "new",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "tail",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "{\"choices\":[\"old\",\"tail\"],\"choices\":[\"new\"],\"choices\":[null,null]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "new",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "tail",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"choices\":[\"old\",\"tail\"],\"choices\":[\"new\"],\"choices\":[null,null]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"a\",\"label\":\"b\"},{\"id\":\"tail\",\"label\":\"\"}]",
+      "actions": [
+        {
+          "id": "a",
+          "label": "b"
+        },
+        {
+          "id": "tail",
+          "label": ""
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"actions\":[{\"id\":\"a\"},{\"id\":\"tail\"}],\"actions\":[null],\"actions\":[{\"label\":\"b\"},null]}",
+      "input_hex": "7b22616374696f6e73223a5b7b226964223a2261227d2c7b226964223a227461696c227d5d2c22616374696f6e73223a5b6e756c6c5d2c22616374696f6e73223a5b7b226c6162656c223a2262227d2c6e756c6c5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"actions\":[{\"id\":\"a\"},{\"id\":\"tail\"}],\"actions\":[null],\"actions\":[{\"label\":\"b\"},null]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "a",
+                "label": "b"
+              },
+              {
+                "id": "tail",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "a",
+                "label": "b"
+              },
+              {
+                "id": "tail",
+                "label": ""
+              }
+            ],
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"actions\":[{\"id\":\"a\"},{\"id\":\"tail\"}],\"actions\":[null],\"actions\":[{\"label\":\"b\"},null]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"\",\"label\":\"b\"}]",
+      "actions": [
+        {
+          "id": "",
+          "label": "b"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[],\"actions\":[{\"label\":\"b\"}]}",
+      "input_hex": "7b22616374696f6e73223a5b7b226964223a2261227d5d2c22616374696f6e73223a5b5d2c22616374696f6e73223a5b7b226c6162656c223a2262227d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[],\"actions\":[{\"label\":\"b\"}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":[],\"actions\":[{\"label\":\"b\"}]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"\",\"label\":\"b\"}]",
+      "actions": [
+        {
+          "id": "",
+          "label": "b"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"actions\":[{\"id\":\"a\"}],\"actions\":null,\"actions\":[{\"label\":\"b\"}]}",
+      "input_hex": "7b22616374696f6e73223a5b7b226964223a2261227d5d2c22616374696f6e73223a6e756c6c2c22616374696f6e73223a5b7b226c6162656c223a2262227d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":null,\"actions\":[{\"label\":\"b\"}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "",
+                "label": "b"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"actions\":[{\"id\":\"a\"}],\"actions\":null,\"actions\":[{\"label\":\"b\"}]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\ufffd\",\"style\":\"primary\"},{\"id\":\"choice_1\",\"label\":\"\ud800\udc00\",\"style\":\"secondary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "\ufffd",
+          "style": "primary"
+        },
+        {
+          "id": "choice_1",
+          "label": "\ud800\udc00",
+          "style": "secondary"
+        }
+      ],
+      "input": "{\"question\":\"\\ud800\",\"choices\":[\"\\udfff\",\"\\ud800\\udc00\"]}",
+      "input_hex": "7b227175657374696f6e223a225c7564383030222c2263686f69636573223a5b225c7564666666222c225c75643830305c7564633030225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "\ud800\udc00",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd",
+                "style": "primary"
+              },
+              {
+                "id": "choice_1",
+                "label": "\ud800\udc00",
+                "style": "secondary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":\"\\ud800\\ud800\\udc00\"}",
+      "input_hex": "7b227175657374696f6e223a225c75643830305c75643830305c7564633030227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\ufffd\ud800\udc00",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\ufffd\ud800\udc00",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd\ud800\udc00",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":\"\\\\ud800\"}",
+      "input_hex": "7b227175657374696f6e223a225c5c7564383030227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\\ud800",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\\ud800",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\\ud800",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":\"\\uDFFF\\uD800\"}",
+      "input_hex": "7b227175657374696f6e223a225c75444646465c7544383030227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"question\":\"\\ud800\\uZZZZ\"}",
+      "input_hex": "7b227175657374696f6e223a225c75643830305c755a5a5a5a227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"question\":\"\\ud800\\uZZZZ\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"question\":\"\\ud800\\uZZZZ\"}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "[{\"id\":\"\ufffd\",\"label\":\"\ud800\udc00\"}]",
+      "actions": [
+        {
+          "id": "\ufffd",
+          "label": "\ud800\udc00"
+        }
+      ],
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":\"\\ud800\",\"actions\":[{\"id\":\"\\udfff\",\"label\":\"\\uD800\\uDC00\"}]}",
+      "input_hex": "7b2273756d6d617279223a225c7564383030222c22616374696f6e73223a5b7b226964223a225c7564666666222c226c6162656c223a225c75443830305c7544433030227d5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":\"\\ud800\",\"actions\":[{\"id\":\"\\udfff\",\"label\":\"\\uD800\\uDC00\"}]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "\ufffd",
+                "label": "\ud800\udc00"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": [
+              {
+                "id": "\ufffd",
+                "label": "\ud800\udc00"
+              }
+            ],
+            "PlanReview": true,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":\"\\ud800\",\"actions\":[{\"id\":\"\\udfff\",\"label\":\"\\uD800\\uDC00\"}]}",
+      "summary": "\ufffd"
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"summary\":true}",
+      "input_hex": "7b2273756d6d617279223a747275657d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"summary\":true}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"summary\":true}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"actions\":false}",
+      "input_hex": "7b22616374696f6e73223a66616c73657d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"actions\":false}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"actions\":false}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"choices\":[]}",
+      "input_hex": "7b2263686f69636573223a5b5d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"choices\":[]}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"choices\":[]}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\ufffd\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "\ufffd",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"question\":\"\ufffd\",\"choices\":[\"\ufffd\"]}",
+      "input_hex": "7b227175657374696f6e223a22ff222c2263686f69636573223a5b22ff225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"unknown\":\"\ufffd\"}",
+      "input_hex": "7b22756e6b6e6f776e223a22ff227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"unknown\":\"\ufffd\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"unknown\":\"\ufffd\"}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\ufffd\ufffd\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "\ufffd\ufffd",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"question\":\"\ufffd\ufffd\",\"choices\":[\"\ufffd\ufffd\"]}",
+      "input_hex": "7b227175657374696f6e223a22e282222c2263686f69636573223a5b22e282225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"unknown\":\"\ufffd\ufffd\"}",
+      "input_hex": "7b22756e6b6e6f776e223a22e282227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"unknown\":\"\ufffd\ufffd\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"unknown\":\"\ufffd\ufffd\"}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\ufffd\ufffd\ufffd\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "\ufffd\ufffd\ufffd",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"question\":\"\ufffd\ufffd\ufffd\",\"choices\":[\"\ufffd\ufffd\ufffd\"]}",
+      "input_hex": "7b227175657374696f6e223a22eda080222c2263686f69636573223a5b22eda080225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd\ufffd\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"unknown\":\"\ufffd\ufffd\ufffd\"}",
+      "input_hex": "7b22756e6b6e6f776e223a22eda080227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"unknown\":\"\ufffd\ufffd\ufffd\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"unknown\":\"\ufffd\ufffd\ufffd\"}",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "[{\"id\":\"choice_0\",\"label\":\"\ufffd\ufffd\ufffd\ufffd\",\"style\":\"primary\"}]",
+      "choices": [
+        {
+          "id": "choice_0",
+          "label": "\ufffd\ufffd\ufffd\ufffd",
+          "style": "primary"
+        }
+      ],
+      "input": "{\"question\":\"\ufffd\ufffd\ufffd\ufffd\",\"choices\":[\"\ufffd\ufffd\ufffd\ufffd\"]}",
+      "input_hex": "7b227175657374696f6e223a22f0808080222c2263686f69636573223a5b22f0808080225d7d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": [
+              {
+                "id": "choice_0",
+                "label": "\ufffd\ufffd\ufffd\ufffd",
+                "style": "primary"
+              }
+            ],
+            "PlanReview": false,
+            "Question": "\ufffd\ufffd\ufffd\ufffd",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "\ufffd\ufffd\ufffd\ufffd",
+      "summary": ""
+    },
+    {
+      "action_bytes": "null",
+      "actions": null,
+      "choice_bytes": "",
+      "choices": null,
+      "input": "{\"unknown\":\"\ufffd\ufffd\ufffd\ufffd\"}",
+      "input_hex": "7b22756e6b6e6f776e223a22f0808080227d",
+      "pauses": [
+        {
+          "final": "",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "{\"unknown\":\"\ufffd\ufffd\ufffd\ufffd\"}",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "AskUserQuestion",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "The agent needs your input to continue.",
+            "Requested": true
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "present_plan",
+          "pause": {
+            "Actions": null,
+            "PlanReview": true,
+            "Question": "fallback",
+            "Requested": true
+          }
+        },
+        {
+          "final": "",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        },
+        {
+          "final": " fallback \n",
+          "name": "other",
+          "pause": {
+            "Actions": null,
+            "PlanReview": false,
+            "Question": "",
+            "Requested": false
+          }
+        }
+      ],
+      "question": "{\"unknown\":\"\ufffd\ufffd\ufffd\ufffd\"}",
+      "summary": ""
+    }
+  ],
+  "marshal_empty": "[]",
+  "marshal_nil": "null",
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/userinput-reference/reference_test.go": "013f716c68e76c79004162fcffba7eb74f9d6d5914bd027da18d6c755856b50d",
+      "scripts/userinput-reference/run.py": "581aa17a6cc169430b011c90f8ef13927d0bc14e911d42e549dcc2ab97367d00"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/stream.go": "e965af45e4650dfdff38df948e38cc06dbfbea5aa86a8f1bd7fe51751be2be09",
+      "pkg/agentsdk/userinput.go": "4aa18cb476934cca1bbdb65a3b761a4ce158b148336634d6ec7c463142477917",
+      "pkg/agentsdk/userinput_test.go": "56c14091283e336a01742263956e871466a29caf50aea6446b52a63690169d41"
+    }
+  }
+}

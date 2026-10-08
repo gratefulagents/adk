@@ -578,6 +578,27 @@ pub struct RemoteOptions {
     pub root_certificates: Vec<reqwest::Certificate>,
 }
 
+pub(crate) fn validate_remote_options(
+    url: &str,
+    options: &RemoteOptions,
+    limits: &Limits,
+) -> Result<Url, Error> {
+    validate_limits(limits)?;
+    if options.tenant_id.trim().is_empty() {
+        return Err(Error::Policy("remote tenant required".into()));
+    }
+    if options
+        .oauth
+        .as_ref()
+        .is_some_and(|p| p.audience.trim().is_empty())
+    {
+        return Err(Error::Policy("OAuth audience required".into()));
+    }
+    let url = Url::parse(url).map_err(|_| Error::Config("invalid remote URL".into()))?;
+    validate_url(&url, options.allow_private_network, false)?;
+    Ok(url)
+}
+
 fn validate_url(url: &Url, private: bool, endpoint: bool) -> Result<(), Error> {
     if !url.username().is_empty()
         || url.password().is_some()
@@ -719,19 +740,7 @@ impl HttpTransport {
         options: RemoteOptions,
         limits: Limits,
     ) -> Result<Self, Error> {
-        validate_limits(&limits)?;
-        if options.tenant_id.trim().is_empty() {
-            return Err(Error::Policy("remote tenant required".into()));
-        }
-        if options
-            .oauth
-            .as_ref()
-            .is_some_and(|p| p.audience.trim().is_empty())
-        {
-            return Err(Error::Policy("OAuth audience required".into()));
-        }
-        let url = Url::parse(url).map_err(|_| Error::Config("invalid remote URL".into()))?;
-        validate_url(&url, options.allow_private_network, false)?;
+        let url = validate_remote_options(url, &options, &limits)?;
         let mut transport = Self {
             server: server.into(),
             post_url: url.clone(),

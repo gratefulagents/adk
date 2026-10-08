@@ -52,13 +52,9 @@ impl RunnerCheckpoint {
         if value.get("schema_version").and_then(Value::as_u64) != Some(1) {
             return Err(unsupported("unknown runner checkpoint schema"));
         }
-        let checkpoint: Self = serde_json::from_value(value).map_err(invalid)?;
-        if checkpoint
-            .runtime
-            .as_ref()
-            .is_some_and(|state| state.version != 1)
-        {
-            return Err(unsupported("unknown runtime continuation schema"));
+        let mut checkpoint: Self = serde_json::from_value(value).map_err(invalid)?;
+        if let Some(state) = &mut checkpoint.runtime {
+            state.restore_provenance()?;
         }
         Ok(checkpoint)
     }
@@ -77,13 +73,25 @@ pub struct RuntimeCheckpoint {
     base_turn_limit: Option<std::num::NonZeroU32>,
     #[serde(default)]
     stop_gate_blocks: usize,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pending_completion: bool,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    verifier_ran: bool,
     phase: Phase,
     calls: VecDeque<ToolCall>,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    disabled_handoff_calls: HashMap<String, Option<String>>,
     turns: u32,
+    #[serde(default)]
+    last_model: Option<String>,
     cost: f64,
     tool_calls: u64,
     tool_pause: bool,
+    #[serde(default)]
+    summary_turn: bool,
     tool_final: Option<String>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    matched_stop_tool: bool,
     tool_turn_start: Option<usize>,
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
@@ -96,6 +104,32 @@ pub struct RuntimeCheckpoint {
     approval_journal: Vec<crate::compat::ApprovalJournalEntry>,
 }
 impl RuntimeCheckpoint {
+    fn restore_provenance(&mut self) -> Result<(), Error> {
+        match self.version {
+            1 => {
+                // V1 exported fabricated current-agent names; only native data is trusted.
+                self.result.history_provenance =
+                    vec![ItemProvenance::Unknown; self.result.history.len()];
+                self.result.new_items_provenance =
+                    vec![ItemProvenance::Unknown; self.result.new_items.len()];
+            }
+            2 => {
+                if self.result.history.len() != self.result.history_provenance.len()
+                    || self.result.new_items.len() != self.result.new_items_provenance.len()
+                {
+                    return Err(invalid("native provenance length mismatch"));
+                }
+                normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
+                normalize_provenance(
+                    self.result.new_items.len(),
+                    &self.result.new_items_provenance,
+                )?;
+            }
+            _ => return Err(unsupported("unknown runtime continuation schema")),
+        }
+        Ok(())
+    }
+
     pub fn wall_time_ms(&self, now: DateTime<Utc>) -> i64 {
         (now - self.started_at).num_milliseconds().max(0)
     }
@@ -174,11 +208,30 @@ pub(super) struct DurableState {
     tool_calls: u64,
 }
 
+impl DurableState {
+    pub(super) fn elapsed(&self) -> Duration {
+        (Utc::now() - self.started_at).to_std().unwrap_or_default()
+    }
+}
+
 fn invalid(error: impl std::fmt::Display) -> Error {
     Error::new(ErrorCategory::InvalidInput, error.to_string())
 }
 fn unsupported(message: &str) -> Error {
     Error::new(ErrorCategory::Unsupported, message)
+}
+
+fn validate_resume_effect(effect: &Effect) -> Result<(), Error> {
+    if matches!(
+        effect.state,
+        EffectState::Dispatched | EffectState::OutcomeUnknown | EffectState::Unknown(_)
+    ) || matches!(effect.classification, EffectClassification::Unknown(_))
+    {
+        return Err(unsupported(
+            "operator_resolution: effect state or classification requires explicit reconciliation; never replayed",
+        ));
+    }
+    Ok(())
 }
 
 fn reconcile_children(mut children: Value) -> Result<Value, Error> {
@@ -300,6 +353,10 @@ impl Runner {
         }
         let fingerprint = self.durable_fingerprint()?;
         let mut engine = self.engine(context, request, host);
+        engine.result.history_provenance = normalize_provenance(
+            engine.result.history.len(),
+            &engine.result.history_provenance,
+        )?;
         engine.streaming = sender.is_some() || child_control.is_some();
         engine.child_control = child_control;
         engine.sender = sender;
@@ -333,6 +390,9 @@ impl Runner {
             if checkpoint.schema_version != 1 {
                 return Err(unsupported("unknown runner checkpoint schema").into());
             }
+            if let Some(effect) = &checkpoint.effect {
+                validate_resume_effect(effect)?;
+            }
             if checkpoint.run_id != engine.context.run_id
                 || checkpoint.attempt_id == state.attempt_id
             {
@@ -364,9 +424,7 @@ impl Runner {
             let execution_boundary = checkpoint.execution_boundary().to_owned();
             let mut saved = checkpoint.runtime.ok_or_else(|| unsupported(
                 "Go checkpoint requires migration: missing policy, cumulative turns/cost and exact continuation"))?;
-            if saved.version != 1 {
-                return Err(unsupported("unknown runtime continuation schema").into());
-            }
+            saved.restore_provenance()?;
             if engine.child_control.is_some() {
                 let previous = crate::subagent::SecurityBaseline {
                     tools: saved.policy.tools.clone(),
@@ -383,9 +441,15 @@ impl Runner {
             }
             let mut original_policy = saved.policy.clone();
             original_policy.max_turns = saved.base_turn_limit.unwrap_or(saved.policy.max_turns);
-            if (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
+            if (self.config.final_answer_verifier.is_none() && saved.verifier_ran)
+                || (!self.config.require_completion_confirmation && saved.pending_completion)
+                || (self.config.stop_gate.is_none() && saved.stop_gate_blocks != 0)
                 || (self.config.stop_gate.is_none()
+                    && self.config.final_answer_verifier.is_none()
+                    && !self.config.require_completion_confirmation
                     && self.config.subagents.is_none()
+                    && self.config.immediate_input_signal.is_none()
+                    && self.config.immediate_input_finalizer.is_none()
                     && saved.policy.max_turns != original_policy.max_turns)
                 || saved.policy.max_turns < original_policy.max_turns
                 || saved.stop_gate_blocks > self.config.stop_gate_max_blocks
@@ -433,17 +497,6 @@ impl Runner {
             }
             if !saved.cost.is_finite() || saved.cost < 0.0 {
                 return Err(invalid("invalid durable cost counter").into());
-            }
-            if checkpoint.effect.as_ref().is_some_and(|effect| {
-                matches!(
-                    effect.state,
-                    EffectState::Dispatched | EffectState::OutcomeUnknown
-                )
-            }) {
-                return Err(unsupported(
-                    "operator_resolution: dispatched effect has an unknown outcome; never replayed",
-                )
-                .into());
             }
             if !matches!(
                 execution_boundary.as_str(),
@@ -498,9 +551,13 @@ impl Runner {
                 saved.phase
             };
             engine.calls = saved.calls;
-            for entry in engine.approval_journal.entries() {
-                let call =
-                    adk_codec::approval::approval_call(&entry.marker.data).map_err(invalid)?;
+            for entry in engine
+                .approval_journal
+                .entries()
+                .into_iter()
+                .filter(|entry| !entry.historical_only)
+            {
+                let call = entry.call().map_err(invalid)?;
                 if engine.calls.iter().any(|pending| *pending == call) {
                     use adk_codec::approval::ApprovalPhase;
                     match entry.marker.phase {
@@ -519,11 +576,17 @@ impl Runner {
             engine.policy = saved.policy;
             engine.base_turn_limit = original_policy.max_turns;
             engine.stop_gate_blocks = saved.stop_gate_blocks;
+            engine.pending_completion = saved.pending_completion;
+            engine.verifier_ran = saved.verifier_ran;
             engine.turns = saved.turns;
+            engine.last_model = saved.last_model;
             engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
             engine.tool_pause = saved.tool_pause;
+            engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
+            engine.matched_stop_tool = saved.matched_stop_tool;
+            engine.disabled_handoff_calls = saved.disabled_handoff_calls;
             engine.tool_turn_start = saved.tool_turn_start;
             engine.consecutive_tool_errors = saved.consecutive_tool_errors;
             engine.tool_error_escalated = saved.tool_error_escalated;
@@ -585,8 +648,37 @@ impl Runner {
 
     fn durable_fingerprint(&self) -> Result<String, Error> {
         let config = &self.config;
-        if config.compaction.is_some()
+        if config
+            .immediate_input_poller
+            .as_ref()
+            .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .immediate_input_signal
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .immediate_input_finalizer
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .tool_input_guardrails
+                .iter()
+                .chain(&config.tool_output_guardrails)
+                .any(|g| g.durable_key().is_none_or(str::is_empty))
+            || config.compaction.is_some()
+            || config
+                .compaction_model_resolver
+                .as_ref()
+                .is_some_and(|resolver| resolver.durable_key().is_none_or(str::is_empty))
             || config.turn_context.is_some()
+            || config
+                .compaction_carry_forward
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .final_answer_verifier
+                .as_ref()
+                .is_some_and(|verifier| verifier.durable_key().is_none_or(str::is_empty))
             || config
                 .stop_gate
                 .as_ref()
@@ -598,7 +690,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, replay-unsafe stop gates or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates, final answer verifiers or hooks",
             ));
         }
         let mut agents = vec![self.initial.clone()];
@@ -610,24 +702,148 @@ impl Runner {
                 continue;
             }
             if !names.insert(agent.name.clone())
+                || agent
+                    .input_guardrails
+                    .iter()
+                    .chain(&agent.output_guardrails)
+                    .any(|g| g.durable_key().is_none_or(str::is_empty))
                 || agent.output_parser.is_some()
+                || agent.handoffs.iter().any(|handoff| {
+                    handoff
+                        .input_type
+                        .as_ref()
+                        .is_some_and(|input_type| input_type.parser.is_some())
+                        || handoff
+                            .history_filter
+                            .as_ref()
+                            .is_some_and(|filter| filter.durable_key().is_none_or(str::is_empty))
+                        || handoff.is_enabled.as_ref().is_some_and(|predicate| {
+                            predicate.durable_key().is_none_or(str::is_empty)
+                        })
+                        || handoff.on_handoff.as_ref().is_some_and(|callback| {
+                            callback.durable_key().is_none_or(str::is_empty)
+                        })
+                })
+                || agent
+                    .instruction_provider
+                    .as_ref()
+                    .is_some_and(|provider| provider.durable_key().is_none_or(str::is_empty))
                 || agent
                     .hooks
                     .as_ref()
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names and no custom parsers or hooks",
+                    "durable agents require unique names, no custom output or handoff parsers, and replay-safe instruction providers, handoff predicates, history filters and callbacks, guardrails and hooks",
                 ));
             }
-            catalog.push(serde_json::json!({
+            let mut entry = serde_json::json!({
                 "name": agent.name, "instructions": agent.instructions, "model": agent.model.name(),
                 "fallbacks": agent.fallbacks.iter().map(ModelBinding::name).collect::<Vec<_>>(),
                 "settings": agent.settings, "schema": agent.output_schema,
                 "schema_name": agent.output_schema_name, "strict": agent.output_schema_strict,
                 "tools": agent.tools.iter().map(|t| t.definition()).collect::<Vec<_>>(),
                 "handoffs": agent.handoffs.iter().map(|h| (&h.definition, &h.target.name)).collect::<Vec<_>>()
-            }));
+            });
+            if agent.tool_use != ToolUseBehavior::Continue
+                || !agent.stop_at_tools.is_empty()
+                || agent.tool_final_output.is_some()
+            {
+                entry["tool_stopping"] = serde_json::json!({"behavior": agent.tool_use, "names": agent.stop_at_tools, "output": agent.tool_final_output});
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.on_handoff.is_some())
+            {
+                entry["handoff_callbacks"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .on_handoff
+                            .as_ref()
+                            .and_then(|callback| callback.durable_key()))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.is_enabled.is_some())
+            {
+                entry["handoff_predicates"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .is_enabled
+                            .as_ref()
+                            .and_then(|predicate| predicate.durable_key()))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.history_filter.is_some())
+            {
+                entry["handoff_history_filters"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .history_filter
+                            .as_ref()
+                            .and_then(|filter| filter.durable_key()))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.input_type.is_some())
+            {
+                entry["handoff_input_types"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .input_type
+                            .as_ref()
+                            .map(|input_type| &input_type.schema))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if !agent.handoff_description.is_empty() {
+                entry["handoff_description"] = serde_json::json!(agent.handoff_description);
+            }
+            if let Some(provider) = &agent.instruction_provider {
+                entry["instruction_provider"] = serde_json::json!(provider.durable_key());
+            }
+            if !agent.mcp_servers.is_empty() {
+                entry["mcp_servers"] = serde_json::json!(agent.mcp_servers);
+            }
+            if let Some(ceiling) = agent.tool_access_ceiling {
+                entry["tool_access_ceiling"] = serde_json::json!(ceiling);
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.input_filter != HandoffInputFilter::Preserve)
+            {
+                entry["handoff_input_filters"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff.input_filter)
+                        .collect::<Vec<_>>()
+                );
+            }
+            if !agent.input_guardrails.is_empty() || !agent.output_guardrails.is_empty() {
+                entry["guardrails"] = serde_json::json!({"input": agent.input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": agent.output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
+            }
+            catalog.push(entry);
             agents.extend(agent.handoffs.iter().map(|h| h.target.clone()));
         }
         let mut baseline = serde_json::json!({
@@ -638,8 +854,69 @@ impl Runner {
             "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
             "tool_error_limit": config.consecutive_tool_error_limit,
         });
+        if !config.tool_input_guardrails.is_empty() || !config.tool_output_guardrails.is_empty() {
+            baseline["tool_guardrails"] = serde_json::json!({"input": config.tool_input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": config.tool_output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
+        }
+        if let Some(limit) = config.subagent_max_turns {
+            baseline["subagent_max_turns"] = serde_json::json!(limit);
+        }
+        let handoff = config.handoff_history;
+        if handoff.enabled {
+            baseline["handoff_history"] = serde_json::json!({
+                "max_tokens": handoff.max_tokens, "target_tokens": handoff.target_tokens,
+                "preserve_recent_items": handoff.preserve_recent_items,
+                "summary_bullet_limit": handoff.summary_bullet_limit,
+            });
+        }
+        let compaction = config.local_compaction;
+        if let Some(resolve) = config.compaction_model_defaults {
+            baseline["compaction_model_defaults"] = serde_json::json!(resolve);
+        }
+        if let Some(resolver) = &config.compaction_model_resolver {
+            baseline["compaction_model_resolver"] = serde_json::json!(resolver.durable_key());
+        }
+        // Default-on summaries must also invalidate legacy deterministic-default checkpoints.
+        baseline["use_llm_summary"] = serde_json::json!(compaction.use_llm_summary);
+        if compaction != LocalCompactionPolicy::default() {
+            baseline["local_compaction"] = serde_json::json!({
+                "enabled": compaction.enabled,
+                "trigger_tokens": compaction.trigger_tokens,
+                "target_tokens": compaction.target_tokens,
+                "preserve_recent_items": compaction.preserve_recent_items,
+                "preserve_initial_user_messages": compaction.preserve_initial_user_messages,
+                "summary_bullet_limit": compaction.summary_bullet_limit,
+            });
+        }
+        if !config.additional_instructions.trim().is_empty() {
+            baseline["additional_instructions"] =
+                serde_json::json!(config.additional_instructions.trim());
+        }
+        if !config.working_state_context.is_empty() {
+            baseline["working_state_context"] = serde_json::json!(config.working_state_context);
+        }
+        if let Some(callback) = &config.compaction_carry_forward {
+            baseline["compaction_carry_forward"] = serde_json::json!(callback.durable_key());
+        }
+        if let Some(callback) = &config.immediate_input_poller {
+            baseline["immediate_input_poller"] = serde_json::json!(callback.durable_key());
+        }
+        if let Some(callback) = &config.immediate_input_signal {
+            baseline["immediate_input_signal"] = serde_json::json!(callback.durable_key());
+        }
+        if let Some(callback) = &config.immediate_input_finalizer {
+            baseline["immediate_input_finalizer"] = serde_json::json!(callback.durable_key());
+        }
+        if config.require_completion_confirmation {
+            baseline["require_completion_confirmation"] = serde_json::json!(true);
+        }
+        if config.force_final_summary_turn {
+            baseline["force_final_summary_turn"] = serde_json::json!(true);
+        }
         if config.subagents.is_some() {
             baseline["subagents"] = serde_json::json!({"version": 1});
+        }
+        if let Some(verifier) = &config.final_answer_verifier {
+            baseline["final_answer_verifier"] = serde_json::json!(verifier.durable_key());
         }
         if let Some(gate) = &config.stop_gate {
             baseline["stop_gate"] = serde_json::json!({"key":gate.durable_key(), "max_blocks":config.stop_gate_max_blocks});
@@ -688,6 +965,8 @@ impl Engine {
             }
         }
         let name = match boundary {
+            // A drain/close may have happened after this write. Never replay it blindly.
+            Boundary::ImmediateInputDispatched => "immediate_input_dispatched",
             Boundary::Started => "run_started",
             Boundary::ModelPrepared => "model_prepared",
             Boundary::ModelDispatched => "model_dispatched",
@@ -747,21 +1026,37 @@ impl Engine {
                 }
             }
         }
-        let agent = adk_codec::dto::AgentRef {
-            name: self.agent.name.clone(),
-        };
         let mut history = self
             .result
             .history
             .iter()
-            .map(|item| {
-                let provenance = match item {
-                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. }
-                        if message.role == Role::User =>
-                    {
-                        None
+            .zip(&self.result.history_provenance)
+            .map(|(item, source)| {
+                // SDK 1dc92b7 RestoreRunItems rejects Unknown. Missing native authorship
+                // must not be exported as executable Go history with a known nil agent.
+                let incompatible_role = match item {
+                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                        !matches!(
+                            (message.role, source),
+                            (Role::User, ItemProvenance::Unattributed)
+                                | (Role::Assistant, ItemProvenance::Agent { .. })
+                        )
                     }
-                    _ => Some(&agent),
+                    _ => false,
+                };
+                // Go also infers message role from nil/non-nil agent. Keep native-only
+                // summaries and other incompatible role/provenance pairs behind this gate.
+                if matches!(source, ItemProvenance::Unknown) || incompatible_role {
+                    return Ok(adk_codec::dto::RunItemSnapshot {
+                        kind: adk_codec::dto::SnapshotType::Unknown,
+                        ..Default::default()
+                    });
+                }
+                let agent = match source {
+                    ItemProvenance::Agent { name } => {
+                        Some(adk_codec::dto::AgentRef { name: name.clone() })
+                    }
+                    _ => None,
                 };
                 let projected;
                 let item = match item {
@@ -789,7 +1084,9 @@ impl Engine {
                     }
                     _ => item,
                 };
-                adk_codec::approval::encode_item(item, provenance).map_err(invalid)
+                adk_codec::approval::encode_item(item, agent.as_ref())
+                    .map(|wire| adk_codec::snapshot_items(&[wire]).remove(0))
+                    .map_err(invalid)
             })
             .collect::<Result<Vec<_>, _>>()?;
         for (offset, marker) in self
@@ -804,7 +1101,10 @@ impl Engine {
                 .checked_add(offset)
                 .filter(|i| *i <= history.len())
                 .ok_or_else(|| invalid("approval marker outside history"))?;
-            history.insert(index, marker.marker.to_wire().map_err(invalid)?);
+            history.insert(
+                index,
+                adk_codec::snapshot_items(&[marker.marker.to_wire().map_err(invalid)?]).remove(0),
+            );
         }
         let count = |n: u64| i64::try_from(n).map_err(invalid);
         let sequence = state
@@ -826,11 +1126,11 @@ impl Engine {
             }
             .into(),
             agent_name: self.agent.name.clone(),
-            history: adk_codec::snapshot_items(&history),
+            history,
             interruptions: None,
             children: state.child_checkpoint.clone(),
             usage: adk_codec::dto::Usage {
-                requests: i64::from(self.turns),
+                requests: count(self.result.usage.requests)?,
                 input_tokens: count(self.result.usage.input_tokens)?,
                 output_tokens: count(self.result.usage.output_tokens)?,
                 cache_read_tokens: count(self.result.usage.cache_read_tokens)?,
@@ -839,7 +1139,7 @@ impl Engine {
             created_at: Utc::now(),
             effect: state.effect.clone(),
             runtime: Some(RuntimeCheckpoint {
-                version: 1,
+                version: 2,
                 boundary: name.into(),
                 started_at: state.started_at,
                 deadline_at: state.deadline_at,
@@ -848,13 +1148,19 @@ impl Engine {
                 policy: self.policy.clone(),
                 base_turn_limit: Some(self.base_turn_limit),
                 stop_gate_blocks: self.stop_gate_blocks,
+                pending_completion: self.pending_completion,
+                verifier_ran: self.verifier_ran,
                 phase: self.phase,
                 calls: self.calls.clone(),
                 turns: self.turns,
+                last_model: self.last_model.clone(),
                 cost: self.cost,
                 tool_calls: state.tool_calls,
                 tool_pause: self.tool_pause,
+                summary_turn: self.summary_turn,
                 tool_final: self.tool_final.clone(),
+                matched_stop_tool: self.matched_stop_tool,
+                disabled_handoff_calls: self.disabled_handoff_calls.clone(),
                 tool_turn_start: self.tool_turn_start,
                 consecutive_tool_errors: self.consecutive_tool_errors,
                 tool_error_escalated: self.tool_error_escalated,
@@ -885,6 +1191,11 @@ pub struct GoRecovery {
     pub policy: RunPolicy,
     /// Required when a stop gate is configured: Go does not persist these values.
     pub stop_gate_blocks: Option<usize>,
+    /// Required when completion confirmation is enabled; Go does not persist this state.
+    pub pending_completion: Option<bool>,
+    /// Required when a final answer verifier is configured; Go does not persist this state.
+    pub verifier_ran: Option<bool>,
+    /// Required for a stop gate, completion confirmation, or final answer verifier.
     pub effective_max_turns: Option<std::num::NonZeroU32>,
     pub turns: u32,
     pub usage: Usage,
@@ -895,6 +1206,7 @@ pub struct GoRecovery {
     /// Go checkpoints do not persist a parsed final result; terminal migration
     /// requires the host to supply its verified result rather than invent one.
     pub final_output: Option<Value>,
+    pub final_output_is_raw_json: bool,
 }
 
 impl Runner {
@@ -936,6 +1248,7 @@ impl Runner {
         }
         let count = |n: i64| u64::try_from(n).map_err(invalid);
         if u64::from(recovery.turns) < count(checkpoint.usage.requests)?
+            || recovery.usage.requests < count(checkpoint.usage.requests)?
             || recovery.usage.input_tokens < count(checkpoint.usage.input_tokens)?
             || recovery.usage.output_tokens < count(checkpoint.usage.output_tokens)?
             || recovery.usage.cache_read_tokens < count(checkpoint.usage.cache_read_tokens)?
@@ -948,6 +1261,7 @@ impl Runner {
             ));
         }
         let mut history = vec![];
+        let mut history_provenance = vec![];
         let mut approval_journal = vec![];
         for item in &checkpoint.history {
             use adk_codec::dto::{RunItemType, SnapshotType};
@@ -1008,6 +1322,7 @@ impl Runner {
                         approved: approval.approved,
                     };
                     approval_journal.push(crate::compat::ApprovalJournalEntry {
+                        argument_text: Some(data.input.text().into_owned()),
                         marker: adk_codec::approval::ApprovalMarker {
                             phase: if data.approved {
                                 adk_codec::approval::ApprovalPhase::Approved
@@ -1018,6 +1333,7 @@ impl Runner {
                             agent: wire.agent.clone(),
                         },
                         new_items_before: 0,
+                        historical_only: false,
                         history_before: Some(history.len()),
                         reason: None,
                     });
@@ -1044,8 +1360,34 @@ impl Runner {
                 }
             }
             history.push(adk_codec::approval::decode_item(&wire).map_err(invalid)?);
+            history_provenance.push(if item.agent_name.is_empty() {
+                ItemProvenance::Unattributed
+            } else {
+                ItemProvenance::Agent {
+                    name: item.agent_name.clone(),
+                }
+            });
         }
         validate_history_pairs(&history)?;
+        if checkpoint.boundary == "tool_completed" {
+            let mut agents = vec![self.initial.clone()];
+            let mut seen = HashSet::new();
+            while let Some(agent) = agents.pop() {
+                if !seen.insert(Arc::as_ptr(&agent) as usize) {
+                    continue;
+                }
+                if agent.name == checkpoint.agent_name
+                    && (recovery.policy.tool_use == ToolUseBehavior::StopAfterTool
+                        || agent.tool_use == ToolUseBehavior::StopAfterTool
+                        || !agent.stop_at_tools.is_empty())
+                {
+                    return Err(unsupported(
+                        "Go post-tool stopping requires reconciled finalization; its checkpoint does not preserve the turn decision or original final output",
+                    ));
+                }
+                agents.extend(agent.handoffs.iter().map(|handoff| handoff.target.clone()));
+            }
+        }
         let completed = checkpoint.boundary == "run_completed";
         if completed && recovery.final_output.is_none() {
             return Err(invalid(
@@ -1068,28 +1410,67 @@ impl Runner {
         } else {
             0
         };
+        let pending_completion = if self.config.require_completion_confirmation {
+            let pending = recovery.pending_completion.ok_or_else(|| {
+                invalid("Go completion confirmation migration requires verified pending state")
+            })?;
+            policy.max_turns = recovery.effective_max_turns.ok_or_else(|| {
+                invalid(
+                    "Go completion confirmation migration requires verified effective turn limit",
+                )
+            })?;
+            if policy.max_turns < base_turn_limit {
+                return Err(invalid(
+                    "invalid verified Go completion confirmation turn limit",
+                ));
+            }
+            pending
+        } else {
+            false
+        };
+        let verifier_ran = if self.config.final_answer_verifier.is_some() {
+            let ran = recovery.verifier_ran.ok_or_else(|| {
+                invalid("Go verifier migration requires verified invocation state")
+            })?;
+            policy.max_turns = recovery.effective_max_turns.ok_or_else(|| {
+                invalid("Go verifier migration requires verified effective turn limit")
+            })?;
+            if policy.max_turns < base_turn_limit {
+                return Err(invalid("invalid verified Go verifier turn limit"));
+            }
+            ran
+        } else {
+            false
+        };
         checkpoint.runtime = Some(RuntimeCheckpoint {
-            version: 1,
+            version: 2,
             boundary: checkpoint.boundary.clone(),
             fingerprint: self.durable_fingerprint()?,
             started_at: recovery.started_at,
             deadline_at: recovery.deadline_at,
             result: RunResult {
+                metrics: None,
+                history_provenance,
+                new_items_provenance: Vec::new(),
                 status: if completed {
                     RunStatus::Completed
                 } else {
                     RunStatus::Incomplete
                 },
                 final_output: recovery.final_output,
+                final_output_is_raw_json: recovery.final_output_is_raw_json,
                 new_items: vec![],
                 history,
                 responses: vec![],
                 usage: recovery.usage,
                 pending_approvals: vec![],
                 last_agent: Some(checkpoint.agent_name.clone()),
+                guardrails: vec![],
             },
             base_turn_limit: Some(base_turn_limit),
             stop_gate_blocks,
+            pending_completion,
+            verifier_ran,
             policy,
             phase: if completed {
                 Phase::Finish
@@ -1098,10 +1479,14 @@ impl Runner {
             },
             calls: VecDeque::new(),
             turns: recovery.turns,
+            last_model: None,
             cost: recovery.cost,
             tool_calls: recovery.tool_calls,
             tool_pause: false,
+            summary_turn: false,
             tool_final: None,
+            matched_stop_tool: false,
+            disabled_handoff_calls: HashMap::new(),
             tool_turn_start: None,
             consecutive_tool_errors: 0,
             tool_error_escalated: false,
@@ -1140,27 +1525,29 @@ impl StoredCheckpointStore {
         let (snapshot, _) = store
             .load(&lease.tenant_id, &lease.run_id)
             .map_err(persistence_error)?;
+        if matches!(snapshot.status, adk_durable::RunStatus::Unknown(_)) {
+            return Err(unsupported(
+                "operator_resolution: unknown stored run status requires explicit reconciliation",
+            ));
+        }
         if snapshot.cancellation.is_some() || !snapshot.child_runs.is_empty() {
             return Err(unsupported(
                 "stored cancellation/child runs require reconciliation",
             ));
         }
-        if snapshot.effects.iter().any(|e| {
-            matches!(
-                e.state,
-                EffectState::Dispatched | EffectState::OutcomeUnknown
-            )
-        }) {
-            return Err(unsupported(
-                "operator_resolution: stored effect outcome is unknown",
-            ));
+        for effect in &snapshot.effects {
+            validate_resume_effect(effect)?;
         }
         let sequence = snapshot
             .state
             .as_ref()
             .map(|value| {
-                RunnerCheckpoint::decode(&serde_json::to_vec(value).map_err(invalid)?)
-                    .map(|checkpoint| checkpoint.sequence)
+                let checkpoint =
+                    RunnerCheckpoint::decode(&serde_json::to_vec(value).map_err(invalid)?)?;
+                if let Some(effect) = &checkpoint.effect {
+                    validate_resume_effect(effect)?;
+                }
+                Ok::<_, Error>(checkpoint.sequence)
             })
             .transpose()?
             .unwrap_or(0);
@@ -1230,7 +1617,7 @@ impl CheckpointStore for StoredCheckpointStore {
                 .revision
                 .checked_add(1)
                 .ok_or_else(|| invalid("revision overflow"))?;
-            next.updated_at = checkpoint.created_at;
+            next.updated_at = checkpoint.created_at.fixed_offset();
             next.state = Some(serde_json::to_value(checkpoint).map_err(invalid)?);
             next.status = if checkpoint.execution_boundary() == "run_completed" {
                 adk_durable::RunStatus::Succeeded
@@ -1269,7 +1656,7 @@ impl CheckpointStore for StoredCheckpointStore {
             next.cumulative_budget = budget;
             let event = adk_durable::Event {
                 event_type: checkpoint.execution_boundary().into(),
-                classification: next.classification,
+                classification: next.classification.clone(),
                 payload: next.state.clone(),
                 ..Default::default()
             };

@@ -62,12 +62,33 @@ fn shell(script: &str) -> Request {
 }
 async fn wait_file(path: &std::path::Path) {
     tokio::time::timeout(Duration::from_secs(5), async {
-        while !path.exists() {
+        // Shell redirection creates the file before echo writes the complete PID.
+        while !fs::read(path).is_ok_and(|bytes| bytes.ends_with(b"\n")) {
             tokio::time::sleep(Duration::from_millis(10)).await;
         }
     })
     .await
     .unwrap();
+}
+#[tokio::test]
+async fn file_readiness_waits_for_a_complete_line() {
+    let temp = Temp::new();
+    let path = temp.0.join("leader");
+    fs::write(&path, b"").unwrap();
+    let ready = wait_file(&path);
+    tokio::pin!(ready);
+    for contents in [b"".as_slice(), b"123"] {
+        fs::write(&path, contents).unwrap();
+        assert!(
+            tokio::time::timeout(Duration::from_millis(20), &mut ready)
+                .await
+                .is_err()
+        );
+    }
+    fs::write(&path, b"123\n").unwrap();
+    tokio::time::timeout(Duration::from_secs(1), ready)
+        .await
+        .unwrap();
 }
 fn assert_reaped(pid: i32) {
     let result = unsafe { libc::waitpid(pid, std::ptr::null_mut(), libc::WNOHANG) };

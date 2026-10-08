@@ -108,7 +108,7 @@ fn go_event_schemas_roundtrip_without_precision_loss() {
     }
     let state = State::replay(&events()).unwrap();
     assert_eq!(
-        state.tasks["task_000000000001"].metadata["large"].as_u64(),
+        state.tasks["task_000000000001"].metadata.as_ref().unwrap()["large"].as_u64(),
         Some(9007199254740993)
     );
     let task: Task =
@@ -694,7 +694,7 @@ fn hybrid_boosts_do_not_manufacture_relevance() {
         id: "pinned".into(),
         kind: "pinned".into(),
         content: "unrelated".into(),
-        updated_at: Utc::now(),
+        updated_at: Utc::now().fixed_offset(),
         ..Default::default()
     };
     assert!(
@@ -1152,6 +1152,57 @@ fn go_embedding_json_and_little_endian_sqlite_cache_are_reused() {
             embedder.calls.load(Ordering::SeqCst),
             1,
             "Go vectors should be reused without backfill"
+        );
+    }
+}
+
+#[test]
+fn persisted_metadata_presence_survives_mutations_and_reopen() {
+    for sqlite in [false, true] {
+        let temp = TempDir::new().unwrap();
+        let store = open(temp.path(), sqlite);
+        let task = task(&store, "Metadata presence");
+        let memory = memory(&store, "Default metadata remains omitted");
+        assert_eq!(task.metadata, None);
+        assert_eq!(memory.metadata, None);
+        assert!(
+            serde_json::to_value(&task)
+                .unwrap()
+                .get("metadata")
+                .is_none()
+        );
+        assert!(
+            serde_json::to_value(&memory)
+                .unwrap()
+                .get("metadata")
+                .is_none()
+        );
+        for metadata in [json!({"nested": [null, 3]}), Value::Null] {
+            let updated = store
+                .update_task(
+                    &task.id,
+                    TaskPatch {
+                        metadata: Some(metadata.clone()),
+                        ..Default::default()
+                    },
+                )
+                .unwrap();
+            assert_eq!(updated.metadata, Some(metadata.clone()));
+            assert_eq!(
+                serde_json::to_value(&updated).unwrap().get("metadata"),
+                Some(&metadata)
+            );
+        }
+        store.claim_task(&task.id, "actor").unwrap();
+        drop(store);
+        let store = open(temp.path(), sqlite);
+        assert_eq!(
+            store.get_task(&task.id).unwrap().metadata,
+            Some(Value::Null)
+        );
+        assert_eq!(
+            store.list_memories(MemoryFilter::default()).unwrap()[0].metadata,
+            None
         );
     }
 }

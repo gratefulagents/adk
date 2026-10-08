@@ -48,6 +48,7 @@ async fn invoke(tool: &dyn Tool, ctx: &ToolContext, args: Value) -> ToolOutput {
     tool.execute(
         ctx,
         ToolCall {
+            raw_arguments: None,
             id: "test".into(),
             name: tool.definition().name.clone(),
             arguments: args,

@@ -64,3 +64,27 @@ redirects and proxy discovery are off, and uncertain calls require reconciliatio
 distinguishes stream resumption from replay, and discusses legacy fallback only
 for specific initialize errors (400/404/405). Tests must count actual dispatches,
 not merely assert that an error was returned.
+
+## Builder composition decision
+
+The native builder adopts typed inputs and a non-cloneable lifecycle owner,
+not Go manager-option callbacks or a facade that merely aliases `extra_tools`.
+Cloneable handles are revocable and do not own shutdown authority. Cleanup runs
+in retained Tokio tasks, rather than an async `Drop` substitute that could be
+cancelled with its caller; watch/oneshot channels let unpolled caller futures
+release transport locks when the owner closes. Explicit close remains required
+before executor shutdown. The native no-replay rule survives this layer.
+
+Keep `builder` and `mcp` Cargo features independent: compile-time availability is
+not runtime selection or host authority. Reject implicit configuration discovery
+and credential/environment grants from repository config. A separate composed
+registration lane preserves normal prepared policy/role ceilings without
+switching on unrelated extensions. Bounds and rollback are explicit native
+differences from the pinned Go runtime's partial-result construction behavior.
+
+Selection is independently checked against `runtime.BuildToolBundle` at
+SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`; the fixture records runtime/MCP
+source hashes, harness hashes, tool identities and its explicit test launch
+policy (`scripts/mcp-runtime-reference/run.py`). This establishes the bounded
+selection matrix, not whole-builder, sandbox, or framework parity. No new
+third-party dependency or copied framework implementation was introduced.

@@ -222,7 +222,11 @@ pub fn rank_hybrid(
                 score += cfg.pinned_boost;
             }
             if cfg.recency_weight > 0.0 {
-                let age = (now - m.updated_at).num_milliseconds().max(0) as f64 / 1000.0;
+                let age = now
+                    .signed_duration_since(m.updated_at)
+                    .num_milliseconds()
+                    .max(0) as f64
+                    / 1000.0;
                 score +=
                     cfg.recency_weight * 0.5f64.powf(age / cfg.recency_half_life.as_secs_f64());
             }

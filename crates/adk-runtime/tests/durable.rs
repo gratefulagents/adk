@@ -1,6 +1,6 @@
 use adk_core::*;
 use adk_runtime::*;
-use serde_json::json;
+use serde_json::{Value, json};
 use std::{
     collections::VecDeque,
     sync::{
@@ -74,6 +74,7 @@ impl Host for HostImpl {
     }
 }
 struct ModelImpl {
+    requests: Mutex<Vec<ModelRequest>>,
     responses: Mutex<VecDeque<ModelResponse>>,
     calls: AtomicUsize,
     fail: bool,
@@ -85,9 +86,10 @@ impl Model for ModelImpl {
     fn complete<'a>(
         &'a self,
         _: &'a Context,
-        _: ModelRequest,
+        request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
+            self.requests.lock().unwrap().push(request);
             self.calls.fetch_add(1, Ordering::SeqCst);
             if self.fail {
                 return Err(Error::new(ErrorCategory::Provider, "ambiguous failure"));
@@ -143,8 +145,12 @@ fn message(role: Role, text: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage {
+            requests: 1,
             input_tokens: 10,
             output_tokens: 2,
             ..Default::default()
@@ -157,6 +163,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 fn call(id: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: id.into(),
             name: "effect".into(),
             arguments: json!({}),
@@ -172,6 +179,7 @@ fn context() -> Context {
 }
 fn request(resume: bool) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: if resume {
             vec![]
         } else {
@@ -186,6 +194,7 @@ fn setup(
     model_fail: bool,
 ) -> (Runner, Arc<ModelImpl>, Arc<ToolImpl>) {
     let model = Arc::new(ModelImpl {
+        requests: Mutex::new(vec![]),
         responses: Mutex::new(VecDeque::from([
             response(items),
             response(vec![message(Role::Assistant, "answer")]),
@@ -234,6 +243,81 @@ async fn run(
             durable(store, checkpoint),
         )
         .await
+}
+
+#[tokio::test]
+async fn final_summary_dispatch_restriction_survives_checkpoint_and_config_is_bound() {
+    let (_, model, tool) = setup(vec![call("denied")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool.clone());
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let error = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(store.clone(), None),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    let checkpoint = store.latest();
+    assert_eq!(
+        serde_json::to_value(&checkpoint).unwrap()["runtime"]["summary_turn"],
+        true
+    );
+    req.input.clear();
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    let error = changed
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint.clone())),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        error
+            .error
+            .info
+            .message
+            .contains("configuration or security policy changed")
+    );
+    let error = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint)),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert!(
+        error
+            .partial
+            .unwrap()
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert!(tool.keys.lock().unwrap().is_empty());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
 }
 
 #[tokio::test]
@@ -307,7 +391,9 @@ async fn completed_model_and_tool_boundaries_resume_remaining_work_once() {
         assert_eq!(tool.keys.lock().unwrap().len(), tools_left);
         assert_eq!(model.calls.load(Ordering::SeqCst), 1);
         assert_eq!(result.result.usage.input_tokens, 20);
+        assert_eq!(result.result.usage.requests, 2);
         let saved = resumed_store.latest();
+        assert_eq!(saved.usage.requests, 2);
         assert_eq!(saved.runtime.as_ref().unwrap().turns(), 2);
         assert_eq!(saved.runtime.as_ref().unwrap().tool_calls(), 2);
         assert_eq!(
@@ -342,6 +428,155 @@ async fn prepared_recovery_keeps_effect_key_step_id_and_advances_sequence() {
     );
     assert!(dispatch.sequence > prepared.sequence);
     assert_ne!(dispatch.attempt_id, prepared.attempt_id);
+}
+
+#[tokio::test]
+async fn unknown_effect_metadata_blocks_native_resume_and_stored_adapter() {
+    use adk_durable::{FilesystemStore, RunId, RunSnapshot, RunStore, TenantId};
+
+    let (runner, _, _) = setup(vec![call("one")], false, false);
+    let original = Arc::new(Store::default());
+    run(&runner, original.clone(), None).await.unwrap();
+    for boundary in [
+        "model_prepared",
+        "model_completed",
+        "tool_prepared",
+        "tool_completed",
+    ] {
+        for field in ["state", "classification"] {
+            for wire in [
+                Some(json!("future_value")),
+                Some(json!("")),
+                Some(Value::Null),
+                None,
+            ] {
+                let checkpoint = original.at(boundary);
+                let mut value = serde_json::to_value(&checkpoint).unwrap();
+                match &wire {
+                    Some(wire) => value["effect"][field] = wire.clone(),
+                    None => {
+                        value["effect"].as_object_mut().unwrap().remove(field);
+                    }
+                }
+                let decoded =
+                    RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).unwrap();
+                let expected = wire.as_ref().and_then(Value::as_str).unwrap_or("");
+                match field {
+                    "state" => assert_eq!(
+                        decoded.effect.as_ref().unwrap().state,
+                        adk_durable::EffectState::Unknown(expected.into())
+                    ),
+                    _ => assert_eq!(
+                        decoded.effect.as_ref().unwrap().classification,
+                        adk_durable::EffectClassification::Unknown(expected.into())
+                    ),
+                }
+                assert_eq!(
+                    serde_json::to_value(&decoded).unwrap()["effect"][field],
+                    json!(expected)
+                );
+
+                let (resumer, model, tool) =
+                    setup(vec![message(Role::Assistant, "resumed")], false, false);
+                let resumed = Arc::new(Store::default());
+                let error = run(&resumer, resumed.clone(), Some(decoded.clone()))
+                    .await
+                    .err()
+                    .unwrap();
+                assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+                assert!(error.error.info.message.contains("operator_resolution"));
+                assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+                assert!(tool.keys.lock().unwrap().is_empty());
+                assert!(resumed.checkpoints.lock().unwrap().is_empty());
+
+                for in_ledger in [true, false] {
+                    let directory = tempfile::tempdir().unwrap();
+                    let fs = Arc::new(
+                        FilesystemStore::new(directory.path(), Default::default()).unwrap(),
+                    );
+                    let tenant = TenantId::from("tenant");
+                    let run_id = RunId::from("run-1");
+                    let mut snapshot =
+                        RunSnapshot::new(tenant.clone(), run_id.clone(), chrono::Utc::now());
+                    snapshot.state = Some(
+                        serde_json::to_value(if in_ledger { &checkpoint } else { &decoded })
+                            .unwrap(),
+                    );
+                    snapshot.effects.push(checkpoint.effect.clone().unwrap());
+                    if in_ledger {
+                        snapshot.effects.push(decoded.effect.clone().unwrap());
+                    }
+                    fs.create(snapshot).unwrap();
+                    let lease = fs
+                        .acquire_lease(&tenant, &run_id, "worker", Duration::from_secs(60))
+                        .unwrap();
+                    let before = fs.load(&tenant, &run_id).unwrap();
+                    let error = StoredCheckpointStore::open(fs.clone(), lease)
+                        .err()
+                        .expect("unknown effect must block adapter entry");
+                    assert_eq!(error.info.category, ErrorCategory::Unsupported);
+                    assert!(error.info.message.contains("operator_resolution"));
+                    assert_eq!(fs.load(&tenant, &run_id).unwrap(), before);
+                    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+                    assert!(tool.keys.lock().unwrap().is_empty());
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn unknown_stored_run_status_blocks_adapter_before_execution() {
+    use adk_durable::{FilesystemStore, RunId, RunSnapshot, RunStore, TenantId};
+
+    for status in ["future_status", "RUNNING"] {
+        let directory = tempfile::tempdir().unwrap();
+        let fs = Arc::new(FilesystemStore::new(directory.path(), Default::default()).unwrap());
+        let tenant = TenantId::from("tenant");
+        let run_id = RunId::from("run-1");
+        let mut value = serde_json::to_value(RunSnapshot::new(
+            tenant.clone(),
+            run_id.clone(),
+            chrono::Utc::now(),
+        ))
+        .unwrap();
+        value["status"] = json!(status);
+        let snapshot: RunSnapshot = serde_json::from_value(value).unwrap();
+        assert_eq!(
+            snapshot.status,
+            adk_durable::RunStatus::Unknown(status.into())
+        );
+        assert_eq!(
+            serde_json::to_value(&snapshot).unwrap()["status"],
+            json!(status)
+        );
+        fs.create(snapshot).unwrap();
+        let lease = fs
+            .acquire_lease(&tenant, &run_id, "worker", Duration::from_secs(60))
+            .unwrap();
+        let before = fs.load(&tenant, &run_id).unwrap();
+        let (runner, model, tool) = setup(vec![call("one")], false, false);
+        let error = match StoredCheckpointStore::open(fs.clone(), lease) {
+            Err(error) => error,
+            Ok(adapter) => {
+                runner
+                    .run_durable(
+                        context(),
+                        request(false),
+                        Arc::new(HostImpl),
+                        DurableRun::new(Arc::new(adapter)),
+                    )
+                    .await
+                    .unwrap();
+                panic!("unknown stored status allowed execution");
+            }
+        };
+        assert_eq!(error.info.category, ErrorCategory::Unsupported);
+        assert!(error.info.message.contains("unknown stored run status"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        assert!(tool.keys.lock().unwrap().is_empty());
+        assert_eq!(fs.load(&tenant, &run_id).unwrap(), before);
+    }
 }
 
 #[tokio::test]
@@ -403,9 +638,12 @@ fn verified() -> GoRecovery {
     GoRecovery {
         policy: RunPolicy::default(),
         stop_gate_blocks: None,
+        pending_completion: None,
+        verifier_ran: None,
         effective_max_turns: None,
         turns: 2,
         usage: Usage {
+            requests: 2,
             input_tokens: 11,
             output_tokens: 7,
             ..Default::default()
@@ -415,8 +653,25 @@ fn verified() -> GoRecovery {
         started_at: chrono::Utc::now(),
         deadline_at: None,
         final_output: None,
+        final_output_is_raw_json: false,
     }
 }
+#[test]
+fn opaque_snapshot_kinds_cannot_enter_executable_go_recovery() {
+    let original = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    for kind in ["", "unknown", "future_kind"] {
+        let mut checkpoint = original.clone();
+        checkpoint.history[0].kind = kind.to_owned().into();
+        let error = runner
+            .migrate_go_checkpoint(checkpoint, verified())
+            .err()
+            .unwrap();
+        assert_eq!(error.info.category, ErrorCategory::Unsupported);
+    }
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+}
+
 #[tokio::test]
 async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() {
     let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
@@ -427,11 +682,16 @@ async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() 
         .err()
         .unwrap();
     assert!(error.error.info.message.contains("requires migration"));
+    let mut reset = verified();
+    reset.usage.requests = 1;
+    assert!(runner.migrate_go_checkpoint(cp.clone(), reset).is_err());
     let migrated = runner
         .migrate_go_checkpoint(cp.clone(), verified())
         .unwrap();
     let result = run(&runner, store.clone(), Some(migrated)).await.unwrap();
     assert_eq!(result.result.usage.input_tokens, 21);
+    assert_eq!(result.result.usage.requests, 3);
+    assert_eq!(store.latest().usage.requests, 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 3);
     assert_eq!(store.latest().runtime.as_ref().unwrap().cost(), 0.25);
     assert_eq!(store.latest().runtime.as_ref().unwrap().tool_calls(), 1);
@@ -470,7 +730,7 @@ async fn future_schemas_and_changed_policy_fail_closed_and_go_reader_is_gated() 
     value["schema_version"] = json!(2);
     assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
     value["schema_version"] = json!(1);
-    value["runtime"]["version"] = json!(2);
+    value["runtime"]["version"] = json!(3);
     assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
     let cp = store.at("model_prepared");
     let mut req = request(true);
@@ -587,6 +847,7 @@ async fn cumulative_turn_token_and_cost_limits_remain_exhausted_after_go_migrati
     }
     for budget in ["turn", "token", "cost"] {
         let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
             responses: Mutex::new(VecDeque::new()),
             calls: AtomicUsize::new(0),
             fail: false,
@@ -612,6 +873,7 @@ async fn cumulative_turn_token_and_cost_limits_remain_exhausted_after_go_migrati
             .run_durable(
                 context(),
                 RunRequest {
+                    input_provenance: Vec::new(),
                     input: vec![],
                     policy,
                 },
@@ -1002,6 +1264,11 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
                 AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
+                on_handoff: None,
+                input_type: None,
+                history_filter: None,
+                is_enabled: None,
+                input_filter: Default::default(),
                 definition: ToolDefinition {
                     name: "transfer_to_target".into(),
                     description: "".into(),
@@ -1049,6 +1316,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     let (_, model, _) = setup(
         vec![RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "handoff-1".into(),
                 name: "transfer".into(),
                 arguments: json!({}),
@@ -1059,6 +1327,11 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     );
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
+        on_handoff: None,
+        input_type: None,
+        history_filter: None,
+        is_enabled: None,
+        input_filter: Default::default(),
         definition: ToolDefinition {
             name: "transfer".into(),
             description: "".into(),
@@ -1178,19 +1451,22 @@ async fn actual_go_reader_accepts_rust_approval_history_and_refuses_nonterminal_
     if std::env::var_os("ADK_TEST_GO").is_none() {
         return;
     }
-    let (runner, _, _) = setup(vec![call("one")], false, false);
     let store = Arc::new(Store::default());
-    let mut req = request(false);
-    req.policy.tools.approval = ApprovalPolicy::All;
-    runner
-        .run_durable(
-            context(),
-            req,
-            Arc::new(HostImpl),
-            DurableRun::new(store.clone()),
-        )
-        .await
-        .unwrap();
+    for provenance in [ItemProvenance::Unknown, ItemProvenance::Unattributed] {
+        let (runner, _, _) = setup(vec![call("one")], false, false);
+        let mut req = request(false);
+        req.input_provenance = vec![provenance];
+        req.policy.tools.approval = ApprovalPolicy::All;
+        runner
+            .run_durable(
+                context(),
+                req,
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone()),
+            )
+            .await
+            .unwrap();
+    }
     assert!(
         store
             .latest()
@@ -1538,4 +1814,1989 @@ fn actual_go_stop_gate_fixture_is_current() {
         serde_json::from_str::<serde_json::Value>(include_str!("fixtures/go-stop-gate.json"))
             .unwrap()
     );
+}
+
+struct DurableGuard {
+    key: Option<&'static str>,
+    calls: Arc<AtomicUsize>,
+}
+impl Guardrail for DurableGuard {
+    fn name(&self) -> &str {
+        "policy"
+    }
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        _: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(None)
+        })
+    }
+}
+
+#[tokio::test]
+async fn durable_guardrails_require_stable_keys_and_completed_recovery_preserves_reports() {
+    let calls = Arc::new(AtomicUsize::new(0));
+    let make_runner = |key| {
+        let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
+            responses: Mutex::new(VecDeque::from([response(vec![message(
+                Role::Assistant,
+                "done",
+            )])])),
+            calls: AtomicUsize::new(0),
+            fail: false,
+        });
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+        agent.input_guardrails.push(Arc::new(DurableGuard {
+            key,
+            calls: calls.clone(),
+        }));
+        Runner::new(agent, RunnerConfig::default()).unwrap()
+    };
+    let store = Arc::new(Store::default());
+    let error = run(&make_runner(None), store.clone(), None)
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+    assert_eq!(calls.load(Ordering::SeqCst), 0);
+    assert!(store.checkpoints.lock().unwrap().is_empty());
+    let runner = make_runner(Some("v1"));
+    let first = run(&runner, store.clone(), None).await.unwrap();
+    assert_eq!(first.result.guardrails.len(), 1);
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    let checkpoint = store.latest();
+    let recovered = run(&runner, store.clone(), Some(checkpoint.clone()))
+        .await
+        .unwrap();
+    assert_eq!(recovered.result.guardrails, first.result.guardrails);
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    assert!(
+        run(&make_runner(Some("v2")), store, Some(checkpoint))
+            .await
+            .is_err()
+    );
+}
+
+#[tokio::test]
+async fn checkpoint_requests_do_not_substitute_attempt_count() {
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut recovery = verified();
+    recovery.turns = 4;
+    let migrated = runner.migrate_go_checkpoint(cp, recovery).unwrap();
+    let store = Arc::new(Store::default());
+    let result = run(&runner, store.clone(), Some(migrated)).await.unwrap();
+    assert_eq!(result.result.usage.requests, 3);
+    assert_eq!(store.latest().usage.requests, 3);
+    assert_eq!(store.latest().runtime.as_ref().unwrap().turns(), 5);
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.turns, 5);
+    assert!(metrics.model.is_some());
+    assert_eq!(
+        store
+            .latest()
+            .runtime
+            .as_ref()
+            .unwrap()
+            .result()
+            .metrics
+            .as_ref(),
+        Some(metrics)
+    );
+    let restored = run(&runner, store.clone(), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(restored.result.metrics, result.result.metrics);
+}
+
+#[tokio::test]
+async fn native_provenance_v1_unknown_v2_exact_and_unknown_go_projection() {
+    for version in [1, 2] {
+        let (runner, _, _) = setup(vec![call("1")], false, false);
+        let store = Arc::new(Store::default());
+        let mut req = request(false);
+        req.input = vec![message(Role::Assistant, "past")];
+        req.input_provenance = vec![ItemProvenance::Agent {
+            name: "historical".into(),
+        }];
+        runner
+            .run_durable(
+                context(),
+                req,
+                Arc::new(HostImpl),
+                durable(store.clone(), None),
+            )
+            .await
+            .unwrap();
+        let checkpoint = store.at("tool_completed");
+        assert_eq!(checkpoint.schema_version, 1);
+        assert_eq!(checkpoint.history[0].agent_name, "historical");
+        assert_eq!(checkpoint.history[1].agent_name, "agent");
+        assert_eq!(checkpoint.history[2].agent_name, "agent");
+        let mut value = serde_json::to_value(checkpoint).unwrap();
+        assert_eq!(value["runtime"]["version"], 2);
+        value["runtime"]["version"] = json!(version);
+        if version == 1 {
+            value["runtime"]["result"]
+                .as_object_mut()
+                .unwrap()
+                .remove("history_provenance");
+            value["runtime"]["result"]
+                .as_object_mut()
+                .unwrap()
+                .remove("new_items_provenance");
+            for item in value["history"].as_array_mut().unwrap() {
+                item["agent_name"] = json!("fabricated-current-agent");
+            }
+        }
+        let checkpoint = RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).unwrap();
+        let expected = if version == 1 {
+            vec![ItemProvenance::Unknown; 3]
+        } else {
+            vec![
+                ItemProvenance::Agent {
+                    name: "historical".into(),
+                },
+                ItemProvenance::Agent {
+                    name: "agent".into(),
+                },
+                ItemProvenance::Agent {
+                    name: "agent".into(),
+                },
+            ]
+        };
+        assert_eq!(
+            checkpoint
+                .runtime
+                .as_ref()
+                .unwrap()
+                .result()
+                .history_provenance,
+            expected
+        );
+        let (resumer, _, tool) = setup(vec![message(Role::Assistant, "continued")], false, false);
+        let resumed_store = Arc::new(Store::default());
+        let outcome = run(&resumer, resumed_store.clone(), Some(checkpoint))
+            .await
+            .unwrap();
+        assert!(tool.keys.lock().unwrap().is_empty());
+        assert_eq!(&outcome.result.history_provenance[..3], expected);
+        assert_eq!(
+            outcome.result.history_provenance[3],
+            ItemProvenance::Agent {
+                name: "agent".into()
+            }
+        );
+        if version == 1 {
+            let mut exported = resumed_store.latest();
+            assert!(
+                exported.history[..3]
+                    .iter()
+                    .all(|item| item.kind == adk_codec::dto::SnapshotType::Unknown)
+            );
+            assert!(
+                exported.history[..3]
+                    .iter()
+                    .all(|item| item.agent_name.is_empty())
+            );
+            exported.runtime = None;
+            let mut recovery = verified();
+            recovery.final_output = Some(json!("continued"));
+            assert!(resumer.migrate_go_checkpoint(exported, recovery).is_err());
+        }
+    }
+}
+
+#[tokio::test]
+async fn native_v2_rejects_missing_or_misaligned_sidecars() {
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let store = Arc::new(Store::default());
+    run(&runner, store.clone(), None).await.unwrap();
+    let checkpoint = store.latest();
+    assert_eq!(
+        checkpoint.history[0].kind,
+        adk_codec::dto::SnapshotType::Unknown
+    );
+    for field in ["history_provenance", "new_items_provenance"] {
+        let mut value = serde_json::to_value(&checkpoint).unwrap();
+        value["runtime"]["result"][field] = json!([]);
+        assert!(RunnerCheckpoint::decode(&serde_json::to_vec(&value).unwrap()).is_err());
+        let malformed: RunnerCheckpoint = serde_json::from_value(value).unwrap();
+        let error = run(&runner, Arc::new(Store::default()), Some(malformed))
+            .await
+            .err()
+            .unwrap();
+        assert!(error.error.info.message.contains("provenance length"));
+    }
+}
+
+#[tokio::test]
+async fn go_import_preserves_explicit_names_and_known_nil() {
+    let mut checkpoint =
+        RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    for (index, item) in checkpoint.history.iter_mut().enumerate() {
+        item.agent_name = if index == 0 {
+            String::new()
+        } else {
+            format!("producer-{index}")
+        };
+    }
+    let expected: Vec<_> = checkpoint
+        .history
+        .iter()
+        .map(|item| {
+            if item.agent_name.is_empty() {
+                ItemProvenance::Unattributed
+            } else {
+                ItemProvenance::Agent {
+                    name: item.agent_name.clone(),
+                }
+            }
+        })
+        .collect();
+    let migrated = runner
+        .migrate_go_checkpoint(checkpoint, verified())
+        .unwrap();
+    assert_eq!(
+        migrated
+            .runtime
+            .as_ref()
+            .unwrap()
+            .result()
+            .history_provenance,
+        expected
+    );
+    let store = Arc::new(Store::default());
+    let outcome = run(&runner, store.clone(), Some(migrated)).await.unwrap();
+    assert_eq!(
+        &outcome.result.history_provenance[..expected.len()],
+        expected
+    );
+    for (snapshot, provenance) in store.latest().history.iter().zip(expected) {
+        let name = match provenance {
+            ItemProvenance::Agent { name } => name,
+            _ => String::new(),
+        };
+        assert_eq!(snapshot.agent_name, name);
+        assert_ne!(snapshot.kind, adk_codec::dto::SnapshotType::Unknown);
+    }
+}
+
+#[tokio::test]
+async fn compatibility_projection_survives_actual_checkpoint_and_completed_resume() {
+    let fixtures: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let mut count = 0;
+    for (name, case) in fixtures["provider_response_cases"].as_object().unwrap() {
+        let projection = match case["protocol"].as_str().unwrap() {
+            "anthropic" => SnapshotProjection::GoAnthropicMessage,
+            _ => SnapshotProjection::GoOpenAiMessage,
+        };
+        for (raw_key, snapshot_key) in [
+            ("raw_json", "snapshot_json"),
+            ("stream_raw_json", "stream_snapshot_json"),
+        ] {
+            let Some(raw) = case[raw_key].as_str() else {
+                continue;
+            };
+            let expected = case[snapshot_key].as_str().unwrap();
+            let (runner, model, _) = setup(
+                vec![message(Role::Assistant, "native preserved")],
+                false,
+                false,
+            );
+            {
+                let mut responses = model.responses.lock().unwrap();
+                let response = responses.front_mut().unwrap();
+                response.snapshot_raw = Some(JsonDocument::new(raw.into()).unwrap());
+                response.snapshot_projection = Some(projection);
+            }
+            let store = Arc::new(Store::default());
+            let original = run(&runner, store.clone(), None).await.unwrap();
+            let checkpoint =
+                RunnerCheckpoint::decode(&serde_json::to_vec(&store.latest()).unwrap()).unwrap();
+            let restored = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+                .await
+                .unwrap();
+            assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+            for result in [original, restored] {
+                let response = &result.result.responses[0];
+                assert_eq!(
+                    response.items,
+                    vec![message(Role::Assistant, "native preserved")]
+                );
+                assert_eq!(response.snapshot_projection, Some(projection));
+                assert_eq!(response.snapshot_raw.as_ref().unwrap().as_str(), raw);
+                let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response).unwrap();
+                assert_eq!(
+                    adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                    expected.as_bytes(),
+                    "{name}/{raw_key}"
+                );
+            }
+            count += 1;
+        }
+    }
+    assert_eq!(count, 15);
+}
+
+#[tokio::test]
+async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configuration_changes() {
+    for filter in [
+        HandoffInputFilter::Preserve,
+        HandoffInputFilter::RemoveTools,
+    ] {
+        let (_, model, _) = setup(
+            vec![
+                RunItem::Reasoning {
+                    reasoning: Reasoning {
+                        text: "thinking".into(),
+                        ..Default::default()
+                    },
+                },
+                message(Role::Assistant, "transfer now"),
+                RunItem::ToolCall {
+                    call: ToolCall {
+                        raw_arguments: None,
+                        id: "transfer".into(),
+                        name: "transfer".into(),
+                        arguments: json!({}),
+                    },
+                },
+            ],
+            false,
+            false,
+        );
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+        agent.handoffs.push(Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: true,
+                requires_approval: true,
+            },
+            target: Arc::new(AgentConfig::new(
+                "target",
+                ModelBinding::complete("model", model.clone()),
+            )),
+            input_filter: filter,
+        });
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let failure = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(failure.error.info.message, "injected persistence failure");
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let checkpoint = store.latest();
+        assert_eq!(checkpoint.execution_boundary(), "handoff_completed");
+        assert_eq!(checkpoint.agent_name, "target");
+        let snapshot = serde_json::to_value(&checkpoint).unwrap();
+        let state = &snapshot["runtime"];
+        let before: RunResult = serde_json::from_value(state["result"].clone()).unwrap();
+        assert_eq!(before.usage.input_tokens, 10);
+        assert_eq!(before.usage.output_tokens, 2);
+        assert_eq!(before.usage.requests, 1);
+        assert_eq!(before.new_items.len(), 4);
+        assert_eq!(before.responses.len(), 1);
+        assert_eq!(state["approval_journal"].as_array().unwrap().len(), 1);
+        if filter == HandoffInputFilter::RemoveTools {
+            assert_eq!(
+                before.history,
+                vec![
+                    message(Role::User, "go"),
+                    message(Role::Assistant, "transfer now")
+                ]
+            );
+            assert_eq!(
+                before.history_provenance,
+                vec![
+                    ItemProvenance::Unknown,
+                    ItemProvenance::Agent {
+                        name: "agent".into()
+                    }
+                ]
+            );
+            assert_eq!(
+                before.usage.context_tokens,
+                Some(compaction::estimate_history_tokens(&before.history))
+            );
+            assert!(state["approval_journal"][0]["history_before"].is_null());
+            assert_eq!(checkpoint.history.len(), 2);
+        } else {
+            assert_eq!(before.history.len(), 5);
+            assert!(state["approval_journal"][0]["history_before"].is_number());
+            assert_eq!(checkpoint.history.len(), 6);
+        }
+        agent.handoffs[0].input_filter = if filter == HandoffInputFilter::RemoveTools {
+            HandoffInputFilter::Preserve
+        } else {
+            HandoffInputFilter::RemoveTools
+        };
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        for cp in [store.at("run_started"), checkpoint.clone()] {
+            let error = run(&changed, Arc::new(Store::default()), Some(cp))
+                .await
+                .err()
+                .unwrap();
+            assert!(
+                error
+                    .error
+                    .info
+                    .message
+                    .contains("configuration or security policy changed")
+            );
+        }
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let result = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+            .await
+            .unwrap();
+        assert_eq!(result.result.status, RunStatus::Completed);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests[1].input, before.history);
+        assert_eq!(requests[1].input_provenance, before.history_provenance);
+        assert_eq!(&result.result.new_items[..4], before.new_items);
+        assert_eq!(result.result.responses[0], before.responses[0]);
+        assert_eq!(result.result.usage.input_tokens, 20);
+    }
+}
+
+#[tokio::test]
+async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_definitions() {
+    for ceiling in [
+        None,
+        Some(AccessMode::ReadOnly),
+        Some(AccessMode::FullAccess),
+    ] {
+        let model = Arc::new(ModelImpl {
+            requests: Mutex::new(vec![]),
+            responses: Mutex::new(VecDeque::from([
+                response(vec![RunItem::ToolCall {
+                    call: ToolCall {
+                        raw_arguments: None,
+                        id: "transfer".into(),
+                        name: "transfer".into(),
+                        arguments: json!({}),
+                    },
+                }]),
+                response(vec![message(Role::Assistant, "done")]),
+            ])),
+            calls: AtomicUsize::new(0),
+            fail: false,
+        });
+        let mut target = AgentConfig::new("target", ModelBinding::complete("model", model.clone()));
+        target.tool_access_ceiling = ceiling;
+        let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
+        parent.handoffs.push(Handoff {
+            on_handoff: None,
+            input_type: None,
+            history_filter: None,
+            is_enabled: None,
+            definition: ToolDefinition {
+                name: "transfer".into(),
+                description: "transfer".into(),
+                input_schema: schemars::json_schema!({"type":"object"}),
+                read_only: true,
+                requires_approval: false,
+            },
+            target: Arc::new(target),
+            input_filter: HandoffInputFilter::Preserve,
+        });
+        let runner = Runner::new(parent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let failure = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(failure.error.info.message, "injected persistence failure");
+        let checkpoint = store.latest();
+        assert_eq!(checkpoint.agent_name, "target");
+        for changed_ceiling in [
+            None,
+            Some(AccessMode::ReadOnly),
+            Some(AccessMode::WorkspaceWrite),
+            Some(AccessMode::FullAccess),
+        ] {
+            if changed_ceiling == ceiling {
+                continue;
+            }
+            let mut changed = parent.clone();
+            Arc::make_mut(&mut changed.handoffs[0].target).tool_access_ceiling = changed_ceiling;
+            let changed = Runner::new(changed, RunnerConfig::default()).unwrap();
+            for checkpoint in [store.at("run_started"), checkpoint.clone()] {
+                let error = run(&changed, Arc::new(Store::default()), Some(checkpoint))
+                    .await
+                    .err()
+                    .unwrap();
+                assert!(
+                    error
+                        .error
+                        .info
+                        .message
+                        .contains("configuration or security policy changed")
+                );
+            }
+        }
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+        let result = run(&runner, Arc::new(Store::default()), Some(checkpoint))
+            .await
+            .unwrap();
+        assert_eq!(result.result.status, RunStatus::Completed);
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    }
+}
+
+struct DurableImmediate {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+    fail_after: Option<Arc<Store>>,
+}
+impl ImmediateInputPoller for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn poll<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if let Some(store) = &self.fail_after {
+                *store.fail.lock().unwrap() = Some(("model_prepared".into(), false));
+            }
+            Ok(ImmediateInputBatch {
+                items: vec![message(Role::User, "steer")],
+                provenance: vec![ItemProvenance::Unattributed],
+            })
+        })
+    }
+}
+impl ImmediateInputFinalizer for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            if let Some(store) = &self.fail_after {
+                *store.fail.lock().unwrap() = Some(("model_completed".into(), false));
+            }
+            Ok(ImmediateInputBatch::default())
+        })
+    }
+}
+
+impl ImmediateInputSignal for DurableImmediate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            std::future::pending().await
+        })
+    }
+}
+
+#[tokio::test]
+async fn immediate_input_durable_requires_keys_and_binds_each_callback() {
+    for kind in 0..3 {
+        let finalizer = kind == 1;
+        let (_, model, _) = setup(vec![message(Role::Assistant, "answer")], false, false);
+        let agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+        let make_runner = |key| {
+            let callback = Arc::new(DurableImmediate {
+                key,
+                calls: AtomicUsize::new(0),
+                fail_after: None,
+            });
+            let mut config = RunnerConfig::default();
+            if kind == 2 {
+                config.immediate_input_signal = Some(callback.clone());
+                config.immediate_input_poller = Some(Arc::new(DurableImmediate {
+                    key: Some("poll-v1"),
+                    calls: AtomicUsize::new(0),
+                    fail_after: None,
+                }));
+            } else if finalizer {
+                config.immediate_input_finalizer = Some(callback.clone());
+            } else {
+                config.immediate_input_poller = Some(callback.clone());
+            }
+            (Runner::new(agent.clone(), config).unwrap(), callback)
+        };
+        let (runner, callback) = make_runner(None);
+        let error = runner
+            .run_durable(
+                context(),
+                request(false),
+                Arc::new(HostImpl),
+                DurableRun::new(Arc::new(Store::default())),
+            )
+            .await
+            .err()
+            .unwrap();
+        assert!(error.error.info.message.contains("immediate input"));
+        assert_eq!(callback.calls.load(Ordering::SeqCst), 0);
+        let (runner, callback) = make_runner(Some("queue-v1"));
+        let store = Arc::new(Store::default());
+        let outcome = runner
+            .run_durable(
+                context(),
+                request(false),
+                Arc::new(HostImpl),
+                DurableRun::new(store.clone()),
+            )
+            .await
+            .unwrap();
+        assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+        if !finalizer {
+            assert_eq!(
+                outcome.result.new_items_provenance[0],
+                ItemProvenance::Unattributed
+            );
+        }
+        for key in [Some("queue-v2"), Some("queue-v1")] {
+            let (restored, callback) = make_runner(key);
+            let result = restored
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(store.latest())),
+                )
+                .await;
+            if key == Some("queue-v1") {
+                assert!(result.is_ok());
+            } else {
+                assert!(
+                    result
+                        .err()
+                        .unwrap()
+                        .error
+                        .info
+                        .message
+                        .contains("configuration or security policy changed")
+                );
+            }
+            assert_eq!(callback.calls.load(Ordering::SeqCst), 0);
+        }
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(store.latest()))
+                )
+                .await
+                .err()
+                .unwrap()
+                .error
+                .info
+                .message
+                .contains("configuration or security policy changed")
+        );
+    }
+}
+
+#[tokio::test]
+async fn interrupted_immediate_admission_never_replays_queue_effects() {
+    for finalizer in [false, true] {
+        for after_callback in [false, true] {
+            let (_, model, _) = setup(vec![message(Role::Assistant, "answer")], false, false);
+            let store = Arc::new(Store::default());
+            if !after_callback {
+                *store.fail.lock().unwrap() = Some(("immediate_input_dispatched".into(), true));
+            }
+            let callback = Arc::new(DurableImmediate {
+                key: Some("queue-v1"),
+                calls: AtomicUsize::new(0),
+                fail_after: after_callback.then(|| store.clone()),
+            });
+            let mut config = RunnerConfig::default();
+            if finalizer {
+                config.immediate_input_finalizer = Some(callback.clone());
+            } else {
+                config.immediate_input_poller = Some(callback.clone());
+            }
+            let runner = Runner::new(
+                AgentConfig::new("agent", ModelBinding::complete("model", model)),
+                config,
+            )
+            .unwrap();
+            let error = runner
+                .run_durable(
+                    context(),
+                    request(false),
+                    Arc::new(HostImpl),
+                    DurableRun::new(store.clone()),
+                )
+                .await
+                .err()
+                .unwrap();
+            assert_eq!(error.error.info.message, "injected persistence failure");
+            assert_eq!(
+                callback.calls.load(Ordering::SeqCst),
+                usize::from(after_callback)
+            );
+            let checkpoint = store.latest();
+            assert_eq!(
+                checkpoint.execution_boundary(),
+                "immediate_input_dispatched"
+            );
+            if after_callback && !finalizer {
+                assert!(
+                    error
+                        .partial
+                        .as_ref()
+                        .unwrap()
+                        .history
+                        .contains(&message(Role::User, "steer"))
+                );
+            }
+            let error = runner
+                .run_durable(
+                    context(),
+                    request(true),
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(checkpoint)),
+                )
+                .await
+                .err()
+                .unwrap();
+            assert!(error.error.info.message.contains("reconciliation"));
+            assert_eq!(
+                callback.calls.load(Ordering::SeqCst),
+                usize::from(after_callback)
+            );
+        }
+    }
+}
+
+#[derive(Default)]
+struct DurableWake {
+    entered: tokio::sync::Notify,
+    wake: tokio::sync::Notify,
+    calls: AtomicUsize,
+}
+impl ImmediateInputSignal for DurableWake {
+    fn durable_key(&self) -> Option<&str> {
+        Some("wake-v1")
+    }
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(self.wake.notified())
+    }
+}
+impl Model for DurableWake {
+    fn provider(&self) -> &str {
+        "test"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            if self.calls.fetch_add(1, Ordering::SeqCst) == 0 {
+                self.entered.notify_one();
+                std::future::pending::<()>().await;
+            }
+            Ok(response(vec![message(Role::Assistant, "answer")]))
+        })
+    }
+}
+
+#[tokio::test]
+async fn immediate_signal_durable_refund_restores_but_dispatch_requires_reconciliation() {
+    let wake = Arc::new(DurableWake::default());
+    let poller = Arc::new(DurableImmediate {
+        key: Some("poll-v1"),
+        calls: AtomicUsize::new(0),
+        fail_after: None,
+    });
+    let runner = Runner::new(
+        AgentConfig::new("agent", ModelBinding::complete("model", wake.clone())),
+        RunnerConfig {
+            immediate_input_poller: Some(poller.clone()),
+            immediate_input_signal: Some(wake.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let notify = async {
+        wake.entered.notified().await;
+        wake.wake.notify_one();
+    };
+    let (result, _) = tokio::join!(
+        runner.run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            DurableRun::new(store.clone())
+        ),
+        notify
+    );
+    let result = result.unwrap().result;
+    assert_eq!(result.metrics.unwrap().turns, 2);
+    assert_eq!(result.responses.len(), 1);
+    assert_eq!(wake.calls.load(Ordering::SeqCst), 2);
+    req.input.clear();
+    let restored = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(store.latest())),
+        )
+        .await
+        .unwrap();
+    assert_eq!(restored.result.responses.len(), 1);
+    let error = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            durable(
+                Arc::new(Store::default()),
+                Some(store.at("model_dispatched")),
+            ),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(error.error.info.message.contains("reconciliation"));
+    assert_eq!(wake.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(poller.calls.load(Ordering::SeqCst), 2);
+}
+
+#[tokio::test]
+async fn additional_instructions_survive_checkpoint_and_config_is_bound() {
+    let (_, model, tool) = setup(vec![call("denied")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool.clone());
+    agent.mcp_servers = vec!["connected".into()];
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            force_final_summary_turn: true,
+            additional_instructions: "run-wide".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let error = runner
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(store.clone(), None),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    let checkpoint = store.latest();
+    assert_eq!(
+        serde_json::to_value(&checkpoint).unwrap()["runtime"]["summary_turn"],
+        true
+    );
+    req.input.clear();
+    let mut changed_agent = agent.clone();
+    changed_agent.mcp_servers.clear();
+    let changed_mcp = Runner::new(
+        changed_agent,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            additional_instructions: "run-wide".into(),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mismatch = changed_mcp
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint.clone())),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        mismatch
+            .error
+            .info
+            .message
+            .contains("configuration or security policy changed")
+    );
+    let changed = Runner::new(
+        agent,
+        RunnerConfig {
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = changed
+        .run_durable(
+            context(),
+            req.clone(),
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint.clone())),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert!(
+        error
+            .error
+            .info
+            .message
+            .contains("configuration or security policy changed")
+    );
+    let error = runner
+        .run_durable(
+            context(),
+            req,
+            Arc::new(HostImpl),
+            durable(Arc::new(Store::default()), Some(checkpoint)),
+        )
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert!(
+        error
+            .partial
+            .unwrap()
+            .history
+            .iter()
+            .any(|item| matches!(item, RunItem::ToolResult { output, .. } if output.is_error))
+    );
+    assert!(tool.keys.lock().unwrap().is_empty());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn completion_confirmation_survives_every_candidate_checkpoint_without_repeating_calls() {
+    let baseline: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/confirmation/observations.json"
+    ))
+    .unwrap();
+    let expected = baseline["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| case["name"] == "double" && case["streamed"] == false)
+        .unwrap();
+    let (_, model, tool) = setup(vec![], false, false);
+    *model.responses.lock().unwrap() = VecDeque::from([
+        response(vec![message(Role::Assistant, "first")]),
+        response(vec![message(Role::Assistant, "final")]),
+    ]);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            require_completion_confirmation: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let mut checkpoint = None;
+    let mut finished = None;
+    let mut saw_pending = false;
+    for _ in 0..8 {
+        match runner
+            .run_durable(
+                context(),
+                req.clone(),
+                Arc::new(HostImpl),
+                durable(store.clone(), checkpoint),
+            )
+            .await
+        {
+            Ok(outcome) => {
+                finished = Some(outcome.result);
+                break;
+            }
+            Err(error) => assert_eq!(error.error.info.message, "injected persistence failure"),
+        }
+        let saved = store.latest();
+        let value = serde_json::to_value(&saved).unwrap();
+        if value["runtime"]["pending_completion"] == true {
+            saw_pending = true;
+            assert_eq!(value["runtime"]["policy"]["max_turns"], 2);
+        }
+        let changed = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let mut resume = req.clone();
+        resume.input.clear();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    resume,
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(saved.clone()))
+                )
+                .await
+                .is_err()
+        );
+        checkpoint = Some(saved);
+        req.input.clear();
+    }
+    assert!(saw_pending);
+    let result = finished.expect("confirmation must finish after recovery");
+    assert_eq!(result.final_text(), expected["final"]);
+    assert_eq!(json!(model.calls.load(Ordering::SeqCst)), expected["calls"]);
+    let feedback: Vec<_> = result
+        .history
+        .iter()
+        .filter_map(|item| match item {
+            RunItem::Message { message } => {
+                message.content.iter().find_map(|content| match content {
+                    Content::Text { text } if text.starts_with("[SYSTEM]") => Some(text.clone()),
+                    _ => None,
+                })
+            }
+            _ => None,
+        })
+        .collect();
+    assert_eq!(json!(feedback), expected["feedback"]);
+}
+
+#[test]
+fn go_confirmation_migration_requires_verified_pending_state_and_extended_budget() {
+    let (_, model, tool) = setup(vec![], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            require_completion_confirmation: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    assert!(
+        runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .is_err()
+    );
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    assert!(runner.migrate_go_checkpoint(cp.clone(), state).is_err());
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    state.effective_max_turns = Some(std::num::NonZeroU32::new(1).unwrap());
+    assert!(runner.migrate_go_checkpoint(cp.clone(), state).is_err());
+    let mut state = verified();
+    state.pending_completion = Some(true);
+    state.effective_max_turns = Some(state.policy.max_turns.saturating_add(1));
+    let migrated = runner.migrate_go_checkpoint(cp, state).unwrap();
+    assert_eq!(
+        serde_json::to_value(migrated).unwrap()["runtime"]["pending_completion"],
+        true
+    );
+}
+
+struct ReplaySafeVerifier {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+}
+impl FinalAnswerVerifier for ReplaySafeVerifier {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn verify<'a>(&'a self, _: &'a Context, _: &'a Value) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok("fix this".into())
+        })
+    }
+}
+#[tokio::test]
+async fn durable_verifier_invocation_state_survives_checkpoints_and_binds_configuration() {
+    let (_, model, tool) = setup(vec![], false, false);
+    *model.responses.lock().unwrap() = VecDeque::from([
+        response(vec![message(Role::Assistant, "first")]),
+        response(vec![message(Role::Assistant, "final")]),
+    ]);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool);
+    for key in [None, Some("")] {
+        let unsafe_runner = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                    key,
+                    calls: AtomicUsize::new(0),
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(
+            run(&unsafe_runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    let verifier = Arc::new(ReplaySafeVerifier {
+        key: Some("pure-v1"),
+        calls: AtomicUsize::new(0),
+    });
+    let runner = Runner::new(
+        agent.clone(),
+        RunnerConfig {
+            final_answer_verifier: Some(verifier.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let mut req = request(false);
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let mut checkpoint = None;
+    let mut result = None;
+    for iteration in 0..8 {
+        match runner
+            .run_durable(
+                context(),
+                req.clone(),
+                Arc::new(HostImpl),
+                durable(store.clone(), checkpoint),
+            )
+            .await
+        {
+            Ok(outcome) => {
+                result = Some(outcome.result);
+                break;
+            }
+            Err(error) => assert_eq!(error.error.info.message, "injected persistence failure"),
+        }
+        let saved = store.latest();
+        if iteration == 0 {
+            assert_eq!(verifier.calls.load(Ordering::SeqCst), 0);
+        } else {
+            assert_eq!(
+                serde_json::to_value(&saved).unwrap()["runtime"]["verifier_ran"],
+                true
+            );
+        }
+        let changed = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                    key: Some("pure-v2"),
+                    calls: AtomicUsize::new(0),
+                })),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut resume = req.clone();
+        resume.input.clear();
+        assert!(
+            changed
+                .run_durable(
+                    context(),
+                    resume,
+                    Arc::new(HostImpl),
+                    durable(Arc::new(Store::default()), Some(saved.clone()))
+                )
+                .await
+                .is_err()
+        );
+        checkpoint = Some(saved);
+        req.input.clear();
+    }
+    let result = result.expect("verifier must finish after recovery");
+    assert_eq!(result.final_text(), "final");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(verifier.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(result.history.iter().filter(|item|matches!(item,RunItem::Message {message} if message.content.iter().any(|content| matches!(content,Content::Text {text} if text.contains("An independent reviewer"))))).count(),1);
+}
+
+#[test]
+fn go_verifier_recovery_requires_verified_invocation_state_and_budget() {
+    let (_, model, tool) = setup(vec![], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model));
+    agent.tools.push(tool);
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            final_answer_verifier: Some(Arc::new(ReplaySafeVerifier {
+                key: Some("pure-v1"),
+                calls: AtomicUsize::new(0),
+            })),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let cp = RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    assert!(
+        runner
+            .migrate_go_checkpoint(cp.clone(), verified())
+            .is_err()
+    );
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    assert!(runner.migrate_go_checkpoint(cp.clone(), evidence).is_err());
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    evidence.effective_max_turns = Some(std::num::NonZeroU32::new(1).unwrap());
+    assert!(runner.migrate_go_checkpoint(cp.clone(), evidence).is_err());
+    let mut evidence = verified();
+    evidence.verifier_ran = Some(true);
+    evidence.effective_max_turns = Some(evidence.policy.max_turns.saturating_add(1));
+    let migrated = runner.migrate_go_checkpoint(cp, evidence).unwrap();
+    assert_eq!(
+        serde_json::to_value(migrated).unwrap()["runtime"]["verifier_ran"],
+        true
+    );
+}
+
+struct PureInstructions(Option<&'static str>);
+impl InstructionProvider for PureInstructions {
+    fn durable_key(&self) -> Option<&str> {
+        self.0
+    }
+    fn instructions<'a>(
+        &'a self,
+        ctx: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            Ok(format!(
+                "{}:{}",
+                ctx.agent.name, ctx.snapshot.usage.input_tokens
+            ))
+        })
+    }
+}
+#[tokio::test]
+async fn durable_dynamic_instructions_require_pure_identity_and_bind_recovery() {
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    for key in [None, Some("")] {
+        agent.instruction_provider = Some(Arc::new(PureInstructions(key)));
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        assert!(
+            run(&runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    agent.instruction_provider = Some(Arc::new(PureInstructions(Some("pure-v1"))));
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let saved = store.latest();
+    assert_eq!(model.requests.lock().unwrap()[0].instructions, "agent:0");
+    agent.instruction_provider = Some(Arc::new(PureInstructions(Some("pure-v2"))));
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(saved.clone()))
+            .await
+            .is_err()
+    );
+    let result = run(&runner, Arc::new(Store::default()), Some(saved))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_text(), "done");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch() {
+    let (_, model, tool) = setup(vec![call("id")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.tools.push(tool.clone());
+    agent.stop_at_tools.insert("effect".into());
+    agent.tool_final_output = Some(ToolFinalOutput::Json(json!("quoted")));
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("tool_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    let saved = store.latest();
+    assert_eq!(
+        serde_json::to_value(&saved).unwrap()["runtime"]["matched_stop_tool"],
+        true
+    );
+    agent.stop_at_tools.clear();
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(saved.clone()))
+            .await
+            .is_err()
+    );
+    let completed = Arc::new(Store::default());
+    let outcome = run(&runner, completed.clone(), Some(saved)).await.unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!("quoted")));
+    assert!(outcome.result.final_output_is_raw_json);
+    assert_eq!(outcome.result.final_text(), "");
+    let result = run(
+        &runner,
+        Arc::new(Store::default()),
+        Some(completed.latest()),
+    )
+    .await
+    .unwrap();
+    assert!(result.result.final_output_is_raw_json);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    assert_eq!(tool.keys.lock().unwrap().len(), 1);
+    let mut source =
+        RunnerCheckpoint::decode(include_bytes!("fixtures/go-checkpoint.json")).unwrap();
+    source.boundary = "tool_completed".into();
+    assert!(
+        runner
+            .migrate_go_checkpoint(source.clone(), verified())
+            .is_err()
+    );
+    source.boundary = "run_completed".into();
+    let mut evidence = verified();
+    evidence.final_output = Some(json!("quoted"));
+    evidence.final_output_is_raw_json = true;
+    let migrated = runner.migrate_go_checkpoint(source, evidence).unwrap();
+    let recovered = run(&runner, Arc::new(Store::default()), Some(migrated))
+        .await
+        .unwrap();
+    assert_eq!(recovered.result.final_text(), "");
+    assert!(recovered.result.final_output_is_raw_json);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+#[tokio::test]
+async fn handoff_description_is_bound_to_durable_agent_configuration() {
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.handoff_description = "original".into();
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    run(&runner, store.clone(), None).await.unwrap();
+    agent.handoff_description = "changed".into();
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+struct PureHandoff {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+}
+impl HandoffCallback for PureHandoff {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        input: &'a ToolCall,
+    ) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            assert_eq!(context.agent.name, "agent");
+            assert_eq!(context.target.name, "target");
+            assert_eq!(&input.arguments, &json!({"reason":"review"}));
+            self.calls.fetch_add(1, Ordering::SeqCst);
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_callbacks_require_replay_identity_and_committed_transfer_is_not_repeated() {
+    let transfer = RunItem::ToolCall {
+        call: ToolCall {
+            raw_arguments: None,
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({"reason":"review"}),
+        },
+    };
+    let (_, model, _) = setup(vec![transfer], false, false);
+    let target = Arc::new(AgentConfig::new(
+        "target",
+        ModelBinding::complete("model", model.clone()),
+    ));
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.handoffs.push(Handoff::new(target));
+    for key in [None, Some("")] {
+        agent.handoffs[0].on_handoff = Some(Arc::new(PureHandoff {
+            key,
+            calls: AtomicUsize::new(0),
+        }));
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        assert!(
+            run(&runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    let callback = Arc::new(PureHandoff {
+        key: Some("pure-v1"),
+        calls: AtomicUsize::new(0),
+    });
+    agent.handoffs[0].on_handoff = Some(callback.clone());
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+    agent.handoffs[0].on_handoff = Some(Arc::new(PureHandoff {
+        key: Some("pure-v2"),
+        calls: AtomicUsize::new(0),
+    }));
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(result.result.final_text(), "answer");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+}
+
+struct PureHandoffPredicate {
+    key: Option<&'static str>,
+    enabled_at_exposure: bool,
+    calls: AtomicUsize,
+}
+impl HandoffPredicate for PureHandoffPredicate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn enabled(&self, context: HandoffContext<'_>) -> bool {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        self.enabled_at_exposure && context.snapshot.responses.is_empty()
+    }
+}
+#[tokio::test]
+async fn handoff_predicate_identity_and_classification_survive_model_checkpoint() {
+    for exposed in [false, true] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                raw_arguments: None,
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: json!({}),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        agent
+            .handoffs
+            .push(Handoff::new(Arc::new(AgentConfig::new("target", binding))));
+        for key in [None, Some("")] {
+            agent.handoffs[0].is_enabled = Some(Arc::new(PureHandoffPredicate {
+                key,
+                enabled_at_exposure: exposed,
+                calls: AtomicUsize::new(0),
+            }));
+            let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+            assert!(
+                run(&runner, Arc::new(Store::default()), None)
+                    .await
+                    .is_err()
+            );
+            assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        }
+        let predicate = Arc::new(PureHandoffPredicate {
+            key: Some("gate-v1"),
+            enabled_at_exposure: exposed,
+            calls: AtomicUsize::new(0),
+        });
+        agent.handoffs[0].is_enabled = Some(predicate.clone());
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+        assert!(run(&runner, store.clone(), None).await.is_err());
+        assert_eq!(predicate.calls.load(Ordering::SeqCst), 2);
+        agent.handoffs[0].is_enabled = Some(Arc::new(PureHandoffPredicate {
+            key: Some("gate-v2"),
+            enabled_at_exposure: exposed,
+            calls: AtomicUsize::new(0),
+        }));
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            run(&changed, Arc::new(Store::default()), Some(store.latest()))
+                .await
+                .is_err()
+        );
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("agent"));
+        assert_eq!(predicate.calls.load(Ordering::SeqCst), 3);
+        assert!(result.result.new_items.iter().any(|item| matches!(item, RunItem::ToolResult {call_id,output} if call_id == "transfer" && output.is_error != exposed)));
+        assert!(
+            !result
+                .result
+                .new_items
+                .iter()
+                .any(|item| matches!(item, RunItem::Handoff { .. }))
+        );
+    }
+}
+
+struct PureHistoryFilter {
+    key: Option<&'static str>,
+    mode: &'static str,
+    calls: AtomicUsize,
+}
+impl HandoffHistoryFilter for PureHistoryFilter {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn filter<'a>(
+        &'a self,
+        _: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            assert_eq!(history.approvals.len(), 1);
+            match self.mode {
+                "strip" => {
+                    (history.items, history.provenance) = history
+                        .items
+                        .into_iter()
+                        .zip(history.provenance)
+                        .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                        .unzip();
+                    history.approvals.clear();
+                }
+                "forge" => history.approvals[0].marker.data.tool_name = "forged".into(),
+                "out_of_range" => history.approvals[0].before_item = history.items.len() + 1,
+                _ => {}
+            }
+            Ok(history)
+        })
+    }
+}
+#[tokio::test]
+async fn custom_handoff_history_filter_preserves_approval_boundaries_and_durable_identity() {
+    for mode in ["preserve", "strip", "forge", "out_of_range"] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                raw_arguments: None,
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: json!({}),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding.clone())));
+        handoff.definition.requires_approval = true;
+        let mut agent = AgentConfig::new("agent", binding);
+        agent.handoffs.push(handoff);
+        for key in [None, Some("")] {
+            agent.handoffs[0].history_filter = Some(Arc::new(PureHistoryFilter {
+                key,
+                mode,
+                calls: AtomicUsize::new(0),
+            }));
+            let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+            assert!(
+                run(&runner, Arc::new(Store::default()), None)
+                    .await
+                    .is_err()
+            );
+            assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        }
+        let filter = Arc::new(PureHistoryFilter {
+            key: Some(mode),
+            mode,
+            calls: AtomicUsize::new(0),
+        });
+        agent.handoffs[0].history_filter = Some(filter.clone());
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let error = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(filter.calls.load(Ordering::SeqCst), 1);
+        if matches!(mode, "forge" | "out_of_range") {
+            let partial = error.partial.unwrap();
+            assert!(
+                partial
+                    .history
+                    .iter()
+                    .any(|item| matches!(item,RunItem::ToolCall {call} if call.id=="transfer"))
+            );
+            assert_eq!(partial.last_agent.as_deref(), Some("agent"));
+            assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+            assert_ne!(store.latest().execution_boundary(), "handoff_completed");
+            continue;
+        }
+        assert_eq!(error.error.info.message, "injected persistence failure");
+        let checkpoint = serde_json::to_value(store.latest()).unwrap();
+        let entries = checkpoint["runtime"]["approval_journal"]
+            .as_array()
+            .unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0]["history_before"].is_null(), mode == "strip");
+        agent.handoffs[0].history_filter = Some(Arc::new(PureHistoryFilter {
+            key: Some("changed"),
+            mode,
+            calls: AtomicUsize::new(0),
+        }));
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            run(&changed, Arc::new(Store::default()), Some(store.latest()))
+                .await
+                .is_err()
+        );
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(filter.calls.load(Ordering::SeqCst), 1);
+    }
+}
+
+struct HandoffInputParser;
+impl OutputParser for HandoffInputParser {
+    fn parse(&self, _: &str) -> Result<Value, Error> {
+        Ok(Value::Null)
+    }
+}
+#[tokio::test]
+async fn handoff_input_type_is_bound_to_durable_identity_and_custom_parsers_are_rejected() {
+    let transfer = RunItem::ToolCall {
+        call: ToolCall {
+            raw_arguments: None,
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({}),
+        },
+    };
+    let (_, model, _) = setup(vec![transfer], false, false);
+    let binding = ModelBinding::complete("model", model.clone());
+    let mut agent = AgentConfig::new("agent", binding.clone());
+    agent
+        .handoffs
+        .push(Handoff::new(Arc::new(AgentConfig::new("target", binding))));
+    agent.handoffs[0].input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"object","properties":{}}),
+        parser: Some(Arc::new(HandoffInputParser)),
+    });
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    assert!(
+        run(&runner, Arc::new(Store::default()), None)
+            .await
+            .is_err()
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    agent.handoffs[0].input_type.as_mut().unwrap().parser = None;
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    agent.handoffs[0].input_type = None;
+    let changed = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    agent.handoffs[0].input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"string"}),
+        parser: None,
+    });
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    assert_eq!(
+        run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap()
+            .result
+            .last_agent
+            .as_deref(),
+        Some("target")
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}
+
+struct RawHandoffRecorder(Mutex<Vec<String>>);
+impl HandoffCallback for RawHandoffRecorder {
+    fn durable_key(&self) -> Option<&str> {
+        Some("raw-observer-v1")
+    }
+    fn on_handoff<'a>(&'a self, _: HandoffContext<'a>, call: &'a ToolCall) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.0
+                .lock()
+                .unwrap()
+                .push(call.argument_text().into_owned());
+        })
+    }
+}
+#[tokio::test]
+async fn raw_handoff_arguments_survive_pending_native_checkpoints_without_reconstruction() {
+    for raw in ["", "null", "{ \"n\":1e0, \"n\":2 }"] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: serde_json::from_str(raw).unwrap_or(Value::Null),
+                raw_arguments: Some(raw.into()),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding)));
+        let callback = Arc::new(RawHandoffRecorder(Mutex::new(vec![])));
+        handoff.on_handoff = Some(callback.clone());
+        agent.handoffs.push(handoff);
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+        assert!(run(&runner, store.clone(), None).await.is_err());
+        assert!(callback.0.lock().unwrap().is_empty());
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(*callback.0.lock().unwrap(), [raw]);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    }
+}
+
+struct CountingRawApproval(AtomicUsize);
+impl Host for CountingRawApproval {
+    fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async { Ok(()) })
+    }
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ApprovalRequest,
+    ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+        Box::pin(async move {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(ApprovalDecision::Approve)
+        })
+    }
+}
+#[tokio::test]
+async fn approved_raw_handoff_identity_survives_json_value_checkpoint_storage() {
+    for raw in ["", "null", " { \"n\":1e0, \"n\":2 } "] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: serde_json::from_str(raw).unwrap_or(Value::Null),
+                raw_arguments: Some(raw.into()),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding)));
+        let callback = Arc::new(RawHandoffRecorder(Mutex::new(vec![])));
+        handoff.on_handoff = Some(callback.clone());
+        handoff.definition.requires_approval = true;
+        agent.handoffs.push(handoff);
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let host = Arc::new(CountingRawApproval(AtomicUsize::new(0)));
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("tool_prepared".into(), true));
+        assert!(
+            runner
+                .run_durable(
+                    context(),
+                    request(false),
+                    host.clone(),
+                    durable(store.clone(), None)
+                )
+                .await
+                .is_err()
+        );
+        assert_eq!(host.0.load(Ordering::SeqCst), 1);
+        assert!(callback.0.lock().unwrap().is_empty());
+        let checkpoint =
+            serde_json::from_value(serde_json::to_value(store.latest()).unwrap()).unwrap();
+        let result = runner
+            .run_durable(
+                context(),
+                request(true),
+                host.clone(),
+                durable(Arc::new(Store::default()), Some(checkpoint)),
+            )
+            .await
+            .unwrap();
+        assert_eq!(host.0.load(Ordering::SeqCst), 1);
+        assert_eq!(*callback.0.lock().unwrap(), [raw]);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    }
+}
+
+#[derive(Default)]
+struct CountHandoffCompaction(AtomicUsize);
+impl RunHooks for CountHandoffCompaction {
+    fn durable_observer(&self) -> bool {
+        true
+    }
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if matches!(event, Observation::Compacted { .. }) {
+                self.0.fetch_add(1, Ordering::SeqCst);
+            }
+            Ok(())
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_compaction_preserves_approval_identity_and_committed_recovery() {
+    let mut items: Vec<_> = (0..24)
+        .map(|_| message(Role::Assistant, &"old context. ".repeat(100)))
+        .collect();
+    items.push(RunItem::ToolCall {
+        call: ToolCall {
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({}),
+            raw_arguments: None,
+        },
+    });
+    let (_, model, _) = setup(items, false, false);
+    let binding = ModelBinding::complete("model", model.clone());
+    let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding.clone())));
+    handoff.definition.requires_approval = true;
+    let mut agent = AgentConfig::new("agent", binding);
+    agent.handoffs.push(handoff);
+    let hooks = Arc::new(CountHandoffCompaction::default());
+    let config = RunnerConfig {
+        hooks: Some(hooks.clone()),
+        local_compaction: compaction::LocalCompactionPolicy {
+            enabled: false,
+            ..Default::default()
+        },
+        handoff_history: compaction::HandoffHistoryPolicy {
+            enabled: true,
+            max_tokens: 300,
+            target_tokens: 120,
+            preserve_recent_items: 3,
+            summary_bullet_limit: 2,
+        },
+        ..Default::default()
+    };
+    let runner = Runner::new(agent.clone(), config.clone()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    let error = run(&runner, store.clone(), None).await.err().unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    assert_eq!(hooks.0.load(Ordering::SeqCst), 1);
+    assert!(!compaction::extract_summary(&error.partial.unwrap().history).is_empty());
+    for changed in [
+        compaction::HandoffHistoryPolicy {
+            enabled: false,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            max_tokens: 400,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            target_tokens: 100,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            preserve_recent_items: 4,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            summary_bullet_limit: 3,
+            ..config.handoff_history
+        },
+    ] {
+        let incompatible = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                handoff_history: changed,
+                ..config.clone()
+            },
+        )
+        .unwrap();
+        assert!(
+            run(
+                &incompatible,
+                Arc::new(Store::default()),
+                Some(store.latest())
+            )
+            .await
+            .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    }
+    let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(result.result.final_text(), "answer");
+    assert_eq!(result.result.new_items.len(), 27);
+    assert!(result.result.history.len() < result.result.new_items.len());
+    assert!(
+        result
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item,RunItem::ToolCall {call} if call.id=="transfer"))
+    );
+    assert!(
+        result
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item,RunItem::Handoff {call_id,..} if call_id=="transfer"))
+    );
+    assert_eq!(hooks.0.load(Ordering::SeqCst), 1);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
 }

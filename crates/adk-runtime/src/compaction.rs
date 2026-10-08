@@ -2,12 +2,16 @@
 //! See docs/local-compaction.md for the GPL-3.0-only source, parity boundary and runner integration.
 use crate::runner::{CompactedHistory, CompactionConfig, CompactionRequest, Compactor};
 use adk_codec::approval::{ApprovalMarker, ApprovalMarkerBoundary};
-use adk_codec::dto::RawJson;
-use adk_core::{BoxFuture, Content, Context, Error, Message, ModelRequest, Role, RunItem, Usage};
+use adk_core::{
+    BoxFuture, Content, Context, Error, ItemProvenance, Message, ModelRequest, Role, RunItem,
+    Usage, normalize_provenance,
+};
 use std::{
     collections::{BTreeMap, HashMap, HashSet},
     sync::Arc,
 };
+
+mod llm;
 
 pub const SUMMARY_MARKER: &str = "[COMPACTED HISTORY SUMMARY]";
 pub const CARRY_FORWARD_MARKER: &str = "[COMPACTION CARRY-FORWARD]";
@@ -17,6 +21,7 @@ pub const REQUEST_SAFETY_BUFFER: u64 = 8_192;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct LocalCompactionPolicy {
     pub enabled: bool,
+    pub use_llm_summary: bool,
     pub trigger_tokens: u64,
     pub target_tokens: u64,
     pub preserve_recent_items: usize,
@@ -27,6 +32,7 @@ impl Default for LocalCompactionPolicy {
     fn default() -> Self {
         Self {
             enabled: true,
+            use_llm_summary: true,
             trigger_tokens: 180_000,
             target_tokens: 100_000,
             preserve_recent_items: 12,
@@ -36,13 +42,30 @@ impl Default for LocalCompactionPolicy {
     }
 }
 impl LocalCompactionPolicy {
+    pub fn uses_default_thresholds(self) -> bool {
+        Self {
+            use_llm_summary: true,
+            ..self
+        } == Self::default()
+    }
     pub fn for_model(model: &str) -> Self {
         let model = model
             .trim()
             .split_once('/')
             .map_or(model.trim(), |(_, name)| name)
             .trim()
-            .to_lowercase();
+            .chars()
+            .map(|ch| {
+                // Preserve Go Unicode 15 simple casing, including dotted capital I.
+                if unicode_general_category::get_general_category(ch)
+                    == unicode_general_category::GeneralCategory::Unassigned
+                {
+                    ch
+                } else {
+                    ch.to_lowercase().next().unwrap()
+                }
+            })
+            .collect::<String>();
         let (trigger_tokens, target_tokens) = if ["spark", "nano", "mini", "lite", "flash"]
             .iter()
             .any(|part| model.contains(part))
@@ -96,6 +119,64 @@ impl LocalCompactionPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HandoffHistoryPolicy {
+    pub enabled: bool,
+    pub max_tokens: u64,
+    pub target_tokens: u64,
+    pub preserve_recent_items: usize,
+    pub summary_bullet_limit: usize,
+}
+impl Default for HandoffHistoryPolicy {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            max_tokens: 6_000,
+            target_tokens: 3_000,
+            preserve_recent_items: 8,
+            summary_bullet_limit: 4,
+        }
+    }
+}
+impl HandoffHistoryPolicy {
+    pub fn normalized(mut self) -> Self {
+        if self.max_tokens == 0 {
+            self.max_tokens = 6_000;
+        }
+        if self.target_tokens == 0 || self.target_tokens >= self.max_tokens {
+            self.target_tokens = self.max_tokens / 2;
+        }
+        if self.preserve_recent_items == 0 {
+            self.preserve_recent_items = 8;
+        }
+        if self.summary_bullet_limit == 0 {
+            self.summary_bullet_limit = 4;
+        }
+        self
+    }
+    pub fn local_policy(self) -> LocalCompactionPolicy {
+        let policy = self.normalized();
+        LocalCompactionPolicy {
+            enabled: policy.enabled,
+            use_llm_summary: false,
+            trigger_tokens: policy.max_tokens,
+            target_tokens: policy.target_tokens,
+            preserve_recent_items: policy.preserve_recent_items.max(2),
+            preserve_initial_user_messages: 1,
+            summary_bullet_limit: policy.summary_bullet_limit,
+        }
+        .normalized()
+    }
+}
+
+pub fn compact_handoff_history(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    policy: HandoffHistoryPolicy,
+) -> LocalCompactionOutcome {
+    compact_with_approvals(items, markers, policy.local_policy(), 0)
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct LocalCompactor {
     pub policy: LocalCompactionPolicy,
@@ -115,15 +196,19 @@ impl Compactor for LocalCompactor {
                 target_tokens: request.target_tokens,
                 ..self.policy
             };
-            let outcome = compact_for_request(
+            let provenance =
+                normalize_provenance(request.history.len(), &request.history_provenance)?;
+            let outcome = compact_with_provenance(
                 &request.history,
+                &[],
+                &provenance,
                 policy,
                 overhead.min(i64::MAX as u64) as i64,
             );
-            let history = if outcome.changed {
-                finalize_local_history(&outcome.history, &request.history)
+            let (history, _, history_provenance) = if outcome.changed {
+                finalize_with_provenance(&outcome, &request.history, &[], &provenance)
             } else {
-                outcome.history
+                (outcome.history, outcome.markers, outcome.history_provenance)
             };
             let context_tokens = if outcome.changed {
                 estimate_history_tokens(&history) + overhead
@@ -131,6 +216,7 @@ impl Compactor for LocalCompactor {
                 outcome.after_tokens
             };
             Ok(CompactedHistory {
+                history_provenance,
                 history,
                 context_tokens,
                 usage: Usage::default(),
@@ -142,6 +228,7 @@ impl Compactor for LocalCompactor {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct LocalCompactionOutcome {
+    pub history_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
     pub markers: Vec<ApprovalMarkerBoundary>,
     pub before_tokens: u64,
@@ -152,11 +239,20 @@ pub struct LocalCompactionOutcome {
 
 #[derive(Debug, Clone)]
 enum HistoryItem {
-    Native(RunItem),
+    Native(RunItem, ItemProvenance),
     Approval(ApprovalMarker),
 }
 
 fn mixed_history(items: &[RunItem], markers: &[ApprovalMarkerBoundary]) -> Vec<HistoryItem> {
+    mixed_history_with_provenance(items, markers, &vec![ItemProvenance::Unknown; items.len()])
+}
+
+fn mixed_history_with_provenance(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    provenance: &[ItemProvenance],
+) -> Vec<HistoryItem> {
+    assert_eq!(items.len(), provenance.len());
     let mut markers: Vec<_> = markers.iter().collect();
     markers.sort_by_key(|boundary| boundary.before_item);
     assert!(
@@ -167,7 +263,7 @@ fn mixed_history(items: &[RunItem], markers: &[ApprovalMarkerBoundary]) -> Vec<H
     );
     let mut markers = markers.into_iter().peekable();
     let mut history = Vec::with_capacity(items.len() + markers.len());
-    for index in 0..=items.len() {
+    for (index, (item, source)) in items.iter().zip(provenance).enumerate() {
         while markers
             .peek()
             .is_some_and(|boundary| boundary.before_item == index)
@@ -176,26 +272,35 @@ fn mixed_history(items: &[RunItem], markers: &[ApprovalMarkerBoundary]) -> Vec<H
                 markers.next().unwrap().marker.clone(),
             ));
         }
-        if let Some(item) = items.get(index) {
-            history.push(HistoryItem::Native(item.clone()));
-        }
+        history.push(HistoryItem::Native(item.clone(), source.clone()));
     }
+    history.extend(markers.map(|boundary| HistoryItem::Approval(boundary.marker.clone())));
     history
 }
 
-fn split_history(items: Vec<HistoryItem>) -> (Vec<RunItem>, Vec<ApprovalMarkerBoundary>) {
+fn split_history(
+    items: Vec<HistoryItem>,
+) -> (
+    Vec<RunItem>,
+    Vec<ApprovalMarkerBoundary>,
+    Vec<ItemProvenance>,
+) {
+    let mut provenance = Vec::new();
     let mut history = Vec::new();
     let mut markers = Vec::new();
     for item in items {
         match item {
-            HistoryItem::Native(item) => history.push(item),
+            HistoryItem::Native(item, source) => {
+                history.push(item);
+                provenance.push(source);
+            }
             HistoryItem::Approval(marker) => markers.push(ApprovalMarkerBoundary {
                 before_item: history.len(),
                 marker,
             }),
         }
     }
-    (history, markers)
+    (history, markers, provenance)
 }
 
 /// Default Go finalization without approval markers or dynamic carry-forward hooks.
@@ -210,10 +315,11 @@ pub fn finalize_local_history_with_approvals(
     previous: &[RunItem],
     previous_markers: &[ApprovalMarkerBoundary],
 ) -> (Vec<RunItem>, Vec<ApprovalMarkerBoundary>) {
-    split_history(finalize_mixed_history(
+    let (history, markers, _) = split_history(finalize_mixed_history(
         &mixed_history(compacted, markers),
         &mixed_history(previous, previous_markers),
-    ))
+    ));
+    (history, markers)
 }
 
 /// Default Go post-compaction finalization, with no dynamic carry-forward hook.
@@ -224,7 +330,7 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
         .filter(|item| {
             !matches!(
                 item,
-                HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. })
+                HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. }, _)
             ) || !item_text(item).starts_with(CARRY_FORWARD_MARKER)
         })
         .cloned()
@@ -233,10 +339,13 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
     let mut ref_outputs = HashMap::new();
     for item in previous.iter().chain(items.iter()) {
         match item {
-            HistoryItem::Native(RunItem::ToolCall { call }) if !call.id.is_empty() => {
+            HistoryItem::Native(RunItem::ToolCall { call }, _) if !call.id.is_empty() => {
                 ref_calls.insert(call.id.as_str(), item);
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }) if !call_id.is_empty() => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => {
                 ref_outputs.insert(call_id.as_str(), item);
             }
             _ => {}
@@ -245,9 +354,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
     let current_outputs: HashSet<_> = items
         .iter()
         .filter_map(|item| match item {
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }) if !call_id.is_empty() => {
-                Some(call_id.as_str())
-            }
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => Some(call_id.as_str()),
             _ => None,
         })
         .collect();
@@ -262,15 +372,18 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
             }
         })
         .collect();
-    let last_output = items
-        .iter()
-        .rposition(|item| matches!(item, HistoryItem::Native(RunItem::ToolResult { .. })));
+    let last_output = items.iter().rposition(|item| {
+        matches!(
+            item,
+            HistoryItem::Native(RunItem::ToolResult { .. } | RunItem::Handoff { .. }, _)
+        )
+    });
     let mut emitted_calls = HashSet::new();
     let mut emitted_outputs = HashSet::new();
     let mut out = Vec::new();
     for (index, item) in items.iter().enumerate() {
         match item {
-            HistoryItem::Native(RunItem::ToolCall { call }) => {
+            HistoryItem::Native(RunItem::ToolCall { call }, _) => {
                 let id = call.id.as_str();
                 if id.is_empty() || emitted_calls.contains(id) {
                     continue;
@@ -291,7 +404,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
                     emitted_outputs.insert(id);
                 }
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }) => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) => {
                 let id = call_id.as_str();
                 if id.is_empty() || emitted_outputs.contains(id) {
                     continue;
@@ -335,14 +451,15 @@ fn item_text(item: &HistoryItem) -> String {
     match item {
         HistoryItem::Native(
             RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+            _,
         ) => content_text(&message.content).trim().into(),
-        HistoryItem::Native(RunItem::Reasoning { reasoning }) => reasoning.text.trim().into(),
-        HistoryItem::Native(RunItem::Compaction { .. }) => "OpenAI compaction item".into(),
+        HistoryItem::Native(RunItem::Reasoning { reasoning }, _) => reasoning.text.trim().into(),
+        HistoryItem::Native(RunItem::Compaction { .. }, _) => "OpenAI compaction item".into(),
         _ => String::new(),
     }
 }
 fn arguments(call: &adk_core::ToolCall) -> String {
-    call.arguments.to_string()
+    call.argument_text().into_owned()
 }
 fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
     items
@@ -350,27 +467,25 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
         .map(|item| match item {
             HistoryItem::Native(
                 RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+                _,
             ) => estimate_string_tokens(&content_text(&message.content)) + 8,
-            HistoryItem::Native(RunItem::ToolCall { call }) => {
+            HistoryItem::Native(RunItem::ToolCall { call }, _) => {
                 estimate_string_tokens(&call.name) + estimate_string_tokens(&arguments(call)) + 16
             }
-            HistoryItem::Native(RunItem::ToolResult { output, .. }) => {
+            HistoryItem::Native(RunItem::ToolResult { output, .. }, _) => {
                 estimate_string_tokens(&content_text(&output.content)) + 12
             }
-            HistoryItem::Native(RunItem::Handoff { agent, .. }) => {
+            HistoryItem::Native(RunItem::Handoff { agent, .. }, _) => {
                 estimate_string_tokens(agent) + 8
             }
-            HistoryItem::Native(RunItem::Reasoning { reasoning }) => {
+            HistoryItem::Native(RunItem::Reasoning { reasoning }, _) => {
                 estimate_string_tokens(&reasoning.text) + 8
             }
-            HistoryItem::Native(RunItem::Compaction { compaction }) => {
+            HistoryItem::Native(RunItem::Compaction { compaction }, _) => {
                 estimate_string_tokens(&compaction.encrypted_content).min(20_000) + 8
             }
             HistoryItem::Approval(marker) => {
-                let input = match &marker.data.input {
-                    RawJson::Missing => String::new(),
-                    RawJson::Present(value) => value.to_string(),
-                };
+                let input = marker.data.input.text();
                 estimate_string_tokens(&marker.data.tool_name) + estimate_string_tokens(&input) + 8
             }
         })
@@ -480,8 +595,78 @@ pub fn compact_with_approvals(
     compact_mixed(&mixed_history(items, markers), policy, overhead)
 }
 
+pub(crate) fn compact_with_provenance(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    provenance: &[ItemProvenance],
+    policy: LocalCompactionPolicy,
+    overhead: i64,
+) -> LocalCompactionOutcome {
+    compact_mixed(
+        &mixed_history_with_provenance(items, markers, provenance),
+        policy,
+        overhead,
+    )
+}
+
+pub(crate) fn finalize_with_provenance(
+    compacted: &LocalCompactionOutcome,
+    previous: &[RunItem],
+    previous_markers: &[ApprovalMarkerBoundary],
+    previous_provenance: &[ItemProvenance],
+) -> (
+    Vec<RunItem>,
+    Vec<ApprovalMarkerBoundary>,
+    Vec<ItemProvenance>,
+) {
+    split_history(finalize_mixed_history(
+        &mixed_history_with_provenance(
+            &compacted.history,
+            &compacted.markers,
+            &compacted.history_provenance,
+        ),
+        &mixed_history_with_provenance(previous, previous_markers, previous_provenance),
+    ))
+}
+
 pub fn extract_summary(items: &[RunItem]) -> String {
     extract_mixed_summary(&mixed_history(items, &[]))
+}
+
+pub(crate) struct LocalCompactionPlan {
+    pub outcome: LocalCompactionOutcome,
+    source: Vec<HistoryItem>,
+    protected: HashSet<usize>,
+    removed: Vec<usize>,
+    summary: String,
+}
+
+pub(crate) fn plan_with_provenance(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    provenance: &[ItemProvenance],
+    policy: LocalCompactionPolicy,
+    overhead: i64,
+) -> LocalCompactionPlan {
+    let mut plan = plan_mixed(
+        &mixed_history_with_provenance(items, markers, provenance),
+        policy,
+        overhead,
+    );
+    if plan.outcome.changed {
+        let (history, markers, history_provenance) = split_history(rebuild_attributed(
+            &plan.source,
+            &plan.protected,
+            &plan.summary,
+            ItemProvenance::Agent {
+                name: "context-summary".into(),
+            },
+        ));
+        plan.outcome.history = history;
+        plan.outcome.markers = markers;
+        plan.outcome.history_provenance = history_provenance;
+    }
+    plan
 }
 
 fn compact_mixed(
@@ -489,16 +674,31 @@ fn compact_mixed(
     policy: LocalCompactionPolicy,
     overhead: i64,
 ) -> LocalCompactionOutcome {
+    plan_mixed(items, policy, overhead).outcome
+}
+
+fn plan_mixed(
+    items: &[HistoryItem],
+    policy: LocalCompactionPolicy,
+    overhead: i64,
+) -> LocalCompactionPlan {
     let policy = policy.normalized();
     let unchanged = |tokens, reason| {
-        let (history, markers) = split_history(items.to_vec());
-        LocalCompactionOutcome {
-            history,
-            markers,
-            before_tokens: tokens,
-            after_tokens: tokens,
-            changed: false,
-            reason,
+        let (history, markers, history_provenance) = split_history(items.to_vec());
+        LocalCompactionPlan {
+            source: items.to_vec(),
+            protected: (0..items.len()).collect(),
+            removed: Vec::new(),
+            summary: String::new(),
+            outcome: LocalCompactionOutcome {
+                history_provenance,
+                history,
+                markers,
+                before_tokens: tokens,
+                after_tokens: tokens,
+                changed: false,
+                reason,
+            },
         }
     };
     if !policy.enabled || items.is_empty() {
@@ -557,11 +757,8 @@ fn compact_mixed(
             after = estimate_mixed_tokens(&history);
         }
         if after > adjusted.target_tokens {
-            history = rebuild(
-                items,
-                &protected,
-                "[COMPACTED HISTORY SUMMARY]\nEarlier context compacted.",
-            );
+            summary = "[COMPACTED HISTORY SUMMARY]\nEarlier context compacted.".into();
+            history = rebuild(items, &protected, &summary);
             after = estimate_mixed_tokens(&history);
         }
         if after >= before - overhead {
@@ -570,8 +767,9 @@ fn compact_mixed(
             }
             continue;
         }
-        let (history, markers) = split_history(history);
+        let (history, markers, history_provenance) = split_history(history);
         let outcome = LocalCompactionOutcome {
+            history_provenance,
             history,
             markers,
             before_tokens: before,
@@ -581,9 +779,17 @@ fn compact_mixed(
         };
         if best
             .as_ref()
-            .is_none_or(|b: &LocalCompactionOutcome| outcome.after_tokens < b.after_tokens)
+            .is_none_or(|b: &LocalCompactionPlan| outcome.after_tokens < b.outcome.after_tokens)
         {
-            best = Some(outcome);
+            best = Some(LocalCompactionPlan {
+                outcome,
+                source: items.to_vec(),
+                removed: (0..items.len())
+                    .filter(|i| !protected.contains(i))
+                    .collect(),
+                protected,
+                summary,
+            });
         }
         if after <= adjusted.target_tokens {
             return best.expect("candidate selected");
@@ -596,6 +802,7 @@ fn must_preserve(item: &HistoryItem) -> bool {
     match item {
         HistoryItem::Native(
             RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+            _,
         ) => {
             matches!(message.role, Role::System | Role::Developer)
                 || message
@@ -603,19 +810,19 @@ fn must_preserve(item: &HistoryItem) -> bool {
                     .iter()
                     .any(|c| !matches!(c, Content::Text { .. }))
         }
-        HistoryItem::Native(RunItem::ToolResult { output, .. }) => output
+        HistoryItem::Native(RunItem::ToolResult { output, .. }, _) => output
             .content
             .iter()
             .any(|c| !matches!(c, Content::Text { .. })),
-        HistoryItem::Native(RunItem::Handoff { .. }) => true,
-        HistoryItem::Native(RunItem::Compaction { compaction }) => {
+        HistoryItem::Native(RunItem::Handoff { .. }, _) => true,
+        HistoryItem::Native(RunItem::Compaction { compaction }, _) => {
             !compaction.encrypted_content.trim().is_empty()
         }
         _ => false,
     }
 }
 fn is_initial_user(item: &HistoryItem) -> bool {
-    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
+    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }, _) if message.role == Role::User)
         && {
             let text = item_text(item);
             !text.is_empty()
@@ -629,10 +836,13 @@ fn protect_pairs(items: &[HistoryItem], protected: &mut HashSet<usize>) {
     let mut outputs = HashMap::new();
     for (i, item) in items.iter().enumerate() {
         match item {
-            HistoryItem::Native(RunItem::ToolCall { call }) if !call.id.is_empty() => {
+            HistoryItem::Native(RunItem::ToolCall { call }, _) if !call.id.is_empty() => {
                 calls.insert(&call.id, i);
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }) if !call_id.is_empty() => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => {
                 outputs.insert(call_id, i);
             }
             _ => {}
@@ -641,8 +851,11 @@ fn protect_pairs(items: &[HistoryItem], protected: &mut HashSet<usize>) {
     let extras: Vec<_> = protected
         .iter()
         .filter_map(|i| match &items[*i] {
-            HistoryItem::Native(RunItem::ToolCall { call }) => outputs.get(&call.id),
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }) => calls.get(call_id),
+            HistoryItem::Native(RunItem::ToolCall { call }, _) => outputs.get(&call.id),
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) => calls.get(call_id),
             _ => None,
         })
         .copied()
@@ -650,19 +863,34 @@ fn protect_pairs(items: &[HistoryItem], protected: &mut HashSet<usize>) {
     protected.extend(extras);
 }
 fn summary_item(text: &str) -> HistoryItem {
-    HistoryItem::Native(RunItem::Message {
-        message: Message {
-            role: Role::Assistant,
-            content: vec![Content::Text { text: text.into() }],
+    HistoryItem::Native(
+        RunItem::Message {
+            message: Message {
+                role: Role::Assistant,
+                content: vec![Content::Text { text: text.into() }],
+            },
         },
-    })
+        ItemProvenance::Unattributed,
+    )
 }
 fn rebuild(items: &[HistoryItem], protected: &HashSet<usize>, summary: &str) -> Vec<HistoryItem> {
+    rebuild_attributed(items, protected, summary, ItemProvenance::Unattributed)
+}
+fn rebuild_attributed(
+    items: &[HistoryItem],
+    protected: &HashSet<usize>,
+    summary: &str,
+    provenance: ItemProvenance,
+) -> Vec<HistoryItem> {
+    let mut inserted_summary = summary_item(summary);
+    if let HistoryItem::Native(_, source) = &mut inserted_summary {
+        *source = provenance;
+    }
     let first_removed = (0..items.len()).find(|i| !protected.contains(i));
     let first_protected = (0..items.len()).find(|i| protected.contains(i));
     let defer = first_protected.filter(|p| {
         first_removed.is_some_and(|r| r < *p)
-            && matches!(&items[*p], HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
+            && matches!(&items[*p], HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }, _) if message.role == Role::User)
     });
     let mut out = vec![];
     let mut inserted = false;
@@ -670,11 +898,11 @@ fn rebuild(items: &[HistoryItem], protected: &HashSet<usize>, summary: &str) -> 
         if protected.contains(&i) {
             out.push(item.clone());
             if defer == Some(i) && !inserted {
-                out.push(summary_item(summary));
+                out.push(inserted_summary.clone());
                 inserted = true;
             }
         } else if !inserted && defer.is_none_or(|d| i > d) {
-            out.push(summary_item(summary));
+            out.push(inserted_summary.clone());
             inserted = true;
         }
     }
@@ -687,6 +915,7 @@ fn extract_mixed_summary(items: &[HistoryItem]) -> String {
         .find_map(|item| match item {
             HistoryItem::Native(
                 RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+                _,
             ) if message.role == Role::Assistant => {
                 let text = item_text(item);
                 text.starts_with(SUMMARY_MARKER).then_some(text)
@@ -696,7 +925,7 @@ fn extract_mixed_summary(items: &[HistoryItem]) -> String {
         .unwrap_or_default()
 }
 fn is_summary(item: &HistoryItem) -> bool {
-    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::Assistant)
+    matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }, _) if message.role == Role::Assistant)
         && item_text(item).starts_with(SUMMARY_MARKER)
 }
 fn normalize_summary(text: &str) -> String {
@@ -736,11 +965,11 @@ fn truncate(text: &str, max: usize) -> String {
 fn scope(items: &[HistoryItem]) -> String {
     let users = items
         .iter()
-        .filter(|i| matches!(i, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User))
+        .filter(|i| matches!(i, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }, _) if message.role == Role::User))
         .count();
     let tools = items
         .iter()
-        .filter(|i| matches!(i, HistoryItem::Native(RunItem::ToolResult { .. })))
+        .filter(|i| matches!(i, HistoryItem::Native(RunItem::ToolResult { .. }, _)))
         .count();
     format!(
         "Scope: {} earlier messages compacted (user={}, assistant={}, tool={}).",
@@ -812,7 +1041,7 @@ fn summarize(items: &[HistoryItem], limit: usize) -> String {
     let mut seen = HashSet::new();
     let mut names = vec![];
     for item in items {
-        if let HistoryItem::Native(RunItem::ToolCall { call }) = item {
+        if let HistoryItem::Native(RunItem::ToolCall { call }, _) = item {
             let name = call.name.trim();
             if !name.is_empty() && seen.insert(name.to_lowercase()) {
                 names.push(name);
@@ -828,7 +1057,7 @@ fn summarize(items: &[HistoryItem], limit: usize) -> String {
         "Recent user requests",
         unique_bullets(items, limit, |item| {
             let text = item_text(item);
-            if matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }) if message.role == Role::User)
+            if matches!(item, HistoryItem::Native(RunItem::Message { message } | RunItem::PhasedMessage { message, .. }, _) if message.role == Role::User)
                 && !text.starts_with("[SYSTEM]")
                 && !text.starts_with("[PHASE TRANSITION")
             {
@@ -901,7 +1130,7 @@ fn summarize_terse(items: &[HistoryItem], limit: usize) -> String {
     let mut lines = vec![SUMMARY_MARKER.into(), scope(items)];
     let mut counts = BTreeMap::<&str, usize>::new();
     for item in items {
-        if let HistoryItem::Native(RunItem::ToolCall { call }) = item {
+        if let HistoryItem::Native(RunItem::ToolCall { call }, _) = item {
             *counts.entry(&call.name).or_default() += 1;
         }
     }
@@ -932,6 +1161,7 @@ fn timeline(item: &HistoryItem) -> Option<String> {
     match item {
         HistoryItem::Native(
             RunItem::Message { message } | RunItem::PhasedMessage { message, .. },
+            _,
         ) => {
             let text = item_text(item);
             if text.is_empty() {
@@ -950,7 +1180,7 @@ fn timeline(item: &HistoryItem) -> Option<String> {
                 ))
             }
         }
-        HistoryItem::Native(RunItem::ToolCall { call }) => {
+        HistoryItem::Native(RunItem::ToolCall { call }, _) => {
             if call.name.eq_ignore_ascii_case("bash") {
                 let command = call
                     .arguments
@@ -977,7 +1207,7 @@ fn timeline(item: &HistoryItem) -> Option<String> {
                 )
             })
         }
-        HistoryItem::Native(RunItem::ToolResult { output, .. }) => Some(format!(
+        HistoryItem::Native(RunItem::ToolResult { output, .. }, _) => Some(format!(
             "  - tool: tool_result: {}{}",
             if output.is_error { "error " } else { "" },
             truncate(&content_text(&output.content), 160)
@@ -986,14 +1216,14 @@ fn timeline(item: &HistoryItem) -> Option<String> {
             "  - assistant: tool_approval {}",
             marker.data.tool_name
         )),
-        HistoryItem::Native(RunItem::Reasoning { reasoning }) => {
+        HistoryItem::Native(RunItem::Reasoning { reasoning }, _) => {
             (!reasoning.text.trim().is_empty())
                 .then(|| format!("  - assistant: {}", truncate(&reasoning.text, 160)))
         }
-        HistoryItem::Native(RunItem::Compaction { .. }) => {
+        HistoryItem::Native(RunItem::Compaction { .. }, _) => {
             Some("  - assistant: OpenAI compaction item".into())
         }
-        HistoryItem::Native(RunItem::Handoff { .. }) => None,
+        HistoryItem::Native(RunItem::Handoff { .. }, _) => None,
     }
 }
 fn referenced_paths(items: &[HistoryItem], limit: usize) -> Vec<String> {
@@ -1001,11 +1231,11 @@ fn referenced_paths(items: &[HistoryItem], limit: usize) -> Vec<String> {
     let mut seen = HashSet::new();
     for item in items {
         let text = match item {
-            HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. }) => {
+            HistoryItem::Native(RunItem::Message { .. } | RunItem::PhasedMessage { .. }, _) => {
                 item_text(item)
             }
-            HistoryItem::Native(RunItem::ToolCall { call }) => arguments(call),
-            HistoryItem::Native(RunItem::ToolResult { output, .. }) => {
+            HistoryItem::Native(RunItem::ToolCall { call }, _) => arguments(call),
+            HistoryItem::Native(RunItem::ToolResult { output, .. }, _) => {
                 content_text(&output.content)
             }
             _ => String::new(),

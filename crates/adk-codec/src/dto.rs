@@ -2,10 +2,19 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
-fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
+pub(crate) fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
     d: D,
 ) -> Result<T, D::Error> {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}
+pub(crate) fn null_default_elements<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
+    d: D,
+) -> Result<Vec<T>, D::Error> {
+    Ok(Option::<Vec<Option<T>>>::deserialize(d)?
+        .unwrap_or_default()
+        .into_iter()
+        .map(Option::unwrap_or_default)
+        .collect())
 }
 fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
     if !v.is_finite() {
@@ -32,15 +41,37 @@ fn is_zero<T: Default + PartialEq>(v: &T) -> bool {
 }
 
 // RawMessage distinguishes a nil slice from the explicit JSON bytes `null`.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default)]
 pub enum RawJson {
     #[default]
     Missing,
     Present(Value),
+    Encoded(Box<serde_json::value::RawValue>),
 }
 impl RawJson {
+    pub fn text(&self) -> std::borrow::Cow<'_, str> {
+        match self {
+            Self::Missing => std::borrow::Cow::Borrowed(""),
+            Self::Present(value) => std::borrow::Cow::Owned(value.to_string()),
+            Self::Encoded(raw) => std::borrow::Cow::Borrowed(raw.get()),
+        }
+    }
+    pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
+        match self {
+            Self::Missing => None,
+            Self::Present(value) => Some(std::borrow::Cow::Borrowed(value)),
+            Self::Encoded(raw) => Some(std::borrow::Cow::Owned(
+                serde_json::from_str(raw.get()).expect("validated JSON"),
+            )),
+        }
+    }
     pub fn is_missing(&self) -> bool {
         matches!(self, Self::Missing)
+    }
+}
+impl PartialEq for RawJson {
+    fn eq(&self, other: &Self) -> bool {
+        self.value() == other.value()
     }
 }
 impl Serialize for RawJson {
@@ -48,12 +79,13 @@ impl Serialize for RawJson {
         match self {
             Self::Missing => s.serialize_none(),
             Self::Present(v) => v.serialize(s),
+            Self::Encoded(raw) => raw.serialize(s),
         }
     }
 }
 impl<'de> Deserialize<'de> for RawJson {
     fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        Value::deserialize(d).map(Self::Present)
+        Box::<serde_json::value::RawValue>::deserialize(d).map(Self::Encoded)
     }
 }
 impl JsonSchema for RawJson {
@@ -69,10 +101,11 @@ impl JsonSchema for RawJson {
 #[serde(transparent)]
 pub struct RunItemType(pub i64);
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(from = "String", into = "String")]
 pub enum SnapshotType {
     #[default]
+    Unspecified,
     Message,
     ToolCall,
     ToolOutput,
@@ -82,6 +115,41 @@ pub enum SnapshotType {
     ToolApproval,
     Compaction,
     Unknown,
+    Other(String),
+}
+impl From<String> for SnapshotType {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "" => Self::Unspecified,
+            "message" => Self::Message,
+            "tool_call" => Self::ToolCall,
+            "tool_output" => Self::ToolOutput,
+            "handoff_call" => Self::HandoffCall,
+            "handoff_output" => Self::HandoffOutput,
+            "reasoning" => Self::Reasoning,
+            "tool_approval" => Self::ToolApproval,
+            "compaction" => Self::Compaction,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(value),
+        }
+    }
+}
+impl From<SnapshotType> for String {
+    fn from(value: SnapshotType) -> Self {
+        match value {
+            SnapshotType::Unspecified => "".into(),
+            SnapshotType::Message => "message".into(),
+            SnapshotType::ToolCall => "tool_call".into(),
+            SnapshotType::ToolOutput => "tool_output".into(),
+            SnapshotType::HandoffCall => "handoff_call".into(),
+            SnapshotType::HandoffOutput => "handoff_output".into(),
+            SnapshotType::Reasoning => "reasoning".into(),
+            SnapshotType::ToolApproval => "tool_approval".into(),
+            SnapshotType::Compaction => "compaction".into(),
+            SnapshotType::Unknown => "unknown".into(),
+            SnapshotType::Other(value) => value,
+        }
+    }
 }
 impl From<RunItemType> for SnapshotType {
     fn from(t: RunItemType) -> Self {
@@ -288,7 +356,7 @@ pub struct Usage {
 pub struct ResponseSnapshot {
     #[serde(
         rename = "items",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub items: Vec<RunItemSnapshot>,
@@ -298,31 +366,31 @@ pub struct ResponseSnapshot {
     pub end_turn: Option<bool>,
     #[serde(
         rename = "texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub texts: Vec<String>,
     #[serde(
         rename = "reasoning",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub reasoning: Vec<ReasoningSnapshot>,
     #[serde(
         rename = "reasoning_texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub reasoning_texts: Vec<String>,
     #[serde(
         rename = "thinking_texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub thinking_texts: Vec<String>,
     #[serde(
         rename = "tool_calls",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub tool_calls: Vec<ToolCallSnapshot>,
@@ -363,7 +431,7 @@ pub struct RunItemSnapshot {
     pub message_phase: String,
     #[serde(
         rename = "message_images",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub message_images: Vec<ImageAttachment>,

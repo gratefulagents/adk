@@ -942,6 +942,7 @@ done
             tool.execute(
                 &ctx,
                 adk_core::ToolCall {
+                    raw_arguments: None,
                     id: "attach".into(),
                     name: "attach_repository".into(),
                     arguments: serde_json::json!({"repository": "acme/repo"}),

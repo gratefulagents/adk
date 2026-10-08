@@ -3673,3 +3673,130 @@ async fn approved_raw_handoff_identity_survives_json_value_checkpoint_storage() 
         assert_eq!(result.result.last_agent.as_deref(), Some("target"));
     }
 }
+
+#[derive(Default)]
+struct CountHandoffCompaction(AtomicUsize);
+impl RunHooks for CountHandoffCompaction {
+    fn durable_observer(&self) -> bool {
+        true
+    }
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if matches!(event, Observation::Compacted { .. }) {
+                self.0.fetch_add(1, Ordering::SeqCst);
+            }
+            Ok(())
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_compaction_preserves_approval_identity_and_committed_recovery() {
+    let mut items: Vec<_> = (0..24)
+        .map(|_| message(Role::Assistant, &"old context. ".repeat(100)))
+        .collect();
+    items.push(RunItem::ToolCall {
+        call: ToolCall {
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({}),
+            raw_arguments: None,
+        },
+    });
+    let (_, model, _) = setup(items, false, false);
+    let binding = ModelBinding::complete("model", model.clone());
+    let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding.clone())));
+    handoff.definition.requires_approval = true;
+    let mut agent = AgentConfig::new("agent", binding);
+    agent.handoffs.push(handoff);
+    let hooks = Arc::new(CountHandoffCompaction::default());
+    let config = RunnerConfig {
+        hooks: Some(hooks.clone()),
+        local_compaction: compaction::LocalCompactionPolicy {
+            enabled: false,
+            ..Default::default()
+        },
+        handoff_history: compaction::HandoffHistoryPolicy {
+            enabled: true,
+            max_tokens: 300,
+            target_tokens: 120,
+            preserve_recent_items: 3,
+            summary_bullet_limit: 2,
+        },
+        ..Default::default()
+    };
+    let runner = Runner::new(agent.clone(), config.clone()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    let error = run(&runner, store.clone(), None).await.err().unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    assert_eq!(hooks.0.load(Ordering::SeqCst), 1);
+    assert!(!compaction::extract_summary(&error.partial.unwrap().history).is_empty());
+    for changed in [
+        compaction::HandoffHistoryPolicy {
+            enabled: false,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            max_tokens: 400,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            target_tokens: 100,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            preserve_recent_items: 4,
+            ..config.handoff_history
+        },
+        compaction::HandoffHistoryPolicy {
+            summary_bullet_limit: 3,
+            ..config.handoff_history
+        },
+    ] {
+        let incompatible = Runner::new(
+            agent.clone(),
+            RunnerConfig {
+                handoff_history: changed,
+                ..config.clone()
+            },
+        )
+        .unwrap();
+        assert!(
+            run(
+                &incompatible,
+                Arc::new(Store::default()),
+                Some(store.latest())
+            )
+            .await
+            .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+    }
+    let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(result.result.final_text(), "answer");
+    assert_eq!(result.result.new_items.len(), 27);
+    assert!(result.result.history.len() < result.result.new_items.len());
+    assert!(
+        result
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item,RunItem::ToolCall {call} if call.id=="transfer"))
+    );
+    assert!(
+        result
+            .result
+            .history
+            .iter()
+            .any(|item| matches!(item,RunItem::Handoff {call_id,..} if call_id=="transfer"))
+    );
+    assert_eq!(hooks.0.load(Ordering::SeqCst), 1);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}

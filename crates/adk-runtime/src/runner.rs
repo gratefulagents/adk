@@ -41,9 +41,10 @@ use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, estimate_history_tokens,
-    estimate_history_tokens_with_approvals, estimate_request_overhead_tokens,
-    finalize_with_provenance, output_reserve_tokens, plan_with_provenance,
+    EstimateCalibration, HandoffHistoryPolicy, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER,
+    estimate_history_tokens, estimate_history_tokens_with_approvals,
+    estimate_request_overhead_tokens, finalize_with_provenance, output_reserve_tokens,
+    plan_with_provenance,
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
@@ -660,6 +661,7 @@ pub struct RunnerConfig {
     pub compaction: Option<CompactionConfig>,
     /// Baseline local fallback; independent of the optional provider/custom compactor.
     pub local_compaction: LocalCompactionPolicy,
+    pub handoff_history: HandoffHistoryPolicy,
     /// Resolve thresholds per active model without changing retention. None resolves only an unchanged default policy.
     pub compaction_model_defaults: Option<bool>,
     pub compaction_model_resolver: Option<Arc<dyn CompactionModelResolver>>,
@@ -704,6 +706,7 @@ impl Default for RunnerConfig {
             durable: None,
             compaction: None,
             local_compaction: LocalCompactionPolicy::default(),
+            handoff_history: HandoffHistoryPolicy::default(),
             compaction_model_defaults: None,
             compaction_model_resolver: None,
         }
@@ -956,6 +959,7 @@ impl Runner {
         }
         config.output.work_dir = Some(config.work_dir.clone());
         config.local_compaction = config.local_compaction.normalized();
+        config.handoff_history = config.handoff_history.normalized();
         if config.stop_gate_max_blocks == 0 {
             config.stop_gate_max_blocks = 8;
         }
@@ -1735,6 +1739,68 @@ impl Engine {
             provenance.push(ItemProvenance::Unattributed);
         }
         Ok(())
+    }
+    async fn compact_handoff(&mut self) -> Result<(), Error> {
+        let policy = self.config.handoff_history.local_policy();
+        if !policy.enabled {
+            return Ok(());
+        }
+        let markers = self
+            .approval_journal
+            .history_markers()
+            .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+        let before = estimate_history_tokens_with_approvals(&self.result.history, &markers);
+        if before <= policy.trigger_tokens {
+            return Ok(());
+        }
+        self.observe(Observation::CompactionStarted {
+            context_tokens: before,
+            target_tokens: policy.target_tokens,
+        })
+        .await?;
+        let plan = plan_with_provenance(
+            &self.result.history,
+            &markers,
+            &self.result.history_provenance,
+            policy,
+            0,
+        );
+        if !plan.outcome.changed {
+            self.observe(Observation::CompactionFailed {
+                error: ErrorInfo {
+                    category: ErrorCategory::ModelBehavior,
+                    message: format!("handoff: {}", plan.outcome.reason),
+                },
+            })
+            .await?;
+            return Ok(());
+        }
+        let (mut history, mut markers, mut provenance) = finalize_with_provenance(
+            &plan.outcome,
+            &self.result.history,
+            &markers,
+            &self.result.history_provenance,
+        );
+        self.apply_compaction_carry_forward(&mut history, &mut provenance, &mut markers)
+            .await?;
+        validate_history_pairs(&history)?;
+        let context_tokens = estimate_history_tokens_with_approvals(&history, &markers);
+        let before = std::mem::replace(&mut self.result.history, history);
+        let before_items = before.len();
+        self.result.history_provenance = provenance;
+        self.result.usage.context_tokens = Some(context_tokens);
+        self.observe(Observation::ApprovalHistoryReplaced {
+            before,
+            after: self.result.history.clone(),
+            markers,
+        })
+        .await?;
+        self.observe(Observation::Compacted {
+            before_items,
+            after_items: self.result.history.len(),
+            context_tokens,
+        })
+        .await
     }
     async fn resolve_compaction(
         &mut self,
@@ -3634,6 +3700,7 @@ impl Engine {
                 })
                 .await?;
             }
+            self.compact_handoff().await?;
             self.agent = handoff.target.clone();
             self.matched_stop_tool = false;
             self.pending_completion = false;

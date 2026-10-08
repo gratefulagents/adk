@@ -119,6 +119,64 @@ impl LocalCompactionPolicy {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct HandoffHistoryPolicy {
+    pub enabled: bool,
+    pub max_tokens: u64,
+    pub target_tokens: u64,
+    pub preserve_recent_items: usize,
+    pub summary_bullet_limit: usize,
+}
+impl Default for HandoffHistoryPolicy {
+    fn default() -> Self {
+        Self {
+            enabled: false,
+            max_tokens: 6_000,
+            target_tokens: 3_000,
+            preserve_recent_items: 8,
+            summary_bullet_limit: 4,
+        }
+    }
+}
+impl HandoffHistoryPolicy {
+    pub fn normalized(mut self) -> Self {
+        if self.max_tokens == 0 {
+            self.max_tokens = 6_000;
+        }
+        if self.target_tokens == 0 || self.target_tokens >= self.max_tokens {
+            self.target_tokens = self.max_tokens / 2;
+        }
+        if self.preserve_recent_items == 0 {
+            self.preserve_recent_items = 8;
+        }
+        if self.summary_bullet_limit == 0 {
+            self.summary_bullet_limit = 4;
+        }
+        self
+    }
+    pub fn local_policy(self) -> LocalCompactionPolicy {
+        let policy = self.normalized();
+        LocalCompactionPolicy {
+            enabled: policy.enabled,
+            use_llm_summary: false,
+            trigger_tokens: policy.max_tokens,
+            target_tokens: policy.target_tokens,
+            preserve_recent_items: policy.preserve_recent_items.max(2),
+            preserve_initial_user_messages: 1,
+            summary_bullet_limit: policy.summary_bullet_limit,
+        }
+        .normalized()
+    }
+}
+
+pub fn compact_handoff_history(
+    items: &[RunItem],
+    markers: &[ApprovalMarkerBoundary],
+    policy: HandoffHistoryPolicy,
+) -> LocalCompactionOutcome {
+    compact_with_approvals(items, markers, policy.local_policy(), 0)
+}
+
 #[derive(Debug, Clone, Default)]
 pub struct LocalCompactor {
     pub policy: LocalCompactionPolicy,
@@ -284,7 +342,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
             HistoryItem::Native(RunItem::ToolCall { call }, _) if !call.id.is_empty() => {
                 ref_calls.insert(call.id.as_str(), item);
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }, _) if !call_id.is_empty() => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => {
                 ref_outputs.insert(call_id.as_str(), item);
             }
             _ => {}
@@ -293,9 +354,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
     let current_outputs: HashSet<_> = items
         .iter()
         .filter_map(|item| match item {
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }, _) if !call_id.is_empty() => {
-                Some(call_id.as_str())
-            }
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => Some(call_id.as_str()),
             _ => None,
         })
         .collect();
@@ -310,9 +372,12 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
             }
         })
         .collect();
-    let last_output = items
-        .iter()
-        .rposition(|item| matches!(item, HistoryItem::Native(RunItem::ToolResult { .. }, _)));
+    let last_output = items.iter().rposition(|item| {
+        matches!(
+            item,
+            HistoryItem::Native(RunItem::ToolResult { .. } | RunItem::Handoff { .. }, _)
+        )
+    });
     let mut emitted_calls = HashSet::new();
     let mut emitted_outputs = HashSet::new();
     let mut out = Vec::new();
@@ -339,7 +404,10 @@ fn finalize_mixed_history(compacted: &[HistoryItem], previous: &[HistoryItem]) -
                     emitted_outputs.insert(id);
                 }
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }, _) => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) => {
                 let id = call_id.as_str();
                 if id.is_empty() || emitted_outputs.contains(id) {
                     continue;
@@ -391,7 +459,7 @@ fn item_text(item: &HistoryItem) -> String {
     }
 }
 fn arguments(call: &adk_core::ToolCall) -> String {
-    call.arguments.to_string()
+    call.argument_text().into_owned()
 }
 fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
     items
@@ -417,11 +485,7 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
                 estimate_string_tokens(&compaction.encrypted_content).min(20_000) + 8
             }
             HistoryItem::Approval(marker) => {
-                let input = marker
-                    .data
-                    .input
-                    .value()
-                    .map_or_else(String::new, |value| value.to_string());
+                let input = marker.data.input.text();
                 estimate_string_tokens(&marker.data.tool_name) + estimate_string_tokens(&input) + 8
             }
         })
@@ -775,7 +839,10 @@ fn protect_pairs(items: &[HistoryItem], protected: &mut HashSet<usize>) {
             HistoryItem::Native(RunItem::ToolCall { call }, _) if !call.id.is_empty() => {
                 calls.insert(&call.id, i);
             }
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }, _) if !call_id.is_empty() => {
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) if !call_id.is_empty() => {
                 outputs.insert(call_id, i);
             }
             _ => {}
@@ -785,7 +852,10 @@ fn protect_pairs(items: &[HistoryItem], protected: &mut HashSet<usize>) {
         .iter()
         .filter_map(|i| match &items[*i] {
             HistoryItem::Native(RunItem::ToolCall { call }, _) => outputs.get(&call.id),
-            HistoryItem::Native(RunItem::ToolResult { call_id, .. }, _) => calls.get(call_id),
+            HistoryItem::Native(
+                RunItem::ToolResult { call_id, .. } | RunItem::Handoff { call_id, .. },
+                _,
+            ) => calls.get(call_id),
             _ => None,
         })
         .copied()

@@ -1378,3 +1378,34 @@ passed. The evidence command now includes core/provider contract tests. No broad
 ledger claims were inferred: **255 verified / 8,636 unresolved / 251 excluded**.
 Full issue acceptance and credentialed live verification remain incomplete; no
 excluded CLI/evaluation or release/default-switch work was introduced.
+
+### Handoff-history compaction and composition
+
+Added a separate deterministic `HandoffHistoryPolicy`, its public helper and
+runner application after custom/built-in filters, before target activation and
+checkpoint. Builder feature selection, legacy compaction enablement and explicit
+host-policy precedence now match the SDK's distinct handoff defaults. Native
+pair/provenance/approval repair and carry-forward remain authoritative; audit
+items are unchanged. The work also fixed local compaction dropping a native
+handoff's matching call and switched tool/approval estimates to retained raw text.
+
+The new independently reproduced pinned oracle covers 18 helper cases, 12
+normal/streamed runner cases and 10 builder cases. Tests compare exact message
+history/summary bytes, token estimates, default normalization, filter/carry order,
+no-op/failure behavior, unchanged audit output and actual target requests.
+Separate regressions cover approval-bearing durable recovery, all enabled policy
+fields in the replay fingerprint, no repeated committed compaction, cancellation
+while carry-forward is pending, raw estimates and native handoff pair repair.
+The catalog-handoff offline example now actually triggers history compaction.
+
+Fresh final Linux Rust 1.88.0 locked workspace/all-features/all-targets:
+**1,300 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file formatting, facade matrix, standalone consumer, 20 offline
+scenarios and host-session example passed. Pinned oracles and original source
+regressions, 18 ledger validators, source/license locks, Python syntax, Go
+formatting and whitespace checks passed. Three narrowly evidenced composition
+records are closed: **258 verified / 8,633 unresolved / 251 excluded**.
+Native opaque-content/pair protection and unsigned policy counters are documented;
+no full arbitrary Go wire-history/helper claim was inferred. Full issue acceptance
+and credentialed live verification remain open. Excluded CLI/evaluation and
+release/default-switch work remain untouched.

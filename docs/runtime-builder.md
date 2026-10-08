@@ -1228,3 +1228,37 @@ existing malformed-argument normalization/rejection policies; raw handoff tests
 do not establish complete provider parity. Valid Chat/Responses string arguments
 and Anthropic tool input retain lexical text where available; Anthropic outbound
 requests still use parsed values, not a byte-identical JSON replay.
+
+### Handoff-history compaction
+
+Handoff history has a separate deterministic policy, not the regular turn's LLM
+summary policy. `RunnerConfig::handoff_history` uses `HandoffHistoryPolicy`; direct
+runner defaults are disabled with 6,000 maximum / 3,000 target tokens, eight recent
+items and four summary bullets. Zero values normalize like the SDK, recent items
+are at least two during planning, and the original initial user message is kept.
+As with native local compaction, policy counters are unsigned; use zero rather
+than a negative Go sentinel to request defaults.
+
+The builder's `Features::handoff_history` selects this capability independently
+of `Features::compaction`. Legacy `Config::enable_compaction` enables both when
+no explicit feature set is present. Builder defaults are 2,400 maximum / 1,200
+target tokens, six recent items and four summary bullets. An explicit
+`Config::handoff_history: Some(policy)` overrides feature selection, including an
+explicit disabled policy. This mirrors the SDK host-policy override, not an
+implicit dependency on whether catalog handoffs are enabled.
+
+The runner applies custom/built-in handoff filters first, then compacts, repairs
+native call/handoff and approval relationships, refreshes carry-forward context,
+and only then activates and checkpoints the target. Audit `new_items` remain
+unchanged. Summary provenance is `context-summary`; discarded approval anchors
+are rebased or removed through the normal journal replacement boundary. Parent
+cancellation/deadlines still govern carry-forward and stop before target dispatch.
+`CompactionStarted`, `Compacted` and `CompactionFailed` hooks report progress;
+nonfatal handoff planning failures include a `handoff:` reason prefix. No model
+call is made for this narrower deterministic compaction.
+
+All enabled policy fields participate in durable identity. Committed handoff
+recovery does not rerun its compaction/carry-forward, but effects before a failed
+checkpoint are not exactly-once. Native opaque-content protection and handoff
+pair preservation remain deliberate security constraints; the source oracle's
+message-only projections do not establish arbitrary Go wire-history equivalence.

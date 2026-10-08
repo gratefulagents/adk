@@ -2972,3 +2972,310 @@ async fn contradictory_raw_handoff_arguments_fail_before_callback_or_target() {
     assert!(callback.inputs.lock().unwrap().is_empty());
     assert_eq!(model.requests.lock().unwrap().len(), 1);
 }
+
+fn handoff_compaction_input(kind: &str) -> Vec<RunItem> {
+    if kind == "empty" {
+        return vec![];
+    }
+    let mut items = vec![message(Role::User, "Original task: audit handoff context")];
+    if kind != "short" {
+        items.extend((0..24).map(|index| {
+            message(
+                Role::Assistant,
+                format!("step {index}: {}", "old context. ".repeat(100)),
+            )
+        }));
+    }
+    items
+}
+fn compact_message_projection(items: &[RunItem]) -> Value {
+    json!(items.iter().filter_map(|item| match item {
+        RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => Some(json!({"role":message.role,"text":message.content.iter().filter_map(|part| match part { Content::Text {text} => Some(text.as_str()), _=>None }).collect::<String>()})),
+        _=>None,
+    }).collect::<Vec<_>>())
+}
+#[test]
+fn handoff_history_policy_matches_pinned_normalization_and_compaction() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-compaction/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 18);
+    for case in fixture["cases"].as_array().unwrap() {
+        let cfg = &case["policy"];
+        let policy = HandoffHistoryPolicy {
+            enabled: cfg["Enabled"].as_bool().unwrap(),
+            max_tokens: cfg["MaxTokens"].as_u64().unwrap(),
+            target_tokens: cfg["TargetTokens"].as_u64().unwrap(),
+            preserve_recent_items: cfg["PreserveRecentItems"].as_u64().unwrap() as usize,
+            summary_bullet_limit: cfg["SummaryBulletLimit"].as_u64().unwrap() as usize,
+        };
+        let result = compact_handoff_history(
+            &handoff_compaction_input(case["kind"].as_str().unwrap()),
+            &[],
+            policy,
+        );
+        assert_eq!(
+            result.changed, case["changed"],
+            "{} {}",
+            case["kind"], case["name"]
+        );
+        assert_eq!(result.reason, case["reason"]);
+        assert_eq!(result.before_tokens, case["before"]);
+        assert_eq!(result.after_tokens, case["after"]);
+        assert_eq!(compact_message_projection(&result.history), case["history"]);
+    }
+}
+struct HandoffCompactionHooks {
+    events: Arc<Mutex<Vec<String>>>,
+    before: Mutex<Vec<u64>>,
+    after: Mutex<Vec<u64>>,
+    failures: Mutex<Vec<String>>,
+}
+impl RunHooks for HandoffCompactionHooks {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            match event {
+                Observation::CompactionStarted { context_tokens, .. } => {
+                    self.before.lock().unwrap().push(context_tokens)
+                }
+                Observation::Compacted { context_tokens, .. } => {
+                    self.events.lock().unwrap().push("compacted".into());
+                    self.after.lock().unwrap().push(context_tokens);
+                }
+                Observation::CompactionFailed { error } => {
+                    self.events.lock().unwrap().push("failed".into());
+                    self.failures.lock().unwrap().push(error.message);
+                }
+                _ => {}
+            }
+            Ok(())
+        })
+    }
+}
+impl CompactionCarryForward for HandoffCompactionHooks {
+    fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.events.lock().unwrap().push("carry".into());
+            Ok("host state".into())
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_history_compaction_matches_pinned_filter_order_carry_and_failure() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-compaction/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["runs"].as_array().unwrap().len(), 12);
+    for case in fixture["runs"].as_array().unwrap() {
+        let scenario = case["scenario"].as_str().unwrap();
+        let streamed = case["streamed"] == true;
+        let events = Arc::new(Mutex::new(vec![]));
+        let hooks = Arc::new(HandoffCompactionHooks {
+            events: events.clone(),
+            before: Mutex::new(vec![]),
+            after: Mutex::new(vec![]),
+            failures: Mutex::new(vec![]),
+        });
+        let model = Script::new(vec![
+            Ok(response(
+                vec![
+                    message(Role::Assistant, "transfer"),
+                    RunItem::ToolCall {
+                        call: ToolCall {
+                            id: "h1".into(),
+                            name: "transfer_to_expert".into(),
+                            arguments: json!({}),
+                            raw_arguments: None,
+                        },
+                    },
+                ],
+                false,
+            )),
+            Ok(answer()),
+        ]);
+        let binding = if streamed {
+            ModelBinding::streaming("offline", model.clone())
+        } else {
+            ModelBinding::complete("offline", model.clone())
+        };
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+        handoff.history_filter = Some(Arc::new(HistoryFilter {
+            scenario: if scenario == "filtered-empty" {
+                "empty"
+            } else {
+                "messages"
+            }
+            .into(),
+            events: events.clone(),
+            inputs: Mutex::new(vec![]),
+        }));
+        handoff.on_handoff = Some(Arc::new(SeedHandoff {
+            raw_inputs: Mutex::new(vec![]),
+            events: events.clone(),
+            inputs: Mutex::new(vec![]),
+            seeded: AtomicUsize::new(0),
+        }));
+        let mut agent = AgentConfig::new("router", binding);
+        agent.handoffs.push(handoff);
+        let config = RunnerConfig {
+            hooks: Some(hooks.clone()),
+            compaction_carry_forward: if scenario == "carry" {
+                Some(hooks.clone())
+            } else {
+                None
+            },
+            local_compaction: LocalCompactionPolicy {
+                enabled: false,
+                ..Default::default()
+            },
+            handoff_history: HandoffHistoryPolicy {
+                enabled: scenario != "disabled",
+                max_tokens: if scenario == "ineffective" { 1 } else { 300 },
+                target_tokens: if scenario == "ineffective" { 0 } else { 120 },
+                preserve_recent_items: 3,
+                summary_bullet_limit: 2,
+            },
+            ..Default::default()
+        };
+        let runner = Runner::new(agent, config).unwrap();
+        let input = handoff_compaction_input(if ["below", "ineffective"].contains(&scenario) {
+            "short"
+        } else {
+            "long"
+        });
+        let result = if streamed {
+            let mut stream = runner.stream(context(), request(input, 3), Arc::new(Quiet));
+            while stream.next().await.is_some() {}
+            stream.finish().await.unwrap()
+        } else {
+            runner
+                .run(context(), request(input, 3), Arc::new(Quiet))
+                .await
+                .unwrap()
+        };
+        assert_eq!(json!(*events.lock().unwrap()), case["events"], "{scenario}");
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(
+            compact_message_projection(&requests[1].input),
+            case["target_input"],
+            "{scenario}"
+        );
+        assert_eq!(
+            compact_message_projection(&result.result.history),
+            case["final_history"]
+        );
+        assert_eq!(
+            compact_message_projection(&result.result.new_items),
+            case["new_items"]
+        );
+        assert_eq!(result.result.last_agent.as_deref(), Some("expert"));
+        assert_eq!(
+            json!(*hooks.after.lock().unwrap()),
+            json!(
+                case["recordings"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .map(|row| row["after"].clone())
+                    .collect::<Vec<_>>()
+            )
+        );
+        let expected_before = case["recordings"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .chain(case["failures"].as_array().unwrap())
+            .map(|row| row["before"].clone())
+            .collect::<Vec<_>>();
+        assert_eq!(json!(*hooks.before.lock().unwrap()), json!(expected_before));
+        assert_eq!(
+            *hooks.failures.lock().unwrap(),
+            case["failures"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|row| format!("handoff: {}", row["reason"].as_str().unwrap()))
+                .collect::<Vec<_>>()
+        );
+        if !case["recordings"].as_array().unwrap().is_empty() {
+            assert!(result.result.history_provenance.iter().any(|source| source
+                == &ItemProvenance::Agent {
+                    name: "context-summary".into()
+                }));
+        }
+    }
+}
+
+impl CompactionCarryForward for BlockingHandoff {
+    fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            struct Probe<'a>(&'a AtomicUsize);
+            impl Drop for Probe<'_> {
+                fn drop(&mut self) {
+                    self.0.fetch_add(1, Ordering::SeqCst);
+                }
+            }
+            let _probe = Probe(&self.dropped);
+            self.entered.notify_one();
+            std::future::pending().await
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_compaction_cancellation_drops_carry_before_target_dispatch() {
+    let carry = Arc::new(BlockingHandoff {
+        entered: tokio::sync::Notify::new(),
+        dropped: AtomicUsize::new(0),
+    });
+    let model = Script::new(vec![Ok(response(vec![call("transfer_to_expert")], false))]);
+    let binding = ModelBinding::complete("offline", model.clone());
+    let mut agent = AgentConfig::new("router", binding.clone());
+    agent
+        .handoffs
+        .push(Handoff::new(Arc::new(AgentConfig::new("expert", binding))));
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            local_compaction: LocalCompactionPolicy {
+                enabled: false,
+                ..Default::default()
+            },
+            handoff_history: HandoffHistoryPolicy {
+                enabled: true,
+                max_tokens: 300,
+                target_tokens: 120,
+                ..Default::default()
+            },
+            compaction_carry_forward: Some(carry.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let token = CancellationToken::new();
+    let mut ctx = context();
+    ctx.cancellation = Arc::new(token.clone());
+    let run = runner.run(
+        ctx,
+        request(handoff_compaction_input("long"), 3),
+        Arc::new(Quiet),
+    );
+    let cancel = async {
+        carry.entered.notified().await;
+        token.cancel();
+    };
+    let (result, ()) = tokio::join!(run, cancel);
+    let error = result.err().unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Cancelled);
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.last_agent.as_deref(), Some("router"));
+    assert!(extract_summary(&partial.history).is_empty());
+    assert_eq!(carry.dropped.load(Ordering::SeqCst), 1);
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
+}

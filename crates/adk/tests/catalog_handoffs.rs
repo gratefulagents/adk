@@ -1427,3 +1427,84 @@ async fn builder_invalid_output_schema_closes_owned_session_without_dispatch() {
         .await
         .unwrap();
 }
+
+#[tokio::test]
+async fn handoff_history_builder_feature_and_explicit_policy_match_pinned_selection() {
+    use adk::runtime::compaction::*;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-compaction/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["builder"].as_array().unwrap().len(), 10);
+    for case in fixture["builder"].as_array().unwrap() {
+        let mode = case["mode"].as_str().unwrap();
+        let mut cfg = config();
+        cfg.enable_compaction = case["legacy"] == true;
+        cfg.features = if mode == "legacy" {
+            None
+        } else {
+            Some(Features {
+                handoff_history: mode == "on",
+                ..Default::default()
+            })
+        };
+        if mode.starts_with("explicit-") {
+            cfg.handoff_history = Some(HandoffHistoryPolicy {
+                enabled: mode == "explicit-on",
+                max_tokens: 300,
+                target_tokens: 120,
+                preserve_recent_items: 3,
+                summary_bullet_limit: 2,
+            });
+        }
+        let features = cfg.resolved_features();
+        if !mode.starts_with("explicit-") {
+            assert_eq!(features.handoff_history, case["policy"]["Enabled"]);
+        }
+        cfg.features = Some(Features {
+            handoffs: true,
+            compaction: false,
+            ..features
+        });
+        let transfer = call("transfer_to_reviewer");
+        let model = Script::new(vec![
+            response(vec![transfer]),
+            response(vec![message("done")]),
+        ]);
+        let mut bundle = builder(cfg, &model).build(&context()).await.unwrap();
+        let mut input = vec![RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text {
+                    text: "original task".into(),
+                }],
+            },
+        }];
+        input.extend((0..24).map(|_| message(&"old context. ".repeat(100))));
+        let before = input.clone();
+        let expected_policy = &case["policy"];
+        let policy = HandoffHistoryPolicy {
+            enabled: expected_policy["Enabled"].as_bool().unwrap(),
+            max_tokens: expected_policy["MaxTokens"].as_u64().unwrap(),
+            target_tokens: expected_policy["TargetTokens"].as_u64().unwrap(),
+            preserve_recent_items: expected_policy["PreserveRecentItems"].as_u64().unwrap()
+                as usize,
+            summary_bullet_limit: expected_policy["SummaryBulletLimit"].as_u64().unwrap() as usize,
+        };
+        let expected = compact_handoff_history(&before, &[], policy);
+        let expected = if expected.changed {
+            let mut history = finalize_local_history(&expected.history, &before);
+            history.push(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: "[COMPACTION CARRY-FORWARD]\nThis live runtime state was injected after context compaction. Treat it as current and higher priority than older compacted history.\n\nRuntime state: provider=openai, mode=chat".into() }] } });
+            history
+        } else {
+            expected.history
+        };
+        let outcome = bundle
+            .run(context(), input, Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(outcome.result.last_agent.as_deref(), Some("reviewer"));
+        assert_eq!(model.requests.lock().unwrap()[1].input, expected, "{mode}");
+        bundle.close().await.unwrap();
+    }
+}

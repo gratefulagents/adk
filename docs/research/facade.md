@@ -477,3 +477,18 @@ compaction otherwise breaks exact call identity during durable recovery. Rejecte
 weakening identity to parsed-value equality, which could conflate separately
 approved raw invocations. Non-UTF-8 Go bytes, mutable target/context pointers and
 full provider replay parity remain open, not implicitly equivalent.
+
+### Separate deterministic handoff compaction
+
+Pinned SDK `internal/agent/history_compaction.go::MaybeCompactHandoffInput`,
+`run_config.go::HandoffHistoryConfig.normalized` and
+`pkg/agentsdk/runtime/builder.go::runHandoffHistory` establish two distinct defaults:
+direct 6000/3000/8/4 versus builder 2400/1200/6/4. Adopted separate Rust policy and
+feature selection, explicit host override precedence, filter-before-compaction
+ordering, carry-forward before activation, and durable policy identity. Reused
+the native deterministic planner rather than introducing another summarizer or
+running an LLM during transfer. Rejected dropping a native handoff's matching
+call; native pair/provenance/approval security invariants remain authoritative.
+The source/license/harness hashes and 18 helper, 12 runner and 10 builder
+observations are in `fixtures/handoff-compaction/observations.json`. This narrows
+three composition-field claims, not full wire-history or helper equivalence.

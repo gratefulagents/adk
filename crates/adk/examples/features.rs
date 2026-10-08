@@ -638,6 +638,7 @@ async fn handoffs_subagents() {
             }],
             features: Some(Features {
                 handoffs: true,
+                handoff_history: true,
                 ..Default::default()
             }),
             ..Default::default()
@@ -648,12 +649,10 @@ async fn handoffs_subagents() {
         .await
         .unwrap();
         assert!(bundle.specialists().contains_key("reviewer"));
+        let mut input = request().input;
+        input.extend((0..12).map(|_| message(Role::Assistant, &"older context. ".repeat(100))));
         let result = bundle
-            .run(
-                context(),
-                request().input,
-                Arc::new(RecordingHost::default()),
-            )
+            .run(context(), input, Arc::new(RecordingHost::default()))
             .await
             .unwrap();
         assert_eq!(result.result.last_agent.as_deref(), Some("reviewer"));
@@ -661,6 +660,7 @@ async fn handoffs_subagents() {
         {
             let requests = model.requests.lock().unwrap();
             assert_eq!(requests.len(), 2);
+            assert!(!compaction::extract_summary(&requests[1].input).is_empty());
             assert_eq!(requests[1].instructions, "Review carefully.");
             assert!(
                 requests[1]

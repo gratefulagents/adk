@@ -860,6 +860,14 @@ impl Runner {
         if let Some(limit) = config.subagent_max_turns {
             baseline["subagent_max_turns"] = serde_json::json!(limit);
         }
+        let handoff = config.handoff_history;
+        if handoff.enabled {
+            baseline["handoff_history"] = serde_json::json!({
+                "max_tokens": handoff.max_tokens, "target_tokens": handoff.target_tokens,
+                "preserve_recent_items": handoff.preserve_recent_items,
+                "summary_bullet_limit": handoff.summary_bullet_limit,
+            });
+        }
         let compaction = config.local_compaction;
         if let Some(resolve) = config.compaction_model_defaults {
             baseline["compaction_model_defaults"] = serde_json::json!(resolve);

@@ -47,6 +47,7 @@ pub struct Features {
     pub mode_instructions: bool,
     pub mode_model_routing: bool,
     pub compaction: bool,
+    pub handoff_history: bool,
     pub retry: bool,
     pub approval: bool,
     pub builtin_guardrails: bool,
@@ -150,6 +151,7 @@ pub struct Config {
     pub enable_compaction: bool,
     /// Explicit host policy overrides compaction feature enablement.
     pub local_compaction: Option<adk_runtime::compaction::LocalCompactionPolicy>,
+    pub handoff_history: Option<adk_runtime::compaction::HandoffHistoryPolicy>,
     pub enable_retry: bool,
     pub enable_approval: bool,
     pub enable_guardrails: bool,
@@ -193,6 +195,7 @@ impl Default for Config {
             legacy_tools: Default::default(),
             enable_compaction: false,
             local_compaction: None,
+            handoff_history: None,
             enable_retry: false,
             enable_approval: false,
             enable_guardrails: false,
@@ -211,6 +214,7 @@ impl Config {
             parallel_tool_calls: true,
             untrusted_tool_outputs: true,
             compaction: self.enable_compaction,
+            handoff_history: self.enable_compaction,
             retry: self.enable_retry,
             approval: self.enable_approval,
             builtin_guardrails: self.enable_guardrails,
@@ -1830,6 +1834,16 @@ impl Builder {
             self.runner.retry.initial_delay = Duration::from_millis(250);
             self.runner.retry.max_delay = Duration::from_millis(2000);
         }
+        self.runner.handoff_history =
+            self.config
+                .handoff_history
+                .unwrap_or(adk_runtime::compaction::HandoffHistoryPolicy {
+                    enabled: features.handoff_history,
+                    max_tokens: 2_400,
+                    target_tokens: 1_200,
+                    preserve_recent_items: 6,
+                    summary_bullet_limit: 4,
+                });
         if let Some(policy) = self.config.local_compaction {
             self.runner.local_compaction = policy;
             self.runner.compaction_model_defaults = Some(features.compaction);

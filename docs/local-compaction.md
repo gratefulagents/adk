@@ -268,3 +268,11 @@ forced overflow recovery in both execution modes, one-turn retry limits, no-op
 and disabled recovery, transient/cache preservation, and active-model defaults
 before any reported usage. Custom compaction with repeated ordinary messages
 retains approval-local anchors without treating prose duplication as corruption.
+
+Handoffs can now use `HandoffHistoryPolicy` and `compact_handoff_history` independently
+of ordinary turn compaction. The runner integrates this after history filtering,
+with marker/provenance-aware planning and existing carry-forward handling. Raw
+argument text contributes to tool/approval estimates; native handoff outputs are
+paired with their calls during planning and finalization. See
+[builder semantics](runtime-builder.md#handoff-history-compaction) for distinct
+builder defaults, feature/host precedence and the exact parity boundary.

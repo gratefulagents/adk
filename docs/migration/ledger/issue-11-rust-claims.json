@@ -4354,6 +4354,75 @@
         "runtime",
         "durable"
       ]
+    },
+    "SDK-0FC2618017B081CD": {
+      "source": "pkg/agentsdk/runtime/builder.go",
+      "source_name": "Config.HandoffHistory",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::Config::handoff_history",
+        "crates/adk/src/builder.rs::Features::handoff_history",
+        "crates/adk-runtime/src/compaction.rs::HandoffHistoryPolicy"
+      ],
+      "rust_test_identifiers": [
+        "handoff_history_builder_feature_and_explicit_policy_match_pinned_selection",
+        "handoff_history_policy_matches_pinned_normalization_and_compaction",
+        "handoff_history_compaction_matches_pinned_filter_order_carry_and_failure",
+        "handoff_compaction_preserves_approval_identity_and_committed_recovery",
+        "handoff_compaction_cancellation_drops_carry_before_target_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildRunConfigHonorsHostOverrides",
+      "rationale": "Field-level selection/composition only: ten independent pinned builder cases verify legacy EnableCompaction mapping, explicit feature on/off, exact builder thresholds and explicit host-policy precedence. Eighteen helper cases verify zero/default normalization, recent-item minimum, empty/below-threshold/target pressure and deterministic summaries; twelve normal/streamed runs compare filtering before compaction, carry-forward, failures, target history and unchanged audit output. Native handoff pair/approval preservation, cancellation and all policy fields in durable identity are checked independently. Rust uses unsigned policy counters and preserves native opaque/handoff security invariants; this does not close whole RunConfig, Go wire handoff representation, arbitrary signed config decoding or all compaction-helper input classes.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "runtime"
+      ]
+    },
+    "SDK-93885E12C4A6D24F": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "RuntimeFeatures.HandoffHistory",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::Config::handoff_history",
+        "crates/adk/src/builder.rs::Features::handoff_history",
+        "crates/adk-runtime/src/compaction.rs::HandoffHistoryPolicy"
+      ],
+      "rust_test_identifiers": [
+        "handoff_history_builder_feature_and_explicit_policy_match_pinned_selection",
+        "handoff_history_policy_matches_pinned_normalization_and_compaction",
+        "handoff_history_compaction_matches_pinned_filter_order_carry_and_failure",
+        "handoff_compaction_preserves_approval_identity_and_committed_recovery",
+        "handoff_compaction_cancellation_drops_carry_before_target_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildRunConfigHonorsHostOverrides",
+      "rationale": "Field-level selection/composition only: ten independent pinned builder cases verify legacy EnableCompaction mapping, explicit feature on/off, exact builder thresholds and explicit host-policy precedence. Eighteen helper cases verify zero/default normalization, recent-item minimum, empty/below-threshold/target pressure and deterministic summaries; twelve normal/streamed runs compare filtering before compaction, carry-forward, failures, target history and unchanged audit output. Native handoff pair/approval preservation, cancellation and all policy fields in durable identity are checked independently. Rust uses unsigned policy counters and preserves native opaque/handoff security invariants; this does not close whole RunConfig, Go wire handoff representation, arbitrary signed config decoding or all compaction-helper input classes.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "runtime"
+      ]
+    },
+    "SDK-B59D64335DD78D83": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "RuntimeFeatures.HandoffHistory",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::Config::handoff_history",
+        "crates/adk/src/builder.rs::Features::handoff_history",
+        "crates/adk-runtime/src/compaction.rs::HandoffHistoryPolicy"
+      ],
+      "rust_test_identifiers": [
+        "handoff_history_builder_feature_and_explicit_policy_match_pinned_selection",
+        "handoff_history_policy_matches_pinned_normalization_and_compaction",
+        "handoff_history_compaction_matches_pinned_filter_order_carry_and_failure",
+        "handoff_compaction_preserves_approval_identity_and_committed_recovery",
+        "handoff_compaction_cancellation_drops_carry_before_target_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildRunConfigHonorsHostOverrides",
+      "rationale": "Field-level selection/composition only: ten independent pinned builder cases verify legacy EnableCompaction mapping, explicit feature on/off, exact builder thresholds and explicit host-policy precedence. Eighteen helper cases verify zero/default normalization, recent-item minimum, empty/below-threshold/target pressure and deterministic summaries; twelve normal/streamed runs compare filtering before compaction, carry-forward, failures, target history and unchanged audit output. Native handoff pair/approval preservation, cancellation and all policy fields in durable identity are checked independently. Rust uses unsigned policy counters and preserves native opaque/handoff security invariants; this does not close whole RunConfig, Go wire handoff representation, arbitrary signed config decoding or all compaction-helper input classes.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "runtime"
+      ]
     }
   }
 }

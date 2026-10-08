@@ -940,3 +940,39 @@ async fn identical_messages_retain_source_positions_and_summaries_are_unattribut
         ItemProvenance::Unattributed
     );
 }
+
+#[test]
+fn raw_argument_estimates_and_handoff_pairs_survive_local_compaction() {
+    let raw = format!("{{\"n\":{}1}}", " ".repeat(128));
+    let call = ToolCall {
+        id: "transfer".into(),
+        name: "transfer_to_target".into(),
+        arguments: serde_json::from_str(&raw).unwrap(),
+        raw_arguments: Some(raw.clone()),
+    };
+    let item = RunItem::ToolCall { call: call.clone() };
+    let marker = ApprovalMarkerBoundary {
+        before_item: 1,
+        marker: ApprovalMarker::from_call(&call, ApprovalPhase::Approved, None).unwrap(),
+    };
+    assert_eq!(
+        estimate_history_tokens_with_approvals(
+            std::slice::from_ref(&item),
+            std::slice::from_ref(&marker)
+        ),
+        2 * (estimate_string_tokens(&call.name) + estimate_string_tokens(&raw)) + 24
+    );
+    let handoff = RunItem::Handoff {
+        call_id: call.id.clone(),
+        agent: "target".into(),
+    };
+    let history = vec![item.clone(), handoff.clone()];
+    assert_eq!(
+        finalize_local_history(std::slice::from_ref(&handoff), &history),
+        history
+    );
+    assert_eq!(
+        finalize_local_history(std::slice::from_ref(&item), &history),
+        history
+    );
+}

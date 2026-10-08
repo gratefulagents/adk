@@ -115,6 +115,7 @@ fn context() -> ToolContext {
 }
 fn call(name: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call".into(),
         name: name.into(),
         arguments: json!({}),

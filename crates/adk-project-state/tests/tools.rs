@@ -30,6 +30,7 @@ async fn invoke(tools: &[Arc<dyn Tool>], name: &str, arguments: Value, error: bo
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments,

@@ -334,7 +334,10 @@ impl ChatLoop {
                             &pending.call,
                             ApprovalPhase::Denied,
                             None,
-                        ),
+                        )
+                        .map_err(|error| {
+                            Error::new(ErrorCategory::InvalidInput, error.to_string())
+                        })?,
                     });
                     denied.items.push(RunItem::ToolResult {
                         call_id: pending.call.id.clone(),

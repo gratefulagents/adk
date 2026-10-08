@@ -557,8 +557,7 @@ impl Runner {
                 .into_iter()
                 .filter(|entry| !entry.historical_only)
             {
-                let call =
-                    adk_codec::approval::approval_call(&entry.marker.data).map_err(invalid)?;
+                let call = entry.call().map_err(invalid)?;
                 if engine.calls.iter().any(|pending| *pending == call) {
                     use adk_codec::approval::ApprovalPhase;
                     match entry.marker.phase {
@@ -1315,6 +1314,7 @@ impl Runner {
                         approved: approval.approved,
                     };
                     approval_journal.push(crate::compat::ApprovalJournalEntry {
+                        argument_text: Some(data.input.text().into_owned()),
                         marker: adk_codec::approval::ApprovalMarker {
                             phase: if data.approved {
                                 adk_codec::approval::ApprovalPhase::Approved

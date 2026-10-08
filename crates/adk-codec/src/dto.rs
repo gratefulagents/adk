@@ -49,6 +49,13 @@ pub enum RawJson {
     Encoded(Box<serde_json::value::RawValue>),
 }
 impl RawJson {
+    pub fn text(&self) -> std::borrow::Cow<'_, str> {
+        match self {
+            Self::Missing => std::borrow::Cow::Borrowed(""),
+            Self::Present(value) => std::borrow::Cow::Owned(value.to_string()),
+            Self::Encoded(raw) => std::borrow::Cow::Borrowed(raw.get()),
+        }
+    }
     pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
         match self {
             Self::Missing => None,

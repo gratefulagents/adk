@@ -23,6 +23,7 @@ async fn call(registry: &Registry, input: Value) -> ToolOutput {
                 idempotency_key: None,
             },
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: "Memory".into(),
                 arguments: input,

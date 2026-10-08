@@ -23,6 +23,7 @@ fn message() -> RunItem {
 }
 fn history() -> (RunRequest, Vec<ApprovalMarkerBoundary>) {
     let call = ToolCall {
+        raw_arguments: None,
         id: "historic".into(),
         name: "write".into(),
         arguments: json!({"x": 1}),
@@ -37,7 +38,8 @@ fn history() -> (RunRequest, Vec<ApprovalMarkerBoundary>) {
                 Some(dto::AgentRef {
                     name: "old-agent".into(),
                 }),
-            ),
+            )
+            .unwrap(),
         })
         .collect();
     (
@@ -181,14 +183,13 @@ async fn seeded_history_preserves_snapshot_order_and_provenance_without_replayin
 
 #[tokio::test]
 async fn malformed_markers_fail_before_model_or_commit() {
-    for case in 0..4 {
+    for case in 0..3 {
         let probe = Arc::new(Probe::default());
         let (request, mut markers) = history();
         match case {
             0 => markers[1].before_item = 3,
             1 => markers[1].before_item = 0,
-            2 => markers[0].marker.data.approved = true,
-            _ => markers[0].marker.data.input = dto::RawJson::Missing,
+            _ => markers[0].marker.data.approved = true,
         }
         let error = runner(&probe)
             .run_with_approval_history(context(), request, probe.clone(), markers)
@@ -246,6 +247,7 @@ async fn durable_restore_retains_historical_only_markers_without_republishing() 
         markers
             .iter()
             .map(|boundary| adk_runtime::compat::ApprovalJournalEntry {
+                argument_text: Some(boundary.marker.data.input.text().into_owned()),
                 marker: boundary.marker.clone(),
                 new_items_before: 0,
                 history_before: Some(boundary.before_item),
@@ -294,4 +296,27 @@ async fn durable_restore_retains_historical_only_markers_without_republishing() 
             .len(),
         4
     );
+}
+
+#[tokio::test]
+async fn missing_marker_input_has_explicit_provenance_and_is_not_fabricated_as_null() {
+    let probe = Arc::new(Probe::default());
+    let (mut request, mut markers) = history();
+    if let RunItem::ToolCall { call } = &mut request.input[0] {
+        call.arguments = json!(null);
+        call.raw_arguments = Some(String::new());
+    }
+    for marker in &mut markers {
+        marker.marker.data.input = dto::RawJson::Missing;
+    }
+    runner(&probe)
+        .run_with_approval_history(context(), request, probe.clone(), markers)
+        .await
+        .unwrap();
+    let requests = probe.requests.lock().unwrap();
+    let RunItem::ToolCall { call } = &requests[0].input[0] else {
+        panic!("expected historical call")
+    };
+    assert_eq!(call.raw_arguments.as_deref(), Some(""));
+    assert_eq!(call.argument_text(), "");
 }

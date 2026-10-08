@@ -90,6 +90,7 @@ async fn invoke(tool: &lsp::LspTool, context: &ToolContext, args: Value) -> Tool
     tool.execute(
         context,
         ToolCall {
+            raw_arguments: None,
             id: "lsp".into(),
             name: "LSP".into(),
             arguments: args,
@@ -462,6 +463,7 @@ async fn cancellation_deadline_and_host_close_interrupt_requests() {
         let operation = tool.execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "hang".into(),
                 name: "LSP".into(),
                 arguments: json!({"operation":"workspaceSymbol","query":"hang"}),
@@ -551,6 +553,7 @@ while True:
         .execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "pid".into(),
                 name: "LSP".into(),
                 arguments: request("hover"),
@@ -603,6 +606,7 @@ while True:
     let mut operation = tool.execute(
         &ctx,
         ToolCall {
+            raw_arguments: None,
             id: "active".into(),
             name: "LSP".into(),
             arguments: json!({"operation":"workspaceSymbol","query":"hang"}),

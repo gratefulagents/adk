@@ -41,6 +41,7 @@ async fn call(root: &Path, name: &str, args: Value) -> ToolOutput {
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments: args,
@@ -177,6 +178,7 @@ async fn cancellation_and_host_environment_names_are_respected() {
             .execute(
                 &ctx,
                 ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "skill_install".into(),
                     arguments: json!({"name":"demo"})
@@ -197,6 +199,7 @@ async fn cancellation_and_host_environment_names_are_respected() {
         .execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: "skill_install".into(),
                 arguments: json!({"name":"demo"}),

@@ -33,6 +33,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 fn call(name: &str, arguments: Value) -> ModelResponse {
     response(vec![RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: format!("call-{name}"),
             name: name.into(),
             arguments,
@@ -371,6 +372,7 @@ async fn sync_timeout_keeps_child_alive_across_runs_and_status_can_reread() {
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "status".into(),
                 name: "subagent_status".into(),
                 arguments: json!({"detail":"results"}),

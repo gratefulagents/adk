@@ -35,6 +35,7 @@ fn response() -> ModelResponse {
             },
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "lookup".into(),
                     arguments: json!({"q": 1}),

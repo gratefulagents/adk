@@ -304,7 +304,7 @@ def verify_rust() -> None:
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host,mcp,project-state", "--test", "resolution", "--test", "host", "--test", "host_config", "--test", "host_rules",
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
-               "-p", "adk-core", "--test", "result_helpers", "--test", "host_conversation",
+               "-p", "adk-core", "--test", "contracts", "--test", "result_helpers", "--test", "host_conversation",
                "--test", "settings", "--test", "builder", "--test", "catalog_handoffs",
                "--test", "builtin_guardrails", "--test", "builtin_guardrails_oracle",
                "--test", "fileconfig", "--test", "fileconfig_oracle", "-p", "adk-tools", "-p", "adk-mcp",

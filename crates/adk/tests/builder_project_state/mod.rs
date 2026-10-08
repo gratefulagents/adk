@@ -106,6 +106,7 @@ async fn injected_store_wins_and_retained_tools_are_revoked_on_close_and_drop() 
             idempotency_key: None,
         };
         let call = || ToolCall {
+            raw_arguments: None,
             id: "offline".into(),
             name: "task_create".into(),
             arguments: json!({"title":"persistent task"}),

@@ -107,8 +107,11 @@ pub trait HandoffCallback: Send + Sync {
     fn durable_key(&self) -> Option<&str> {
         None
     }
-    fn on_handoff<'a>(&'a self, context: HandoffContext<'a>, input: &'a Value)
-    -> BoxFuture<'a, ()>;
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        call: &'a ToolCall,
+    ) -> BoxFuture<'a, ()>;
 }
 
 #[derive(Clone)]
@@ -2284,6 +2287,7 @@ impl Engine {
         for item in &response.items {
             match item {
                 RunItem::ToolCall { call } => {
+                    call.validate_argument_projection()?;
                     if call.id.is_empty() || !ids.insert(call.id.clone()) || self.result.history[..self.result.history.len() - response.items.len()].iter().any(|i| matches!(i, RunItem::ToolCall { call: prior } if prior.id == call.id)) {
                         return Err(Error::new(ErrorCategory::ModelBehavior, "duplicate tool call ID"));
                     }
@@ -3489,11 +3493,14 @@ impl Engine {
             })
             .await?;
             if let Some(callback) = &handoff.on_handoff {
-                if handoff
-                    .input_type
-                    .as_ref()
-                    .and_then(|input_type| input_type.parser.as_ref())
-                    .is_some_and(|parser| parser.parse(&call.arguments.to_string()).is_err())
+                let input = call.argument_text();
+                if !input.is_empty()
+                    && handoff.input_type.as_ref().is_some_and(|input_type| {
+                        input_type.parser.as_ref().map_or_else(
+                            || serde_json::from_str::<Value>(&input).is_err(),
+                            |parser| parser.parse(&input).is_err(),
+                        )
+                    })
                 {
                     self.observe(Observation::HandoffInputValidationFailed {
                         tool: call.name.clone(),
@@ -3511,7 +3518,7 @@ impl Engine {
                                 config: &self.config,
                                 policy: &self.policy,
                             },
-                            &call.arguments,
+                            &call,
                         )
                         .await;
                     Ok(())
@@ -3882,6 +3889,7 @@ fn validate_history_pairs(history: &[RunItem]) -> Result<(), Error> {
     for item in history {
         match item {
             RunItem::ToolCall { call } => {
+                call.validate_argument_projection()?;
                 if !pending.insert(call.id.clone()) {
                     return Err(Error::new(
                         ErrorCategory::InvalidInput,

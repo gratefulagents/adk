@@ -77,11 +77,45 @@ pub struct Message {
 }
 
 /// A provider-issued tool invocation. Preserve `id` when producing its result.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+/// Equality compares effective argument text, including missing input and raw spelling.
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
 pub struct ToolCall {
     pub id: String,
     pub name: String,
     pub arguments: Value,
+    /// Original UTF-8 argument text. Some("") distinguishes absent input from JSON null.
+    /// None means arguments were constructed as a native value without raw provenance.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub raw_arguments: Option<String>,
+}
+impl PartialEq for ToolCall {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+            && self.name == other.name
+            && self.arguments == other.arguments
+            && self.argument_text() == other.argument_text()
+    }
+}
+impl ToolCall {
+    pub fn argument_text(&self) -> std::borrow::Cow<'_, str> {
+        match &self.raw_arguments {
+            Some(raw) => std::borrow::Cow::Borrowed(raw),
+            None => std::borrow::Cow::Owned(self.arguments.to_string()),
+        }
+    }
+
+    pub fn validate_argument_projection(&self) -> Result<(), crate::Error> {
+        if let Some(raw) = &self.raw_arguments {
+            let projected = serde_json::from_str::<Value>(raw).unwrap_or(Value::Null);
+            if projected != self.arguments {
+                return Err(crate::Error::new(
+                    crate::ErrorCategory::InvalidInput,
+                    "raw tool arguments disagree with parsed value",
+                ));
+            }
+        }
+        Ok(())
+    }
 }
 
 /// A model-visible tool outcome, distinct from an infrastructure failure.

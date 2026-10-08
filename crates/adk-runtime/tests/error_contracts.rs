@@ -22,6 +22,7 @@ fn message(role: Role, text: &str) -> RunItem {
 fn call() -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: "call-1".into(),
             name: "work".into(),
             arguments: json!({}),

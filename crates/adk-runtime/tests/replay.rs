@@ -52,6 +52,7 @@ fn input_items(items: &Value, role: Role) -> Vec<RunItem> {
             },
             "tool_call" => RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: item["id"].as_str().unwrap().into(),
                     name: item["name"].as_str().unwrap().into(),
                     arguments: item["arguments"].clone(),

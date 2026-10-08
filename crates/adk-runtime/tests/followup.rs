@@ -344,6 +344,7 @@ impl Tool for TestTool {
 fn call(name: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: name.into(),
             name: name.into(),
             arguments: json!({}),
@@ -757,6 +758,7 @@ async fn stop_gate_resets_on_tools_and_explicit_nonfinal_progress() {
                 response(
                     vec![RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: None,
                             id: id.into(),
                             name: "read".into(),
                             arguments: json!({}),
@@ -1556,6 +1558,7 @@ async fn critic_matches_pinned_sdk_verdicts_prompts_and_read_only_turn_limits() 
                 replies.push(Ok(response(
                     vec![RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: None,
                             id: format!("call_{i}"),
                             name: if name == "write" { "write" } else { "read" }.into(),
                             arguments: json!({}),
@@ -1736,6 +1739,7 @@ async fn dynamic_instructions_match_pinned_static_precedence_usage_composition_a
                 } else {
                     RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: None,
                             id: "transfer".into(),
                             name: "transfer_to_child".into(),
                             arguments: json!({}),
@@ -2190,6 +2194,7 @@ impl RunHooks for CallbackHooks {
     }
 }
 struct SeedHandoff {
+    raw_inputs: Mutex<Vec<String>>,
     events: Arc<Mutex<Vec<String>>>,
     inputs: Mutex<Vec<Value>>,
     seeded: AtomicUsize,
@@ -2198,7 +2203,7 @@ impl HandoffCallback for SeedHandoff {
     fn on_handoff<'a>(
         &'a self,
         context: HandoffContext<'a>,
-        input: &'a Value,
+        input: &'a ToolCall,
     ) -> BoxFuture<'a, ()> {
         Box::pin(async move {
             assert_eq!(context.agent.name, "router");
@@ -2212,7 +2217,11 @@ impl HandoffCallback for SeedHandoff {
                     .any(|item| matches!(item, RunItem::Handoff { .. }))
             );
             self.events.lock().unwrap().push("callback".into());
-            self.inputs.lock().unwrap().push(input.clone());
+            self.raw_inputs
+                .lock()
+                .unwrap()
+                .push(input.argument_text().into_owned());
+            self.inputs.lock().unwrap().push(input.arguments.clone());
             self.seeded.store(1, Ordering::SeqCst);
         })
     }
@@ -2238,7 +2247,7 @@ impl InstructionProvider for SeedHandoff {
 }
 
 #[tokio::test]
-async fn handoff_callback_matches_pinned_structured_inputs_order_and_siblings() {
+async fn handoff_callback_matches_pinned_raw_inputs_order_and_siblings() {
     let fixture: Value = serde_json::from_str(include_str!(
         "../../../fixtures/handoff-callback/observations.json"
     ))
@@ -2246,6 +2255,7 @@ async fn handoff_callback_matches_pinned_structured_inputs_order_and_siblings() 
     for case in fixture["cases"].as_array().unwrap() {
         let events = Arc::new(Mutex::new(vec![]));
         let callback = Arc::new(SeedHandoff {
+            raw_inputs: Mutex::new(vec![]),
             events: events.clone(),
             inputs: Mutex::new(vec![]),
             seeded: AtomicUsize::new(0),
@@ -2259,6 +2269,11 @@ async fn handoff_callback_matches_pinned_structured_inputs_order_and_siblings() 
                 let id = output["call_id"].as_str().unwrap();
                 RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: if id == "h1" {
+                            Some(case["input_raw"].as_str().unwrap().into())
+                        } else {
+                            None
+                        },
                         id: id.into(),
                         name: match id {
                             "lookup" => "lookup",
@@ -2321,6 +2336,10 @@ async fn handoff_callback_matches_pinned_structured_inputs_order_and_siblings() 
         .unwrap();
         assert_eq!(result.result.last_agent.as_deref(), Some("expert"));
         assert_eq!(result.result.final_text(), case["final_text"]);
+        assert_eq!(
+            json!(*callback.raw_inputs.lock().unwrap()),
+            case["callback_inputs_raw"]
+        );
         let has_callback = case["has_callback"] == true;
         let mut expected = vec!["old_agent_hook", "run_hook"];
         if has_callback {
@@ -2361,7 +2380,7 @@ struct BlockingHandoff {
     dropped: AtomicUsize,
 }
 impl HandoffCallback for BlockingHandoff {
-    fn on_handoff<'a>(&'a self, _: HandoffContext<'a>, _: &'a Value) -> BoxFuture<'a, ()> {
+    fn on_handoff<'a>(&'a self, _: HandoffContext<'a>, _: &'a ToolCall) -> BoxFuture<'a, ()> {
         Box::pin(async move {
             struct Probe<'a>(&'a AtomicUsize);
             impl Drop for Probe<'_> {
@@ -2382,7 +2401,16 @@ impl HandoffHistoryFilter for BlockingHandoff {
         history: HandoffHistory,
     ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
         Box::pin(async move {
-            self.on_handoff(context, &Value::Null).await;
+            self.on_handoff(
+                context,
+                &ToolCall {
+                    id: String::new(),
+                    name: String::new(),
+                    arguments: Value::Null,
+                    raw_arguments: None,
+                },
+            )
+            .await;
             Ok(history)
         })
     }
@@ -2479,6 +2507,7 @@ async fn handoff_enablement_matches_pinned_exposure_reclassification_and_sibling
             .iter()
             .map(|output| RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: output["id"].as_str().unwrap().into(),
                     name: if output["id"] == "h1" {
                         "transfer_to_expert"
@@ -2502,6 +2531,7 @@ async fn handoff_enablement_matches_pinned_exposure_reclassification_and_sibling
             ModelBinding::complete("offline", model)
         };
         let callback = Arc::new(SeedHandoff {
+            raw_inputs: Mutex::new(vec![]),
             events: Arc::new(Mutex::new(vec![])),
             inputs: Mutex::new(vec![]),
             seeded: AtomicUsize::new(0),
@@ -2641,6 +2671,7 @@ async fn custom_handoff_history_filter_matches_pinned_current_turn_and_result_vi
             message(Role::Assistant, "transfer"),
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "lookup".into(),
                     name: "lookup".into(),
                     arguments: json!({}),
@@ -2648,6 +2679,7 @@ async fn custom_handoff_history_filter_matches_pinned_current_turn_and_result_vi
             },
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "h1".into(),
                     name: "transfer_to_expert".into(),
                     arguments: json!({}),
@@ -2662,6 +2694,7 @@ async fn custom_handoff_history_filter_matches_pinned_current_turn_and_result_vi
         };
         let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
         handoff.on_handoff = Some(Arc::new(SeedHandoff {
+            raw_inputs: Mutex::new(vec![]),
             events: events.clone(),
             inputs: Mutex::new(vec![]),
             seeded: AtomicUsize::new(0),
@@ -2797,10 +2830,7 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
             .count(),
         4
     );
-    for case in cases
-        .iter()
-        .filter(|case| case["native_value_representable"] == true)
-    {
+    for case in cases {
         for validate_tool_arguments in [false, true] {
             let events = Arc::new(Mutex::new(vec![]));
             let parser = Arc::new(HandoffParser {
@@ -2809,15 +2839,18 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
                 inputs: Mutex::new(vec![]),
             });
             let callback = Arc::new(SeedHandoff {
+                raw_inputs: Mutex::new(vec![]),
                 events: events.clone(),
                 inputs: Mutex::new(vec![]),
                 seeded: AtomicUsize::new(0),
             });
-            let input: Value = serde_json::from_str(case["raw"].as_str().unwrap()).unwrap();
+            let input: Value =
+                serde_json::from_str(case["raw"].as_str().unwrap()).unwrap_or(Value::Null);
             let model = Script::new(vec![
                 Ok(response(
                     vec![RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: Some(case["raw"].as_str().unwrap().into()),
                             id: "h1".into(),
                             name: "transfer_to_expert".into(),
                             arguments: input.clone(),
@@ -2878,6 +2911,10 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
                 case["last_agent"].as_str()
             );
             assert_eq!(result.result.final_text(), case["final_text"]);
+            assert_eq!(
+                json!(*callback.raw_inputs.lock().unwrap()),
+                case["callback_inputs"]
+            );
             assert_eq!(json!(*events.lock().unwrap()), case["events"]);
             assert_eq!(json!(*parser.inputs.lock().unwrap()), case["parser_inputs"]);
             assert_eq!(
@@ -2899,4 +2936,39 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
             );
         }
     }
+}
+
+#[tokio::test]
+async fn contradictory_raw_handoff_arguments_fail_before_callback_or_target() {
+    let model = Script::new(vec![Ok(response(
+        vec![RunItem::ToolCall {
+            call: ToolCall {
+                id: "h1".into(),
+                name: "transfer_to_expert".into(),
+                arguments: json!({"reason":"typed"}),
+                raw_arguments: Some("{\"reason\":\"different\"}".into()),
+            },
+        }],
+        true,
+    ))]);
+    let binding = ModelBinding::complete("offline", model.clone());
+    let callback = Arc::new(SeedHandoff {
+        events: Arc::new(Mutex::new(vec![])),
+        inputs: Mutex::new(vec![]),
+        raw_inputs: Mutex::new(vec![]),
+        seeded: AtomicUsize::new(0),
+    });
+    let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+    handoff.on_handoff = Some(callback.clone());
+    let mut source = AgentConfig::new("router", binding);
+    source.handoffs.push(handoff);
+    let runner = Runner::new(source, RunnerConfig::default()).unwrap();
+    let error = runner
+        .run(context(), request(vec![], 3), Arc::new(Quiet))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+    assert!(callback.inputs.lock().unwrap().is_empty());
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
 }

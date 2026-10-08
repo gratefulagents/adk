@@ -31,7 +31,7 @@ fn full() -> ModelRequest {
         input: vec![
             RunItem::Message { message: message(Role::User, "user") },
             RunItem::PhasedMessage { message: message(Role::Assistant, "answer <>&"), phase: "commentary".into() },
-            RunItem::ToolCall { call: ToolCall { id: "call".into(), name: "tool".into(), arguments: json!({"x":"<>&"}) } },
+            RunItem::ToolCall { call: ToolCall {raw_arguments: None, id: "call".into(), name: "tool".into(), arguments: json!({"x":"<>&"}) } },
             RunItem::ToolResult { call_id: "call".into(), output: ToolOutput { content: vec![Content::Text { text: "done".into() }], is_error: false, should_pause: false } },
             RunItem::Reasoning { reasoning: Reasoning { id: "reason".into(), text: "reasoning".into(), signature: "signature".into(), ..Default::default() } },
         ],
@@ -162,13 +162,15 @@ fn approval_markers_keep_order_authorship_and_estimates() {
     let request = full();
     let marker = ApprovalMarker::from_call(
         &ToolCall {
+            raw_arguments: None,
             id: "call".into(),
             name: "tool".into(),
             arguments: json!({"x":"<>&"}),
         },
         ApprovalPhase::Approved,
         Some(AgentRef { name: "A".into() }),
-    );
+    )
+    .unwrap();
     let boundary = ApprovalMarkerBoundary {
         before_item: 3,
         marker,

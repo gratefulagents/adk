@@ -109,6 +109,8 @@ pub fn apply_go_config(
 
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub struct ApprovalJournalEntry {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub argument_text: Option<String>,
     pub marker: ApprovalMarker,
     pub new_items_before: usize,
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -116,6 +118,18 @@ pub struct ApprovalJournalEntry {
     /// None when compaction removed the corresponding call and output.
     pub history_before: Option<usize>,
     pub reason: Option<String>,
+}
+
+impl ApprovalJournalEntry {
+    pub(crate) fn call(&self) -> Result<adk_core::ToolCall, BridgeError> {
+        let mut call = approval::approval_call(&self.marker.data)?;
+        if let Some(raw) = &self.argument_text {
+            call.raw_arguments = Some(raw.clone());
+            call.validate_argument_projection()
+                .map_err(|_| BridgeError("approval raw arguments disagree with parsed value"))?;
+        }
+        Ok(call)
+    }
 }
 
 /// Wire items plus lossless sidecars: Go Approved=false alone cannot distinguish
@@ -157,6 +171,7 @@ impl ApprovalJournal {
             approval::approval_call(&boundary.marker.data)?;
             previous = boundary.before_item;
             entries.push(ApprovalJournalEntry {
+                argument_text: Some(boundary.marker.data.input.text().into_owned()),
                 marker: boundary.marker,
                 new_items_before: 0,
                 historical_only: true,
@@ -168,13 +183,17 @@ impl ApprovalJournal {
     }
 
     pub(crate) fn restore(
-        entries: Vec<ApprovalJournalEntry>,
+        mut entries: Vec<ApprovalJournalEntry>,
         history_len: usize,
         new_items_len: usize,
     ) -> Result<Self, BridgeError> {
-        for entry in &entries {
+        for entry in &mut entries {
             entry.marker.validate()?;
-            approval::approval_call(&entry.marker.data)?;
+            entry.marker = ApprovalMarker::from_call(
+                &entry.call()?,
+                entry.marker.phase,
+                entry.marker.agent.clone(),
+            )?;
             if entry.history_before.is_some_and(|n| n > history_len)
                 || entry.new_items_before > new_items_len
             {
@@ -323,11 +342,15 @@ impl RunHooks for ApprovalJournal {
                         ApprovalDecision::Deny => ApprovalPhase::Denied,
                     };
                     state.entries.push(ApprovalJournalEntry {
+                        argument_text: call.raw_arguments.clone(),
                         marker: ApprovalMarker::from_call(
                             &call,
                             phase,
                             agent.map(|name| dto::AgentRef { name }),
-                        ),
+                        )
+                        .map_err(|error| {
+                            Error::new(ErrorCategory::InvalidInput, error.to_string())
+                        })?,
                         new_items_before,
                         historical_only: false,
                         history_before: Some(history_before),
@@ -360,7 +383,7 @@ fn rebase_entry(
     if boundary > before.len() {
         return Err(BridgeError("cannot rebase a future approval boundary"));
     }
-    let call = approval::approval_call(&entry.marker.data)?;
+    let call = entry.call()?;
     if !after.iter().any(|item| match item {
         RunItem::ToolCall { call: surviving } => surviving == &call,
         RunItem::ToolResult { call_id, .. } => call_id == &call.id,
@@ -596,6 +619,7 @@ mod history_seed_tests {
     #[tokio::test]
     async fn seeded_journal_encodes_only_history_and_rebases_after_restore() {
         let call = ToolCall {
+            raw_arguments: None,
             id: "old".into(),
             name: "write".into(),
             arguments: serde_json::json!({}),
@@ -610,7 +634,8 @@ mod history_seed_tests {
                     Some(dto::AgentRef {
                         name: "old-agent".into(),
                     }),
-                ),
+                )
+                .unwrap(),
             })
             .collect();
         let before = vec![

@@ -30,6 +30,7 @@ fn definition() -> ToolDefinition {
 }
 fn call(command: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call-1".into(),
         name: "shell".into(),
         arguments: json!({"command": command}),

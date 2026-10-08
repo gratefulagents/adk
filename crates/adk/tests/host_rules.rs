@@ -32,6 +32,7 @@ async fn literal_shell_operators_are_not_character_class_set_syntax() {
     ] {
         let compiled = compile_guardrail_rules(&[rule(pattern)]).unwrap();
         let call = ToolCall {
+            raw_arguments: None,
             id: "call".into(),
             name: "shell".into(),
             arguments: serde_json::json!({"command": command}),

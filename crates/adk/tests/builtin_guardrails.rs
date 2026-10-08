@@ -24,6 +24,7 @@ fn context() -> Context {
 }
 fn call(name: &str, arguments: Value) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call".into(),
         name: name.into(),
         arguments,

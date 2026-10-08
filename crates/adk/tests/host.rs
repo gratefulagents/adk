@@ -549,6 +549,7 @@ fn approval_options(fixture: &Arc<Fixture>) -> ChatLoopOptions {
         vec![
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "c1".into(),
                     name: "write".into(),
                     arguments: json!({}),
@@ -556,6 +557,7 @@ fn approval_options(fixture: &Arc<Fixture>) -> ChatLoopOptions {
             },
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "c2".into(),
                     name: "write".into(),
                     arguments: json!({}),
@@ -699,6 +701,7 @@ async fn dynamic_rules_match_go_actions_and_multi_star_globs() {
         };
         let guards = compile_guardrail_rules(&[rule]).unwrap();
         let call = ToolCall {
+            raw_arguments: None,
             id: "c".into(),
             name: "mcp_sql_db_write".into(),
             arguments: json!({"text":"secret"}),
@@ -904,6 +907,7 @@ async fn input_journal_is_replayed_without_duplicate_append_or_historic_executio
     use adk::codec::approval::{ApprovalMarker, ApprovalMarkerBoundary, ApprovalPhase};
     let fixture = Arc::new(Fixture::default());
     let call = ToolCall {
+        raw_arguments: None,
         id: "historic".into(),
         name: "write".into(),
         arguments: json!({}),
@@ -938,7 +942,8 @@ async fn input_journal_is_replayed_without_duplicate_append_or_historic_executio
                     Some(adk::codec::dto::AgentRef {
                         name: "old-agent".into(),
                     }),
-                ),
+                )
+                .unwrap(),
             })
             .collect(),
     };
@@ -977,13 +982,15 @@ async fn invalid_input_journal_fails_before_model() {
             before_item: 1,
             marker: ApprovalMarker::from_call(
                 &ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "write".into(),
                     arguments: json!({}),
                 },
                 ApprovalPhase::Denied,
                 None,
-            ),
+            )
+            .unwrap(),
         });
     let failure = ChatLoop::new(fixture.options())
         .run(context())
@@ -1006,6 +1013,7 @@ async fn approval_resume_limit_uses_source_default_twelve() {
             fixture.responses.lock().unwrap().push_back(Ok(response(
                 vec![RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: None,
                         id: format!("c{index}"),
                         name: "write".into(),
                         arguments: json!({}),

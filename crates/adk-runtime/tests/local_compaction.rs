@@ -59,7 +59,8 @@ fn fixture_history(items: &Value) -> (Vec<RunItem>, Vec<ApprovalMarkerBoundary>)
                     item["agent"]
                         .as_str()
                         .map(|name| AgentRef { name: name.into() }),
-                ),
+                )
+                .unwrap(),
             });
         } else {
             history.push(serde_json::from_value(item.clone()).unwrap());
@@ -768,6 +769,7 @@ fn compaction_preserves_phased_multimodal_items_tool_pairs_and_provider_origins(
         },
         RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "images".into(),
                 name: "inspect".into(),
                 arguments: json!({}),

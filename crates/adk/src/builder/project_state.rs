@@ -284,6 +284,7 @@ mod tests {
             tool.execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "test".into(),
                     name: "task_create".into(),
                     arguments: serde_json::json!({"title":"single write"}),

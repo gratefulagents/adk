@@ -232,6 +232,7 @@ async fn run_case(case: &Value) -> Value {
             .execute(
                 &context(),
                 ToolCall {
+                    raw_arguments: None,
                     id: step["name"].as_str().unwrap().into(),
                     name: name.into(),
                     arguments,

@@ -21,17 +21,21 @@ pub struct ApprovalMarker {
 }
 
 impl ApprovalMarker {
-    pub fn from_call(call: &ToolCall, phase: ApprovalPhase, agent: Option<dto::AgentRef>) -> Self {
-        Self {
+    pub fn from_call(
+        call: &ToolCall,
+        phase: ApprovalPhase,
+        agent: Option<dto::AgentRef>,
+    ) -> Result<Self, BridgeError> {
+        Ok(Self {
             data: dto::ToolApprovalData {
                 tool_name: call.name.clone(),
-                input: dto::RawJson::Present(call.arguments.clone()),
+                input: tool_input(call)?,
                 call_id: call.id.clone(),
                 approved: phase == ApprovalPhase::Approved,
             },
             phase,
             agent,
-        }
+        })
     }
 
     /// Go markers have no reason field. The caller supplies it explicitly.
@@ -61,6 +65,20 @@ impl ApprovalMarker {
     }
 }
 
+fn tool_input(call: &ToolCall) -> Result<dto::RawJson, BridgeError> {
+    call.validate_argument_projection()
+        .map_err(|_| BridgeError("raw tool arguments disagree with parsed value"))?;
+    match &call.raw_arguments {
+        None => Ok(dto::RawJson::Present(call.arguments.clone())),
+        Some(raw) if raw.is_empty() => Ok(dto::RawJson::Missing),
+        Some(raw) => Ok(dto::RawJson::Encoded(
+            serde_json::value::RawValue::from_string(raw.clone()).map_err(|_| {
+                BridgeError("invalid raw tool arguments cannot be embedded in SDK JSON")
+            })?,
+        )),
+    }
+}
+
 pub fn approval_call(data: &dto::ToolApprovalData) -> Result<ToolCall, BridgeError> {
     Ok(ToolCall {
         id: data.call_id.clone(),
@@ -68,8 +86,8 @@ pub fn approval_call(data: &dto::ToolApprovalData) -> Result<ToolCall, BridgeErr
         arguments: data
             .input
             .value()
-            .ok_or(BridgeError("missing approval input is not JSON null"))?
-            .into_owned(),
+            .map_or(serde_json::Value::Null, |value| value.into_owned()),
+        raw_arguments: Some(data.input.text().into_owned()),
     })
 }
 
@@ -163,7 +181,7 @@ pub fn encode_item(
             wire.tool_call = Some(dto::ToolCallData {
                 id: call.id.clone(),
                 name: call.name.clone(),
-                input: dto::RawJson::Present(call.arguments.clone()),
+                input: tool_input(call)?,
             });
         }
         RunItem::ToolResult { call_id, output } => {
@@ -236,14 +254,16 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                 .tool_call
                 .as_ref()
                 .ok_or(BridgeError("missing ToolCall"))?;
-            let Some(arguments) = call.input.value() else {
-                return Err(BridgeError("missing tool input is not JSON null"));
-            };
+            let arguments = call
+                .input
+                .value()
+                .map_or(serde_json::Value::Null, |value| value.into_owned());
             RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: Some(call.input.text().into_owned()),
                     id: call.id.clone(),
                     name: call.name.clone(),
-                    arguments: arguments.into_owned(),
+                    arguments,
                 },
             }
         }

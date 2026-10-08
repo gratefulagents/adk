@@ -111,6 +111,7 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
             json!({})
         };
         let call = ToolCall {
+            raw_arguments: None,
             id: "call".into(),
             name: case["tool_name"].as_str().unwrap().into(),
             arguments,

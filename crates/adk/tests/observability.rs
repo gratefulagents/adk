@@ -59,6 +59,7 @@ fn pipeline(mode: CaptureMode) -> (Arc<Observability>, Arc<Records>) {
 }
 fn call(id: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: id.into(),
         name: "test".into(),
         arguments: json!({"command":"private input"}),
@@ -1298,4 +1299,30 @@ async fn verifier_failure_diagnostics_respect_capture_policy_and_event_order() {
         );
         assert!(records[1].sequence > records[0].sequence);
     }
+}
+
+#[test]
+fn raw_argument_provenance_obeys_capture_redaction_without_mutating_operational_input() {
+    let raw = r#"{ "password":"private-value", "reason":"custom-sensitive" }"#;
+    let call = ToolCall {
+        id: "call".into(),
+        name: "transfer".into(),
+        arguments: serde_json::from_str(raw).unwrap(),
+        raw_arguments: Some(raw.into()),
+    };
+    let data = serde_json::to_value(&call).unwrap();
+    let metadata = CapturePolicy::default().capture(&data).to_string();
+    assert!(!metadata.contains("private-value"));
+    assert!(!metadata.contains("custom-sensitive"));
+    let full = CapturePolicy {
+        mode: CaptureMode::Full,
+        redactors: vec![Arc::new(|text| {
+            text.replace("custom-sensitive", "[REDACTED]")
+        })],
+    }
+    .capture(&data)
+    .to_string();
+    assert!(!full.contains("private-value"));
+    assert!(!full.contains("custom-sensitive"));
+    assert_eq!(call.argument_text(), raw);
 }

@@ -157,6 +157,7 @@ fn done() -> Step {
 }
 fn call() -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call".into(),
         name: "tool".into(),
         arguments: json!({"value": "private-input"}),

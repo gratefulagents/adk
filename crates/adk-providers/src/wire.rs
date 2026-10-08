@@ -139,6 +139,18 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     let mut tool_images = Vec::new();
     for (input_index, item) in request.input.iter().enumerate() {
+        if let RunItem::ToolCall { call } = item {
+            call.validate_argument_projection()?;
+            if protocol == Protocol::Anthropic
+                && call.raw_arguments.as_ref().is_some_and(|raw| {
+                    !raw.is_empty() && serde_json::from_str::<Value>(raw).is_err()
+                })
+            {
+                return Err(crate::invalid(
+                    "invalid raw tool arguments cannot be embedded in provider JSON",
+                ));
+            }
+        }
         if !matches!(item, RunItem::ToolResult { .. }) && !tool_images.is_empty() {
             entries.push(json!({"role":"user","content":content(&tool_images, protocol, false)?}));
             tool_images.clear();
@@ -187,10 +199,10 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
             }
             RunItem::ToolCall { call } => match protocol {
                 Protocol::Responses => {
-                    json!({"type":"function_call","call_id":call.id,"name":call.name,"arguments":call.arguments.to_string()})
+                    json!({"type":"function_call","call_id":call.id,"name":call.name,"arguments":call.argument_text().as_ref()})
                 }
                 Protocol::Chat => {
-                    json!({"role":"assistant","content":null,"tool_calls":[{"id":call.id,"type":"function","function":{"name":call.name,"arguments":call.arguments.to_string()}}]})
+                    json!({"role":"assistant","content":null,"tool_calls":[{"id":call.id,"type":"function","function":{"name":call.name,"arguments":call.argument_text().as_ref()}}]})
                 }
                 Protocol::Anthropic => {
                     json!({"role":"assistant","content":[{"type":"tool_use","id":call.id,"name":call.name,"input":call.arguments}]})
@@ -559,6 +571,14 @@ fn call(
     arguments: &str,
     normalize: bool,
 ) -> Result<RunItem, Error> {
+    let raw = match &value[arguments] {
+        Value::String(raw) if raw.trim().is_empty() => "{}".into(),
+        Value::String(raw) if normalize && serde_json::from_str::<Value>(raw).is_err() => {
+            "{}".into()
+        }
+        Value::String(raw) => raw.trim().to_owned(),
+        input => input.to_string(),
+    };
     let arguments = match &value[arguments] {
         Value::String(raw) if raw.trim().is_empty() => json!({}),
         Value::String(raw) => match serde_json::from_str(raw) {
@@ -581,6 +601,7 @@ fn call(
     };
     Ok(RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: Some(raw),
             id: string(value, id)?,
             name: string(value, name)?,
             arguments,
@@ -865,6 +886,36 @@ fn response_inner(
                     Some("tool_use" | "pause_turn")
                 ))
             });
+        }
+    }
+    if protocol == Protocol::Anthropic
+        && let Some(source) = source
+    {
+        let original: std::collections::BTreeMap<&str, &serde_json::value::RawValue> =
+            serde_json::from_str(source).map_err(|_| {
+                Error::new(ErrorCategory::Provider, "invalid provider response JSON")
+            })?;
+        if let Some(content) = original.get("content") {
+            let blocks: Vec<std::collections::BTreeMap<&str, &serde_json::value::RawValue>> =
+                serde_json::from_str(content.get()).map_err(|_| {
+                    Error::new(ErrorCategory::Provider, "invalid provider content JSON")
+                })?;
+            let raw_calls = body["content"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .zip(&blocks)
+                .filter(|(block, _)| block["type"] == "tool_use");
+            for (call, (_, raw)) in items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(raw_calls)
+            {
+                call.raw_arguments = raw.get("input").map(|input| input.get().to_owned());
+            }
         }
     }
     Ok(ModelResponse {

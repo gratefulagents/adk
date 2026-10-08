@@ -5,6 +5,7 @@ use std::time::Duration;
 
 fn call(id: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: id.into(),
         name: "Edit".into(),
         arguments: json!({"text":"日本語", "n":9007199254740993_u64}),
@@ -25,7 +26,7 @@ fn result(id: &str, error: bool) -> RunItem {
 fn marker(id: &str, phase: ApprovalPhase, before_item: usize) -> ApprovalMarkerBoundary {
     ApprovalMarkerBoundary {
         before_item,
-        marker: ApprovalMarker::from_call(&call(id), phase, None),
+        marker: ApprovalMarker::from_call(&call(id), phase, None).unwrap(),
     }
 }
 
@@ -306,7 +307,8 @@ fn approval_native_call_bridge_requires_explicit_reason_and_preserves_null() {
                 Some(dto::AgentRef {
                     name: "worker".into(),
                 }),
-            );
+            )
+            .unwrap();
             let request = marker.to_request("host supplied reason").unwrap();
             assert_eq!(request.call, call);
             assert_eq!(request.reason, "host supplied reason");
@@ -319,7 +321,10 @@ fn approval_native_call_bridge_requires_explicit_reason_and_preserves_null() {
     }
     let mut marker = marker("a", ApprovalPhase::Pending, 0).marker;
     marker.data.input = dto::RawJson::Missing;
-    assert!(marker.to_request("").is_err());
+    let absent = marker.to_request("").unwrap();
+    assert_eq!(absent.call.raw_arguments.as_deref(), Some(""));
+    assert_eq!(absent.call.arguments, json!(null));
+    assert_eq!(absent.call.argument_text(), "");
     assert_eq!(
         decode_history(&[marker.to_wire().unwrap()], &[ApprovalPhase::Pending])
             .unwrap()
@@ -430,7 +435,11 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
     }
     let mut call_wire = encode_item(&RunItem::ToolCall { call: call("a") }, None).unwrap();
     call_wire.tool_call.as_mut().unwrap().input = dto::RawJson::Missing;
-    assert!(decode_item(&call_wire).is_err());
+    let RunItem::ToolCall { call: absent } = decode_item(&call_wire).unwrap() else {
+        panic!("expected call")
+    };
+    assert_eq!(absent.raw_arguments.as_deref(), Some(""));
+    assert_eq!(absent.arguments, json!(null));
 }
 
 #[test]
@@ -661,4 +670,61 @@ fn attachment_only_content_is_canonicalized_but_never_reordered() {
     .unwrap();
     wire.tool_output = Some(dto::ToolOutputData::default());
     assert!(decode_item(&wire).is_err());
+}
+
+#[test]
+fn raw_tool_inputs_and_approval_markers_preserve_source_text_without_fabricating_json() {
+    for raw in ["", "null", "{ \"n\":1e0, \"n\":2, \"reason\":\"billing\" }"] {
+        let call = ToolCall {
+            id: "raw".into(),
+            name: "transfer".into(),
+            arguments: serde_json::from_str(raw).unwrap_or(serde_json::Value::Null),
+            raw_arguments: Some(raw.into()),
+        };
+        let encoded = encode_item(&RunItem::ToolCall { call: call.clone() }, None).unwrap();
+        let RunItem::ToolCall { call: decoded } = decode_item(&encoded).unwrap() else {
+            panic!("expected call")
+        };
+        assert_eq!(decoded.argument_text(), raw);
+        assert_eq!(decoded, call);
+        let marker = ApprovalMarker::from_call(&call, ApprovalPhase::Approved, None).unwrap();
+        assert_eq!(
+            marker
+                .to_request("host reason")
+                .unwrap()
+                .call
+                .argument_text(),
+            raw
+        );
+    }
+    let invalid = ToolCall {
+        id: "raw".into(),
+        name: "transfer".into(),
+        arguments: json!(null),
+        raw_arguments: Some("{".into()),
+    };
+    assert!(
+        encode_item(
+            &RunItem::ToolCall {
+                call: invalid.clone()
+            },
+            None
+        )
+        .is_err()
+    );
+    assert!(ApprovalMarker::from_call(&invalid, ApprovalPhase::Pending, None).is_err());
+    let mismatch = ToolCall {
+        raw_arguments: Some("{}".into()),
+        ..invalid
+    };
+    assert!(
+        encode_item(
+            &RunItem::ToolCall {
+                call: mismatch.clone()
+            },
+            None
+        )
+        .is_err()
+    );
+    assert!(ApprovalMarker::from_call(&mismatch, ApprovalPhase::Pending, None).is_err());
 }

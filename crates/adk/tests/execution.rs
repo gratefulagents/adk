@@ -87,6 +87,7 @@ fn policy() -> security::SecurityPolicy {
 fn call(command: &str) -> security::CommandRequest {
     // All test commands are literal ASCII without JSON metacharacters.
     security::CommandRequest::from_call(ToolCall {
+        raw_arguments: None,
         id: "call-1".into(),
         name: "shell".into(),
         arguments: format!(r#"{{"command":"{command}"}}"#).parse().unwrap(),

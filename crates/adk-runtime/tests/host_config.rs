@@ -393,6 +393,7 @@ async fn child_turn_caps_are_per_invocation_for_both_adapters_and_clamped_by_sch
             let mut call = response(false);
             call.items = vec![RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: id.into(),
                     name: tool_name.into(),
                     arguments: json!({"message":id}),
@@ -620,6 +621,7 @@ impl Tool for ApprovedTool {
 #[tokio::test]
 async fn replacing_carry_forward_preserves_approval_markers_and_item_sources() {
     let call = ToolCall {
+        raw_arguments: None,
         id: "approved".into(),
         name: "approved".into(),
         arguments: json!({}),

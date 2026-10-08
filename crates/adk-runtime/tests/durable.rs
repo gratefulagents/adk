@@ -163,6 +163,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 fn call(id: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: id.into(),
             name: "effect".into(),
             arguments: json!({}),
@@ -1315,6 +1316,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     let (_, model, _) = setup(
         vec![RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "handoff-1".into(),
                 name: "transfer".into(),
                 arguments: json!({}),
@@ -2164,6 +2166,7 @@ async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configu
                 message(Role::Assistant, "transfer now"),
                 RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: None,
                         id: "transfer".into(),
                         name: "transfer".into(),
                         arguments: json!({}),
@@ -2285,6 +2288,7 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
             responses: Mutex::new(VecDeque::from([
                 response(vec![RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: None,
                         id: "transfer".into(),
                         name: "transfer".into(),
                         arguments: json!({}),
@@ -3220,12 +3224,12 @@ impl HandoffCallback for PureHandoff {
     fn on_handoff<'a>(
         &'a self,
         context: HandoffContext<'a>,
-        input: &'a Value,
+        input: &'a ToolCall,
     ) -> BoxFuture<'a, ()> {
         Box::pin(async move {
             assert_eq!(context.agent.name, "agent");
             assert_eq!(context.target.name, "target");
-            assert_eq!(input, &json!({"reason":"review"}));
+            assert_eq!(&input.arguments, &json!({"reason":"review"}));
             self.calls.fetch_add(1, Ordering::SeqCst);
         })
     }
@@ -3234,6 +3238,7 @@ impl HandoffCallback for PureHandoff {
 async fn handoff_callbacks_require_replay_identity_and_committed_transfer_is_not_repeated() {
     let transfer = RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: "transfer".into(),
             name: "transfer_to_target".into(),
             arguments: json!({"reason":"review"}),
@@ -3307,6 +3312,7 @@ async fn handoff_predicate_identity_and_classification_survive_model_checkpoint(
     for exposed in [false, true] {
         let transfer = RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "transfer".into(),
                 name: "transfer_to_target".into(),
                 arguments: json!({}),
@@ -3410,6 +3416,7 @@ async fn custom_handoff_history_filter_preserves_approval_boundaries_and_durable
     for mode in ["preserve", "strip", "forge", "out_of_range"] {
         let transfer = RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "transfer".into(),
                 name: "transfer_to_target".into(),
                 arguments: json!({}),
@@ -3495,6 +3502,7 @@ impl OutputParser for HandoffInputParser {
 async fn handoff_input_type_is_bound_to_durable_identity_and_custom_parsers_are_rejected() {
     let transfer = RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: "transfer".into(),
             name: "transfer_to_target".into(),
             arguments: json!({}),
@@ -3549,4 +3557,119 @@ async fn handoff_input_type_is_bound_to_durable_identity_and_custom_parsers_are_
         Some("target")
     );
     assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}
+
+struct RawHandoffRecorder(Mutex<Vec<String>>);
+impl HandoffCallback for RawHandoffRecorder {
+    fn durable_key(&self) -> Option<&str> {
+        Some("raw-observer-v1")
+    }
+    fn on_handoff<'a>(&'a self, _: HandoffContext<'a>, call: &'a ToolCall) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.0
+                .lock()
+                .unwrap()
+                .push(call.argument_text().into_owned());
+        })
+    }
+}
+#[tokio::test]
+async fn raw_handoff_arguments_survive_pending_native_checkpoints_without_reconstruction() {
+    for raw in ["", "null", "{ \"n\":1e0, \"n\":2 }"] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: serde_json::from_str(raw).unwrap_or(Value::Null),
+                raw_arguments: Some(raw.into()),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding)));
+        let callback = Arc::new(RawHandoffRecorder(Mutex::new(vec![])));
+        handoff.on_handoff = Some(callback.clone());
+        agent.handoffs.push(handoff);
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+        assert!(run(&runner, store.clone(), None).await.is_err());
+        assert!(callback.0.lock().unwrap().is_empty());
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(*callback.0.lock().unwrap(), [raw]);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    }
+}
+
+struct CountingRawApproval(AtomicUsize);
+impl Host for CountingRawApproval {
+    fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async { Ok(()) })
+    }
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ApprovalRequest,
+    ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+        Box::pin(async move {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(ApprovalDecision::Approve)
+        })
+    }
+}
+#[tokio::test]
+async fn approved_raw_handoff_identity_survives_json_value_checkpoint_storage() {
+    for raw in ["", "null", " { \"n\":1e0, \"n\":2 } "] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: serde_json::from_str(raw).unwrap_or(Value::Null),
+                raw_arguments: Some(raw.into()),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding)));
+        let callback = Arc::new(RawHandoffRecorder(Mutex::new(vec![])));
+        handoff.on_handoff = Some(callback.clone());
+        handoff.definition.requires_approval = true;
+        agent.handoffs.push(handoff);
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let host = Arc::new(CountingRawApproval(AtomicUsize::new(0)));
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("tool_prepared".into(), true));
+        assert!(
+            runner
+                .run_durable(
+                    context(),
+                    request(false),
+                    host.clone(),
+                    durable(store.clone(), None)
+                )
+                .await
+                .is_err()
+        );
+        assert_eq!(host.0.load(Ordering::SeqCst), 1);
+        assert!(callback.0.lock().unwrap().is_empty());
+        let checkpoint =
+            serde_json::from_value(serde_json::to_value(store.latest()).unwrap()).unwrap();
+        let result = runner
+            .run_durable(
+                context(),
+                request(true),
+                host.clone(),
+                durable(Arc::new(Store::default()), Some(checkpoint)),
+            )
+            .await
+            .unwrap();
+        assert_eq!(host.0.load(Ordering::SeqCst), 1);
+        assert_eq!(*callback.0.lock().unwrap(), [raw]);
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    }
 }

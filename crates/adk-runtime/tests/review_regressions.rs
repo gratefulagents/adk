@@ -260,6 +260,7 @@ async fn conversation_can_adopt_failed_resume_and_continue_without_repeated_effe
         vec![
             Ok(response(vec![RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "approved-call".into(),
                     name: "count".into(),
                     arguments: json!({}),

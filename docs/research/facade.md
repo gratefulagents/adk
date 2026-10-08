@@ -462,3 +462,18 @@ missing/malformed JSON or preserve raw spelling: four source cases remain
 explicitly outside the native comparator, so full InputType/raw callback parity
 is not closed. Reuse the native OutputParser contract instead of creating a second
 parser abstraction; durable custom parsers remain explicitly unsupported.
+
+
+### Raw handoff argument provenance
+
+Follow-up to the optional-input-type limitation above: retained UTF-8 argument
+text alongside parsed `ToolCall.arguments`, with consistency checks at model and
+history boundaries. All 16 callback and 18 input-type pinned cases now compare
+raw text, including absent/null and malformed input. Borrowing the call is more
+idiomatic than duplicating callback types for raw and parsed input. Go JSON wire
+bridges reject invalid embedded JSON explicitly; native persistence can preserve
+it as a string. Approval journals need a raw-text sidecar because Go marker JSON
+compaction otherwise breaks exact call identity during durable recovery. Rejected
+weakening identity to parsed-value equality, which could conflate separately
+approved raw invocations. Non-UTF-8 Go bytes, mutable target/context pointers and
+full provider replay parity remain open, not implicitly equivalent.

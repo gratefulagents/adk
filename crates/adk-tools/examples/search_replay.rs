@@ -47,6 +47,7 @@ async fn main() {
             .execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "fixture".into(),
                     name: request.name,
                     arguments: request.arguments,

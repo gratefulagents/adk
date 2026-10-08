@@ -88,6 +88,7 @@ fn result_views_borrow_only_new_items_and_unified_approvals() {
     for id in ["one", "two"] {
         result.pending_approvals.push(ApprovalRequest {
             call: ToolCall {
+                raw_arguments: None,
                 id: id.into(),
                 name: "review".into(),
                 arguments: json!({}),

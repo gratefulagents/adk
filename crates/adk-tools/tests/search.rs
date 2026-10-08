@@ -37,6 +37,7 @@ async fn execute(root: &Path, name: &str, args: Value) -> Result<ToolOutput, Err
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments: args,
@@ -380,6 +381,7 @@ async fn bounds_errors_and_cancellation_are_explicit() {
         .execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "cancel".into(),
                 name: "grep".into(),
                 arguments: json!({"pattern":"x"}),
@@ -452,6 +454,7 @@ async fn every_search_name_rejects_escape_and_pre_cancelled_execution() {
             .execute(
                 &ctx,
                 ToolCall {
+                    raw_arguments: None,
                     id: "cancel".into(),
                     name: name.into(),
                     arguments: args,

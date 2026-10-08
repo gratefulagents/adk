@@ -29,6 +29,7 @@ fn image() -> ImageAttachment {
 fn tool(name: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: String::new(),
             name: name.into(),
             arguments: serde_json::json!({}),

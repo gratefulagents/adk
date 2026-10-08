@@ -112,6 +112,7 @@ async fn tool_output_replacement_precedes_next_guard_and_preserves_flags() {
         should_pause: true,
     };
     let call = ToolCall {
+        raw_arguments: None,
         id: "1".into(),
         name: "tool".into(),
         arguments: json!({}),
@@ -187,6 +188,7 @@ async fn cancellation_prevents_callback_invocation() {
 async fn diagnostic_strings_do_not_replace_content_and_tripwire_precedes_replacement() {
     let seen = Arc::new(Mutex::new(vec![]));
     let call = ToolCall {
+        raw_arguments: None,
         id: "1".into(),
         name: "tool".into(),
         arguments: json!({}),

@@ -1292,3 +1292,67 @@ fn provider_response_retains_whole_body_not_just_metadata() {
         );
     }
 }
+
+#[test]
+fn tool_argument_text_survives_provider_normalization_and_request_replay() {
+    for raw in [" { \"n\":1e0, \"n\":2 } ", " ", "{", "null", "[1,2]"] {
+        let response=wire::response(&json!({"choices":[{"message":{"tool_calls":[{"id":"c","function":{"name":"transfer","arguments":raw}}]},"finish_reason":"tool_calls"}]}),Protocol::Chat).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!("expected call")
+        };
+        let normalized = if serde_json::from_str::<serde_json::Value>(raw).is_ok() {
+            raw.trim()
+        } else {
+            "{}"
+        };
+        assert_eq!(call.argument_text(), normalized);
+        call.validate_argument_projection().unwrap();
+        let mut req = request();
+        req.instructions.clear();
+        req.input = response.items;
+        let replay = wire::request(&req, Protocol::Chat, false).unwrap();
+        assert_eq!(
+            replay["messages"][0]["tool_calls"][0]["function"]["arguments"],
+            normalized
+        );
+        let replay = wire::request(&req, Protocol::Responses, false).unwrap();
+        assert_eq!(replay["input"][0]["arguments"], normalized);
+    }
+    let mut chat = StreamState::new(Protocol::Chat);
+    let streamed_raw = r#" { "n":1e0, "n":2 } "#;
+    chat.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"c","function":{"name":"transfer","arguments":streamed_raw}}]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+    let events = chat.event("[DONE]").unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), streamed_raw);
+    let response=wire::response_json(br#"{"content":[{"type":"tool_use","id":"c","name":"transfer","input":{ "n":1e0, "n":2 }}],"stop_reason":"tool_use"}"#,Protocol::Anthropic).unwrap();
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
+    let mut state = StreamState::new(Protocol::Anthropic);
+    for event in [
+        json!({"type":"message_start","message":{"id":"m","usage":{}}}),
+        json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"c","name":"transfer","input":{}}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{ \"n\":1e0,"}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":" \"n\":2 }"}}),
+        json!({"type":"content_block_stop","index":0}),
+        json!({"type":"message_delta","delta":{"stop_reason":"tool_use"},"usage":{"output_tokens":2}}),
+    ] {
+        state.event(&event.to_string()).unwrap();
+    }
+    let events = state.event(r#"{"type":"message_stop"}"#).unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
+}

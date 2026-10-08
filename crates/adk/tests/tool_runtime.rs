@@ -66,6 +66,7 @@ impl Model for TestModel {
                     .into_iter()
                     .map(|name| RunItem::ToolCall {
                         call: ToolCall {
+                            raw_arguments: None,
                             id: name.into(),
                             name: name.into(),
                             arguments: Default::default(),

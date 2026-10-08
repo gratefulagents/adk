@@ -1208,6 +1208,7 @@ impl adk_core::Model for ToolModel {
             } else {
                 vec![RunItem::ToolCall {
                     call: adk_core::ToolCall {
+                        raw_arguments: None,
                         id: "read-1".into(),
                         name: "read".into(),
                         arguments: serde_json::json!({}),

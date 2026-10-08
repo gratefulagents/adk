@@ -782,6 +782,59 @@ impl StreamState {
     }
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
         let mut response = wire::response(&self.body, self.protocol)?;
+        if self.protocol == Protocol::Anthropic {
+            let source_calls = self
+                .tools
+                .iter()
+                .filter(|(_, block)| block["type"] == "tool_use");
+            for (call, (index, _)) in response
+                .items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    adk_core::RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(source_calls)
+            {
+                if let Some(input) = self.snapshot_inputs.get(index) {
+                    call.raw_arguments = Some(input.clone());
+                }
+            }
+        }
+        if self.snapshot_profile == crate::snapshot::Profile::Stream
+            && self.protocol != Protocol::Anthropic
+        {
+            let arguments: Vec<_> = match self.protocol {
+                Protocol::Chat => self.body["choices"][0]["message"]["tool_calls"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|tool| tool["function"]["arguments"].as_str())
+                    .collect(),
+                Protocol::Responses => self.body["output"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter(|item| item["type"] == "function_call")
+                    .map(|item| item["arguments"].as_str())
+                    .collect(),
+                Protocol::Anthropic => unreachable!(),
+            };
+            for (call, raw) in response
+                .items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    adk_core::RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(arguments)
+            {
+                let Some(raw) = raw else { continue };
+                if serde_json::from_str::<Value>(raw).is_ok_and(|value| value == call.arguments) {
+                    call.raw_arguments = Some(raw.into());
+                }
+            }
+        }
         if let Some(document) = &response.snapshot_raw {
             response.snapshot_raw = Some(match self.snapshot_profile {
                 crate::snapshot::Profile::Collected => document.clone(),

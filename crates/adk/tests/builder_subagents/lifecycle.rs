@@ -75,6 +75,7 @@ async fn owned_automatic_children_stop_on_close_and_drop_with_escaped_handles() 
             idempotency_key: None,
         };
         let call = ToolCall {
+            raw_arguments: None,
             id: "background".into(),
             name: "subagent".into(),
             arguments: json!({"message":"work","mode":"background"}),

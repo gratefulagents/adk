@@ -42,6 +42,7 @@ fn answer(value: &str) -> ModelResponse {
 fn call(id: &str, name: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: id.into(),
             name: name.into(),
             arguments: json!({}),
@@ -3190,6 +3191,7 @@ async fn handoff_tool_ceiling_denies_before_approval_and_preserves_parent_policy
                             .iter()
                             .map(|name| RunItem::ToolCall {
                                 call: ToolCall {
+                                    raw_arguments: None,
                                     id: (*name).into(),
                                     name: (*name).into(),
                                     arguments: json!({"invalid": true}),

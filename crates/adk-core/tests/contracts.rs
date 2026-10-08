@@ -131,6 +131,7 @@ fn native_items_preserve_order_ids_and_arbitrary_precision() {
     let items = vec![
         RunItem::ToolCall {
             call: ToolCall {
+                raw_arguments: None,
                 id: "call-7".into(),
                 name: "calculate".into(),
                 arguments: serde_json::from_str(number).unwrap(),
@@ -457,4 +458,50 @@ fn usage_preserves_reported_request_count_and_defaults_missing_count_to_zero() {
     );
     value.as_object_mut().unwrap().remove("requests");
     assert_eq!(serde_json::from_value::<Usage>(value).unwrap().requests, 0);
+}
+
+#[test]
+fn tool_argument_provenance_preserves_missing_malformed_and_lexical_json() {
+    for raw in ["", "null", "{", "{ \"n\":1e0, \"n\":2, \"s\":\"日本語\" }"] {
+        let arguments = serde_json::from_str(raw).unwrap_or(Value::Null);
+        let call = ToolCall {
+            id: "call".into(),
+            name: "transfer".into(),
+            arguments,
+            raw_arguments: Some(raw.into()),
+        };
+        call.validate_argument_projection().unwrap();
+        assert_eq!(call.argument_text(), raw);
+        let restored: ToolCall =
+            serde_json::from_value(serde_json::to_value(&call).unwrap()).unwrap();
+        assert_eq!(restored.raw_arguments.as_deref(), Some(raw));
+        assert_eq!(restored, call);
+        let mut changed = call.clone();
+        changed.arguments = json!({"changed":true});
+        assert!(changed.validate_argument_projection().is_err());
+    }
+    let native = ToolCall {
+        id: "call".into(),
+        name: "transfer".into(),
+        arguments: Value::Null,
+        raw_arguments: None,
+    };
+    assert_eq!(native.argument_text(), "null");
+    assert!(
+        !serde_json::to_value(&native)
+            .unwrap()
+            .as_object()
+            .unwrap()
+            .contains_key("raw_arguments")
+    );
+    let explicit = ToolCall {
+        raw_arguments: Some("null".into()),
+        ..native.clone()
+    };
+    assert_eq!(native, explicit);
+    let missing = ToolCall {
+        raw_arguments: Some(String::new()),
+        ..native
+    };
+    assert_ne!(missing, explicit);
 }

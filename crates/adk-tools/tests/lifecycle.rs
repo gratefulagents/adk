@@ -31,6 +31,7 @@ async fn call(root: &Path, name: &str, arguments: Value) -> ToolOutput {
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "test".into(),
                 name: name.into(),
                 arguments,
@@ -226,6 +227,7 @@ async fn read_only_selection_cancellation_and_invalid_inputs_do_not_mutate() {
             .execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "test".into(),
                     name: "Delete".into(),
                     arguments: json!({"path":"a"})

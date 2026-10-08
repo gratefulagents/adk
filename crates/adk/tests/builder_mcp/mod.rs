@@ -94,6 +94,7 @@ fn operation(dir: &Path, policy: ToolPolicy) -> ToolContext {
 }
 fn call(name: &str, arguments: serde_json::Value) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "offline".into(),
         name: name.into(),
         arguments,

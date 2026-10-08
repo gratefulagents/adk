@@ -31,6 +31,7 @@ fn message(text: &str) -> RunItem {
 }
 fn call(id: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: id.into(),
         name: id.into(),
         arguments: json!({}),

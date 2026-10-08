@@ -62,6 +62,7 @@ fn answer(text: &str) -> ModelResponse {
 }
 fn call(name: &str, arguments: Value) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: format!("call-{name}"),
         name: name.into(),
         arguments,
@@ -533,11 +534,11 @@ impl HandoffCallback for HandoffState {
     fn on_handoff<'a>(
         &'a self,
         context: HandoffContext<'a>,
-        input: &'a Value,
+        input: &'a ToolCall,
     ) -> BoxFuture<'a, ()> {
         Box::pin(async move {
             assert_eq!(context.target.name, "specialist");
-            assert_eq!(input, &json!({"key":"answer"}));
+            assert_eq!(&input.arguments, &json!({"key":"answer"}));
             self.callbacks.fetch_add(1, Ordering::SeqCst);
         })
     }

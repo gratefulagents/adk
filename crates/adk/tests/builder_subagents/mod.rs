@@ -109,6 +109,7 @@ async fn automatic_catalog_and_managed_tools_match_pinned_builder_stages() {
                         idempotency_key: None,
                     },
                     ToolCall {
+                        raw_arguments: None,
                         id: "fixture-call".into(),
                         name: "subagent".into(),
                         arguments: json!({"message":"delegate","mode":"sync"}),
@@ -142,6 +143,7 @@ async fn automatic_children_run_in_both_modes_with_role_security_and_limits() {
             let parent = Script::new(vec![
                 response(vec![RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: None,
                         id: "delegate".into(),
                         name: "subagent".into(),
                         arguments: json!({"message":"review","mode":mode}),

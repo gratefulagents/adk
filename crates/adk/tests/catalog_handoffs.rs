@@ -64,6 +64,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 fn call(name: &str) -> RunItem {
     RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: name.into(),
             name: name.into(),
             arguments: json!({}),
@@ -670,6 +671,7 @@ async fn readonly_targets_deny_mutation_exceptions_and_saved_handles_revoke_on_c
                     idempotency_key: None,
                 },
                 ToolCall {
+                    raw_arguments: None,
                     id: "saved".into(),
                     name: "inspect".into(),
                     arguments: json!({}),
@@ -1264,6 +1266,7 @@ async fn managed_subagent_default_uses_registered_catalog_not_parent_identity() 
                         idempotency_key: None,
                     },
                     ToolCall {
+                        raw_arguments: None,
                         id: "delegate".into(),
                         name: "subagent".into(),
                         arguments,

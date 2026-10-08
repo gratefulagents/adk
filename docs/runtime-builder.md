@@ -1126,7 +1126,8 @@ Optional `Handoff::input_type` supplies `HandoffInputType { schema, parser }`.
 `handoff.tool_definition()` returns the effective definition used for model
 requests: the optional schema overrides `definition.input_schema`. This declaration
 does **not** enforce schema conformance of callback arguments. SDK `OutputSchema`
-only parses JSON by default; native `ToolCall.arguments` is already parsed JSON.
+only parses JSON by default; native parsing uses `ToolCall::argument_text()` and
+skips absent input, just like the SDK.
 A custom `OutputParser` is invoked only when both the input type and callback are
 present. Its returned value is discarded, preserving the original callback input.
 Parser errors emit `HandoffInputValidationFailed` but do not prevent transfer;
@@ -1141,11 +1142,17 @@ operations; their trait is synchronous, not a detached execution service.
 
 The independent 16-case Go oracle covers raw arguments, hook ordering, siblings,
 shared-context/target mutation and normal/streamed execution. Native tests compare
-the **structured-input subset**, order and sibling outputs; shared state replaces
-mutable target pointers. `ToolCall.arguments` is parsed JSON: whitespace and the
-distinction between absent arguments and JSON null are not retained. Exact raw
-callback and mutable-context parity therefore remain unresolved ledger obligations,
-not disabled features or claimed equivalence.
+all 16 cases' UTF-8 argument text, order and sibling outputs; shared state replaces
+mutable target pointers. Callbacks receive `&ToolCall`: use `arguments` for parsed
+JSON and `argument_text()` for original spelling. `raw_arguments: Some("")`
+represents absent input, `Some("null")` explicit JSON null, and `None` a native
+value without raw provenance. Malformed input projects to `Value::Null` while
+retaining its original text. Model/history boundaries reject raw/value disagreement.
+Native durable recovery preserves text independently of JSON marker compaction.
+Go wire bridges reject malformed JSON that cannot be embedded in a JSON document;
+they do not replace it with null. Capture policy applies to raw metadata as well
+as parsed input. Mutable-context/target-pointer and non-UTF-8 byte parity remain
+unresolved obligations, not disabled features or claimed equivalence.
 
 
 ### Dynamic handoff availability
@@ -1212,9 +1219,12 @@ invalid Go item graphs or fabricated approval markers.
 
 The 18-case pinned input-type oracle additionally proves that valid JSON with the
 wrong schema shape and JSON null do not warn by default; parser failure is
-advisory and parser transformations never replace callback arguments. Four oracle
-cases (missing or malformed JSON, in normal/streamed execution) are explicitly not
-representable in native `Value`. The native comparator checks the remaining 14
-cases with strict ordinary-tool argument validation both on and off. Native
+advisory and parser transformations never replace callback arguments. All 18
+cases, including missing and malformed input in normal/streamed execution, are
+compared with strict ordinary-tool argument validation both on and off. Native
 configuration still requires a well-formed JSON Schema; arbitrary malformed Go
-schema bytes and raw parser byte identity are not claimed as equivalent.
+schema bytes are not claimed as equivalent. Provider adapters retain their
+existing malformed-argument normalization/rejection policies; raw handoff tests
+do not establish complete provider parity. Valid Chat/Responses string arguments
+and Anthropic tool input retain lexical text where available; Anthropic outbound
+requests still use parsed values, not a byte-identical JSON replay.

@@ -54,6 +54,7 @@ fn items(value: &Value) -> Vec<HistoryItem> {
                 },
                 "toolCall" => RunItem::ToolCall {
                     call: ToolCall {
+                        raw_arguments: None,
                         id: spec["id"].as_str().unwrap_or_default().into(),
                         name: spec["name"].as_str().unwrap_or_default().into(),
                         arguments: serde_json::from_str(&recipe(&spec["input"]))
@@ -254,6 +255,7 @@ fn repeated_items_preserve_exact_positions_provenance_and_approval_boundaries() 
     use adk_codec::approval::ApprovalPhase;
     let duplicate = summary_item(&"same evidence ".repeat(1000));
     let call = ToolCall {
+        raw_arguments: None,
         id: "pending".into(),
         name: "write".into(),
         arguments: serde_json::json!({}),
@@ -271,11 +273,9 @@ fn repeated_items_preserve_exact_positions_provenance_and_approval_boundaries() 
             },
             ItemProvenance::Unattributed,
         ),
-        HistoryItem::Approval(ApprovalMarker::from_call(
-            &call,
-            ApprovalPhase::Pending,
-            None,
-        )),
+        HistoryItem::Approval(
+            ApprovalMarker::from_call(&call, ApprovalPhase::Pending, None).unwrap(),
+        ),
         HistoryItem::Native(
             match duplicate {
                 HistoryItem::Native(item, _) => item,

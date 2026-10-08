@@ -1349,3 +1349,32 @@ feature scenarios and host-session example passed. Exact oracle reproduction,
 checks passed. Ledger remains **255 verified / 8,636 unresolved / 251 excluded**.
 Full issue #11 and credentialed live verification remain incomplete; excluded
 CLI/evaluation and release/default-switch work remain untouched.
+
+
+### Exact native handoff argument text
+
+`ToolCall` now retains optional UTF-8 argument text independently of its parsed
+value. Handoff callbacks borrow the call and advisory parsers receive its exact
+text, skipping absent input. All 16 callback and 18 input-type oracle cases now
+run, including missing/malformed input that earlier checkpoints excluded. Model
+and history boundaries reject contradictory raw/parsed projections. Core/codec,
+provider request replay, native recovery, host history, approval identity and
+capture-redaction regressions cover the new representation. Native approval
+journals preserve a text sidecar across Go marker JSON compaction. Malformed raw
+JSON is rejected by SDK document bridges rather than silently converted to null.
+
+Valid provider argument spelling is retained where the adapter exposes it;
+malformed provider normalization/rejection and Anthropic parsed outbound replay
+are not claims of full provider-byte parity. Go non-UTF-8 bytes and mutable
+context/target pointers also remain open. The broad Rust-file diff outside these
+boundaries initializes the new optional field in existing ToolCall literals.
+
+Fresh final Linux Rust 1.88.0 locked workspace/all-features/all-targets:
+**1,294 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, all 77 modified Rust files' formatting, facade feature matrix, standalone
+consumer, 20 offline scenarios and host-session example passed. Independent
+pinned oracles, 18 ledger validators, source/license locks and whitespace checks
+passed. The evidence command now includes core/provider contract tests. No broad
+ledger claims were inferred: **255 verified / 8,636 unresolved / 251 excluded**.
+Full issue acceptance and credentialed live verification remain incomplete; no
+excluded CLI/evaluation or release/default-switch work was introduced.

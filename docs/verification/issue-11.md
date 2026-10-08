@@ -1313,3 +1313,12 @@ history-filter field is verified: **255 verified / 8,636 unresolved / 251 exclud
 Whole-SDK completion and exact raw callback/optional-schema compatibility remain
 open; credentialed live tests remain unverified. No excluded CLI/evaluation,
 release or production-default work was introduced.
+
+The runnable `handoffs_subagents` example now composes a shared availability gate,
+awaited callback and custom message-history filter, checks preserved provenance
+and unchanged emitted handoff items, then disables the same gate for a second run.
+Fresh `cargo run --locked -p adk --all-features --example features -- all` passed
+all 20 scenarios. Strict direct-driver Clippy for the changed example, Rustfmt,
+`verify-rust` with all pinned oracles, 18 ledger validators, source locks and
+whitespace checks passed. Library code is unchanged from the 1,284-test checkpoint;
+the full workspace suite was not redundantly rerun for this example-only change.

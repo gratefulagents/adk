@@ -520,20 +520,101 @@ async fn chatloop() {
     assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
 }
 
+struct HandoffState {
+    enabled: AtomicUsize,
+    callbacks: AtomicUsize,
+}
+impl HandoffPredicate for HandoffState {
+    fn enabled(&self, _: HandoffContext<'_>) -> bool {
+        self.enabled.load(Ordering::SeqCst) != 0
+    }
+}
+impl HandoffCallback for HandoffState {
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        input: &'a Value,
+    ) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            assert_eq!(context.target.name, "specialist");
+            assert_eq!(input, &json!({"key":"answer"}));
+            self.callbacks.fetch_add(1, Ordering::SeqCst);
+        })
+    }
+}
+impl HandoffHistoryFilter for HandoffState {
+    fn filter<'a>(
+        &'a self,
+        _: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            assert_eq!(self.callbacks.load(Ordering::SeqCst), 1);
+            assert!(
+                history
+                    .items
+                    .iter()
+                    .any(|item| matches!(item, RunItem::Handoff { .. }))
+            );
+            (history.items, history.provenance) = history
+                .items
+                .into_iter()
+                .zip(history.provenance)
+                .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                .unzip();
+            history.approvals.clear();
+            Ok(history)
+        })
+    }
+}
+
 async fn handoffs_subagents() {
     let specialist = Scripted::new(vec![answer("specialist evidence")]);
     let mut a = agent(Scripted::new(vec![tool_response(
         "transfer_to_specialist",
         json!({"key":"answer"}),
     )]));
-    a.handoffs.push(Handoff::new(Arc::new(AgentConfig::new(
+    let state = Arc::new(HandoffState {
+        enabled: AtomicUsize::new(1),
+        callbacks: AtomicUsize::new(0),
+    });
+    let mut handoff = Handoff::new(Arc::new(AgentConfig::new(
         "specialist",
         ModelBinding::complete("offline", specialist.clone()),
-    ))));
+    )));
+    handoff.is_enabled = Some(state.clone());
+    handoff.on_handoff = Some(state.clone());
+    handoff.history_filter = Some(state.clone());
+    a.handoffs.push(handoff);
+    let handoffs = a.handoffs.clone();
     let result = run(a).await.result;
     assert_eq!(result.final_output, Some(json!("specialist evidence")));
     assert_eq!(result.last_agent.as_deref(), Some("specialist"));
-    assert_eq!(specialist.requests.lock().unwrap().len(), 1);
+    assert_eq!(state.callbacks.load(Ordering::SeqCst), 1);
+    {
+        let requests = specialist.requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert!(
+            requests[0]
+                .input
+                .iter()
+                .all(|item| matches!(item, RunItem::Message { .. }))
+        );
+        assert_eq!(requests[0].input.len(), requests[0].input_provenance.len());
+    }
+    assert!(
+        result
+            .new_items
+            .iter()
+            .any(|item| matches!(item, RunItem::Handoff { .. }))
+    );
+    state.enabled.store(0, Ordering::SeqCst);
+    let model = Scripted::new(vec![answer("handoff disabled")]);
+    let mut disabled = agent(model.clone());
+    disabled.handoffs = handoffs;
+    assert_eq!(run(disabled).await.result.final_text(), "handoff disabled");
+    assert!(model.requests.lock().unwrap()[0].tools.is_empty());
+    assert_eq!(state.callbacks.load(Ordering::SeqCst), 1);
 
     // The facade can compose a catalog transfer without an async scheduler.
     {

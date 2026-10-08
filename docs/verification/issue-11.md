@@ -1441,3 +1441,29 @@ ignored entries are explicit Go/MCP/sandbox helpers, not 30 credentialed live te
 Ledger remains **258 verified / 8,633 unresolved / 251 excluded**. Full issue
 acceptance and credentialed provider/remote-collector verification remain open;
 excluded CLI/evaluation and release/default-switch work remain untouched.
+
+### Refreshed MCP interoperability and trace-store feature coverage
+
+The pinned MCP interoperability harness was rerun against the unchanged SDK
+revision and protocol module v1.4.1. All **28 cross-wire cases passed**, followed
+by **112 MCP regressions passing** (the 28 explicit cross-wire tests remain
+ignored in that second ordinary invocation). The evidence artifact records the
+actual commands, source hashes, module verification and 28 observations. An
+initial cache-only attempt lacked a transitive Go module; the subsequent run
+resolved public build dependencies and passed. These are local Go/Rust peers,
+not credentialed remote-service tests.
+
+The Linux trace-store feature scenario now demonstrates the pinned example's
+metadata and score-document round trips, ordered category appends, finish-time
+update and run listing/filtering, alongside owned runner tracing. It additionally
+checks candidate/start-time filters and private file modes. The category backend
+still requires Linux `openat2`; macOS only exercises native observation storage.
+No evaluation adapter or CLI behavior was added.
+
+Fresh locked workspace/all-features/all-targets verification: **1,306 passed,
+0 failed, 30 ignored**. Strict Clippy, strict rustdoc, changed-example formatting,
+offline build and all 20 feature scenarios plus host-session passed. Pinned
+reference/ledger checks and 18 ledger validator tests passed; source/license
+locks and whitespace checks passed. Ledger remains **258 verified / 8,633
+unresolved / 251 excluded**. This checkpoint does not claim full issue acceptance
+or credentialed provider/remote-collector verification.

@@ -1168,7 +1168,9 @@ async fn tracestore() {
     #[cfg(target_os = "linux")]
     {
         use adk::{
-            tracestore::{FilesystemTraceStore as SdkStore, RunMetadata},
+            tracestore::{
+                FilesystemTraceStore as SdkStore, RunFilter, RunMetadata, Score, ScoreMetrics,
+            },
             tracewriter::{Options, TraceWriter},
             tracing::TraceSession,
             tracing_runtime::RunTrace,
@@ -1179,12 +1181,63 @@ async fn tracestore() {
             "sdk-run",
             Options::default(),
         ));
-        let path = writer
-            .init_run(&RunMetadata {
-                run_id: "sdk-run".into(),
+        let metadata = RunMetadata {
+            run_id: "sdk-run".into(),
+            candidate_id: "candidate".into(),
+            model: "scripted".into(),
+            mode: "exploration".into(),
+            permission_mode: "workspace_write".into(),
+            max_turns: 8,
+            tools: vec!["echo".into()],
+            started_at: "2025-01-02T03:04:05Z".parse().unwrap(),
+            ..Default::default()
+        };
+        let path = writer.init_run(&metadata).unwrap();
+        assert!(path.starts_with(root.join("sdk")));
+        let persisted: RunMetadata =
+            serde_json::from_slice(&std::fs::read(path.join("metadata.json")).unwrap()).unwrap();
+        assert_eq!(persisted, metadata);
+        for tokens in [42, 58] {
+            store
+                .append_trace(
+                    "sdk-run",
+                    "llm_calls",
+                    serde_json::to_string(&json!({"event":"llm_call","tokens":tokens}))
+                        .unwrap()
+                        .as_bytes(),
+                )
+                .unwrap();
+        }
+        let calls: Vec<serde_json::Value> = std::fs::read_to_string(path.join("llm_calls.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(
+            calls,
+            vec![
+                json!({"event":"llm_call","tokens":42}),
+                json!({"event":"llm_call","tokens":58})
+            ]
+        );
+        let score = Score {
+            task_id: "task".into(),
+            candidate_id: "candidate".into(),
+            success: true,
+            metrics: ScoreMetrics {
+                accuracy: 1.0,
+                tokens_used: 100,
+                cost_usd: 0.0042,
+                duration_sec: 1.23,
+                tool_calls: 1,
+                turns_used: 2,
                 ..Default::default()
-            })
-            .unwrap();
+            },
+        };
+        store.write_score("sdk-run", &score).unwrap();
+        let persisted: Score =
+            serde_json::from_slice(&std::fs::read(path.join("score.json")).unwrap()).unwrap();
+        assert_eq!(persisted, score);
         let trace = RunTrace::new(TraceSession::new("standalone", writer.clone()));
         let observer = trace.observer();
         let runner = Runner::new(
@@ -1216,6 +1269,58 @@ async fn tracestore() {
         assert_eq!(session["num_turns"], 1);
         assert_eq!(session["stop_reason"], "completed");
         assert_eq!(writer.health().write_errors, 0);
+        let finished_at = "2025-01-02T03:04:07Z".parse().unwrap();
+        store
+            .update_metadata_finished_at("sdk-run", finished_at)
+            .unwrap();
+        let mut expected = metadata;
+        expected.finished_at = finished_at;
+        assert_eq!(
+            store.list_runs(&RunFilter::default()).unwrap(),
+            vec![expected.clone()]
+        );
+        assert_eq!(
+            store
+                .list_runs(&RunFilter {
+                    candidate_id: "candidate".into(),
+                    since: Some(expected.started_at),
+                })
+                .unwrap(),
+            vec![expected]
+        );
+        assert!(
+            store
+                .list_runs(&RunFilter {
+                    candidate_id: "does-not-exist".into(),
+                    ..Default::default()
+                })
+                .unwrap()
+                .is_empty()
+        );
+        assert!(
+            store
+                .list_runs(&RunFilter {
+                    since: Some(finished_at),
+                    ..Default::default()
+                })
+                .unwrap()
+                .is_empty()
+        );
+        for name in [
+            "metadata.json",
+            "score.json",
+            "llm_calls.jsonl",
+            "spans.jsonl",
+        ] {
+            assert_eq!(
+                std::fs::metadata(path.join(name))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o600
+            );
+        }
         store.close();
     }
 }

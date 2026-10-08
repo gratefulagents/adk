@@ -126,11 +126,13 @@ retain the counter independently of the turn count. Native JSON omits zero count
 to preserve schema-1 fixture bytes; the SDK snapshot's usage document still emits
 its required `requests` field.
 
-**Exact automatic SDK snapshot parity remains incomplete**: request assembly and
-history agent provenance are missing, and the native raw provider shape differs
-from the SDK adapter's normalized raw representation. Callers supplying typed
-spans can attach explicit `Snapshot` documents with that provenance and shape.
-The response conversion and its fixtures do not close those remaining obligations.
+**Exact automatic SDK snapshot parity remains incomplete**: request snapshots
+assemble representable settings and explicitly attributed history, but reject
+unknown provenance instead of inventing it. The native raw provider shape still
+differs from the SDK adapter's normalized raw representation. Callers supplying
+typed spans can attach explicit `Snapshot` documents with that provenance and
+shape. The response conversion and its fixtures do not close that remaining
+provider normalization obligation.
 
 ## Exporters
 

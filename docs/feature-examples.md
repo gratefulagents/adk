@@ -56,7 +56,7 @@ boundaries are deliberately explicit.
 | `costs` | Host-selected pricing produces an exact usage observation; an exhausted monetary budget reports `Guardrail` before tool execution. | Example monetary units, not live prices; reported usage limits cannot preempt provider spend. |
 | `policy` | Read-only denies mutation; writable access still requires tool approval; denylist and exact-name allowlist win; access clamping cannot escalate authority. | Policy decisions do not themselves provide process isolation. |
 | `memory` | Custom auditing `Store` wrapper, namespace store/search/delete and tag/phrase ranking; wrong-namespace deletion fails. Inject the custom store into the real `Memory` tool and assert its operation counts; exercise store/search/delete, source/repo metadata and host-bound namespace despite model-supplied namespace. | This uses `project_state::memory::Store`, the namespace SDK-memory contract, **not project-state task/memory APIs**. No PostgreSQL/pgvector service. |
-| `tracestore` | Real private filesystem event store persists two ordered, decodable JSONL records, hides raw content, creates mode-0600 files, and rejects traversal and reopening an existing run. | Native event store lacks Go metadata/score/list-run APIs; see below. |
+| `tracestore` | Native private event store persists two ordered, decodable JSONL records, hides raw content, and rejects traversal/reopening. On Linux, the distinct SDK-compatible category store round-trips metadata and a score document, appends ordered LLM records, updates finish time, filters runs by candidate and start time, and persists owned runner spans with private files and explicit closure. | Category-store mutation requires Linux `openat2`; it is not executed on macOS. Score persistence is not an evaluation adapter. |
 
 ## Genuine gaps and semantic differences
 
@@ -71,10 +71,15 @@ boundaries are deliberately explicit.
   through `RunHooks`, then returns parsed JSON or raw text. The executable asserts
   this current contract. Applications needing fail-closed validation must not assume
   the schema alone blocks the answer.
-- **Trace persistence:** `FilesystemTraceStore` writes the native observation schema,
-  not Go `llm_calls.jsonl`/`metadata.json`/`score.json`. Go's `WriteScore`,
-  `UpdateMetadataFinishedAt`, filtered `ListRuns`, and metadata round trips have no
-  counterpart demonstrated here. No fake score/eval adapter is introduced.
+- **Trace persistence:** `observability::FilesystemTraceStore` writes the native
+  observation schema. On Linux, the same scenario separately exercises
+  `tracestore::FilesystemTraceStore` and its `llm_calls.jsonl`, `metadata.json`,
+  `score.json`, finish-time update and filtered run listing, matching the pinned
+  SDK trace-store example. The owned runner tracing path asserts trace start/end,
+  completed session status and zero writer errors. Unknown history provenance is
+  not inferred, and raw provider snapshots still differ from SDK normalization;
+  see [trace storage](trace-store.md).
+  No evaluation or Terminal-Bench execution is introduced.
 - **Memory custom backends:** the host-injected store and namespace-bound tool are
   exercised; database persistence and vector retrieval are not. A production custom
   store must implement the namespace `Store` contract, not project-state recall.

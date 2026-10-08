@@ -1266,3 +1266,25 @@ feature scenarios and host-session example passed. All pinned fixture checks,
 checks passed. Ledger remains **253 verified / 8,638 unresolved / 251 excluded**.
 Full issue #11 remains incomplete; credentialed live tests remain unverified.
 Excluded CLI/evaluation adapters and release/default-switch work remain untouched.
+
+### Dynamic handoff availability and stale-name behavior
+
+Added owned `HandoffPredicate` / `Handoff::is_enabled`, defaulting to enabled.
+Predicates filter request definitions and are rechecked during response
+classification. First-enabled-sibling selection and callback suppression match
+the independent 12-case normal/streamed pinned oracle. Exact result comparisons
+preserve the SDK's advertised-then-disabled quirk: wrapper success text, but no
+transfer. Initially hidden names instead return unknown-tool errors. Durable
+checkpoints retain classification/exposure outcomes and reject unsafe or changed
+predicate identities rather than reevaluating the pending call on recovery.
+
+Fresh Linux Rust 1.88.0 locked workspace/all-features/all-targets:
+**1,281 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, Rustfmt, facade matrix, standalone consumer, 20 offline examples and
+host-session example passed. Pinned oracle reproduction and original
+`TestHandoffIsEnabledGatesTool` execution, 18 ledger tests, source locks, Python
+syntax, Go formatting and whitespace checks passed. The predicate-field
+obligation is verified: **254 verified / 8,637 unresolved / 251 excluded**.
+Whole-handoff parity, arbitrary input filters, exact callback argument provenance
+and the rest of issue #11 remain open. Credentialed live tests are unverified;
+no CLI/evaluation adapter, release or default-switch work was added.

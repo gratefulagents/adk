@@ -1100,8 +1100,7 @@ This public-constructor algorithm is intentionally **not** the catalog-builder
 algorithm, which lowercases and uses `specialist` as its fallback.
 Forty-four pinned cases verify the constructor and explicit metadata overrides;
 catalog fixtures independently verify target descriptions. Arbitrary handoff
-input-filter callbacks and dynamic enable predicates remain separate missing
-capabilities; this constructor does not claim or silently emulate them.
+input-filter callbacks remain a separate missing capability; this constructor does not claim or silently emulate them.
 
 
 ### Awaited handoff callbacks
@@ -1137,3 +1136,29 @@ mutable target pointers. `ToolCall.arguments` is parsed JSON: whitespace and the
 distinction between absent arguments and JSON null are not retained. Exact raw
 callback and mutable-context parity therefore remain unresolved ledger obligations,
 not disabled features or claimed equivalence.
+
+
+### Dynamic handoff availability
+
+`Handoff::is_enabled: Option<Arc<dyn HandoffPredicate>>` defaults to enabled.
+A predicate reads the borrowed `HandoffContext`; keep it nonblocking and
+side-effect-free. Use host-owned shared state to change availability between
+turns without rebuilding the graph. The predicate is checked for model exposure
+and again when selecting a transfer from the response. It cannot bypass host
+policy. Disabled handoffs do not invoke callbacks or transfer control, including
+when the model repeats a name from history; the first enabled sibling wins.
+
+The pinned SDK has an important distinction: a handoff hidden from the request
+produces an ordinary unknown-tool error. If it was advertised but disabled before
+the response is classified, the SDK executes its ordinary tool wrapper and emits
+`Handing off to <target>` as untrusted tool text **without actually transferring**.
+The native runner retains this observable result, not a false transfer event.
+Twelve independent normal/streamed oracle cases compare exact tool lists, result
+content, selected target and callback counts, including both directions of state
+change during the model request.
+
+Durable use requires a nonempty stable `durable_key()` for deterministic,
+effect-free predicates. Checkpoints preserve disabled-call classification and
+whether the tool was advertised, so recovery does not reinterpret an already
+classified call. Configuration identity changes are rejected. Evaluation counts
+are not an API contract; predicates must not perform I/O or rely on call counts.

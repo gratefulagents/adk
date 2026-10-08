@@ -79,6 +79,8 @@ pub struct RuntimeCheckpoint {
     verifier_ran: bool,
     phase: Phase,
     calls: VecDeque<ToolCall>,
+    #[serde(default, skip_serializing_if = "HashMap::is_empty")]
+    disabled_handoff_calls: HashMap<String, Option<String>>,
     turns: u32,
     #[serde(default)]
     last_model: Option<String>,
@@ -585,6 +587,7 @@ impl Runner {
             engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
             engine.matched_stop_tool = saved.matched_stop_tool;
+            engine.disabled_handoff_calls = saved.disabled_handoff_calls;
             engine.tool_turn_start = saved.tool_turn_start;
             engine.consecutive_tool_errors = saved.consecutive_tool_errors;
             engine.tool_error_escalated = saved.tool_error_escalated;
@@ -708,9 +711,12 @@ impl Runner {
                 || agent.output_parser.is_some()
                 || agent.handoffs.iter().any(|handoff| {
                     handoff
-                        .on_handoff
+                        .is_enabled
                         .as_ref()
-                        .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+                        .is_some_and(|predicate| predicate.durable_key().is_none_or(str::is_empty))
+                        || handoff.on_handoff.as_ref().is_some_and(|callback| {
+                            callback.durable_key().is_none_or(str::is_empty)
+                        })
                 })
                 || agent
                     .instruction_provider
@@ -722,7 +728,7 @@ impl Runner {
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, handoff callbacks, guardrails and hooks",
+                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, handoff predicates and callbacks, guardrails and hooks",
                 ));
             }
             let mut entry = serde_json::json!({
@@ -752,6 +758,22 @@ impl Runner {
                             .on_handoff
                             .as_ref()
                             .and_then(|callback| callback.durable_key()))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.is_enabled.is_some())
+            {
+                entry["handoff_predicates"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .is_enabled
+                            .as_ref()
+                            .and_then(|predicate| predicate.durable_key()))
                         .collect::<Vec<_>>()
                 );
             }
@@ -1092,6 +1114,7 @@ impl Engine {
                 summary_turn: self.summary_turn,
                 tool_final: self.tool_final.clone(),
                 matched_stop_tool: self.matched_stop_tool,
+                disabled_handoff_calls: self.disabled_handoff_calls.clone(),
                 tool_turn_start: self.tool_turn_start,
                 consecutive_tool_errors: self.consecutive_tool_errors,
                 tool_error_escalated: self.tool_error_escalated,
@@ -1416,6 +1439,7 @@ impl Runner {
             summary_turn: false,
             tool_final: None,
             matched_stop_tool: false,
+            disabled_handoff_calls: HashMap::new(),
             tool_turn_start: None,
             consecutive_tool_errors: 0,
             tool_error_escalated: false,

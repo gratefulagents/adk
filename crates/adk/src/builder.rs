@@ -1677,6 +1677,7 @@ impl Builder {
                 graph_names.insert(name.clone());
                 agent.handoffs.push(Handoff {
                     on_handoff: None,
+                is_enabled: None,
                     definition: ToolDefinition {
                         name, description,
                         input_schema: serde_json::json!({"type":"object", "properties":{}, "additionalProperties":false}).try_into().expect("object schema"),

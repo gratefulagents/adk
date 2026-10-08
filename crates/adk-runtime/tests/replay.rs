@@ -336,6 +336,7 @@ async fn replay(script: &Value) -> Value {
         target.instructions = "Follow the replay script.".into();
         agent.handoffs = vec![adk_runtime::Handoff {
             on_handoff: None,
+                is_enabled: None,
             input_filter: Default::default(),
             definition: ToolDefinition {
                 name: "transfer".into(),

@@ -4314,6 +4314,25 @@
         "runtime",
         "builder"
       ]
+    },
+    "SDK-EC36EAAFECF54F0F": {
+      "source": "internal/agent/handoff.go",
+      "source_name": "Handoff.IsEnabledFn",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::HandoffPredicate",
+        "crates/adk-runtime/src/runner.rs::Handoff::is_enabled"
+      ],
+      "rust_test_identifiers": [
+        "handoff_enablement_matches_pinned_exposure_reclassification_and_sibling_selection",
+        "handoff_predicate_identity_and_classification_survive_model_checkpoint"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffIsEnabledGatesTool",
+      "rationale": "Owned optional read-only predicate replaces Go callback assignment. Twelve independent pinned normal/streamed cases verify nil/true/false exposure, reclassification after state changes during the model request, hidden-name rejection, selected enabled sibling, callback suppression and exact tool result content. In particular an advertised handoff disabled before classification returns the ordinary wrapper success text without transferring; native tests preserve this source quirk. Durable tests require replay-safe stable identities, reject mismatches and retain the classification decision across a model checkpoint. Predicates must be prompt nonblocking reads, not side-effectful callback counters or mutation of agent/cancellation identities. This closes the predicate field contract, not arbitrary mutable RunContext, full Handoff, raw callback bytes, input filters or tracing parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "durable"
+      ]
     }
   }
 }

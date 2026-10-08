@@ -111,12 +111,20 @@ pub trait HandoffCallback: Send + Sync {
     -> BoxFuture<'a, ()>;
 }
 
+pub trait HandoffPredicate: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn enabled(&self, context: HandoffContext<'_>) -> bool;
+}
+
 #[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
     pub input_filter: HandoffInputFilter,
     pub on_handoff: Option<Arc<dyn HandoffCallback>>,
+    pub is_enabled: Option<Arc<dyn HandoffPredicate>>,
 }
 
 impl Handoff {
@@ -149,6 +157,7 @@ impl Handoff {
             target,
             input_filter: HandoffInputFilter::Preserve,
             on_handoff: None,
+            is_enabled: None,
         }
     }
 }
@@ -985,6 +994,7 @@ impl Runner {
             policy: request.policy,
             phase: Phase::Start,
             calls: VecDeque::new(),
+            disabled_handoff_calls: HashMap::new(),
             approvals: HashMap::new(),
             denial_reasons: HashMap::new(),
             deferred_calls: VecDeque::new(),
@@ -1069,6 +1079,7 @@ struct Engine {
     base_turn_limit: std::num::NonZeroU32,
     phase: Phase,
     calls: VecDeque<ToolCall>,
+    disabled_handoff_calls: HashMap<String, Option<String>>,
     approvals: HashMap<String, ApprovalDecision>,
     denial_reasons: HashMap<String, String>,
     deferred_calls: VecDeque<ToolCall>,
@@ -2126,7 +2137,13 @@ impl Engine {
         let (mut tools, mut declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
             .map(|tool| (tool.definition(), tool.timeout()))
-            .chain(self.agent.handoffs.iter().map(|h| (&h.definition, None)))
+            .chain(
+                self.agent
+                    .handoffs
+                    .iter()
+                    .filter(|handoff| self.handoff_enabled(handoff))
+                    .map(|h| (&h.definition, None)),
+            )
             .filter(|(definition, _)| {
                 self.effective_tool_policy().decision(definition) != ToolDecision::Deny
             })
@@ -2183,6 +2200,8 @@ impl Engine {
             );
         self.compact_local(&mut request, false, &binding).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
+        let exposed_tools: HashSet<_> =
+            request.tools.iter().map(|tool| tool.name.clone()).collect();
         let Some((response, model, streamed, cost)) =
             self.model_response(request, declared_tool_timeouts).await?
         else {
@@ -2236,12 +2255,28 @@ impl Engine {
                 }
             }
         }
-        if let Some(index) = self.calls.iter().position(|call| {
-            self.agent
+        self.disabled_handoff_calls.clear();
+        let mut selected = None;
+        for (index, call) in self.calls.iter().enumerate() {
+            if let Some(handoff) = self
+                .agent
                 .handoffs
                 .iter()
-                .any(|h| h.definition.name == call.name)
-        }) {
+                .find(|h| h.definition.name == call.name)
+            {
+                if self.handoff_enabled(handoff) {
+                    selected = Some(index);
+                    break;
+                }
+                self.disabled_handoff_calls.insert(
+                    call.id.clone(),
+                    exposed_tools
+                        .contains(&call.name)
+                        .then(|| handoff.target.name.clone()),
+                );
+            }
+        }
+        if let Some(index) = selected {
             let handoff = self.calls.remove(index).unwrap();
             self.calls.push_front(handoff);
         }
@@ -2341,17 +2376,17 @@ impl Engine {
                 return Ok(());
             }
         }
-        let has_tools =
-            (self.config.require_completion_confirmation
-                || self.config.stop_gate.is_some()
-                || self.config.final_answer_verifier.is_some())
-                && (self
-                    .tools_for_access()
-                    .iter()
-                    .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
-                    || self.agent.handoffs.iter().any(|handoff| {
-                        self.tool_decision(&handoff.definition) != ToolDecision::Deny
-                    }));
+        let has_tools = (self.config.require_completion_confirmation
+            || self.config.stop_gate.is_some()
+            || self.config.final_answer_verifier.is_some())
+            && (self
+                .tools_for_access()
+                .iter()
+                .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
+                || self.agent.handoffs.iter().any(|handoff| {
+                    self.handoff_enabled(handoff)
+                        && self.tool_decision(&handoff.definition) != ToolDecision::Deny
+                }));
         if self.config.require_completion_confirmation && !self.pending_completion && has_tools {
             self.pending_completion = true;
             self.append_unattributed(RunItem::Message {
@@ -3102,6 +3137,18 @@ impl Engine {
         }
         policy
     }
+    fn handoff_enabled(&self, handoff: &Handoff) -> bool {
+        handoff.is_enabled.as_ref().is_none_or(|predicate| {
+            predicate.enabled(HandoffContext {
+                operation: &self.context,
+                agent: &self.agent,
+                target: &handoff.target,
+                snapshot: &self.result,
+                config: &self.config,
+                policy: &self.policy,
+            })
+        })
+    }
     fn tools_for_access(&self) -> Vec<Arc<dyn Tool>> {
         let access = self.effective_tool_policy().access;
         self.agent
@@ -3130,10 +3177,12 @@ impl Engine {
             return Ok(());
         }
         if self.calls.front().is_some_and(|call| {
-            self.agent
-                .handoffs
-                .iter()
-                .any(|handoff| handoff.definition.name == call.name)
+            !self.disabled_handoff_calls.contains_key(&call.id)
+                && self
+                    .agent
+                    .handoffs
+                    .iter()
+                    .any(|handoff| handoff.definition.name == call.name)
         }) {
             return Ok(());
         }
@@ -3257,10 +3306,10 @@ impl Engine {
         let tool = accessible_tools
             .iter()
             .find(|t| t.definition().name == call.name);
-        let handoff = agent
-            .handoffs
-            .iter()
-            .find(|h| h.definition.name == call.name);
+        let handoff = agent.handoffs.iter().find(|h| {
+            h.definition.name == call.name
+                && !matches!(self.disabled_handoff_calls.get(&call.id), Some(None))
+        });
         let definition = tool
             .map(|t| t.definition())
             .or_else(|| handoff.map(|h| &h.definition));
@@ -3368,6 +3417,25 @@ impl Engine {
             }
         }
         self.checkpoint(Boundary::ToolPrepared, Some(&call)).await?;
+        if let Some(Some(target)) = self.disabled_handoff_calls.get(&call.id) {
+            let output = ToolOutput {
+                content: vec![Content::Text {
+                    text: format!("Handing off to {target}"),
+                }],
+                is_error: false,
+                should_pause: false,
+            };
+            self.finish_tool(
+                call,
+                ExecutedTool {
+                    guardrails: vec![],
+                    raw: output,
+                    hook_error: None,
+                },
+            )
+            .await?;
+            return Ok(false);
+        }
         if let Some(handoff) = handoff {
             self.observe(Observation::Handoff {
                 from: self.agent.name.clone(),

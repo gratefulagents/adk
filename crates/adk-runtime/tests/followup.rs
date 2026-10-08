@@ -676,6 +676,7 @@ async fn wire_bridge_preserves_pause_continuation_and_projects_handoff_outputs_i
     source.tools = vec![before.clone(), after.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
@@ -893,6 +894,7 @@ async fn handoff_skipped_siblings_preserve_but_do_not_advance_tool_error_streak(
     source.tools = vec![skipped.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
@@ -933,6 +935,7 @@ async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
     let mut agent = AgentConfig::new("source", ModelBinding::complete("source", model.clone()));
     agent.handoffs = vec![Handoff {
         on_handoff: None,
+        is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
             .definition
@@ -1773,6 +1776,7 @@ async fn dynamic_instructions_match_pinned_static_precedence_usage_composition_a
             child.instruction_provider = Some(provider.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                is_enabled: None,
                 definition: ToolDefinition {
                     name: "transfer_to_child".into(),
                     description: String::new(),
@@ -2025,6 +2029,7 @@ async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_gua
         if name == "handoff" {
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                is_enabled: None,
                 definition: ToolDefinition {
                     name: "transfer_to_child".into(),
                     description: String::new(),
@@ -2391,4 +2396,142 @@ async fn handoff_callback_cancellation_drops_future_before_target_dispatch() {
     );
     assert_eq!(callback.dropped.load(Ordering::SeqCst), 1);
     assert_eq!(model.requests.lock().unwrap().len(), 1);
+}
+
+struct EnabledHandoff(Arc<AtomicUsize>);
+impl HandoffPredicate for EnabledHandoff {
+    fn enabled(&self, context: HandoffContext<'_>) -> bool {
+        assert_eq!(context.agent.name, "router");
+        assert_eq!(context.target.name, "expert");
+        self.0.load(Ordering::SeqCst) != 0
+    }
+}
+struct EnabledModel {
+    script: Arc<Script>,
+    enabled: Arc<AtomicUsize>,
+    after: usize,
+}
+impl Model for EnabledModel {
+    fn provider(&self) -> &str {
+        "fake"
+    }
+    fn complete<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            self.enabled.store(self.after, Ordering::SeqCst);
+            self.script.complete(context, request).await
+        })
+    }
+}
+impl StreamingModel for EnabledModel {
+    fn stream<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            Ok(
+                Box::new(Events(Some(self.complete(context, request).await?)))
+                    as Box<dyn ModelStream>,
+            )
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_enablement_matches_pinned_exposure_reclassification_and_sibling_selection() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-enabled/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let enabled = Arc::new(AtomicUsize::new(usize::from(case["initial"] == true)));
+        let calls = case["outputs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|output| RunItem::ToolCall {
+                call: ToolCall {
+                    id: output["id"].as_str().unwrap().into(),
+                    name: if output["id"] == "h1" {
+                        "transfer_to_expert"
+                    } else {
+                        "transfer_to_other"
+                    }
+                    .into(),
+                    arguments: json!({}),
+                },
+            })
+            .collect();
+        let script = Script::new(vec![Ok(response(calls, true)), Ok(answer())]);
+        let model = Arc::new(EnabledModel {
+            script: script.clone(),
+            enabled: enabled.clone(),
+            after: usize::from(case["after_request"] == true),
+        });
+        let binding = if case["streamed"] == true {
+            ModelBinding::streaming("offline", model)
+        } else {
+            ModelBinding::complete("offline", model)
+        };
+        let callback = Arc::new(SeedHandoff {
+            events: Arc::new(Mutex::new(vec![])),
+            inputs: Mutex::new(vec![]),
+            seeded: AtomicUsize::new(0),
+        });
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+        handoff.on_handoff = Some(callback.clone());
+        if case["scenario"] != "default" {
+            handoff.is_enabled = Some(Arc::new(EnabledHandoff(enabled)));
+        }
+        let mut source = AgentConfig::new("router", binding.clone());
+        source.handoffs.push(handoff);
+        if case["scenario"] == "enabled_sibling" {
+            source
+                .handoffs
+                .push(Handoff::new(Arc::new(AgentConfig::new("other", binding))));
+        }
+        let runner = Runner::new(source, RunnerConfig::default()).unwrap();
+        let result = if case["streamed"] == true {
+            runner
+                .stream(context(), request(vec![], 3), Arc::new(Quiet))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(vec![], 3), Arc::new(Quiet))
+                .await
+        }
+        .unwrap();
+        assert_eq!(
+            result.result.last_agent.as_deref(),
+            case["last_agent"].as_str(),
+            "{case}"
+        );
+        assert_eq!(
+            callback.inputs.lock().unwrap().len(),
+            case["callbacks"].as_u64().unwrap() as usize
+        );
+        let requests = script.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert_eq!(
+            json!(
+                requests[0]
+                    .tools
+                    .iter()
+                    .map(|tool| &tool.name)
+                    .collect::<Vec<_>>()
+            ),
+            case["tools"],
+            "{case}"
+        );
+        let outputs: Vec<_> = requests[1].input.iter().filter_map(|item| match item {
+            RunItem::Handoff {call_id, agent} => Some(json!({"id":call_id,"error":false,"content":format!("Handing off to {agent}")})),
+            RunItem::ToolResult {call_id, output} => Some(json!({"id":call_id,"error":output.is_error,"content":output.content.iter().filter_map(|content| if let Content::Text {text} = content { Some(text.as_str()) } else { None }).collect::<String>()})),
+            _ => None,
+        }).collect();
+        assert_eq!(json!(outputs), case["outputs"], "{case}");
+    }
 }

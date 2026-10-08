@@ -517,6 +517,7 @@ async fn runner_handoff_switches_generation_parent_on_shared_root() {
     source.instructions = "source instructions".into();
     source.handoffs.push(Handoff {
         on_handoff: None,
+        is_enabled: None,
         input_filter: Default::default(),
         definition: definition("transfer"),
         target,

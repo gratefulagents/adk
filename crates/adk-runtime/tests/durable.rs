@@ -1264,6 +1264,7 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                is_enabled: None,
                 input_filter: Default::default(),
                 definition: ToolDefinition {
                     name: "transfer_to_target".into(),
@@ -1323,6 +1324,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
         on_handoff: None,
+        is_enabled: None,
         input_filter: Default::default(),
         definition: ToolDefinition {
             name: "transfer".into(),
@@ -2170,6 +2172,7 @@ async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configu
         let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
         agent.handoffs.push(Handoff {
             on_handoff: None,
+            is_enabled: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "".into(),
@@ -2291,6 +2294,7 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
         let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
         parent.handoffs.push(Handoff {
             on_handoff: None,
+            is_enabled: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "transfer".into(),
@@ -3274,4 +3278,86 @@ async fn handoff_callbacks_require_replay_identity_and_committed_transfer_is_not
     assert_eq!(result.result.final_text(), "answer");
     assert_eq!(model.calls.load(Ordering::SeqCst), 2);
     assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+}
+
+struct PureHandoffPredicate {
+    key: Option<&'static str>,
+    enabled_at_exposure: bool,
+    calls: AtomicUsize,
+}
+impl HandoffPredicate for PureHandoffPredicate {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn enabled(&self, context: HandoffContext<'_>) -> bool {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        self.enabled_at_exposure && context.snapshot.responses.is_empty()
+    }
+}
+#[tokio::test]
+async fn handoff_predicate_identity_and_classification_survive_model_checkpoint() {
+    for exposed in [false, true] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: json!({}),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut agent = AgentConfig::new("agent", binding.clone());
+        agent
+            .handoffs
+            .push(Handoff::new(Arc::new(AgentConfig::new("target", binding))));
+        for key in [None, Some("")] {
+            agent.handoffs[0].is_enabled = Some(Arc::new(PureHandoffPredicate {
+                key,
+                enabled_at_exposure: exposed,
+                calls: AtomicUsize::new(0),
+            }));
+            let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+            assert!(
+                run(&runner, Arc::new(Store::default()), None)
+                    .await
+                    .is_err()
+            );
+            assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        }
+        let predicate = Arc::new(PureHandoffPredicate {
+            key: Some("gate-v1"),
+            enabled_at_exposure: exposed,
+            calls: AtomicUsize::new(0),
+        });
+        agent.handoffs[0].is_enabled = Some(predicate.clone());
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+        assert!(run(&runner, store.clone(), None).await.is_err());
+        assert_eq!(predicate.calls.load(Ordering::SeqCst), 2);
+        agent.handoffs[0].is_enabled = Some(Arc::new(PureHandoffPredicate {
+            key: Some("gate-v2"),
+            enabled_at_exposure: exposed,
+            calls: AtomicUsize::new(0),
+        }));
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            run(&changed, Arc::new(Store::default()), Some(store.latest()))
+                .await
+                .is_err()
+        );
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("agent"));
+        assert_eq!(predicate.calls.load(Ordering::SeqCst), 3);
+        assert!(result.result.new_items.iter().any(|item| matches!(item, RunItem::ToolResult {call_id,output} if call_id == "transfer" && output.is_error != exposed)));
+        assert!(
+            !result
+                .result
+                .new_items
+                .iter()
+                .any(|item| matches!(item, RunItem::Handoff { .. }))
+        );
+    }
 }

@@ -416,3 +416,17 @@ native tool-call value does not retain whitespace or missing/null provenance.
 The oracle and tests explicitly separate verified structured-value behavior from
 those unresolved full-parity obligations. No external ADK version or licensing
 claim is added by this source-specific change.
+
+
+### Dynamic handoff predicates
+
+The same pinned GPL-3.0-only SDK handoff/runner sources are reproduced in
+`fixtures/handoff-enabled/observations.json` with source and harness hashes.
+Adopted separate request-exposure and response-classification checks, default
+availability, and first-enabled-sibling precedence. A 12-case normal/streamed
+oracle found that disabling an already-advertised handoff still runs its ordinary
+wrapper (success text but no transfer); retained this behavior instead of trusting
+the source comment's blanket “unknown tool” description. Native predicates are
+owned, synchronous, nonblocking reads over borrowed context, with durable stable
+identity and persisted classification. Rejected mutable identity and side-effectful
+call-count dependence; no evaluation-count guarantee is made.

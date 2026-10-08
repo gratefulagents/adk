@@ -1263,6 +1263,7 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
                 AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
+                on_handoff: None,
                 input_filter: Default::default(),
                 definition: ToolDefinition {
                     name: "transfer_to_target".into(),
@@ -1321,6 +1322,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     );
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
+        on_handoff: None,
         input_filter: Default::default(),
         definition: ToolDefinition {
             name: "transfer".into(),
@@ -2167,6 +2169,7 @@ async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configu
         );
         let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
         agent.handoffs.push(Handoff {
+            on_handoff: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "".into(),
@@ -2287,6 +2290,7 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
         target.tool_access_ceiling = ceiling;
         let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
         parent.handoffs.push(Handoff {
+            on_handoff: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
                 description: "transfer".into(),
@@ -3191,4 +3195,83 @@ async fn handoff_description_is_bound_to_durable_agent_configuration() {
             .is_err()
     );
     assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}
+
+struct PureHandoff {
+    key: Option<&'static str>,
+    calls: AtomicUsize,
+}
+impl HandoffCallback for PureHandoff {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        input: &'a Value,
+    ) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            assert_eq!(context.agent.name, "agent");
+            assert_eq!(context.target.name, "target");
+            assert_eq!(input, &json!({"reason":"review"}));
+            self.calls.fetch_add(1, Ordering::SeqCst);
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_callbacks_require_replay_identity_and_committed_transfer_is_not_repeated() {
+    let transfer = RunItem::ToolCall {
+        call: ToolCall {
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({"reason":"review"}),
+        },
+    };
+    let (_, model, _) = setup(vec![transfer], false, false);
+    let target = Arc::new(AgentConfig::new(
+        "target",
+        ModelBinding::complete("model", model.clone()),
+    ));
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.handoffs.push(Handoff::new(target));
+    for key in [None, Some("")] {
+        agent.handoffs[0].on_handoff = Some(Arc::new(PureHandoff {
+            key,
+            calls: AtomicUsize::new(0),
+        }));
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        assert!(
+            run(&runner, Arc::new(Store::default()), None)
+                .await
+                .is_err()
+        );
+        assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    }
+    let callback = Arc::new(PureHandoff {
+        key: Some("pure-v1"),
+        calls: AtomicUsize::new(0),
+    });
+    agent.handoffs[0].on_handoff = Some(callback.clone());
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
+    agent.handoffs[0].on_handoff = Some(Arc::new(PureHandoff {
+        key: Some("pure-v2"),
+        calls: AtomicUsize::new(0),
+    }));
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(result.result.final_text(), "answer");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    assert_eq!(callback.calls.load(Ordering::SeqCst), 1);
 }

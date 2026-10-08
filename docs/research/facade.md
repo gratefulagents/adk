@@ -399,3 +399,20 @@ actual transfer belongs to the runner lifecycle. SDK GPL-3.0-only sources are
 version/license and 44 independently generated cases are in
 `fixtures/handoff-constructor/observations.json`. Callback/gating/filter parity
 is explicitly separate and remains incomplete.
+
+
+### Handoff callbacks: owned async boundary
+
+Source: [SDK handoff.go](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/handoff.go)
+and [runner.go](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/runner.go),
+GPL-3.0-only; exact source/harness hashes and toolchain version are in
+`fixtures/handoff-callback/observations.json`. The source callback returns void
+(not an error); validation only warns. Adopted originating-agent → run-hook →
+callback ordering and one selected callback per turn. Retained Rust borrowed
+contexts, `Arc` ownership, bounded async execution and explicit replay identity
+rather than copying mutable Go pointers. Shared state plus dynamic instructions
+supports target seeding. Rejected claims of raw-byte equivalence: the current
+native tool-call value does not retain whitespace or missing/null provenance.
+The oracle and tests explicitly separate verified structured-value behavior from
+those unresolved full-parity obligations. No external ADK version or licensing
+claim is added by this source-specific change.

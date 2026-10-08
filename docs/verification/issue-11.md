@@ -1238,3 +1238,31 @@ Two constructor/description obligations are newly verified:
 **253 verified / 8,638 unresolved / 251 excluded**. Arbitrary handoff filters,
 callbacks and dynamic enable predicates remain separate missing capabilities;
 the full issue remains incomplete. Credentialed live tests remain unverified.
+
+### Awaited handoff callbacks and originating hook order
+
+Added host-owned `HandoffCallback` with borrowed context, cancellation/deadline
+bounding and durable identity checks. Corrected transfer observation to invoke the
+originating agent's hook before the run hook and callback, not the target's hook
+after activation. A committed handoff resumes without repeating the callback;
+unsafe or changed callback identities are rejected. Schema diagnostics are
+advisory and contain no argument values.
+
+The independent pinned Go oracle reproduces 16 normal/streamed cases and the
+original `TestHandoffOnHandoffReceivesInput` regression. Native tests compare
+structured input, shared-state seeding, hook/callback ordering, first matching
+call and skipped siblings; a cancellation test proves the callback future is
+dropped before target dispatch. Native parsed JSON cannot retain raw whitespace
+or distinguish absent arguments from null, and borrowed contexts intentionally
+do not expose mutable Go agent pointers. The native always-present definition
+schema also differs from optional SDK `InputType` warning semantics. These are
+explicit unresolved compatibility obligations: no callback ledger IDs are closed.
+
+Fresh Linux Rust 1.88.0 locked workspace/all-features/all-targets run:
+**1,279 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, facade matrix, platform-free consumer, 20 offline
+feature scenarios and host-session example passed. All pinned fixture checks,
+18 ledger validators, source locks, Python syntax, Go formatting and whitespace
+checks passed. Ledger remains **253 verified / 8,638 unresolved / 251 excluded**.
+Full issue #11 remains incomplete; credentialed live tests remain unverified.
+Excluded CLI/evaluation adapters and release/default-switch work remain untouched.

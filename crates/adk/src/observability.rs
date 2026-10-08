@@ -555,6 +555,9 @@ impl RunHooks for Observability {
                     "compacted",
                     json!({"before_items":before_items,"after_items":after_items,"context_tokens":context_tokens}),
                 ),
+                Observation::HandoffInputValidationFailed { tool } => {
+                    ("handoff_input_validation_failed", json!({"tool":tool}))
+                }
                 Observation::OutputValidationFailed { message } => {
                     ("output_validation_failed", json!({"message":message}))
                 }

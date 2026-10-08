@@ -93,11 +93,30 @@ pub enum HandoffInputFilter {
     RemoveTools,
 }
 
+pub struct HandoffContext<'a> {
+    pub operation: &'a Context,
+    pub agent: &'a AgentConfig,
+    pub target: &'a AgentConfig,
+    pub snapshot: &'a RunResult,
+    pub config: &'a RunnerConfig,
+    pub policy: &'a RunPolicy,
+}
+
+pub trait HandoffCallback: Send + Sync {
+    /// Opt in only for deterministic, effect-free behavior with a stable configuration identity.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn on_handoff<'a>(&'a self, context: HandoffContext<'a>, input: &'a Value)
+    -> BoxFuture<'a, ()>;
+}
+
 #[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
     pub input_filter: HandoffInputFilter,
+    pub on_handoff: Option<Arc<dyn HandoffCallback>>,
 }
 
 impl Handoff {
@@ -129,6 +148,7 @@ impl Handoff {
             },
             target,
             input_filter: HandoffInputFilter::Preserve,
+            on_handoff: None,
         }
     }
 }
@@ -339,6 +359,9 @@ pub enum Observation {
         before_items: usize,
         after_items: usize,
         context_tokens: u64,
+    },
+    HandoffInputValidationFailed {
+        tool: String,
     },
     OutputValidationFailed {
         message: String,
@@ -3346,6 +3369,38 @@ impl Engine {
         }
         self.checkpoint(Boundary::ToolPrepared, Some(&call)).await?;
         if let Some(handoff) = handoff {
+            self.observe(Observation::Handoff {
+                from: self.agent.name.clone(),
+                to: handoff.target.name.clone(),
+            })
+            .await?;
+            if let Some(callback) = &handoff.on_handoff {
+                if compile_schema(&handoff.definition.input_schema)
+                    .map_or(true, |schema| !schema.is_valid(&call.arguments))
+                {
+                    self.observe(Observation::HandoffInputValidationFailed {
+                        tool: call.name.clone(),
+                    })
+                    .await?;
+                }
+                bounded(&self.context, None, async {
+                    callback
+                        .on_handoff(
+                            HandoffContext {
+                                operation: &self.context,
+                                agent: &self.agent,
+                                target: &handoff.target,
+                                snapshot: &self.result,
+                                config: &self.config,
+                                policy: &self.policy,
+                            },
+                            &call.arguments,
+                        )
+                        .await;
+                    Ok(())
+                })
+                .await?;
+            }
             // Handoff outputs include deliberately skipped siblings; they are
             // not a failed tool turn and must neither advance nor reset its streak.
             self.tool_turn_start = None;
@@ -3406,16 +3461,10 @@ impl Engine {
                 })
                 .await?;
             }
-            let from = self.agent.name.clone();
             self.agent = handoff.target.clone();
             self.matched_stop_tool = false;
             self.pending_completion = false;
             self.result.last_agent = Some(self.agent.name.clone());
-            self.observe(Observation::Handoff {
-                from,
-                to: self.agent.name.clone(),
-            })
-            .await?;
             self.phase = Phase::Model;
             self.checkpoint(Boundary::Handoff, None).await?;
             return Ok(false);

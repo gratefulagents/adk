@@ -1100,5 +1100,40 @@ This public-constructor algorithm is intentionally **not** the catalog-builder
 algorithm, which lowercases and uses `specialist` as its fallback.
 Forty-four pinned cases verify the constructor and explicit metadata overrides;
 catalog fixtures independently verify target descriptions. Arbitrary handoff
-input-filter callbacks, `OnHandoff`, and dynamic enable predicates remain separate
-missing capabilities; this constructor does not claim or silently emulate them.
+input-filter callbacks and dynamic enable predicates remain separate missing
+capabilities; this constructor does not claim or silently emulate them.
+
+
+### Awaited handoff callbacks
+
+Set `Handoff::on_handoff` to an `Arc<dyn HandoffCallback>`. Its borrowed
+`HandoffContext` exposes the operation, originating agent, target, result snapshot,
+configuration and policy. The originating agent hook runs first, then the run
+hook, then the callback, before synthesized handoff outputs, history filtering
+and target activation. Only the selected call invokes a callback; duplicate and
+alternate sibling calls receive skipped outputs. A callback returns an awaited
+unit future, matching the SDK's void callback rather than inventing callback-error
+semantics. Cancellation/deadlines interrupt it and drop its future before transfer.
+
+Use shared owned state (for example, an `Arc` used by both the callback and the
+target's `InstructionProvider`) to seed target instructions. The callback does
+not expose mutable agent configuration or allow replacement of cancellation
+identity. Durable runs reject callbacks unless `durable_key()` identifies
+explicitly deterministic, effect-free behavior; changed identities invalidate
+recovery. A committed handoff checkpoint resumes at the target without repeating
+the callback. Crash-before-checkpoint recovery is not an exactly-once guarantee.
+
+Input validation against `handoff.definition.input_schema` is advisory when a
+callback is installed: invalid arguments emit `HandoffInputValidationFailed`,
+but are still delivered. Diagnostics carry only the tool name, not arguments or
+schema error text. Observer failures remain fail-closed. Native definitions always
+have a schema (including the constructor's empty object schema); the SDK only
+warns when an explicit `InputType` is set and argument bytes are present.
+
+The independent 16-case Go oracle covers raw arguments, hook ordering, siblings,
+shared-context/target mutation and normal/streamed execution. Native tests compare
+the **structured-input subset**, order and sibling outputs; shared state replaces
+mutable target pointers. `ToolCall.arguments` is parsed JSON: whitespace and the
+distinction between absent arguments and JSON null are not retained. Exact raw
+callback and mutable-context parity therefore remain unresolved ledger obligations,
+not disabled features or claimed equivalence.

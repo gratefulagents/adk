@@ -706,6 +706,12 @@ impl Runner {
                     .chain(&agent.output_guardrails)
                     .any(|g| g.durable_key().is_none_or(str::is_empty))
                 || agent.output_parser.is_some()
+                || agent.handoffs.iter().any(|handoff| {
+                    handoff
+                        .on_handoff
+                        .as_ref()
+                        .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+                })
                 || agent
                     .instruction_provider
                     .as_ref()
@@ -716,7 +722,7 @@ impl Runner {
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, guardrails and hooks",
+                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, handoff callbacks, guardrails and hooks",
                 ));
             }
             let mut entry = serde_json::json!({
@@ -732,6 +738,22 @@ impl Runner {
                 || agent.tool_final_output.is_some()
             {
                 entry["tool_stopping"] = serde_json::json!({"behavior": agent.tool_use, "names": agent.stop_at_tools, "output": agent.tool_final_output});
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.on_handoff.is_some())
+            {
+                entry["handoff_callbacks"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .on_handoff
+                            .as_ref()
+                            .and_then(|callback| callback.durable_key()))
+                        .collect::<Vec<_>>()
+                );
             }
             if !agent.handoff_description.is_empty() {
                 entry["handoff_description"] = serde_json::json!(agent.handoff_description);

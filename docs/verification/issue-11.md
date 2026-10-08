@@ -1322,3 +1322,30 @@ all 20 scenarios. Strict direct-driver Clippy for the changed example, Rustfmt,
 `verify-rust` with all pinned oracles, 18 ledger validators, source locks and
 whitespace checks passed. Library code is unchanged from the 1,284-test checkpoint;
 the full workspace suite was not redundantly rerun for this example-only change.
+
+### Optional handoff input types and advisory parsing
+
+Added `HandoffInputType` and effective `Handoff::tool_definition()` projection.
+Source verification corrected an earlier assumption: the pinned SDK's default
+`OutputSchema::Validate` parses JSON but does not enforce JSON Schema. Optional
+custom parsers run only when a callback exists; their returned values are discarded,
+and errors warn without suppressing callback or transfer. Native diagnostics expose
+only the tool name. Strict ordinary-tool argument validation no longer makes
+handoff parsing fatal. Durable identities bind optional schema presence/content;
+custom parsers are rejected, matching the existing output-parser replay limit.
+
+The independent 18-case normal/streamed oracle covers absent type, wrong shape,
+null, parser success/transformation/failure, absent callback and missing/malformed
+JSON. Native tests compare the 14 representable cases with strict argument
+validation both on and off; four raw missing/malformed cases remain explicitly
+unverified in the native Value API. No full InputType/raw-callback ledger claim
+was added. The runnable example declares its callback schema explicitly.
+
+Fresh Linux Rust 1.88.0 locked workspace/all-features/all-targets:
+**1,286 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, facade matrix, standalone consumer, 20 offline
+feature scenarios and host-session example passed. Exact oracle reproduction,
+18 ledger validators, source locks, Python syntax, Go formatting and whitespace
+checks passed. Ledger remains **255 verified / 8,636 unresolved / 251 excluded**.
+Full issue #11 and credentialed live verification remain incomplete; excluded
+CLI/evaluation and release/default-switch work remain untouched.

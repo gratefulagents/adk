@@ -137,16 +137,31 @@ pub trait HandoffPredicate: Send + Sync {
 }
 
 #[derive(Clone)]
+pub struct HandoffInputType {
+    pub schema: schemars::Schema,
+    pub parser: Option<Arc<dyn OutputParser>>,
+}
+
+#[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
     pub input_filter: HandoffInputFilter,
+    pub input_type: Option<HandoffInputType>,
     pub history_filter: Option<Arc<dyn HandoffHistoryFilter>>,
     pub on_handoff: Option<Arc<dyn HandoffCallback>>,
     pub is_enabled: Option<Arc<dyn HandoffPredicate>>,
 }
 
 impl Handoff {
+    pub fn tool_definition(&self) -> ToolDefinition {
+        let mut definition = self.definition.clone();
+        if let Some(input_type) = &self.input_type {
+            definition.input_schema = input_type.schema.clone();
+        }
+        definition
+    }
+
     pub fn new(target: Arc<AgentConfig>) -> Self {
         let mut name = String::new();
         let mut invalid_run = false;
@@ -175,6 +190,7 @@ impl Handoff {
             },
             target,
             input_filter: HandoffInputFilter::Preserve,
+            input_type: None,
             history_filter: None,
             on_handoff: None,
             is_enabled: None,
@@ -1161,6 +1177,9 @@ fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), 
         compile_schema(schema)?;
     }
     for handoff in &agent.handoffs {
+        if let Some(input_type) = &handoff.input_type {
+            compile_schema(&input_type.schema)?;
+        }
         if handoff.history_filter.is_some() && handoff.input_filter != HandoffInputFilter::Preserve
         {
             return Err(Error::new(
@@ -2163,18 +2182,17 @@ impl Engine {
         let accessible_tools = self.tools_for_access();
         let (mut tools, mut declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
-            .map(|tool| (tool.definition(), tool.timeout()))
+            .map(|tool| (tool.definition().clone(), tool.timeout()))
             .chain(
                 self.agent
                     .handoffs
                     .iter()
                     .filter(|handoff| self.handoff_enabled(handoff))
-                    .map(|h| (&h.definition, None)),
+                    .map(|handoff| (handoff.tool_definition(), None)),
             )
             .filter(|(definition, _)| {
                 self.effective_tool_policy().decision(definition) != ToolDecision::Deny
             })
-            .map(|(definition, timeout)| (definition.clone(), timeout))
             .unzip();
         self.summary_turn = self.final_summary_required();
         let instructions = self.build_instructions().await?;
@@ -3363,7 +3381,8 @@ impl Engine {
         }
         let definition = definition.unwrap();
         let decision = self.tool_decision(definition);
-        if self.config.validate_tool_arguments
+        if handoff.is_none()
+            && self.config.validate_tool_arguments
             && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
         {
             return Err(Error::new(
@@ -3470,8 +3489,11 @@ impl Engine {
             })
             .await?;
             if let Some(callback) = &handoff.on_handoff {
-                if compile_schema(&handoff.definition.input_schema)
-                    .map_or(true, |schema| !schema.is_valid(&call.arguments))
+                if handoff
+                    .input_type
+                    .as_ref()
+                    .and_then(|input_type| input_type.parser.as_ref())
+                    .is_some_and(|parser| parser.parse(&call.arguments.to_string()).is_err())
                 {
                     self.observe(Observation::HandoffInputValidationFailed {
                         tool: call.name.clone(),

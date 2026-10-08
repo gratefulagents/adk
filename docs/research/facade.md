@@ -446,3 +446,19 @@ custom filters. Validation before commit and detached-journal marker checking
 prevent rejected replacements from corrupting live approval state. Stable
 identity is required for durable use; effects and call counts are not replay
 contracts. Exact raw JSON callback provenance remains a separate open capability.
+
+
+### Optional handoff input types: JSON parsing is not schema validation
+
+The SDK's pinned `internal/agent/output_schema.go` fallback `Validate` only calls
+`json.Unmarshal`, despite the method name and comment. A custom `ParseFn` may
+return an advisory error; its parsed/transformed return value is discarded by the
+handoff runner. `fixtures/handoff-input-type/observations.json` records exact
+source/harness hashes and 18 independently executed normal/streamed cases.
+Adopted optional declared schema, parser-only advisory warnings, unchanged callback
+values and no parser invocation without a callback. Rejected the previously
+assumed stricter JSON Schema validation. Native parsed values cannot represent
+missing/malformed JSON or preserve raw spelling: four source cases remain
+explicitly outside the native comparator, so full InputType/raw callback parity
+is not closed. Reuse the native OutputParser contract instead of creating a second
+parser abstraction; durable custom parsers remain explicitly unsupported.

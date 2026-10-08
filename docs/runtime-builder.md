@@ -1122,12 +1122,22 @@ explicitly deterministic, effect-free behavior; changed identities invalidate
 recovery. A committed handoff checkpoint resumes at the target without repeating
 the callback. Crash-before-checkpoint recovery is not an exactly-once guarantee.
 
-Input validation against `handoff.definition.input_schema` is advisory when a
-callback is installed: invalid arguments emit `HandoffInputValidationFailed`,
-but are still delivered. Diagnostics carry only the tool name, not arguments or
-schema error text. Observer failures remain fail-closed. Native definitions always
-have a schema (including the constructor's empty object schema); the SDK only
-warns when an explicit `InputType` is set and argument bytes are present.
+Optional `Handoff::input_type` supplies `HandoffInputType { schema, parser }`.
+`handoff.tool_definition()` returns the effective definition used for model
+requests: the optional schema overrides `definition.input_schema`. This declaration
+does **not** enforce schema conformance of callback arguments. SDK `OutputSchema`
+only parses JSON by default; native `ToolCall.arguments` is already parsed JSON.
+A custom `OutputParser` is invoked only when both the input type and callback are
+present. Its returned value is discarded, preserving the original callback input.
+Parser errors emit `HandoffInputValidationFailed` but do not prevent transfer;
+the diagnostic contains only the tool name, not argument values or private parser
+error text. Hook failures remain fail-closed. `validate_tool_arguments` applies
+to ordinary tools, not a transfer's advisory parser contract.
+
+Custom handoff parsers are not replay-safe by default and are rejected by durable
+execution, like custom output parsers. Optional schema presence and content are
+bound into the durable graph fingerprint. Parsers must be prompt, nonblocking
+operations; their trait is synchronous, not a detached execution service.
 
 The independent 16-case Go oracle covers raw arguments, hook ordering, siblings,
 shared-context/target mutation and normal/streamed execution. Native tests compare
@@ -1198,3 +1208,13 @@ provenance, cancellation/drop, rejection without replacement, approval retention
 and clearing, forged/out-of-range marker rejection and durable recovery. The API
 preserves native history/security invariants rather than accepting arbitrary
 invalid Go item graphs or fabricated approval markers.
+
+
+The 18-case pinned input-type oracle additionally proves that valid JSON with the
+wrong schema shape and JSON null do not warn by default; parser failure is
+advisory and parser transformations never replace callback arguments. Four oracle
+cases (missing or malformed JSON, in normal/streamed execution) are explicitly not
+representable in native `Value`. The native comparator checks the remaining 14
+cases with strict ordinary-tool argument validation both on and off. Native
+configuration still requires a well-formed JSON Schema; arbitrary malformed Go
+schema bytes and raw parser byte identity are not claimed as equivalent.

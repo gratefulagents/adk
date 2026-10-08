@@ -1264,6 +1264,7 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                input_type: None,
                 history_filter: None,
                 is_enabled: None,
                 input_filter: Default::default(),
@@ -1325,6 +1326,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -2174,6 +2176,7 @@ async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configu
         let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
         agent.handoffs.push(Handoff {
             on_handoff: None,
+            input_type: None,
             history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
@@ -2297,6 +2300,7 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
         let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
         parent.handoffs.push(Handoff {
             on_handoff: None,
+            input_type: None,
             history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
@@ -3479,4 +3483,70 @@ async fn custom_handoff_history_filter_preserves_approval_boundaries_and_durable
         assert_eq!(result.result.last_agent.as_deref(), Some("target"));
         assert_eq!(filter.calls.load(Ordering::SeqCst), 1);
     }
+}
+
+struct HandoffInputParser;
+impl OutputParser for HandoffInputParser {
+    fn parse(&self, _: &str) -> Result<Value, Error> {
+        Ok(Value::Null)
+    }
+}
+#[tokio::test]
+async fn handoff_input_type_is_bound_to_durable_identity_and_custom_parsers_are_rejected() {
+    let transfer = RunItem::ToolCall {
+        call: ToolCall {
+            id: "transfer".into(),
+            name: "transfer_to_target".into(),
+            arguments: json!({}),
+        },
+    };
+    let (_, model, _) = setup(vec![transfer], false, false);
+    let binding = ModelBinding::complete("model", model.clone());
+    let mut agent = AgentConfig::new("agent", binding.clone());
+    agent
+        .handoffs
+        .push(Handoff::new(Arc::new(AgentConfig::new("target", binding))));
+    agent.handoffs[0].input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"object","properties":{}}),
+        parser: Some(Arc::new(HandoffInputParser)),
+    });
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    assert!(
+        run(&runner, Arc::new(Store::default()), None)
+            .await
+            .is_err()
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+    agent.handoffs[0].input_type.as_mut().unwrap().parser = None;
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    assert!(run(&runner, store.clone(), None).await.is_err());
+    agent.handoffs[0].input_type = None;
+    let changed = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    agent.handoffs[0].input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"string"}),
+        parser: None,
+    });
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    assert_eq!(
+        run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap()
+            .result
+            .last_agent
+            .as_deref(),
+        Some("target")
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
 }

@@ -582,6 +582,10 @@ async fn handoffs_subagents() {
         "specialist",
         ModelBinding::complete("offline", specialist.clone()),
     )));
+    handoff.input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"object","properties":{"key":{"type":"string"}}}),
+        parser: None,
+    });
     handoff.is_enabled = Some(state.clone());
     handoff.on_handoff = Some(state.clone());
     handoff.history_filter = Some(state.clone());

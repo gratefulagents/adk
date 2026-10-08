@@ -374,6 +374,7 @@ async fn final_summary_turn_denies_hallucinated_tools_and_handoffs_without_appro
     a.tools.push(tool.clone());
     a.handoffs.push(Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         definition: ToolDefinition {
@@ -895,6 +896,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
     a.tools = vec![effect.clone()];
     a.handoffs = vec![Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -1777,6 +1779,7 @@ async fn fallback_state_is_per_agent_identity_not_display_name() {
     source.fallbacks = vec![ModelBinding::complete("backup", backup)];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -2647,6 +2650,7 @@ async fn handoff_filter_hook_failure_keeps_partial_history_and_journal_coherent(
             let mut source_agent = agent(source);
             source_agent.handoffs.push(Handoff {
                 on_handoff: None,
+                input_type: None,
                 history_filter: None,
                 is_enabled: None,
                 definition: TestTool::new("transfer", true, true).definition.clone(),
@@ -2807,6 +2811,7 @@ async fn handoff_input_filter_preserves_audit_and_filters_run_stream_and_approva
                 source_agent.tools = vec![effect.clone()];
                 source_agent.handoffs.push(Handoff {
                     on_handoff: None,
+                    input_type: None,
                     history_filter: None,
                     is_enabled: None,
                     definition: TestTool::new("transfer", true, false).definition.clone(),
@@ -3062,6 +3067,7 @@ async fn native_handoff_target_history_matches_pinned_go_filter_cases() {
         let mut source_agent = agent(source);
         source_agent.handoffs.push(Handoff {
             on_handoff: None,
+            input_type: None,
             history_filter: None,
             is_enabled: None,
             definition: TestTool::new("transfer", false, false).definition.clone(),
@@ -3219,6 +3225,7 @@ async fn handoff_tool_ceiling_denies_before_approval_and_preserves_parent_policy
             .extend(forbidden.iter().cloned().map(|t| t as Arc<dyn Tool>));
         target.handoffs.push(Handoff {
             on_handoff: None,
+            input_type: None,
             history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
@@ -3235,6 +3242,7 @@ async fn handoff_tool_ceiling_denies_before_approval_and_preserves_parent_policy
         parent.tools.push(parent_write.clone());
         parent.handoffs.push(Handoff {
             on_handoff: None,
+            input_type: None,
             history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
@@ -3384,6 +3392,7 @@ async fn tool_ceiling_intersects_every_host_access_and_none_preserves_exceptions
             ))]));
             parent.handoffs.push(Handoff {
                 on_handoff: None,
+                input_type: None,
                 history_filter: None,
                 is_enabled: None,
                 definition: ToolDefinition {

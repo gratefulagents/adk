@@ -676,6 +676,7 @@ async fn wire_bridge_preserves_pause_continuation_and_projects_handoff_outputs_i
     source.tools = vec![before.clone(), after.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -895,6 +896,7 @@ async fn handoff_skipped_siblings_preserve_but_do_not_advance_tool_error_streak(
     source.tools = vec![skipped.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -937,6 +939,7 @@ async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
     let mut agent = AgentConfig::new("source", ModelBinding::complete("source", model.clone()));
     agent.handoffs = vec![Handoff {
         on_handoff: None,
+        input_type: None,
         history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
@@ -1779,6 +1782,7 @@ async fn dynamic_instructions_match_pinned_static_precedence_usage_composition_a
             child.instruction_provider = Some(provider.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                input_type: None,
                 history_filter: None,
                 is_enabled: None,
                 definition: ToolDefinition {
@@ -2033,6 +2037,7 @@ async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_gua
         if name == "handoff" {
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                input_type: None,
                 history_filter: None,
                 is_enabled: None,
                 definition: ToolDefinition {
@@ -2319,9 +2324,6 @@ async fn handoff_callback_matches_pinned_structured_inputs_order_and_siblings() 
         let has_callback = case["has_callback"] == true;
         let mut expected = vec!["old_agent_hook", "run_hook"];
         if has_callback {
-            if !input.is_object() {
-                expected.push("schema_warning");
-            }
             expected.push("callback");
         }
         expected.push("target_instructions");
@@ -2742,5 +2744,159 @@ async fn invalid_handoff_filter_output_does_not_replace_committed_history() {
         assert_eq!(model.requests.lock().unwrap().len(), 1);
         source.handoffs[0].input_filter = HandoffInputFilter::RemoveTools;
         assert!(Runner::new(source, RunnerConfig::default()).is_err());
+    }
+}
+
+struct HandoffParser {
+    reject: bool,
+    events: Arc<Mutex<Vec<String>>>,
+    inputs: Mutex<Vec<String>>,
+}
+impl OutputParser for HandoffParser {
+    fn parse(&self, input: &str) -> Result<Value, Error> {
+        self.events.lock().unwrap().push("parser".into());
+        self.inputs.lock().unwrap().push(input.into());
+        if self.reject {
+            Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "private parse failure",
+            ))
+        } else {
+            Ok(json!({"transformed":true}))
+        }
+    }
+}
+struct InputTypeDiagnostics(AtomicUsize);
+impl RunHooks for InputTypeDiagnostics {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        observation: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if let Observation::HandoffInputValidationFailed { tool } = observation {
+                assert_eq!(tool, "transfer_to_expert");
+                self.0.fetch_add(1, Ordering::SeqCst);
+            }
+            Ok(())
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_callback_values() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-input-type/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 18);
+    assert_eq!(
+        cases
+            .iter()
+            .filter(|case| case["native_value_representable"] == false)
+            .count(),
+        4
+    );
+    for case in cases
+        .iter()
+        .filter(|case| case["native_value_representable"] == true)
+    {
+        for validate_tool_arguments in [false, true] {
+            let events = Arc::new(Mutex::new(vec![]));
+            let parser = Arc::new(HandoffParser {
+                reject: case["scenario"] == "parse_reject",
+                events: events.clone(),
+                inputs: Mutex::new(vec![]),
+            });
+            let callback = Arc::new(SeedHandoff {
+                events: events.clone(),
+                inputs: Mutex::new(vec![]),
+                seeded: AtomicUsize::new(0),
+            });
+            let input: Value = serde_json::from_str(case["raw"].as_str().unwrap()).unwrap();
+            let model = Script::new(vec![
+                Ok(response(
+                    vec![RunItem::ToolCall {
+                        call: ToolCall {
+                            id: "h1".into(),
+                            name: "transfer_to_expert".into(),
+                            arguments: input.clone(),
+                        },
+                    }],
+                    true,
+                )),
+                Ok(answer()),
+            ]);
+            let binding = if case["streamed"] == true {
+                ModelBinding::streaming("offline", model.clone())
+            } else {
+                ModelBinding::complete("offline", model.clone())
+            };
+            let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+            if case["has_type"] == true {
+                handoff.input_type = Some(HandoffInputType {
+                    schema: serde_json::from_value(case["schema"].clone()).unwrap(),
+                    parser: if case["custom_parser"] == true {
+                        Some(parser.clone())
+                    } else {
+                        None
+                    },
+                });
+            }
+            if case["has_callback"] == true {
+                handoff.on_handoff = Some(callback.clone());
+            }
+            assert_eq!(
+                handoff.tool_definition().input_schema.as_value(),
+                &case["schema"]
+            );
+            let mut source = AgentConfig::new("router", binding);
+            source.handoffs.push(handoff);
+            let diagnostics = Arc::new(InputTypeDiagnostics(AtomicUsize::new(0)));
+            let runner = Runner::new(
+                source,
+                RunnerConfig {
+                    validate_tool_arguments,
+                    hooks: Some(diagnostics.clone()),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let result = if case["streamed"] == true {
+                runner
+                    .stream(context(), request(vec![], 3), Arc::new(Quiet))
+                    .finish()
+                    .await
+            } else {
+                runner
+                    .run(context(), request(vec![], 3), Arc::new(Quiet))
+                    .await
+            }
+            .unwrap();
+            assert_eq!(
+                result.result.last_agent.as_deref(),
+                case["last_agent"].as_str()
+            );
+            assert_eq!(result.result.final_text(), case["final_text"]);
+            assert_eq!(json!(*events.lock().unwrap()), case["events"]);
+            assert_eq!(json!(*parser.inputs.lock().unwrap()), case["parser_inputs"]);
+            assert_eq!(
+                diagnostics.0.load(Ordering::SeqCst),
+                usize::from(case["warning"] == true)
+            );
+            assert_eq!(
+                callback.inputs.lock().unwrap().len(),
+                case["callback_inputs"].as_array().unwrap().len()
+            );
+            if case["has_callback"] == true {
+                assert_eq!(callback.inputs.lock().unwrap()[0], input);
+            }
+            assert_eq!(
+                model.requests.lock().unwrap()[0].tools[0]
+                    .input_schema
+                    .as_value(),
+                &case["schema"]
+            );
+        }
     }
 }

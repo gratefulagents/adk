@@ -1409,3 +1409,35 @@ Native opaque-content/pair protection and unsigned policy counters are documente
 no full arbitrary Go wire-history/helper claim was inferred. Full issue acceptance
 and credentialed live verification remain open. Excluded CLI/evaluation and
 release/default-switch work remain untouched.
+
+### Measured handoff spans and raw tool trace inputs
+
+The runtime now brackets a transfer with start/completion observations while
+preserving the existing transition hook. The trace adapter retains its handoff
+span through source/run hooks, callback, filtering, compaction/carry-forward and
+the target checkpoint, then closes the source-agent envelope. Owner cleanup
+closes interrupted spans before the agent/root; dropping a pending operation
+precedes trace cleanup. Progress still counts a transfer once, and the schema-2
+TraceWriter transition feed retains its original single record. Tool function
+span inputs and metadata digests now use retained raw argument text rather than
+a parsed/re-serialized projection.
+
+Eight independent pinned normal/streamed cases compare actual span openness and
+hook/callback/filter/carry ordering, including cancellation. Native tests also
+cover dropping each pending stage, persistence failure while the span is open,
+exactly-one span end before its parent/root, no fabricated compaction counts,
+ordered progress events and exact raw input/digest transport. Native agent-parent
+envelopes and explicit owner cleanup remain documented differences from the SDK;
+no broad trace-graph parity or new ledger closure is claimed.
+
+Fresh final Linux Rust 1.88.0 locked workspace/all-features/all-targets:
+**1,306 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file formatting, facade matrix, standalone consumer, all 20
+offline scenarios and host-session example passed. Independent pinned oracles,
+18 ledger validators, source/license locks, Python syntax, Go formatting and
+whitespace checks passed. The normally ignored executable-Go runner/config codec
+differential was explicitly run separately and passed (1 test). The 30 default
+ignored entries are explicit Go/MCP/sandbox helpers, not 30 credentialed live tests.
+Ledger remains **258 verified / 8,633 unresolved / 251 excluded**. Full issue
+acceptance and credentialed provider/remote-collector verification remain open;
+excluded CLI/evaluation and release/default-switch work remain untouched.

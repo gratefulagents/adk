@@ -828,3 +828,51 @@ fn captured_attempt_request_and_conversion_errors_reach_writer() {
     let calls = records(&path, "llm_calls");
     assert!(calls[1].get("request").is_none());
 }
+
+#[tokio::test]
+async fn runtime_tool_metadata_hashes_raw_argument_text_not_its_parsed_projection() {
+    use adk::{
+        core::{Context, ToolCall},
+        runtime::{CancellationToken, Observation, RunHooks},
+    };
+    use sha2::{Digest, Sha256};
+    let root = tempfile::tempdir().unwrap();
+    let writer = TraceWriter::new(
+        Arc::new(FilesystemTraceStore::new(root.path()).unwrap()),
+        "run",
+        Options::default(),
+    );
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let raw = r#" { "n":1e0, "n":2 } "#;
+    writer
+        .observe(
+            &Context {
+                run_id: "run".into(),
+                cancellation: Arc::new(CancellationToken::new()),
+                deadline: None,
+            },
+            Observation::ToolStarted {
+                agent: "source".into(),
+                call: ToolCall {
+                    id: "call".into(),
+                    name: "tool".into(),
+                    arguments: serde_json::from_str(raw).unwrap(),
+                    raw_arguments: Some(raw.into()),
+                },
+            },
+        )
+        .await
+        .unwrap();
+    let input = &records(&path, "tool_calls")[0]["input"];
+    assert_eq!(input["bytes"], raw.len());
+    assert_eq!(
+        input["sha256"],
+        format!("{:x}", Sha256::digest(raw.as_bytes()))
+    );
+    assert_eq!(input["captured"], false);
+}

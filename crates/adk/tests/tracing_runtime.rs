@@ -638,7 +638,17 @@ async fn late_generation_keeps_parent_and_repeated_starts_are_safe() {
     observer
         .observe(
             &context,
-            Observation::Handoff {
+            Observation::HandoffStarted {
+                from: "source".into(),
+                to: "target".into(),
+            },
+        )
+        .await
+        .unwrap();
+    observer
+        .observe(
+            &context,
+            Observation::HandoffCompleted {
                 from: "source".into(),
                 to: "target".into(),
             },
@@ -960,4 +970,424 @@ async fn owned_run_wrapper_orders_cleanup_on_completion_and_cancellation() {
         drop(runner);
         assert_eq!(sink.traces.lock().unwrap().len(), 1);
     }
+}
+
+struct Completion(Option<ModelResponse>);
+impl ModelStream for Completion {
+    fn next(&mut self) -> BoxFuture<'_, Result<Option<ModelEvent>, Error>> {
+        Box::pin(async {
+            Ok(self
+                .0
+                .take()
+                .map(|response| ModelEvent::Complete { response }))
+        })
+    }
+}
+impl StreamingModel for Provider {
+    fn stream<'a>(
+        &'a self,
+        ctx: &'a Context,
+        req: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            Ok(Box::new(Completion(Some(self.complete(ctx, req).await?))) as Box<dyn ModelStream>)
+        })
+    }
+}
+struct HandoffTraceProbe {
+    sink: Arc<Recorder>,
+    stages: Mutex<Vec<serde_json::Value>>,
+    open: std::sync::atomic::AtomicBool,
+    cancel: Option<CancellationToken>,
+    block: &'static str,
+}
+impl HandoffTraceProbe {
+    fn stage(&self, name: &str) {
+        self.stages
+            .lock()
+            .unwrap()
+            .push(json!({"name":name,"open":self.open.load(std::sync::atomic::Ordering::SeqCst)}));
+    }
+    async fn enter(&self, name: &str) {
+        self.stage(name);
+        if self.block == name {
+            struct Pending<'a>(&'a HandoffTraceProbe);
+            impl Drop for Pending<'_> {
+                fn drop(&mut self) {
+                    self.0.stage("dropped");
+                }
+            }
+            let _pending = Pending(self);
+            std::future::pending::<()>().await;
+        }
+    }
+}
+impl TraceProcessor for HandoffTraceProbe {
+    fn trace_start(&self, trace: &Trace) {
+        self.sink.trace_start(trace);
+    }
+    fn trace_end(&self, trace: &Trace) {
+        self.sink.trace_end(trace);
+        self.stage("trace_end");
+    }
+    fn span_start(&self, span: &Span) {
+        self.sink.span_start(span);
+        if span.name == "handoff" {
+            self.open.store(true, std::sync::atomic::Ordering::SeqCst);
+            self.stage("span_start");
+        }
+    }
+    fn span_end(&self, span: &Span) {
+        self.sink.span_end(span);
+        if span.name == "handoff" {
+            self.open.store(false, std::sync::atomic::Ordering::SeqCst);
+            self.stage("span_end");
+        }
+    }
+}
+impl HandoffCallback for HandoffTraceProbe {
+    fn on_handoff<'a>(&'a self, _: HandoffContext<'a>, _: &'a ToolCall) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            self.enter("callback").await;
+            if let Some(cancel) = &self.cancel {
+                cancel.cancel();
+            }
+        })
+    }
+}
+impl HandoffHistoryFilter for HandoffTraceProbe {
+    fn filter<'a>(
+        &'a self,
+        _: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            self.enter("filter").await;
+            (history.items, history.provenance) = history
+                .items
+                .into_iter()
+                .zip(history.provenance)
+                .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                .unzip();
+            history.approvals.clear();
+            Ok(history)
+        })
+    }
+}
+impl CompactionCarryForward for HandoffTraceProbe {
+    fn context<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.enter("carry").await;
+            Ok("host state".into())
+        })
+    }
+}
+impl InstructionProvider for HandoffTraceProbe {
+    fn instructions<'a>(
+        &'a self,
+        _: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>> {
+        Box::pin(async move {
+            self.stage("target");
+            Ok("target".into())
+        })
+    }
+}
+struct HandoffStageHook(Arc<HandoffTraceProbe>, &'static str);
+impl RunHooks for HandoffStageHook {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        event: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if matches!(event, Observation::Handoff { .. }) {
+                self.0.stage(self.1);
+            }
+            Ok(())
+        })
+    }
+}
+fn traced_handoff(
+    probe: Arc<HandoffTraceProbe>,
+    streamed: bool,
+    scenario: &str,
+) -> (Runner, RunTrace, RunRequest) {
+    let owner = RunTrace::new(TraceSession::new("run", probe.clone()));
+    let observer = owner.observer();
+    let binding = |steps: Vec<Step>| {
+        let model = Arc::new(Provider(Mutex::new(steps.into())));
+        if streamed {
+            ModelBinding::streaming("fixture", model)
+        } else {
+            ModelBinding::complete("fixture", model)
+        }
+    };
+    let mut target = AgentConfig::new("target", binding(vec![done()]));
+    target.instruction_provider = Some(probe.clone());
+    let mut handoff = Handoff::new(Arc::new(target));
+    handoff.on_handoff = Some(probe.clone());
+    if scenario != "plain" && scenario != "cancel" {
+        handoff.history_filter = Some(probe.clone());
+    }
+    let mut call = call();
+    call.name = "transfer_to_target".into();
+    call.arguments = json!({});
+    let mut source = AgentConfig::new(
+        "source",
+        binding(vec![response(vec![RunItem::ToolCall { call }])]),
+    );
+    source.hooks = Some(Arc::new(HandoffStageHook(probe.clone(), "agent_hook")));
+    source.handoffs.push(handoff);
+    let carry = scenario == "carry";
+    let cfg = RunnerConfig {
+        hooks: Some(Arc::new(CompositeHooks::new([
+            observer.clone() as Arc<dyn RunHooks>,
+            Arc::new(HandoffStageHook(probe.clone(), "run_hook")),
+        ]))),
+        generation_observer: Some(observer),
+        local_compaction: compaction::LocalCompactionPolicy {
+            enabled: false,
+            ..Default::default()
+        },
+        handoff_history: compaction::HandoffHistoryPolicy {
+            enabled: carry,
+            max_tokens: 300,
+            target_tokens: 120,
+            ..Default::default()
+        },
+        compaction_carry_forward: if carry { Some(probe) } else { None },
+        ..Default::default()
+    };
+    let mut req = request();
+    req.input.push(RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![Content::Text {
+                text: "original task".into(),
+            }],
+        },
+    });
+    if carry {
+        req.input.extend((0..12).map(|_| RunItem::Message {
+            message: Message {
+                role: Role::Assistant,
+                content: vec![Content::Text {
+                    text: "older context. ".repeat(100),
+                }],
+            },
+        }));
+    }
+    (Runner::new(source, cfg).unwrap(), owner, req)
+}
+#[tokio::test]
+async fn handoff_span_lifetime_matches_pinned_hooks_callbacks_filters_and_carry() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-tracing/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 8);
+    for case in fixture["cases"].as_array().unwrap() {
+        let scenario = case["scenario"].as_str().unwrap();
+        let streamed = case["streamed"] == true;
+        let sink = Arc::new(Recorder::default());
+        let token = CancellationToken::new();
+        let probe = Arc::new(HandoffTraceProbe {
+            sink: sink.clone(),
+            stages: Mutex::new(vec![]),
+            open: Default::default(),
+            cancel: (scenario == "cancel").then_some(token.clone()),
+            block: "",
+        });
+        let (runner, owner, req) = traced_handoff(probe.clone(), streamed, scenario);
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token);
+        let result = if streamed {
+            owner
+                .run(runner.stream(ctx, req, Arc::new(HostSink)).finish())
+                .await
+        } else {
+            owner.run(runner.run(ctx, req, Arc::new(HostSink))).await
+        };
+        assert_eq!(result.is_err(), case["error"]);
+        assert_eq!(
+            json!(*probe.stages.lock().unwrap()),
+            case["events"],
+            "{scenario}"
+        );
+        let trace = assert_closed(&sink);
+        let handoffs: Vec<_> = trace
+            .spans
+            .iter()
+            .filter(|span| span.name == "handoff")
+            .collect();
+        assert_eq!(handoffs.len(), case["starts"].as_u64().unwrap() as usize);
+        assert_eq!(case["ends"], 1);
+        assert_eq!(case["end_time_set"], true);
+        let source=trace.spans.iter().find(|span|matches!(&span.data,Some(SpanData::Agent {agent_name,..}) if agent_name=="source")).unwrap();
+        assert_eq!(handoffs[0].parent_id, source.id);
+        let events = sink.events.lock().unwrap();
+        let end = |id: &str| {
+            events
+                .iter()
+                .position(|(kind, item)| kind == "end" && item == id)
+                .unwrap()
+        };
+        assert!(end(&handoffs[0].id) < end(&source.id));
+    }
+}
+#[tokio::test]
+async fn dropping_handoff_stages_closes_children_before_source_and_root() {
+    for block in ["callback", "filter", "carry"] {
+        let sink = Arc::new(Recorder::default());
+        let probe = Arc::new(HandoffTraceProbe {
+            sink: sink.clone(),
+            stages: Mutex::new(vec![]),
+            open: Default::default(),
+            cancel: None,
+            block,
+        });
+        let (runner, owner, req) = traced_handoff(
+            probe.clone(),
+            false,
+            if block == "carry" {
+                "carry"
+            } else {
+                "filtered"
+            },
+        );
+        let mut run = Box::pin(owner.run(runner.run(context(), req, Arc::new(HostSink))));
+        std::future::poll_fn(|cx| {
+            assert!(std::future::Future::poll(run.as_mut(), cx).is_pending());
+            std::task::Poll::Ready(())
+        })
+        .await;
+        assert!(probe.open.load(std::sync::atomic::Ordering::SeqCst));
+        assert_eq!(probe.stages.lock().unwrap().last().unwrap()["name"], block);
+        drop(run);
+        let trace = assert_closed(&sink);
+        let stages = probe.stages.lock().unwrap();
+        let dropped = stages
+            .iter()
+            .position(|stage| stage["name"] == "dropped")
+            .unwrap();
+        assert_eq!(stages[dropped]["open"], true);
+        assert_eq!(stages[dropped + 1]["name"], "span_end");
+        assert_eq!(stages[dropped + 2]["name"], "trace_end");
+        let handoff = trace
+            .spans
+            .iter()
+            .find(|span| span.name == "handoff")
+            .unwrap();
+        let events = sink.events.lock().unwrap();
+        let end = |id: &str| {
+            events
+                .iter()
+                .position(|(kind, item)| kind == "end" && item == id)
+                .unwrap()
+        };
+        assert!(end(&handoff.id) < end(&handoff.parent_id));
+        if block == "carry" {
+            let compaction = trace
+                .spans
+                .iter()
+                .find(|span| span.name == "compaction")
+                .unwrap();
+            assert!(end(&compaction.id) < end(&handoff.id));
+            assert!(compaction.data.is_none());
+        }
+    }
+}
+
+struct HandoffCheckpointProbe {
+    sink: Arc<Recorder>,
+    fail: bool,
+}
+impl CheckpointStore for HandoffCheckpointProbe {
+    fn persist<'a>(
+        &'a self,
+        _: &'a Context,
+        checkpoint: &'a RunnerCheckpoint,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            if checkpoint.execution_boundary() == "handoff_completed" {
+                let spans = self.sink.starts.lock().unwrap();
+                let handoff = spans.iter().find(|span| span.name == "handoff").unwrap();
+                assert!(
+                    !self
+                        .sink
+                        .events
+                        .lock()
+                        .unwrap()
+                        .iter()
+                        .any(|(kind, id)| kind == "end" && id == &handoff.id)
+                );
+                if self.fail {
+                    return Err(Error::new(ErrorCategory::Host, "checkpoint failure"));
+                }
+            }
+            Ok(())
+        })
+    }
+}
+#[tokio::test]
+async fn handoff_span_stays_open_through_checkpoint_and_closes_on_persistence_error() {
+    for fail in [false, true] {
+        let (sink, owner, observer) = setup();
+        let target = Arc::new(agent("target", vec![done()]));
+        let mut call = call();
+        call.name = "transfer_to_target".into();
+        let mut source = agent("source", vec![response(vec![RunItem::ToolCall { call }])]);
+        source.handoffs.push(Handoff::new(target));
+        let runner = Runner::new(source, config(observer)).unwrap();
+        let store = Arc::new(HandoffCheckpointProbe {
+            sink: sink.clone(),
+            fail,
+        });
+        let result = owner
+            .run(runner.run_durable(
+                context(),
+                request(),
+                Arc::new(HostSink),
+                DurableRun::new(store),
+            ))
+            .await;
+        assert_eq!(result.is_err(), fail);
+        let trace = assert_closed(&sink);
+        let handoffs: Vec<_> = trace
+            .spans
+            .iter()
+            .filter(|span| span.name == "handoff")
+            .collect();
+        assert_eq!(handoffs.len(), 1);
+        let events = sink.events.lock().unwrap();
+        let end = |id: &str| {
+            events
+                .iter()
+                .position(|(kind, item)| kind == "end" && item == id)
+                .unwrap()
+        };
+        assert!(end(&handoffs[0].id) < end(&handoffs[0].parent_id));
+    }
+}
+#[tokio::test]
+async fn runtime_function_span_keeps_exact_raw_argument_text() {
+    let (sink, owner, observer) = setup();
+    let raw = r#" { "n":1e0, "n":2 } "#;
+    let mut call = call();
+    call.arguments = serde_json::from_str(raw).unwrap();
+    call.raw_arguments = Some(raw.into());
+    observer
+        .observe(
+            &context(),
+            Observation::ToolStarted {
+                agent: "source".into(),
+                call,
+            },
+        )
+        .await
+        .unwrap();
+    owner.finish();
+    let trace = assert_closed(&sink);
+    assert!(matches!(&trace.spans[0].data,Some(SpanData::Function {input,..}) if input==raw));
 }

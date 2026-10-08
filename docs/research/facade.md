@@ -492,3 +492,17 @@ call; native pair/provenance/approval security invariants remain authoritative.
 The source/license/harness hashes and 18 helper, 12 runner and 10 builder
 observations are in `fixtures/handoff-compaction/observations.json`. This narrows
 three composition-field claims, not full wire-history or helper equivalence.
+
+
+### Handoff tracing spans the operation
+
+The pinned runner starts its handoff span before source-agent/run hooks and ends
+it after callback, filtering, compaction/carry-forward and the target checkpoint;
+its deferred cleanup ends an interrupted open span before the trace. Adopted
+separate start/completion observations, preserving the original transition hook,
+and explicit Rust owner cleanup rather than a thread-local entered tracing guard
+held across await. Eight independent normal/streamed source cases record span
+openness during hooks/callback/filter/carry and cancellation. Native pending-future
+and failed-checkpoint tests cover cleanup ordering. Rejected the previous point
+span because it excluded actual transfer work. Native agent-parent envelopes
+remain documented, not claimed identical to the SDK root-parent graph.

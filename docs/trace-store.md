@@ -287,9 +287,18 @@ those snapshots. Request snapshots now assemble from explicit attribution and
 representable request settings; unknown attribution records a snapshot error
 rather than fabricating agent names. See the runtime builder's attribution API.
 
-Handoffs are point observations, not measured transfer durations. Compaction counts
-are populated only from observed success. A new compaction start replaces an
-unterminated no-op attempt rather than inheriting stale counts or parentage.
+Handoff spans begin before the source-agent/run handoff hooks and remain open
+through the callback, history filter, deterministic compaction/carry-forward and
+target checkpoint. The completion observation closes the span and source-agent
+envelope before target generation. Interrupted transfers close on owner cleanup,
+before the source agent/root; dropping an unfinished callback/filter/carry future
+happens before that cleanup. No successful-transfer status is fabricated. The
+native agent-parent envelopes are intentional and are not an exact copy of the
+SDK's root-parent span graph. Function inputs retain authoritative raw argument
+text when available; metadata tool-call digests hash those bytes rather than a
+parsed/re-serialized projection. Compaction counts are populated only from
+observed success. A new compaction start replaces an unterminated no-op attempt
+rather than inheriting stale counts or parentage.
 Failed, skipped or dropped compactions carry no fabricated measurements. Agent
 spans carry configured agent instructions, distinct from resolved generation
 instructions (which can include cache prefixes and output-schema directives).

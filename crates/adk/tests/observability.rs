@@ -1326,3 +1326,38 @@ fn raw_argument_provenance_obeys_capture_redaction_without_mutating_operational_
     assert!(!full.contains("custom-sensitive"));
     assert_eq!(call.argument_text(), raw);
 }
+
+#[tokio::test]
+async fn handoff_lifecycle_is_ordered_without_double_counting_progress() {
+    let (pipeline, records) = pipeline(CaptureMode::Metadata);
+    for event in [
+        Observation::HandoffStarted {
+            from: "source".into(),
+            to: "target".into(),
+        },
+        Observation::Handoff {
+            from: "source".into(),
+            to: "target".into(),
+        },
+        Observation::HandoffCompleted {
+            from: "source".into(),
+            to: "target".into(),
+        },
+    ] {
+        pipeline.observe(&context(), event).await.unwrap();
+    }
+    assert_eq!(pipeline.snapshot().await.handoffs, 1);
+    let records = records.0.lock().unwrap();
+    assert_eq!(
+        records
+            .iter()
+            .map(|row| row.kind.as_str())
+            .collect::<Vec<_>>(),
+        ["handoff_start", "handoff", "handoff_complete"]
+    );
+    assert!(
+        records
+            .windows(2)
+            .all(|pair| pair[0].sequence < pair[1].sequence)
+    );
+}

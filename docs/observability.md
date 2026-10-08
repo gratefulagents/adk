@@ -108,6 +108,14 @@ Pauses do **not** end run/agent spans: resuming the same owned continuation pres
 
 Parity gaps: there are no Go-style endpoint/env/stdout constructors, OTLP transport/TLS setup, global tracer mutation, trace-ID-ready callback, full Go span-data union or complete GenAI semantic-attribute mapping. Provider latency/cache/cost/error-attempt metadata absent from native hooks is not fabricated. Phase/subagent/session/compaction records are root events, not separately synthesized lifecycle spans. `OtelBridge` is a working API/SDK bridge with host-owned exporters, not an ADK-managed OTLP service.
 
+Handoff lifecycle observations bracket the existing transition: `handoff_start`
+precedes the original source-agent/run `handoff` hooks; `handoff_complete` follows
+the committed target checkpoint. Only `handoff` increments the progress handoff
+counter. Start without completion is possible on cancellation/error; trace-owner
+cleanup closes the outstanding span without inventing a successful transition.
+The schema-2 TraceWriter transition feed still writes the original single handoff
+record; the new observations are native operation-lifecycle events.
+
 ## Verification and source references
 
 Run `cargo test -p adk --features observability --test observability` for native tests and `cargo test -p adk --features otel --test observability` for actual SDK spans as well. Coverage includes fragmented/malformed/oversized JSONL, fanout order/backpressure, default/full/operator redaction, complete pre-cap output, a real runner, cumulative usage, real paused continuation, successful two-turn spans, shared-run isolation, ended-parent contexts, final error attributes, filesystem modes/confinement and quota/hardlink defenses.

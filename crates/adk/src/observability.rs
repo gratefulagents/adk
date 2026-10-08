@@ -535,7 +535,13 @@ impl RunHooks for Observability {
                     "raw_tool_output",
                     json!({"call_id":call.id,"tool_name":call.name,"is_error":output.is_error,"output":output}),
                 ),
+                Observation::HandoffStarted { from, to } => {
+                    ("handoff_start", json!({"from":from,"to":to}))
+                }
                 Observation::Handoff { from, to } => ("handoff", json!({"from":from,"to":to})),
+                Observation::HandoffCompleted { from, to } => {
+                    ("handoff_complete", json!({"from":from,"to":to}))
+                }
                 Observation::CompactionStarted {
                     context_tokens,
                     target_tokens,

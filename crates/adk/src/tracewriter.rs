@@ -726,7 +726,7 @@ impl RunHooks for TraceWriter {
                     &agent,
                     &call.name,
                     &call.id,
-                    &serde_json::to_vec(&call.arguments).expect("serializable arguments"),
+                    call.argument_text().as_bytes(),
                     "",
                 ),
                 Observation::RawToolOutput { call, output } => {

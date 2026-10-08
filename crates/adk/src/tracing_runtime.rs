@@ -65,6 +65,7 @@ impl RunTrace {
                         agent: None,
                         tools: HashMap::new(),
                         compaction: None,
+                        handoff: None,
                         generations: HashMap::new(),
                     }),
                     events: VecDeque::new(),
@@ -175,7 +176,8 @@ impl<F> Drop for TracedRun<F> {
 /// Install the same Arc in both RunnerConfig observer fields for exactly one run.
 /// Repeated active agent/tool/generation starts are ignored. Agent lifetimes span
 /// repeated model attempts and end at handoff, AgentEnded or owner completion.
-/// Handoff is a point observation, not a measurement of the handoff operation.
+/// Handoff spans cover hooks, callback, filtering, compaction and checkpoint.
+/// Interrupted transfers end when the owner closes; no success is inferred.
 /// Compaction has counts only on success; failures/drops have no fabricated data.
 /// Function output joins guarded text/reasoning blocks with newlines, omits media,
 /// and precedes native output caps and untrusted wrapping.
@@ -198,6 +200,7 @@ struct State {
     agent: Option<(String, SpanGuard)>,
     tools: HashMap<String, SpanGuard>,
     compaction: Option<(u64, SpanGuard)>,
+    handoff: Option<(String, String, SpanGuard)>,
     generations: HashMap<String, Arc<dyn GenerationObserver>>,
 }
 impl RuntimeTracing {
@@ -285,6 +288,7 @@ impl State {
                     span.finish();
                 }
                 self.compaction.take();
+                self.handoff.take();
                 self.agent.take();
                 self.session.take();
             }
@@ -328,6 +332,8 @@ impl State {
                 }
                 Observation::AgentEnded { agent, .. } => {
                     if self.agent.as_ref().is_some_and(|(name, _)| name == &agent) {
+                        self.compaction.take();
+                        self.handoff.take();
                         self.agent.take();
                     }
                 }
@@ -336,8 +342,8 @@ impl State {
                         let span = self.span(
                             "function",
                             Some(SpanData::Function {
+                                input: call.argument_text().into_owned(),
                                 tool_name: call.name,
-                                input: call.arguments.to_string(),
                                 output: String::new(),
                                 is_error: false,
                             }),
@@ -369,16 +375,27 @@ impl State {
                         span.finish();
                     }
                 }
-                Observation::Handoff { from, to } => {
-                    self.span(
-                        "handoff",
-                        Some(SpanData::Handoff {
-                            from_agent: from,
-                            to_agent: to,
-                        }),
-                    )
-                    .finish();
-                    self.agent.take();
+                Observation::HandoffStarted { from, to } => {
+                    if self.handoff.is_none() {
+                        let span = self.span(
+                            "handoff",
+                            Some(SpanData::Handoff {
+                                from_agent: from.clone(),
+                                to_agent: to.clone(),
+                            }),
+                        );
+                        self.handoff = Some((from, to, span));
+                    }
+                }
+                Observation::HandoffCompleted { from, to } => {
+                    if self
+                        .handoff
+                        .as_ref()
+                        .is_some_and(|(source, target, _)| source == &from && target == &to)
+                    {
+                        self.handoff.take();
+                        self.agent.take();
+                    }
                 }
                 Observation::CompactionStarted { context_tokens, .. } => {
                     // Native no-op local compaction can return without a terminal

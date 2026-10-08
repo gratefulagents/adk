@@ -393,7 +393,15 @@ pub enum Observation {
         call: ToolCall,
         output: ToolOutput,
     },
+    HandoffStarted {
+        from: String,
+        to: String,
+    },
     Handoff {
+        from: String,
+        to: String,
+    },
+    HandoffCompleted {
         from: String,
         to: String,
     },
@@ -3553,6 +3561,13 @@ impl Engine {
             return Ok(false);
         }
         if let Some(handoff) = handoff {
+            let from = self.agent.name.clone();
+            let to = handoff.target.name.clone();
+            self.observe(Observation::HandoffStarted {
+                from: from.clone(),
+                to: to.clone(),
+            })
+            .await?;
             self.observe(Observation::Handoff {
                 from: self.agent.name.clone(),
                 to: handoff.target.name.clone(),
@@ -3707,6 +3722,8 @@ impl Engine {
             self.result.last_agent = Some(self.agent.name.clone());
             self.phase = Phase::Model;
             self.checkpoint(Boundary::Handoff, None).await?;
+            self.observe(Observation::HandoffCompleted { from, to })
+                .await?;
             return Ok(false);
         }
         let tool = tool.expect("tool or handoff resolved");

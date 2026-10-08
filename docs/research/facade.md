@@ -384,3 +384,18 @@ recovery rather than infer it from lossy history. Source is GPL-3.0-only SDK
 `internal/agent/agent.go`, `runner.go`, and `run_result.go` at
 `1dc92b73900fac74dc357a938e4b5eee6392b418`; the 34 normal/streamed observations and
 source hashes are in `fixtures/tool-stopping/observations.json`.
+
+### Owned handoff construction
+
+Adopt `Handoff::new(Arc<AgentConfig>)` plus explicit mutable definition fields
+instead of nullable target pointers and Go functional options. Preserve target
+identity, case-sensitive default naming, metadata, schema and flags. Do not
+reuse the catalog naming helper: the pinned SDK uses two different algorithms.
+Preserve original role/generic target descriptions independently of the catalog's
+trimmed/overridden tool description. Reject a standalone no-op transfer wrapper:
+actual transfer belongs to the runner lifecycle. SDK GPL-3.0-only sources are
+`internal/agent/handoff.go`, `agent_tool.go`, `pkg/agentsdk/specialists.go` and
+`runtime/builder.go` at `1dc92b73900fac74dc357a938e4b5eee6392b418`; file hashes,
+version/license and 44 independently generated cases are in
+`fixtures/handoff-constructor/observations.json`. Callback/gating/filter parity
+is explicitly separate and remains incomplete.

@@ -70,10 +70,19 @@
       "./internal/agent",
       "-run",
       "^(TestRunnerStopOnFirstTool|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./internal/agent",
+      "-run",
+      "^TestHandoffToTool$"
     ]
   ],
   "counts": {
-    "pass": 779,
+    "pass": 780,
     "skip": 5
   },
   "exit_code": 0,
@@ -149,6 +158,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/openai/gpt-6-astra": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/unknown-model": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestFinalAnswerVerifierSingleRefutationRound": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestHandoffToTool": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/high": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/low": "pass",

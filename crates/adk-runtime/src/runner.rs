@@ -100,6 +100,39 @@ pub struct Handoff {
     pub input_filter: HandoffInputFilter,
 }
 
+impl Handoff {
+    pub fn new(target: Arc<AgentConfig>) -> Self {
+        let mut name = String::new();
+        let mut invalid_run = false;
+        for character in target.name.trim().chars() {
+            if character.is_ascii_alphanumeric() || matches!(character, '_' | '-') {
+                name.push(character);
+                invalid_run = false;
+            } else if !invalid_run {
+                name.push('_');
+                invalid_run = true;
+            }
+        }
+        let name = name.trim_matches(['_', '-']);
+        let name = if name.is_empty() { "agent" } else { name };
+        Self {
+            definition: ToolDefinition {
+                name: format!("transfer_to_{name}"),
+                description: if target.handoff_description.is_empty() {
+                    format!("Handoff to {}", target.name)
+                } else {
+                    target.handoff_description.clone()
+                },
+                input_schema: schemars::json_schema!({"type":"object", "properties":{}}),
+                read_only: true,
+                requires_approval: false,
+            },
+            target,
+            input_filter: HandoffInputFilter::Preserve,
+        }
+    }
+}
+
 pub trait OutputParser: Send + Sync {
     fn parse(&self, raw: &str) -> Result<Value, Error>;
 }
@@ -144,6 +177,7 @@ pub struct AgentConfig {
     /// Narrows host access and disables host mutation exceptions when set.
     pub tool_access_ceiling: Option<AccessMode>,
     pub handoffs: Vec<Handoff>,
+    pub handoff_description: String,
     pub output_schema: Option<schemars::Schema>,
     pub output_schema_name: String,
     pub output_schema_strict: bool,
@@ -169,6 +203,7 @@ impl AgentConfig {
             tools: vec![],
             tool_access_ceiling: None,
             handoffs: vec![],
+            handoff_description: String::new(),
             output_schema: None,
             output_schema_name: "final_output".into(),
             output_schema_strict: true,

@@ -4272,6 +4272,48 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-FF91FF3E60F84D58": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.HandoffDescription",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::handoff_description",
+        "crates/adk/src/builder.rs::Builder"
+      ],
+      "rust_test_identifiers": [
+        "public_handoff_constructor_matches_pinned_defaults_and_explicit_overrides",
+        "public_handoff_constructor_transfers_to_the_owned_target",
+        "bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle",
+        "handoff_description_is_bound_to_durable_agent_configuration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffToTool",
+      "rationale": "Forty-four independent pinned constructor observations verify case-preserving ASCII names, invalid Unicode runs, underscore/hyphen behavior, fallback agent, exact default/custom/whitespace descriptions, pointer identity, object schema and read-only/approval defaults. Rust uses owned Arc target construction and explicit mutable metadata overrides instead of nullable Go pointers/functional options (docs/research/facade.md). Catalog fixtures verify original role/generic target description separately from overridden catalog tool descriptions; native execution, durable fingerprint and offline handoff example exercise the public API. Constructor/default metadata only: dynamic enable, OnHandoff, arbitrary input-filter callbacks, ToTool standalone wrapper and whole Handoff parity remain separate open obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-53CC316510C70AAD": {
+      "source": "internal/agent/handoff.go",
+      "source_name": "NewHandoff",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Handoff::new",
+        "crates/adk/src/builder.rs::Builder"
+      ],
+      "rust_test_identifiers": [
+        "public_handoff_constructor_matches_pinned_defaults_and_explicit_overrides",
+        "public_handoff_constructor_transfers_to_the_owned_target",
+        "bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle",
+        "handoff_description_is_bound_to_durable_agent_configuration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffToTool",
+      "rationale": "Forty-four independent pinned constructor observations verify case-preserving ASCII names, invalid Unicode runs, underscore/hyphen behavior, fallback agent, exact default/custom/whitespace descriptions, pointer identity, object schema and read-only/approval defaults. Rust uses owned Arc target construction and explicit mutable metadata overrides instead of nullable Go pointers/functional options (docs/research/facade.md). Catalog fixtures verify original role/generic target description separately from overridden catalog tool descriptions; native execution, durable fingerprint and offline handoff example exercise the public API. Constructor/default metadata only: dynamic enable, OnHandoff, arbitrary input-filter callbacks, ToTool standalone wrapper and whole Handoff parity remain separate open obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "builder"
+      ]
     }
   }
 }

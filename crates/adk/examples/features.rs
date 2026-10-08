@@ -523,17 +523,13 @@ async fn chatloop() {
 async fn handoffs_subagents() {
     let specialist = Scripted::new(vec![answer("specialist evidence")]);
     let mut a = agent(Scripted::new(vec![tool_response(
-        "transfer",
+        "transfer_to_specialist",
         json!({"key":"answer"}),
     )]));
-    a.handoffs.push(Handoff {
-        input_filter: Default::default(),
-        definition: definition("transfer", false),
-        target: Arc::new(AgentConfig::new(
-            "specialist",
-            ModelBinding::complete("offline", specialist.clone()),
-        )),
-    });
+    a.handoffs.push(Handoff::new(Arc::new(AgentConfig::new(
+        "specialist",
+        ModelBinding::complete("offline", specialist.clone()),
+    ))));
     let result = run(a).await.result;
     assert_eq!(result.final_output, Some(json!("specialist evidence")));
     assert_eq!(result.last_agent.as_deref(), Some("specialist"));

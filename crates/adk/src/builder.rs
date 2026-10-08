@@ -1448,6 +1448,7 @@ impl Builder {
                 let mut target =
                     AgentConfig::new(&role.name, ModelBinding::streaming(model, routes.clone()));
                 target.instructions = role.instructions.clone();
+                target.handoff_description = role.description.clone();
                 target.fallbacks = fallbacks
                     .into_iter()
                     .map(|name| ModelBinding::streaming(name, routes.clone()))
@@ -1484,6 +1485,7 @@ impl Builder {
                 let mut target =
                     AgentConfig::new("specialist", ModelBinding::streaming(model, routes.clone()));
                 target.instructions = "# System context\nYou are part of a multi-agent system designed to make agent coordination and execution easy. Agents use two primary abstractions: tools and handoffs. Handoffs transfer control to another agent that is better suited for the task, and are achieved by calling a handoff function, generally named `transfer_to_<agent_name>`. Transfers between agents are handled seamlessly in the background; do not mention or draw attention to these transfers in your conversation with the user.\n\nYou are the handoff specialist. Resolve the delegated request and explain the result briefly.".into();
+                target.handoff_description = "Specialist for handoff requests.".into();
                 target.settings = base_settings;
                 target.settings.insert(
                     "parallel_tool_calls".into(),

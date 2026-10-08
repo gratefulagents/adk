@@ -1163,6 +1163,10 @@ async fn bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle
             let target = &actual.target;
             assert_eq!(target.name, expected["target"]["name"], "{name}");
             assert_eq!(
+                target.handoff_description, expected["target"]["handoff_description"],
+                "{name}"
+            );
+            assert_eq!(
                 target.instructions, expected["target"]["instructions"],
                 "{name}"
             );

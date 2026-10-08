@@ -1077,3 +1077,28 @@ selection changes. Go `tool_completed` recovery with an enabled stop policy
 requires reconciled finalization, because that checkpoint does not establish the
 turn's stop decision or original raw tool output. Terminal Go recovery requires
 host-verified output and its `final_output_is_raw_json` origin.
+
+### Constructing an owned handoff
+
+`Handoff::new(Arc::new(target))` creates an always-available transfer definition
+subject to host policy: read-only, no tool-owned approval, an empty object schema,
+and preserved history. Customize `handoff.definition.name`, `description`, or
+`input_schema` explicitly rather than passing Go functional-option closures.
+The target stays shared through `Arc`; transfer execution remains the runner's
+responsibility, not a standalone tool that only pretends to transfer control.
+
+The default description is the target's `handoff_description` when nonempty,
+otherwise `Handoff to <original target name>`. Whitespace-only custom descriptions
+are retained. Role targets preserve the original role description; the generic
+target preserves the SDK's specialist description. These values are bound in
+durable configuration fingerprints.
+
+Default names preserve ASCII case, digits, underscores and hyphens, replacing
+runs of other characters with an underscore and trimming outer underscores and
+hyphens. An empty normalized name becomes `agent`; the prefix is `transfer_to_`.
+This public-constructor algorithm is intentionally **not** the catalog-builder
+algorithm, which lowercases and uses `specialist` as its fallback.
+Forty-four pinned cases verify the constructor and explicit metadata overrides;
+catalog fixtures independently verify target descriptions. Arbitrary handoff
+input-filter callbacks, `OnHandoff`, and dynamic enable predicates remain separate
+missing capabilities; this constructor does not claim or silently emulate them.

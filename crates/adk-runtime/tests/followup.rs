@@ -2078,3 +2078,68 @@ async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_gua
         );
     }
 }
+
+#[test]
+fn public_handoff_constructor_matches_pinned_defaults_and_explicit_overrides() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-constructor/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let mut target = AgentConfig::new(
+            case["name"].as_str().unwrap(),
+            ModelBinding::complete("offline", Script::new(vec![])),
+        );
+        target.handoff_description = case["target_description"].as_str().unwrap().into();
+        let target = Arc::new(target);
+        let mut handoff = Handoff::new(target.clone());
+        if case["overrides"] == true {
+            handoff.definition.name = "custom_transfer".into();
+            handoff.definition.description = case["description"].as_str().unwrap().into();
+        }
+        assert_eq!(handoff.definition.name, case["tool_name"], "{case}");
+        assert_eq!(
+            handoff.definition.description, case["description"],
+            "{case}"
+        );
+        assert_eq!(
+            handoff.definition.input_schema.as_value(),
+            &case["schema"],
+            "{case}"
+        );
+        assert_eq!(handoff.definition.read_only, case["read_only"], "{case}");
+        assert_eq!(
+            handoff.definition.requires_approval, case["approval"],
+            "{case}"
+        );
+        assert_eq!(handoff.input_filter, HandoffInputFilter::Preserve);
+        assert!(Arc::ptr_eq(&handoff.target, &target));
+        assert_eq!(target.handoff_description, case["target_description"]);
+    }
+}
+
+#[tokio::test]
+async fn public_handoff_constructor_transfers_to_the_owned_target() {
+    let model = Script::new(vec![
+        Ok(response(vec![call("transfer_to_Code_Reviewer")], true)),
+        Ok(answer()),
+    ]);
+    let binding = ModelBinding::complete("offline", model.clone());
+    let mut target = AgentConfig::new("Code Reviewer", binding.clone());
+    target.instructions = "Review the changes".into();
+    target.handoff_description = "reviewer".into();
+    let mut parent = AgentConfig::new("parent", binding);
+    parent.handoffs.push(Handoff::new(Arc::new(target)));
+    let runner = Runner::new(parent, RunnerConfig::default()).unwrap();
+    let result = runner
+        .run(context(), request(vec![], 3), Arc::new(Quiet))
+        .await
+        .unwrap();
+    assert_eq!(result.result.last_agent.as_deref(), Some("Code Reviewer"));
+    assert_eq!(result.result.final_text(), "done");
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    assert_eq!(requests[0].tools[0].name, "transfer_to_Code_Reviewer");
+    assert_eq!(requests[0].tools[0].description, "reviewer");
+    assert_eq!(requests[1].instructions, "Review the changes");
+}

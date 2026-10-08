@@ -3174,3 +3174,21 @@ async fn named_tool_stop_and_raw_final_kind_survive_recovery_without_redispatch(
     assert!(recovered.result.final_output_is_raw_json);
     assert_eq!(model.calls.load(Ordering::SeqCst), 1);
 }
+
+#[tokio::test]
+async fn handoff_description_is_bound_to_durable_agent_configuration() {
+    let (_, model, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+    agent.handoff_description = "original".into();
+    let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+    let store = Arc::new(Store::default());
+    run(&runner, store.clone(), None).await.unwrap();
+    agent.handoff_description = "changed".into();
+    let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+    assert!(
+        run(&changed, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .is_err()
+    );
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+}

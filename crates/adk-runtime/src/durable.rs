@@ -733,6 +733,9 @@ impl Runner {
             {
                 entry["tool_stopping"] = serde_json::json!({"behavior": agent.tool_use, "names": agent.stop_at_tools, "output": agent.tool_final_output});
             }
+            if !agent.handoff_description.is_empty() {
+                entry["handoff_description"] = serde_json::json!(agent.handoff_description);
+            }
             if let Some(provider) = &agent.instruction_provider {
                 entry["instruction_provider"] = serde_json::json!(provider.durable_key());
             }

@@ -1213,3 +1213,28 @@ whitespace checks passed. Three agent-field obligations are newly verified:
 **251 verified / 8,640 unresolved / 251 excluded**. Full issue #11 remains open;
 credentialed live checks remain unverified. No excluded CLI/evaluation adapters,
 release work or production-default switch was added.
+
+### Public owned handoff construction
+
+`Handoff::new` and `AgentConfig::handoff_description` preserve constructor defaults,
+shared target identity and description metadata. Forty-four independent pinned
+cases cover naming, Unicode/invalid runs, empty fallback, custom/whitespace
+metadata and explicit name/description overrides. Catalog observations verify
+role/generic descriptions separately from overridden tool descriptions. The
+native dispatch test and offline handoff example use the constructor; durable
+recovery rejects changed description configuration.
+
+The initial full run exposed a pre-existing nested-timeout fixture race: paused
+Tokio time did not order a leaf's fixed delay against wall-clock deadlines, so a
+child could complete where the assertion expected pending. The two-slot fixture
+now gates leaf completion until the worker receives its pending result. No
+assertions were weakened. Five focused repetitions passed, followed by a fresh
+locked Linux Rust 1.88.0 workspace/all-features/all-targets run:
+**1,276 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, changed-file Rustfmt, facade matrix, standalone consumer, 20 offline
+scenarios and host-session example passed. Source oracles, 18 ledger validators,
+source locks, Python compilation, Go formatting and whitespace checks passed.
+Two constructor/description obligations are newly verified:
+**253 verified / 8,638 unresolved / 251 excluded**. Arbitrary handoff filters,
+callbacks and dynamic enable predicates remain separate missing capabilities;
+the full issue remains incomplete. Credentialed live tests remain unverified.

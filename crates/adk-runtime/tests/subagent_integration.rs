@@ -499,6 +499,48 @@ async fn tool_policy_timeout_preserves_managed_pending_results() {
 
 #[tokio::test(start_paused = true)]
 async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
+    struct Leaf(Option<Arc<tokio::sync::Notify>>);
+    impl Model for Leaf {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                if let Some(release) = &self.0 {
+                    release.notified().await;
+                } else {
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                }
+                Ok(answer("late nested evidence"))
+            })
+        }
+    }
+    struct ReleasingWorker {
+        model: Arc<FakeModel>,
+        release: Option<Arc<tokio::sync::Notify>>,
+        call_id: String,
+    }
+    impl Model for ReleasingWorker {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            context: &'a Context,
+            request: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            if let Some(release) = &self.release
+                && request.input.iter().any(|item| matches!(item, RunItem::ToolResult { call_id, .. } if call_id == &self.call_id))
+            {
+                release.notify_one();
+            }
+            self.model.complete(context, request)
+        }
+    }
     for max_concurrency in [1, 2] {
         for name in ["subagent", "subagent_wait", "specialist"] {
             let (foreign_owner, foreign_session) =
@@ -516,8 +558,19 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
                 answer("nested synthesis"),
             ]);
             let model = FakeModel::new(responses, Duration::ZERO);
-            let mut agent =
-                AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+            // Paused Tokio time cannot order a leaf delay against core wall-clock deadlines.
+            let release = (max_concurrency == 2).then(|| Arc::new(tokio::sync::Notify::new()));
+            let mut agent = AgentConfig::new(
+                "worker",
+                ModelBinding::complete(
+                    "fake",
+                    Arc::new(ReleasingWorker {
+                        model: model.clone(),
+                        release: release.clone(),
+                        call_id: format!("call-{name}"),
+                    }),
+                ),
+            );
             agent.tools = build_subagent_task_tools(foreign_session.clone(), "leaf");
             agent.tools.push(Arc::new(AgentAsTool::new(
                 "specialist",
@@ -533,13 +586,7 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
                 },
             )
             .unwrap();
-            let leaf = runner(
-                "leaf",
-                FakeModel::new(
-                    vec![answer("late nested evidence")],
-                    Duration::from_millis(50),
-                ),
-            );
+            let leaf = runner("leaf", Arc::new(Leaf(release)));
             let owner = Scheduler::new(
                 context(),
                 SchedulerConfig {

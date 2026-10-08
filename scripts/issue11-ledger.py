@@ -28,7 +28,7 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["fixtures/tool-stopping/observations.json", "scripts/tool-stopping-reference/run.py", "scripts/tool-stopping-reference/reference_test.go", "fixtures/dynamic-instructions/observations.json", "scripts/dynamic-instructions-reference/run.py", "scripts/dynamic-instructions-reference/reference_test.go", "crates/adk-runtime/src/verifier.rs", "fixtures/critic/observations.json", "scripts/critic-reference/run.py", "scripts/critic-reference/reference_test.go", "fixtures/verifier/observations.json", "scripts/verifier-reference/run.py",
+RUST_INPUTS = ["fixtures/handoff-constructor/observations.json", "scripts/handoff-constructor-reference/run.py", "scripts/handoff-constructor-reference/reference_test.go", "fixtures/tool-stopping/observations.json", "scripts/tool-stopping-reference/run.py", "scripts/tool-stopping-reference/reference_test.go", "fixtures/dynamic-instructions/observations.json", "scripts/dynamic-instructions-reference/run.py", "scripts/dynamic-instructions-reference/reference_test.go", "crates/adk-runtime/src/verifier.rs", "fixtures/critic/observations.json", "scripts/critic-reference/run.py", "scripts/critic-reference/reference_test.go", "fixtures/verifier/observations.json", "scripts/verifier-reference/run.py",
                "scripts/verifier-reference/reference_test.go",
                "crates/adk-codec/src/config.rs", "crates/adk-codec/tests/runner_codecs.rs",
                "fixtures/confirmation/observations.json", "scripts/confirmation-reference/run.py",
@@ -285,6 +285,7 @@ def verify_rust() -> None:
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     llm_summary_check = subprocess.run([sys.executable, str(ROOT / "scripts/llm-summary-reference/run.py"), "--check"],
                                       cwd=ROOT, text=True, capture_output=True, check=True)
+    handoff_constructor_check = subprocess.run([sys.executable, str(ROOT / "scripts/handoff-constructor-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     tool_stopping_check = subprocess.run([sys.executable, str(ROOT / "scripts/tool-stopping-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     dynamic_instructions_check = subprocess.run([sys.executable, str(ROOT / "scripts/dynamic-instructions-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     critic_check = subprocess.run([sys.executable, str(ROOT / "scripts/critic-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
@@ -332,7 +333,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout,
+        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},

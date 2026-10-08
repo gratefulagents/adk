@@ -711,9 +711,12 @@ impl Runner {
                 || agent.output_parser.is_some()
                 || agent.handoffs.iter().any(|handoff| {
                     handoff
-                        .is_enabled
+                        .history_filter
                         .as_ref()
-                        .is_some_and(|predicate| predicate.durable_key().is_none_or(str::is_empty))
+                        .is_some_and(|filter| filter.durable_key().is_none_or(str::is_empty))
+                        || handoff.is_enabled.as_ref().is_some_and(|predicate| {
+                            predicate.durable_key().is_none_or(str::is_empty)
+                        })
                         || handoff.on_handoff.as_ref().is_some_and(|callback| {
                             callback.durable_key().is_none_or(str::is_empty)
                         })
@@ -728,7 +731,7 @@ impl Runner {
                     .is_some_and(|hooks| !hooks.durable_observer())
             {
                 return Err(unsupported(
-                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, handoff predicates and callbacks, guardrails and hooks",
+                    "durable agents require unique names, no custom parsers, and replay-safe instruction providers, handoff predicates, history filters and callbacks, guardrails and hooks",
                 ));
             }
             let mut entry = serde_json::json!({
@@ -774,6 +777,22 @@ impl Runner {
                             .is_enabled
                             .as_ref()
                             .and_then(|predicate| predicate.durable_key()))
+                        .collect::<Vec<_>>()
+                );
+            }
+            if agent
+                .handoffs
+                .iter()
+                .any(|handoff| handoff.history_filter.is_some())
+            {
+                entry["handoff_history_filters"] = serde_json::json!(
+                    agent
+                        .handoffs
+                        .iter()
+                        .map(|handoff| handoff
+                            .history_filter
+                            .as_ref()
+                            .and_then(|filter| filter.durable_key()))
                         .collect::<Vec<_>>()
                 );
             }

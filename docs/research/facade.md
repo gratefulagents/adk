@@ -430,3 +430,19 @@ the source comment's blanket “unknown tool” description. Native predicates a
 owned, synchronous, nonblocking reads over borrowed context, with durable stable
 identity and persisted classification. Rejected mutable identity and side-effectful
 call-count dependence; no evaluation-count guarantee is made.
+
+
+### Owned handoff history replacement
+
+The pinned GPL-3.0-only SDK `handoff.go`, `runner.go` and
+`internal/agent/audit_fixes_test.go` are source-hashed in
+`fixtures/handoff-filter/observations.json`. Eight independently executed
+normal/streamed cases confirm that the filter sees current-turn synthesized
+outputs and all output items, but only replaces continuation/final history.
+Adopted that ordering and visibility. Chose an owned async `HandoffHistory`
+return with explicit provenance and approval anchors, not Go slice mutation.
+Rejected fabricated approvals, invalid tool graphs and simultaneous built-in/
+custom filters. Validation before commit and detached-journal marker checking
+prevent rejected replacements from corrupting live approval state. Stable
+identity is required for durable use; effects and call counts are not replay
+contracts. Exact raw JSON callback provenance remains a separate open capability.

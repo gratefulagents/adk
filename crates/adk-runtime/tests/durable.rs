@@ -1264,6 +1264,7 @@ async fn actual_go_emitted_completed_boundaries_resume_without_replaying_effects
             agent.tools.push(tool.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                history_filter: None,
                 is_enabled: None,
                 input_filter: Default::default(),
                 definition: ToolDefinition {
@@ -1324,6 +1325,7 @@ async fn native_handoff_checkpoint_restores_target_and_pairs_go_history() {
     let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
     agent.handoffs.push(Handoff {
         on_handoff: None,
+        history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
         definition: ToolDefinition {
@@ -2172,6 +2174,7 @@ async fn handoff_filter_checkpoint_restores_filtered_history_and_rejects_configu
         let mut agent = AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
         agent.handoffs.push(Handoff {
             on_handoff: None,
+            history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
@@ -2294,6 +2297,7 @@ async fn tool_ceiling_is_bound_to_durable_handoff_graph_even_with_identical_defi
         let mut parent = AgentConfig::new("parent", ModelBinding::complete("model", model.clone()));
         parent.handoffs.push(Handoff {
             on_handoff: None,
+            history_filter: None,
             is_enabled: None,
             definition: ToolDefinition {
                 name: "transfer".into(),
@@ -3359,5 +3363,120 @@ async fn handoff_predicate_identity_and_classification_survive_model_checkpoint(
                 .iter()
                 .any(|item| matches!(item, RunItem::Handoff { .. }))
         );
+    }
+}
+
+struct PureHistoryFilter {
+    key: Option<&'static str>,
+    mode: &'static str,
+    calls: AtomicUsize,
+}
+impl HandoffHistoryFilter for PureHistoryFilter {
+    fn durable_key(&self) -> Option<&str> {
+        self.key
+    }
+    fn filter<'a>(
+        &'a self,
+        _: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            assert_eq!(history.approvals.len(), 1);
+            match self.mode {
+                "strip" => {
+                    (history.items, history.provenance) = history
+                        .items
+                        .into_iter()
+                        .zip(history.provenance)
+                        .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                        .unzip();
+                    history.approvals.clear();
+                }
+                "forge" => history.approvals[0].marker.data.tool_name = "forged".into(),
+                "out_of_range" => history.approvals[0].before_item = history.items.len() + 1,
+                _ => {}
+            }
+            Ok(history)
+        })
+    }
+}
+#[tokio::test]
+async fn custom_handoff_history_filter_preserves_approval_boundaries_and_durable_identity() {
+    for mode in ["preserve", "strip", "forge", "out_of_range"] {
+        let transfer = RunItem::ToolCall {
+            call: ToolCall {
+                id: "transfer".into(),
+                name: "transfer_to_target".into(),
+                arguments: json!({}),
+            },
+        };
+        let (_, model, _) = setup(vec![transfer], false, false);
+        let binding = ModelBinding::complete("model", model.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("target", binding.clone())));
+        handoff.definition.requires_approval = true;
+        let mut agent = AgentConfig::new("agent", binding);
+        agent.handoffs.push(handoff);
+        for key in [None, Some("")] {
+            agent.handoffs[0].history_filter = Some(Arc::new(PureHistoryFilter {
+                key,
+                mode,
+                calls: AtomicUsize::new(0),
+            }));
+            let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+            assert!(
+                run(&runner, Arc::new(Store::default()), None)
+                    .await
+                    .is_err()
+            );
+            assert_eq!(model.calls.load(Ordering::SeqCst), 0);
+        }
+        let filter = Arc::new(PureHistoryFilter {
+            key: Some(mode),
+            mode,
+            calls: AtomicUsize::new(0),
+        });
+        agent.handoffs[0].history_filter = Some(filter.clone());
+        let runner = Runner::new(agent.clone(), RunnerConfig::default()).unwrap();
+        let store = Arc::new(Store::default());
+        *store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+        let error = run(&runner, store.clone(), None).await.err().unwrap();
+        assert_eq!(filter.calls.load(Ordering::SeqCst), 1);
+        if matches!(mode, "forge" | "out_of_range") {
+            let partial = error.partial.unwrap();
+            assert!(
+                partial
+                    .history
+                    .iter()
+                    .any(|item| matches!(item,RunItem::ToolCall {call} if call.id=="transfer"))
+            );
+            assert_eq!(partial.last_agent.as_deref(), Some("agent"));
+            assert_eq!(model.calls.load(Ordering::SeqCst), 1);
+            assert_ne!(store.latest().execution_boundary(), "handoff_completed");
+            continue;
+        }
+        assert_eq!(error.error.info.message, "injected persistence failure");
+        let checkpoint = serde_json::to_value(store.latest()).unwrap();
+        let entries = checkpoint["runtime"]["approval_journal"]
+            .as_array()
+            .unwrap();
+        assert_eq!(entries.len(), 1);
+        assert_eq!(entries[0]["history_before"].is_null(), mode == "strip");
+        agent.handoffs[0].history_filter = Some(Arc::new(PureHistoryFilter {
+            key: Some("changed"),
+            mode,
+            calls: AtomicUsize::new(0),
+        }));
+        let changed = Runner::new(agent, RunnerConfig::default()).unwrap();
+        assert!(
+            run(&changed, Arc::new(Store::default()), Some(store.latest()))
+                .await
+                .is_err()
+        );
+        let result = run(&runner, Arc::new(Store::default()), Some(store.latest()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("target"));
+        assert_eq!(filter.calls.load(Ordering::SeqCst), 1);
     }
 }

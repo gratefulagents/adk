@@ -1677,6 +1677,7 @@ impl Builder {
                 graph_names.insert(name.clone());
                 agent.handoffs.push(Handoff {
                     on_handoff: None,
+                history_filter: None,
                 is_enabled: None,
                     definition: ToolDefinition {
                         name, description,

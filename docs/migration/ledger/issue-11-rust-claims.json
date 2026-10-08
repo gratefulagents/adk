@@ -4333,6 +4333,27 @@
         "runtime",
         "durable"
       ]
+    },
+    "SDK-1603C1672E387343": {
+      "source": "internal/agent/handoff.go",
+      "source_name": "Handoff.InputFilter",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::HandoffHistoryFilter",
+        "crates/adk-runtime/src/runner.rs::Handoff::history_filter"
+      ],
+      "rust_test_identifiers": [
+        "custom_handoff_history_filter_matches_pinned_current_turn_and_result_views",
+        "invalid_handoff_filter_output_does_not_replace_committed_history",
+        "custom_handoff_history_filter_preserves_approval_boundaries_and_durable_identity",
+        "handoff_callback_cancellation_drops_future_before_target_dispatch"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffInputFilterSeesCurrentTurnItems",
+      "rationale": "Eight independent pinned normal/streamed cases compare filter current history, new-item history, callback/filter order, target request, final history and unchanged result items for preservation, message-only selection, summary replacement and empty history. Native owned async history replacement carries explicit provenance and approval anchors rather than Go slice mutation. Additional tests enforce valid tool pairs, provenance lengths, existing-only ordered in-range approval markers, failure-before-replacement, cancellation/drop and durable identity/no-repeat. Filters may replace valid native history but may not fabricate approval authority or invalid tool graphs; these security boundaries and native attribution rules are explicit in docs/runtime-builder.md. Field-level transformation is verified; full Handoff, raw callback bytes and wire provenance compatibility remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "durable"
+      ]
     }
   }
 }

@@ -676,6 +676,7 @@ async fn wire_bridge_preserves_pause_continuation_and_projects_handoff_outputs_i
     source.tools = vec![before.clone(), after.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
@@ -894,6 +895,7 @@ async fn handoff_skipped_siblings_preserve_but_do_not_advance_tool_error_streak(
     source.tools = vec![skipped.clone()];
     source.handoffs = vec![Handoff {
         on_handoff: None,
+        history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
@@ -935,6 +937,7 @@ async fn stop_gate_does_not_run_when_all_handoffs_are_denied() {
     let mut agent = AgentConfig::new("source", ModelBinding::complete("source", model.clone()));
     agent.handoffs = vec![Handoff {
         on_handoff: None,
+        history_filter: None,
         is_enabled: None,
         input_filter: Default::default(),
         definition: TestTool::new("transfer", true, true, false, false)
@@ -1776,6 +1779,7 @@ async fn dynamic_instructions_match_pinned_static_precedence_usage_composition_a
             child.instruction_provider = Some(provider.clone());
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                history_filter: None,
                 is_enabled: None,
                 definition: ToolDefinition {
                     name: "transfer_to_child".into(),
@@ -2029,6 +2033,7 @@ async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_gua
         if name == "handoff" {
             agent.handoffs.push(Handoff {
                 on_handoff: None,
+                history_filter: None,
                 is_enabled: None,
                 definition: ToolDefinition {
                     name: "transfer_to_child".into(),
@@ -2368,34 +2373,52 @@ impl HandoffCallback for BlockingHandoff {
         })
     }
 }
+impl HandoffHistoryFilter for BlockingHandoff {
+    fn filter<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            self.on_handoff(context, &Value::Null).await;
+            Ok(history)
+        })
+    }
+}
 #[tokio::test]
 async fn handoff_callback_cancellation_drops_future_before_target_dispatch() {
-    let callback = Arc::new(BlockingHandoff {
-        entered: tokio::sync::Notify::new(),
-        dropped: AtomicUsize::new(0),
-    });
-    let model = Script::new(vec![Ok(response(vec![call("transfer_to_expert")], true))]);
-    let binding = ModelBinding::complete("offline", model.clone());
-    let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
-    handoff.on_handoff = Some(callback.clone());
-    let mut agent = AgentConfig::new("router", binding);
-    agent.handoffs.push(handoff);
-    let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
-    let token = CancellationToken::new();
-    let mut ctx = context();
-    ctx.cancellation = Arc::new(token.clone());
-    let run = runner.run(ctx, request(vec![], 3), Arc::new(Quiet));
-    let cancel = async {
-        callback.entered.notified().await;
-        token.cancel();
-    };
-    let (result, ()) = tokio::join!(run, cancel);
-    assert_eq!(
-        result.err().unwrap().error.info.category,
-        ErrorCategory::Cancelled
-    );
-    assert_eq!(callback.dropped.load(Ordering::SeqCst), 1);
-    assert_eq!(model.requests.lock().unwrap().len(), 1);
+    for use_filter in [false, true] {
+        let callback = Arc::new(BlockingHandoff {
+            entered: tokio::sync::Notify::new(),
+            dropped: AtomicUsize::new(0),
+        });
+        let model = Script::new(vec![Ok(response(vec![call("transfer_to_expert")], true))]);
+        let binding = ModelBinding::complete("offline", model.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+        if use_filter {
+            handoff.history_filter = Some(callback.clone());
+        } else {
+            handoff.on_handoff = Some(callback.clone());
+        }
+        let mut agent = AgentConfig::new("router", binding);
+        agent.handoffs.push(handoff);
+        let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let token = CancellationToken::new();
+        let mut ctx = context();
+        ctx.cancellation = Arc::new(token.clone());
+        let run = runner.run(ctx, request(vec![], 3), Arc::new(Quiet));
+        let cancel = async {
+            callback.entered.notified().await;
+            token.cancel();
+        };
+        let (result, ()) = tokio::join!(run, cancel);
+        assert_eq!(
+            result.err().unwrap().error.info.category,
+            ErrorCategory::Cancelled
+        );
+        assert_eq!(callback.dropped.load(Ordering::SeqCst), 1);
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+    }
 }
 
 struct EnabledHandoff(Arc<AtomicUsize>);
@@ -2533,5 +2556,191 @@ async fn handoff_enablement_matches_pinned_exposure_reclassification_and_sibling
             _ => None,
         }).collect();
         assert_eq!(json!(outputs), case["outputs"], "{case}");
+    }
+}
+
+fn handoff_history_projection(items: &[RunItem]) -> Value {
+    json!(items.iter().filter_map(|item| match item {
+        RunItem::Message {message} | RunItem::PhasedMessage {message, ..} => Some(json!({"kind":"message","text":message.content.iter().filter_map(|content| if let Content::Text {text}=content {Some(text.as_str())} else {None}).collect::<String>()})),
+        RunItem::ToolCall {call} => Some(json!({"kind":"call","id":call.id,"name":call.name})),
+        RunItem::ToolResult {call_id, output} => Some(json!({"kind":"output","id":call_id,"error":output.is_error,"text":output.content.iter().filter_map(|content| if let Content::Text {text}=content {Some(text.as_str())} else {None}).collect::<String>()})),
+        RunItem::Handoff {call_id,agent} => Some(json!({"kind":"output","id":call_id,"error":false,"text":format!("Handing off to {agent}")})),
+        _=>None,
+    }).collect::<Vec<_>>())
+}
+struct HistoryFilter {
+    scenario: String,
+    events: Arc<Mutex<Vec<String>>>,
+    inputs: Mutex<Vec<Value>>,
+}
+impl HandoffHistoryFilter for HistoryFilter {
+    fn filter<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            self.events.lock().unwrap().push("filter".into());
+            assert_eq!(context.agent.name, "router");
+            assert_eq!(context.target.name, "expert");
+            self.inputs.lock().unwrap().extend([
+                handoff_history_projection(&history.items),
+                handoff_history_projection(&context.snapshot.new_items),
+            ]);
+            match self.scenario.as_str() {
+                "messages" => {
+                    (history.items, history.provenance) = history
+                        .items
+                        .into_iter()
+                        .zip(history.provenance)
+                        .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                        .unzip();
+                    history.approvals.clear();
+                }
+                "replace" => {
+                    history.items = vec![message(Role::User, "filtered summary")];
+                    history.provenance = vec![ItemProvenance::Unattributed];
+                    history.approvals.clear();
+                }
+                "empty" => {
+                    history.items.clear();
+                    history.provenance.clear();
+                    history.approvals.clear();
+                }
+                "bad_provenance" => {
+                    history.provenance = vec![ItemProvenance::Unknown];
+                }
+                "orphan" => {
+                    history
+                        .items
+                        .retain(|item| !matches!(item, RunItem::ToolCall { .. }));
+                    history.provenance.clear();
+                }
+                _ => {}
+            }
+            Ok(history)
+        })
+    }
+}
+#[tokio::test]
+async fn custom_handoff_history_filter_matches_pinned_current_turn_and_result_views() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-filter/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let events = Arc::new(Mutex::new(vec![]));
+        let filter = Arc::new(HistoryFilter {
+            scenario: case["scenario"].as_str().unwrap().into(),
+            events: events.clone(),
+            inputs: Mutex::new(vec![]),
+        });
+        let calls = vec![
+            message(Role::Assistant, "transfer"),
+            RunItem::ToolCall {
+                call: ToolCall {
+                    id: "lookup".into(),
+                    name: "lookup".into(),
+                    arguments: json!({}),
+                },
+            },
+            RunItem::ToolCall {
+                call: ToolCall {
+                    id: "h1".into(),
+                    name: "transfer_to_expert".into(),
+                    arguments: json!({}),
+                },
+            },
+        ];
+        let model = Script::new(vec![Ok(response(calls, true)), Ok(answer())]);
+        let binding = if case["streamed"] == true {
+            ModelBinding::streaming("offline", model.clone())
+        } else {
+            ModelBinding::complete("offline", model.clone())
+        };
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+        handoff.on_handoff = Some(Arc::new(SeedHandoff {
+            events: events.clone(),
+            inputs: Mutex::new(vec![]),
+            seeded: AtomicUsize::new(0),
+        }));
+        handoff.history_filter = Some(filter.clone());
+        let mut source = AgentConfig::new("router", binding);
+        source.handoffs.push(handoff);
+        let runner = Runner::new(source, RunnerConfig::default()).unwrap();
+        let mut req = request(vec![message(Role::User, "hello")], 3);
+        req.input_provenance = vec![ItemProvenance::Unattributed];
+        let result = if case["streamed"] == true {
+            runner
+                .stream(context(), req, Arc::new(Quiet))
+                .finish()
+                .await
+        } else {
+            runner.run(context(), req, Arc::new(Quiet)).await
+        }
+        .unwrap();
+        assert_eq!(json!(*events.lock().unwrap()), case["events"]);
+        assert_eq!(filter.inputs.lock().unwrap()[0], case["filter_input"]);
+        assert_eq!(filter.inputs.lock().unwrap()[1], case["filter_all"]);
+        assert_eq!(
+            handoff_history_projection(&result.result.new_items),
+            case["result_items"]
+        );
+        assert_eq!(
+            handoff_history_projection(&result.result.history),
+            case["final_history"]
+        );
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(
+            handoff_history_projection(&requests[1].input),
+            case["target_input"]
+        );
+        if case["scenario"] != "empty" {
+            assert_eq!(
+                requests[1].input_provenance[0],
+                ItemProvenance::Unattributed
+            );
+        }
+        if case["scenario"] == "preserve" || case["scenario"] == "messages" {
+            assert_eq!(
+                requests[1].input_provenance[1],
+                ItemProvenance::Agent {
+                    name: "router".into()
+                }
+            );
+        }
+    }
+}
+#[tokio::test]
+async fn invalid_handoff_filter_output_does_not_replace_committed_history() {
+    for scenario in ["bad_provenance", "orphan"] {
+        let model = Script::new(vec![Ok(response(vec![call("transfer_to_expert")], true))]);
+        let binding = ModelBinding::complete("offline", model.clone());
+        let mut handoff = Handoff::new(Arc::new(AgentConfig::new("expert", binding.clone())));
+        handoff.history_filter = Some(Arc::new(HistoryFilter {
+            scenario: scenario.into(),
+            events: Arc::new(Mutex::new(vec![])),
+            inputs: Mutex::new(vec![]),
+        }));
+        let mut source = AgentConfig::new("router", binding);
+        source.handoffs.push(handoff);
+        let runner = Runner::new(source.clone(), RunnerConfig::default()).unwrap();
+        let error = runner
+            .run(
+                context(),
+                request(vec![message(Role::User, "hello")], 3),
+                Arc::new(Quiet),
+            )
+            .await
+            .err()
+            .unwrap();
+        assert_eq!(error.partial.as_ref().unwrap().history.len(), 3);
+        assert!(matches!(
+            &error.partial.as_ref().unwrap().history[1],
+            RunItem::ToolCall { .. }
+        ));
+        assert_eq!(model.requests.lock().unwrap().len(), 1);
+        source.handoffs[0].input_filter = HandoffInputFilter::RemoveTools;
+        assert!(Runner::new(source, RunnerConfig::default()).is_err());
     }
 }

@@ -111,6 +111,24 @@ pub trait HandoffCallback: Send + Sync {
     -> BoxFuture<'a, ()>;
 }
 
+#[derive(Clone)]
+pub struct HandoffHistory {
+    pub items: Vec<RunItem>,
+    pub provenance: Vec<ItemProvenance>,
+    pub approvals: Vec<ApprovalMarkerBoundary>,
+}
+
+pub trait HandoffHistoryFilter: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn filter<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>>;
+}
+
 pub trait HandoffPredicate: Send + Sync {
     fn durable_key(&self) -> Option<&str> {
         None
@@ -123,6 +141,7 @@ pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
     pub input_filter: HandoffInputFilter,
+    pub history_filter: Option<Arc<dyn HandoffHistoryFilter>>,
     pub on_handoff: Option<Arc<dyn HandoffCallback>>,
     pub is_enabled: Option<Arc<dyn HandoffPredicate>>,
 }
@@ -156,6 +175,7 @@ impl Handoff {
             },
             target,
             input_filter: HandoffInputFilter::Preserve,
+            history_filter: None,
             on_handoff: None,
             is_enabled: None,
         }
@@ -1141,6 +1161,13 @@ fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), 
         compile_schema(schema)?;
     }
     for handoff in &agent.handoffs {
+        if handoff.history_filter.is_some() && handoff.input_filter != HandoffInputFilter::Preserve
+        {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "choose a custom or built-in handoff history filter, not both",
+            ));
+        }
         validate_agent(&handoff.target, seen)?;
     }
     Ok(())
@@ -3500,6 +3527,55 @@ impl Engine {
                 }
             }
             self.publish_committed().await?;
+            if let Some(filter) = &handoff.history_filter {
+                let approvals = self
+                    .approval_journal
+                    .history_markers()
+                    .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+                let filtered = bounded(
+                    &self.context,
+                    None,
+                    filter.filter(
+                        HandoffContext {
+                            operation: &self.context,
+                            agent: &self.agent,
+                            target: &handoff.target,
+                            snapshot: &self.result,
+                            config: &self.config,
+                            policy: &self.policy,
+                        },
+                        HandoffHistory {
+                            items: self.result.history.clone(),
+                            provenance: self.result.history_provenance.clone(),
+                            approvals: approvals.clone(),
+                        },
+                    ),
+                )
+                .await?;
+                validate_history_pairs(&filtered.items)?;
+                let provenance = normalize_provenance(filtered.items.len(), &filtered.provenance)?;
+                crate::compat::ApprovalJournal::from_history(
+                    filtered.approvals.clone(),
+                    filtered.items.len(),
+                )
+                .map_err(|error| Error::new(ErrorCategory::InvalidInput, error.to_string()))?;
+                let observation = Observation::ApprovalHistoryReplaced {
+                    before: self.result.history.clone(),
+                    after: filtered.items.clone(),
+                    markers: filtered.approvals,
+                };
+                // A rejected replacement must not invalidate the live approval journal.
+                let journal = crate::compat::ApprovalJournal::from_history(
+                    approvals,
+                    self.result.history.len(),
+                )
+                .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+                journal.observe(&self.context, observation.clone()).await?;
+                self.result.usage.context_tokens = Some(estimate_history_tokens(&filtered.items));
+                self.result.history = filtered.items;
+                self.result.history_provenance = provenance;
+                self.observe(observation).await?;
+            }
             if handoff.input_filter == HandoffInputFilter::RemoveTools {
                 let (history, provenance): (Vec<_>, Vec<_>) = self
                     .result

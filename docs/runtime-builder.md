@@ -1099,8 +1099,8 @@ hyphens. An empty normalized name becomes `agent`; the prefix is `transfer_to_`.
 This public-constructor algorithm is intentionally **not** the catalog-builder
 algorithm, which lowercases and uses `specialist` as its fallback.
 Forty-four pinned cases verify the constructor and explicit metadata overrides;
-catalog fixtures independently verify target descriptions. Arbitrary handoff
-input-filter callbacks remain a separate missing capability; this constructor does not claim or silently emulate them.
+catalog fixtures independently verify target descriptions. Callback, predicate and
+history-filter contracts are described separately below.
 
 
 ### Awaited handoff callbacks
@@ -1162,3 +1162,39 @@ effect-free predicates. Checkpoints preserve disabled-call classification and
 whether the tool was advertised, so recovery does not reinterpret an already
 classified call. Configuration identity changes are rejected. Evaluation counts
 are not an API contract; predicates must not perform I/O or rely on call counts.
+
+
+### Custom handoff history filters
+
+Set `Handoff::history_filter` to an `Arc<dyn HandoffHistoryFilter>` to replace the
+target's input with valid native history. The awaited filter receives owned
+`HandoffHistory { items, provenance, approvals }` and a borrowed `HandoffContext`.
+`items` includes the current turn and synthesized transfer/skipped-sibling
+outputs. `context.snapshot.new_items` exposes the accumulated output-only history,
+corresponding to the SDK filter's second argument. The callback runs first, then
+the history filter, then target activation. Filtering changes subsequent input
+and final history, not already-emitted events or `RunResult::new_items`.
+
+Return the supplied history unchanged, select/reorder complete tool pairs, retain
+only messages, replace it with a summary, or return empty history. Provenance
+must match returned items; an empty provenance vector means explicitly unknown
+attribution, never inferred target authorship. Approval sidecars may only retain
+existing markers at ordered, in-range boundaries, or remove them. Filters cannot
+invent or duplicate approval authority. Invalid tool pairs, provenance or markers
+fail before the replacement is committed. Validation uses a detached approval
+journal, so a rejected marker cannot invalidate the live journal. Later host-hook
+errors remain fail-closed with consistent committed history/approval anchors.
+
+Choose either `history_filter` or built-in `input_filter: RemoveTools`; setting
+both is a configuration error rather than undocumented precedence. Async filter
+errors, cancellation and deadlines stop before target dispatch. Use `durable_key()`
+only for deterministic, effect-free filters with stable configuration identity;
+committed handoff recovery neither repeats the filter nor reinterprets provenance.
+
+Eight independent pinned normal/streamed cases verify current-turn visibility,
+callback/filter order, unchanged output history, target input and final history
+for preserve/messages/summary/empty filters. Native tests additionally verify
+provenance, cancellation/drop, rejection without replacement, approval retention
+and clearing, forged/out-of-range marker rejection and durable recovery. The API
+preserves native history/security invariants rather than accepting arbitrary
+invalid Go item graphs or fabricated approval markers.

@@ -1288,3 +1288,28 @@ obligation is verified: **254 verified / 8,637 unresolved / 251 excluded**.
 Whole-handoff parity, arbitrary input filters, exact callback argument provenance
 and the rest of issue #11 remain open. Credentialed live tests are unverified;
 no CLI/evaluation adapter, release or default-switch work was added.
+
+### Custom handoff history filters
+
+Added owned asynchronous `HandoffHistoryFilter` with explicit provenance and
+approval anchors. It sees current-turn transfer and skipped-sibling outputs plus
+the accumulated output-only snapshot, replaces continuation history before target
+activation, and leaves emitted/new items unchanged. Eight independent pinned
+normal/streamed cases compare preserve/messages/summary/empty transformations,
+callback/filter order, target inputs and final history. Native tests cover invalid
+pairs/provenance, cancellation/drop, retained/removed approval anchors, rejection
+of forged/out-of-range markers before replacement, stable durable identity and
+no repeated filter after a committed handoff. Conflicting custom/built-in filters
+are rejected. Security invariants are explicit rather than weakened to accept
+invalid native histories or fabricated approval authority.
+
+Fresh locked Linux Rust 1.88.0 workspace/all-features/all-targets:
+**1,284 passed / 0 failed / 30 ignored**. Strict direct-driver Clippy, strict
+rustdoc, all changed Rust files' formatting, facade matrix, standalone consumer,
+20 offline feature scenarios and host-session example passed. Independent oracle
+reproduction, original `TestHandoffInputFilterSeesCurrentTurnItems`, 18 ledger tests,
+source locks, Python syntax, Go formatting and whitespace checks passed. The
+history-filter field is verified: **255 verified / 8,636 unresolved / 251 excluded**.
+Whole-SDK completion and exact raw callback/optional-schema compatibility remain
+open; credentialed live tests remain unverified. No excluded CLI/evaluation,
+release or production-default work was introduced.

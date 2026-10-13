@@ -5737,6 +5737,38 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-13F63641F9F37DA1": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "CompactContentEventLine",
+      "implementation_symbols": [
+        "crates/adk-codec/src/events.rs::compact_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "content_event_lines_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Verified for UTF-8 Rust line inputs against 1,429 independently executed pinned Go cases. Covers all 83 event fields, exact canonical encoding, ordered duplicate/null/case-fold semantics, scalar type/overflow errors, repeated slice storage, Unicode escapes, permissive timestamp parsing and marshal rejection, nesting limit, missing types and raw first-line fallback. Does not claim arbitrary invalid-UTF8 Go string bytes, session stream construction or native event conversion. No redaction or size cap is imposed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DFDC520DB5190933": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ParseContentEventLine",
+      "implementation_symbols": [
+        "crates/adk-codec/src/events.rs::parse_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "content_event_lines_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Verified for UTF-8 Rust line inputs against 1,429 independently executed pinned Go cases. Covers all 83 event fields, exact canonical encoding, ordered duplicate/null/case-fold semantics, scalar type/overflow errors, repeated slice storage, Unicode escapes, permissive timestamp parsing and marshal rejection, nesting limit, missing types and raw first-line fallback. Does not claim arbitrary invalid-UTF8 Go string bytes, session stream construction or native event conversion. No redaction or size cap is imposed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

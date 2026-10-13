@@ -105,7 +105,72 @@ func TestNativeContentEventReference(t *testing.T) {
 			"go_type": field.Type.String(), "cases": serialized,
 		})
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite}, "", "  ")
+	lines := []string{
+		"", " \t\n", "not-json\nsecond", "null", "{}", "[]", "true", "1", `"text"`,
+		`{"type":"x"}`, `{"type":""}`, `{"type":null}`, `{"TYPE":"event","MeSSage":"text"}`,
+		`{"type":"a","type":"b"}`, `{"type":"a","type":null}`, `{"type":"a","type":3,"type":"b"}`,
+		`{"type":"event","ſtatuſ":"ready","coſt_known":true}`,
+		`{"type":"event","message":"\ud800"}`, `{"type":"event","message":"\udfff"}`,
+		`{"type":"event","message":"\ud800\udfff"}`, `{"type":"event","message":"\ud800x\ud800"}`,
+		`{"type":"event","tools":["a","b"],"TOOLS":[null]}`,
+		`{"type":"event","tools":["a","b"],"tools":["c"],"tools":[null,null]}`,
+		`{"type":"event","tools":["a","b"],"tools":[],"tools":[null]}`,
+		`{"type":"event","tools":["a","b"],"tools":null,"tools":[null]}`,
+		`{"type":"event","ts":"2024-01-01T00:00:00Z","ts":null}`,
+		`{"type":"event","ts":"2024-01-01T00:00:00\u005a"}`,
+		`{"type":"event","unknown":{"a":[null,true,1e999,"\ud800"]}}`,
+		`{"type":"event"} null`, `{"type":"event",}`, `{"type":"event","message":"bad` + "\n" + `string"}`,
+	}
+	for _, timestamp := range []string{
+		"0000-01-01T00:00:00Z", "2024-02-29T1:02:03Z", "2024-01-01T00:00:00,123Z",
+		"2024-01-01T00:00:00.123456789123Z", "2024-01-01T00:00:00+24:00",
+		"2024-01-01T00:00:00-24:60", "2024-01-01T00:00:00+00:60",
+		"2024-01-01T00:00:00+25:00", "2024-01-01T00:00:00+00:61",
+		"2023-02-29T00:00:00Z", "2024-01-01T00:00:60Z", "2024-01-01T00:00:00.Z",
+	} {
+		encoded, _ := json.Marshal(timestamp)
+		lines = append(lines, `{"type":"event","ts":`+string(encoded)+`}`)
+	}
+	for _, field := range fields {
+		name := field["json_name"].(string)
+		for _, canonical := range field["cases"].([]string) {
+			if name == "type" {
+				continue
+			}
+			lines = append(lines, canonical[:len(canonical)-1]+`,"type":"event"}`)
+			var decoded map[string]json.RawMessage
+			if err := json.Unmarshal([]byte(canonical), &decoded); err != nil {
+				t.Fatal(err)
+			}
+			if value, exists := decoded[name]; exists {
+				lines = append(lines, `{"type":"event","`+name+`":`+string(value)+`,"`+strings.ToUpper(name)+`":null}`)
+			}
+		}
+		if name == "type" {
+			continue
+		}
+		for _, value := range []string{`null`, `"string"`, `true`, `1`, `-0`, `1.0`, `1e0`, `1e999`, `[]`, `{}`, `[null,"x"]`} {
+			lines = append(lines, `{"type":"event","`+name+`":`+value+`}`)
+		}
+	}
+	for _, depth := range []int{128, 9999, 10000, 10001} {
+		lines = append(lines, `{"type":"event","unknown":`+strings.Repeat("[", depth)+`0`+strings.Repeat("]", depth)+`}`)
+	}
+	parsed := []map[string]any{}
+	for _, line := range lines {
+		event, ok := ParseContentEventLine(line)
+		row := map[string]any{"line": line, "ok": ok, "compact": CompactContentEventLine(line)}
+		if ok {
+			encoded, err := json.Marshal(event)
+			row["marshal_ok"] = err == nil
+			row["timestamp"] = event.Timestamp.Format(time.RFC3339Nano)
+			if err == nil {
+				row["event_json"] = string(encoded)
+			}
+		}
+		parsed = append(parsed, row)
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite, "lines": parsed}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

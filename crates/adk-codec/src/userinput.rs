@@ -23,7 +23,7 @@ fn go_utf8(mut input: &[u8]) -> String {
     text
 }
 
-fn decode<T: serde::de::DeserializeOwned>(input: &[u8]) -> Result<T, serde_json::Error> {
+pub(crate) fn decode<T: serde::de::DeserializeOwned>(input: &[u8]) -> Result<T, serde_json::Error> {
     let mut bytes = go_utf8(input).into_bytes();
     let mut inside = false;
     let mut i = 0;
@@ -64,17 +64,17 @@ fn decode<T: serde::de::DeserializeOwned>(input: &[u8]) -> Result<T, serde_json:
 
 // Go retains backing-array elements across repeated nonempty slice fields.
 #[derive(Default)]
-struct GoSlice<T> {
+pub(crate) struct GoSlice<T> {
     slots: Vec<T>,
     len: Option<usize>,
 }
 impl<T> GoSlice<T> {
-    fn into_values(self) -> Option<Vec<T>> {
+    pub(crate) fn into_values(self) -> Option<Vec<T>> {
         self.len
             .map(|len| self.slots.into_iter().take(len).collect())
     }
 }
-struct ElementSeed<'a, T>(&'a mut T);
+pub(crate) struct ElementSeed<'a, T>(pub(crate) &'a mut T);
 impl<'de, T: Deserialize<'de>> serde::de::DeserializeSeed<'de> for ElementSeed<'_, T> {
     type Value = ();
     fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {

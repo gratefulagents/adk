@@ -125,7 +125,7 @@ reason/message/error output after outer trimming, and imposes no text-size cap.
 It preserves raw agent/tool/status text, including whitespace. This function
 neither logs nor redacts; apply host redaction before exposing its result.
 It is distinct from native `EventRecord` serialization and does not claim the
-SDK's JSONL parser or `NewSessionEventStream` construction behavior.
+`NewSessionEventStream` construction behavior.
 
 Ten independently executed cases in `fixtures/content-event/observations.json`
 cover optional fields/order, blank values, CR/LF, Unicode and long output.
@@ -137,7 +137,18 @@ loss in the default JSON float parser; workspace `serde_json` enables
 original finite `f64` value. This is canonical typed-wire evidence, not proof of
 Go's permissive case-insensitive/duplicate-field JSON decoder behavior. Timestamp
 and slice fields remain separate ledger obligations despite their canonical cases
-passing. Run
+passing.
+
+`adk::codec::events::parse_content_event_line(&str)` and
+`compact_content_event_line(&str)` provide the separate SDK JSONL helpers.
+An additional 1,429 independently executed line cases cover all fields, invalid
+field types, duplicate/null/case-fold semantics, Unicode escapes, repeated slices,
+Go's permissive timestamp parser and its 10,000-container limit. Successful
+records compare exact serialized bytes; timestamps outside RFC3339 offset bounds
+parse but fail serialization as in Go. Invalid/non-event lines use first-line
+fallback. The public input is valid UTF-8, not arbitrary Go string bytes; no
+redaction, output cap, stream construction or native event conversion is implied.
+Run
 `python3 scripts/content-event-reference/run.py --check` and
 `cargo test --locked -p adk-codec --test content_events` to reproduce them.
 

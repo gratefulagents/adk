@@ -215,3 +215,42 @@ fn content_event_rejects_nonfinite_floats_like_go() {
         }
     }
 }
+
+#[test]
+fn content_event_lines_match_pinned_sdk() {
+    use adk_codec::events::{compact_content_event_line, parse_content_event_line};
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-event/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["lines"].as_array().unwrap() {
+        let line = case["line"].as_str().unwrap();
+        let parsed = parse_content_event_line(line);
+        assert_eq!(parsed.is_some(), case["ok"].as_bool().unwrap(), "{line}");
+        assert_eq!(
+            compact_content_event_line(line),
+            case["compact"].as_str().unwrap(),
+            "{line}"
+        );
+        if let Some(event) = parsed {
+            assert_eq!(
+                event.timestamp.as_str(),
+                case["timestamp"].as_str().unwrap(),
+                "{line}"
+            );
+            let encoded = to_go_json(&event);
+            assert_eq!(
+                encoded.is_ok(),
+                case["marshal_ok"].as_bool().unwrap(),
+                "{line}"
+            );
+            if let Ok(encoded) = encoded {
+                assert_eq!(
+                    encoded,
+                    case["event_json"].as_str().unwrap().as_bytes(),
+                    "{line}"
+                );
+            }
+        }
+    }
+}

@@ -1557,3 +1557,31 @@ passed. Scoped independent review found no blocker and rechecked hashes/ledger;
 its compiler/oracle execution was sandbox-blocked, so executable results remain
 from the main build environment. Full issue acceptance and live-service checks
 remain open.
+
+### SDK JSONL event helpers
+
+Added `adk::codec::events::{parse_content_event_line, compact_content_event_line}`
+for UTF-8 Rust line inputs. The independent pinned Go oracle executes **1,429
+line cases** covering all 83 fields, malformed records/types, duplicate/null and
+case-fold behavior, repeated slices, Unicode escapes, permissive timestamp
+parsing, marshal failures and the 10,000-container boundary. Successful records
+compare exact Go JSON bytes; non-event records compare exact first-line fallback.
+No line/output size cap, logger, redaction or session-stream construction was added.
+The existing strict timestamp DTO decoder remains strict; only the SDK JSONL path
+accepts Go's permissive timestamp forms. Arbitrary invalid-UTF8 Go string input is
+not a Rust `&str` capability.
+
+Differential verification caught two subtle parser differences: unknown values
+beyond Go's nesting limit and integer `-0` (which Serde classifies as a float).
+Both are corrected. The first full negative-zero run caught one omitted multiline
+field; the final focused and full runs pass after correcting that field too.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,321 passed / 0 failed /
+30 ignored**. Strict direct-driver Clippy, strict rustdoc, changed-file formatting,
+facade feature matrix, standalone consumer, all 20 offline scenarios and the
+host-session example passed. Codec doctest check passed with no doctests present.
+Pinned reference reproduction, **19 ledger validators**, source/license locks and
+whitespace checks passed. Two narrowly scoped UTF-8 helper claims are closed:
+**342 verified / 8,549 unresolved / 251 excluded**. These counts are inventory
+obligations, not a count of missing features. Full issue acceptance and credentialed
+live-service verification remain open; CLI/evaluation exclusions are unchanged.

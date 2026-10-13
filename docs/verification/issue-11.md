@@ -1530,3 +1530,30 @@ strict Clippy/rustdoc, changed-file formatting, pinned oracles, 18 ledger valida
 source/license locks and whitespace checks passed. One typed formatter record is
 closed: **262 verified / 8,629 unresolved / 251 excluded**. Full acceptance and
 credentialed live-service verification remain open.
+
+### Canonical content-event fields and exact float parsing
+
+The independent Go oracle now reflects all **83 ContentEvent fields**, with
+**284 canonical documents** and **six nonfinite rejection cases**. Exact typed
+Rust decode/re-encode initially exposed eight mismatches in the two cost fields
+near numeric formatting thresholds and for large exponents. Enabling
+`serde_json/float_roundtrip` at the workspace dependency fixes the typed-float
+parsing loss while retaining `arbitrary_precision` for raw numbers. All canonical
+cases and nonfinite rejection checks now pass. No dependency version or lockfile
+changed. The ledger now hash-binds the workspace manifest; a negative validator
+rejects stale feature evidence.
+
+**78 scalar field records** are closed using explicit source/field mappings and
+independently generated canonical documents. Timestamp, slices, permissive Go
+JSON decoding, complete type/stream behavior and invalid-UTF8 Go strings are not
+silently included in those claims. The overlay is **340 verified / 8,551
+unresolved / 251 excluded**.
+
+Fresh Linux Rust 1.88.0 full workspace/all-features/all-targets: **1,320 passed /
+0 failed / 30 ignored**. Strict Clippy/rustdoc, formatting, facade matrix,
+standalone consumer, all 20 offline scenarios and host-session passed. Pinned
+oracles, **19 ledger validators**, source/license locks and whitespace checks
+passed. Scoped independent review found no blocker and rechecked hashes/ledger;
+its compiler/oracle execution was sandbox-blocked, so executable results remain
+from the main build environment. Full issue acceptance and live-service checks
+remain open.

@@ -128,7 +128,16 @@ It is distinct from native `EventRecord` serialization and does not claim the
 SDK's JSONL parser or `NewSessionEventStream` construction behavior.
 
 Ten independently executed cases in `fixtures/content-event/observations.json`
-cover optional fields/order, blank values, CR/LF, Unicode and long output. Run
+cover optional fields/order, blank values, CR/LF, Unicode and long output.
+The same oracle separately reflects all 83 SDK content-event fields and produces
+284 canonical documents plus six nonfinite-float rejections. The codec test
+compares exact Go JSON bytes after typed decode/re-encode. This caught precision
+loss in the default JSON float parser; workspace `serde_json` enables
+`float_roundtrip` alongside `arbitrary_precision` so typed costs retain their
+original finite `f64` value. This is canonical typed-wire evidence, not proof of
+Go's permissive case-insensitive/duplicate-field JSON decoder behavior. Timestamp
+and slice fields remain separate ledger obligations despite their canonical cases
+passing. Run
 `python3 scripts/content-event-reference/run.py --check` and
 `cargo test --locked -p adk-codec --test content_events` to reproduce them.
 

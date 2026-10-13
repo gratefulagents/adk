@@ -55,6 +55,12 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_workspace_feature_manifest_is_hash_bound(self):
+        self.assertIn("Cargo.toml", self.evidence["files"])
+        self.evidence["files"]["Cargo.toml"] = "0" * 64
+        with self.assertRaisesRegex(SystemExit, "stale Rust evidence for Cargo.toml"):
+            self.apply()
+
     def test_failed_ignored_or_absent_rust_test_is_rejected(self):
         original = copy.deepcopy(self.evidence)
         for change in ("failed", "ignored", "absent"):

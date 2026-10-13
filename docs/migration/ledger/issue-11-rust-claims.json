@@ -4487,6 +4487,1256 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-3162EA28F563616D": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Type",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::kind"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Type (string) to ContentEvent::kind. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2C5058A88BBB7C75": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Session",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::session"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Session (int32) to ContentEvent::session. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F21B0E34E4355C89": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Message",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::message"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Message (string) to ContentEvent::message. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C0FC2691078B7AB9": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Tool",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tool"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Tool (string) to ContentEvent::tool. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D764D0AD343EE8F8": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.ToolUseID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tool_use_id"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.ToolUseID (string) to ContentEvent::tool_use_id. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F20AB8F19378411E": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.ParentCallID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::parent_call_id"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.ParentCallID (string) to ContentEvent::parent_call_id. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-576D367507B2C5A7": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.IsError",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::is_error"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.IsError (bool) to ContentEvent::is_error. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A4EBAA13BD495E46": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.AgentName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::agent_name"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.AgentName (string) to ContentEvent::agent_name. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AB8556948EA9FBE4": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.InputRaw",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::input_raw"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.InputRaw (string) to ContentEvent::input_raw. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FEB26E1B6D102B6C": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Output",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::output"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Output (string) to ContentEvent::output. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B84F467596A3A619": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.ToolDurationMS",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tool_duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.ToolDurationMS (int64) to ContentEvent::tool_duration_ms. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D41EBEB4587372A9": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Phase",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::phase"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Phase (string) to ContentEvent::phase. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7B8DDD1CF50D3040": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.LLMAttempt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::llm_attempt"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.LLMAttempt (int32) to ContentEvent::llm_attempt. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D125954975DF2F2B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.LLMScope",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::llm_scope"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.LLMScope (string) to ContentEvent::llm_scope. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D8C74AB4FA9D61A1": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.AttemptNumber",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::attempt_number"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.AttemptNumber (int32) to ContentEvent::attempt_number. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D881EED859B43FA4": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.AttemptStatus",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::attempt_status"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.AttemptStatus (string) to ContentEvent::attempt_status. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9F1C343F7064F1D2": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Scope",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::scope"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Scope (string) to ContentEvent::scope. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-49F5ED11B9E608BB": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.RequestedModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::requested_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.RequestedModel (string) to ContentEvent::requested_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DB5D5B24A1CA4E4D": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.ResolvedModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::resolved_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.ResolvedModel (string) to ContentEvent::resolved_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-985B4D4B9538A32B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CanonicalModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::canonical_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CanonicalModel (string) to ContentEvent::canonical_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-03466F7C6FF4BAA6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Provider",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::provider"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Provider (string) to ContentEvent::provider. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6D2953D58CCAA7A6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Turn",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::turn"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Turn (int32) to ContentEvent::turn. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8EA487255A25B0C9": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.UsageAvailable",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::usage_available"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.UsageAvailable (bool) to ContentEvent::usage_available. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E3B0B0E0BF810001": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.HasPromptTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::has_prompt_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.HasPromptTokens (bool) to ContentEvent::has_prompt_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2FACCDE739AB43BA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.HasCompletionTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::has_completion_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.HasCompletionTokens (bool) to ContentEvent::has_completion_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-120036FDB6868114": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.HasTotalTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::has_total_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.HasTotalTokens (bool) to ContentEvent::has_total_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F6C4E3596919C661": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.PromptTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::prompt_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.PromptTokens (int64) to ContentEvent::prompt_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-363906790FBD2653": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CompletionTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::completion_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CompletionTokens (int64) to ContentEvent::completion_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BE85970260BD1931": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.TotalTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::total_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.TotalTokens (int64) to ContentEvent::total_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B4F2ACA4872104CE": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.AttemptLatencyMs",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::attempt_latency_ms"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.AttemptLatencyMs (int64) to ContentEvent::attempt_latency_ms. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A70EA4D4F5E51936": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.RetryPlanned",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::retry_planned"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.RetryPlanned (bool) to ContentEvent::retry_planned. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2165C7FE0C103FF3": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.RetryAfterMs",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::retry_after_ms"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.RetryAfterMs (int64) to ContentEvent::retry_after_ms. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-379E725FAE429C4A": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.FallbackPlanned",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::fallback_planned"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.FallbackPlanned (bool) to ContentEvent::fallback_planned. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AC6D3928C72BB60A": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.FallbackFromModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::fallback_from_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.FallbackFromModel (string) to ContentEvent::fallback_from_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D1F9EA97261A5482": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.FallbackToModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::fallback_to_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.FallbackToModel (string) to ContentEvent::fallback_to_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3047354C56C8C32C": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.FallbackReason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::fallback_reason"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.FallbackReason (string) to ContentEvent::fallback_reason. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-78A3C48133FEABC0": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.FailureKind",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::failure_kind"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.FailureKind (string) to ContentEvent::failure_kind. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E34171E363584ED0": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.TaskID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::task_id"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.TaskID (string) to ContentEvent::task_id. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-438572DFBE1D6939": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Status",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::status"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Status (string) to ContentEvent::status. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-07F1A7CE12AB65E7": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentType",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_type"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentType (string) to ContentEvent::subagent_type. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D73A35DEA1AEB3F9": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentModel (string) to ContentEvent::subagent_model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-739D89252B0C5124": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentPrompt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_prompt"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentPrompt (string) to ContentEvent::subagent_prompt. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8018D170B5CD0FB2": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentResultText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_result_text"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentResultText (string) to ContentEvent::subagent_result_text. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-72D3809DEDF20AAA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentToolCount",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_tool_count"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentToolCount (int32) to ContentEvent::subagent_tool_count. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-98CB56FE8046B6CA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentTokens (int64) to ContentEvent::subagent_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E6BB326D4C06AAFD": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentDurationMs",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentDurationMs (int64) to ContentEvent::subagent_duration_ms. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0855E84121795C7F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentCostUsd",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_cost_usd"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_rejects_nonfinite_floats_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentCostUsd (float64) to ContentEvent::subagent_cost_usd. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F44A578046F1EFE0": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentCostKnown",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_cost_known"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentCostKnown (bool) to ContentEvent::subagent_cost_known. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0BE8734EF9520272": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentNumTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_num_turns"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentNumTurns (int32) to ContentEvent::subagent_num_turns. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FBC056357E937028": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentCacheReadTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_cache_read_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentCacheReadTokens (int64) to ContentEvent::subagent_cache_read_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-ACFF364CA3EAE5A4": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentCacheCreateTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_cache_create_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentCacheCreateTokens (int64) to ContentEvent::subagent_cache_create_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0E0A083ACF9C7014": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentStopReason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_stop_reason"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentStopReason (string) to ContentEvent::subagent_stop_reason. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A35BBD6B7B623CEF": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentCurrentStep",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_current_step"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentCurrentStep (string) to ContentEvent::subagent_current_step. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE9CACF21B26584F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentLastTool",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_last_tool"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentLastTool (string) to ContentEvent::subagent_last_tool. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E9A9E3DA244D47B7": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentFilesWritten",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_files_written"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentFilesWritten (int) to ContentEvent::subagent_files_written. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E4F1BC07CA5DB28F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentMessagesReceived",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_messages_received"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentMessagesReceived (int) to ContentEvent::subagent_messages_received. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-962FB902FF15FF8F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentLastParentMessage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_last_parent_message"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.SubagentLastParentMessage (string) to ContentEvent::subagent_last_parent_message. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3A2CD702C5B10598": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Step",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::step"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Step (string) to ContentEvent::step. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4B17CDE47A97C750": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::model"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Model (string) to ContentEvent::model. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D367E6C566700F9A": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.PermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.PermissionMode (string) to ContentEvent::permission_mode. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE7F5399CCC21A81": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Cwd",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::cwd"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Cwd (string) to ContentEvent::cwd. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A4C5B51AC1E24B7A": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.MaxTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::max_turns"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.MaxTurns (int32) to ContentEvent::max_turns. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5A1F7707CC87AACF": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CostUsd",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::cost_usd"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_rejects_nonfinite_floats_like_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CostUsd (float64) to ContentEvent::cost_usd. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-486E854593420CC6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CostKnown",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::cost_known"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CostKnown (bool) to ContentEvent::cost_known. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AA83CB566EF76FEA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.InputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::input_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.InputTokens (int64) to ContentEvent::input_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4A116AA1D9BD32C6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::output_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.OutputTokens (int64) to ContentEvent::output_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6CD511D3655420E6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CacheReadInputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::cache_read_input_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CacheReadInputTokens (int64) to ContentEvent::cache_read_input_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DA76B7CA6A50F53D": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.CacheCreationInputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::cache_creation_input_tokens"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.CacheCreationInputTokens (int64) to ContentEvent::cache_creation_input_tokens. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A9CA57A24D6ACA56": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.InputTokensIncludeCache",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::input_tokens_include_cache"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.InputTokensIncludeCache (bool) to ContentEvent::input_tokens_include_cache. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D47380815A406B7F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.InputTokensIncludeCacheKnown",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::input_tokens_include_cache_known"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.InputTokensIncludeCacheKnown (bool) to ContentEvent::input_tokens_include_cache_known. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-53C88E658E525EFB": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.NumTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::num_turns"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.NumTurns (int32) to ContentEvent::num_turns. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-CCE207826068471F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.DurationMs",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.DurationMs (int64) to ContentEvent::duration_ms. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9955DB3CA1797CC9": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.StopReason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::stop_reason"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.StopReason (string) to ContentEvent::stop_reason. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-013FCD0254B87D8B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.TokensBefore",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tokens_before"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.TokensBefore (int32) to ContentEvent::tokens_before. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B769E00C1FB1DFAC": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.TokensAfter",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tokens_after"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.TokensAfter (int32) to ContentEvent::tokens_after. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-860046D5084EDB8E": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.HookName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::hook_name"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.HookName (string) to ContentEvent::hook_name. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-45F082D85C7D0233": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Decision",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::decision"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Decision (string) to ContentEvent::decision. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8A3396EBF28892DF": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Reason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::reason"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed scalar field mapping for ContentEvent.Reason (string) to ContentEvent::reason. The pinned Go reflection oracle assigns each of all 83 fields independently and emits 284 canonical documents; Rust independently decodes and re-encodes exact Go JSON bytes. Evidence covers zero/omission, nonzero values, signed limits, escaped UTF-8 strings and floating-point boundaries as applicable; nonfinite floats are rejected. This closes the scalar field mapping on Linux x86_64, not permissive Go JSON parsing, event-stream behavior, invalid-UTF8 Go strings or full-type parity. Timestamp and slice fields remain separately unresolved.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

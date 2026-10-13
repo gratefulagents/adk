@@ -29,7 +29,7 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "go.mod", "go.sum"]
+        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "internal/agent/stream_events.go", "internal/agent/event_stream_test.go", "pkg/agentsdk/aliases.go", "pkg/agentsdk/events/events.go", "pkg/agentsdk/events/events_test.go", "go.mod", "go.sum"]
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA,
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
@@ -44,6 +44,8 @@ def main():
         regression = subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk', '-run', '^TestContentEventLineHelpers$'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(regression.stdout.decode('utf-8', errors='backslashreplace'), end='')
         regression.check_returncode()
+        subprocess.run([go, 'test', '-count=1', '-v', './internal/agent', '-run', '^TestEventStreamSubscribeReceivesChildSubagentEvents$'], cwd=source, env=env, check=True)
+        subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk/events', '-run', '^TestLineWriterEmitsSubAgentEvents$'], cwd=source, env=env, check=True)
         result = dict(provenance=provenance, **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/content-event/observations.json'

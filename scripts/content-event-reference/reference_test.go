@@ -170,7 +170,55 @@ func TestNativeContentEventReference(t *testing.T) {
 		}
 		parsed = append(parsed, row)
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite, "lines": parsed}, "", "  ")
+	progressInputs := []ContentEvent{
+		{}, {Type: "subagent_status"}, {Type: "other", TaskID: "task"},
+		{Type: "Subagent_status", TaskID: "task"}, {Type: "subagent_status", TaskID: " "},
+		{Type: "subagent_status", TaskID: "task", SubagentType: "fallback"},
+		{Type: "subagent_status", TaskID: "task", AgentName: " ", SubagentType: "fallback"},
+		{Type: "subagent_status", TaskID: "task", AgentName: "explicit", SubagentType: "fallback"},
+		{Type: "subagent_status", TaskID: "task", SubagentDependsOn: []string{}, SubagentWaitingOn: []string{}},
+		{Type: "subagent_status", TaskID: "task", SubagentDependsOn: []string{"dependency"}, SubagentWaitingOn: []string{"waiting"}},
+	}
+	for _, field := range fields {
+		for _, canonical := range field["cases"].([]string) {
+			var event ContentEvent
+			if err := json.Unmarshal([]byte(canonical), &event); err != nil {
+				t.Fatal(err)
+			}
+			event.Type = "subagent_status"
+			if event.TaskID == "" {
+				event.TaskID = "task"
+			}
+			progressInputs = append(progressInputs, event)
+		}
+	}
+	progress := []map[string]any{}
+	for _, event := range progressInputs {
+		input, err := json.Marshal(event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		output, ok := SubAgentStreamEventFromContentEvent(event)
+		encoded, err := json.Marshal(output)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(event.SubagentDependsOn) > 0 {
+			event.SubagentDependsOn[0] = "mutated"
+		}
+		if len(event.SubagentWaitingOn) > 0 {
+			event.SubagentWaitingOn[0] = "mutated"
+		}
+		after, err := json.Marshal(output)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(encoded) != string(after) {
+			t.Fatal("projection aliases input slices")
+		}
+		progress = append(progress, map[string]any{"input_json": string(input), "ok": ok, "output_json": string(encoded)})
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite, "lines": parsed, "subagent_progress": progress}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

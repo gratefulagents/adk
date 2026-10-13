@@ -76,3 +76,11 @@ accepts Go's single-digit hours, comma fractions, excess fractional digits
 of 24 hours or more cannot subsequently serialize as RFC3339. Timestamp JSON
 escapes are rejected, matching Go's timestamp unmarshaler. This permissive path
 does not change the stricter DTO deserializer or create a session event stream.
+
+`events::subagent_event(&ContentEvent)` selects `subagent_status` records with a
+nonempty task ID and returns an owned `dto::SubagentStreamEvent`. Agent names fall
+back to `subagent_type` only when empty. Empty dependency/waiting lists project to
+`None` (Go nil); populated lists are independently owned. All 21 projected fields
+retain the SDK's wire names and widths on the supported 64-bit target. This is a
+host-facing projection, not runtime emission, a stream writer or a permissive Go
+JSON decoder for the projected DTO.

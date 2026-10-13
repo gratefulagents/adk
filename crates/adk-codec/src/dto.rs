@@ -1120,3 +1120,35 @@ pub struct ChildToolEvent {
     #[serde(rename = "DurationMS")]
     pub duration_ms: i64,
 }
+
+/// Owned SDK subagent progress projection, not a native runtime observation.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default, rename_all = "PascalCase")]
+pub struct SubagentStreamEvent {
+    #[serde(rename = "TaskID")]
+    pub task_id: String,
+    pub agent_name: String,
+    pub status: String,
+    pub message: String,
+    #[serde(rename = "ToolUseID")]
+    pub tool_use_id: String,
+    #[serde(rename = "ParentCallID")]
+    pub parent_call_id: String,
+    pub depends_on: Option<Vec<String>>,
+    pub waiting_on: Option<Vec<String>>,
+    pub current_step: String,
+    pub last_tool: String,
+    pub files_written: i64,
+    pub messages_received: i64,
+    pub last_parent_message: String,
+    pub tool_count: i32,
+    pub tokens: i64,
+    #[serde(rename = "DurationMS")]
+    pub duration_ms: i64,
+    #[serde(rename = "CostUSD", serialize_with = "serialize_go_float")]
+    pub cost_usd: f64,
+    pub cost_known: bool,
+    pub num_turns: i32,
+    pub stop_reason: String,
+    pub result_text: String,
+}

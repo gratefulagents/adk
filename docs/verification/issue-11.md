@@ -1585,3 +1585,28 @@ whitespace checks passed. Two narrowly scoped UTF-8 helper claims are closed:
 **342 verified / 8,549 unresolved / 251 excluded**. These counts are inventory
 obligations, not a count of missing features. Full issue acceptance and credentialed
 live-service verification remain open; CLI/evaluation exclusions are unchanged.
+
+### Owned typed subagent progress projection
+
+Added `adk::codec::events::subagent_event` and `dto::SubagentStreamEvent`. Selection
+requires exactly `subagent_status` and a nonempty task ID; the agent name falls
+back to the subagent type only when empty. All **21 fields** are projected,
+including independent dependency/waiting lists, signed counters and exact costs.
+Empty lists project to Go nil. No runtime event emission, native-schema conversion,
+line writer or whole stream-type decoder is claimed.
+
+The pinned oracle compares **294 projections**, varying every source content-event
+field, selector/fallback cases, signed limits, escaped strings, slice values and
+float boundaries. Both Go and Rust checks mutate source lists after projection
+and verify the output remains unchanged. The checker also executes the original
+SDK subscription and public line-writer subagent regressions. Nonfinite costs
+remain representable in memory but fail JSON serialization.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,322 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, changed-file formatting, full facade matrix,
+platform-free consumer, all 20 offline scenarios and host-session example passed.
+Pinned oracles, **19 ledger validators**, source/license locks and whitespace
+checks passed. Twenty-three specific records (21 fields and the internal/public
+projection helper) are closed: **365 verified / 8,526 unresolved / 251 excluded**.
+These are inventory obligations, not counts of missing features. Full acceptance
+and credentialed live-service verification remain open; exclusions are unchanged.

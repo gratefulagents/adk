@@ -254,3 +254,44 @@ fn content_event_lines_match_pinned_sdk() {
         }
     }
 }
+
+#[test]
+fn subagent_progress_matches_pinned_sdk() {
+    use adk_codec::events::subagent_event;
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-event/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["subagent_progress"].as_array().unwrap() {
+        let input = case["input_json"].as_str().unwrap();
+        let mut event: ContentEvent = serde_json::from_str(input).unwrap();
+        let projected = subagent_event(&event);
+        assert_eq!(
+            projected.is_some(),
+            case["ok"].as_bool().unwrap(),
+            "{input}"
+        );
+        assert_eq!(
+            to_go_json(&projected).unwrap(),
+            case["output_json"].as_str().unwrap().as_bytes(),
+            "{input}"
+        );
+        event.subagent_depends_on.fill("mutated".into());
+        event.subagent_waiting_on.fill("mutated".into());
+        assert_eq!(
+            to_go_json(&projected).unwrap(),
+            case["output_json"].as_str().unwrap().as_bytes(),
+            "{input}"
+        );
+    }
+    for cost in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        let projected = subagent_event(&ContentEvent {
+            kind: "subagent_status".into(),
+            task_id: "task".into(),
+            subagent_cost_usd: cost,
+            ..Default::default()
+        })
+        .unwrap();
+        assert!(to_go_json(&projected).is_err());
+    }
+}

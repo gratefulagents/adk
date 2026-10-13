@@ -5769,6 +5769,374 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-0AD766D6B2166367": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.AgentName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::agent_name"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE5C88CA8DC721A7": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.CostKnown",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::cost_known"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-37CDAE650C1BAB20": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.CostUSD",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::cost_usd"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8EC7E13A7E812F71": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.CurrentStep",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::current_step"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8E01398852823456": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.DependsOn",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::depends_on"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1C3882BB219EB005": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.DurationMS",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::duration_ms"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C01B2C89D14710FC": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.FilesWritten",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::files_written"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4ED4DA71FE918A44": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.LastParentMessage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::last_parent_message"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9E7A52A406ECA3BD": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.LastTool",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::last_tool"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0891408632BD3CE1": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.Message",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::message"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0859E8C4B3A63C7C": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.MessagesReceived",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::messages_received"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1FB8C4B99D106673": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.NumTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::num_turns"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0D6C99B8B641ADB0": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.ParentCallID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::parent_call_id"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BAE240DF6D2B4B33": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.ResultText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::result_text"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6332175C2AC9EBC8": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.Status",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::status"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-92C4B9324C39321F": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.StopReason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::stop_reason"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B24CDB8F5FF3BB87": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.TaskID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::task_id"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9603F0743B062040": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.Tokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::tokens"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B02D4F545B55F2BB": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.ToolCount",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::tool_count"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2A1774D354465784": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.ToolUseID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::tool_use_id"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C53DCAE60D4C0905": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEvent.WaitingOn",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::SubagentStreamEvent::waiting_on"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B58ABEB46B591920": {
+      "source": "internal/agent/stream_events.go",
+      "source_name": "SubAgentStreamEventFromContentEvent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/events.rs::subagent_event"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3CB5A7F231EAE89B": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "SubAgentStreamEventFromContentEvent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/events.rs::subagent_event"
+      ],
+      "rust_test_identifiers": [
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Owned UTF-8 subagent status projection verified against 294 independently executed pinned Go cases: exact type/task selection, fallback agent name, all projected scalar/slice fields, omission/defaults, integer widths, float encoding and independent dependency/waiting ownership. Canonical source-field observations vary all 83 ContentEvent fields independently. Empty input slices project to nil as the source append does. Files/messages counters target 64-bit Go int. This closes only the named projection/helper or field, not permissive DTO decoding, runtime emission, full stream types, LineWriter or invalid-UTF8 Go strings.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

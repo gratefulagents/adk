@@ -422,3 +422,42 @@ where
         Ok(())
     }
 }
+
+/// Select an SDK subagent status record and copy its progress fields.
+///
+/// Dependency lists are independently owned; empty lists project to Go's nil
+/// slices. This neither emits an event nor converts native runtime observations.
+pub fn subagent_event(event: &ContentEvent) -> Option<crate::dto::SubagentStreamEvent> {
+    if event.kind != "subagent_status" || event.task_id.is_empty() {
+        return None;
+    }
+    Some(crate::dto::SubagentStreamEvent {
+        task_id: event.task_id.clone(),
+        agent_name: if event.agent_name.is_empty() {
+            event.subagent_type.clone()
+        } else {
+            event.agent_name.clone()
+        },
+        status: event.status.clone(),
+        message: event.message.clone(),
+        tool_use_id: event.tool_use_id.clone(),
+        parent_call_id: event.parent_call_id.clone(),
+        depends_on: (!event.subagent_depends_on.is_empty())
+            .then(|| event.subagent_depends_on.clone()),
+        waiting_on: (!event.subagent_waiting_on.is_empty())
+            .then(|| event.subagent_waiting_on.clone()),
+        current_step: event.subagent_current_step.clone(),
+        last_tool: event.subagent_last_tool.clone(),
+        files_written: event.subagent_files_written,
+        messages_received: event.subagent_messages_received,
+        last_parent_message: event.subagent_last_parent_message.clone(),
+        tool_count: event.subagent_tool_count,
+        tokens: event.subagent_tokens,
+        duration_ms: event.subagent_duration_ms,
+        cost_usd: event.subagent_cost_usd,
+        cost_known: event.subagent_cost_known,
+        num_turns: event.subagent_num_turns,
+        stop_reason: event.subagent_stop_reason.clone(),
+        result_text: event.subagent_result_text.clone(),
+    })
+}

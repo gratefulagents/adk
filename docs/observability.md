@@ -157,3 +157,16 @@ Run
 Run `cargo test -p adk --features observability --test observability` for native tests and `cargo test -p adk --features otel --test observability` for actual SDK spans as well. Coverage includes fragmented/malformed/oversized JSONL, fanout order/backpressure, default/full/operator redaction, complete pre-cap output, a real runner, cumulative usage, real paused continuation, successful two-turn spans, shared-run isolation, ended-parent contexts, final error attributes, filesystem modes/confinement and quota/hardlink defenses.
 
 Reference behavior was read from `repos/sdk/pkg/agentsdk/events/events.go`, `tracestore/trace_writer.go`, `tracestore/trace_store.go`, `tracestore/filesystem_linux.go`, `otel/processor.go`, `repos/sdk/internal/agent/stream.go`, and the native `adk-core` types/Host plus `adk-runtime::RunHooks` and runner lifecycle. Deliberate format and lifecycle differences are enumerated above rather than labeled full Go parity.
+
+### Typed SDK subagent progress
+
+With `compat`, `adk::codec::events::subagent_event` projects a SDK `ContentEvent`
+into the owned `SubagentStreamEvent` DTO. It selects exactly `subagent_status`
+with a nonempty task ID, preserves unknown status strings, and falls back from an
+empty agent name to the subagent type. It copies all 21 fields, including owned
+dependency/waiting lists (empty becomes Go nil), signed counters and exact costs.
+The 294 pinned projection cases compare exact wire bytes and verify that mutating
+the input does not change the projected lists. Original SDK subscription and
+public line-writer subagent regressions also run in the reference checker.
+This helper does not emit observations, subscribe to a runtime, translate native
+`EventRecord`s or implement `LineWriter`.

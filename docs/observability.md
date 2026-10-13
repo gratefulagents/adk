@@ -170,3 +170,23 @@ the input does not change the projected lists. Original SDK subscription and
 public line-writer subagent regressions also run in the reference checker.
 This helper does not emit observations, subscribe to a runtime, translate native
 `EventRecord`s or implement `LineWriter`.
+
+### SDK JSONL host writer
+
+`adk::codec::line_writer::LineWriter` (feature `compat`) is the separate owned
+`std::io::Write` adapter. A synchronous `FnMut(LineEvent)` receives subagent
+progress before child-tool classification, otherwise compact logs. Writes preserve
+order and partial bytes; an empty write or explicit flush dispatches a pending
+partial line. Drop does not flush. Shared use is host-owned via `Mutex`; a no-op
+closure replaces a nil sink. The API documentation includes a runnable example.
+
+The pinned scanner's 16-MiB boundary is a buffering/dispatch threshold, not an
+output cap. Overflow changes dispatch to logs, including already scanned tokens,
+then compacts the whole original buffer; this can repeat its first line. The
+22-case oracle verifies this behavior, uncapped oversized error output, CRLF,
+partial and empty writes, split UTF-8, no-op sinks and exact per-write ordering.
+Large outputs compare complete hashes and byte lengths rather than prefixes.
+Invalid raw Go string bytes are normalized to the same replacement-character
+text as Go JSON rendering; native `String` cannot retain those raw bytes.
+Redaction remains the host's responsibility. This adapter does not automatically
+subscribe to the native runner or construct an SDK session event stream.

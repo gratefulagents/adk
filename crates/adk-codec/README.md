@@ -84,3 +84,21 @@ back to `subagent_type` only when empty. Empty dependency/waiting lists project 
 retain the SDK's wire names and widths on the supported 64-bit target. This is a
 host-facing projection, not runtime emission, a stream writer or a permissive Go
 JSON decoder for the projected DTO.
+
+`line_writer::LineWriter::new(sink)` implements `std::io::Write` and dispatches
+owned `LineEvent::{Log, ChildTool, Subagent}` values synchronously in input order.
+The sink is a Rust `FnMut`; use a no-op closure to discard output. A host can wrap
+the writer in `Mutex` for shared use. Pending bytes survive writes (including
+split UTF-8); an empty `write` or explicit `flush` dispatches the final partial
+line, while drop does not. This does not construct an SDK session stream or emit
+native runner observations.
+
+The adapter retains the SDK scanner's 16-MiB boundary, CR removal and fallback
+semantics. Scanner failure sends previously scanned tokens as logs and the whole
+buffer as one compacted fallback, which can repeat its first line. Emitted text
+is **not capped or redacted**, including oversized valid JSON error output.
+Invalid UTF-8 becomes replacement characters as in Go's JSON string rendering;
+arbitrary invalid raw Go string bytes are not represented by Rust `String`.
+The independent 22-case oracle records exact small output, complete-output SHA-256
+and lengths for large lines, per-write acceptance and event counts. The original
+three SDK line-writer tests and the Rust host-owned mutex/flush test also run.

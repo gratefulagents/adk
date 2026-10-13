@@ -6137,6 +6137,40 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-7FF7E0AD6260DB7B": {
+      "source": "pkg/agentsdk/events/events.go",
+      "source_name": "NewLineWriter",
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter::new"
+      ],
+      "rust_test_identifiers": [
+        "line_writer_matches_pinned_sdk",
+        "explicit_flush_and_shared_host_ownership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterBuffersPartialLines",
+      "rationale": "Owned Rust writer verified against 22 independent pinned Go scenarios and the original three line-writer regressions. Per-write byte counts and event ordering cover buffered fragments, empty writes, CR removal, typed classification and 16-MiB scanner fallback; whole-output hashes and byte lengths verify uncapped oversized logs. Invalid raw UTF-8 is compared after explicit Go JSON string rendering, not claimed as raw-byte String parity. The native FnMut sink, host-owned Mutex, no-op sink and explicit flush (equivalent to empty Write) are documented composition boundaries. No full runtime Event enum, automatic native observation subscription or session-stream construction is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-84D7AE3F32E747AD": {
+      "source": "pkg/agentsdk/events/events.go",
+      "source_name": "LineWriter.Write",
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter::write"
+      ],
+      "rust_test_identifiers": [
+        "line_writer_matches_pinned_sdk",
+        "explicit_flush_and_shared_host_ownership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterBuffersPartialLines",
+      "rationale": "Owned Rust writer verified against 22 independent pinned Go scenarios and the original three line-writer regressions. Per-write byte counts and event ordering cover buffered fragments, empty writes, CR removal, typed classification and 16-MiB scanner fallback; whole-output hashes and byte lengths verify uncapped oversized logs. Invalid raw UTF-8 is compared after explicit Go JSON string rendering, not claimed as raw-byte String parity. The native FnMut sink, host-owned Mutex, no-op sink and explicit flush (equivalent to empty Write) are documented composition boundaries. No full runtime Event enum, automatic native observation subscription or session-stream construction is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

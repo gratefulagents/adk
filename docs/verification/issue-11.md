@@ -1610,3 +1610,33 @@ checks passed. Twenty-three specific records (21 fields and the internal/public
 projection helper) are closed: **365 verified / 8,526 unresolved / 251 excluded**.
 These are inventory obligations, not counts of missing features. Full acceptance
 and credentialed live-service verification remain open; exclusions are unchanged.
+
+### Owned SDK JSONL host writer
+
+Added `adk::codec::line_writer::{LineWriter, LineEvent}` with synchronous ordered
+`FnMut` dispatch and `std::io::Write`. Partial bytes, CR removal, empty-write
+behavior and subagent/child/log classification match **22 independently executed
+pinned SDK scenarios**. All three original SDK line-writer regressions also pass.
+Boundary cases cover the 16-MiB scanner threshold, overflow after earlier tokens,
+fragmented input and complete oversized JSON error output. The oracle compares
+small text exactly and large text using full-output SHA-256 plus byte lengths,
+not truncated prefixes. Its raw-byte length records make the invalid-UTF8 boundary
+visible: Rust text matches Go JSON string rendering, not arbitrary raw Go bytes.
+
+The native lifecycle is explicit: flush is an empty write, drop does not flush,
+shared ownership uses a host mutex, and a no-op closure replaces a nil sink. Tests
+exercise these choices and the API includes a runnable doctest. The SDK's unusual
+overflow fallback (which may repeat the first line as a log) is retained and
+documented rather than silently changed. Redaction remains host-owned. The only
+dependency change is a dev-only edge to already locked `sha2` 0.10.9 for fixture
+hashes; no dependency version changed and standalone consumers do not acquire it
+from this crate's runtime dependencies.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,324 passed / 0 failed /
+30 ignored**, plus the new doctest. Strict Clippy/rustdoc, changed-file formatting,
+facade matrix, platform-free consumer, all 20 offline scenarios and host-session
+passed. Pinned oracles, **19 ledger validators** (now requiring the line-writer
+oracle marker), source/license locks and whitespace checks passed. Constructor
+and write claims bring the overlay to **367 verified / 8,524 unresolved / 251
+excluded**. SDK session event-stream construction, full runtime event mapping,
+remaining ledger obligations and credentialed live services are still open.

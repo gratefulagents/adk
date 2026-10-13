@@ -3,7 +3,7 @@ use crate::dto::{RunItem, RunItemType};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-fn go_utf8(mut input: &[u8]) -> String {
+pub(crate) fn go_utf8(mut input: &[u8]) -> String {
     let mut text = String::new();
     while !input.is_empty() {
         match std::str::from_utf8(input) {

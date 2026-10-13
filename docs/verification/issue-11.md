@@ -1675,3 +1675,31 @@ A source review corrected misleading SDK comments: `AgentLogger` uses Go's globa
 logger composition must retain host destination control. Full issue acceptance
 and credentialed live-service verification remain open; no exclusions or release
 defaults changed.
+
+### Owned content-event logger and stream inheritance
+
+Added `ContentLogger` for exact SDK `AgentLogger.Event` message bodies and
+`ContentStream::set_logger` with child snapshot inheritance. Event annotation
+precedes logging; logging precedes subscriber delivery and JSONL serialization.
+The pinned logger oracle covers **42 event cases**, all event branches, partial
+UTF-8 byte previews, inherited names and logging despite serialization failure.
+A complete **10,137,174-byte** log over all **1,112,064 Unicode scalar values** is
+compared by length and SHA-256. Generated Go 1.26.8 Unicode 15.0.0 printable ranges
+retain BSD attribution/license and independently checked source hashes.
+
+Three Rust regressions cover that oracle, attachment/detachment isolation,
+writer-failure ordering, explicit flush and last-owner resource release. The
+embedding doctest composes owned log and JSONL writers without global state.
+This does not implement arbitrary Go global logger flags/prefixes/timestamps,
+turn/tool logger methods or Go printf arguments. Logs are unredacted and require
+a trusted destination; native event redaction is a separate pipeline.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,331 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, facade feature matrix, standalone consumer,
+20 offline scenarios, host-session, two facade doctests and one codec doctest
+passed. All pinned oracles, **19 ledger validators**, source/license locks and
+whitespace checks passed. Three narrow logger-setter/child-constructor claims
+bring the overlay to **377 verified / 8,514 unresolved / 251 excluded**. No
+immutable inventory, exclusion, CLI/evaluation behavior or release default changed.
+Full logger/session construction, other ledger obligations and credentialed live
+services remain open; offline observations do not establish live-service parity.

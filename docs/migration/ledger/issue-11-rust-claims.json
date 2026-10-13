@@ -6304,6 +6304,63 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-4DADC025B24A859F": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NewChildEventStream",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::child"
+      ],
+      "rust_test_identifiers": [
+        "stream_logger_snapshots_and_annotations_match_sdk",
+        "log_precedes_delivery_and_jsonl_despite_writer_errors",
+        "event_log_bodies_match_pinned_sdk",
+        "content_stream_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only child construction and attaching/detaching the concrete owned event logger are closed. Independent pinned logger observations verify inheritance snapshots, parent/child replacement isolation, subagent-name annotation before logging and logging despite serialization failure; the existing stream oracle verifies copied metadata and shared writer/subscribers. Native tests additionally verify logger-before-delivery-before-JSONL ordering on writer failure and last-owner release. ContentLogger emits exact SDK Event message bodies with host-owned destinations and no process-global Go log flags, prefix or timestamp. All Unicode scalars and byte-split previews are compared against Go 1.26.8. Whole AgentLogger construction/turn/tool methods, whole Emit, typed convenience methods and session options remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-615DDE6F89CB3DA4": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.SetLogger",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::set_logger"
+      ],
+      "rust_test_identifiers": [
+        "stream_logger_snapshots_and_annotations_match_sdk",
+        "log_precedes_delivery_and_jsonl_despite_writer_errors",
+        "event_log_bodies_match_pinned_sdk",
+        "content_stream_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only child construction and attaching/detaching the concrete owned event logger are closed. Independent pinned logger observations verify inheritance snapshots, parent/child replacement isolation, subagent-name annotation before logging and logging despite serialization failure; the existing stream oracle verifies copied metadata and shared writer/subscribers. Native tests additionally verify logger-before-delivery-before-JSONL ordering on writer failure and last-owner release. ContentLogger emits exact SDK Event message bodies with host-owned destinations and no process-global Go log flags, prefix or timestamp. All Unicode scalars and byte-split previews are compared against Go 1.26.8. Whole AgentLogger construction/turn/tool methods, whole Emit, typed convenience methods and session options remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-864F63A2D225EB68": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "NewChildEventStream",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::child"
+      ],
+      "rust_test_identifiers": [
+        "stream_logger_snapshots_and_annotations_match_sdk",
+        "log_precedes_delivery_and_jsonl_despite_writer_errors",
+        "event_log_bodies_match_pinned_sdk",
+        "content_stream_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only child construction and attaching/detaching the concrete owned event logger are closed. Independent pinned logger observations verify inheritance snapshots, parent/child replacement isolation, subagent-name annotation before logging and logging despite serialization failure; the existing stream oracle verifies copied metadata and shared writer/subscribers. Native tests additionally verify logger-before-delivery-before-JSONL ordering on writer failure and last-owner release. ContentLogger emits exact SDK Event message bodies with host-owned destinations and no process-global Go log flags, prefix or timestamp. All Unicode scalars and byte-split previews are compared against Go 1.26.8. Whole AgentLogger construction/turn/tool methods, whole Emit, typed convenience methods and session options remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

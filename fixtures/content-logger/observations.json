@@ -1,0 +1,646 @@
+{
+  "allUnicodeLogBytes": 10137174,
+  "allUnicodeLogSHA256": "e278e6bc1af6258c1a06e066374be5131b7d4a537e30073abd7fa2e0887c8146",
+  "cases": [
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=0 preview=\"\"\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=36 preview=\"hello\\n\\\"world\\\"\\x00\\a\\b\\f\\r\\t\\v\\u0085\\u00a0\\u00ad\\u200b\\u2028\ud83d\ude00\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_thinking"
+      },
+      "log": "[event] assistant_thinking len=0\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_thinking"
+      },
+      "log": "[event] assistant_thinking len=36\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "tool_start"
+      },
+      "log": "[event] tool_start tool= id= agent=\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "tool_start"
+      },
+      "log": "[event] tool_start tool=shell\n id=id agent=agent\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "tool_end"
+      },
+      "log": "[event] tool_end tool= id= is_error=false agent=\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "tool_end"
+      },
+      "log": "[event] tool_end tool=shell\n id=id is_error=true agent=agent\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "phase_transition"
+      },
+      "log": "[event] phase_transition name= msg=\"\"\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "phase_transition"
+      },
+      "log": "[event] phase_transition name=phase msg=\"hello\\n\\\"world\\\"\\x00\\a\\b\\f\\r\\t\\v\\u0085\\u00a0\\u00ad\\u200b\\u2028\ud83d\ude00\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "subagent_status"
+      },
+      "log": "[event] subagent_status task= status= type= model= msg=\"\"\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "subagent_status"
+      },
+      "log": "[event] subagent_status task=task status=failed type=researcher model=child msg=\"hello\\n\\\"world\\\"\\x00\\a\\b\\f\\r\\t\\v\\u0085\\u00a0\\u00ad\\u200b\\u2028\ud83d\ude00\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "session_end"
+      },
+      "log": "[event] session_end status=\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "session_end"
+      },
+      "log": "[event] session_end status=failed\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= latency_ms=0\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status=failed model=model provider=provider reason=timeout latency_ms=-1 error=\"provider error\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "system_init"
+      },
+      "log": "[event] system_init\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "system_init"
+      },
+      "log": "[event] system_init\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": ""
+      },
+      "log": "[event] \n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": ""
+      },
+      "log": "[event] \n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "unknown\n"
+      },
+      "log": "[event] unknown\n"
+    },
+    {
+      "event": {
+        "agent_name": "agent",
+        "attempt_latency_ms": -1,
+        "attempt_status": "failed",
+        "failure_kind": "timeout",
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "is_error": true,
+        "message": "hello\n\"world\"\u0000\u0007\b\f\r\t\u000b\u0085\u00a0\u00ad\u200b\u2028\ud83d\ude00",
+        "model": "model",
+        "output": "provider error",
+        "phase": "phase",
+        "provider": "provider",
+        "session": 0,
+        "status": "failed",
+        "subagent_model": "child",
+        "subagent_type": "researcher",
+        "task_id": "task",
+        "tool": "shell\n",
+        "tool_use_id": "id",
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "unknown\n"
+      },
+      "log": "[event] unknown\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=207 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\\x9f\\x98\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=208 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\\x9f\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=209 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=210 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=211 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=1007 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\\x9f\\x98\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=1008 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\\x9f\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=1009 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\xf0\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=1010 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "message": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "assistant_text"
+      },
+      "log": "[event] assistant_text len=1011 preview=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    },
+    {
+      "event": {
+        "input_tokens_include_cache": false,
+        "input_tokens_include_cache_known": false,
+        "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\ud83d\ude00suffix",
+        "session": 0,
+        "ts": "0001-01-01T00:00:00Z",
+        "type": "llm_attempt"
+      },
+      "log": "[event] llm_attempt status= model= provider= reason= latency_ms=0 error=\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\u2026\"\n"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/content-logger-reference/reference_test.go": "2eaa464eeb8517234ae2e6e813322027710677fe7b2c056b6f242d5c3be5b51b",
+      "scripts/content-logger-reference/run.py": "4606d6c83709206a4c7deb34a29d842c834bad0cd8eada274af8e043c33bd2f4"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/event_stream.go": "382a14c0207aa1952510d9003cdb32021082620a9fd8cb0161f8a8a3c61cf6ab",
+      "internal/agent/logger.go": "36ec226d01a1468880ecb4556a13821a4b6d13135a1ab1322c94e3e823887275",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1"
+    },
+    "stdlibSHA256": {
+      "LICENSE": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad",
+      "src/strconv/isprint.go": "24114557c2b3cad7b80c8e71683831bfbe1c72eb99e8fd28a3a48eaf77705fb4",
+      "src/strconv/quote.go": "6602960ec8777de9926c1d02fbf5cb0828d4aefa38083865f4af17b6892c09a2",
+      "src/unicode/tables.go": "6a88d48746c4b2c471cc04ae40559694b734770212e6f5ea5f1962adb0c0bdb1"
+    }
+  },
+  "streamLog": "[event] subagent_status task=child status= type=researcher model= msg=\"first\"\n[event] subagent_status task=child status= type=researcher model= msg=\"inherited name\"\n[event] phase_transition name= msg=\"not serializable\"\n"
+}

@@ -30,6 +30,15 @@ separate: API mapping does not imply behavioral parity. External Rust-framework
 research records design inspiration, not copied implementation or relicensing.
 The optional OpenTelemetry API/SDK dependencies retain their Apache-2.0 license.
 
+## Go Unicode printable ranges
+
+`crates/adk/src/content_logger/printable.rs` is generated from Go 1.26.8
+`strconv.IsPrint` (Unicode 15.0.0), Copyright 2013 The Go Authors. All rights
+reserved. Its BSD-3-Clause license is retained in
+[`docs/migration/licenses/go-LICENSE.txt`](docs/migration/licenses/go-LICENSE.txt)
+and must accompany source and binary redistributions. The reference fixture
+records source and license SHA-256 hashes; no Go runtime is linked into ADK.
+
 ## matchit 0.8.4
 
 `adk-mcp` reaches `matchit` through `axum 0.8.9`. The package declares `MIT AND

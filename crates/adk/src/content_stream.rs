@@ -1,4 +1,5 @@
 //! SDK content-event streams, distinct from native ordered observations.
+use crate::content_logger::ContentLogger;
 use adk_codec::{dto::ContentEvent, snapshots::to_go_json, timestamp::GoTimestamp};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};
 use std::{
@@ -14,6 +15,7 @@ struct StreamContext {
     phase: String,
     step: String,
     task_id: String,
+    logger: Option<Arc<ContentLogger>>,
 }
 
 struct Subscriber {
@@ -90,6 +92,14 @@ impl ContentStream {
             .session = session;
     }
 
+    /// Attach or detach an owned logger. Existing children retain their snapshot.
+    pub fn set_logger(&self, logger: Option<Arc<ContentLogger>>) {
+        self.context
+            .lock()
+            .unwrap_or_else(|p| p.into_inner())
+            .logger = logger;
+    }
+
     pub fn set_phase(&self, phase: impl Into<String>) {
         self.context.lock().unwrap_or_else(|p| p.into_inner()).phase = phase.into();
     }
@@ -114,7 +124,7 @@ impl ContentStream {
     }
 
     pub fn emit(&self, mut event: ContentEvent) {
-        {
+        let logger = {
             let context = self.context.lock().unwrap_or_else(|p| p.into_inner());
             if event.session == 0 {
                 event.session = context.session;
@@ -128,7 +138,8 @@ impl ContentStream {
             if event.task_id.is_empty() {
                 event.task_id.clone_from(&context.task_id);
             }
-        }
+            context.logger.clone()
+        };
         if zero_timestamp(&event.timestamp) {
             event.timestamp = now();
         }
@@ -150,6 +161,12 @@ impl ContentStream {
                     }
                 }
             }
+        }
+        if let Some(logger) = logger {
+            let _ = logger.event(&event);
+        }
+        {
+            let mut bus = self.shared.bus.lock().unwrap_or_else(|p| p.into_inner());
             for subscriber in bus.subscribers.values_mut() {
                 if subscriber.dropped > 0 {
                     let marker = ContentEvent {

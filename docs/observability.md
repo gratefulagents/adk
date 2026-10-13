@@ -217,12 +217,38 @@ observations when the native sequence contract is required.
 
 **Limits:** automatic timestamps are UTC; the pinned comparator explicitly runs
 in a UTC Go profile. Explicit offsets and zero instants in nonzero offsets are
-preserved/recognized. Non-UTC host-local automatic timestamp parity, SDK
-`AgentLogger` mirroring, logger inheritance, typed emit conveniences and full
-`NewSessionEventStream` options remain separate obligations. No generic callback
-is advertised as an implemented SDK logger. The API contains a runnable embedding
-example; source fixtures cover metadata, annotations, subscriber loss and writer
-failure, with additional concurrent-record and owned-lifetime regressions.
-Although SDK comments call its logger a stdout mirror, its implementation uses
-Go's global `log.Printf`: the default destination is stderr, and the host can
-redirect it. Logger parity must account for that host-selected destination.
+preserved/recognized. Non-UTC host-local automatic timestamp parity, typed emit
+conveniences and full `NewSessionEventStream` options remain separate obligations.
+The API contains a runnable embedding example; source fixtures cover metadata,
+annotations, subscriber loss and writer failure, with additional concurrent-record
+and owned-lifetime regressions.
+
+### Owned content-event logging
+
+`adk::content_logger::ContentLogger` implements the SDK `AgentLogger.Event` log
+**body** format under `observability`. The host explicitly supplies a trusted
+`Write + Send` destination; no process-global logger or timestamp/prefix is
+installed. Although SDK comments call this stdout mirroring, Go `log.Printf`
+uses stderr by default and permits host replacement of output, flags and prefix.
+Hosts wanting such decoration wrap the supplied writer. This is not full
+`AgentLogger` turn/tool logging or arbitrary Go printf compatibility.
+
+Attach with `stream.set_logger(Some(Arc::new(logger)))`, detach with `None`.
+Children snapshot the current logger along with metadata, but share its owned
+writer. Parent replacement does not change existing children. After name
+annotation, emission logs first, delivers to subscribers, then attempts JSONL
+serialization/writing. Log failures do not stop delivery; marshal failures do not
+undo logs or subscription events. These sinks are not one globally atomic
+transaction across producers. Explicitly flush each destination; dropping the
+last logger owner releases its writer without flushing.
+
+Logs contain **unredacted** messages, identifiers and provider errors. They are
+not the redacted native observation pipeline. Assistant previews cap at 200
+**bytes**, attempt-error previews at 1,000, both followed by an ellipsis when
+truncated. Other quoted event messages remain uncapped. Byte cuts inside UTF-8
+use Go `\xNN` quoting, not replacement characters. The independent pinned
+oracle covers 42 event cases, logger inheritance and a complete SHA-256/length
+comparison over all 1,112,064 Unicode scalar values. It uses Go 1.26.8's Unicode
+15.0.0 printable tables rather than the Rust compiler's changing Unicode tables.
+See the runnable Rust API example and `scripts/content-logger-reference/run.py
+--check`; Go module dependencies must already be cached for this offline check.

@@ -37,7 +37,7 @@ boundaries are deliberately explicit.
 
 | SDK feature directory / scenario | Executed Rust behavior and assertions | Boundary |
 | --- | --- | --- |
-| `agent_runtime` | Two model turns execute a lookup once; the next request contains its result; final text, last agent, response count and accumulated usage match. One-turn exhaustion retains partial responses and reports `MaxTurns`. | Uses injected models, not a live backend or dynamic instruction callback. |
+| `agent_runtime` | Two model turns execute a lookup once; the next request contains its result; final text, last agent, response count and accumulated usage match. One-turn exhaustion retains partial responses and reports `MaxTurns`. Host-owned autonomous progress tracking consumes actual new items and reports one tool call without a breaker. | Uses injected models; no automatic continuation loop, live backend or dynamic instruction callback. |
 | `model_abstraction` | Custom `Model`/`StreamingModel` implementations behind `Routes`; default route resolution, unknown-prefix rejection, first-prefix stripping while preserving `vendor/model`; unused backend is not invoked. | Models are deterministic fixtures. |
 | `providers` | Real request encoders for Chat Completions, Responses and Anthropic preserve model, instructions and user content. Chat/Anthropic response decoders agree on content and token usage. Provider protocol defaults and incompatible auth modes are checked. | No HTTP/auth refresh/live calls; the six dedicated live-provider Go tests remain unverified. |
 | `tools` | A real runner pauses on exact-call approval without executing the tool, then resumes once, executes once and returns the final answer. | Does not claim all timeout/wrapper combinations. |

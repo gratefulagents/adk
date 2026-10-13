@@ -1491,3 +1491,28 @@ found no blocking issue (its sandbox could not independently execute compilers;
 these execution results are from the main build environment). Ledger remains
 **258 verified / 8,633 unresolved / 251 excluded**; no broad provider capability
 was silently closed. Full issue acceptance remains open.
+
+### Host-owned autonomous progress helpers
+
+Added `adk::runtime::autoloop::{AutoTracker, CircuitBreakerResult,
+DEFAULT_MAX_AUTO_LOOPS, build_smart_nudge}`. The host supplies newly emitted items
+and decides whether to continue; no runner loop, worker CLI or global policy was
+introduced. Tracking retains bounded tool/error history, argument-aware FNV-1a
+signatures, SDK cycle/stall/error priorities, exact continuation strings and
+rune-based truncation. Native saturating counters and multi-part text projection
+are explicit limits; untrusted error text is not promoted to trusted instructions.
+
+The pinned Go oracle covers **20 scenarios / 167 states**, comparing exact
+counters, breaker booleans/reasons and nudge strings. It also executes all five
+original SDK tracker/nudge regressions. Seven unit tests cover additional depth,
+raw-spelling, Unicode, priority and saturation boundaries. The offline runtime
+example now feeds an actual runner result through the public facade helper.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,317 passed / 0
+failed / 30 ignored**; strict Clippy/rustdoc/formatting, feature matrix, standalone
+consumer, all 20 scenarios and host-session passed. Pinned oracles, 18 ledger
+validators (including missing-oracle rejection), source/license locks and
+whitespace checks passed. Three narrow records—the default cap and result
+boolean/reason fields—are closed; the overlay is now **261 verified / 8,630
+unresolved / 251 excluded**, not a count of missing features. Full issue acceptance
+and credentialed live verification remain open; excluded work is unchanged.

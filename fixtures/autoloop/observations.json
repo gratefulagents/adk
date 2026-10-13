@@ -1,0 +1,2737 @@
+{
+  "cases": [
+    {
+      "input": {
+        "name": "no_tools",
+        "phase": "shipping",
+        "turns": [
+          [],
+          [],
+          [],
+          [],
+          [],
+          []
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the shipping phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 1,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 2,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 3,
+          "nudge": "[SYSTEM] WARNING: You have produced text without tool calls for 3 consecutive turns. In autonomous mode, every turn MUST include at least one tool call. Do NOT output only text. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 4,
+          "nudge": "[SYSTEM] WARNING: You have produced text without tool calls for 4 consecutive turns. In autonomous mode, every turn MUST include at least one tool call. Do NOT output only text. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 5,
+          "nudge": "[SYSTEM] WARNING: You have produced text without tool calls for 5 consecutive turns. In autonomous mode, every turn MUST include at least one tool call. Do NOT output only text. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stalled - no tool calls in 5 consecutive turns",
+          "tool_count": 0,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 6,
+          "nudge": "[SYSTEM] WARNING: You have produced text without tool calls for 6 consecutive turns. In autonomous mode, every turn MUST include at least one tool call. Do NOT output only text. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stalled - no tool calls in 6 consecutive turns",
+          "tool_count": 0,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "cycle_1",
+        "phase": "plan",
+        "turns": [
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 3 times",
+          "tool_count": 7,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 4 times",
+          "tool_count": 8,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 4 times",
+          "tool_count": 9,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 5 times",
+          "tool_count": 10,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 5 times",
+          "tool_count": 11,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 5 times",
+          "tool_count": 12,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool0] repeated 5 times",
+          "tool_count": 13,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "cycle_2",
+        "phase": "plan",
+        "turns": [
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool0] repeated 3 times",
+          "tool_count": 7,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1] repeated 4 times",
+          "tool_count": 8,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool0] repeated 4 times",
+          "tool_count": 9,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1] repeated 5 times",
+          "tool_count": 10,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool0] repeated 5 times",
+          "tool_count": 11,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1] repeated 5 times",
+          "tool_count": 12,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool0] repeated 5 times",
+          "tool_count": 13,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "cycle_3",
+        "phase": "plan",
+        "turns": [
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool2",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool2",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool2",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool1",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool2",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"path\":\"same\"}",
+              "kind": "call",
+              "name": "tool0",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the plan phase. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1 -> tool2]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1->tool2] repeated 2 times",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool2 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool2->tool0] repeated 2 times",
+          "tool_count": 7,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool2 -> tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool2->tool0->tool1] repeated 2 times",
+          "tool_count": 8,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1 -> tool2]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1->tool2] repeated 3 times",
+          "tool_count": 9,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool2 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool2->tool0] repeated 3 times",
+          "tool_count": 10,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool2 -> tool0 -> tool1]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool2->tool0->tool1] repeated 3 times",
+          "tool_count": 11,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool0 -> tool1 -> tool2]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool0->tool1->tool2] repeated 3 times",
+          "tool_count": 12,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [tool1 -> tool2 -> tool0]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [tool1->tool2->tool0] repeated 3 times",
+          "tool_count": 13,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "distinct",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 6 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 6,
+          "tripped": false
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "whitespace",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "{ \"path\" : \"same\" }\t\t\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": " { \"path\" : \"same\" }\t\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "  { \"path\" : \"same\" }\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "   { \"path\" : \"same\" }\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "    { \"path\" : \"same\" }\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "     { \"path\" : \"same\" }",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [read_file->read_file] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "huge_number",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "1e999\t\t\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": " 1e999\t\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "  1e999\t\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "   1e999\t\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "    1e999\t",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "     1e999",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [read_file->read_file] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "numbers",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "1",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "1.0",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "1e0",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "1E+00",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "10e-1",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "0.1e1",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 6 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 6,
+          "tripped": false
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "malformed",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "{broken0",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken1",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken2",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken3",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken4",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken5",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 6 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 6,
+          "tripped": false
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "same_malformed",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{broken",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [read_file->read_file] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "missing",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [read_file->read_file] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "null",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "null",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [read_file -> read_file]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck in tool loop - pattern [read_file->read_file] repeated 3 times",
+          "tool_count": 6,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "strings",
+        "phase": "",
+        "turns": [
+          [
+            {
+              "input": "{\"s\":\"\"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"s\":\" \"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"s\":\"  \"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"s\":\"   \"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"s\":\"    \"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"s\":\"     \"}",
+              "kind": "call",
+              "name": "read_file",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 6 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 6,
+          "tripped": false
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "errors",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":6}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 4 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 5,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 7,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "unicode_errors",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":6}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "  \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  "
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 4 times: \"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...",
+          "tool_count": 5,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...",
+          "tool_count": 7,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "empty_errors",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":6}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": ""
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 4 times: \"\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: ",
+          "tool_count": 5,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: ",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: ",
+          "tool_count": 7,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "different_errors",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error0"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error1"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error2"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error3"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error4"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error5"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":6}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "error6"
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 3 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 4 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 5 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 6 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 6,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 7 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 7,
+          "tripped": false
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "error_history_retained",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{\"i\":0}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":1}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":2}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":3}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":4}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":5}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{\"i\":6}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 4 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 5,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 5 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 7,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "error_precedes_cycle",
+        "phase": "review",
+        "turns": [
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ],
+          [
+            {
+              "input": "{}",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            },
+            {
+              "input": "",
+              "kind": "error",
+              "name": "",
+              "text": "failed"
+            }
+          ]
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. You are in the review phase. 2 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 2,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] You have hit the same error 3 times: \"failed\". Do NOT retry the same approach. Try a fundamentally different strategy, or skip this subtask and move on. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 3,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [work -> work]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 4,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [work -> work]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 5,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [work -> work]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 6,
+          "tripped": true
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Detected repetitive tool pattern: [work -> work]. You appear stuck in a loop. Step back, reassess your approach, and try something fundamentally different. If the current subtask is blocked, skip it and move on to other work. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "Agent stuck - same error repeated 5 times: failed",
+          "tool_count": 7,
+          "tripped": true
+        }
+      ]
+    },
+    {
+      "input": {
+        "name": "no_tool_reset",
+        "phase": "",
+        "turns": [
+          [],
+          [],
+          [],
+          [
+            {
+              "input": "",
+              "kind": "call",
+              "name": "work",
+              "text": ""
+            }
+          ],
+          [],
+          []
+        ]
+      },
+      "states": [
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 1,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 2,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 3,
+          "nudge": "[SYSTEM] WARNING: You have produced text without tool calls for 3 consecutive turns. In autonomous mode, every turn MUST include at least one tool call. Do NOT output only text. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 0,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 0,
+          "nudge": "[SYSTEM] Continue. 1 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 1,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        },
+        {
+          "no_tool_turns": 2,
+          "nudge": "[SYSTEM] You produced text without tool calls. In autonomous mode, every turn must include at least one tool call. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+          "reason": "",
+          "tool_count": 1,
+          "tripped": false
+        }
+      ]
+    }
+  ],
+  "default_max_auto_loops": 200,
+  "nil_nudge": "[SYSTEM] Continue. You are in the plan phase. 0 tool calls so far. Use tools to make progress. Finish is a hard stop, not a progress report: if you named any backlog item, TODO, follow-up, remaining risk, or next step, call a tool for the top item now. Call finish only when no actionable work remains or a concrete external blocker prevents useful tool progress.",
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/autoloop-reference/reference_test.go": "a1418ba416fe93981c18ae5785c46ce152e5f17e5d2e6336c1a84fb86e5085a4",
+      "scripts/autoloop-reference/run.py": "b00935bd4b0e2bd8b738376c67843329d5391927a6ba693a3cfed3187fe8b1ef"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/items.go": "fc3506f8767831ea124df1c0d1c9a72c4fdc6c248860a1660eaa3bb569ae287b",
+      "pkg/agentsdk/autoloop.go": "f9c3a756abf90dcb68c29faaa38ae635ab370fb1bbca5f722dcaa571acbf965b",
+      "pkg/agentsdk/autoloop_test.go": "0853c583ca0e81d31e496d344bb76959a32665b8ab2e42a54d022e4eb74def16"
+    }
+  }
+}

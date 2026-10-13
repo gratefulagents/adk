@@ -29,7 +29,8 @@ class EvidenceTests(unittest.TestCase):
                        "Pinned SDK workspace context observations reproduced exactly",
                        "Pinned SDK project-state runtime observations reproduced exactly",
                        "Pinned metadata compaction observations reproduced exactly",
-                       "Pinned LLM summary observations reproduced exactly"):
+                       "Pinned LLM summary observations reproduced exactly",
+                       "Pinned autoloop observations reproduced exactly"):
             with self.subTest(marker=marker):
                 self.evidence["reference_fixture_check"] = original.replace(marker, "")
                 with self.assertRaisesRegex(SystemExit, "builder evidence requires"):

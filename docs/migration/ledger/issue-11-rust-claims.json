@@ -4423,6 +4423,54 @@
         "builder",
         "runtime"
       ]
+    },
+    "SDK-7163FC10EFE1E704": {
+      "source": "pkg/agentsdk/autoloop.go",
+      "source_name": "DefaultMaxAutoLoops",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::DEFAULT_MAX_AUTO_LOOPS"
+      ],
+      "rust_test_identifiers": [
+        "autonomous_progress_matches_pinned_public_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall",
+      "rationale": "Only the public default value 200 is closed; the host owns enforcement, not the runner.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E8E415A01A4EAAC8": {
+      "source": "pkg/agentsdk/autoloop.go",
+      "source_name": "CircuitBreakerResult.Tripped",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::CircuitBreakerResult::tripped"
+      ],
+      "rust_test_identifiers": [
+        "autonomous_progress_matches_pinned_public_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall",
+      "rationale": "Only the typed boolean outcome field is closed. The independent 20-scenario oracle compares its value at all 167 states, including default, stall, error and cycle outcomes.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-69BDB6F8777C93B0": {
+      "source": "pkg/agentsdk/autoloop.go",
+      "source_name": "CircuitBreakerResult.Reason",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::CircuitBreakerResult::reason"
+      ],
+      "rust_test_identifiers": [
+        "autonomous_progress_matches_pinned_public_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall",
+      "rationale": "Only the valid-UTF8 reason field is closed. The independent oracle compares exact empty and populated reasons across all 167 states, including Unicode truncation and breaker priority. This does not claim arbitrary invalid-UTF8 Go strings or JSON serialization of the entire type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

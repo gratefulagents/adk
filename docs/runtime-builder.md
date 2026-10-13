@@ -8,7 +8,9 @@ runtime is allowed to assemble.
 
 For caller-driven message ingestion and approval persistence on top of a native
 agent, enable `host` and use the [standalone host-session API](host-sessions.md).
-Its stores and lifecycle remain application-owned.
+Its stores and lifecycle remain application-owned. For opt-in post-turn stall,
+error and tool-cycle classification, use the [autonomous progress helpers](autonomous-progress.md).
+The host owns continuation policy; these helpers do not add an automatic run loop.
 
 ## Construction
 

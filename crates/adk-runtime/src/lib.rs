@@ -9,6 +9,7 @@
 //! Abortion only takes effect when a task yields. Non-yielding work can prevent
 //! shutdown; blocking processes/threads need their own owner and termination API.
 
+pub mod autoloop;
 pub mod compaction;
 pub mod guardrails;
 pub use guardrails::{

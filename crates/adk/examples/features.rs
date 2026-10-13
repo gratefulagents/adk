@@ -241,6 +241,15 @@ async fn agent_runtime() {
     assert_eq!(result.usage.output_tokens, 4);
     assert_eq!(result.last_agent.as_deref(), Some("assistant"));
     assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+    let mut progress = adk::runtime::autoloop::AutoTracker::default();
+    progress.update(&result.new_items);
+    assert_eq!(progress.tool_call_count(), 1);
+    assert_eq!(progress.consecutive_no_tool_turns(), 0);
+    assert!(!progress.check_circuit_breakers().tripped);
+    assert!(
+        adk::runtime::autoloop::build_smart_nudge(Some(&progress), "plan")
+            .contains("1 tool calls so far")
+    );
     {
         let requests = model.requests.lock().unwrap();
         assert_eq!(requests[0].instructions, "Use lookup before answering");

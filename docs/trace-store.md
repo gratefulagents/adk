@@ -95,10 +95,12 @@ their assembled protocol response, not a transcript of SSE events. Custom models
 set `raw: None` when unavailable. JSON serialization round trips distinguish an
 absent raw value from `Some(serde_json::Value::Null)`. This field
 is sensitive response content, not a diagnostic or a redacted logging surface.
-It is not yet the pinned SDK's raw snapshot representation: the Go OpenAI adapter
-stores its normalized internal Anthropic-shaped response. Exact SDK response
-snapshot assembly must account for that difference rather than relabel native
-provider JSON as Go-equivalent.
+Native raw data is not relabeled as a Go-compatible snapshot. Built-in providers
+separately populate ordered `snapshot_raw` and an explicit `snapshot_projection`
+tag for compatibility traces. The codec projects SDK items, usage and end-turn
+from that document while leaving native execution data intact. See the bounded
+complete/streaming fixture coverage in [providers](providers.md#ordered-diagnostic-snapshots).
+Custom models without a projection tag retain the native-raw fallback.
 
 The `adk::codec::snapshots::RequestSnapshot` document (`compat` feature) serializes every pinned request
 field. `Snapshot::from_serializable` uses the Go-compatible serializer, including
@@ -128,11 +130,11 @@ its required `requests` field.
 
 **Exact automatic SDK snapshot parity remains incomplete**: request snapshots
 assemble representable settings and explicitly attributed history, but reject
-unknown provenance instead of inventing it. The native raw provider shape still
-differs from the SDK adapter's normalized raw representation. Callers supplying
-typed spans can attach explicit `Snapshot` documents with that provenance and
-shape. The response conversion and its fixtures do not close that remaining
-provider normalization obligation.
+unknown provenance instead of inventing it. Ordered provider normalization is
+verified for the recorded complete/streaming fixture profiles, not every possible
+provider response. Callers supplying typed spans can attach explicit `Snapshot`
+documents. Neither those explicit documents nor the bounded provider fixtures
+close all remaining provider parity obligations.
 
 ## Exporters
 

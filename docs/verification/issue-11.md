@@ -1467,3 +1467,27 @@ reference/ledger checks and 18 ledger validator tests passed; source/license
 locks and whitespace checks passed. Ledger remains **258 verified / 8,633
 unresolved / 251 excluded**. This checkpoint does not claim full issue acceptance
 or credentialed provider/remote-collector verification.
+
+### Explicit provider image-analysis helper
+
+Added borrowed `ImageAnalysisRequest` and `Provider::analyze_image`, exposed through
+`adk::providers`. The helper uses Responses independently of ordinary Chat
+selection and shares the existing client/session. Default model/detail, MIME
+normalization, request budget/storage/cache settings, SSE text extraction and
+validation match 11 independently executed pinned public-helper observations.
+The existing image-loading tool is unchanged. Native tests also cover cancellation
+before dispatch and while a stream is open, unsupported Anthropic protocol and
+redacted HTTP failures. Transient retries remain host-owned; no credentialed
+OAuth or live image-understanding parity is claimed. Corrected older trace-store
+documentation: ordered provider snapshot normalization already exists with
+bounded fixture coverage, distinct from native raw payloads.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,309 passed / 0
+failed / 30 ignored**. Strict Clippy/rustdoc, formatting, facade feature matrix,
+standalone consumer, all 20 offline feature scenarios and host-session passed.
+The 11-case Go oracle and original pinned image-client regression reproduced;
+18 ledger validators and source/license locks passed. Read-only specialist review
+found no blocking issue (its sandbox could not independently execute compilers;
+these execution results are from the main build environment). Ledger remains
+**258 verified / 8,633 unresolved / 251 excluded**; no broad provider capability
+was silently closed. Full issue acceptance remains open.

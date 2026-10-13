@@ -99,6 +99,167 @@ fn read_request(socket: &mut TcpStream) -> String {
     }
     String::from_utf8(bytes).unwrap()
 }
+#[tokio::test]
+async fn image_analysis_matches_pinned_public_helper() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/image-analysis/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let input = &case["input"];
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let no_text = input["no_text"].as_bool().unwrap();
+        let server = (!case["request"].is_null()).then(|| std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            let mut body = String::from("data: {\"type\":\"response.created\",\"response\":{\"id\":\"vision\",\"model\":\"gpt-5.5\"}}\n\n");
+            if !no_text {
+                body.push_str("data: {\"type\":\"response.content_part.added\",\"output_index\":0,\"part\":{\"type\":\"output_text\"}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"delta\":\"  vision ok  \"}\n\ndata: {\"type\":\"response.output_text.done\",\"output_index\":0}\n\n");
+            }
+            body.push_str("data: {\"type\":\"response.completed\",\"response\":{\"id\":\"vision\",\"model\":\"gpt-5.5\",\"output\":[]}}\n\ndata: [DONE]\n\n");
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", body.len(), body).unwrap();
+            captured
+        }));
+        let mut request = ImageAnalysisRequest::new(
+            input["model"].as_str().unwrap(),
+            input["data"].as_str().unwrap().as_bytes(),
+            input["mime"].as_str().unwrap(),
+            input["prompt"].as_str().unwrap(),
+        );
+        if !input["default"].as_bool().unwrap() {
+            request.detail = input["detail"].as_str().unwrap();
+        }
+        let result = provider(&endpoint).analyze_image(&context(), request).await;
+        if case["error"] == "" {
+            assert_eq!(
+                result.unwrap(),
+                case["result"].as_str().unwrap(),
+                "{}",
+                input["name"]
+            );
+        } else {
+            let error = result.unwrap_err();
+            assert_eq!(
+                error.info.category,
+                if no_text {
+                    adk_core::ErrorCategory::Provider
+                } else {
+                    adk_core::ErrorCategory::InvalidInput
+                }
+            );
+        }
+        if let Some(server) = server {
+            let captured = server.join().unwrap();
+            assert!(captured.starts_with("POST /v1/responses HTTP/1.1"));
+            assert!(
+                captured
+                    .to_lowercase()
+                    .contains("authorization: bearer fixture-token")
+            );
+            let body: serde_json::Value =
+                serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+            assert_eq!(body, case["request"], "{}", input["name"]);
+        }
+    }
+}
+
+#[tokio::test]
+async fn image_analysis_respects_cancellation_and_rejects_anthropic() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let token = CancellationToken::new();
+    token.cancel();
+    let mut cancelled = context();
+    cancelled.cancellation = Arc::new(token);
+    let provider = provider("http://127.0.0.1:1");
+    let error = provider
+        .analyze_image(
+            &cancelled,
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe"),
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Cancelled);
+    let scope = Scope::new("fixture", "http://127.0.0.1:1", None, AuthMode::ApiKey).unwrap();
+    let provider = Provider::new(
+        "anthropic",
+        Protocol::Anthropic,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    let error = provider
+        .analyze_image(
+            &context(),
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe"),
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Unsupported);
+}
+
+#[tokio::test]
+async fn image_analysis_cancels_open_stream_and_redacts_http_failures() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let (ready_tx, ready_rx) = tokio::sync::oneshot::channel();
+    let (release_tx, release_rx) = std::sync::mpsc::channel();
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        read_request(&mut socket);
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\n\r\n").unwrap();
+        ready_tx.send(()).unwrap();
+        release_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+    });
+    let token = Arc::new(CancellationToken::new());
+    let mut ctx = context();
+    ctx.cancellation = token.clone();
+    let provider = provider(&endpoint);
+    let (result, ()) = tokio::join!(
+        provider.analyze_image(
+            &ctx,
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe")
+        ),
+        async {
+            ready_rx.await.unwrap();
+            token.cancel();
+        },
+    );
+    release_tx.send(()).unwrap();
+    server.join().unwrap();
+    assert_eq!(
+        result.unwrap_err().info.category,
+        adk_core::ErrorCategory::Cancelled
+    );
+
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        read_request(&mut socket);
+        let body = "private-prompt fixture-token";
+        write!(
+            socket,
+            "HTTP/1.1 503 Unavailable\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+            body.len(),
+            body
+        )
+        .unwrap();
+    });
+    let error = self::provider(&endpoint)
+        .analyze_image(
+            &context(),
+            ImageAnalysisRequest::new("", b"image", "image/png", "private-prompt"),
+        )
+        .await
+        .unwrap_err();
+    server.join().unwrap();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Provider);
+    assert!(!error.to_string().contains("private-prompt"));
+    assert!(!error.to_string().contains("fixture-token"));
+}
+
 #[test]
 fn named_routes_preserve_gateway_model_ids_and_reject_unknown_prefixes() {
     let mut routes = adk_providers::routing::Routes::new("default");

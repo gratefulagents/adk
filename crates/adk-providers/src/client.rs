@@ -9,6 +9,7 @@ use adk_core::{
     BoxFuture, Context, Error, ErrorCategory, Model, ModelEvent, ModelRequest, ModelResponse,
     ModelStream, StreamingModel,
 };
+use base64::{Engine, engine::general_purpose::STANDARD};
 use reqwest::Client;
 use serde_json::{Value, json};
 use std::{
@@ -24,7 +25,144 @@ pub struct Provider {
     client: Client,
     thinking_overrides: Mutex<BTreeMap<String, (String, bool)>>,
 }
+/// An explicit image-analysis call, separate from the attachment-loading tool.
+pub struct ImageAnalysisRequest<'a> {
+    pub model: &'a str,
+    pub data: &'a [u8],
+    pub media_type: &'a str,
+    pub prompt: &'a str,
+    pub detail: &'a str,
+}
+
+impl<'a> ImageAnalysisRequest<'a> {
+    pub fn new(model: &'a str, data: &'a [u8], media_type: &'a str, prompt: &'a str) -> Self {
+        Self {
+            model,
+            data,
+            media_type,
+            prompt,
+            detail: "high",
+        }
+    }
+}
+
 impl Provider {
+    /// Uses Responses even when ordinary calls select Chat, sharing this provider's
+    /// transport and credential session. The host retains retry ownership.
+    pub async fn analyze_image(
+        &self,
+        context: &Context,
+        request: ImageAnalysisRequest<'_>,
+    ) -> Result<String, Error> {
+        context.check_active()?;
+        if self.protocol == Protocol::Anthropic {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "image analysis requires an OpenAI-compatible provider",
+            ));
+        }
+        if request.data.is_empty() {
+            return Err(crate::invalid("image data is empty"));
+        }
+        let prompt = request.prompt.trim();
+        if prompt.is_empty() {
+            return Err(crate::invalid("prompt is required"));
+        }
+        let model = request.model.trim();
+        let model = if model.is_empty() {
+            crate::factory::DEFAULT_CHAT_MODEL
+        } else {
+            model
+        };
+        let detail = match request.detail.trim().to_ascii_lowercase().as_str() {
+            "low" => "low",
+            "original" => "original",
+            "auto" => "auto",
+            _ => "high",
+        };
+        let media_type = request
+            .media_type
+            .split(';')
+            .next()
+            .unwrap_or_default()
+            .trim();
+        let media_type =
+            if media_type.is_empty() || media_type.contains([' ', '\t', '\r', '\n', ',']) {
+                "application/octet-stream"
+            } else {
+                media_type
+            };
+        let mut body = json!({
+            "model": model,
+            "max_output_tokens": 4096,
+            "input": [{"role":"user", "content":[
+                {"type":"input_text", "text":prompt},
+                {"type":"input_image", "detail":detail, "image_url":format!("data:{media_type};base64,{}", STANDARD.encode(request.data))}
+            ]}],
+            "instructions":"Analyze the image and answer the user's prompt. Be concise and specific.",
+            "truncation":"auto",
+            "store":false,
+            "prompt_cache_retention":"in_memory",
+            "stream":true,
+        });
+        let codex = self.session.scope().mode == AuthMode::OpenAiOAuth;
+        if codex {
+            crate::openai::codex(&mut body);
+        }
+        let transport = Self {
+            name: self.name.clone(),
+            protocol: Protocol::Responses,
+            session: self.session.clone(),
+            client: self.client.clone(),
+            thinking_overrides: Mutex::default(),
+        };
+        let response = transport.send_body(context, "/responses", body).await?;
+        let mut state = StreamState::new(Protocol::Responses);
+        state.snapshot_profile = if codex {
+            crate::snapshot::Profile::Collected
+        } else {
+            crate::snapshot::Profile::Complete
+        };
+        let mut stream = HttpStream {
+            context: context.clone(),
+            response: Some(response),
+            decoder: Decoder::default(),
+            state,
+            queue: VecDeque::new(),
+            closed: false,
+        };
+        while let Some(event) = stream.read().await? {
+            if let ModelEvent::Complete { response } = event {
+                let parts: Vec<_> = response
+                    .items
+                    .iter()
+                    .filter_map(|item| match item {
+                        adk_core::RunItem::Message { message }
+                        | adk_core::RunItem::PhasedMessage { message, .. } => {
+                            Some(&message.content)
+                        }
+                        _ => None,
+                    })
+                    .flatten()
+                    .filter_map(|content| match content {
+                        adk_core::Content::Text { text } if !text.trim().is_empty() => {
+                            Some(text.as_str())
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                let text = parts.join("\n").trim().to_owned();
+                if text.is_empty() {
+                    return Err(protocol_error("image analysis response contained no text"));
+                }
+                return Ok(text);
+            }
+        }
+        Err(protocol_error(
+            "image analysis stream ended without completion",
+        ))
+    }
+
     pub fn new(
         name: impl Into<String>,
         protocol: Protocol,

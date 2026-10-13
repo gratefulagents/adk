@@ -77,8 +77,8 @@ boundaries are deliberately explicit.
   `score.json`, finish-time update and filtered run listing, matching the pinned
   SDK trace-store example. The owned runner tracing path asserts trace start/end,
   completed session status and zero writer errors. Unknown history provenance is
-  not inferred, and raw provider snapshots still differ from SDK normalization;
-  see [trace storage](trace-store.md).
+  not inferred; normalized provider snapshots have separate, bounded fixture
+  coverage rather than a full parity claim. See [trace storage](trace-store.md).
   No evaluation or Terminal-Bench execution is introduced.
 - **Memory custom backends:** the host-injected store and namespace-bound tool are
   exercised; database persistence and vector retrieval are not. A production custom

@@ -153,6 +153,42 @@ status and normalized usage only; never record authorization, refresh bodies,
 account identifiers, raw prompts or unredacted server errors. Do not run this matrix
 in ordinary CI or silently substitute API keys for an unavailable OAuth account.
 
+### Explicit image analysis
+
+`adk::providers::client::{Provider, ImageAnalysisRequest}` exposes an explicit
+image-analysis helper, separate from the `AnalyzeImage` tool (which only attaches
+loaded images to a conversation). Given an owned provider and request context:
+
+```rust,ignore
+let mut request = ImageAnalysisRequest::new(
+    "gpt-5.5", image_bytes, "image/png", "What is shown?",
+);
+request.detail = "low"; // Constructor defaults to high.
+let answer = provider.analyze_image(&context, request).await?;
+```
+
+The helper always posts to Responses, even if ordinary model calls use Chat. It
+shares the existing HTTP client and credential session; it performs no discovery,
+login, implicit credential lookup or detached work. Empty model uses the pinned
+chat default; supply a provider-local model, not a route-prefixed name. Defaults
+are 4096 output tokens, automatic truncation, no storage, in-memory prompt-cache
+retention and high detail. `low`, `original` and `auto` are recognized after
+case/whitespace normalization; other details use high. MIME parameters are
+removed; blank or malformed MIME labels fall back to `application/octet-stream`.
+Images are base64 data URLs. The helper returns trimmed, newline-joined nonblank
+text or a safe error. Anthropic-protocol instances reject this OpenAI-specific
+operation before dispatch.
+
+The 11 independently executed pinned public-helper cases in
+`fixtures/image-analysis/observations.json` compare exact request JSON, validation,
+text and no-output behavior against local HTTP servers. Native regressions also
+cover cancellation before dispatch and during an open stream, unsupported
+protocols, and redacted HTTP failures. As with other native providers, transient
+retry scheduling is host-owned rather than copying the Go client's retry loop;
+error strings are sanitized, not byte-identical. Codex mode retains the existing
+Responses rewriting/session machinery, but this helper's credentialed OAuth and
+live image understanding remain **unverified**.
+
 ### Ordered diagnostic snapshots
 
 `ModelResponse::raw` still contains native provider data. The independent optional

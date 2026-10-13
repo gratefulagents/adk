@@ -1,0 +1,968 @@
+{
+  "annotation": [
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"subagent_status\",\"session\":0,\"agent_name\":\"explicit\",\"task_id\":\"task\",\"subagent_type\":\"worker\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    },
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"subagent_status\",\"session\":0,\"agent_name\":\"worker\",\"task_id\":\"task\",\"subagent_type\":\"worker\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    },
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"subagent_status\",\"session\":0,\"agent_name\":\"renamed\",\"task_id\":\"task\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    },
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"subagent_status\",\"session\":0,\"agent_name\":\"renamed\",\"task_id\":\"task\",\"subagent_type\":\"renamed\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    },
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"other\",\"session\":0,\"task_id\":\"task\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    },
+    {
+      "automatic": true,
+      "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"subagent_status\",\"session\":0,\"task_id\":\"unknown\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+      "nonfinite": false
+    }
+  ],
+  "drops": [
+    {
+      "capacity": 1,
+      "closed": {
+        "closed": true,
+        "events": []
+      },
+      "first": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"0\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "second": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"events_dropped\",\"session\":0,\"message\":\"3 events dropped (slow subscriber)\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "third": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"events_dropped\",\"session\":0,\"message\":\"1 events dropped (slow subscriber)\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      }
+    },
+    {
+      "capacity": 2,
+      "closed": {
+        "closed": true,
+        "events": []
+      },
+      "first": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"0\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"1\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "second": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"events_dropped\",\"session\":0,\"message\":\"2 events dropped (slow subscriber)\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"later\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "third": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"last\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      }
+    },
+    {
+      "capacity": 0,
+      "closed": {
+        "closed": true,
+        "events": []
+      },
+      "first": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"0\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"1\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"2\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"3\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"4\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"5\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"6\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"7\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"8\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"9\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"10\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"11\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"12\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"13\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"14\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"15\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"16\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"17\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"18\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"19\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"20\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"21\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"22\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"23\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"24\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"25\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"26\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"27\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"28\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"29\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"30\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"31\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"32\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"33\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"34\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"35\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"36\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"37\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"38\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"39\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"40\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"41\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"42\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"43\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"44\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"45\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"46\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"47\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"48\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"49\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"50\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"51\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"52\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"53\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"54\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"55\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"56\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"57\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"58\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"59\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"60\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"61\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"62\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"63\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "second": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"events_dropped\",\"session\":0,\"message\":\"2 events dropped (slow subscriber)\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"later\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "third": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"last\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      }
+    },
+    {
+      "capacity": -1,
+      "closed": {
+        "closed": true,
+        "events": []
+      },
+      "first": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"0\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"1\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"2\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"3\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"4\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"5\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"6\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"7\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"8\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"9\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"10\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"11\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"12\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"13\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"14\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"15\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"16\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"17\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"18\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"19\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"20\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"21\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"22\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"23\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"24\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"25\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"26\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"27\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"28\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"29\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"30\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"31\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"32\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"33\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"34\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"35\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"36\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"37\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"38\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"39\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"40\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"41\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"42\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"43\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"44\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"45\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"46\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"47\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"48\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"49\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"50\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"51\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"52\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"53\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"54\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"55\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"56\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"57\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"58\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"59\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"60\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"61\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"62\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"tick\",\"session\":0,\"message\":\"63\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "second": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"events_dropped\",\"session\":0,\"message\":\"2 events dropped (slow subscriber)\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          },
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"later\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      },
+      "third": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"last\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+            "nonfinite": false
+          }
+        ]
+      }
+    }
+  ],
+  "failure": {
+    "attempts": 1,
+    "subscriber": {
+      "closed": false,
+      "events": [
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"writer_failure\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"marshal_failure\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": true
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "closed": {
+      "closed": true,
+      "events": []
+    },
+    "subscriber": {
+      "closed": false,
+      "events": [
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"root\",\"session\":8,\"message\":\"message\",\"phase\":\"implementation\",\"step\":\"editing\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"child\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": false,
+          "json": "{\"ts\":\"2020-02-03T04:05:06.1234+05:30\",\"type\":\"explicit\",\"session\":9,\"phase\":\"phase\",\"task_id\":\"override\",\"step\":\"step\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"zero_offset\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"zero_large_offset\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"cleared\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"minimum\",\"session\":-2147483648,\"phase\":\"\u754c\\nphase\",\"step\":\" \\tstep\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        },
+        {
+          "automatic": true,
+          "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"maximum\",\"session\":2147483647,\"phase\":\"\u754c\\nphase\",\"step\":\" \\tstep\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+          "nonfinite": false
+        }
+      ]
+    },
+    "wire": [
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"root\",\"session\":8,\"message\":\"message\",\"phase\":\"implementation\",\"step\":\"editing\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"child\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": false,
+        "json": "{\"ts\":\"2020-02-03T04:05:06.1234+05:30\",\"type\":\"explicit\",\"session\":9,\"phase\":\"phase\",\"task_id\":\"override\",\"step\":\"step\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"zero_offset\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"zero_large_offset\",\"session\":7,\"phase\":\"planning\",\"task_id\":\"task\",\"step\":\"exploring\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"cleared\",\"session\":0,\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"minimum\",\"session\":-2147483648,\"phase\":\"\u754c\\nphase\",\"step\":\" \\tstep\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      },
+      {
+        "automatic": true,
+        "json": "{\"ts\":\"0001-01-01T00:00:00Z\",\"type\":\"maximum\",\"session\":2147483647,\"phase\":\"\u754c\\nphase\",\"step\":\" \\tstep\",\"input_tokens_include_cache\":false,\"input_tokens_include_cache_known\":false}",
+        "nonfinite": false
+      }
+    ]
+  },
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/content-stream-reference/reference_test.go": "ac85d1e0f8f11af39a51c90ffd6b0cf38f9908adb55442b231f65bb034904179",
+      "scripts/content-stream-reference/run.py": "4b22fb3a229b52a00683868a8ccef56719c08325e2840d32078bcf905c8ab09b"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/event_stream.go": "382a14c0207aa1952510d9003cdb32021082620a9fd8cb0161f8a8a3c61cf6ab",
+      "internal/agent/event_stream_test.go": "84ecfa9b759423060cff649f2c58355afa4a1b2bed1d5daa11656dd709dde60c",
+      "internal/agent/stream_events.go": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
+      "pkg/agentsdk/events/events.go": "bd22ae98200ebbbdc42398feb7a27b777ea716dad806cefac3f06fe4ffa25481",
+      "pkg/agentsdk/events/events_test.go": "74656dc67c90ebd0f0e403d649011a29b0ca16d809a6a40d5a2ebf0182dcf49d",
+      "pkg/agentsdk/session_event_stream.go": "0da3c09dc207fc3fcd9619764e3c5ac9ff9a32a218aee9fe0606212beb45e5c0",
+      "pkg/agentsdk/session_event_stream_test.go": "f99222442c0c91aa3d1f03097afaadb9f30082fb82a47eab6022efa9dc8ba7ee"
+    },
+    "timezone": "UTC"
+  }
+}

@@ -36,6 +36,9 @@ pub use adk_security as security;
 #[cfg(all(feature = "tools", feature = "runtime"))]
 pub mod tool_runtime;
 
+/// SDK content-event metadata and bounded owned subscriptions.
+#[cfg(feature = "observability")]
+pub mod content_stream;
 /// Ordered native events, explicit capture policy and host-owned telemetry.
 #[cfg(feature = "observability")]
 pub mod observability;

@@ -6171,6 +6171,139 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-A0656182E1CBFB54": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.SetPhase",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::set_phase"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6708041A190004C2": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.SetSession",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::set_session"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-E33457204EA9F69C": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.SetStep",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::set_step"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-08F4315A3BB97008": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.Subscribe",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::subscribe"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-859FF28256EEF81B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "NewEventStream",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::new"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-17DCE4BAB637DDF5": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NewEventStream",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::new"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-59FBF64314D27B4D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NewEventWriter",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::new"
+      ],
+      "rust_test_identifiers": [
+        "content_stream_matches_pinned_sdk",
+        "subscriptions_and_last_stream_have_explicit_owned_lifetimes",
+        "subscriber_drop_counts_do_not_affect_other_receivers",
+        "child_threads_preserve_complete_records_and_each_producers_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named default construction, metadata setter or bounded subscription operation is verified. Independent pinned UTC-profile observations cover default/explicit/copied metadata, clearing and signed session limits, shared subscriptions, capacities 1/2/default64, slow-subscriber markers and idempotent unsubscribe. Native tests additionally verify independent event ownership, 200 concurrent complete records with per-producer ordering, drop-count isolation and last-owner resource release. Rust unsigned capacity uses zero for the Go nonpositive default. Automatic timestamps are UTC, not arbitrary host-local zones. Logger attachment, whole EventStream/Emit/child-with-logger parity, typed emit convenience methods and NewSessionEventStream are not closed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

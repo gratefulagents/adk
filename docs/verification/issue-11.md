@@ -1640,3 +1640,38 @@ oracle marker), source/license locks and whitespace checks passed. Constructor
 and write claims bring the overlay to **367 verified / 8,524 unresolved / 251
 excluded**. SDK session event-stream construction, full runtime event mapping,
 remaining ledger obligations and credentialed live services are still open.
+
+### Owned content-stream metadata and subscriptions
+
+Added `adk::content_stream::{ContentStream, ContentSubscription}` under the existing
+`observability` feature. Parent/child streams share the owned writer and bus while
+copying metadata. Emission fills only unset context, recognizes zero instants even
+in nonzero offsets, recalls subagent names, broadcasts before best-effort JSONL
+writes and reports subscriber loss through source-compatible drop markers.
+Subscriptions close explicitly or on drop; queued records survive explicit close,
+and the last stream owner releases the writer. Independent Rust event ownership
+and unsigned capacity (`0` selects the SDK's 64-slot default) are documented.
+
+The pinned Go oracle has **166 recorded event views**, including exact wire
+serialization and subscription observations, and executes six original internal
+stream tests plus the public session-stream constructor regression. Four Rust
+tests compare those views and additionally verify owned lifetimes, independent
+subscriber counters and **200 concurrent complete records with per-producer
+ordering**. The native clock uses UTC; the oracle explicitly selects and verifies
+the UTC Go profile. Non-UTC automatic clock behavior is not claimed. Bus and writer
+serialization are separate, not a global atomic cross-sink sequence.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,328 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, changed-file formatting, facade feature matrix,
+platform-free consumer, 20 offline scenarios, host-session and both facade/codec
+doctests passed. Pinned oracles, **19 ledger validators**, source/license locks and
+whitespace checks passed. Only seven constructor/setter/subscription records are
+closed: **374 verified / 8,517 unresolved / 251 excluded**. Whole `Emit`, child
+logger inheritance, logger attachment, typed convenience emission and complete
+`NewSessionEventStream` remain open, despite the tested no-logger core path.
+
+A source review corrected misleading SDK comments: `AgentLogger` uses Go's global
+`log.Printf`, whose default is stderr, not a hard-wired stdout destination. Future
+logger composition must retain host destination control. Full issue acceptance
+and credentialed live-service verification remain open; no exclusions or release
+defaults changed.

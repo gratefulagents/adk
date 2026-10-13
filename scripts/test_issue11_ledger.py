@@ -32,7 +32,8 @@ class EvidenceTests(unittest.TestCase):
                        "Pinned LLM summary observations reproduced exactly",
                        "Pinned autoloop observations reproduced exactly",
                        "Pinned content event observations reproduced exactly",
-                       "Pinned line writer observations reproduced exactly"):
+                       "Pinned line writer observations reproduced exactly",
+                       "Pinned content stream observations reproduced exactly"):
             with self.subTest(marker=marker):
                 self.evidence["reference_fixture_check"] = original.replace(marker, "")
                 with self.assertRaisesRegex(SystemExit, "builder evidence requires"):

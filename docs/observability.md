@@ -190,3 +190,39 @@ Invalid raw Go string bytes are normalized to the same replacement-character
 text as Go JSON rendering; native `String` cannot retain those raw bytes.
 Redaction remains the host's responsibility. This adapter does not automatically
 subscribe to the native runner or construct an SDK session event stream.
+
+### Owned SDK content streams
+
+With `observability`, `adk::content_stream::ContentStream` owns a `Write + Send`
+writer and an in-process subscription bus. `child(task_id)` shares those resources
+but copies the current session/phase/step. Setters affect that stream's context,
+not previously created children. `emit` fills only missing/zero metadata, preserves
+explicit values, and recalls subagent names from earlier status events. Generic
+emission does not apply the SDK tool convenience methods' truncation policies.
+
+`subscribe(0)` chooses 64 slots (the native replacement for Go's nonpositive
+capacity); positive capacities are bounded. Slow consumers receive the exact
+`events_dropped` marker before later events when space is available. Markers use
+fresh timestamps and zero context, and go only to the affected subscription.
+`close` is idempotent and leaves queued events readable. Dropping a subscription
+unsubscribes; dropping the last stream releases the writer and closes remaining
+senders. Subscriber events are independently owned, not shared Go slice storage.
+
+Subscription delivery precedes best-effort JSON serialization and one writer call.
+Marshal/write failures do not revoke already delivered events; emission does not
+flush. Explicit `flush` reports the writer's flush result. Bus and writer locks are
+separate, as in the SDK: concurrent producers have intact records and per-producer
+order, not a global atomic ordering across both sinks. Use native `EventRecord`
+observations when the native sequence contract is required.
+
+**Limits:** automatic timestamps are UTC; the pinned comparator explicitly runs
+in a UTC Go profile. Explicit offsets and zero instants in nonzero offsets are
+preserved/recognized. Non-UTC host-local automatic timestamp parity, SDK
+`AgentLogger` mirroring, logger inheritance, typed emit conveniences and full
+`NewSessionEventStream` options remain separate obligations. No generic callback
+is advertised as an implemented SDK logger. The API contains a runnable embedding
+example; source fixtures cover metadata, annotations, subscriber loss and writer
+failure, with additional concurrent-record and owned-lifetime regressions.
+Although SDK comments call its logger a stdout mirror, its implementation uses
+Go's global `log.Printf`: the default destination is stderr, and the host can
+redirect it. Logger parity must account for that host-selected destination.

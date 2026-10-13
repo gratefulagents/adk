@@ -4471,6 +4471,22 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-33DDACB0CD25275F": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "CompactContentEvent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/events.rs::compact_content_event"
+      ],
+      "rust_test_identifiers": [
+        "typed_content_event_format_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "The typed formatter is verified for representable UTF-8 ContentEvent records. Ten independently executed SDK cases compare full strings, ordered optional fields, error-only output, first-LF extraction, whitespace/CR preservation, Unicode and uncapped long text. It does not redact or log. This claim does not cover JSONL parsing, stream construction, invalid-UTF8 Go strings or native observation-schema conversion.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

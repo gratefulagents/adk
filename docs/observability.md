@@ -116,6 +116,22 @@ cleanup closes the outstanding span without inventing a successful transition.
 The schema-2 TraceWriter transition feed still writes the original single handoff
 record; the new observations are native operation-lifecycle events.
 
+## Typed SDK event debug formatting
+
+With `compat`, `adk::codec::events::compact_content_event` formats a typed
+`adk::codec::dto::ContentEvent` using the pinned SDK's ordered debug fields.
+It includes output only for error events, retains the first LF-delimited line of
+reason/message/error output after outer trimming, and imposes no text-size cap.
+It preserves raw agent/tool/status text, including whitespace. This function
+neither logs nor redacts; apply host redaction before exposing its result.
+It is distinct from native `EventRecord` serialization and does not claim the
+SDK's JSONL parser or `NewSessionEventStream` construction behavior.
+
+Ten independently executed cases in `fixtures/content-event/observations.json`
+cover optional fields/order, blank values, CR/LF, Unicode and long output. Run
+`python3 scripts/content-event-reference/run.py --check` and
+`cargo test --locked -p adk-codec --test content_events` to reproduce them.
+
 ## Verification and source references
 
 Run `cargo test -p adk --features observability --test observability` for native tests and `cargo test -p adk --features otel --test observability` for actual SDK spans as well. Coverage includes fragmented/malformed/oversized JSONL, fanout order/backpressure, default/full/operator redaction, complete pre-cap output, a real runner, cumulative usage, real paused continuation, successful two-turn spans, shared-run isolation, ended-parent contexts, final error attributes, filesystem modes/confinement and quota/hardlink defenses.

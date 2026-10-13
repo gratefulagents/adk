@@ -1516,3 +1516,17 @@ whitespace checks passed. Three narrow records—the default cap and result
 boolean/reason fields—are closed; the overlay is now **261 verified / 8,630
 unresolved / 251 excluded**, not a count of missing features. Full issue acceptance
 and credentialed live verification remain open; excluded work is unchanged.
+
+### Typed content-event formatter
+
+Added `adk::codec::events::compact_content_event` for the existing SDK DTO. Ten
+independent pinned cases compare exact optional-field ordering, error-only output,
+first-LF extraction, preserved whitespace/CR, Unicode and uncapped long strings.
+The helper neither logs nor redacts, and does not relabel native observations or
+claim session-stream construction/JSONL parser parity.
+
+Fresh workspace/all-features/all-targets: **1,318 passed / 0 failed / 30 ignored**;
+strict Clippy/rustdoc, changed-file formatting, pinned oracles, 18 ledger validators,
+source/license locks and whitespace checks passed. One typed formatter record is
+closed: **262 verified / 8,629 unresolved / 251 excluded**. Full acceptance and
+credentialed live-service verification remain open.

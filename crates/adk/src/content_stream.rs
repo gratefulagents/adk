@@ -1,4 +1,7 @@
 //! SDK content-event streams, distinct from native ordered observations.
+mod runtime;
+pub use runtime::ContentGenerationObserver;
+
 mod llm;
 pub use llm::LlmAttempt;
 

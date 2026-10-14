@@ -5,6 +5,7 @@ from collections import Counter
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -24,10 +25,38 @@ def main():
     if revision != PIN or subprocess.check_output(["git", "-C", str(SDK), "status", "--porcelain"], text=True).strip():
         sys.exit("reference must be clean at the authoritative pin")
     go = os.environ.get("GO", "go")
-    guardrails = "^(TestRunnerInputGuardrailTripwire|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerRecoversFromPanickingInputGuardrail)$"
+    # Keep the bounded historical regressions and every internal regression
+    # required by current Rust claims. Refreshing must not silently drop proof
+    # added by later slices of the migration.
+    internal_tests = {
+        "TestRunnerInputGuardrailTripwire", "TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+        "TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace",
+        "TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+        "TestRunnerRecoversFromPanickingInputGuardrail", "TestModeReasoningSettings",
+        "TestResolveRoleModeRouting", "TestBuildMCPPromptContextSanitizesServerNames",
+        "TestBuildMCPPromptContextEmpty", "TestSanitizeMCPServerName", "TestCompactionDefaultsForModel",
+        "TestRequireCompletionConfirmation", "TestRequireCompletionConfirmationOffByDefault",
+        "TestFinalAnswerVerifierSingleRefutationRound", "TestAgentGetInstructions_Static",
+        "TestAgentGetInstructions_Dynamic", "TestRunnerStopOnFirstTool",
+        "TestRunnerStopAtToolsRunsOutputGuardrails", "TestRunnerStopAtToolsUsesToolOutputAsFinal",
+        "TestHandoffToTool", "TestHandoffIsEnabledGatesTool", "TestHandoffInputFilterSeesCurrentTurnItems",
+        "TestThinkingDeltaEmitterCoalesces", "TestThinkingDeltaEmitterFlushesOnSize",
+        "TestRunnerStreamsThinkingDeltasToEventStream", "TestRunStreamedDoesNotEmitThinkingDeltaEvents",
+    }
+    claims = json.loads((ROOT / "docs/migration/ledger/issue-11-rust-claims.json").read_text())
+    prefix = "github.com/gratefulagents/sdk/internal/agent/"
+    for claim in claims["claims"].values():
+        reference = claim["reference_test"]
+        if reference.startswith(prefix):
+            name = reference[len(prefix):]
+            if not re.fullmatch(r"Test[A-Za-z0-9_]+", name):
+                sys.exit(f"unsupported internal reference identifier: {name}")
+            internal_tests.add(name)
+    internal_pattern = "^(" + "|".join(sorted(internal_tests)) + ")$"
+
     commands = [
         [go, "test", "-count=1", "-json", "./pkg/agentsdk/..."],
-        [go, "test", "-count=1", "-json", "./internal/agent", "-run", guardrails],
+        [go, "test", "-count=1", "-json", "./internal/agent", "-run", internal_pattern],
     ]
     tests = {}
     packages = {}

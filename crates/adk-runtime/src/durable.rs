@@ -909,6 +909,9 @@ impl Runner {
         if config.require_completion_confirmation {
             baseline["require_completion_confirmation"] = serde_json::json!(true);
         }
+        if config.blocking_reasoning {
+            baseline["blocking_reasoning"] = serde_json::json!(true);
+        }
         if config.force_final_summary_turn {
             baseline["force_final_summary_turn"] = serde_json::json!(true);
         }

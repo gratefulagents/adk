@@ -412,3 +412,38 @@ representable attempt (or deliberate conversion) rather than relying on silent
 Go argument rejection. The pinned oracle verifies 25 complete wire/subscriber
 records, including every independent alias-default combination and rich metrics.
 These helpers do not automatically attach to the runner/provider retry loop.
+
+### Opt-in runner attempt/reasoning adapter
+
+`ContentGenerationObserver` connects a host-owned `Arc<ContentStream>` to
+`RunnerConfig::generation_observer`. Unlike manually calling emitters, this
+adapter uses each real generation's ID to correlate start/end attempts, live
+reasoning chunks and accepted final reasoning. Use `CompositeGenerationObserver`
+to preserve an existing trace observer; replacing the config field outright
+would replace that observer. Existing `RunHooks` remain separate and unchanged.
+
+For a blocking run, explicitly set `RunnerConfig::blocking_reasoning = true` to
+consume native streaming bindings. The default remains the completion path.
+Complete-only models do not invent live chunks. In streamed runs, native model
+events remain on the existing event channel and the adapter emits no duplicate
+JSONL reasoning deltas. Hidden blocking text/tool events are not published.
+Surfaced reasoning counts as visible output, preventing retry/replay after that
+output. The execution-selection option participates in durable configuration
+identity; observer callbacks remain observational, not exactly-once effects.
+
+The first nonempty reasoning chunk emits immediately. Later chunks coalesce until
+500 ms have elapsed or 4,096 UTF-8 bytes accumulate; model return flushes the tail
+before the terminal attempt. There is no background timer. Accepted nonempty
+reasoning items, not concatenated deltas or opaque continuation fields, supply
+final thinking. A failed retained response is not accepted final thinking.
+
+This is an explicit trusted-content sink: `ContentStream` does not apply the
+separate `TraceWriter` capture/redaction policy. Sanitize before emission if the
+host requires it, including before logger/subscriber delivery. The adapter owns
+no store/exporter shutdown and does not implicitly flush the host's writer.
+
+This bounded integration does not establish complete SDK attempt/turn numbering
+under interruption, provider-specific completion-only reasoning callbacks, or
+all automatic subagent wiring. Builder-created child configuration selection is
+unchanged: opting the parent into blocking stream consumption does not silently
+change child execution selection. Those broader parity obligations stay open.

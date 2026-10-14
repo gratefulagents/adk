@@ -29,21 +29,26 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "internal/agent/stream.go", "internal/agent/stream_test.go", "internal/agent/stream_events.go", "internal/agent/subagent_registry.go", "internal/agent/event_stream_test.go", "pkg/agentsdk/aliases.go", "pkg/agentsdk/events/events.go", "pkg/agentsdk/events/events_test.go", "go.mod", "go.sum"]
+        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "internal/agent/stream.go", "internal/agent/stream_test.go", "internal/agent/stream_events.go", "internal/agent/subagent_registry.go", "internal/agent/thinking_delta.go", "internal/agent/thinking_delta_test.go", "internal/agent/runner.go", "internal/agent/runner_test.go", "internal/agent/platform_hooks.go", "internal/agent/event_stream_test.go", "pkg/agentsdk/aliases.go", "pkg/agentsdk/events/events.go", "pkg/agentsdk/events/events_test.go", "go.mod", "go.sum"]
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA,
                       'license': 'GPL-3.0-only', 'timezone': 'UTC',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
                       'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
-                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/content-stream-reference/run.py', 'scripts/content-stream-reference/reference_test.go']}}
+                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/content-stream-reference/run.py', 'scripts/content-stream-reference/reference_test.go', 'scripts/content-stream-reference/thinking_reference_test.go']}}
         shutil.copyfile(ROOT / 'scripts/content-stream-reference/reference_test.go', source / 'pkg/agentsdk/native_content_stream_test.go')
+        shutil.copyfile(ROOT / 'scripts/content-stream-reference/thinking_reference_test.go', source / 'internal/agent/native_thinking_delta_test.go')
+        thinking_output = source / 'thinking.json'
+        env['THINKING_OUTPUT'] = str(thinking_output)
+        thinking_attempt_output = source / 'thinking-attempts.json'
+        env['THINKING_ATTEMPT_OUTPUT'] = str(thinking_attempt_output)
         output = source / 'observations.json'
         env['METADATA_OUTPUT'] = str(output)
         execution = subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeContentStreamReference)$', './pkg/agentsdk'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(execution.stdout.decode('utf-8', errors='backslashreplace'), end='')
         execution.check_returncode()
-        subprocess.run([go, 'test', '-count=1', '-v', './internal/agent', '-run', '^(TestEventStream|TestChildEventStream|TestTruncateBytes$|TestTruncate$)'], cwd=source, env=env, check=True)
+        subprocess.run([go, 'test', '-count=1', '-v', './internal/agent', '-run', '^(TestEventStream|TestChildEventStream|TestTruncateBytes$|TestTruncate$|TestThinkingDelta|TestRunnerStreamsThinkingDeltasToEventStream$|TestRunStreamedDoesNotEmitThinkingDeltaEvents$|TestNativeThinking)'], cwd=source, env=env, check=True)
         subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk', '-run', '^TestNewSessionEventStreamEmitsSystemInit$'], cwd=source, env=env, check=True)
-        result = dict(provenance=provenance, **json.loads(output.read_text()))
+        result = dict(provenance=provenance, thinkingCases=json.loads(thinking_output.read_text()), thinkingAttempts=json.loads(thinking_attempt_output.read_text()), **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/content-stream/observations.json'
         if args.check:

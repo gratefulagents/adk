@@ -66,6 +66,9 @@ fn wire(buffer: &Buffer, start: DateTime<Utc>) -> Value {
     events.into()
 }
 
+#[path = "content_stream/runtime.rs"]
+mod runtime;
+
 #[path = "content_stream/llm.rs"]
 mod llm;
 

@@ -48,7 +48,7 @@ use crate::compaction::{
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
-use crate::tracing::{GenerationGuard, GenerationObserver, GenerationStatus};
+use crate::tracing::{GenerationGuard, GenerationObserver, GenerationRecord, GenerationStatus};
 
 #[derive(Clone)]
 pub enum ModelBinding {
@@ -632,6 +632,8 @@ pub struct RunnerConfig {
     pub retry: RetryPolicy,
     pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
     pub generation_observer: Option<Arc<dyn GenerationObserver>>,
+    /// Consume streaming bindings in blocking runs to surface observer reasoning deltas.
+    pub blocking_reasoning: bool,
     pub limits: Limits,
     pub cost_estimator: Option<Arc<dyn CostEstimator>>,
     /// None disables the model inactivity timeout. Host backpressure is excluded.
@@ -688,6 +690,7 @@ impl Default for RunnerConfig {
             retry: RetryPolicy::default(),
             error_handler: None,
             generation_observer: None,
+            blocking_reasoning: false,
             limits: Limits::default(),
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
@@ -2324,13 +2327,16 @@ impl Engine {
         self.checkpoint(Boundary::ModelPrepared, None).await?;
         let exposed_tools: HashSet<_> =
             request.tools.iter().map(|tool| tool.name.clone()).collect();
-        let Some((response, model, streamed, cost)) =
+        let Some((response, model, streamed, cost, generation)) =
             self.model_response(request, declared_tool_timeouts).await?
         else {
             self.phase = Phase::Model;
             self.checkpoint(Boundary::ModelCompleted, None).await?;
             return Ok(());
         };
+        if let (Some(observer), Some(record)) = (&self.config.generation_observer, &generation) {
+            observer.accepted(&self.context, record);
+        }
         self.observe(Observation::ModelAccepted {
             agent: self.agent.name.clone(),
             response: response.clone(),
@@ -2771,7 +2777,16 @@ impl Engine {
         &mut self,
         mut request: ModelRequest,
         mut declared_tool_timeouts: Vec<Option<Duration>>,
-    ) -> Result<Option<(ModelResponse, String, bool, Option<f64>)>, Error> {
+    ) -> Result<
+        Option<(
+            ModelResponse,
+            String,
+            bool,
+            Option<f64>,
+            Option<GenerationRecord>,
+        )>,
+        Error,
+    > {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
@@ -2873,7 +2888,12 @@ impl Engine {
                 let context = self.context.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
                 let attempt_result = {
-                    let attempt = self.model_attempt(binding, request.clone(), visible.clone());
+                    let attempt = self.model_attempt(
+                        binding,
+                        request.clone(),
+                        visible.clone(),
+                        generation.as_ref(),
+                    );
                     tokio::pin!(attempt);
                     let wake = async {
                         match &signal {
@@ -2959,6 +2979,9 @@ impl Engine {
                             binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
                             cost,
+                            generation
+                                .as_ref()
+                                .map(|generation| generation.record.clone()),
                         )));
                     }
                     Err((error, committed)) => {
@@ -3137,6 +3160,7 @@ impl Engine {
         binding: &ModelBinding,
         request: ModelRequest,
         visible: Arc<std::sync::atomic::AtomicBool>,
+        generation: Option<&GenerationGuard>,
     ) -> Result<ModelResponse, (Error, bool)> {
         let timeout = self.config.model_idle_timeout;
         match binding {
@@ -3147,13 +3171,17 @@ impl Engine {
             )
             .await
             .map_err(|e| (e, false)),
-            ModelBinding::Streaming { model, .. } if !self.streaming => bounded(
-                &self.context,
-                timeout,
-                model.complete(&self.context, request),
-            )
-            .await
-            .map_err(|e| (e, false)),
+            ModelBinding::Streaming { model, .. }
+                if !self.streaming && !self.config.blocking_reasoning =>
+            {
+                bounded(
+                    &self.context,
+                    timeout,
+                    model.complete(&self.context, request),
+                )
+                .await
+                .map_err(|e| (e, false))
+            }
             ModelBinding::Streaming { model, .. } => {
                 let context = self.context.clone();
                 let mut stream = bounded(&context, timeout, model.stream(&context, request))
@@ -3171,6 +3199,23 @@ impl Engine {
                                     ErrorCategory::ModelBehavior,
                                     "model event after Complete",
                                 ));
+                            }
+                            if !self.streaming {
+                                match &event {
+                                    ModelEvent::Complete { response } => {
+                                        complete = Some(response.clone())
+                                    }
+                                    ModelEvent::ReasoningDelta { delta } if !delta.is_empty() => {
+                                        if let Some(generation) = generation {
+                                            committed = true;
+                                            visible
+                                                .store(true, std::sync::atomic::Ordering::Release);
+                                            generation.reasoning_delta(delta);
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                                continue;
                             }
                             committed = true;
                             // Every native model event is published to the host. Do not
@@ -3213,6 +3258,8 @@ impl Engine {
                     Ok(response) => Ok(response),
                     Err(error) => {
                         if let Some(response) = complete {
+                            // Retaining an authoritative response must not replay its history or usage.
+                            committed = true;
                             let _ = self.record_response(response, binding.name(), None);
                             let _ = self.charge_child_usage().await;
                         } else {

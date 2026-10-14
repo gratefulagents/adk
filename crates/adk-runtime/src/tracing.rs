@@ -46,6 +46,51 @@ pub enum GenerationStatus {
 pub trait GenerationObserver: Send + Sync {
     fn start(&self, context: &Context, record: &GenerationRecord);
     fn end(&self, context: &Context, record: &GenerationRecord);
+    /// Nonempty reasoning surfaced by opted-in blocking runs only, never by streamed runs.
+    /// Delivery commits the attempt against retry and immediate-input replacement.
+    fn reasoning_delta(&self, _context: &Context, _record: &GenerationRecord, _delta: &str) {}
+    /// Flush pending content once before `end`, including cancellation and future drop.
+    /// The record need not contain the final response, error, or retry decision yet.
+    fn returned(&self, _context: &Context, _record: &GenerationRecord) {}
+    /// Successful record after `end`, immediately before the `ModelAccepted` hooks.
+    /// Retained responses from failed attempts never reach this callback.
+    fn accepted(&self, _context: &Context, _record: &GenerationRecord) {}
+}
+
+pub struct CompositeGenerationObserver {
+    observers: Vec<Arc<dyn GenerationObserver>>,
+}
+impl CompositeGenerationObserver {
+    pub fn new(observers: Vec<Arc<dyn GenerationObserver>>) -> Self {
+        Self { observers }
+    }
+}
+impl GenerationObserver for CompositeGenerationObserver {
+    fn start(&self, context: &Context, record: &GenerationRecord) {
+        for observer in &self.observers {
+            observer.start(context, record);
+        }
+    }
+    fn end(&self, context: &Context, record: &GenerationRecord) {
+        for observer in &self.observers {
+            observer.end(context, record);
+        }
+    }
+    fn reasoning_delta(&self, context: &Context, record: &GenerationRecord, delta: &str) {
+        for observer in &self.observers {
+            observer.reasoning_delta(context, record, delta);
+        }
+    }
+    fn returned(&self, context: &Context, record: &GenerationRecord) {
+        for observer in &self.observers {
+            observer.returned(context, record);
+        }
+    }
+    fn accepted(&self, context: &Context, record: &GenerationRecord) {
+        for observer in &self.observers {
+            observer.accepted(context, record);
+        }
+    }
 }
 
 pub(crate) struct GenerationGuard {
@@ -102,9 +147,17 @@ impl GenerationGuard {
         guard.observer.start(&guard.context, &guard.record);
         guard
     }
+    pub fn reasoning_delta(&self, delta: &str) {
+        self.observer
+            .reasoning_delta(&self.context, &self.record, delta);
+    }
     pub fn returned(&mut self) {
+        if self.record.ended_at.is_some() {
+            return;
+        }
         self.record.ended_at = Some(SystemTime::now());
         self.record.latency = self.started.elapsed();
+        self.observer.returned(&self.context, &self.record);
     }
     pub fn finish(&mut self, status: GenerationStatus) {
         if self.finished {

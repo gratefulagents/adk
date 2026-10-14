@@ -6770,6 +6770,116 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-C0480D7EE0A1F15C": {
+      "source": "internal/agent/thinking_delta.go",
+      "source_name": "thinkingDeltaEmitter.Chunk",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ThinkingBuffer::chunk"
+      ],
+      "rust_test_identifiers": [
+        "content_stream::runtime::tests::coalescing_matches_pinned_sdk_fake_clock_cases",
+        "content_stream::runtime::tests::returned_and_end_flush_each_attempt_once_and_remove_buffers",
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-02364811EE021B3C": {
+      "source": "internal/agent/thinking_delta.go",
+      "source_name": "thinkingDeltaEmitter.Flush",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ThinkingBuffer::flush"
+      ],
+      "rust_test_identifiers": [
+        "content_stream::runtime::tests::coalescing_matches_pinned_sdk_fake_clock_cases",
+        "content_stream::runtime::tests::returned_and_end_flush_each_attempt_once_and_remove_buffers",
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-3E92A284AEC34FA8": {
+      "source": "internal/agent/thinking_delta_test.go",
+      "source_name": "TestThinkingDeltaEmitterCoalesces",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ThinkingBuffer::chunk"
+      ],
+      "rust_test_identifiers": [
+        "content_stream::runtime::tests::coalescing_matches_pinned_sdk_fake_clock_cases",
+        "content_stream::runtime::tests::returned_and_end_flush_each_attempt_once_and_remove_buffers",
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-D502F0D5E8F94881": {
+      "source": "internal/agent/thinking_delta_test.go",
+      "source_name": "TestThinkingDeltaEmitterFlushesOnSize",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ThinkingBuffer::chunk"
+      ],
+      "rust_test_identifiers": [
+        "content_stream::runtime::tests::coalescing_matches_pinned_sdk_fake_clock_cases",
+        "content_stream::runtime::tests::returned_and_end_flush_each_attempt_once_and_remove_buffers",
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterFlushesOnSize",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-A6A364A105CC1A25": {
+      "source": "internal/agent/thinking_delta_test.go",
+      "source_name": "TestRunnerStreamsThinkingDeltasToEventStream",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ContentGenerationObserver",
+        "crates/adk-runtime/src/runner.rs::RunnerConfig::blocking_reasoning"
+      ],
+      "rust_test_identifiers": [
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items",
+        "runtime::attempt_events_match_pinned_sdk_real_runner_objects",
+        "runtime::retained_failed_responses_never_emit_final_thinking_or_usage"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStreamsThinkingDeltasToEventStream",
+      "rationale": "Only this named source regression is closed through explicit host-owned adapter attachment and native streaming bindings. Blocking stream consumption is explicit opt-in; native streamed delivery gets no duplicate JSONL reasoning deltas. Real scripted runs, without manual emitters, verify nonempty shared attempt identity and ordered deltas/final accepted reasoning; four actual pinned Go runner attempt records compare complete normalized JSON. Failed retained responses do not emit accepted final thinking. Defaults, complete-only live reasoning, native interruption numbering, provider-wide and automatic child wiring remain explicit limits, not implied whole runner closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-CF3DA76866378A61": {
+      "source": "internal/agent/thinking_delta_test.go",
+      "source_name": "TestRunStreamedDoesNotEmitThinkingDeltaEvents",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ContentGenerationObserver",
+        "crates/adk-runtime/src/runner.rs::RunnerConfig::blocking_reasoning"
+      ],
+      "rust_test_identifiers": [
+        "runtime::streamed_run_has_native_reasoning_but_zero_jsonl_deltas",
+        "runtime::attempt_events_match_pinned_sdk_real_runner_objects",
+        "runtime::retained_failed_responses_never_emit_final_thinking_or_usage"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunStreamedDoesNotEmitThinkingDeltaEvents",
+      "rationale": "Only this named source regression is closed through explicit host-owned adapter attachment and native streaming bindings. Blocking stream consumption is explicit opt-in; native streamed delivery gets no duplicate JSONL reasoning deltas. Real scripted runs, without manual emitters, verify nonempty shared attempt identity and ordered deltas/final accepted reasoning; four actual pinned Go runner attempt records compare complete normalized JSON. Failed retained responses do not emit accepted final thinking. Defaults, complete-only live reasoning, native interruption numbering, provider-wide and automatic child wiring remain explicit limits, not implied whole runner closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

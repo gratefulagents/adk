@@ -1901,3 +1901,47 @@ reported Clippy warnings in unchanged code; the supported Rust 1.88 strict gate
 above passed without warnings. Ledger: **401 verified / 8,490
 unresolved / 251 excluded**. This is finalization-method closure, not whole issue
 acceptance; live-service and remaining reusable-capability obligations stay open.
+
+### Host-owned runner reasoning correlation
+
+Added `ContentGenerationObserver` and ordered observer composition, backed by
+runtime callbacks for reasoning, model return and correlated acceptance. Blocking
+native stream consumption is explicitly selected with `blocking_reasoning`;
+default completion and ordinary streamed delivery remain unchanged. Surfaced
+reasoning commits an attempt against retry/immediate-input replacement; hidden
+text/tool fragments are not published or retained on retry. The option is included
+in durable fingerprints only when true, preserving default replay identity.
+
+The adapter correlates real attempt/delta/final-thinking IDs, flushes coalesced
+residue before terminal events, and never turns a failed retained response into
+accepted thinking. It preserves trace composition without implying trace capture
+redacts this separately trusted content sink. Completion usage uses SDK
+`input_tokens`/`output_tokens`; failed events carry bounded error output without
+invented completed usage. Stores, exporters and writer flushing remain host-owned.
+
+Independent pinned Go evidence now includes six fake-clock coalescer cases and
+four complete actual-run attempt records (success/failure), plus the original
+blocking/streamed reasoning regressions. Native coverage adds ten runtime tests,
+eight real-run facade tests and three private adapter tests. A runnable embedding
+doctest shows explicit attachment. Source review of the runtime found no concrete
+blockers; that read-only reviewer could not execute its own compiler checks.
+
+Fresh Rust 1.88.0 workspace/all-features/all-targets: **1,370 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, feature matrix, independent standalone consumer,
+20 offline scenarios, host-session, **six doctests**, all pinned oracles, 19 ledger
+validators, source locks and changed-file formatting/whitespace checks pass.
+Original Go reference refresh: **786 passed / 5 skipped** across 35 packages;
+skips are helper/platform/environment cases, not live-provider validation.
+
+The first combined gate stopped because the old reference-refresh script omitted
+ten previously added internal regression references, not because a Rust or Go
+behavioral test failed. The driver now retains the bounded historical regressions
+and includes current claimed internal test identifiers. Fresh reference execution,
+Rust evidence regeneration, all ledger checks and the remaining matrix passed.
+
+Six precise coalescer/regression claims bring the overlay to **407 verified / 8,484
+unresolved / 251 excluded**. No whole-runner closure is claimed: native numbering
+under interruption, provider-specific completion-only live reasoning and automatic
+child configuration selection remain explicit limits. Full issue acceptance and
+credentialed live-provider verification remain open; no excluded CLI/evaluation,
+release, merge or default-switch work was performed.

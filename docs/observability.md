@@ -297,3 +297,19 @@ outer JSON whitespace are not representable. Tool-call/output items must carry
 their matching payload. Native body support does not close whole logger/session
 parity: only the seven separately verified log-level/type/predicate ledger
 records are added by this slice. All log sinks must remain trusted and private.
+
+### Typed content-event helpers
+
+`ContentStream::emit_text`, `emit_thinking`, `emit_thinking_delta`,
+`emit_compaction`, and `emit_hook_decision` construct SDK content events through
+`emit`, retaining its metadata, logging, subscription and JSONL ordering. Text
+and thinking take one explicit agent name; pass `""` for no name. Thinking deltas
+retain the attempt ID in `tool_use_id`. Compaction takes signed 64-bit counts
+and narrows them to signed 32-bit event fields as on the supported SDK host.
+These helpers do not truncate text, summaries or reasons, and do not redact
+sensitive content. Use private sinks. UTF-8 text is required by Rust's API.
+
+The pinned oracle compares 21 complete records, including empty fields, escaped
+multiline Unicode, 68,000-byte content and overflowing signed counts, through
+both JSONL output and subscriptions. Session construction and remaining typed
+emitters are separate contracts, not implied by these helpers.

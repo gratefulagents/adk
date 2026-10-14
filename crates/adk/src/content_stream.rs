@@ -197,6 +197,73 @@ impl ContentStream {
         }
     }
 
+    pub fn emit_text(&self, text: impl Into<String>, agent_name: impl Into<String>) {
+        self.emit(ContentEvent {
+            kind: "assistant_text".into(),
+            message: text.into(),
+            agent_name: agent_name.into(),
+            ..Default::default()
+        });
+    }
+
+    pub fn emit_thinking(&self, thinking: impl Into<String>, agent_name: impl Into<String>) {
+        self.emit(ContentEvent {
+            kind: "assistant_thinking".into(),
+            message: thinking.into(),
+            agent_name: agent_name.into(),
+            ..Default::default()
+        });
+    }
+
+    pub fn emit_thinking_delta(
+        &self,
+        chunk: impl Into<String>,
+        agent_name: impl Into<String>,
+        attempt_id: impl Into<String>,
+    ) {
+        self.emit(ContentEvent {
+            kind: "assistant_thinking_delta".into(),
+            message: chunk.into(),
+            agent_name: agent_name.into(),
+            tool_use_id: attempt_id.into(),
+            ..Default::default()
+        });
+    }
+
+    /// Counts narrow to signed 32 bits, matching the SDK's 64-bit host conversion.
+    pub fn emit_compaction(
+        &self,
+        tokens_before: i64,
+        tokens_after: i64,
+        summary: impl Into<String>,
+    ) {
+        self.emit(ContentEvent {
+            kind: "compact_boundary".into(),
+            message: "Context compacted".into(),
+            output: summary.into(),
+            tokens_before: tokens_before as i32,
+            tokens_after: tokens_after as i32,
+            ..Default::default()
+        });
+    }
+
+    pub fn emit_hook_decision(
+        &self,
+        hook_name: impl Into<String>,
+        tool_name: impl Into<String>,
+        decision: impl Into<String>,
+        reason: impl Into<String>,
+    ) {
+        self.emit(ContentEvent {
+            kind: "hook_decision".into(),
+            hook_name: hook_name.into(),
+            tool: tool_name.into(),
+            decision: decision.into(),
+            reason: reason.into(),
+            ..Default::default()
+        });
+    }
+
     /// Explicit host flush; emitting and dropping streams do not flush the writer.
     pub fn flush(&self) -> io::Result<()> {
         self.shared

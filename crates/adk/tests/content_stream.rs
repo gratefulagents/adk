@@ -61,6 +61,32 @@ fn wire(buffer: &Buffer, start: DateTime<Utc>) -> Value {
     events.into()
 }
 
+#[test]
+fn typed_helpers_match_pinned_sdk() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-stream/observations.json"
+    ))
+    .unwrap();
+    let start: DateTime<Utc> = SystemTime::now().into();
+    let output = Buffer::default();
+    let root = ContentStream::new(output.clone());
+    root.set_session(-7);
+    root.set_phase("helpers");
+    let child = root.child("task");
+    let sub = child.subscribe(32);
+    for text in [String::new(), "line\n\"<&>😀".into(), "😀".repeat(17000)] {
+        child.emit_text(&text, "");
+        child.emit_text(&text, "agent");
+        child.emit_thinking(&text, "");
+        child.emit_thinking(&text, "agent");
+        child.emit_thinking_delta(&text, "agent", "attempt");
+        child.emit_compaction(2147483648, -2147483649, &text);
+        child.emit_hook_decision("hook", "tool", "deny", &text);
+    }
+    assert_eq!(wire(&output, start), fixture["helpers"]);
+    assert_eq!(drain(&sub, start)["events"], fixture["helpers"]);
+}
+
 fn event(kind: &str) -> ContentEvent {
     ContentEvent {
         kind: kind.into(),

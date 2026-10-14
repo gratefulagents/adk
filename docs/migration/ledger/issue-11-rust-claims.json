@@ -6480,6 +6480,86 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-3EB9468EBF3751E3": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitText",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_text"
+      ],
+      "rust_test_identifiers": [
+        "typed_helpers_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed emitter is closed within the UTF-8 Rust text domain. Independent pinned TestNativeContentStreamReference observations compare all serialized fields and subscription delivery for empty, multiline escaped Unicode and 68000-byte text, child metadata and signed count overflow. Text/thinking use one explicit agent name (empty means absent) rather than Go variadic arguments, whose extra names are ignored. Compaction accepts signed 64-bit counts and preserves narrowing. No truncation or redaction is introduced. Does not claim whole session construction, tool emitters, arbitrary invalid Go strings or non-UTC automatic timestamps.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-2351EBA21487F0FA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitThinking",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_thinking"
+      ],
+      "rust_test_identifiers": [
+        "typed_helpers_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed emitter is closed within the UTF-8 Rust text domain. Independent pinned TestNativeContentStreamReference observations compare all serialized fields and subscription delivery for empty, multiline escaped Unicode and 68000-byte text, child metadata and signed count overflow. Text/thinking use one explicit agent name (empty means absent) rather than Go variadic arguments, whose extra names are ignored. Compaction accepts signed 64-bit counts and preserves narrowing. No truncation or redaction is introduced. Does not claim whole session construction, tool emitters, arbitrary invalid Go strings or non-UTC automatic timestamps.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-99C5FF615CC7302B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitThinkingDelta",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_thinking_delta"
+      ],
+      "rust_test_identifiers": [
+        "typed_helpers_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed emitter is closed within the UTF-8 Rust text domain. Independent pinned TestNativeContentStreamReference observations compare all serialized fields and subscription delivery for empty, multiline escaped Unicode and 68000-byte text, child metadata and signed count overflow. Text/thinking use one explicit agent name (empty means absent) rather than Go variadic arguments, whose extra names are ignored. Compaction accepts signed 64-bit counts and preserves narrowing. No truncation or redaction is introduced. Does not claim whole session construction, tool emitters, arbitrary invalid Go strings or non-UTC automatic timestamps.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-F41DAC0F259E7D2F": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitCompaction",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_compaction"
+      ],
+      "rust_test_identifiers": [
+        "typed_helpers_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed emitter is closed within the UTF-8 Rust text domain. Independent pinned TestNativeContentStreamReference observations compare all serialized fields and subscription delivery for empty, multiline escaped Unicode and 68000-byte text, child metadata and signed count overflow. Text/thinking use one explicit agent name (empty means absent) rather than Go variadic arguments, whose extra names are ignored. Compaction accepts signed 64-bit counts and preserves narrowing. No truncation or redaction is introduced. Does not claim whole session construction, tool emitters, arbitrary invalid Go strings or non-UTC automatic timestamps.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-F61906F2D4DD1A2B": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitHookDecision",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_hook_decision"
+      ],
+      "rust_test_identifiers": [
+        "typed_helpers_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed emitter is closed within the UTF-8 Rust text domain. Independent pinned TestNativeContentStreamReference observations compare all serialized fields and subscription delivery for empty, multiline escaped Unicode and 68000-byte text, child metadata and signed count overflow. Text/thinking use one explicit agent name (empty means absent) rather than Go variadic arguments, whose extra names are ignored. Compaction accepts signed 64-bit counts and preserves narrowing. No truncation or redaction is introduced. Does not claim whole session construction, tool emitters, arbitrary invalid Go strings or non-UTC automatic timestamps.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

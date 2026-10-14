@@ -151,7 +151,21 @@ func TestNativeContentStreamReference(t *testing.T) {
 	root.Emit(ContentEvent{Type: "marshal_failure", CostUsd: math.NaN()})
 	failure := map[string]any{"attempts": failed.attempts, "subscriber": drain(sub)}
 	unsubscribe()
-	result := map[string]any{"metadata": metadata, "annotation": annotation, "drops": drops, "failure": failure}
+	output.Reset()
+	root = NewEventStream(&output)
+	root.SetSession(-7)
+	root.SetPhase("helpers")
+	child = NewChildEventStream(root, "task")
+	for _, text := range []string{"", "line\n\"<&>😀", strings.Repeat("😀", 17000)} {
+		child.EmitText(text)
+		child.EmitText(text, "agent")
+		child.EmitThinking(text)
+		child.EmitThinking(text, "agent")
+		child.EmitThinkingDelta(text, "agent", "attempt")
+		child.EmitCompaction(2147483648, -2147483649, text)
+		child.EmitHookDecision("hook", "tool", "deny", text)
+	}
+	result := map[string]any{"metadata": metadata, "annotation": annotation, "drops": drops, "failure": failure, "helpers": wire(&output)}
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

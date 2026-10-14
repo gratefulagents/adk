@@ -1733,3 +1733,27 @@ process-global output/prefix/timestamp flags, arbitrary printf arguments and
 invalid/raw-whitespace Go RawMessage inputs remain outside this API. No immutable
 inventory, exclusion or release default changed. Full issue acceptance and
 credentialed live-service verification remain open.
+
+### Typed text, thinking, compaction and hook emission
+
+Five `ContentStream` helpers now construct the SDK event fields and use the
+existing ordered emission path. The pinned stream oracle adds 21 records for
+empty/multiline/escaped Unicode, 68,000-byte untruncated text, child metadata,
+attempt identifiers and signed 64-to-32-bit compaction narrowing. The Rust
+regression compares complete JSONL records and independently delivered records.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,335 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, feature matrix, standalone consumer, 20 offline
+scenarios, host-session, three facade doctests and one codec doctest passed.
+Pinned oracles, 19 ledger validators and source/license locks passed. Five named
+emitter records are closed: **389 verified / 8,502 unresolved / 251 excluded**.
+Session construction and remaining typed helpers are not claimed by this slice.
+
+Remote CI on the preceding `55fb4c6` commit is not fully green: 44 jobs passed,
+but two dependency jobs failed on **RUSTSEC-2024-0449**, unmaintained
+`unsafe-libyaml 0.2.11` via `serde_yaml_ng 0.10.0`. The audit reports bans,
+licenses and sources passing; advisories fail. No exception was added. Replacing
+the YAML implementation requires preserving mode/role compatibility and the
+Rust 1.88 MSRV; the newly released `serde-saphyr 2.0.0` declares Rust 1.89 and
+is not a drop-in supported-target solution. This readiness blocker and the
+remaining issue acceptance/live-service work remain open.

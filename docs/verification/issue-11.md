@@ -1861,3 +1861,21 @@ overlay to **399 verified / 8,492 unresolved / 251 excluded**. Remaining ledger
 and issue acceptance are open; credentialed provider behavior remains unverified.
 Prior pushed head `8223bc99eb1dd98be5e4adaff9c4766eb789d6e6` had all 46 reported
 GitHub checks successful; that CI result is not attributed to this newer slice.
+
+### Typed LLM-attempt event normalization
+
+`LlmAttempt` and full `ContentEvent` inputs now use the same emitter. A pinned Go
+oracle compares 25 complete subscriber/JSONL records: empty inputs, signed attempt
+limits, all 16 independent default/conflict combinations, no reverse defaults,
+fixed-offset nanosecond timestamps, context inheritance/overrides, full usage and
+retry/fallback data, and uncapped 40,000-byte unrelated payloads. Four additional
+native tests validate the mapping. Rust uses explicit `i32` attempts; invalid Go
+vararg types/counts and implicit platform-int narrowing are not replicated.
+
+Fresh Rust 1.88.0 workspace/all-features/all-targets: **1,348 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, facade feature matrix, standalone consumer,
+20 offline examples, host-session, five doctests, pinned oracles, 19 ledger
+validators, source locks, formatting and whitespace checks pass. Overlay:
+**400 verified / 8,491 unresolved / 251 excluded**. This closes only the typed
+emission contract, not automatic provider/runner event wiring, credentialed
+provider parity, remaining reusable ledger entries or full issue acceptance.

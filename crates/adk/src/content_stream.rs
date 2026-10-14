@@ -1,4 +1,7 @@
 //! SDK content-event streams, distinct from native ordered observations.
+mod llm;
+pub use llm::LlmAttempt;
+
 mod subagent;
 pub use subagent::{SubagentCompleted, SubagentStarted, SubagentTaskStatus};
 

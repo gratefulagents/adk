@@ -293,6 +293,54 @@ func TestNativeContentStreamReference(t *testing.T) {
 		unsubscribe()
 	}
 	result["subagentStatusCases"] = statusCases
+	llmCases := []map[string]any{}
+	emitAttempt := func(form string, input ContentEvent) {
+		output.Reset()
+		root = NewEventStream(&output)
+		root.SetSession(7)
+		root.SetPhase("phase")
+		root.SetStep("step")
+		child = NewChildEventStream(root, "task")
+		sub, unsubscribe = child.Subscribe(8)
+		if form == "six" {
+			child.EmitLLMAttempt(input.AttemptNumber, input.Scope, input.AgentName, input.CanonicalModel, input.TaskID, input.AttemptStatus)
+		} else {
+			child.EmitLLMAttempt(input)
+		}
+		observed := capture()
+		observed["form"] = form
+		observed["input"] = input
+		llmCases = append(llmCases, observed)
+		unsubscribe()
+	}
+	emitAttempt("event", ContentEvent{})
+	emitAttempt("six", ContentEvent{})
+	for _, attempt := range []int32{0, 2, -1, -2147483648, 2147483647} {
+		emitAttempt("six", ContentEvent{AttemptNumber: attempt, Scope: " subagent\n", AgentName: "helper😀", CanonicalModel: "model\n", TaskID: "task-123", AttemptStatus: "unrecognized status"})
+	}
+	for mask := 0; mask < 16; mask++ {
+		input := ContentEvent{Type: "wrong", AttemptNumber: -2147483648, Scope: "canonical scope", AttemptStatus: "canonical status", CanonicalModel: "canonical model"}
+		if mask&1 != 0 {
+			input.LLMAttempt = -7
+		}
+		if mask&2 != 0 {
+			input.LLMScope = " "
+		}
+		if mask&4 != 0 {
+			input.Status = "legacy status"
+		}
+		if mask&8 != 0 {
+			input.Model = "legacy model"
+		}
+		emitAttempt("event", input)
+	}
+	emitAttempt("event", ContentEvent{LLMAttempt: -7, LLMScope: "legacy scope", Status: "legacy status", Model: "legacy model"})
+	fixed, err := time.Parse(time.RFC3339Nano, "2025-01-02T03:04:05.123456789+05:30")
+	if err != nil {
+		t.Fatal(err)
+	}
+	emitAttempt("event", ContentEvent{Type: "wrong", Timestamp: fixed, Session: -3, Phase: "own", Step: "own-step", TaskID: "own-task", AgentName: "own-agent", AttemptNumber: 2147483647, Scope: "subagent", AttemptStatus: "failed", CanonicalModel: "canonical", RequestedModel: "requested", ResolvedModel: "resolved", Provider: "provider", Turn: -2147483648, UsageAvailable: true, HasPromptTokens: true, HasCompletionTokens: true, HasTotalTokens: true, PromptTokens: -9223372036854775808, CompletionTokens: 9223372036854775807, TotalTokens: -1, AttemptLatencyMs: 9223372036854775807, RetryPlanned: true, RetryAfterMs: -9223372036854775808, FallbackPlanned: true, FallbackFromModel: "from", FallbackToModel: "to", FallbackReason: " reason\n😀 ", FailureKind: "unknown failure", Message: " message\n", InputRaw: strings.Repeat("y", 40000), Output: strings.Repeat("x", 40000), SubagentDependsOn: []string{"dep", "dep"}, IsError: true})
+	result["llmCases"] = llmCases
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

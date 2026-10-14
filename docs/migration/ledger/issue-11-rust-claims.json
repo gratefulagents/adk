@@ -6734,6 +6734,25 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-0C489D213B880334": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitLLMAttempt",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/llm.rs::ContentStream::emit_llm_attempt"
+      ],
+      "rust_test_identifiers": [
+        "llm::llm_inputs_and_one_way_aliases_match_pinned_sdk",
+        "llm::llm_six_field_input_duplicates_aliases_without_normalizing",
+        "llm::llm_alias_defaults_are_independent_and_one_way",
+        "llm::llm_empty_inputs_receive_stream_context_without_inventing_attempt_metrics"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Typed Rust mapping of the valid ContentEvent and six-field i32 forms, not a Go interface-varargs replica. Pinned Go oracle compares 25 complete wire/subscriber records: empty forms, signed attempt boundaries, all 16 independent alias conflict/fallback combinations, no reverse defaults, fixed offset nanosecond timestamps, inherited/explicit context, full usage/retry/fallback fields and 40000-byte unrelated input/output. Always forces llm_attempt; fills only zero/empty legacy aliases; does not infer usage or redact/cap unrelated content. Invalid Go argument counts/types and platform int narrowing are not supported overloads: callers choose typed i32 or ContentEvent. No automatic runner-emission or full provider parity claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

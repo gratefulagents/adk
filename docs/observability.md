@@ -394,3 +394,21 @@ Unicode truncation boundaries, signed metric extremes, status spellings and
 inherited agent identity. Native `LineWriter` integration also checks ordered
 owned progress and subscriber delivery before nonfinite-cost serialization fails.
 These are emitter contracts, not scheduler or automatic runtime-wiring parity.
+
+### Typed LLM-attempt events
+
+`emit_llm_attempt` accepts either `LlmAttempt` (six owned fields) or a full
+`ContentEvent`. The typed record sets both legacy and canonical aliases. Full
+records always become `llm_attempt`, then fill only zero/empty legacy attempt,
+scope, status and model fields from their canonical counterparts. Conflicts are
+preserved, whitespace is not empty, and defaults do not run in reverse. Usage,
+retry/fallback, timestamp and unrelated fields remain intact; this helper neither
+infers metrics nor redacts/caps content. Normal stream annotation still applies.
+
+Rust intentionally uses an `i32` attempt and typed records rather than Go's
+runtime-checked variadic interface. Invalid argument counts/types and implicit
+platform-`int` narrowing are not overloads. Callers must choose an explicit
+representable attempt (or deliberate conversion) rather than relying on silent
+Go argument rejection. The pinned oracle verifies 25 complete wire/subscriber
+records, including every independent alias-default combination and rich metrics.
+These helpers do not automatically attach to the runner/provider retry loop.

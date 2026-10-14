@@ -512,7 +512,7 @@ fn parse_mode_file(path: &Path) -> Result<ModeSpec, Error> {
         let mut plain = value.clone();
         if let Some(mapping) = plain.as_mapping_mut() {
             for key in ["spec", "metadata", "kind", "apiVersion"] {
-                mapping.remove(serde_yaml::Value::String(key.into()));
+                mapping.remove(key);
             }
         }
         mode = serde_yaml::from_value(plain).map_err(|e| config_error(path, e))?;

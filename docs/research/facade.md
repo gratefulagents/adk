@@ -103,13 +103,36 @@ their documented narrow interfaces. The prohibited worker CLI is not reproduced.
 
 ### YAML parser
 
-Host configuration uses `serde_yaml_ng` **0.10.0**, imported locally as
-`serde_yaml` to keep parser references readable. [Registry metadata](https://crates.io/api/v1/crates/serde_yaml_ng/0.10.0)
-reports MIT, Rust 1.64 and an unyanked release (2024-05-26); [source](https://github.com/acatton/serde-yaml-ng)
-is a fork rather than the deprecated `serde_yaml` crate. Input remains trusted
-host configuration with single-component mode/role names, not an unrestricted network
-payload or repository-authorized policy source. The lockfile pins the resolved
-parser and libyaml binding; this choice does not waive dependency checks.
+Host configuration uses `serde_yaml_bw` **2.5.8**, imported locally as
+`serde_yaml`. [Registry metadata](https://crates.io/api/v1/crates/serde_yaml_bw/2.5.8)
+reports MIT OR Apache-2.0 and an unyanked release (2026-09-07); the published
+[source revision](https://github.com/bourumir-wyngs/serde-yaml-bw/tree/f63cf1a24080bb16343f396626b3f07d2682677f)
+is retained in the crate's `.cargo_vcs_info.json`. It preserves the typed
+`Value`/`from_value` API used for mode envelopes and role frontmatter, with
+configurable parser budgets and duplicate-key checks. The replacement's default
+budgets are retained: 1,000,000 events, 50,000 aliases/anchors, depth 2,000,
+1,024 documents, 250,000 nodes and 64 MiB total scalar bytes. Alias-to-anchor
+ratio checking starts at 100 aliases with a multiplier of 10. Inputs exceeding
+these limits fail rather than silently truncating configuration; these are YAML
+limits, not trace-output caps. Rust 1.88 compilation and pinned file-configuration
+observations are checked rather than assuming API similarity proves parity.
+
+This replaces `serde_yaml_ng` 0.10.0 after CI reported its archived
+`unsafe-libyaml` dependency ([RUSTSEC-2024-0449](https://rustsec.org/advisories/RUSTSEC-2024-0449.html)).
+The new lockfile instead resolves `unsafe-libyaml-norway` **0.2.15**, MIT,
+Rust 1.71.1 ([source revision](https://github.com/cafkafk/unsafe-libyaml-norway/tree/74c6e2094c70342620843efcffa354431b83ee05)),
+and `granit-parser` **1.3.0**, MIT OR Apache-2.0, Rust 1.81. The Norway repository
+was unarchived when checked, but still contains translated unsafe Rust and its
+last push was 2024-12-21: this is **not** a memory-safety guarantee or evidence of
+recent maintenance. Dependency auditing remains mandatory; no advisory exception
+is added. The preferred safe-Rust alternative `serde-saphyr` **2.0.0** was rejected
+for this change because its declared Rust 1.89 minimum exceeds our Rust 1.88
+contract and its API is not a drop-in `Value` replacement.
+
+Input remains trusted host configuration with single-component mode/role names,
+not an unrestricted network payload or repository-authorized policy source.
+The lockfile pins resolved dependencies; this choice does not waive dependency
+checks. No third-party source is vendored by this replacement.
 
 ## What remains to validate
 

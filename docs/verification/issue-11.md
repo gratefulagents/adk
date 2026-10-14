@@ -1757,3 +1757,24 @@ the YAML implementation requires preserving mode/role compatibility and the
 Rust 1.88 MSRV; the newly released `serde-saphyr 2.0.0` declares Rust 1.89 and
 is not a drop-in supported-target solution. This readiness blocker and the
 remaining issue acceptance/live-service work remain open.
+
+### YAML dependency-audit remediation
+
+Replaced `serde_yaml_ng 0.10.0` with exact `serde_yaml_bw 2.5.8`, preserving
+mode/role typed deserialization and using string-key removal for the changed
+`Value` API. Both workspace and standalone-consumer locks now resolve the
+replacement dependency graph. No advisory exceptions or policy weakening were
+introduced. `cargo-deny 0.20.2 --locked check` reports **advisories ok, bans ok,
+licenses ok, sources ok**. Research records source revisions, licenses, parser
+budgets, the remaining unsafe-library risk, and why `serde-saphyr 2.0.0` is not
+compatible with our Rust 1.88 minimum.
+
+The focused builder/file-configuration suite passes **72 tests**, including the
+pinned Go oracle and a new regression for aliases, multiline Unicode, envelopes,
+duplicate keys, undefined aliases, malformed input and unknown fields. Full
+workspace/all-features/all-targets passes **1,336 tests / 0 failed / 30 ignored**;
+strict Clippy/rustdoc, source/reference checks and 19 ledger validators pass.
+The initial embedding check correctly rejected the stale standalone lockfile;
+it was updated, not bypassed. The rerun passed the locked feature matrix,
+standalone consumer, 20 offline scenarios, host-session and facade/codec doctests.
+No extra capability ledger records are closed by this dependency change.

@@ -22,6 +22,32 @@ fn write(root: &std::path::Path, path: &str, text: &str) {
     fs::write(path, text).unwrap();
 }
 
+#[test]
+fn yaml_parser_preserves_aliases_blocks_envelopes_and_rejects_malformed_input() {
+    let dir = tempfile::tempdir().unwrap();
+    let source = FileConfigSource::new(dir.path());
+    let ctx = context();
+    write(
+        dir.path(),
+        "modes/review.yaml",
+        "metadata:\n  name: review\nspec:\n  description: &description 'Inspect 😀'\n  displayName: *description\n  toolAccess: analysis\n  instructions: |\n    First line\n    Second line\n",
+    );
+    let mode = source.get_mode(&ctx, "review").unwrap();
+    assert_eq!(mode.name, "review");
+    assert_eq!(mode.description, "Inspect 😀");
+    assert_eq!(mode.display_name, "Inspect 😀");
+    assert_eq!(mode.instructions, "First line\nSecond line");
+    for yaml in [
+        "name: first\nname: second\n",
+        "name: *missing\n",
+        "name: [unterminated\n",
+        "name: review\nunknown: true\n",
+    ] {
+        write(dir.path(), "modes/review.yaml", yaml);
+        assert!(source.get_mode(&ctx, "review").is_err(), "{yaml}");
+    }
+}
+
 #[tokio::test]
 async fn no_active_mode_is_not_implicitly_chat() {
     let dir = tempfile::tempdir().unwrap();

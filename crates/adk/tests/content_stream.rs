@@ -1,7 +1,10 @@
 #![cfg(feature = "observability")]
 use adk::{
+    agent_logger::{AgentLogger, LogLevel},
     codec::{dto::ContentEvent, events::parse_content_event_line, snapshots::to_go_json},
-    content_stream::{ContentStream, ContentSubscription},
+    content_stream::{
+        ContentStream, ContentSubscription, SessionEnd, SessionStreamOptions, SystemInit,
+    },
 };
 use chrono::{DateTime, Utc};
 use serde_json::{Value, json};
@@ -59,6 +62,139 @@ fn wire(buffer: &Buffer, start: DateTime<Utc>) -> Value {
         .map(|line| record(serde_json::from_str(line).unwrap(), start))
         .collect();
     events.into()
+}
+
+#[test]
+fn session_construction_and_boundaries_match_pinned_sdk() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-stream/observations.json"
+    ))
+    .unwrap();
+    for (i, case) in fixture["sessions"].as_array().unwrap().iter().enumerate() {
+        let start: DateTime<Utc> = SystemTime::now().into();
+        let output = Buffer::default();
+        let logs = Buffer::default();
+        let mut options = SessionStreamOptions::default();
+        if i > 0 {
+            options.system_init = Some(SystemInit::default());
+        }
+        if i > 1 {
+            options.session = -7;
+            options.phase = "plan".into();
+            options.logger = Some(
+                AgentLogger::new(
+                    if i == 3 {
+                        LogLevel::DEBUG
+                    } else {
+                        LogLevel::NORMAL
+                    },
+                    logs.clone(),
+                )
+                .event_logger(),
+            );
+            options.system_init = Some(SystemInit {
+                model: "model".into(),
+                permission_mode: "read-only".into(),
+                cwd: "/repo/😀".into(),
+                max_turns: if i == 3 { -2147483649 } else { 2147483648 },
+                tools: vec!["Read".into(), "".into(), "Read".into()],
+                mcp_servers: vec!["docs".into()],
+            });
+        }
+        let stream = ContentStream::session(output.clone(), options);
+        // Initialization has already reached the writer when construction returns.
+        assert_eq!(
+            wire(&output, start).as_array().unwrap().len(),
+            usize::from(i > 0)
+        );
+        let sub = stream.subscribe(4);
+        stream.emit_session_end(SessionEnd {
+            status: "completed".into(),
+            cost_usd: 0.125,
+            cost_known: true,
+            input_tokens: -1,
+            output_tokens: i64::MAX,
+            cache_read: 3,
+            cache_create: 4,
+            num_turns: -2147483649,
+            duration_ms: -9,
+            stop_reason: "done\n😀".into(),
+        });
+        stream.emit_session_end(SessionEnd::default());
+        assert_eq!(wire(&output, start), case["wire"], "case {i}");
+        assert_eq!(drain(&sub, start), case["subscriber"], "case {i}");
+        assert_eq!(
+            String::from_utf8(logs.0.lock().unwrap().clone()).unwrap(),
+            case["logs"].as_str().unwrap()
+        );
+    }
+}
+
+#[test]
+fn session_boundaries_preserve_delivery_after_sink_and_serialization_failures() {
+    #[derive(Clone, Default)]
+    struct Failed(Arc<Mutex<(usize, usize)>>);
+    impl Write for Failed {
+        fn write(&mut self, _: &[u8]) -> io::Result<usize> {
+            self.0.lock().unwrap().0 += 1;
+            Err(io::ErrorKind::BrokenPipe.into())
+        }
+        fn flush(&mut self) -> io::Result<()> {
+            self.0.lock().unwrap().1 += 1;
+            Err(io::ErrorKind::BrokenPipe.into())
+        }
+    }
+    let output = Failed::default();
+    let logs = Failed::default();
+    let logger = AgentLogger::new(LogLevel::NORMAL, logs.clone());
+    let stream = ContentStream::session(
+        output.clone(),
+        SessionStreamOptions {
+            logger: Some(logger.event_logger()),
+            system_init: Some(SystemInit::default()),
+            ..Default::default()
+        },
+    );
+    assert_eq!(*output.0.lock().unwrap(), (1, 0));
+    assert_eq!(*logs.0.lock().unwrap(), (1, 0));
+    let subscription = stream.subscribe(4);
+    assert!(matches!(
+        subscription.receiver.try_recv(),
+        Err(mpsc::TryRecvError::Empty)
+    ));
+    for cost in [f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        stream.emit_session_end(SessionEnd {
+            cost_usd: cost,
+            ..Default::default()
+        });
+        let event = subscription.receiver.try_recv().unwrap();
+        assert_eq!(event.kind, "session_end");
+        assert_eq!(event.cost_usd.to_bits(), cost.to_bits());
+    }
+    // Nonfinite costs still log and deliver, but never reach the JSONL writer.
+    assert_eq!(*output.0.lock().unwrap(), (1, 0));
+    assert_eq!(*logs.0.lock().unwrap(), (4, 0));
+    stream.emit_session_end(SessionEnd::default());
+    assert_eq!(
+        subscription.receiver.try_recv().unwrap().kind,
+        "session_end"
+    );
+    assert!(matches!(
+        subscription.receiver.try_recv(),
+        Err(mpsc::TryRecvError::Empty)
+    ));
+    assert_eq!(*output.0.lock().unwrap(), (2, 0));
+    assert_eq!(*logs.0.lock().unwrap(), (5, 0));
+    assert_eq!(
+        stream.flush().unwrap_err().kind(),
+        io::ErrorKind::BrokenPipe
+    );
+    assert_eq!(
+        logger.flush().unwrap_err().kind(),
+        io::ErrorKind::BrokenPipe
+    );
+    assert_eq!(*output.0.lock().unwrap(), (2, 1));
+    assert_eq!(*logs.0.lock().unwrap(), (5, 1));
 }
 
 #[test]

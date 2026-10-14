@@ -313,3 +313,35 @@ The pinned oracle compares 21 complete records, including empty fields, escaped
 multiline Unicode, 68,000-byte content and overflowing signed counts, through
 both JSONL output and subscriptions. Session construction and remaining typed
 emitters are separate contracts, not implied by these helpers.
+
+### Owned session-stream composition
+
+`ContentStream::session(writer, SessionStreamOptions)` applies session/phase and
+an optional owned logger, then emits an optional `SystemInit` before returning.
+Subscriptions created afterward receive subsequent events, not an initialization
+replay. `emit_system_init(SystemInit)` and `emit_session_end(SessionEnd)` use
+named records rather than the SDK's positional argument lists. Turn counts are
+signed 64-bit inputs narrowed to the SDK's signed 32-bit event fields; token and
+duration metrics remain signed 64-bit. Tool/server list order and duplicates are
+preserved. Empty lists are omitted from JSON just as in the SDK. Text is not
+redacted or truncated by these session helpers.
+
+| SDK session option | Native composition |
+|---|---|
+| `Session`, `Phase`, `SystemInit` | Corresponding `SessionStreamOptions` fields |
+| `Logger` | `logger: Some(logger.event_logger())` |
+| `EnableLogger: false` with no logger | Default `logger: None` |
+| `EnableLogger: true`, `LogLevel` | Construct `AgentLogger::new(level, writer)` and attach its event logger |
+
+This deliberately does not allocate a process-global logger or infer its output
+destination. Choose a trusted host-owned writer (including stderr if desired).
+Go global log prefixes/timestamps are not reproduced. Event bodies do not depend
+on log level, while turn/tool methods on the retained `AgentLogger` do. Flush
+stream and logger explicitly; neither session-end emission nor drop flushes or
+closes other owners' resources. A runnable Rust embedding example is included
+in `ContentStream::session` rustdoc.
+
+The pinned oracle compares four session scenarios: absent/default/populated init,
+normal/debug logging, signed narrowing, empty end markers, complete metrics,
+and init-before-end ordering. Only the two typed boundary-emitter ledger entries
+are closed here, not whole Go constructor/default-global-logger parity.

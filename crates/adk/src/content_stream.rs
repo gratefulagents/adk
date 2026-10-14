@@ -38,7 +38,7 @@ struct Shared {
 /// Owned SDK JSONL writer and subscription bus with copied child context.
 ///
 /// Automatic timestamps use UTC. Explicit timestamp offsets are retained. This
-/// is not the native observation bus, a stdout logger or a session builder.
+/// is not the native observation bus or a runtime-session builder.
 /// Writes are best effort, after subscription delivery, as in the SDK. Dropping
 /// the last stream releases the writer and closes remaining subscription senders.
 ///
@@ -60,7 +60,71 @@ pub struct ContentStream {
     shared: Arc<Shared>,
 }
 
+/// Host-owned session metadata and optional initialization event.
+///
+/// Supply `AgentLogger::event_logger()` to enable logging at a host-selected
+/// level and destination. No process-global logger is installed.
+#[derive(Default)]
+pub struct SessionStreamOptions {
+    pub session: i32,
+    pub phase: String,
+    pub logger: Option<Arc<ContentLogger>>,
+    pub system_init: Option<SystemInit>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct SystemInit {
+    pub model: String,
+    pub permission_mode: String,
+    pub cwd: String,
+    pub max_turns: i64,
+    pub tools: Vec<String>,
+    pub mcp_servers: Vec<String>,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct SessionEnd {
+    pub status: String,
+    pub cost_usd: f64,
+    pub cost_known: bool,
+    pub input_tokens: i64,
+    pub output_tokens: i64,
+    pub cache_read: i64,
+    pub cache_create: i64,
+    pub num_turns: i64,
+    pub duration_ms: i64,
+    pub stop_reason: String,
+}
+
 impl ContentStream {
+    /// Construct a session and emit optional initialization before returning.
+    /// Subscribe after construction to receive subsequent events, not init replay.
+    ///
+    /// ```
+    /// use adk::{agent_logger::{AgentLogger, LogLevel},
+    ///     content_stream::{ContentStream, SessionStreamOptions, SystemInit, SessionEnd}};
+    /// let logger = AgentLogger::new(LogLevel::NORMAL, std::io::sink());
+    /// let stream = ContentStream::session(std::io::sink(), SessionStreamOptions {
+    ///     session: 2,
+    ///     phase: "plan".into(),
+    ///     logger: Some(logger.event_logger()),
+    ///     system_init: Some(SystemInit { model: "offline".into(), ..Default::default() }),
+    /// });
+    /// stream.emit_session_end(SessionEnd { status: "completed".into(), ..Default::default() });
+    /// stream.flush().unwrap();
+    /// logger.flush().unwrap();
+    /// ```
+    pub fn session(writer: impl Write + Send + 'static, options: SessionStreamOptions) -> Self {
+        let stream = Self::new(writer);
+        stream.set_session(options.session);
+        stream.set_phase(options.phase);
+        stream.set_logger(options.logger);
+        if let Some(init) = options.system_init {
+            stream.emit_system_init(init);
+        }
+        stream
+    }
+
     pub fn new(writer: impl Write + Send + 'static) -> Self {
         Self {
             context: Mutex::new(StreamContext::default()),
@@ -195,6 +259,36 @@ impl ContentStream {
                 .unwrap_or_else(|p| p.into_inner())
                 .write(&bytes);
         }
+    }
+
+    pub fn emit_system_init(&self, init: SystemInit) {
+        self.emit(ContentEvent {
+            kind: "system_init".into(),
+            model: init.model,
+            permission_mode: init.permission_mode,
+            cwd: init.cwd,
+            max_turns: init.max_turns as i32,
+            tools: init.tools,
+            mcp_servers: init.mcp_servers,
+            ..Default::default()
+        });
+    }
+
+    pub fn emit_session_end(&self, end: SessionEnd) {
+        self.emit(ContentEvent {
+            kind: "session_end".into(),
+            status: end.status,
+            cost_usd: end.cost_usd,
+            cost_known: end.cost_known,
+            input_tokens: end.input_tokens,
+            output_tokens: end.output_tokens,
+            cache_read_input_tokens: end.cache_read,
+            cache_creation_input_tokens: end.cache_create,
+            num_turns: end.num_turns as i32,
+            duration_ms: end.duration_ms,
+            stop_reason: end.stop_reason,
+            ..Default::default()
+        });
     }
 
     pub fn emit_text(&self, text: impl Into<String>, agent_name: impl Into<String>) {

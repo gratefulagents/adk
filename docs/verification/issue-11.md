@@ -1778,3 +1778,40 @@ The initial embedding check correctly rejected the stale standalone lockfile;
 it was updated, not bypassed. The rerun passed the locked feature matrix,
 standalone consumer, 20 offline scenarios, host-session and facade/codec doctests.
 No extra capability ledger records are closed by this dependency change.
+
+### Session-stream construction and typed boundaries
+
+Added owned `SessionStreamOptions`, `SystemInit` and `SessionEnd` records plus
+`ContentStream::session`, `emit_system_init` and `emit_session_end`. Initialization
+reaches the writer before construction returns; later subscriptions do not replay
+it. Metadata, logger ownership, complete terminal usage/cost fields, list ordering,
+empty values and signed turn-count narrowing match four independently executed
+pinned SDK scenarios. A further native regression covers failing log/JSONL sinks,
+NaN and both infinities, continued subscription delivery, and explicit flush.
+Independent source review found no blocking issues; its coverage suggestions were
+added before final verification.
+
+Only the two typed emitter ledger records are newly closed: **391 verified /
+8,500 unresolved / 251 excluded**. Host-owned logger composition is documented;
+Go process-global logger allocation, prefix/timestamp flags and whole constructor
+parity are not claimed. Neither session-end emission nor dropping one owner
+implicitly flushes or closes another owner's resources.
+
+After a worker restart, both immutable source checkouts and the missing SDK tag
+were restored and source locks reverified. Fresh Linux Rust 1.88.0 full workspace,
+all-features/all-targets: **1,338 passed / 0 failed / 30 ignored**. Strict
+Clippy/rustdoc, feature matrix, independent standalone consumer, 20 offline
+scenarios, host-session, four facade doctests, one codec doctest, all reference
+oracles and **19 ledger validators** passed. Changed-file formatting and whitespace
+checks passed. No source inventories or excluded CLI/evaluation scope changed.
+
+The workspace and standalone locks now use **rustls 0.23.46**, addressing
+RUSTSEC-2026-0346 through 0349. Both manifests pass advisories, bans, licenses and
+sources under cargo-deny 0.20.2 after fetching RustSec revision `caee11f`. The
+standalone fixture's existing GPL license and local ADK version are now explicit;
+no audit policy was relaxed. An unused AGPL allowance warning for the standalone
+consumer is informational, not an audit failure.
+
+Other typed emitters, complete SDK ledger closure and full issue acceptance remain
+open. Offline checks do not establish live provider/service behavior; unavailable
+credentialed tests remain unverified, and ignored tests are not counted as passes.

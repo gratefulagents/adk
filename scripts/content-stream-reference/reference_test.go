@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"os"
 	"strings"
@@ -166,6 +167,36 @@ func TestNativeContentStreamReference(t *testing.T) {
 		child.EmitHookDecision("hook", "tool", "deny", text)
 	}
 	result := map[string]any{"metadata": metadata, "annotation": annotation, "drops": drops, "failure": failure, "helpers": wire(&output)}
+	oldWriter, oldFlags, oldPrefix := log.Writer(), log.Flags(), log.Prefix()
+	defer func() { log.SetOutput(oldWriter); log.SetFlags(oldFlags); log.SetPrefix(oldPrefix) }()
+	log.SetFlags(0)
+	log.SetPrefix("")
+	sessions := []map[string]any{}
+	for i := 0; i < 4; i++ {
+		output.Reset()
+		var logs bytes.Buffer
+		log.SetOutput(&logs)
+		opts := SessionEventStreamOptions{}
+		if i > 0 {
+			opts.SystemInit = &SessionSystemInit{}
+		}
+		if i > 1 {
+			opts.Session, opts.Phase = -7, "plan"
+			opts.EnableLogger = true
+			opts.SystemInit = &SessionSystemInit{Model: "model", PermissionMode: "read-only", Cwd: "/repo/😀", MaxTurns: 2147483648, Tools: []string{"Read", "", "Read"}, MCPServers: []string{"docs"}}
+		}
+		if i == 3 {
+			opts.Logger = NewAgentLogger(LogLevelDebug)
+			opts.SystemInit.MaxTurns = -2147483649
+		}
+		root = NewSessionEventStream(&output, opts)
+		sub, unsubscribe = root.Subscribe(4)
+		root.EmitSessionEnd("completed", 0.125, true, -1, 9223372036854775807, 3, 4, -2147483649, -9, "done\n😀")
+		root.EmitSessionEnd("", 0, false, 0, 0, 0, 0, 0, 0, "")
+		sessions = append(sessions, map[string]any{"wire": wire(&output), "subscriber": drain(sub), "logs": logs.String()})
+		unsubscribe()
+	}
+	result["sessions"] = sessions
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

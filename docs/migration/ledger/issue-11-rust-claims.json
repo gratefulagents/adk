@@ -6560,6 +6560,40 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-AE66E7D65E0B7285": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSystemInit",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_system_init"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed session boundary emitter is closed within the Rust UTF-8 domain. Pinned TestNativeContentStreamReference observations compare all emitted fields, metadata, logs and subscription ordering for absent/default/populated initialization, empty/duplicate list elements, cache usage, known/unknown cost, signed token extremes and 64-to-32-bit turn narrowing. Native owned records replace long positional Go arguments. Logger destination and level are composed explicitly by the host; process-global defaults and whole NewSessionEventStream parity are not claimed. Automatic timestamps use UTC.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-666F83F82D57AB78": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSessionEnd",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_session_end"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named typed session boundary emitter is closed within the Rust UTF-8 domain. Pinned TestNativeContentStreamReference observations compare all emitted fields, metadata, logs and subscription ordering for absent/default/populated initialization, empty/duplicate list elements, cache usage, known/unknown cost, signed token extremes and 64-to-32-bit turn narrowing. Native owned records replace long positional Go arguments. Logger destination and level are composed explicitly by the host; process-global defaults and whole NewSessionEventStream parity are not claimed. Automatic timestamps use UTC.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

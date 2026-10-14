@@ -74,6 +74,8 @@ func TestNativeContentLoggerReference(t *testing.T) {
 	parent.Emit(ContentEvent{Type: "subagent_status", TaskID: "child", Message: "inherited name"})
 	parent.Emit(ContentEvent{Type: "phase_transition", Message: "not serializable", CostUsd: math.NaN()})
 	result["streamLog"] = output.String()
+	result["agentLogs"] = agentLoggerObservations()
+	result["agentLogLevels"] = []int{int(LogLevelNormal), int(LogLevelDebug)}
 	encoded, err := json.Marshal(result)
 	if err != nil {
 		t.Fatal(err)

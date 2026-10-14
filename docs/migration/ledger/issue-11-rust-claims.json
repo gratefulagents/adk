@@ -6361,6 +6361,125 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-7A697D745DF6EF80": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LogLevelNormal",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel::NORMAL"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-94B246FA04296E76": {
+      "source": "internal/agent/logger.go",
+      "source_name": "AgentLogger.IsDebug",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::AgentLogger::is_debug"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-9C5D5B5776AC5779": {
+      "source": "internal/agent/logger.go",
+      "source_name": "LogLevelDebug",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel::DEBUG"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-A5C17454DC8204D5": {
+      "source": "internal/agent/logger.go",
+      "source_name": "LogLevel",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-C6ABC77AFF59908C": {
+      "source": "internal/agent/logger.go",
+      "source_name": "LogLevelNormal",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel::NORMAL"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-DC7A24C96F15A0E3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LogLevelDebug",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel::DEBUG"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-EE746575D2BF3469": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LogLevel",
+      "implementation_symbols": [
+        "crates/adk/src/agent_logger.rs::LogLevel"
+      ],
+      "rust_test_identifiers": [
+        "agent_logger_bodies_match_pinned_sdk",
+        "agent_logger_keeps_writing_after_errors_and_shares_owned_event_sink"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the signed 64-bit Linux log-level representation, named normal/debug constants and >=debug predicate are closed. The independent pinned Go logger oracle records the actual constants and executes levels -2,0,1,2, comparing complete normal/debug turn/tool output bytes. Native tests additionally prove disabled debug does not render Display values. Logger body implementations are available but whole logger construction/method parity is not closed by these level claims: global Go destination/timestamp/prefix flags, arbitrary Go printf arguments, invalid raw Go strings and unconstrained RawMessage input are not implemented by the explicit Rust writer and validated DTO APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

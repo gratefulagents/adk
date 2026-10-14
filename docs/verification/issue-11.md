@@ -1703,3 +1703,33 @@ bring the overlay to **377 verified / 8,514 unresolved / 251 excluded**. No
 immutable inventory, exclusion, CLI/evaluation behavior or release default changed.
 Full logger/session construction, other ledger obligations and credentialed live
 services remain open; offline observations do not establish live-service parity.
+
+### Owned turn/tool logger bodies
+
+Added `AgentLogger`, signed `LogLevel`, and `ModelResponseSummary` under the
+existing observability feature, sharing the tested content logger sink. The
+pinned Go oracle now also records complete raw-byte transcripts at levels -2,
+0, 1 and 2. Coverage includes normal/debug bodies, all item discriminants,
+nullable message/compaction, byte-split UTF-8, exact preview/chunk boundaries,
+interior raw-JSON whitespace, signed extremes and terminal newline handling.
+Raw hex fixtures retain invalid UTF-8 produced by unquoted byte previews.
+
+Three native regressions compare the oracle, prove disabled debug avoids
+rendering, exercise shared sink ownership/explicit flush, and verify multi-line
+calls continue after errors while retaining the first error across intervening
+successful writes. Focused independent review found no blocking correctness
+issues; both suggested boundary/recovery regressions were added. Parent-side
+execution then passed despite the review worker's toolchain/cache restrictions.
+
+Fresh Linux Rust 1.88.0 workspace/all-features/all-targets: **1,334 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, feature matrix, standalone consumer, 20 offline
+scenarios, host-session, three facade doctests and one codec doctest passed.
+Pinned oracles, **19 ledger validators**, source/license locks and whitespace
+checks passed. Only seven log-level/type/predicate records are newly closed:
+**384 verified / 8,507 unresolved / 251 excluded**.
+
+The native mapping is documented, but whole logger parity is not claimed: Go
+process-global output/prefix/timestamp flags, arbitrary printf arguments and
+invalid/raw-whitespace Go RawMessage inputs remain outside this API. No immutable
+inventory, exclusion or release default changed. Full issue acceptance and
+credentialed live-service verification remain open.

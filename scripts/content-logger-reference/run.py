@@ -33,13 +33,14 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['internal/agent/logger.go', 'internal/agent/event_stream.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
+        paths = ['internal/agent/logger.go', 'internal/agent/items.go', 'internal/agent/event_stream.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA, 'license': 'GPL-3.0-only',
                       'goVersion': version,
                       'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
                       'stdlibSHA256': {p: hashlib.sha256((goroot / p).read_bytes()).hexdigest() for p in ['src/strconv/quote.go', 'src/strconv/isprint.go', 'src/unicode/tables.go', 'LICENSE']},
-                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/content-logger-reference/run.py', 'scripts/content-logger-reference/reference_test.go']}}
+                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/content-logger-reference/run.py', 'scripts/content-logger-reference/reference_test.go', 'scripts/content-logger-reference/agent_reference_test.go']}}
         shutil.copyfile(ROOT / 'scripts/content-logger-reference/reference_test.go', source / 'pkg/agentsdk/native_content_logger_test.go')
+        shutil.copyfile(ROOT / 'scripts/content-logger-reference/agent_reference_test.go', source / 'pkg/agentsdk/native_agent_logger_test.go')
         env['METADATA_OUTPUT'] = str(source / 'observations.json')
         subprocess.run([go, 'test', '-count=1', '-v', '-run', '^TestNativeContentLoggerReference$', './pkg/agentsdk'], cwd=source, env=env, check=True)
         observed = json.loads((source / 'observations.json').read_text())

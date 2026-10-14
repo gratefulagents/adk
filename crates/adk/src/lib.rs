@@ -36,6 +36,9 @@ pub use adk_security as security;
 #[cfg(all(feature = "tools", feature = "runtime"))]
 pub mod tool_runtime;
 
+/// Host-owned SDK turn/tool logging with native formatting.
+#[cfg(feature = "observability")]
+pub mod agent_logger;
 /// Host-owned SDK content-event log bodies.
 #[cfg(feature = "observability")]
 pub mod content_logger;

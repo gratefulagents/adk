@@ -12,7 +12,8 @@ use std::{
 ///
 /// Emits unredacted event details. Send only to a trusted destination. No global
 /// logger, timestamp prefix, stderr writer, or implicit flush is installed.
-/// Turn/tool logging and Go printf argument formatting are separate contracts.
+/// See [`AgentLogger`](crate::agent_logger::AgentLogger) for turn/tool logging.
+/// Arbitrary Go printf argument formatting is a separate contract.
 /// Dropping the logger releases its writer without flushing it.
 ///
 /// ```
@@ -42,7 +43,7 @@ impl ContentLogger {
     /// Write one SDK log body. Stream mirroring ignores writer errors, while
     /// direct callers can observe them. Like Go log.Output, short writes are not retried.
     pub fn event(&self, event: &ContentEvent) -> io::Result<()> {
-        let mut body = match event.kind.as_str() {
+        let body = match event.kind.as_str() {
             "assistant_text" => format!(
                 "[event] assistant_text len={} preview={}",
                 event.message.len(),
@@ -88,13 +89,17 @@ impl ContentLogger {
             ),
             _ => format!("[event] {}", event.kind),
         };
-        if !body.ends_with('\n') {
-            body.push('\n');
+        self.write_body(body.into_bytes())
+    }
+
+    pub(crate) fn write_body(&self, mut body: Vec<u8>) -> io::Result<()> {
+        if !body.ends_with(b"\n") {
+            body.push(b'\n');
         }
         self.writer
             .lock()
             .unwrap_or_else(|p| p.into_inner())
-            .write(body.as_bytes())
+            .write(&body)
             .map(|_| ())
     }
 
@@ -106,7 +111,7 @@ impl ContentLogger {
     }
 }
 
-fn preview(text: &str, limit: usize) -> Vec<u8> {
+pub(crate) fn preview(text: &str, limit: usize) -> Vec<u8> {
     if text.len() <= limit {
         return text.as_bytes().to_vec();
     }
@@ -115,7 +120,7 @@ fn preview(text: &str, limit: usize) -> Vec<u8> {
     bytes
 }
 
-fn quote(mut bytes: &[u8]) -> String {
+pub(crate) fn quote(mut bytes: &[u8]) -> String {
     let mut out = String::from("\"");
     while !bytes.is_empty() {
         let (valid, invalid) = match std::str::from_utf8(bytes) {

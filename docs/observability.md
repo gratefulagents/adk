@@ -228,7 +228,8 @@ and owned-lifetime regressions.
 `adk::content_logger::ContentLogger` implements the SDK `AgentLogger.Event` log
 **body** format under `observability`. The host explicitly supplies a trusted
 `Write + Send` destination; no process-global logger or timestamp/prefix is
-installed. Although SDK comments call this stdout mirroring, Go `log.Printf`
+installed. `AgentLogger` below adds turn/tool body formatting over the same sink.
+Although SDK comments call this stdout mirroring, Go `log.Printf`
 uses stderr by default and permits host replacement of output, flags and prefix.
 Hosts wanting such decoration wrap the supplied writer. This is not full
 `AgentLogger` turn/tool logging or arbitrary Go printf compatibility.
@@ -252,3 +253,47 @@ comparison over all 1,112,064 Unicode scalar values. It uses Go 1.26.8's Unicode
 15.0.0 printable tables rather than the Rust compiler's changing Unicode tables.
 See the runnable Rust API example and `scripts/content-logger-reference/run.py
 --check`; Go module dependencies must already be cached for this offline check.
+
+### Owned turn/tool logger
+
+`adk::agent_logger::AgentLogger` composes the same owned sink with `LogLevel`.
+`NORMAL` is zero, `DEBUG` is one, and every value >= one enables debug bodies.
+Negative/unknown values are retained, not silently clamped. Use `event_logger()`
+to share the sink with `ContentStream`; dropping `AgentLogger` does not close a
+sink still owned by a stream. Multi-line calls attempt all lines even after a
+write error, then return the first error. Each line is one write, without retrying
+short writes. Call `flush` explicitly; drop does not flush.
+
+| SDK operation | Native mapping |
+|---|---|
+| `NewAgentLogger`, `IsDebug` | `AgentLogger::new(level, writer)`, `is_debug` |
+| `Turn`, `TurnEnd`, `Tools` | `turn`, `turn_end`, `tools` |
+| `Instructions`, `InputItems` | `instructions`, `input_items` |
+| `ToolExec`, `ToolResult` | `tool_exec`, `tool_result` |
+| `ModelResponse` | `model_response(ModelResponseSummary)` |
+| `ParallelToolCalls`, `AutoContinue` | `parallel_tool_calls`, `auto_continue` |
+| `Debugf`, `Infof` | `debug`, `info` with Rust `Display` / `format_args!` |
+| `Warn` / `Warnf`, `Error` / `Errorf` | `warn`, `error` with Rust `Display` |
+| `Event`, `FormatToolNames` | `event`, `format_tool_names` |
+
+Normal mode logs instruction/item/output byte lengths. Debug instructions use
+2,000-byte quoted chunks; message previews use 500 bytes, item tool-call/output
+previews 300 bytes, and tool-result previews 1,000 bytes. These are human-log
+limits, not changes to uncapped trace capture. Unquoted tool previews preserve
+raw truncated UTF-8 bytes, so a debug log is **not guaranteed valid UTF-8**.
+Encrypted compaction content is represented only by byte length. Message roles
+come from the supplied DTO's historical agent presence, not a current-agent guess.
+
+The oracle compares complete raw log bytes for levels -2, 0, 1 and 2, including
+exact limits, split UTF-8, all item discriminants, nullable message/compaction,
+raw JSON interior whitespace and signed integer extremes. Rust-only checks
+exercise disabled formatting, writer recovery, first-error retention and shared
+sink ownership. The API includes a runnable embedding example.
+
+**Limits:** this API does not reproduce Go's process-global destination or
+prefix/timestamp flags, nor interpret Go printf strings. `input_items` accepts
+UTF-8 DTO text and validated `RawJson`; arbitrary invalid Go raw messages and
+outer JSON whitespace are not representable. Tool-call/output items must carry
+their matching payload. Native body support does not close whole logger/session
+parity: only the seven separately verified log-level/type/predicate ledger
+records are added by this slice. All log sinks must remain trusted and private.

@@ -6880,6 +6880,148 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-28C2E1A1EDDCCABF": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionEventStreamOptions.Session",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SessionStreamOptions::session",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Zero/default and signed -7 session metadata propagate to initialization and later events; native i32 retains source width. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-5F4BCAD913C311CB": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionEventStreamOptions.Phase",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SessionStreamOptions::phase",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Empty/default and populated phase strings propagate to initialization and subsequent events without validation or phase-transition policy. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-924085D197D8BC9D": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionEventStreamOptions.SystemInit",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SessionStreamOptions::system_init",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Absent initialization emits nothing; present empty/populated initialization emits exactly once before construction returns. Later subscribers get no replay, and writer failure does not prevent subsequent delivery. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-1AA74AEDFF6A57FA": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionSystemInit.Model",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SystemInit::model",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Empty/default omission and populated model metadata copy exactly; this member performs no model lookup, routing or validation. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-4B3E07B54CCDFDAD": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionSystemInit.PermissionMode",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SystemInit::permission_mode",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Empty/default and read-only mode strings copy exactly; this is reporting metadata, not authorization or permission enforcement. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-DD178A11C95CC9E1": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionSystemInit.Cwd",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SystemInit::cwd",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Empty/default and Unicode directory metadata copy unchanged; neither implementation resolves, validates or changes the working directory. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-4CC93FD2C7904607": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "SessionSystemInit.MaxTurns",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::SystemInit::max_turns",
+        "crates/adk/src/content_stream.rs::ContentStream::session"
+      ],
+      "rust_test_identifiers": [
+        "session_construction_and_boundaries_match_pinned_sdk",
+        "session_boundaries_preserve_delivery_after_sink_and_serialization_failures"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Zero and both signed narrowing boundaries (2147483648 to -2147483648; -2147483649 to 2147483647) match Linux64 Go int-to-int32 wrapping, not clamping or turn-limit enforcement. Member-level closure in the existing Linux/valid-UTF8 domain, based on complete independently pinned wire/subscriber/log observations. This does not close whole construction, options/type serialization or process-global EnableLogger/LogLevel defaults; logging remains explicitly host-owned.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-FAA1375F1D2ED07D": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEventFromContentEvent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "rationale": "Typed helper projection only: twelve direct pinned Go input/output cases compare complete JSON including null rejection and default field presence. Both rejection guards, exact kind matching, whitespace parent IDs, shared identities, exclusive start-input/end-output fields, error flag, signed duration extremes and large uncapped Unicode payloads are checked. Native owned results survive input mutation. Does not close the wider events.Event union, parser or line-writer lifecycle. New directly bound fixture avoids relying on unbound historical sdk.json evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

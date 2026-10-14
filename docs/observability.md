@@ -447,3 +447,18 @@ under interruption, provider-specific completion-only reasoning callbacks, or
 all automatic subagent wiring. Builder-created child configuration selection is
 unchanged: opting the parent into blocking stream consumption does not silently
 change child execution selection. Those broader parity obligations stay open.
+
+### Public metadata and child-tool projection boundaries
+
+Session option `session`, `phase`, and optional `system_init` fields, and init
+model/mode/directory/turn metadata have individual pinned-fixture evidence.
+Permission mode and directory here are reported metadata: constructing a stream
+neither grants permissions nor changes the working directory. The signed init
+turn value narrows to the source's 32-bit event field; it is not a runtime limit.
+This does not imply automatic global-logger construction or whole options parity.
+
+`adk::codec::child_event` projects only `tool_start`/`tool_end` events with a
+nonempty parent ID. Start copies raw input; end copies output, error and duration;
+inapplicable fields keep their defaults. Unlike the typed tool emitter, this
+projection does not truncate raw payloads. Twelve directly pinned helper cases
+cover rejection, defaults, signed extremes and large Unicode input/output.

@@ -218,7 +218,28 @@ func TestNativeContentEventReference(t *testing.T) {
 		}
 		progress = append(progress, map[string]any{"input_json": string(input), "ok": ok, "output_json": string(encoded)})
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite, "lines": parsed, "subagent_progress": progress}, "", "  ")
+
+	childInputs := []ContentEvent{{}, {Type: "tool_start"}, {Type: "tool_end"}, {Type: "message", ParentCallID: "p"}, {Type: " tool_start", ParentCallID: "p"}, {Type: "TOOL_END", ParentCallID: "p"}}
+	for _, kind := range []string{"tool_start", "tool_end"} {
+		childInputs = append(childInputs, ContentEvent{Type: kind, ParentCallID: "p"})
+		for _, duration := range []int64{-9223372036854775808, 9223372036854775807} {
+			childInputs = append(childInputs, ContentEvent{Type: kind, ParentCallID: " ", ToolUseID: "call😀", AgentName: " raw agent ", Tool: "tool\n", InputRaw: strings.Repeat("😀", 10000), Output: "output\x00" + strings.Repeat("界", 12000), IsError: true, ToolDurationMS: duration})
+		}
+	}
+	childTools := []map[string]any{}
+	for _, event := range childInputs {
+		input, err := json.Marshal(event)
+		if err != nil {
+			t.Fatal(err)
+		}
+		output, ok := ChildToolEventFromContentEvent(event)
+		encoded, err := json.Marshal(output)
+		if err != nil {
+			t.Fatal(err)
+		}
+		childTools = append(childTools, map[string]any{"input_json": string(input), "ok": ok, "output_json": string(encoded)})
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": observations, "fields": fields, "nonfinite_rejections": nonfinite, "lines": parsed, "subagent_progress": progress, "child_tools": childTools}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

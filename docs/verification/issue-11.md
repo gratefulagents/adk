@@ -1945,3 +1945,25 @@ under interruption, provider-specific completion-only live reasoning and automat
 child configuration selection remain explicit limits. Full issue acceptance and
 credentialed live-provider verification remain open; no excluded CLI/evaluation,
 release, merge or default-switch work was performed.
+
+### Narrow public-session metadata and child projection closure
+
+A source/evidence audit identified seven already-implemented session metadata
+members with complete existing pinned constructor/boundary proof. Added individual
+claims for session, phase, optional initialization, model, permission-mode report,
+directory report and signed turn narrowing. These are not permission enforcement,
+working-directory mutation, model selection, whole-constructor or global-logger
+claims.
+
+For the public child-tool projection, added twelve direct pinned Go helper cases
+instead of relying on older unbound baseline fixtures. Complete output comparisons
+cover both rejection guards, exact kind matching, empty/default fields, whitespace
+parent IDs, exclusive start/end payloads, signed duration extremes and large
+uncapped Unicode payloads. Owned native results survive input mutation.
+
+Fresh full workspace **1,371 passed / 0 failed / 30 ignored**; strict Clippy/rustdoc,
+feature matrix, independent standalone consumer, 20 offline scenarios, host-session,
+six doctests, all pinned oracles, 19 ledger validators, source locks and formatting/
+whitespace checks pass. Eight precise claims bring the overlay to **415 verified /
+8,476 unresolved / 251 excluded**. Full issue acceptance and live-provider proof
+remain open; no excluded scope or production/default-switch work was added.

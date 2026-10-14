@@ -295,3 +295,27 @@ fn subagent_progress_matches_pinned_sdk() {
         assert!(to_go_json(&projected).is_err());
     }
 }
+
+#[test]
+fn child_tool_projection_matches_pinned_sdk() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-event/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["child_tools"].as_array().unwrap();
+    assert_eq!(cases.len(), 12);
+    for (i, case) in cases.iter().enumerate() {
+        let mut input: ContentEvent =
+            serde_json::from_str(case["input_json"].as_str().unwrap()).unwrap();
+        let output = adk_codec::child_event(&input);
+        input.parent_call_id = "changed".into();
+        input.input_raw.clear();
+        input.output.clear();
+        assert_eq!(output.is_some(), case["ok"].as_bool().unwrap(), "case {i}");
+        assert_eq!(
+            String::from_utf8(to_go_json(&output).unwrap()).unwrap(),
+            case["output_json"].as_str().unwrap(),
+            "case {i}"
+        );
+    }
+}

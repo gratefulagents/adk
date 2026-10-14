@@ -2,11 +2,146 @@
 use adk::{
     core::{Content, Message, ModelResponse, Role, RunItem, Usage},
     observability::CaptureMode,
-    tracestore::{FilesystemTraceStore, Limits, RunMetadata},
+    tracestore::{
+        FilesystemTraceStore, Limits, RunFilter, RunMetadata, Score, StoreError, TraceStore,
+    },
     tracewriter::*,
 };
 use serde_json::{Value, json};
-use std::{fs, sync::Arc};
+use std::{
+    fs,
+    path::PathBuf,
+    sync::{Arc, Mutex},
+};
+
+#[derive(Default)]
+struct FinalizationState {
+    calls: Vec<String>,
+    terminal: Value,
+    health: Option<Value>,
+    finished_at: Option<chrono::DateTime<chrono::FixedOffset>>,
+    ended: bool,
+}
+
+struct FinalizationStore {
+    mask: u8,
+    run_id: String,
+    state: Mutex<FinalizationState>,
+}
+
+impl TraceStore for FinalizationStore {
+    fn append_trace(&self, run_id: &str, category: &str, data: &[u8]) -> Result<(), StoreError> {
+        assert_eq!(run_id, self.run_id);
+        let mut state = self.state.lock().unwrap();
+        state.calls.push(format!("append:{category}"));
+        state.terminal = normalize(serde_json::from_slice(data).unwrap());
+        if self.mask & 1 != 0 {
+            return Err(std::io::Error::other("append failure").into());
+        }
+        Ok(())
+    }
+
+    fn write_file(&self, run_id: &str, path: &str, data: &[u8]) -> Result<(), StoreError> {
+        assert_eq!(run_id, self.run_id);
+        let mut state = self.state.lock().unwrap();
+        state.calls.push(format!("write:{path}"));
+        state.health = Some(serde_json::from_slice(data).unwrap());
+        if self.mask & 2 != 0 {
+            return Err(std::io::Error::other("health failure").into());
+        }
+        Ok(())
+    }
+
+    fn update_metadata_finished_at(
+        &self,
+        run_id: &str,
+        finished_at: chrono::DateTime<chrono::FixedOffset>,
+    ) -> Result<(), StoreError> {
+        assert_eq!(run_id, self.run_id);
+        let mut state = self.state.lock().unwrap();
+        state.calls.push("finish".into());
+        state.finished_at = Some(finished_at);
+        if self.mask & 4 != 0 {
+            return Err(std::io::Error::other("metadata failure").into());
+        }
+        state.ended = true;
+        Ok(())
+    }
+
+    fn create_run_dir(&self, _: &str, _: &RunMetadata) -> Result<PathBuf, StoreError> {
+        panic!("unexpected create_run_dir")
+    }
+
+    fn write_score(&self, _: &str, _: &Score) -> Result<(), StoreError> {
+        panic!("unexpected write_score")
+    }
+
+    fn list_runs(&self, _: &RunFilter) -> Result<Vec<RunMetadata>, StoreError> {
+        panic!("unexpected list_runs")
+    }
+
+    fn run_dir(&self, _: &str) -> Result<PathBuf, StoreError> {
+        panic!("unexpected run_dir")
+    }
+
+    fn update_metadata_mode(&self, _: &str, _: &str) -> Result<(), StoreError> {
+        panic!("unexpected update_metadata_mode")
+    }
+}
+
+#[test]
+fn finalization_failure_matrix_matches_pinned_go_and_preserves_first_error() {
+    let fixture: Vec<Value> = serde_json::from_str(include_str!(
+        "../../../fixtures/tracestore/finalization.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture.len(), 16);
+    for run_id in ["run", ""] {
+        for mask in 0..8 {
+            let expected = fixture
+                .iter()
+                .find(|case| case["mask"] == mask && case["runID"] == run_id)
+                .unwrap();
+            let store = Arc::new(FinalizationStore {
+                mask,
+                run_id: run_id.into(),
+                state: Mutex::new(FinalizationState::default()),
+            });
+            let writer = TraceWriter::new(store.clone(), run_id, Options::default());
+            let before = chrono::Utc::now();
+            let result = writer.finalize_run("finished");
+            let after = chrono::Utc::now();
+            let expected_error = if !run_id.is_empty() && mask & 2 != 0 {
+                Some("health failure")
+            } else if mask & 4 != 0 {
+                Some("metadata failure")
+            } else {
+                None
+            };
+            assert_eq!(
+                result.err().map(|error| error.to_string()).as_deref(),
+                expected_error,
+                "run_id={run_id:?}, mask={mask}"
+            );
+            let state = store.state.lock().unwrap();
+            let health = serde_json::to_value(writer.health()).unwrap();
+            assert_eq!(
+                json!({
+                    "mask": mask,
+                    "runID": run_id,
+                    "calls": state.calls,
+                    "health": health,
+                    "terminal": state.terminal,
+                    "ended": state.ended,
+                }),
+                *expected
+            );
+            assert_eq!(state.health, (!run_id.is_empty()).then_some(health));
+            let finished_at = state.finished_at.unwrap();
+            assert!(finished_at >= before && finished_at <= after);
+        }
+    }
+}
 
 fn normalize(mut value: Value) -> Value {
     match &mut value {

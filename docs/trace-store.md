@@ -70,7 +70,15 @@ spans, generation snapshots, resolved-instruction artifacts and writer health.
 redaction and host redactors. `Snapshot::from_json` preserves original serialized
 bytes for SDK-compatible digests. Tool hooks see the uncapped output; store
 quotas remain independent of the model-facing output cap. `init_run` and
-`finalize_run` are explicit; finalize does not close a shared store.
+`finalize_run` are explicit; finalize does not close a shared store. Finalization
+attempts the terminal append, health artifact and finish-time metadata in order,
+even if an earlier operation fails. Append failures remain visible in writer
+health. The returned result reports the first health serialization/write error,
+otherwise the metadata error; it does not aggregate errors or skip metadata after
+a health failure. With an empty run ID, append/health are skipped but metadata is
+still attempted, matching the pinned source. Sixteen injected-failure cases in
+`fixtures/tracestore/finalization.json` check ordering, terminal records, counters
+and finish-time updates independently of the filesystem backend.
 
 `fixtures/tracestore/sdk-writer.json` independently checks all typed span kinds
 and hook categories against the pinned Go writer. `Trace::new`, `Span::new`,

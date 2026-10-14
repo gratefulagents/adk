@@ -1,0 +1,310 @@
+[
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 1,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 0,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 1,
+      "last_error": "append agent_transitions: append failure"
+    },
+    "mask": 1,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 1,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 2,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 1,
+      "last_error": "append agent_transitions: append failure"
+    },
+    "mask": 3,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 1,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 4,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 1,
+      "last_error": "append agent_transitions: append failure"
+    },
+    "mask": 5,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 1,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 6,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "append:agent_transitions",
+      "write:trace_health.json",
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 1,
+      "last_error": "append agent_transitions: append failure"
+    },
+    "mask": 7,
+    "runID": "run",
+    "terminal": {
+      "run_id": "run",
+      "schema_version": 2,
+      "status": "finished",
+      "turn": 0,
+      "type": "session_end"
+    }
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 0,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 1,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 2,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": true,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 3,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 4,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 5,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 6,
+    "runID": "",
+    "terminal": null
+  },
+  {
+    "calls": [
+      "finish"
+    ],
+    "ended": false,
+    "health": {
+      "events_written": 0,
+      "events_truncated": 0,
+      "events_dropped": 0,
+      "write_errors": 0
+    },
+    "mask": 7,
+    "runID": "",
+    "terminal": null
+  }
+]

@@ -6753,6 +6753,23 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-66D072F4EEDA05C3": {
+      "source": "pkg/agentsdk/tracestore/trace_writer.go",
+      "source_name": "TraceWriter.FinalizeRun",
+      "implementation_symbols": [
+        "crates/adk/src/tracewriter.rs::TraceWriter::finalize_run"
+      ],
+      "rust_test_identifiers": [
+        "finalization_failure_matrix_matches_pinned_go_and_preserves_first_error",
+        "truncation_and_store_quota_failures_are_visible_in_health"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterHealthCountsDropsAndTruncation",
+      "rationale": "Independent pinned Go finalization oracle exercises all eight append/health/metadata failure combinations for populated and empty run IDs. Native tests compare complete normalized terminal records, ordered persistence calls, health counters/errors and finished state, plus timestamp bounds. Metadata update must be attempted after health failure; empty run IDs skip append/health only. Rust intentionally returns the first health serialization/write error or otherwise the metadata result rather than process-global Go logging; append errors remain in health. Store closure is host-owned. This closes the finalization method, not whole store/writer lifecycle or runtime wiring.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

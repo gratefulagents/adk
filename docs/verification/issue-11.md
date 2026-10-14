@@ -1879,3 +1879,25 @@ validators, source locks, formatting and whitespace checks pass. Overlay:
 **400 verified / 8,491 unresolved / 251 excluded**. This closes only the typed
 emission contract, not automatic provider/runner event wiring, credentialed
 provider parity, remaining reusable ledger entries or full issue acceptance.
+
+### Independent trace-finalization persistence
+
+Fixed a source-confirmed ordering gap: a failed health-file write previously
+prevented updating finished-at metadata. `finalize_run` now attempts both and
+returns the first health serialization/write error, otherwise the metadata error.
+Append failures retain existing health accounting. Empty IDs skip append/health,
+not the metadata attempt. No shared store is closed implicitly.
+
+A new independently executed Go oracle covers all eight combinations of append,
+health and metadata failures for both populated and empty run IDs. Native tests
+compare all 16 ordered call sequences, normalized terminal records, health and
+finished state, and separately validate timestamps/error precedence.
+
+Fresh supported Rust 1.88.0 full workspace: **1,349 passed / 0 failed / 30 ignored**;
+strict Clippy/rustdoc, facade matrix/standalone consumer, 20 offline scenarios,
+host-session, five doctests, pinned oracles, 19 ledger validators, immutable source
+locks, formatting and whitespace checks passed. An exploratory specialist check
+reported Clippy warnings in unchanged code; the supported Rust 1.88 strict gate
+above passed without warnings. Ledger: **401 verified / 8,490
+unresolved / 251 excluded**. This is finalization-method closure, not whole issue
+acceptance; live-service and remaining reusable-capability obligations stay open.

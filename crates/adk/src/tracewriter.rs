@@ -692,6 +692,8 @@ impl TraceWriter {
             .store
             .write_file(&state.run_id, "metrics.json", &bytes)
     }
+    /// Always attempts metadata finalization, returning the first health serialization/write
+    /// error if any, otherwise the metadata result. Append errors remain in writer health.
     pub fn finalize_run(&self, status: &str) -> Result<(), StoreError> {
         let mut state = self.state.lock().expect("trace writer poisoned");
         let turn = state.turn;
@@ -699,13 +701,21 @@ impl TraceWriter {
             "agent_transitions",
             json!({"type":"session_end", "status":status, "turn":turn, "timestamp":now()}),
         );
-        let health = serde_json::to_vec_pretty(&state.health)?;
-        state
+        let health_result = if state.run_id.is_empty() {
+            Ok(())
+        } else {
+            serde_json::to_vec_pretty(&state.health)
+                .map_err(StoreError::from)
+                .and_then(|health| {
+                    state
+                        .store
+                        .write_file(&state.run_id, "trace_health.json", &health)
+                })
+        };
+        let metadata_result = state
             .store
-            .write_file(&state.run_id, "trace_health.json", &health)?;
-        state
-            .store
-            .update_metadata_finished_at(&state.run_id, now())
+            .update_metadata_finished_at(&state.run_id, now());
+        health_result.and(metadata_result)
     }
 }
 impl RunHooks for TraceWriter {

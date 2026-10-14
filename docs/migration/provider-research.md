@@ -106,3 +106,21 @@ transport parity. The full adapter fixture/live matrix remains outstanding.
 JWT payload decoding only extracts untrusted expiry/account hints from host-supplied
 material; it is not signature validation or an authorization decision. Explicit
 account scope is still validated by the session.
+
+### TLS patch-level security update
+
+Both workspace and standalone-consumer locks use **rustls 0.23.46** after the
+RustSec database assigned **RUSTSEC-2026-0346**, **0347**, **0348** and **0349** to
+0.23.45 on 2026-10-14. [Release source](https://github.com/rustls/rustls/releases/tag/v/0.23.46)
+and [advisory](https://rustsec.org/advisories/RUSTSEC-2026-0349.html).
+This is a patch-only lockfile change; no transport features or advisory policy
+are relaxed. The earlier local audit used database revision `2290866`, where
+these reports still had draft `RUSTSEC-0000-0000` IDs. Explicit `cargo deny fetch db`
+obtained revision `caee11f` with assigned IDs; `cargo-deny 0.20.2 --locked check`
+then passed on 0.23.46 (advisories, bans, licenses and sources). A cached local
+pass must not override fresher CI advisory evidence.
+
+The standalone-consumer fixture now explicitly declares its existing repository
+GPL-3.0-only license and the local ADK `0.1.0` version requirement, so the same
+strict license/wildcard policy can audit that independent manifest without
+exceptions. Its TLS dependency version matches the workspace lock.

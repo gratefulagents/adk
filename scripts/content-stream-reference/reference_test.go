@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 	"time"
+	"unicode"
 )
 
 type nativeFailedContentWriter struct{ attempts int }
@@ -234,6 +235,64 @@ func TestNativeContentStreamReference(t *testing.T) {
 	}
 	result["toolLimit"] = DefaultMaxToolResultBytes
 	result["toolCases"] = toolCases
+	subagentCases := []map[string]any{}
+	var spaces strings.Builder
+	for r := rune(0); r <= 0x10ffff; r++ {
+		if unicode.IsSpace(r) {
+			spaces.WriteRune(r)
+		}
+	}
+	result["subagentWhitespace"] = spaces.String()
+	subagentTexts := []string{"", spaces.String(), " \n😀\rinterior\t\ntext\x1c\x1f ", strings.Repeat("a", 4096), strings.Repeat("a", 4097), strings.Repeat("😀", 4096), strings.Repeat("😀", 4097), strings.Repeat("a", 4092) + "e\u0301tail", strings.Repeat(" \n😀\n", 2000), "\ufeff prefix\u200b\n😀 \ufeff"}
+	capture := func() map[string]any {
+		delivered := drain(sub)
+		delivered["events"] = compactRecords(delivered["events"].([]map[string]any))
+		return map[string]any{"wire": compactRecords(wire(&output)), "subscriber": delivered}
+	}
+	for _, text := range subagentTexts {
+		output.Reset()
+		root = NewEventStream(&output)
+		root.SetSession(3)
+		root.SetPhase("workers")
+		child = NewChildEventStream(root, "task")
+		child.SetStep("work")
+		sub, unsubscribe = child.Subscribe(8)
+		child.EmitSubagentCompleted("", "cold", "", 0, 0, 0, 0, false, 0, "", "")
+		child.EmitSubagentStarted("", "launch", text, "worker😀", "model", text)
+		child.EmitSubagentCompletedWithUsage("", "failed", text, -2147483648, -9223372036854775808, 9223372036854775807, -0.125, true, 2147483647, Usage{InputTokens: 99, CacheReadTokens: -7, CacheCreateTokens: 9223372036854775807}, "stop\n", text)
+		child.EmitSubagentCompleted("", "other", text, 2147483647, 9223372036854775807, -9223372036854775808, 0.375, false, -2147483648, "other", text)
+		subagentCases = append(subagentCases, capture())
+		unsubscribe()
+	}
+	result["subagentCases"] = subagentCases
+	statusCases := []map[string]any{}
+	statuses := []string{"", "pending", "waiting", "running", "reconciling", "completed", "failed", "cancelled", "canceled", "Completed", "unknown"}
+	durations := []int64{-1, -999999, -1000001, -9223372036854775808, 9223372036854775807, 0, 1000001}
+	for i, status := range statuses {
+		output.Reset()
+		root = NewEventStream(&output)
+		root.SetSession(3)
+		root.SetPhase("workers")
+		child = NewChildEventStream(root, "task")
+		sub, unsubscribe = child.Subscribe(8)
+		child.EmitSubagentStarted("", "", "", "prior", "", "")
+		task := SubAgentTask{Status: SubAgentTaskStatus(status), Message: " \n" + strings.Repeat("😀", 4097) + "\n ", Duration: time.Duration(durations[i%len(durations)]), Result: " result\n" + strings.Repeat("r", 4097), Error: "must not appear", ToolCount: -7, Tokens: -11, DependsOn: []string{"first", "", "first"}, WaitingOn: []string{"first"}, MessagesReceived: -3, LastParentMessage: strings.Repeat("parent\n", 1000), CurrentStep: "step", LastTool: "tool", FilesWritten: 9223372036854775807}
+		if i%2 != 0 {
+			task.AgentName = "agent"
+		}
+		if status == "failed" {
+			task.Result = ""
+		}
+		if i == 0 {
+			task.DependsOn = nil
+			task.WaitingOn = []string{}
+		}
+		child.EmitSubagentTaskStatus(task, "")
+		child.EmitSubagentTaskStatus(task, " \n")
+		statusCases = append(statusCases, capture())
+		unsubscribe()
+	}
+	result["subagentStatusCases"] = statusCases
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

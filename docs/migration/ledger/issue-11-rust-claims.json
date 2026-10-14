@@ -6662,6 +6662,78 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-8A1FAB3A13C563B5": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSubagentStarted",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/subagent.rs::ContentStream::emit_subagent_started"
+      ],
+      "rust_test_identifiers": [
+        "subagent::subagent_lifecycle_helpers_match_pinned_sdk",
+        "subagent::subagent_status_helpers_match_pinned_sdk",
+        "subagent::subagent_helpers_preserve_owned_progress_and_nonfinite_delivery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named emission helper is closed for valid UTF-8 via owned input records. Pinned Go fixtures compare 73 complete JSONL/subscriber records: all Go whitespace, interior controls, Unicode scalar limits, non-whitespace BOM/zero-width space, signed metric/duration extremes, inherited agent identity, terminal status spellings, nil/empty dependency lists, and result versus error. Prompt/result text uses the 4096-rune trim/newline rule, not the tool byte cap. Native LineWriter integration checks ordered owned progress and subscriber-before-nonfinite-serialization failure. No scheduler, automatic native task conversion, generic Truncate or full runtime closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-2368506E0DEBBF85": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSubagentCompleted",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/subagent.rs::ContentStream::emit_subagent_completed"
+      ],
+      "rust_test_identifiers": [
+        "subagent::subagent_lifecycle_helpers_match_pinned_sdk",
+        "subagent::subagent_status_helpers_match_pinned_sdk",
+        "subagent::subagent_helpers_preserve_owned_progress_and_nonfinite_delivery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named emission helper is closed for valid UTF-8 via owned input records. Pinned Go fixtures compare 73 complete JSONL/subscriber records: all Go whitespace, interior controls, Unicode scalar limits, non-whitespace BOM/zero-width space, signed metric/duration extremes, inherited agent identity, terminal status spellings, nil/empty dependency lists, and result versus error. Prompt/result text uses the 4096-rune trim/newline rule, not the tool byte cap. Native LineWriter integration checks ordered owned progress and subscriber-before-nonfinite-serialization failure. No scheduler, automatic native task conversion, generic Truncate or full runtime closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-F58E18B270CE9E8D": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSubagentCompletedWithUsage",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/subagent.rs::ContentStream::emit_subagent_completed"
+      ],
+      "rust_test_identifiers": [
+        "subagent::subagent_lifecycle_helpers_match_pinned_sdk",
+        "subagent::subagent_status_helpers_match_pinned_sdk",
+        "subagent::subagent_helpers_preserve_owned_progress_and_nonfinite_delivery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named emission helper is closed for valid UTF-8 via owned input records. Pinned Go fixtures compare 73 complete JSONL/subscriber records: all Go whitespace, interior controls, Unicode scalar limits, non-whitespace BOM/zero-width space, signed metric/duration extremes, inherited agent identity, terminal status spellings, nil/empty dependency lists, and result versus error. Prompt/result text uses the 4096-rune trim/newline rule, not the tool byte cap. Native LineWriter integration checks ordered owned progress and subscriber-before-nonfinite-serialization failure. No scheduler, automatic native task conversion, generic Truncate or full runtime closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-AE0C0E159367823E": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitSubagentTaskStatus",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/subagent.rs::ContentStream::emit_subagent_task_status"
+      ],
+      "rust_test_identifiers": [
+        "subagent::subagent_lifecycle_helpers_match_pinned_sdk",
+        "subagent::subagent_status_helpers_match_pinned_sdk",
+        "subagent::subagent_helpers_preserve_owned_progress_and_nonfinite_delivery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named emission helper is closed for valid UTF-8 via owned input records. Pinned Go fixtures compare 73 complete JSONL/subscriber records: all Go whitespace, interior controls, Unicode scalar limits, non-whitespace BOM/zero-width space, signed metric/duration extremes, inherited agent identity, terminal status spellings, nil/empty dependency lists, and result versus error. Prompt/result text uses the 4096-rune trim/newline rule, not the tool byte cap. Native LineWriter integration checks ordered owned progress and subscriber-before-nonfinite-serialization failure. No scheduler, automatic native task conversion, generic Truncate or full runtime closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

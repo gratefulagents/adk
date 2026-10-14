@@ -1840,3 +1840,24 @@ Four precise emitter/constant claims bring the overlay to **395 verified / 8,496
 unresolved / 251 excluded**. Generic `TruncateBytes`, invalid Go string bytes,
 remaining subagent/LLM helpers, automatic runtime wiring and full issue/live-service
 acceptance are not implied by these claims.
+
+### Typed subagent lifecycle/status events
+
+Owned started/completed/task-status helpers now match 73 complete pinned Go
+JSONL/subscriber records. The cases cover the 4,096-scalar trim/newline preview,
+all Go whitespace, BOM/zero-width-space retention, signed counts and stored
+duration extremes, cache usage, inherited identity, exact terminal spellings,
+empty dependencies, and result-versus-error semantics. Native `LineWriter`
+composition verifies ordered owned progress and subscriber delivery even when a
+nonfinite cost cannot serialize. These APIs do not mutate scheduler state or
+implicitly convert native task snapshots.
+
+Fresh Rust 1.88.0 full workspace/all-features/all-targets: **1,343 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, facade matrix, independent standalone
+consumer, 20 offline feature scenarios, host-session, four facade/one codec
+doctests, pinned reference oracles, 19 ledger validators, immutable source locks,
+formatting and whitespace checks passed. Four precise emitter claims bring the
+overlay to **399 verified / 8,492 unresolved / 251 excluded**. Remaining ledger
+and issue acceptance are open; credentialed provider behavior remains unverified.
+Prior pushed head `8223bc99eb1dd98be5e4adaff9c4766eb789d6e6` had all 46 reported
+GitHub checks successful; that CI result is not attributed to this newer slice.

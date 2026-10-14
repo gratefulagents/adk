@@ -1,4 +1,7 @@
 //! SDK content-event streams, distinct from native ordered observations.
+mod subagent;
+pub use subagent::{SubagentCompleted, SubagentStarted, SubagentTaskStatus};
+
 use crate::content_logger::ContentLogger;
 use adk_codec::{dto::ContentEvent, snapshots::to_go_json, timestamp::GoTimestamp};
 use chrono::{DateTime, NaiveDateTime, SecondsFormat, Utc};

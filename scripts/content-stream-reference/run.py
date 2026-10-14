@@ -29,7 +29,7 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "internal/agent/stream.go", "internal/agent/stream_test.go", "internal/agent/stream_events.go", "internal/agent/event_stream_test.go", "pkg/agentsdk/aliases.go", "pkg/agentsdk/events/events.go", "pkg/agentsdk/events/events_test.go", "go.mod", "go.sum"]
+        paths = ["pkg/agentsdk/session_event_stream.go", "pkg/agentsdk/session_event_stream_test.go", "internal/agent/event_stream.go", "internal/agent/stream.go", "internal/agent/stream_test.go", "internal/agent/stream_events.go", "internal/agent/subagent_registry.go", "internal/agent/event_stream_test.go", "pkg/agentsdk/aliases.go", "pkg/agentsdk/events/events.go", "pkg/agentsdk/events/events_test.go", "go.mod", "go.sum"]
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA,
                       'license': 'GPL-3.0-only', 'timezone': 'UTC',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
@@ -41,7 +41,7 @@ def main():
         execution = subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeContentStreamReference)$', './pkg/agentsdk'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(execution.stdout.decode('utf-8', errors='backslashreplace'), end='')
         execution.check_returncode()
-        subprocess.run([go, 'test', '-count=1', '-v', './internal/agent', '-run', '^(TestEventStream|TestChildEventStream|TestTruncateBytes$)'], cwd=source, env=env, check=True)
+        subprocess.run([go, 'test', '-count=1', '-v', './internal/agent', '-run', '^(TestEventStream|TestChildEventStream|TestTruncateBytes$|TestTruncate$)'], cwd=source, env=env, check=True)
         subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk', '-run', '^TestNewSessionEventStreamEmitsSystemInit$'], cwd=source, env=env, check=True)
         result = dict(provenance=provenance, **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'

@@ -368,3 +368,29 @@ the reserved cut, 80,000-byte Unicode inputs, empty metadata, signed duration
 extremes and uncapped summaries. Original SDK `TestTruncateBytes` regressions
 also run. A native end-to-end test composes these helpers with `LineWriter` and
 verifies ordered typed child-tool progress with the capped input/error output.
+
+### Typed subagent event snapshots
+
+`emit_subagent_started(SubagentStarted)`,
+`emit_subagent_completed(SubagentCompleted)` and
+`emit_subagent_task_status(SubagentTaskStatus)` emit owned records through the same
+annotation, logging, subscription and JSONL path. Completion includes optional
+cache metrics as zero-default counters; no second positional-argument overload is
+needed. Task-status input is an explicit projection, not an automatic conversion
+from native scheduler state. Emission does not execute or transition a task.
+
+Prompt/result previews trim the pinned Go Unicode whitespace set, replace LF with
+space, and cap at 4,096 Unicode scalars including three ASCII dots. This is not
+the tool-event byte cap. Descriptions, parent messages and dependency lists are
+not capped or redacted. Dependency order/duplicates remain intact; empty lists
+are omitted on the wire. Task durations are signed stored nanoseconds converted
+to milliseconds toward zero, not recomputed from wall-clock time. Only exact
+`completed`, `failed` and `cancelled` statuses expose task result/stop fields;
+the task's separate error is not substituted for its result.
+
+The pinned oracle compares 73 complete wire/subscriber records, including all Go
+whitespace characters, interior controls, BOM/zero-width-space preservation,
+Unicode truncation boundaries, signed metric extremes, status spellings and
+inherited agent identity. Native `LineWriter` integration also checks ordered
+owned progress and subscriber delivery before nonfinite-cost serialization fails.
+These are emitter contracts, not scheduler or automatic runtime-wiring parity.

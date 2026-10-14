@@ -66,21 +66,25 @@ fn wire(buffer: &Buffer, start: DateTime<Utc>) -> Value {
     events.into()
 }
 
+#[path = "content_stream/subagent.rs"]
+mod subagent;
+
+fn digests(mut records: Value) -> Value {
+    for record in records.as_array_mut().unwrap() {
+        let record = record.as_object_mut().unwrap();
+        let text = record.remove("json").unwrap();
+        let text = text.as_str().unwrap();
+        record.insert("bytes".into(), json!(text.len()));
+        record.insert(
+            "sha256".into(),
+            json!(format!("{:x}", Sha256::digest(text.as_bytes()))),
+        );
+    }
+    records
+}
+
 #[test]
 fn tool_helpers_match_pinned_sdk_utf8_byte_caps() {
-    fn digests(mut records: Value) -> Value {
-        for record in records.as_array_mut().unwrap() {
-            let record = record.as_object_mut().unwrap();
-            let text = record.remove("json").unwrap();
-            let text = text.as_str().unwrap();
-            record.insert("bytes".into(), json!(text.len()));
-            record.insert(
-                "sha256".into(),
-                json!(format!("{:x}", Sha256::digest(text.as_bytes()))),
-            );
-        }
-        records
-    }
     let fixture: Value = serde_json::from_str(include_str!(
         "../../../fixtures/content-stream/observations.json"
     ))

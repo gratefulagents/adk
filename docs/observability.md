@@ -345,3 +345,26 @@ The pinned oracle compares four session scenarios: absent/default/populated init
 normal/debug logging, signed narrowing, empty end markers, complete metrics,
 and init-before-end ordering. Only the two typed boundary-emitter ledger entries
 are closed here, not whole Go constructor/default-global-logger parity.
+
+### Typed tool events and bounded UI payloads
+
+`emit_tool_start(ToolStart)` and `emit_tool_end(ToolEnd)` use owned records for
+names, call/parent IDs, agent identity, summary, input/output and duration.
+`DEFAULT_MAX_TOOL_RESULT_BYTES` is the SDK's 32,768-byte event limit. Only raw
+input and output are capped; tool-start summaries and other metadata are not.
+Successful **and failed** output events use this cap. Whitespace is retained.
+Truncation reserves three bytes for ASCII `...` and backs up to a UTF-8 boundary,
+so the final payload never exceeds the cap or contains a partial character.
+Exact-limit payloads are unchanged.
+
+This is separate from debug logging's raw-byte preview rules and from trace
+persistence. Generic `emit` is not newly capped; use the trace-store APIs to retain
+uncapped tool output. These helpers do not redact sensitive content.
+
+The pinned oracle compares **27 complete event records** through both JSONL and
+subscriptions using full SHA-256 digests and byte lengths, not prefix samples.
+Cases cover exact/overflow limits, all four alignments of a four-byte character at
+the reserved cut, 80,000-byte Unicode inputs, empty metadata, signed duration
+extremes and uncapped summaries. Original SDK `TestTruncateBytes` regressions
+also run. A native end-to-end test composes these helpers with `LineWriter` and
+verifies ordered typed child-tool progress with the capped input/error output.

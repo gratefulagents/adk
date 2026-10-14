@@ -1053,8 +1053,8 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/content-stream-reference/reference_test.go": "57d8e23ce733299d79a8127b2f03e9a7dbb9f5414c703689bc99abbfb504398f",
-      "scripts/content-stream-reference/run.py": "4b22fb3a229b52a00683868a8ccef56719c08325e2840d32078bcf905c8ab09b"
+      "scripts/content-stream-reference/reference_test.go": "be8b289f75daf2023f2192e596946e9b644f28aaf409d1db683ee01714e7c6f3",
+      "scripts/content-stream-reference/run.py": "f9c64d6b6965330b7ef41c57bd0918426bb9c5d73b7a851c5dff119a80720004"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -1063,7 +1063,9 @@
       "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
       "internal/agent/event_stream.go": "382a14c0207aa1952510d9003cdb32021082620a9fd8cb0161f8a8a3c61cf6ab",
       "internal/agent/event_stream_test.go": "84ecfa9b759423060cff649f2c58355afa4a1b2bed1d5daa11656dd709dde60c",
+      "internal/agent/stream.go": "e965af45e4650dfdff38df948e38cc06dbfbea5aa86a8f1bd7fe51751be2be09",
       "internal/agent/stream_events.go": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "internal/agent/stream_test.go": "bb91a188b3eabdd77e51bf180052774468d3e4751de7cb64e6c0917bf957276d",
       "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
       "pkg/agentsdk/events/events.go": "bd22ae98200ebbbdc42398feb7a27b777ea716dad806cefac3f06fe4ffa25481",
       "pkg/agentsdk/events/events_test.go": "74656dc67c90ebd0f0e403d649011a29b0ca16d809a6a40d5a2ebf0182dcf49d",
@@ -1208,5 +1210,413 @@
         }
       ]
     }
-  ]
+  ],
+  "toolCases": [
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 170,
+            "nonfinite": false,
+            "sha256": "c73b465095e28908b39da756f3e717b3d76f7986af82babf00b59976e9bc6fc2"
+          },
+          {
+            "automatic": true,
+            "bytes": 208,
+            "nonfinite": false,
+            "sha256": "52f2c83b365ed3d5a6d74c799224745d5deb1603d9362b909bf48efa815faa52"
+          },
+          {
+            "automatic": true,
+            "bytes": 223,
+            "nonfinite": false,
+            "sha256": "573831319edfc5e73c4fbc8a7fa5c9e0e5bd92ea38a3af474eac55ccfea19c82"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 170,
+          "nonfinite": false,
+          "sha256": "c73b465095e28908b39da756f3e717b3d76f7986af82babf00b59976e9bc6fc2"
+        },
+        {
+          "automatic": true,
+          "bytes": 208,
+          "nonfinite": false,
+          "sha256": "52f2c83b365ed3d5a6d74c799224745d5deb1603d9362b909bf48efa815faa52"
+        },
+        {
+          "automatic": true,
+          "bytes": 223,
+          "nonfinite": false,
+          "sha256": "573831319edfc5e73c4fbc8a7fa5c9e0e5bd92ea38a3af474eac55ccfea19c82"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 319,
+            "nonfinite": false,
+            "sha256": "282303773120c98b62d3843f368350dd4c25d1b6ea0ca3ce1d9acc4607cca963"
+          },
+          {
+            "automatic": true,
+            "bytes": 320,
+            "nonfinite": false,
+            "sha256": "39f8d098ea746c0937c8c4ce96432c86735bf0b1bea20d9598974abadf5415de"
+          },
+          {
+            "automatic": true,
+            "bytes": 335,
+            "nonfinite": false,
+            "sha256": "8d61282c6dcb93add20417b5066696ccba1aa081e6772e96a5c1d4cf5514569b"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 319,
+          "nonfinite": false,
+          "sha256": "282303773120c98b62d3843f368350dd4c25d1b6ea0ca3ce1d9acc4607cca963"
+        },
+        {
+          "automatic": true,
+          "bytes": 320,
+          "nonfinite": false,
+          "sha256": "39f8d098ea746c0937c8c4ce96432c86735bf0b1bea20d9598974abadf5415de"
+        },
+        {
+          "automatic": true,
+          "bytes": 335,
+          "nonfinite": false,
+          "sha256": "8d61282c6dcb93add20417b5066696ccba1aa081e6772e96a5c1d4cf5514569b"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65831,
+            "nonfinite": false,
+            "sha256": "49c7da3ea8b40eb213a075918107ddba4717759168624f13626360c1c44f4471"
+          },
+          {
+            "automatic": true,
+            "bytes": 33076,
+            "nonfinite": false,
+            "sha256": "f95f4592c65bdf8927f3e6a0ddf896889d224e450bb6f9cc9bf899e6a46cd523"
+          },
+          {
+            "automatic": true,
+            "bytes": 33091,
+            "nonfinite": false,
+            "sha256": "79ec23d8cab84e8f14659e0c4dc5b5485b253d2795c965ddd33587ada6701d90"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65831,
+          "nonfinite": false,
+          "sha256": "49c7da3ea8b40eb213a075918107ddba4717759168624f13626360c1c44f4471"
+        },
+        {
+          "automatic": true,
+          "bytes": 33076,
+          "nonfinite": false,
+          "sha256": "f95f4592c65bdf8927f3e6a0ddf896889d224e450bb6f9cc9bf899e6a46cd523"
+        },
+        {
+          "automatic": true,
+          "bytes": 33091,
+          "nonfinite": false,
+          "sha256": "79ec23d8cab84e8f14659e0c4dc5b5485b253d2795c965ddd33587ada6701d90"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65832,
+            "nonfinite": false,
+            "sha256": "5b7c50bc8117e95d11e50363bbcd9d92f160b65f67a8fe3c70d6d161e9350a11"
+          },
+          {
+            "automatic": true,
+            "bytes": 33076,
+            "nonfinite": false,
+            "sha256": "3afd270a9014db41684cbcb843fe533e214aa123fe11500bebc794a6c6ab009d"
+          },
+          {
+            "automatic": true,
+            "bytes": 33091,
+            "nonfinite": false,
+            "sha256": "085e03936d3fe1cb0f775b1b73350e4eae4fe63ff91bb002869b7587c60391c7"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65832,
+          "nonfinite": false,
+          "sha256": "5b7c50bc8117e95d11e50363bbcd9d92f160b65f67a8fe3c70d6d161e9350a11"
+        },
+        {
+          "automatic": true,
+          "bytes": 33076,
+          "nonfinite": false,
+          "sha256": "3afd270a9014db41684cbcb843fe533e214aa123fe11500bebc794a6c6ab009d"
+        },
+        {
+          "automatic": true,
+          "bytes": 33091,
+          "nonfinite": false,
+          "sha256": "085e03936d3fe1cb0f775b1b73350e4eae4fe63ff91bb002869b7587c60391c7"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65830,
+            "nonfinite": false,
+            "sha256": "34289a201935c1e2e24d2de8d1d5d620515dc4cb5728326bfafdc4b449091269"
+          },
+          {
+            "automatic": true,
+            "bytes": 33073,
+            "nonfinite": false,
+            "sha256": "f759ae9011ea7ce007e31ef8e3bb8ab5a4ddddf86fbbeeb7dc90ed330d77b395"
+          },
+          {
+            "automatic": true,
+            "bytes": 33088,
+            "nonfinite": false,
+            "sha256": "5ce5758e50c5d17f10d6c32654a4ae454bca36722ce3ea72775cfc61f324af46"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65830,
+          "nonfinite": false,
+          "sha256": "34289a201935c1e2e24d2de8d1d5d620515dc4cb5728326bfafdc4b449091269"
+        },
+        {
+          "automatic": true,
+          "bytes": 33073,
+          "nonfinite": false,
+          "sha256": "f759ae9011ea7ce007e31ef8e3bb8ab5a4ddddf86fbbeeb7dc90ed330d77b395"
+        },
+        {
+          "automatic": true,
+          "bytes": 33088,
+          "nonfinite": false,
+          "sha256": "5ce5758e50c5d17f10d6c32654a4ae454bca36722ce3ea72775cfc61f324af46"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65832,
+            "nonfinite": false,
+            "sha256": "9de54ff444a4f313acb13176c4df0412e1c8c50da87d3396467690d5569b6731"
+          },
+          {
+            "automatic": true,
+            "bytes": 33074,
+            "nonfinite": false,
+            "sha256": "51a867b50017aa108141592d1c42f6bc465bbd1ddcb231c4ee8de98f5ff31343"
+          },
+          {
+            "automatic": true,
+            "bytes": 33089,
+            "nonfinite": false,
+            "sha256": "0887ab13a8e773e9af99266e3c5f028c6acb88872a07cb9281593966e412c833"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65832,
+          "nonfinite": false,
+          "sha256": "9de54ff444a4f313acb13176c4df0412e1c8c50da87d3396467690d5569b6731"
+        },
+        {
+          "automatic": true,
+          "bytes": 33074,
+          "nonfinite": false,
+          "sha256": "51a867b50017aa108141592d1c42f6bc465bbd1ddcb231c4ee8de98f5ff31343"
+        },
+        {
+          "automatic": true,
+          "bytes": 33089,
+          "nonfinite": false,
+          "sha256": "0887ab13a8e773e9af99266e3c5f028c6acb88872a07cb9281593966e412c833"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65834,
+            "nonfinite": false,
+            "sha256": "d5e3951b8e3561efb48865260e1c06f923b488e02d5139fb506a84306125840d"
+          },
+          {
+            "automatic": true,
+            "bytes": 33075,
+            "nonfinite": false,
+            "sha256": "75767ec9dcf4e4b51407e13bf8f5fa4682f01e009bd70148b674299c1233d219"
+          },
+          {
+            "automatic": true,
+            "bytes": 33090,
+            "nonfinite": false,
+            "sha256": "1ea4a8aafb39d33353aad80f63a4d19f3b5f8c30f4b89145dd5faae3a18d053d"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65834,
+          "nonfinite": false,
+          "sha256": "d5e3951b8e3561efb48865260e1c06f923b488e02d5139fb506a84306125840d"
+        },
+        {
+          "automatic": true,
+          "bytes": 33075,
+          "nonfinite": false,
+          "sha256": "75767ec9dcf4e4b51407e13bf8f5fa4682f01e009bd70148b674299c1233d219"
+        },
+        {
+          "automatic": true,
+          "bytes": 33090,
+          "nonfinite": false,
+          "sha256": "1ea4a8aafb39d33353aad80f63a4d19f3b5f8c30f4b89145dd5faae3a18d053d"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 65836,
+            "nonfinite": false,
+            "sha256": "dc6351a67b3009d97d2b0fc0912703f687b628efd9a608813f19bf0f3507a1a2"
+          },
+          {
+            "automatic": true,
+            "bytes": 33076,
+            "nonfinite": false,
+            "sha256": "3afd270a9014db41684cbcb843fe533e214aa123fe11500bebc794a6c6ab009d"
+          },
+          {
+            "automatic": true,
+            "bytes": 33091,
+            "nonfinite": false,
+            "sha256": "085e03936d3fe1cb0f775b1b73350e4eae4fe63ff91bb002869b7587c60391c7"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 65836,
+          "nonfinite": false,
+          "sha256": "dc6351a67b3009d97d2b0fc0912703f687b628efd9a608813f19bf0f3507a1a2"
+        },
+        {
+          "automatic": true,
+          "bytes": 33076,
+          "nonfinite": false,
+          "sha256": "3afd270a9014db41684cbcb843fe533e214aa123fe11500bebc794a6c6ab009d"
+        },
+        {
+          "automatic": true,
+          "bytes": 33091,
+          "nonfinite": false,
+          "sha256": "085e03936d3fe1cb0f775b1b73350e4eae4fe63ff91bb002869b7587c60391c7"
+        }
+      ]
+    },
+    {
+      "subscriber": {
+        "closed": false,
+        "events": [
+          {
+            "automatic": true,
+            "bytes": 113062,
+            "nonfinite": false,
+            "sha256": "ccbd8538a724579f55ec3e318fcf14eb2a850733470170de79b6d7c9fd060e2f"
+          },
+          {
+            "automatic": true,
+            "bytes": 33075,
+            "nonfinite": false,
+            "sha256": "ff60cc611251151339984008595a42b1c014a20859a7b6d39d224d67f63a7cf0"
+          },
+          {
+            "automatic": true,
+            "bytes": 33090,
+            "nonfinite": false,
+            "sha256": "00e179720ad8a97ad08dde339200172d8ddc9e296a4e912be05f2a20e36d0126"
+          }
+        ]
+      },
+      "wire": [
+        {
+          "automatic": true,
+          "bytes": 113062,
+          "nonfinite": false,
+          "sha256": "ccbd8538a724579f55ec3e318fcf14eb2a850733470170de79b6d7c9fd060e2f"
+        },
+        {
+          "automatic": true,
+          "bytes": 33075,
+          "nonfinite": false,
+          "sha256": "ff60cc611251151339984008595a42b1c014a20859a7b6d39d224d67f63a7cf0"
+        },
+        {
+          "automatic": true,
+          "bytes": 33090,
+          "nonfinite": false,
+          "sha256": "00e179720ad8a97ad08dde339200172d8ddc9e296a4e912be05f2a20e36d0126"
+        }
+      ]
+    }
+  ],
+  "toolLimit": 32768
 }

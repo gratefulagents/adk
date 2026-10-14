@@ -6594,6 +6594,74 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-055DFD7FB3712478": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "DefaultMaxToolResultBytes",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::DEFAULT_MAX_TOOL_RESULT_BYTES"
+      ],
+      "rust_test_identifiers": [
+        "tool_helpers_match_pinned_sdk_utf8_byte_caps",
+        "typed_tool_events_reach_owned_host_progress_adapter"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named tool emitter or fixed 32768-byte constant is closed in the Rust UTF-8 domain. Independent pinned Go observations compare 27 complete event hashes/byte lengths through both JSONL and subscriptions: empty values, whitespace, exact/overflow byte limits, all four emoji boundary alignments, uncapped summary text, success/error outputs, inherited metadata and signed duration extremes. Original SDK TestTruncateBytes regressions also execute. Owned records replace positional arguments. Raw input/output reserve three ASCII dots within the byte cap and back up to a UTF-8 boundary, unlike debug logger slicing. This does not cap generic emit or trace-store output, nor claim standalone generic TruncateBytes or invalid-Go-string byte parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6DA4C24A32BFD492": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "DefaultMaxToolResultBytes",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::DEFAULT_MAX_TOOL_RESULT_BYTES"
+      ],
+      "rust_test_identifiers": [
+        "tool_helpers_match_pinned_sdk_utf8_byte_caps",
+        "typed_tool_events_reach_owned_host_progress_adapter"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named tool emitter or fixed 32768-byte constant is closed in the Rust UTF-8 domain. Independent pinned Go observations compare 27 complete event hashes/byte lengths through both JSONL and subscriptions: empty values, whitespace, exact/overflow byte limits, all four emoji boundary alignments, uncapped summary text, success/error outputs, inherited metadata and signed duration extremes. Original SDK TestTruncateBytes regressions also execute. Owned records replace positional arguments. Raw input/output reserve three ASCII dots within the byte cap and back up to a UTF-8 boundary, unlike debug logger slicing. This does not cap generic emit or trace-store output, nor claim standalone generic TruncateBytes or invalid-Go-string byte parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-5966CF9E0C00E080": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitToolStart",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_tool_start"
+      ],
+      "rust_test_identifiers": [
+        "tool_helpers_match_pinned_sdk_utf8_byte_caps",
+        "typed_tool_events_reach_owned_host_progress_adapter"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named tool emitter or fixed 32768-byte constant is closed in the Rust UTF-8 domain. Independent pinned Go observations compare 27 complete event hashes/byte lengths through both JSONL and subscriptions: empty values, whitespace, exact/overflow byte limits, all four emoji boundary alignments, uncapped summary text, success/error outputs, inherited metadata and signed duration extremes. Original SDK TestTruncateBytes regressions also execute. Owned records replace positional arguments. Raw input/output reserve three ASCII dots within the byte cap and back up to a UTF-8 boundary, unlike debug logger slicing. This does not cap generic emit or trace-store output, nor claim standalone generic TruncateBytes or invalid-Go-string byte parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-C40DFF06B5D8E775": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "EventStream.EmitToolEnd",
+      "implementation_symbols": [
+        "crates/adk/src/content_stream.rs::ContentStream::emit_tool_end"
+      ],
+      "rust_test_identifiers": [
+        "tool_helpers_match_pinned_sdk_utf8_byte_caps",
+        "typed_tool_events_reach_owned_host_progress_adapter"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewSessionEventStreamEmitsSystemInit",
+      "rationale": "Only the named tool emitter or fixed 32768-byte constant is closed in the Rust UTF-8 domain. Independent pinned Go observations compare 27 complete event hashes/byte lengths through both JSONL and subscriptions: empty values, whitespace, exact/overflow byte limits, all four emoji boundary alignments, uncapped summary text, success/error outputs, inherited metadata and signed duration extremes. Original SDK TestTruncateBytes regressions also execute. Owned records replace positional arguments. Raw input/output reserve three ASCII dots within the byte cap and back up to a UTF-8 boundary, unlike debug logger slicing. This does not cap generic emit or trace-store output, nor claim standalone generic TruncateBytes or invalid-Go-string byte parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

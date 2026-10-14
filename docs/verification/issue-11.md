@@ -1815,3 +1815,28 @@ consumer is informational, not an audit failure.
 Other typed emitters, complete SDK ledger closure and full issue acceptance remain
 open. Offline checks do not establish live provider/service behavior; unavailable
 credentialed tests remain unverified, and ignored tests are not counted as passes.
+
+### Typed tool-start/tool-end events
+
+Added owned `ToolStart` and `ToolEnd` records and the public 32,768-byte default
+limit. The two emitters cap only raw input/output, including error output, reserve
+three bytes for `...` and back up to a UTF-8 boundary. Summaries remain uncapped;
+whitespace is preserved. Generic emission and trace-store limits did not change.
+
+The independent pinned oracle compares **27 complete records** via both JSONL and
+subscriptions, using complete SHA-256 hashes and byte lengths to keep large
+fixtures compact. Cases include exact/overflow limits, all four four-byte-character
+alignments at the reserved cut, 80,000-byte Unicode data, empty fields, inherited
+metadata and signed duration extremes. Original SDK `TestTruncateBytes` regressions
+also execute. A separate native end-to-end test feeds both helpers into `LineWriter`
+and verifies ordered, typed child-tool progress with capped input/error output.
+
+Fresh Rust 1.88.0 full workspace/all-features/all-targets: **1,340 passed / 0 failed /
+30 ignored**. Strict Clippy/rustdoc, facade feature matrix, standalone consumer,
+20 offline scenarios, host-session, four facade/one codec doctests, all pinned
+oracles, **19 ledger validators**, source locks, formatting and whitespace checks
+pass. No dependency changes were made after the preceding successful audits.
+Four precise emitter/constant claims bring the overlay to **395 verified / 8,496
+unresolved / 251 excluded**. Generic `TruncateBytes`, invalid Go string bytes,
+remaining subagent/LLM helpers, automatic runtime wiring and full issue/live-service
+acceptance are not implied by these claims.

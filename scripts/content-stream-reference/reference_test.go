@@ -3,6 +3,7 @@ package agentsdk
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -197,6 +198,42 @@ func TestNativeContentStreamReference(t *testing.T) {
 		unsubscribe()
 	}
 	result["sessions"] = sessions
+	toolCases := []map[string]any{}
+	texts := []string{"", " \n😀\r\n ", strings.Repeat("x", 32768), strings.Repeat("x", 32769)}
+	for _, n := range []int{32762, 32763, 32764, 32765} {
+		texts = append(texts, strings.Repeat("x", n)+"😀tail")
+	}
+	texts = append(texts, strings.Repeat("😀", 20000))
+	compactRecords := func(records []map[string]any) []map[string]any {
+		for _, record := range records {
+			text := record["json"].(string)
+			record["bytes"] = len(text)
+			record["sha256"] = fmt.Sprintf("%x", sha256.Sum256([]byte(text)))
+			delete(record, "json")
+		}
+		return records
+	}
+	for i, text := range texts {
+		output.Reset()
+		root = NewEventStream(&output)
+		root.SetSession(5)
+		root.SetPhase("tools")
+		child = NewChildEventStream(root, "task")
+		sub, unsubscribe = child.Subscribe(4)
+		name, call, parent, agent, summary := "tool\n", "call", "parent", "agent😀", "summary\n"+text
+		if i == 0 {
+			name, call, parent, agent, summary = "", "", "", "", ""
+		}
+		child.EmitToolStart(name, call, parent, summary, agent, text)
+		child.EmitToolEnd(name, call, parent, false, agent, text, -9223372036854775808)
+		child.EmitToolEnd(name, call, parent, true, agent, text, 9223372036854775807)
+		delivered := drain(sub)
+		delivered["events"] = compactRecords(delivered["events"].([]map[string]any))
+		toolCases = append(toolCases, map[string]any{"wire": compactRecords(wire(&output)), "subscriber": delivered})
+		unsubscribe()
+	}
+	result["toolLimit"] = DefaultMaxToolResultBytes
+	result["toolCases"] = toolCases
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

@@ -3,11 +3,13 @@ use adk::{
     agent_logger::{AgentLogger, LogLevel},
     codec::{dto::ContentEvent, events::parse_content_event_line, snapshots::to_go_json},
     content_stream::{
-        ContentStream, ContentSubscription, SessionEnd, SessionStreamOptions, SystemInit,
+        ContentStream, ContentSubscription, DEFAULT_MAX_TOOL_RESULT_BYTES, SessionEnd,
+        SessionStreamOptions, SystemInit, ToolEnd, ToolStart,
     },
 };
 use chrono::{DateTime, Utc};
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     io::{self, Write},
     sync::{Arc, Mutex, mpsc},
@@ -62,6 +64,147 @@ fn wire(buffer: &Buffer, start: DateTime<Utc>) -> Value {
         .map(|line| record(serde_json::from_str(line).unwrap(), start))
         .collect();
     events.into()
+}
+
+#[test]
+fn tool_helpers_match_pinned_sdk_utf8_byte_caps() {
+    fn digests(mut records: Value) -> Value {
+        for record in records.as_array_mut().unwrap() {
+            let record = record.as_object_mut().unwrap();
+            let text = record.remove("json").unwrap();
+            let text = text.as_str().unwrap();
+            record.insert("bytes".into(), json!(text.len()));
+            record.insert(
+                "sha256".into(),
+                json!(format!("{:x}", Sha256::digest(text.as_bytes()))),
+            );
+        }
+        records
+    }
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/content-stream/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["toolLimit"], json!(DEFAULT_MAX_TOOL_RESULT_BYTES));
+    let mut texts = vec![
+        String::new(),
+        " \n😀\r\n ".into(),
+        "x".repeat(32768),
+        "x".repeat(32769),
+    ];
+    for n in [32762, 32763, 32764, 32765] {
+        texts.push(format!("{}😀tail", "x".repeat(n)));
+    }
+    texts.push("😀".repeat(20000));
+    assert_eq!(texts.len(), fixture["toolCases"].as_array().unwrap().len());
+    for (i, text) in texts.into_iter().enumerate() {
+        let start: DateTime<Utc> = SystemTime::now().into();
+        let output = Buffer::default();
+        let root = ContentStream::new(output.clone());
+        root.set_session(5);
+        root.set_phase("tools");
+        let child = root.child("task");
+        let sub = child.subscribe(4);
+        let (tool, call_id, parent_call_id, agent_name, summary) = if i == 0 {
+            ("", "", "", "", String::new())
+        } else {
+            (
+                "tool\n",
+                "call",
+                "parent",
+                "agent😀",
+                format!("summary\n{text}"),
+            )
+        };
+        child.emit_tool_start(ToolStart {
+            tool: tool.into(),
+            call_id: call_id.into(),
+            parent_call_id: parent_call_id.into(),
+            summary,
+            agent_name: agent_name.into(),
+            input_raw: text.clone(),
+        });
+        for (is_error, duration_ms) in [(false, i64::MIN), (true, i64::MAX)] {
+            child.emit_tool_end(ToolEnd {
+                tool: tool.into(),
+                call_id: call_id.into(),
+                parent_call_id: parent_call_id.into(),
+                is_error,
+                agent_name: agent_name.into(),
+                output: text.clone(),
+                duration_ms,
+            });
+        }
+        let mut delivered = drain(&sub, start);
+        for record in delivered["events"].as_array().unwrap() {
+            let event: ContentEvent =
+                serde_json::from_str(record["json"].as_str().unwrap()).unwrap();
+            let content = if event.kind == "tool_start" {
+                event.input_raw
+            } else {
+                event.output
+            };
+            assert!(content.len() <= DEFAULT_MAX_TOOL_RESULT_BYTES);
+            if text.len() > DEFAULT_MAX_TOOL_RESULT_BYTES {
+                assert!(content.ends_with("..."));
+            } else {
+                assert_eq!(content, text);
+            }
+        }
+        delivered["events"] = digests(delivered["events"].take());
+        assert_eq!(
+            delivered, fixture["toolCases"][i]["subscriber"],
+            "subscriber case {i}"
+        );
+        assert_eq!(
+            digests(wire(&output, start)),
+            fixture["toolCases"][i]["wire"],
+            "wire case {i}"
+        );
+    }
+}
+
+#[test]
+fn typed_tool_events_reach_owned_host_progress_adapter() {
+    use adk::codec::line_writer::{LineEvent, LineWriter};
+    let events = Arc::new(Mutex::new(Vec::new()));
+    let sink = events.clone();
+    let stream = ContentStream::new(LineWriter::new(move |event| {
+        sink.lock().unwrap().push(event)
+    }));
+    stream.emit_tool_start(ToolStart {
+        tool: "Read".into(),
+        call_id: "child-call".into(),
+        parent_call_id: "parent-call".into(),
+        input_raw: "x".repeat(DEFAULT_MAX_TOOL_RESULT_BYTES + 1),
+        ..Default::default()
+    });
+    stream.emit_tool_end(ToolEnd {
+        tool: "Read".into(),
+        call_id: "child-call".into(),
+        parent_call_id: "parent-call".into(),
+        output: "x".repeat(DEFAULT_MAX_TOOL_RESULT_BYTES + 1),
+        is_error: true,
+        duration_ms: 17,
+        ..Default::default()
+    });
+    let events = events.lock().unwrap();
+    let [LineEvent::ChildTool(start), LineEvent::ChildTool(end)] = events.as_slice() else {
+        panic!("expected ordered child tool events")
+    };
+    assert_eq!(start.phase, "start");
+    assert_eq!(end.phase, "end");
+    assert_eq!(start.call_id, "child-call");
+    assert_eq!(end.call_id, "child-call");
+    assert_eq!(start.parent_call_id, "parent-call");
+    assert_eq!(end.parent_call_id, "parent-call");
+    assert_eq!(
+        start.input_raw,
+        format!("{}...", "x".repeat(DEFAULT_MAX_TOOL_RESULT_BYTES - 3))
+    );
+    assert_eq!(end.output, start.input_raw);
+    assert!(end.is_error);
+    assert_eq!(end.duration_ms, 17);
 }
 
 #[test]

@@ -96,6 +96,30 @@ pub struct SessionEnd {
     pub stop_reason: String,
 }
 
+/// SDK tool-event input/output cap, including the ASCII truncation marker.
+pub const DEFAULT_MAX_TOOL_RESULT_BYTES: usize = 32 * 1024;
+
+#[derive(Clone, Debug, Default)]
+pub struct ToolStart {
+    pub tool: String,
+    pub call_id: String,
+    pub parent_call_id: String,
+    pub summary: String,
+    pub agent_name: String,
+    pub input_raw: String,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ToolEnd {
+    pub tool: String,
+    pub call_id: String,
+    pub parent_call_id: String,
+    pub is_error: bool,
+    pub agent_name: String,
+    pub output: String,
+    pub duration_ms: i64,
+}
+
 impl ContentStream {
     /// Construct a session and emit optional initialization before returning.
     /// Subscribe after construction to receive subsequent events, not init replay.
@@ -261,6 +285,36 @@ impl ContentStream {
         }
     }
 
+    /// Emit a tool start, capping only raw input at the SDK's UTF-8-safe byte limit.
+    pub fn emit_tool_start(&self, start: ToolStart) {
+        self.emit(ContentEvent {
+            kind: "tool_start".into(),
+            tool: start.tool,
+            tool_use_id: start.call_id,
+            parent_call_id: start.parent_call_id,
+            message: start.summary,
+            agent_name: start.agent_name,
+            input_raw: truncate_tool_content(start.input_raw),
+            ..Default::default()
+        });
+    }
+
+    /// Both successful and failed tool outputs use the content-event cap.
+    /// Persist uncapped outputs separately through the trace-store API.
+    pub fn emit_tool_end(&self, end: ToolEnd) {
+        self.emit(ContentEvent {
+            kind: "tool_end".into(),
+            tool: end.tool,
+            tool_use_id: end.call_id,
+            parent_call_id: end.parent_call_id,
+            is_error: end.is_error,
+            agent_name: end.agent_name,
+            output: truncate_tool_content(end.output),
+            tool_duration_ms: end.duration_ms,
+            ..Default::default()
+        });
+    }
+
     pub fn emit_system_init(&self, init: SystemInit) {
         self.emit(ContentEvent {
             kind: "system_init".into(),
@@ -395,6 +449,18 @@ impl Drop for ContentSubscription {
     fn drop(&mut self) {
         self.close();
     }
+}
+
+fn truncate_tool_content(mut text: String) -> String {
+    if text.len() > DEFAULT_MAX_TOOL_RESULT_BYTES {
+        let mut end = DEFAULT_MAX_TOOL_RESULT_BYTES - 3;
+        while !text.is_char_boundary(end) {
+            end -= 1;
+        }
+        text.truncate(end);
+        text.push_str("...");
+    }
+    text
 }
 
 fn now() -> GoTimestamp {

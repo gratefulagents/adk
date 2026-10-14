@@ -7194,6 +7194,1751 @@
       }
     },
     {
+      "name": "mode_role_none_base_none",
+      "source_only": [],
+      "input": {
+        "agent_name": "parent",
+        "instructions": "Coordinate the work.",
+        "model": "base-model",
+        "fallback_models": [
+          "base-fallback-z",
+          "base-fallback-a"
+        ],
+        "reasoning": "none",
+        "verbosity": "medium",
+        "max_tokens": 1234,
+        "model_settings": null,
+        "roles": [
+          {
+            "Name": "Zeta Review",
+            "Description": "  Review changes.  ",
+            "Instructions": "  Review exactly.\n",
+            "ToolAccess": "read-only",
+            "ModelOverride": "",
+            "FallbackModels": null
+          },
+          {
+            "Name": "alpha-builder",
+            "Description": "",
+            "Instructions": "Build exactly.",
+            "ToolAccess": "full",
+            "ModelOverride": "",
+            "FallbackModels": null
+          }
+        ],
+        "mode": {
+          "Name": "",
+          "Version": "",
+          "DisplayName": "",
+          "Description": "",
+          "Category": "",
+          "Autonomous": false,
+          "ToolAccess": "",
+          "Instructions": "",
+          "ModelRouting": {
+            "DefaultModel": "mode-model",
+            "FallbackModels": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "ReasoningLevel": "high",
+            "TextVerbosity": "high",
+            "RoleOverrides": {
+              "Zeta Review": {
+                "Model": "",
+                "FallbackModels": null,
+                "ReasoningLevel": "none",
+                "TextVerbosity": ""
+              }
+            }
+          },
+          "Constraints": null
+        },
+        "handoffs": {
+          "Enabled": true,
+          "GenericFallback": false
+        },
+        "subagents": {
+          "GenericFallback": false,
+          "Async": {
+            "Task": true,
+            "Status": false,
+            "Control": false
+          }
+        },
+        "parent_tools": true,
+        "mode_routing": true,
+        "parallel_tool_calls": true,
+        "legacy_enable_handoffs": false,
+        "legacy_enable_subagents": false,
+        "host_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "mcp_servers": [
+          "z-local",
+          "a-local"
+        ]
+      },
+      "output": {
+        "parent": {
+          "name": "parent",
+          "instructions": "Coordinate the work.\n\nAvailable specialist sub-agents (delegate via the subagent tool, agent_name=\u003cname\u003e):\n- Zeta Review:   Review changes.  \n- alpha-builder: Specialist sub-agent\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call — use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile — do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait — it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nHandoffs (transfer full control):\n- transfer_to_zeta_review: Review changes.\n- transfer_to_alpha_builder: Transfer the conversation to the alpha-builder specialist.\n\nSignal tools: finish\n",
+          "dynamic_instructions": true,
+          "handoff_description": "",
+          "model": "base-model",
+          "fallback_models": [
+            "base-fallback-z",
+            "base-fallback-a"
+          ],
+          "model_settings": {
+            "max_tokens": 1234,
+            "parallel_tool_calls": true,
+            "reasoning_effort": "none",
+            "text_verbosity": "medium"
+          },
+          "tools": [
+            {
+              "name": "z_read",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "a_write",
+              "read_only": false,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Bash",
+              "read_only": false,
+              "implementation": "sdk_bash"
+            },
+            {
+              "name": "finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "present_plan",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "AskUserQuestion",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            }
+          ],
+          "mcp_servers": [
+            "z-local",
+            "a-local"
+          ]
+        },
+        "returned_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "specialists": {
+          "Zeta Review": {
+            "name": "Zeta Review",
+            "instructions": "  Review exactly.\n",
+            "dynamic_instructions": false,
+            "handoff_description": "  Review changes.  ",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "reasoning_effort": "none",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": true,
+                "implementation": "sdk_read_only_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          },
+          "alpha-builder": {
+            "name": "alpha-builder",
+            "instructions": "Build exactly.",
+            "dynamic_instructions": false,
+            "handoff_description": "",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "a_write",
+                "read_only": false,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": false,
+                "implementation": "sdk_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          }
+        },
+        "handoffs": [
+          {
+            "tool_name": "transfer_to_zeta_review",
+            "description": "Review changes.",
+            "target": {
+              "name": "Zeta Review",
+              "instructions": "  Review exactly.\n",
+              "dynamic_instructions": false,
+              "handoff_description": "  Review changes.  ",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "reasoning_effort": "none",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": true,
+                  "implementation": "sdk_read_only_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "Zeta Review",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_zeta_review",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          },
+          {
+            "tool_name": "transfer_to_alpha_builder",
+            "description": "Transfer the conversation to the alpha-builder specialist.",
+            "target": {
+              "name": "alpha-builder",
+              "instructions": "Build exactly.",
+              "dynamic_instructions": false,
+              "handoff_description": "",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "a_write",
+                  "read_only": false,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": false,
+                  "implementation": "sdk_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "alpha-builder",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_alpha_builder",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mode_role_none_base_low",
+      "source_only": [],
+      "input": {
+        "agent_name": "parent",
+        "instructions": "Coordinate the work.",
+        "model": "base-model",
+        "fallback_models": [
+          "base-fallback-z",
+          "base-fallback-a"
+        ],
+        "reasoning": "low",
+        "verbosity": "medium",
+        "max_tokens": 1234,
+        "model_settings": null,
+        "roles": [
+          {
+            "Name": "Zeta Review",
+            "Description": "  Review changes.  ",
+            "Instructions": "  Review exactly.\n",
+            "ToolAccess": "read-only",
+            "ModelOverride": "",
+            "FallbackModels": null
+          },
+          {
+            "Name": "alpha-builder",
+            "Description": "",
+            "Instructions": "Build exactly.",
+            "ToolAccess": "full",
+            "ModelOverride": "",
+            "FallbackModels": null
+          }
+        ],
+        "mode": {
+          "Name": "",
+          "Version": "",
+          "DisplayName": "",
+          "Description": "",
+          "Category": "",
+          "Autonomous": false,
+          "ToolAccess": "",
+          "Instructions": "",
+          "ModelRouting": {
+            "DefaultModel": "mode-model",
+            "FallbackModels": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "ReasoningLevel": "high",
+            "TextVerbosity": "high",
+            "RoleOverrides": {
+              "Zeta Review": {
+                "Model": "",
+                "FallbackModels": null,
+                "ReasoningLevel": "none",
+                "TextVerbosity": ""
+              }
+            }
+          },
+          "Constraints": null
+        },
+        "handoffs": {
+          "Enabled": true,
+          "GenericFallback": false
+        },
+        "subagents": {
+          "GenericFallback": false,
+          "Async": {
+            "Task": true,
+            "Status": false,
+            "Control": false
+          }
+        },
+        "parent_tools": true,
+        "mode_routing": true,
+        "parallel_tool_calls": true,
+        "legacy_enable_handoffs": false,
+        "legacy_enable_subagents": false,
+        "host_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "mcp_servers": [
+          "z-local",
+          "a-local"
+        ]
+      },
+      "output": {
+        "parent": {
+          "name": "parent",
+          "instructions": "Coordinate the work.\n\nAvailable specialist sub-agents (delegate via the subagent tool, agent_name=\u003cname\u003e):\n- Zeta Review:   Review changes.  \n- alpha-builder: Specialist sub-agent\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call — use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile — do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait — it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nHandoffs (transfer full control):\n- transfer_to_zeta_review: Review changes.\n- transfer_to_alpha_builder: Transfer the conversation to the alpha-builder specialist.\n\nSignal tools: finish\n",
+          "dynamic_instructions": true,
+          "handoff_description": "",
+          "model": "base-model",
+          "fallback_models": [
+            "base-fallback-z",
+            "base-fallback-a"
+          ],
+          "model_settings": {
+            "max_tokens": 1234,
+            "parallel_tool_calls": true,
+            "thinking_budget": 2048,
+            "reasoning_effort": "low",
+            "text_verbosity": "medium"
+          },
+          "tools": [
+            {
+              "name": "z_read",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "a_write",
+              "read_only": false,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Bash",
+              "read_only": false,
+              "implementation": "sdk_bash"
+            },
+            {
+              "name": "finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "present_plan",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "AskUserQuestion",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            }
+          ],
+          "mcp_servers": [
+            "z-local",
+            "a-local"
+          ]
+        },
+        "returned_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "specialists": {
+          "Zeta Review": {
+            "name": "Zeta Review",
+            "instructions": "  Review exactly.\n",
+            "dynamic_instructions": false,
+            "handoff_description": "  Review changes.  ",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 2048,
+              "reasoning_effort": "none",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": true,
+                "implementation": "sdk_read_only_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          },
+          "alpha-builder": {
+            "name": "alpha-builder",
+            "instructions": "Build exactly.",
+            "dynamic_instructions": false,
+            "handoff_description": "",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "a_write",
+                "read_only": false,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": false,
+                "implementation": "sdk_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          }
+        },
+        "handoffs": [
+          {
+            "tool_name": "transfer_to_zeta_review",
+            "description": "Review changes.",
+            "target": {
+              "name": "Zeta Review",
+              "instructions": "  Review exactly.\n",
+              "dynamic_instructions": false,
+              "handoff_description": "  Review changes.  ",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 2048,
+                "reasoning_effort": "none",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": true,
+                  "implementation": "sdk_read_only_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "Zeta Review",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_zeta_review",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          },
+          {
+            "tool_name": "transfer_to_alpha_builder",
+            "description": "Transfer the conversation to the alpha-builder specialist.",
+            "target": {
+              "name": "alpha-builder",
+              "instructions": "Build exactly.",
+              "dynamic_instructions": false,
+              "handoff_description": "",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "a_write",
+                  "read_only": false,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": false,
+                  "implementation": "sdk_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "alpha-builder",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_alpha_builder",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mode_role_invalid_inherits",
+      "source_only": [],
+      "input": {
+        "agent_name": "parent",
+        "instructions": "Coordinate the work.",
+        "model": "base-model",
+        "fallback_models": [
+          "base-fallback-z",
+          "base-fallback-a"
+        ],
+        "reasoning": "low",
+        "verbosity": "medium",
+        "max_tokens": 1234,
+        "model_settings": null,
+        "roles": [
+          {
+            "Name": "Zeta Review",
+            "Description": "  Review changes.  ",
+            "Instructions": "  Review exactly.\n",
+            "ToolAccess": "read-only",
+            "ModelOverride": "",
+            "FallbackModels": null
+          },
+          {
+            "Name": "alpha-builder",
+            "Description": "",
+            "Instructions": "Build exactly.",
+            "ToolAccess": "full",
+            "ModelOverride": "",
+            "FallbackModels": null
+          }
+        ],
+        "mode": {
+          "Name": "",
+          "Version": "",
+          "DisplayName": "",
+          "Description": "",
+          "Category": "",
+          "Autonomous": false,
+          "ToolAccess": "",
+          "Instructions": "",
+          "ModelRouting": {
+            "DefaultModel": "mode-model",
+            "FallbackModels": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "ReasoningLevel": "high",
+            "TextVerbosity": "high",
+            "RoleOverrides": {
+              "Zeta Review": {
+                "Model": "",
+                "FallbackModels": null,
+                "ReasoningLevel": "unknown",
+                "TextVerbosity": ""
+              }
+            }
+          },
+          "Constraints": null
+        },
+        "handoffs": {
+          "Enabled": true,
+          "GenericFallback": false
+        },
+        "subagents": {
+          "GenericFallback": false,
+          "Async": {
+            "Task": true,
+            "Status": false,
+            "Control": false
+          }
+        },
+        "parent_tools": true,
+        "mode_routing": true,
+        "parallel_tool_calls": true,
+        "legacy_enable_handoffs": false,
+        "legacy_enable_subagents": false,
+        "host_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "mcp_servers": [
+          "z-local",
+          "a-local"
+        ]
+      },
+      "output": {
+        "parent": {
+          "name": "parent",
+          "instructions": "Coordinate the work.\n\nAvailable specialist sub-agents (delegate via the subagent tool, agent_name=\u003cname\u003e):\n- Zeta Review:   Review changes.  \n- alpha-builder: Specialist sub-agent\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call — use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile — do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait — it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nHandoffs (transfer full control):\n- transfer_to_zeta_review: Review changes.\n- transfer_to_alpha_builder: Transfer the conversation to the alpha-builder specialist.\n\nSignal tools: finish\n",
+          "dynamic_instructions": true,
+          "handoff_description": "",
+          "model": "base-model",
+          "fallback_models": [
+            "base-fallback-z",
+            "base-fallback-a"
+          ],
+          "model_settings": {
+            "max_tokens": 1234,
+            "parallel_tool_calls": true,
+            "thinking_budget": 2048,
+            "reasoning_effort": "low",
+            "text_verbosity": "medium"
+          },
+          "tools": [
+            {
+              "name": "z_read",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "a_write",
+              "read_only": false,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Bash",
+              "read_only": false,
+              "implementation": "sdk_bash"
+            },
+            {
+              "name": "finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "present_plan",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "AskUserQuestion",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            }
+          ],
+          "mcp_servers": [
+            "z-local",
+            "a-local"
+          ]
+        },
+        "returned_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "specialists": {
+          "Zeta Review": {
+            "name": "Zeta Review",
+            "instructions": "  Review exactly.\n",
+            "dynamic_instructions": false,
+            "handoff_description": "  Review changes.  ",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": true,
+                "implementation": "sdk_read_only_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          },
+          "alpha-builder": {
+            "name": "alpha-builder",
+            "instructions": "Build exactly.",
+            "dynamic_instructions": false,
+            "handoff_description": "",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "a_write",
+                "read_only": false,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": false,
+                "implementation": "sdk_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          }
+        },
+        "handoffs": [
+          {
+            "tool_name": "transfer_to_zeta_review",
+            "description": "Review changes.",
+            "target": {
+              "name": "Zeta Review",
+              "instructions": "  Review exactly.\n",
+              "dynamic_instructions": false,
+              "handoff_description": "  Review changes.  ",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": true,
+                  "implementation": "sdk_read_only_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "Zeta Review",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_zeta_review",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          },
+          {
+            "tool_name": "transfer_to_alpha_builder",
+            "description": "Transfer the conversation to the alpha-builder specialist.",
+            "target": {
+              "name": "alpha-builder",
+              "instructions": "Build exactly.",
+              "dynamic_instructions": false,
+              "handoff_description": "",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "a_write",
+                  "read_only": false,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": false,
+                  "implementation": "sdk_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "alpha-builder",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_alpha_builder",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "mode_role_blank_inherits",
+      "source_only": [],
+      "input": {
+        "agent_name": "parent",
+        "instructions": "Coordinate the work.",
+        "model": "base-model",
+        "fallback_models": [
+          "base-fallback-z",
+          "base-fallback-a"
+        ],
+        "reasoning": "low",
+        "verbosity": "medium",
+        "max_tokens": 1234,
+        "model_settings": null,
+        "roles": [
+          {
+            "Name": "Zeta Review",
+            "Description": "  Review changes.  ",
+            "Instructions": "  Review exactly.\n",
+            "ToolAccess": "read-only",
+            "ModelOverride": "",
+            "FallbackModels": null
+          },
+          {
+            "Name": "alpha-builder",
+            "Description": "",
+            "Instructions": "Build exactly.",
+            "ToolAccess": "full",
+            "ModelOverride": "",
+            "FallbackModels": null
+          }
+        ],
+        "mode": {
+          "Name": "",
+          "Version": "",
+          "DisplayName": "",
+          "Description": "",
+          "Category": "",
+          "Autonomous": false,
+          "ToolAccess": "",
+          "Instructions": "",
+          "ModelRouting": {
+            "DefaultModel": "mode-model",
+            "FallbackModels": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "ReasoningLevel": "high",
+            "TextVerbosity": "high",
+            "RoleOverrides": {
+              "Zeta Review": {
+                "Model": "",
+                "FallbackModels": null,
+                "ReasoningLevel": " ",
+                "TextVerbosity": ""
+              }
+            }
+          },
+          "Constraints": null
+        },
+        "handoffs": {
+          "Enabled": true,
+          "GenericFallback": false
+        },
+        "subagents": {
+          "GenericFallback": false,
+          "Async": {
+            "Task": true,
+            "Status": false,
+            "Control": false
+          }
+        },
+        "parent_tools": true,
+        "mode_routing": true,
+        "parallel_tool_calls": true,
+        "legacy_enable_handoffs": false,
+        "legacy_enable_subagents": false,
+        "host_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "mcp_servers": [
+          "z-local",
+          "a-local"
+        ]
+      },
+      "output": {
+        "parent": {
+          "name": "parent",
+          "instructions": "Coordinate the work.\n\nAvailable specialist sub-agents (delegate via the subagent tool, agent_name=\u003cname\u003e):\n- Zeta Review:   Review changes.  \n- alpha-builder: Specialist sub-agent\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call — use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile — do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait — it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nHandoffs (transfer full control):\n- transfer_to_zeta_review: Review changes.\n- transfer_to_alpha_builder: Transfer the conversation to the alpha-builder specialist.\n\nSignal tools: finish\n",
+          "dynamic_instructions": true,
+          "handoff_description": "",
+          "model": "base-model",
+          "fallback_models": [
+            "base-fallback-z",
+            "base-fallback-a"
+          ],
+          "model_settings": {
+            "max_tokens": 1234,
+            "parallel_tool_calls": true,
+            "thinking_budget": 2048,
+            "reasoning_effort": "low",
+            "text_verbosity": "medium"
+          },
+          "tools": [
+            {
+              "name": "z_read",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "a_write",
+              "read_only": false,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Bash",
+              "read_only": false,
+              "implementation": "sdk_bash"
+            },
+            {
+              "name": "finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "present_plan",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "AskUserQuestion",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            },
+            {
+              "name": "Finish",
+              "read_only": true,
+              "implementation": "inert_host_tool"
+            }
+          ],
+          "mcp_servers": [
+            "z-local",
+            "a-local"
+          ]
+        },
+        "returned_tools": [
+          {
+            "name": "z_read",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "a_write",
+            "read_only": false,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Bash",
+            "read_only": false,
+            "implementation": "sdk_bash"
+          },
+          {
+            "name": "finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "present_plan",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "AskUserQuestion",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          },
+          {
+            "name": "Finish",
+            "read_only": true,
+            "implementation": "inert_host_tool"
+          }
+        ],
+        "specialists": {
+          "Zeta Review": {
+            "name": "Zeta Review",
+            "instructions": "  Review exactly.\n",
+            "dynamic_instructions": false,
+            "handoff_description": "  Review changes.  ",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": true,
+                "implementation": "sdk_read_only_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          },
+          "alpha-builder": {
+            "name": "alpha-builder",
+            "instructions": "Build exactly.",
+            "dynamic_instructions": false,
+            "handoff_description": "",
+            "model": "mode-model",
+            "fallback_models": [
+              "mode-fallback-z",
+              "mode-fallback-a"
+            ],
+            "model_settings": {
+              "max_tokens": 1234,
+              "parallel_tool_calls": true,
+              "thinking_budget": 8192,
+              "reasoning_effort": "high",
+              "text_verbosity": "high"
+            },
+            "tools": [
+              {
+                "name": "z_read",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "a_write",
+                "read_only": false,
+                "implementation": "inert_host_tool"
+              },
+              {
+                "name": "Bash",
+                "read_only": false,
+                "implementation": "sdk_bash"
+              },
+              {
+                "name": "Finish",
+                "read_only": true,
+                "implementation": "inert_host_tool"
+              }
+            ],
+            "mcp_servers": null
+          }
+        },
+        "handoffs": [
+          {
+            "tool_name": "transfer_to_zeta_review",
+            "description": "Review changes.",
+            "target": {
+              "name": "Zeta Review",
+              "instructions": "  Review exactly.\n",
+              "dynamic_instructions": false,
+              "handoff_description": "  Review changes.  ",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": true,
+                  "implementation": "sdk_read_only_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "Zeta Review",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_zeta_review",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          },
+          {
+            "tool_name": "transfer_to_alpha_builder",
+            "description": "Transfer the conversation to the alpha-builder specialist.",
+            "target": {
+              "name": "alpha-builder",
+              "instructions": "Build exactly.",
+              "dynamic_instructions": false,
+              "handoff_description": "",
+              "model": "mode-model",
+              "fallback_models": [
+                "mode-fallback-z",
+                "mode-fallback-a"
+              ],
+              "model_settings": {
+                "max_tokens": 1234,
+                "parallel_tool_calls": true,
+                "thinking_budget": 8192,
+                "reasoning_effort": "high",
+                "text_verbosity": "high"
+              },
+              "tools": [
+                {
+                  "name": "z_read",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "a_write",
+                  "read_only": false,
+                  "implementation": "inert_host_tool"
+                },
+                {
+                  "name": "Bash",
+                  "read_only": false,
+                  "implementation": "sdk_bash"
+                },
+                {
+                  "name": "Finish",
+                  "read_only": true,
+                  "implementation": "inert_host_tool"
+                }
+              ],
+              "mcp_servers": null
+            },
+            "specialist_key": "alpha-builder",
+            "has_input_filter": true,
+            "filter_output": [
+              {
+                "Type": 0,
+                "Message": {
+                  "text": "retained catalog history"
+                },
+                "ToolCall": null,
+                "ToolOutput": null,
+                "HandoffCall": null,
+                "HandoffOutput": null,
+                "Reasoning": null,
+                "Compaction": null,
+                "ToolApproval": null,
+                "Agent": null
+              }
+            ],
+            "has_input_type": false,
+            "has_on_handoff": false,
+            "has_enabled_predicate": false,
+            "tool": {
+              "name": "transfer_to_alpha_builder",
+              "read_only": true,
+              "implementation": "sdk_handoff_tool"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "mode_routing_gate_off",
       "source_only": [],
       "input": {

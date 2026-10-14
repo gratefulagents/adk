@@ -255,6 +255,31 @@ pub struct ModelRouting {
     pub role_overrides: BTreeMap<String, RoleRouting>,
     pub settings: Map<String, Value>,
 }
+impl ModelRouting {
+    /// Resolves routing settings before merging them into base settings.
+    /// Native settings maps override their own labels; role labels override mode
+    /// settings, except that `none` clears only a label-derived thinking budget,
+    /// not an explicit native mode budget. Native role settings take precedence last.
+    pub fn settings_for_role(&self, role: &str) -> Map<String, Value> {
+        let mut settings =
+            adk_runtime::settings::routing_settings(&self.reasoning_level, &self.text_verbosity);
+        settings.extend(self.settings.clone());
+        if let Some(role) = self.role_overrides.get(role) {
+            let labels = adk_runtime::settings::routing_settings(
+                &role.reasoning_level,
+                &role.text_verbosity,
+            );
+            if labels.get("reasoning_effort").and_then(Value::as_str) == Some("none")
+                && !self.settings.contains_key("thinking_budget")
+            {
+                settings.remove("thinking_budget");
+            }
+            settings.extend(labels);
+            settings.extend(role.settings.clone());
+        }
+        settings
+    }
+}
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(default, rename_all = "camelCase", deny_unknown_fields)]
 pub struct Constraints {
@@ -1425,9 +1450,9 @@ impl Builder {
                         &mut settings,
                         &routing.default_model,
                         &routing.fallback_models,
-                        &routing.reasoning_level,
-                        &routing.text_verbosity,
-                        &routing.settings,
+                        "",
+                        "",
+                        &routing.settings_for_role(&role.name),
                     );
                     if let Some(routing) = routing.role_overrides.get(&role.name) {
                         apply_routing(
@@ -1436,9 +1461,9 @@ impl Builder {
                             &mut settings,
                             &routing.model,
                             &routing.fallback_models,
-                            &routing.reasoning_level,
-                            &routing.text_verbosity,
-                            &routing.settings,
+                            "",
+                            "",
+                            &Map::new(),
                         );
                     }
                 }

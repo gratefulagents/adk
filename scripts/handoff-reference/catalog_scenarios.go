@@ -101,6 +101,18 @@ func catalogScenarios() []catalogScenario {
 		in.Roles[0].FallbackModels = []string{"role-fallback"}
 		in.Mode.ModelRouting.RoleOverrides = map[string]sdkmode.RoleModelRouting{"Zeta Review": {Model: "routed-model", FallbackModels: []string{"routed-z", "routed-a"}, ReasoningLevel: "minimal", TextVerbosity: "low"}}
 	})
+	for _, c := range []struct{ name, base, role string }{
+		{"mode_role_none_base_none", "none", "none"},
+		{"mode_role_none_base_low", "low", "none"},
+		{"mode_role_invalid_inherits", "low", "unknown"},
+		{"mode_role_blank_inherits", "low", " "},
+	} {
+		add(c.name, func(in *catalogInput) {
+			in.Reasoning = c.base
+			in.Mode = mode()
+			in.Mode.ModelRouting.RoleOverrides = map[string]sdkmode.RoleModelRouting{"Zeta Review": {ReasoningLevel: c.role}}
+		})
+	}
 	add("mode_routing_gate_off", func(in *catalogInput) {
 		in.Mode = mode()
 		in.ModeRouting = false

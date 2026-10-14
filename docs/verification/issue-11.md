@@ -1985,3 +1985,21 @@ Nine narrowly scoped claims bring the overlay to **424 verified / 8,467 unresolv
 251 excluded**. Empty Rust vectors do not model Go nil-slice identity. No runtime
 execution-authorization, whole specialist-builder, live-provider, or full-issue
 closure is claimed; excluded CLI/evaluation/release work remains untouched.
+
+### Specialist mode/role reasoning composition correction
+
+Source review found that merging mode and role labels directly into base settings
+retained a mode `high` budget after an explicit role `none`. Specialist construction
+now resolves routing separately (`ModelRouting::settings_for_role`) before base
+merge. Four additional pinned public-builder cases prove base none/high/none has
+no budget, base low/high/none retains 2048, and invalid/blank roles inherit 8192.
+A 16-combination native regression preserves arbitrary settings-map precedence;
+explicit native mode budgets are not mistaken for label-derived budgets.
+
+Fresh full workspace **1,379 passed / 0 failed / 30 ignored**, strict Clippy/rustdoc,
+feature matrix, standalone consumer, 20 offline scenarios, host-session, six
+doctests, all pinned oracles, 19 ledger validators and source locks pass. Focused
+catalog tests: **28 passed**. No additional whole-routing claim is made; ledger
+remains **424 verified / 8,467 unresolved / 251 excluded**. Active-parent role
+routing and native explicit-empty fallback semantics remain unchanged. Full issue
+acceptance and credentialed live-provider verification remain open.

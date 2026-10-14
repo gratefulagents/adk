@@ -103,6 +103,16 @@ Use `Config::reasoning = "none"` to construct base settings with no thinking bud
 The builder's free-form `settings` map remains an explicit native override, not a
 Go `ModelSettings::Merge` codec.
 
+Specialist construction first resolves mode and role labels with
+`ModelRouting::settings_for_role`, then merges that result once into base settings.
+An explicit role `none` clears the **mode-label-derived** thinking budget: base
+`none` + mode `high` + role `none` has no budget; base `low` retains its base 2048
+budget instead of the mode's 8192. Blank/invalid role labels inherit mode labels.
+Native explicit maps retain precedence (mode labels → mode map → role labels →
+role map): role `none` does not delete an explicit mode-map `thinking_budget`.
+This specialist rule does not change the active-parent role routing path or the
+native explicit-empty fallback-list semantics.
+
 ## Strict selection versus legacy defaults
 
 * `Config::features = None` uses `legacy_tools` and the

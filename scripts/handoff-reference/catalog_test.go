@@ -117,6 +117,15 @@ func TestCatalogSemantics(t *testing.T) {
 	if routed.ReasoningEffort != "minimal" || routed.ThinkingBudget != 1024 || routed.TextVerbosity != "low" || routed.MaxTokens != 1234 {
 		t.Fatalf("routed settings: %#v", routed)
 	}
+	for name, budget := range map[string]int{
+		"mode_role_none_base_none": 0, "mode_role_none_base_low": 2048,
+		"mode_role_invalid_inherits": 8192, "mode_role_blank_inherits": 8192,
+	} {
+		got := outputs[name].Specialists["Zeta Review"].Settings
+		if got.ThinkingBudget != budget {
+			t.Fatalf("%s: budget %d, want %d", name, got.ThinkingBudget, budget)
+		}
+	}
 	settings := outputs["settings_config_pointer_not_applied"].Parent.Settings
 	if settings.MaxTokens != 1234 || settings.ToolChoice != "" || settings.ReasoningEffort != "low" || settings.ParallelToolCalls == nil || *settings.ParallelToolCalls {
 		t.Fatalf("builder settings scope: %#v", settings)

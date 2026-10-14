@@ -437,6 +437,97 @@ async fn target_routing_starts_from_config_not_active_parent_and_clears_fallback
 }
 
 #[tokio::test]
+async fn specialist_native_routing_settings_preserve_override_precedence() {
+    for mode_budget in [None, Some(1234)] {
+        for (role_reasoning, effort, budget) in [
+            (" NONE ", "none", mode_budget.unwrap_or(2048)),
+            ("low", "low", 2048),
+            ("invalid", "medium", mode_budget.unwrap_or(8192)),
+            (" ", "medium", mode_budget.unwrap_or(8192)),
+        ] {
+            for role_settings in [false, true] {
+                let mut routing = ModelRouting {
+                    reasoning_level: "high".into(),
+                    text_verbosity: "high".into(),
+                    settings: json!({
+                        "reasoning_effort": "medium",
+                        "text_verbosity": "low",
+                        "native_key": "mode"
+                    })
+                    .as_object()
+                    .unwrap()
+                    .clone(),
+                    ..Default::default()
+                };
+                if let Some(budget) = mode_budget {
+                    routing
+                        .settings
+                        .insert("thinking_budget".into(), budget.into());
+                }
+                let mode_settings = routing.settings_for_role("missing");
+                assert_eq!(
+                    mode_settings["thinking_budget"],
+                    mode_budget.unwrap_or(8192)
+                );
+                assert_eq!(mode_settings["reasoning_effort"], "medium");
+                assert_eq!(mode_settings["text_verbosity"], "low");
+                routing.role_overrides.insert(
+                    "reviewer".into(),
+                    RoleRouting {
+                        reasoning_level: role_reasoning.into(),
+                        text_verbosity: "high".into(),
+                        settings: if role_settings {
+                            json!({
+                                "thinking_budget": 9000,
+                                "reasoning_effort": "max",
+                                "text_verbosity": "medium",
+                                "native_key": "role"
+                            })
+                            .as_object()
+                            .unwrap()
+                            .clone()
+                        } else {
+                            Default::default()
+                        },
+                        ..Default::default()
+                    },
+                );
+                let model = Script::new(vec![]);
+                let mut c = config();
+                c.reasoning = "low".into();
+                c.settings.insert("native_key".into(), "base".into());
+                c.settings.insert("base_only".into(), true.into());
+                c.features.as_mut().unwrap().mode_model_routing = true;
+                c.mode_snapshot = Some(ModeSpec {
+                    model_routing: Some(routing),
+                    ..Default::default()
+                });
+                let mut bundle = builder(c, &model).build(&context()).await.unwrap();
+                let settings = &bundle.specialists()["reviewer"].settings;
+                assert_eq!(
+                    settings["thinking_budget"],
+                    if role_settings { 9000 } else { budget }
+                );
+                assert_eq!(
+                    settings["reasoning_effort"],
+                    if role_settings { "max" } else { effort }
+                );
+                assert_eq!(
+                    settings["text_verbosity"],
+                    if role_settings { "medium" } else { "high" }
+                );
+                assert_eq!(
+                    settings["native_key"],
+                    if role_settings { "role" } else { "mode" }
+                );
+                assert_eq!(settings["base_only"], true);
+                bundle.close().await.unwrap();
+            }
+        }
+    }
+}
+
+#[tokio::test]
 async fn target_routes_and_fallbacks_preflight_before_resource_validation() {
     for fallback in [false, true] {
         let model = Script::new(vec![]);
@@ -1065,6 +1156,10 @@ async fn bounded_catalog_handoff_projection_matches_independent_pinned_go_oracle
         "role_model_and_fallback_override",
         "mode_defaults_override_role",
         "mode_role_routing_wins",
+        "mode_role_none_base_none",
+        "mode_role_none_base_low",
+        "mode_role_invalid_inherits",
+        "mode_role_blank_inherits",
         "mode_routing_gate_off",
         "role_access_aliases",
         "blank_description_fallback",

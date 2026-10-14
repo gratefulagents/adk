@@ -9,6 +9,8 @@
 #[cfg(feature = "compat")]
 pub use adk_codec as codec;
 pub use adk_core as core;
+/// Standalone specialist tool-list selection; execution authorization remains host-owned.
+pub mod specialists;
 /// Compatible durable documents, stores and effect recovery.
 #[cfg(feature = "durable")]
 pub use adk_durable as durable;

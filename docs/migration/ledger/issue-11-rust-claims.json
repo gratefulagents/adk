@@ -7022,6 +7022,150 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-948547EB6A5EDA9D": {
+      "source": "internal/agent/run_context.go",
+      "source_name": "NormalizeToolAccessLevel",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::normalize_tool_access"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-B445D759DBEF599A": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "DefaultSignalToolNames",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::default_signal_tool_names"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-6EC733E77B94E5C4": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "FilterToolsByAccess",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::filter_tools_by_access"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-E4B876D81C697CF7": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NormalizeToolAccessLevel",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::normalize_tool_access"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-E1AA9FD9E55D1763": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "StripNamedSignalTools",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::strip_named_signal_tools"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-7756C66B060E9AFB": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "StripSignalTools",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::strip_signal_tools"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-9DD8971E0EE66C67": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "ToolAccessLevelFromRole",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::normalize_tool_access"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-24644F902E37CD43": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "DefaultSignalToolNames",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::default_signal_tool_names"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
+    },
+    "SDK-474E6E5441F8A871": {
+      "source": "pkg/agentsdk/specialists_test.go",
+      "source_name": "TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::filter_tools_by_access"
+      ],
+      "rust_test_identifiers": [
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestFilterToolsByAccessUsesAdapterForReadOnly",
+      "rationale": "Standalone tool-list transformation only. Independent pinned Go oracle compares 24 access inputs (including Go Unicode whitespace/simple case, empty defaults and unknown fail-closed values), role normalization, exact default/custom signal maps, ordered adapter calls and resulting tool identities. Native tests preserve order, duplicate Arc identity and input ownership, adapt before read-only filtering and never consult adapters for full selection. The same native normalizer implements both identical SDK normalization entrypoints. Full is a selection tier, not execution authority; no whole specialist builder, runtime authorization or nil-versus-empty Go slice identity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime (fixture test); helpers available without default features"
+      ]
     }
   }
 }

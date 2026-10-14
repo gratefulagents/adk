@@ -1264,3 +1264,25 @@ recovery does not rerun its compaction/carry-forward, but effects before a faile
 checkpoint are not exactly-once. Native opaque-content protection and handoff
 pair preservation remain deliberate security constraints; the source oracle's
 message-only projections do not establish arbitrary Go wire-history equivalence.
+
+### Standalone specialist tool lists
+
+`adk::specialists` is available without default features or a runtime/bundle.
+`normalize_tool_access` covers SDK `NormalizeToolAccessLevel` and the identical
+`ToolAccessLevelFromRole` semantics: empty/whitespace selects `Full`, recognized
+full aliases select `Full`, and unknown nonempty values fail closed to `ReadOnly`.
+It preserves pinned Go whitespace and simple-case behavior rather than adopting
+Rust's different Unicode trimming/case-expansion semantics.
+
+`filter_tools_by_access(&tools, access)` clones handles for full selection. For
+read-only selection it first asks each tool for its read-only adapter, then checks
+the resulting declaration. Adapter renaming is allowed; order, duplicates, and
+retained `Arc` identity are preserved. `strip_signal_tools` removes exactly
+`finish`, `present_plan`, and `AskUserQuestion`; `strip_named_signal_tools` removes
+only names mapped to `true`. `default_signal_tool_names` returns a fresh map.
+
+These are **tool-list transformations, not execution authorization**. The separate
+`ToolAccessLevel` enum deliberately does not expose `AccessMode::FullAccess` as a
+consequence of selecting all tools. Execution remains subject to host policy and
+backend enforcement. Existing bundle/role ceilings are unchanged. Rust empty
+vectors do not preserve Go nil-versus-empty slice identity.

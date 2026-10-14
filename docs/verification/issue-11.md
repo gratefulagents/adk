@@ -1967,3 +1967,21 @@ six doctests, all pinned oracles, 19 ledger validators, source locks and formatt
 whitespace checks pass. Eight precise claims bring the overlay to **415 verified /
 8,476 unresolved / 251 excluded**. Full issue acceptance and live-provider proof
 remain open; no excluded scope or production/default-switch work was added.
+
+### Standalone specialist tool-list helpers
+
+Added runtime-independent `adk::specialists` normalization, access-adapter filtering,
+and default/custom signal stripping. SDK role normalization maps to the same native
+normalizer. The two-tier selection enum is deliberately separate from execution
+permissions. The pinned oracle covers 24 access strings, Unicode whitespace/case,
+role defaults, adapter ordering/renaming, default and custom exact signal maps;
+native tests additionally preserve ordered duplicate Arc identity and owned maps.
+
+Fresh full workspace: **1,378 passed / 0 failed / 30 ignored**. Minimal facade:
+**six specialist tests passed** without default features. Strict Clippy/rustdoc,
+feature matrix, standalone consumer, 20 offline scenarios, host-session, six
+doctests, pinned oracles, 19 ledger validators, source locks and formatting pass.
+Nine narrowly scoped claims bring the overlay to **424 verified / 8,467 unresolved /
+251 excluded**. Empty Rust vectors do not model Go nil-slice identity. No runtime
+execution-authorization, whole specialist-builder, live-provider, or full-issue
+closure is claimed; excluded CLI/evaluation/release work remains untouched.

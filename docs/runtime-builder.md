@@ -588,6 +588,27 @@ work. Drop aborts the owner even when tool/session/scheduler handles escape.
 The executor is initialized once before any handle is exposed, with no mutable
 runtime registration or parent-session reference cycle.
 
+For automatic children with **host-owned, cross-turn lifetime**, use
+`Builder::build_session(&session_context).await` to return a `SessionState`, then
+build each turn with `.session(owner.handle()).build(&turn_context)`. The session
+factory assembles its own catalog, child runners, scheduler and tool integrations;
+it retains the tool/MCP/project-state resource owners rather than detaching only
+the scheduler. Closing a turn bundle leaves those child resources and task history
+alive. Explicitly close the session owner after the last turn to cancel and join
+children and tear down retained integrations; dropping it aborts/revokes but does
+not promise asynchronous joining. Escaped handles do not extend owner lifetime.
+
+Use a session-lifetime context/deadline for the factory, **not a first-turn
+cancellation context**. Child configuration is a construction-time snapshot; later
+turn configuration does not reconfigure the existing scheduler/catalog. Factory
+input with a borrowed session is rejected: this API returns an exclusive owner, not
+mutable initialization through shared handles. Explicit `.owned_session(owner)`
+transfers its existing ownership and retains its earlier child resource sets. Manual `SessionState::with_scheduler`
+remains available. Separate session and turn tool resources may duplicate
+integrations; this explicit ownership prevents turn teardown from revoking child
+tools. The `handoffs_subagents` offline example demonstrates two independently
+closed turn bundles borrowing one automatically assembled host-owned session.
+
 Twelve pinned SDK compositions compare selected tools, registered child names,
 model/instruction definitions, empty/generic choices and actual synchronous child
 completion. Native tests additionally cover normal/streamed parents, sync and

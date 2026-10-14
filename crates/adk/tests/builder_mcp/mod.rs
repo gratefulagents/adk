@@ -681,6 +681,62 @@ async fn tool_only_selection_matches_pinned_sdk_builder_observations() {
     assert_eq!(serde_json::Value::Array(actual), expected["cases"]);
 }
 
+fn process_alive(pid: &str) -> bool {
+    Command::new("/bin/kill")
+        .args(["-0", pid])
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .unwrap()
+        .success()
+}
+
+async fn session_with_mcp_after_borrowed_turn(dir: &Path) -> (SessionState, String) {
+    let model = Arc::new(RecordingModel::default());
+    let session = builder(config(dir, enabled()), &model)
+        .mcp(input(dir, &[("chosen", "ok")]))
+        .build_session(&context())
+        .await
+        .unwrap();
+    let process = pid(dir, "chosen").await;
+    // Give asynchronous Drop cleanup time to run if the temporary Bundle
+    // incorrectly retained ownership. Check again after an unrelated turn closes.
+    for after_turn in [false, true] {
+        if after_turn {
+            let mut turn = builder(config(dir, McpFeatures::default()), &model)
+                .session(session.handle())
+                .build(&context())
+                .await
+                .unwrap();
+            turn.close().await.unwrap();
+            drop(turn);
+        }
+        for _ in 0..20 {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+            assert!(process_alive(&process), "session-owned MCP process exited");
+        }
+        assert!(!session.handle().is_closed());
+    }
+    (session, process)
+}
+
+#[tokio::test]
+async fn build_session_retains_mcp_until_close_joins_and_reaps_it() {
+    let dir = tempfile::tempdir().unwrap();
+    let (mut session, process) = session_with_mcp_after_borrowed_turn(dir.path()).await;
+    session.close().await.unwrap();
+    // Unlike Drop, close must have finished reaping before returning.
+    assert!(!process_alive(&process));
+}
+
+#[tokio::test]
+async fn build_session_drop_eventually_reaps_retained_mcp() {
+    let dir = tempfile::tempdir().unwrap();
+    let (session, process) = session_with_mcp_after_borrowed_turn(dir.path()).await;
+    drop(session);
+    reaped(&process).await;
+}
+
 #[tokio::test]
 async fn tool_only_owner_closes_mcp_and_revokes_retained_tools() {
     let dir = tempfile::tempdir().unwrap();

@@ -743,6 +743,14 @@ fn narrow_access(current: AccessMode, constraint: Option<AccessMode>) -> AccessM
 pub struct SessionState {
     handle: SessionHandle,
     scheduler: Option<Scheduler>,
+    resources: Vec<SessionResources>,
+}
+struct SessionResources {
+    tools: ToolBundle,
+    #[cfg(feature = "mcp")]
+    mcp: Option<adk_mcp::session::OwnedMcpSession>,
+    #[cfg(feature = "project-state")]
+    project_state: Option<project_state::Owner>,
 }
 #[derive(Clone)]
 pub struct SessionHandle {
@@ -762,6 +770,7 @@ impl SessionState {
                 subagents: None,
             },
             scheduler: None,
+            resources: Vec::new(),
         }
     }
     pub fn with_scheduler(scheduler: Scheduler) -> Self {
@@ -773,12 +782,46 @@ impl SessionState {
     pub fn handle(&self) -> SessionHandle {
         self.handle.clone()
     }
+    /// Cancel admission, revoke retained tools and join session-owned resources.
+    /// All cleanup is attempted even on error; subsequent calls are no-ops.
+    /// Dropping instead revokes and aborts through resource owners without joining.
     pub async fn close(&mut self) -> Result<(), Error> {
         self.handle.cancellation.cancel();
-        if let Some(scheduler) = self.scheduler.take() {
-            scheduler.shutdown().await?;
+        #[cfg(any(feature = "project-state", feature = "mcp"))]
+        for resources in &self.resources {
+            #[cfg(feature = "project-state")]
+            if let Some(owner) = &resources.project_state {
+                owner.begin_close();
+            }
+            #[cfg(feature = "mcp")]
+            if let Some(mcp) = &resources.mcp {
+                mcp.begin_close();
+            }
         }
-        Ok(())
+        let mut result = Ok(());
+        for resources in &mut self.resources {
+            result = result.and(resources.tools.close().await.map_err(|error| {
+                Error::new(ErrorCategory::Host, "tool teardown failed").with_source(error)
+            }));
+        }
+        if let Some(scheduler) = self.scheduler.take() {
+            result = result.and(scheduler.shutdown().await);
+        }
+        #[cfg(any(feature = "project-state", feature = "mcp"))]
+        for resources in &self.resources {
+            #[cfg(feature = "mcp")]
+            if let Some(mcp) = &resources.mcp {
+                result = result.and(mcp.close().await.map_err(|error| {
+                    Error::new(ErrorCategory::Host, "MCP teardown failed").with_source(error)
+                }));
+            }
+            #[cfg(feature = "project-state")]
+            if let Some(owner) = &resources.project_state {
+                owner.close().await;
+            }
+        }
+        self.resources.clear();
+        result
     }
 }
 impl Drop for SessionState {
@@ -1146,6 +1189,42 @@ impl Builder {
         tool_builder
             .build(policy)
             .map_err(|e| invalid("tool bundle construction failed").with_source(e))
+    }
+
+    /// Build a host-owned session, retaining the construction-time resources used
+    /// by automatic child runners independently of later turn bundles.
+    ///
+    /// `context` must describe the session lifetime, not the first turn: automatic
+    /// children use its cancellation and run identity. Build each turn separately
+    /// with [`Self::session`] and [`SessionState::handle`]; closing those borrowed
+    /// bundles does not close this session's resources. Child configuration is
+    /// fixed at construction, not replaced by later turn configurations.
+    ///
+    /// A borrowed [`Self::session`] is rejected; [`Self::owned_session`] transfers
+    /// its existing ownership as usual. Call [`SessionState::close`] before executor
+    /// shutdown to join resources; dropping only performs RAII revocation/abort.
+    pub async fn build_session(self, context: &Context) -> Result<SessionState, Error> {
+        if self.session.is_some() && self.owned_session.is_none() {
+            return Err(invalid("building a session requires session ownership"));
+        }
+        let Bundle {
+            tools,
+            owned_session,
+            #[cfg(feature = "mcp")]
+            owned_mcp,
+            #[cfg(feature = "project-state")]
+            owned_project_state,
+            ..
+        } = self.build(context).await?;
+        let mut session = owned_session.expect("owned session build");
+        session.resources.push(SessionResources {
+            tools,
+            #[cfg(feature = "mcp")]
+            mcp: owned_mcp,
+            #[cfg(feature = "project-state")]
+            project_state: owned_project_state,
+        });
+        Ok(session)
     }
 
     pub async fn build(mut self, context: &Context) -> Result<Bundle, Error> {
@@ -2184,5 +2263,81 @@ impl ToolRuntime {
             None => Ok(()),
         });
         result
+    }
+}
+
+#[cfg(test)]
+mod session_resource_tests {
+    use super::*;
+    use adk_core::{ToolCall, ToolContext};
+
+    async fn retained_role_tool_is_revoked(close: bool) {
+        let tools = BundleBuilder::new(adk_tools::Config {
+            features: adk_tools::Features::Strict(["Think".into()].into()),
+            ..Default::default()
+        })
+        .build(ToolPolicy::default())
+        .unwrap();
+        let mut session = SessionState::new();
+        session.resources.push(SessionResources {
+            tools,
+            #[cfg(feature = "mcp")]
+            mcp: None,
+            #[cfg(feature = "project-state")]
+            project_state: None,
+        });
+        let role_view = session.resources[0]
+            .tools
+            .role_view(AccessMode::ReadOnly, &BTreeSet::new())
+            .unwrap();
+        assert_eq!(role_view.tools.len(), 1);
+        let tool = role_view.tools[0].clone();
+        let policy = role_view.policy.clone();
+        drop(role_view);
+        assert_eq!(tool.definition().name, "think");
+        let context = || ToolContext {
+            operation: Context {
+                run_id: "independent-tool-caller".into(),
+                cancellation: Arc::new(CancellationToken::new()),
+                deadline: None,
+            },
+            work_dir: ".".into(),
+            policy: policy.clone(),
+            idempotency_key: None,
+        };
+        let call = || ToolCall {
+            raw_arguments: None,
+            id: "retained-role-tool".into(),
+            name: "think".into(),
+            arguments: serde_json::json!({"thought": "check owner lifetime"}),
+        };
+        let output = tool.execute(&context(), call()).await.unwrap();
+        assert!(!output.is_error, "{output:?}");
+
+        if close {
+            session.close().await.unwrap();
+        } else {
+            drop(session);
+        }
+
+        // A fresh caller must fail through the retained tool's owner, not session cancellation.
+        let independent_context = context();
+        assert!(!independent_context.operation.cancellation.is_cancelled());
+        let error = tool
+            .execute(&independent_context, call())
+            .await
+            .unwrap_err();
+        assert_eq!(error.info.category, ErrorCategory::Cancelled);
+        assert!(!independent_context.operation.cancellation.is_cancelled());
+    }
+
+    #[tokio::test]
+    async fn session_close_revokes_retained_role_tool() {
+        retained_role_tool_is_revoked(true).await;
+    }
+
+    #[tokio::test]
+    async fn session_drop_revokes_retained_role_tool() {
+        retained_role_tool_is_revoked(false).await;
     }
 }

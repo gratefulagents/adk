@@ -2003,3 +2003,37 @@ catalog tests: **28 passed**. No additional whole-routing claim is made; ledger
 remains **424 verified / 8,467 unresolved / 251 excluded**. Active-parent role
 routing and native explicit-empty fallback semantics remain unchanged. Full issue
 acceptance and credentialed live-provider verification remain open.
+
+### Host-owned automatic child session lifetime
+
+Added `Builder::build_session`: ordinary catalog/child assembly returns a separate
+exclusive `SessionState` owning its scheduler and child tool/MCP/project-state
+resources. Borrowed-empty-session mutation is still rejected. Turn bundles borrow
+the handle and own independent resources; closing them does not revoke the
+session's child tools. Explicit session close cancels, attempts every resource
+cleanup and joins children; drop uses existing revocation/abort RAII semantics.
+An existing explicitly transferred owner retains earlier resource sets. Configuration
+and session context are construction-time snapshots, not hot reconfiguration.
+
+Six new lifecycle regressions prove cross-turn survival using the original real
+owner-bound probe after the first turn closes/cancels, failed-turn isolation,
+late factory rollback, borrowed factory rejection, joined close and owner drop.
+Two private regressions retain actual role-tool handles and prove revocation on
+close/drop with a fresh uncancelled context. Three integration regressions verify
+real MCP process retention and joined reap, plus injected filesystem-backed
+project-store owner retention/release. The project-store tests use ownership counts,
+not automatic filesystem-host construction or child project-tool execution.
+The offline feature example now runs two separately closed turn bundles against
+one automatically assembled session and preserves scheduler/task history.
+
+Fresh full workspace: **1,390 passed / 0 failed / 30 ignored**. Strict Clippy/rustdoc,
+feature matrix, standalone consumer, 20 offline scenarios, host-session, six
+doctests, pinned Go oracles, 19 ledger validators and source locks pass. Focused
+catalog/lifecycle tests: **34 passed** in both builder-only and builder/MCP/project-
+state configurations; private owner tests pass in both. Independent source review
+found no concrete blockers; its own compiler launcher was unavailable, so compiler
+claims here come from the parent/direct-driver verification.
+
+No broad SDK scheduler/reconfiguration closure is claimed. Ledger remains **424
+verified / 8,467 unresolved / 251 excluded**. Full acceptance and credentialed live
+provider checks remain open; no CLI/evaluation/release/default-switch work.

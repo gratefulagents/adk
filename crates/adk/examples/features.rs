@@ -721,6 +721,62 @@ async fn handoffs_subagents() {
         assert!(session.is_closed());
     }
 
+    {
+        use adk::builder::{Builder, Config, Features, SubagentFeatures};
+        let model = Scripted::new(vec![
+            tool_response("subagent", json!({"message":"first", "mode":"sync"})),
+            answer("first child"),
+            answer("first synthesis"),
+            tool_response("subagent", json!({"message":"second", "mode":"sync"})),
+            answer("second child"),
+            answer("second synthesis"),
+        ]);
+        let host = Arc::new(RecordingHost::default());
+        let config = Config {
+            model: "mock/base".into(),
+            features: Some(Features {
+                subagents: SubagentFeatures {
+                    task: true,
+                    generic_fallback: true,
+                    ..Default::default()
+                },
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        // This context and its owner belong to the whole session, not one turn.
+        let session_context = context();
+        let mut owner = Builder::new(config.clone())
+            .model("mock", adk::providers::factory::Kind::Local, model.clone())
+            .unwrap()
+            .subagent_host(host.clone())
+            .build_session(&session_context)
+            .await
+            .unwrap();
+        let handle = owner.handle();
+        let scheduler = handle.subagents().unwrap().clone();
+        for expected in ["first synthesis", "second synthesis"] {
+            let mut turn = Builder::new(config.clone())
+                .model("mock", adk::providers::factory::Kind::Local, model.clone())
+                .unwrap()
+                .session(handle.clone())
+                .build(&context())
+                .await
+                .unwrap();
+            assert!(Arc::ptr_eq(turn.session().subagents().unwrap(), &scheduler));
+            let result = turn
+                .run(context(), request().input, host.clone())
+                .await
+                .unwrap();
+            assert_eq!(result.result.final_output, Some(json!(expected)));
+            turn.close().await.unwrap();
+            assert!(!handle.is_closed());
+        }
+        assert_eq!(scheduler.scheduler.list().len(), 2);
+        owner.close().await.unwrap();
+        assert!(handle.is_closed());
+    }
+
     use subagent::{Scheduler, SchedulerConfig, SecurityBaseline};
     let child = Scripted::new(vec![answer("child evidence")]);
     let host = Arc::new(RecordingHost::default());

@@ -125,6 +125,53 @@ async fn injected_store_wins_and_retained_tools_are_revoked_on_close_and_drop() 
     }
 }
 #[tokio::test]
+async fn build_session_retains_injected_filesystem_store_until_close_or_drop() {
+    for close in [false, true] {
+        // Prime-only also proves ownership without any selected tool handles.
+        for bits in [1, 2] {
+            let dir = tempfile::tempdir().unwrap();
+            let store = Arc::new(
+                ProjectStore::filesystem(FilesystemOptions {
+                    state_dir: dir.path().join("injected"),
+                    store: StoreOptions {
+                        project_id: "injected".into(),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                })
+                .unwrap(),
+            );
+            let model = Arc::new(RecordingModel::default());
+            let mut session = builder(config(dir.path(), bits), &model)
+                .project_state_store(store.clone())
+                .build_session(&context())
+                .await
+                .unwrap();
+            let retained = Arc::strong_count(&store);
+            assert!(retained > 1, "temporary Bundle released the store owner");
+            assert!(!dir.path().join("state").exists());
+
+            let mut turn = builder(config(dir.path(), 0), &model)
+                .session(session.handle())
+                .build(&context())
+                .await
+                .unwrap();
+            turn.close().await.unwrap();
+            drop(turn);
+            assert!(!session.handle().is_closed());
+            assert_eq!(Arc::strong_count(&store), retained);
+
+            if close {
+                session.close().await.unwrap();
+                assert_eq!(Arc::strong_count(&store), 1);
+            }
+            drop(session);
+            assert_eq!(Arc::strong_count(&store), 1);
+        }
+    }
+}
+
+#[tokio::test]
 async fn priming_does_not_leak_into_initial_prompt_or_claim_tasks() {
     let dir = tempfile::tempdir().unwrap();
     let store = Arc::new(

@@ -7907,6 +7907,60 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-7AB1DCFD60AEF2AC": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go",
+        "facade_signed_usage_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Complete signed compatibility Usage type and its two arithmetic operations, accessible through adk::codec::dto::Usage with compat enabled. The independent pinned Go fixture covers all five JSON counters, omission of zero cache counters, signed extrema, wrapping addition and input/output-only total across 64 operand combinations; both codec and public facade tests compare those observations and retain the right operand. All seven member records are separately verified. This closes only the Usage alias, type and usage.go file, not other aliases, unsigned native accounting, cost.go, or 32-bit Go int behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-C02C9D4F8A1DC0CD": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "Usage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go",
+        "facade_signed_usage_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Complete signed compatibility Usage type and its two arithmetic operations, accessible through adk::codec::dto::Usage with compat enabled. The independent pinned Go fixture covers all five JSON counters, omission of zero cache counters, signed extrema, wrapping addition and input/output-only total across 64 operand combinations; both codec and public facade tests compare those observations and retain the right operand. All seven member records are separately verified. This closes only the Usage alias, type and usage.go file, not other aliases, unsigned native accounting, cost.go, or 32-bit Go int behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-90F2C7B7D0A6DCBB": {
+      "source": "internal/agent/usage.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go",
+        "facade_signed_usage_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Complete signed compatibility Usage type and its two arithmetic operations, accessible through adk::codec::dto::Usage with compat enabled. The independent pinned Go fixture covers all five JSON counters, omission of zero cache counters, signed extrema, wrapping addition and input/output-only total across 64 operand combinations; both codec and public facade tests compare those observations and retain the right operand. All seven member records are separately verified. This closes only the Usage alias, type and usage.go file, not other aliases, unsigned native accounting, cost.go, or 32-bit Go int behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
     }
   }
 }

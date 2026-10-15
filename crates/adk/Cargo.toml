@@ -48,6 +48,7 @@ adk-durable = { version = "0.1.0", path = "../adk-durable", optional = true }
 adk-project-state = { version = "0.1.0", path = "../adk-project-state", optional = true }
 
 [dev-dependencies]
+serde_json.workspace = true
 tokio.workspace = true
 tempfile = "3"
 uuid = "1"

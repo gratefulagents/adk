@@ -2281,3 +2281,29 @@ assembly and explicit recovery are now implemented, but refreshing a durable
 scheduler with tracked executor generations is still unsupported and must not be
 called complete. Full per-record SDK acceptance and live-provider evidence remain
 open; CLI/evaluation/Terminal-Bench and production release/defaults are unchanged.
+
+### Complete signed Usage type and public compatibility path
+
+The three remaining type/alias/file records for `internal/agent/usage.go` and the
+public `Usage` alias now have bounded closure. All seven members were already
+verified independently. A new facade test accesses `adk::codec::dto::Usage` and
+compares the same 64 pinned Go operand pairs, including zero, negative values,
+cache-only counters and signed extrema. It checks all five serialized counters,
+zero-cache omission, wrapping addition, input/output-only totals and preservation
+of the borrowed operand. This is the signed compatibility DTO, not a claim about
+unsigned native runtime accounting or 32-bit Go integers.
+
+The test passes with only `compat` enabled and is absent with default features
+disabled. Its JSON dependency is explicitly test-only; the initial minimal-feature
+build exposed that missing declaration, which was corrected before verification.
+Strict Clippy and formatting pass. Refreshed pinned oracles, claim-bound Rust
+evidence, all 27 audit validators and immutable source locks pass. Counts are now
+**468 verified / 8,423 unresolved / 251 excluded**. The usage group's cost helpers
+and source cost regressions remain unresolved; neither the whole usage group nor
+the complete aliases file is claimed.
+
+Final Rust 1.88 all-feature/all-target workspace: **1,408 passed / 0 failed /
+30 ignored** across 145 targets, no warnings. All 46 remote CI checks for the
+preceding implementation head `2956f24` passed, including Linux/macOS enforcing
+backends and durable PostgreSQL; that result does not establish remote CI for
+this subsequent audit-only change.

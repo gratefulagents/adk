@@ -744,6 +744,7 @@ pub struct SessionState {
     handle: SessionHandle,
     scheduler: Option<Scheduler>,
     resources: Vec<SessionResources>,
+    child_progress: Option<Arc<adk_runtime::subagent_tools::ChildProgressRegistry>>,
 }
 struct SessionResources {
     tools: ToolBundle,
@@ -771,6 +772,7 @@ impl SessionState {
             },
             scheduler: None,
             resources: Vec::new(),
+            child_progress: None,
         }
     }
     pub fn with_scheduler(scheduler: Scheduler) -> Self {
@@ -821,6 +823,7 @@ impl SessionState {
             }
         }
         self.resources.clear();
+        self.child_progress = None;
         result
     }
 }
@@ -2060,7 +2063,16 @@ impl Builder {
                 })
                 .collect::<Result<_, _>>();
             match children {
-                Ok(children) => executor.initialize(children, self.subagent_host.take().unwrap()),
+                Ok(children) => {
+                    let owner = self.owned_session.as_mut().unwrap();
+                    let progress = owner.child_progress.get_or_insert_with(Default::default);
+                    *progress = Arc::new(progress.rebind(self.runner.progress.clone()));
+                    executor.initialize(
+                        children,
+                        self.subagent_host.take().unwrap(),
+                        owner.child_progress.clone(),
+                    );
+                }
                 Err(error) => {
                     tools.close().await.map_err(|e| {
                         Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)

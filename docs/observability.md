@@ -65,6 +65,118 @@ Hook names cover agent start/end, model attempts/acceptance, cumulative usage, r
 
 This does not synthesize Go's session numbers, inferred current step, text summaries, per-model cost attribution, child aggregation or pending Kubernetes events. Content is not retained in the progress ring.
 
+### SDK-shaped progress state
+
+`adk::progress::ProgressTracker` (also `RunProgress`) is a **separate**
+`observability`-gated API. It does not change the native `ProgressSnapshot` above
+or its cumulative-usage semantics. Its `snapshot()` uses SDK-shaped fields,
+signed token/call counters, per-model token totals, and a 20-event ring.
+
+```rust,ignore
+use adk::progress::RunProgress;
+use adk::codec::dto::Usage;
+
+let progress = RunProgress::new();
+progress.set_session(1, "starting");
+progress.record_assistant_text("Inspecting the repository");
+let child = progress.child("child-task-1");
+child.record_llm_usage("model-name", 0.01, &Usage::default());
+let snapshot = progress.snapshot();
+assert_eq!(snapshot.session_number, 1);
+```
+
+Clones share state; snapshots own their data. Children copy the parent's session
+number, result-size setting, processor and root span ID at creation, but have
+independent activity, step inference, text, event rings and model maps. Each
+child LLM usage increment and tool-use count forwards through every ancestor.
+Child completion does **not** add those totals a second time. Session changes
+reset session counters, not run totals. Pending session-start/completion events
+are drained separately from the bounded event ring; no Kubernetes client or
+automatic event publication is installed.
+
+The tracker can emit structural session, subagent, retry and compaction spans
+through a host-owned `TraceProcessor`. Subagent completion closes its matching
+start span; completion without a start produces a point-in-time span. The tracker
+does not flush processors, persist checkpoints or redact its text/metadata.
+Snapshots, pending events and processors therefore belong to trusted hosts:
+unlike the metadata-first native pipeline, this API retains assistant content
+and caller-supplied lifecycle summaries. Do not feed cumulative native `Usage`
+observations into its incremental `record_llm_usage` method.
+
+Structural callbacks run outside the state lock. Concurrent non-reentrant
+structural record calls wait for their callback delivery before returning, so a subsequent host flush
+cannot overtake their spans. Same-thread callback reentry is a Rust extension:
+nested notifications queue behind the active callback and are delivered when it
+returns. A nested record return is therefore not a flush barrier. Callbacks must
+not panic, wait on other threads recording into this tracker, or flush/end the
+enclosing trace while reentrant notifications remain queued.
+
+`adk::progress` also exposes the SDK's `extract_file_path`, `extract_path`,
+`extract_grep_pattern`, `extract_glob_pattern`, `extract_bash_command`,
+`extract_lsp_operation`, `extract_agent_meta`, and `extract_ask_user_question`
+inspection helpers. They accept raw JSON bytes, preserve duplicate-field order
+and case-insensitive field matching, and apply Go's null/type-error behavior.
+In particular, LSP extraction retains successfully decoded fields despite a
+different field's type error; the other simple extractors return an empty value
+on decoding errors, and agent metadata returns the `unknown` description.
+Unknown fields need not fit a finite floating-point JSON value. These functions
+are display helpers, not argument validation or permission checks.
+
+`truncate`, `truncate_bytes` and `truncate_middle` preserve their distinct SDK
+limits (Unicode scalars, UTF-8 bytes, and head/tail scalars respectively). Their
+Rust text inputs are valid UTF-8; raw JSON helpers replace malformed UTF-8 and
+lone UTF-16 surrogates as Go does. No helper invokes a tool or writes a file.
+
+### Runtime progress adapter
+
+`progress::runtime::RuntimeProgressAdapter` connects this tracker through the
+optional synchronous `RunnerConfig::progress` interface. It is neither a
+`RunHooks` policy hook nor a generation observer. Do not also feed the same
+tracker cumulative usage callbacks: per-call accounting already comes directly
+from the runner, including provider/summary compaction and genuinely completed
+steering-superseded calls. Retained failed-stream responses remain in native
+budget accounting but are deliberately omitted from SDK progress, matching the
+SDK's discarded response on Complete → Error. Cancellation alone fabricates no
+usage. Accepted model keys use the configured primary label, while out-of-band
+calls use the actual request label; a host may explicitly override labels.
+
+Pricing defaults to `UsdPolicy::Unpriced`: tokens are tracked without assuming
+that a host estimator's units are USD. `HostUnitsAreUsd` is an explicit unit
+assertion and retains available uncertain subtotals; uncertainty is reported
+through `drain_diagnostics()`. `Custom` accepts a host USD-pricing callback.
+Invalid prices and unsupported signed-counter conversions are diagnostic rather
+than execution-policy failures. Diagnostics and snapshots are trusted-host data.
+
+Root sessions are explicit owned scopes, not inferred from agent-turn or handoff
+events. Call `adapter.session(number, step)` and consume the scope with
+`finish(result, stop_reason)` once the session completes. This records pending
+completion status under either span-ownership mode; dropping it invents no
+completion. Default `SpanOwnership::External` leaves session/compaction spans to
+the tracing owner. With tracker ownership, wrap only that owner's tracing hook
+with `adapter.tracing_hooks(...)`, and finish `RunTrace` without its separate
+session wrapper. Never filter policy hooks to suppress duplicate tracing.
+`ContentOwnership::External` similarly avoids recording accepted content twice
+when another adapter already owns it.
+
+Automatic child assembly shares a session-scoped `ChildProgressRegistry` across
+executor generations. Child runners replace any inherited template observer
+with their immediate-parent scoped binding. Terminal/drop cleanup records status
+once and does not charge aggregate child usage again. These bindings are
+observational state, not an exactly-once durable accounting ledger.
+Each executor generation has its own root observer: refresh to a new observer
+or `None` affects new top-level children, not previously accepted executions.
+The task-binding table remains shared so later descendants inherit their actual
+parent, including an explicitly unobserved parent, across refreshes.
+
+On durable descendant recovery, the scheduler supplies validated root-to-parent
+ancestry. The registry restores absent ancestor bindings before forking the
+descendant, even if those ancestors are still reconciling. Restoration replays
+neither usage nor lifecycle starts; later ancestor execution reuses the same
+binding. Historical model labels are not invented. Custom progress observers
+must opt into the `restore_child` contract to observe independently resumed
+subtrees; its default `None` leaves execution unchanged without misattributing
+the subtree to the root.
+
 ## Capture policy and full outputs
 
 The default `CaptureMode::Metadata` replaces content with `{ "sha256": "…", "bytes": N }`, using UTF-8 bytes for strings and compact JSON bytes for structured values. Identifiers, status and recognized metrics survive; unknown fields are digested rather than presumed safe. Digests still reveal byte length and equality and are not encryption. Run IDs and event-kind labels are host-controlled identifiers, not places for secrets.

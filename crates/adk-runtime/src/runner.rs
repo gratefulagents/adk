@@ -48,6 +48,9 @@ use crate::compaction::{
 };
 use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
+use crate::progress::{
+    ProgressFrame, ProgressObservation, ProgressUsage, RuntimeProgress, UsageOrigin,
+};
 use crate::tracing::{GenerationGuard, GenerationObserver, GenerationRecord, GenerationStatus};
 
 #[derive(Clone)]
@@ -648,6 +651,7 @@ pub struct RunnerConfig {
     pub retry: RetryPolicy,
     pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
     pub generation_observer: Option<Arc<dyn GenerationObserver>>,
+    pub progress: Option<Arc<dyn RuntimeProgress>>,
     /// Consume streaming bindings in blocking runs to surface observer reasoning deltas.
     pub blocking_reasoning: bool,
     pub limits: Limits,
@@ -706,6 +710,7 @@ impl Default for RunnerConfig {
             retry: RetryPolicy::default(),
             error_handler: None,
             generation_observer: None,
+            progress: None,
             blocking_reasoning: false,
             limits: Limits::default(),
             cost_estimator: None,
@@ -977,6 +982,9 @@ impl RunStream {
 }
 
 impl Runner {
+    pub(crate) fn progress_model(&self) -> &str {
+        self.initial.model.name()
+    }
     pub fn new(agent: AgentConfig, mut config: RunnerConfig) -> Result<Self, Error> {
         validate_agent(&agent, &mut HashSet::new())?;
         if config.immediate_input_signal.is_some() && config.immediate_input_poller.is_none() {
@@ -1353,7 +1361,50 @@ impl Engine {
         }
         Ok(())
     }
+    fn progress_frame(&self) -> ProgressFrame<'_> {
+        ProgressFrame {
+            agent_name: &self.agent.name,
+            agent_model: self.agent.model.name(),
+            turn: self.turns,
+            task_id: self.child_control.as_ref().map(|control| control.task_id()),
+        }
+    }
+    fn progress_usage(
+        &self,
+        origin: UsageOrigin,
+        binding: &ModelBinding,
+        usage: &Usage,
+        cost: Option<f64>,
+        cost_known: bool,
+    ) {
+        if let Some(progress) = &self.config.progress {
+            let info = match binding {
+                ModelBinding::Complete { model, .. } => model.info(binding.name()),
+                ModelBinding::Streaming { model, .. } => model.info(binding.name()),
+            };
+            progress.usage(
+                &self.context,
+                self.progress_frame(),
+                ProgressUsage {
+                    origin,
+                    request_model: binding.name(),
+                    provider: &info.provider,
+                    canonical_model: &info.model,
+                    usage,
+                    host_cost: cost,
+                    host_cost_known: cost_known,
+                },
+            );
+        }
+    }
     async fn observe(&self, observation: Observation) -> Result<(), Error> {
+        if let Some(progress) = &self.config.progress {
+            progress.observe(
+                &self.context,
+                self.progress_frame(),
+                ProgressObservation::Lifecycle(&observation),
+            );
+        }
         self.approval_journal
             .observe(&self.context, observation.clone())
             .await?;
@@ -1902,7 +1953,7 @@ impl Engine {
         let before_items = self.result.history.len();
         let request = CompactionRequest {
             agent: self.agent.name.clone(),
-            model,
+            model: model.clone(),
             history: self.result.history.clone(),
             history_provenance: self.result.history_provenance.clone(),
             context_tokens: tokens,
@@ -1941,6 +1992,17 @@ impl Engine {
                 return Err(error);
             }
         };
+        let binding = std::iter::once(&self.agent.model)
+            .chain(&self.agent.fallbacks)
+            .find(|binding| binding.name() == model)
+            .expect("active compaction model");
+        self.progress_usage(
+            UsageOrigin::ProviderCompaction,
+            binding,
+            &compacted.usage,
+            Some(compacted.cost),
+            compacted.cost_known,
+        );
         self.cost_known &= compacted.cost_known;
         self.account_usage(&compacted.usage, Some(compacted.cost))?;
         self.charge_child_usage().await?;
@@ -2085,6 +2147,13 @@ impl Engine {
                     self.config.cost_estimator.as_ref().and_then(|estimator| {
                         estimator.estimate_cost(binding.name(), &response.usage)
                     });
+                self.progress_usage(
+                    UsageOrigin::SummaryCompaction,
+                    binding,
+                    &response.usage,
+                    cost,
+                    cost.is_some(),
+                );
                 self.account_usage(&response.usage, cost)?;
                 self.charge_child_usage().await?;
                 self.observe(Observation::Usage {
@@ -2906,12 +2975,18 @@ impl Engine {
                 let signal = self.config.immediate_input_signal.clone();
                 let context = self.context.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
+                let completed_usage = self
+                    .config
+                    .progress
+                    .as_ref()
+                    .map(|_| Arc::new(std::sync::Mutex::new(None)));
                 let attempt_result = {
                     let attempt = self.model_attempt(
                         binding,
                         request.clone(),
                         visible.clone(),
                         generation.as_ref(),
+                        completed_usage.clone(),
                     );
                     tokio::pin!(attempt);
                     let wake = async {
@@ -2941,7 +3016,7 @@ impl Engine {
                             }, if child_enabled => {
                                 message?;
                                 if !visible.load(std::sync::atomic::Ordering::Acquire) {
-                                    return Ok(None);
+                                    break None;
                                 }
                                 child_enabled = false;
                             }
@@ -2950,6 +3025,21 @@ impl Engine {
                     }
                 };
                 let Some(attempt_result) = attempt_result else {
+                    if let Some(usage) =
+                        completed_usage.and_then(|slot| slot.lock().unwrap().take())
+                    {
+                        let cost =
+                            self.config.cost_estimator.as_ref().and_then(|estimator| {
+                                estimator.estimate_cost(binding.name(), &usage)
+                            });
+                        self.progress_usage(
+                            UsageOrigin::SteeringSuperseded,
+                            binding,
+                            &usage,
+                            cost,
+                            cost.is_some(),
+                        );
+                    }
                     // A child turn limit may already be narrowed by host security policy.
                     if self.child_control.is_none() {
                         self.policy.max_turns = self.policy.max_turns.saturating_add(1);
@@ -2974,6 +3064,13 @@ impl Engine {
                                 cost.filter(|cost| cost.is_finite() && *cost >= 0.0);
                             generation.finish(GenerationStatus::Completed);
                         }
+                        self.progress_usage(
+                            UsageOrigin::Accepted,
+                            binding,
+                            &response.usage,
+                            cost,
+                            cost.is_some(),
+                        );
                         self.calibration.observe_estimate(
                             response
                                 .usage
@@ -3130,6 +3227,18 @@ impl Engine {
                             generation.record.retry_after = Some(delay);
                             generation.finish(GenerationStatus::Retrying);
                         }
+                        if let Some(progress) = &self.config.progress {
+                            progress.observe(
+                                &self.context,
+                                self.progress_frame(),
+                                ProgressObservation::Retry {
+                                    error: &error.info,
+                                    attempt,
+                                    max_retries: self.config.retry.max_retries,
+                                    delay,
+                                },
+                            );
+                        }
                         self.observe(Observation::Retry {
                             model: binding.name().into(),
                             delay,
@@ -3173,6 +3282,7 @@ impl Engine {
         request: ModelRequest,
         visible: Arc<std::sync::atomic::AtomicBool>,
         generation: Option<&GenerationGuard>,
+        completed_usage: Option<Arc<std::sync::Mutex<Option<Usage>>>>,
     ) -> Result<ModelResponse, (Error, bool)> {
         let timeout = self.config.model_idle_timeout;
         match binding {
@@ -3211,6 +3321,11 @@ impl Engine {
                                     ErrorCategory::ModelBehavior,
                                     "model event after Complete",
                                 ));
+                            }
+                            if let (Some(slot), ModelEvent::Complete { response }) =
+                                (&completed_usage, &event)
+                            {
+                                *slot.lock().unwrap() = Some(response.usage.clone());
                             }
                             if !self.streaming {
                                 match &event {
@@ -3275,6 +3390,13 @@ impl Engine {
                             let cost = self.config.cost_estimator.as_ref().and_then(|estimator| {
                                 estimator.estimate_cost(binding.name(), &response.usage)
                             });
+                            self.progress_usage(
+                                UsageOrigin::FailedStreamRetained,
+                                binding,
+                                &response.usage,
+                                cost,
+                                cost.is_some(),
+                            );
                             let _ = self.record_response(response, cost);
                             let _ = self.charge_child_usage().await;
                         } else {
@@ -4183,6 +4305,7 @@ impl Runner {
         control: crate::subagent::ChildControl,
         host: Arc<dyn Host>,
         output_extractor: Option<&crate::subagent_tools::ChildOutputExtractor>,
+        progress: Option<Arc<dyn RuntimeProgress>>,
     ) -> Result<crate::subagent::ChildOutcome, Error> {
         use crate::subagent::{ChildOutcome, TaskStatus};
         let child_agent_name = invocation.agent_name.clone();
@@ -4216,6 +4339,7 @@ impl Runner {
         }
         let mut config = self.config.as_ref().clone();
         config.subagents = Some(session.clone());
+        config.progress = progress;
         config.force_final_summary_turn = true;
         struct ChildInstructions {
             provider: Arc<dyn InstructionProvider>,

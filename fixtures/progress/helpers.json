@@ -1,0 +1,1948 @@
+{
+  "cases": [
+    {
+      "expected": "src/\u4e16\u754c.rs",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"src/\u4e16\u754c.rs\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_simple"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "null",
+      "limit": 0,
+      "name": "ExtractFilePath_null_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "{}",
+      "limit": 0,
+      "name": "ExtractFilePath_empty_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"x\",}",
+      "limit": 0,
+      "name": "ExtractFilePath_invalid_syntax"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":null}",
+      "limit": 0,
+      "name": "ExtractFilePath_null_scalar"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":42}",
+      "limit": 0,
+      "name": "ExtractFilePath_wrong_type"
+    },
+    {
+      "expected": "upper",
+      "function": "ExtractFilePath",
+      "input": "{\"FILE_PATH\":\"upper\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_uppercase_alias"
+    },
+    {
+      "expected": "last",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"first\",\"file_path\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_duplicate"
+    },
+    {
+      "expected": "first",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"first\",\"file_path\":null}",
+      "limit": 0,
+      "name": "ExtractFilePath_duplicate_null"
+    },
+    {
+      "expected": "",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":3,\"file_path\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_duplicate_error_then_valid"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractFilePath",
+      "input": "{\"unknown\":1e1000,\"file_path\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_huge_unknown_number"
+    },
+    {
+      "expected": "a\ufffdb\ufffdc",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"a\\ud800b\\udc00c\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_surrogate"
+    },
+    {
+      "expected": "\ud83d\ude00",
+      "function": "ExtractFilePath",
+      "input": "{\"file_path\":\"\\ud83d\\ude00\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_paired_surrogate"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractFilePath",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"file_path\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractFilePath_nested_unknown"
+    },
+    {
+      "expected": "src/\u4e16\u754c.rs",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"src/\u4e16\u754c.rs\"}",
+      "limit": 0,
+      "name": "ExtractPath_simple"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "null",
+      "limit": 0,
+      "name": "ExtractPath_null_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{}",
+      "limit": 0,
+      "name": "ExtractPath_empty_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"x\",}",
+      "limit": 0,
+      "name": "ExtractPath_invalid_syntax"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{\"path\":null}",
+      "limit": 0,
+      "name": "ExtractPath_null_scalar"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{\"path\":42}",
+      "limit": 0,
+      "name": "ExtractPath_wrong_type"
+    },
+    {
+      "expected": "upper",
+      "function": "ExtractPath",
+      "input": "{\"PATH\":\"upper\"}",
+      "limit": 0,
+      "name": "ExtractPath_uppercase_alias"
+    },
+    {
+      "expected": "last",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"first\",\"path\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractPath_duplicate"
+    },
+    {
+      "expected": "first",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"first\",\"path\":null}",
+      "limit": 0,
+      "name": "ExtractPath_duplicate_null"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{\"path\":3,\"path\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractPath_duplicate_error_then_valid"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractPath",
+      "input": "{\"unknown\":1e1000,\"path\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractPath_huge_unknown_number"
+    },
+    {
+      "expected": "a\ufffdb\ufffdc",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"a\\ud800b\\udc00c\"}",
+      "limit": 0,
+      "name": "ExtractPath_surrogate"
+    },
+    {
+      "expected": "\ud83d\ude00",
+      "function": "ExtractPath",
+      "input": "{\"path\":\"\\ud83d\\ude00\"}",
+      "limit": 0,
+      "name": "ExtractPath_paired_surrogate"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractPath",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"path\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractPath_nested_unknown"
+    },
+    {
+      "expected": "src/\u4e16\u754c.rs",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"src/\u4e16\u754c.rs\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_simple"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "null",
+      "limit": 0,
+      "name": "ExtractGrepPattern_null_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "{}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_empty_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"x\",}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_invalid_syntax"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":null}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_null_scalar"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":42}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_wrong_type"
+    },
+    {
+      "expected": "upper",
+      "function": "ExtractGrepPattern",
+      "input": "{\"PATTERN\":\"upper\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_uppercase_alias"
+    },
+    {
+      "expected": "last",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"first\",\"pattern\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_duplicate"
+    },
+    {
+      "expected": "first",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"first\",\"pattern\":null}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_duplicate_null"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":3,\"pattern\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_duplicate_error_then_valid"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractGrepPattern",
+      "input": "{\"unknown\":1e1000,\"pattern\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_huge_unknown_number"
+    },
+    {
+      "expected": "a\ufffdb\ufffdc",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"a\\ud800b\\udc00c\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_surrogate"
+    },
+    {
+      "expected": "\ud83d\ude00",
+      "function": "ExtractGrepPattern",
+      "input": "{\"pattern\":\"\\ud83d\\ude00\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_paired_surrogate"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractGrepPattern",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"pattern\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractGrepPattern_nested_unknown"
+    },
+    {
+      "expected": "src/\u4e16\u754c.rs",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"src/\u4e16\u754c.rs\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_simple"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "null",
+      "limit": 0,
+      "name": "ExtractGlobPattern_null_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "{}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_empty_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"x\",}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_invalid_syntax"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":null}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_null_scalar"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":42}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_wrong_type"
+    },
+    {
+      "expected": "upper",
+      "function": "ExtractGlobPattern",
+      "input": "{\"PATTERN\":\"upper\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_uppercase_alias"
+    },
+    {
+      "expected": "last",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"first\",\"pattern\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_duplicate"
+    },
+    {
+      "expected": "first",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"first\",\"pattern\":null}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_duplicate_null"
+    },
+    {
+      "expected": "",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":3,\"pattern\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_duplicate_error_then_valid"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractGlobPattern",
+      "input": "{\"unknown\":1e1000,\"pattern\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_huge_unknown_number"
+    },
+    {
+      "expected": "a\ufffdb\ufffdc",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"a\\ud800b\\udc00c\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_surrogate"
+    },
+    {
+      "expected": "\ud83d\ude00",
+      "function": "ExtractGlobPattern",
+      "input": "{\"pattern\":\"\\ud83d\\ude00\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_paired_surrogate"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractGlobPattern",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"pattern\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractGlobPattern_nested_unknown"
+    },
+    {
+      "expected": "src/\u4e16\u754c.rs",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"src/\u4e16\u754c.rs\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_simple"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "null",
+      "limit": 0,
+      "name": "ExtractBashCommand_null_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "{}",
+      "limit": 0,
+      "name": "ExtractBashCommand_empty_object"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"x\",}",
+      "limit": 0,
+      "name": "ExtractBashCommand_invalid_syntax"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":null}",
+      "limit": 0,
+      "name": "ExtractBashCommand_null_scalar"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":42}",
+      "limit": 0,
+      "name": "ExtractBashCommand_wrong_type"
+    },
+    {
+      "expected": "upper",
+      "function": "ExtractBashCommand",
+      "input": "{\"COMMAND\":\"upper\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_uppercase_alias"
+    },
+    {
+      "expected": "last",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"first\",\"command\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_duplicate"
+    },
+    {
+      "expected": "first",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"first\",\"command\":null}",
+      "limit": 0,
+      "name": "ExtractBashCommand_duplicate_null"
+    },
+    {
+      "expected": "",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":3,\"command\":\"last\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_duplicate_error_then_valid"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractBashCommand",
+      "input": "{\"unknown\":1e1000,\"command\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_huge_unknown_number"
+    },
+    {
+      "expected": "a\ufffdb\ufffdc",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"a\\ud800b\\udc00c\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_surrogate"
+    },
+    {
+      "expected": "\ud83d\ude00",
+      "function": "ExtractBashCommand",
+      "input": "{\"command\":\"\\ud83d\\ude00\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_paired_surrogate"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractBashCommand",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"command\":\"kept\"}",
+      "limit": 0,
+      "name": "ExtractBashCommand_nested_unknown"
+    },
+    {
+      "expected": {
+        "file_path": "src/main.rs",
+        "operation": "hover"
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"operation\":\"hover\",\"filePath\":\"src/main.rs\"}",
+      "limit": 0,
+      "name": "lsp_simple"
+    },
+    {
+      "expected": {
+        "file_path": "kept.rs",
+        "operation": ""
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"operation\":3,\"filePath\":\"kept.rs\"}",
+      "limit": 0,
+      "name": "lsp_partial_bad_operation"
+    },
+    {
+      "expected": {
+        "file_path": "",
+        "operation": "hover"
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"operation\":\"hover\",\"filePath\":false}",
+      "limit": 0,
+      "name": "lsp_partial_bad_file"
+    },
+    {
+      "expected": {
+        "file_path": "x.rs",
+        "operation": "references"
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"operation\":3,\"operation\":\"references\",\"filePath\":\"x.rs\"}",
+      "limit": 0,
+      "name": "lsp_duplicate_type_error"
+    },
+    {
+      "expected": {
+        "file_path": "",
+        "operation": ""
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"operation\":\"hover\",\"filePath\":",
+      "limit": 0,
+      "name": "lsp_syntax_error_discards_partial"
+    },
+    {
+      "expected": {
+        "file_path": "x",
+        "operation": "definition"
+      },
+      "function": "ExtractLSPOperation",
+      "input": "{\"OPERATION\":\"definition\",\"FILEPATH\":\"x\"}",
+      "limit": 0,
+      "name": "lsp_case_alias"
+    },
+    {
+      "expected": {
+        "file_path": "",
+        "operation": ""
+      },
+      "function": "ExtractLSPOperation",
+      "input": "null",
+      "limit": 0,
+      "name": "lsp_null"
+    },
+    {
+      "expected": {
+        "Description": "explicit name",
+        "Isolation": "worktree",
+        "Model": "m",
+        "Prompt": "raw prompt",
+        "SubagentType": "worker"
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"description\":\"  explicit\\nname  \",\"prompt\":\"raw prompt\",\"subagent_type\":\"worker\",\"model\":\"m\",\"isolation\":\"worktree\"}",
+      "limit": 0,
+      "name": "agent_all_fields"
+    },
+    {
+      "expected": {
+        "Description": "fallback \u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c...",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "  fallback\n\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  ",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"prompt\":\"  fallback\\n\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c\u754c  \"}",
+      "limit": 0,
+      "name": "agent_fallback"
+    },
+    {
+      "expected": {
+        "Description": "\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9...",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"description\":\"\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\u00e9\"}",
+      "limit": 0,
+      "name": "agent_description_limit"
+    },
+    {
+      "expected": {
+        "Description": "unknown",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"description\":9,\"prompt\":\"fallback\"}",
+      "limit": 0,
+      "name": "agent_type_error"
+    },
+    {
+      "expected": {
+        "Description": "",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "null",
+      "limit": 0,
+      "name": "agent_null"
+    },
+    {
+      "expected": {
+        "Description": "",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{}",
+      "limit": 0,
+      "name": "agent_empty"
+    },
+    {
+      "expected": {
+        "Description": "unknown",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{",
+      "limit": 0,
+      "name": "agent_syntax"
+    },
+    {
+      "expected": {
+        "Description": "name",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "p",
+        "SubagentType": "worker"
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"DESCRIPTION\":\"name\",\"SUBAGENT_TYPE\":\"worker\",\"PROMPT\":\"p\"}",
+      "limit": 0,
+      "name": "agent_case_alias"
+    },
+    {
+      "expected": {
+        "Description": "long-s alias",
+        "Isolation": "none",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"de\u017fcription\":\"long-s alias\",\"i\u017folation\":\"none\"}",
+      "limit": 0,
+      "name": "agent_unicode_fold"
+    },
+    {
+      "expected": {
+        "Description": "known",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input": "{\"unknown\":1e1000,\"description\":\"known\"}",
+      "limit": 0,
+      "name": "agent_unknown_huge"
+    },
+    {
+      "expected": "Continue?",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"question\":\"Continue?\"}",
+      "limit": 0,
+      "name": "question_simple"
+    },
+    {
+      "expected": "Choose? Options: yes: continue | no\nNext?",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"questions\":[{\"question\":\"Choose?\",\"header\":\"ignored\",\"options\":[{\"label\":\"yes\",\"description\":\"continue\"},{\"label\":\"no\"}]},{\"question\":\"Next?\"}]}",
+      "limit": 0,
+      "name": "question_structured"
+    },
+    {
+      "expected": "fallback",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"questions\":[],\"question\":\"fallback\"}",
+      "limit": 0,
+      "name": "question_empty_questions_fallback"
+    },
+    {
+      "expected": "fallback",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"questions\":4,\"question\":\"fallback\"}",
+      "limit": 0,
+      "name": "question_wrong_questions_fallback"
+    },
+    {
+      "expected": "{\"other\":\"raw\"}",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"other\":\"raw\"}",
+      "limit": 0,
+      "name": "question_unrecognized"
+    },
+    {
+      "expected": "null",
+      "function": "ExtractAskUserQuestion",
+      "input": "null",
+      "limit": 0,
+      "name": "question_null"
+    },
+    {
+      "expected": "{",
+      "function": "ExtractAskUserQuestion",
+      "input": "{",
+      "limit": 0,
+      "name": "question_syntax"
+    },
+    {
+      "expected": "Upper?",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"QUESTION\":\"Upper?\"}",
+      "limit": 0,
+      "name": "question_case_alias"
+    },
+    {
+      "expected": "\ufffd",
+      "function": "ExtractAskUserQuestion",
+      "input": "{\"question\":\"\\ud800\"}",
+      "limit": 0,
+      "name": "question_surrogate"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": -1,
+      "name": "Truncate_ascii_-1"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 0,
+      "name": "Truncate_ascii_0"
+    },
+    {
+      "expected": "a",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 1,
+      "name": "Truncate_ascii_1"
+    },
+    {
+      "expected": "al",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 2,
+      "name": "Truncate_ascii_2"
+    },
+    {
+      "expected": "alp",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 3,
+      "name": "Truncate_ascii_3"
+    },
+    {
+      "expected": "a...",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 4,
+      "name": "Truncate_ascii_4"
+    },
+    {
+      "expected": "alph...",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 7,
+      "name": "Truncate_ascii_7"
+    },
+    {
+      "expected": "alpha bet...",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 12,
+      "name": "Truncate_ascii_12"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 34,
+      "name": "Truncate_ascii_34"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 35,
+      "name": "Truncate_ascii_35"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 36,
+      "name": "Truncate_ascii_36"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 37,
+      "name": "Truncate_ascii_37"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 40,
+      "name": "Truncate_ascii_40"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 80,
+      "name": "Truncate_ascii_80"
+    },
+    {
+      "expected": "alpha beta gamma",
+      "function": "Truncate",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 200,
+      "name": "Truncate_ascii_200"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": -1,
+      "name": "Truncate_unicode_-1"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 0,
+      "name": "Truncate_unicode_0"
+    },
+    {
+      "expected": "\u03b1",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 1,
+      "name": "Truncate_unicode_1"
+    },
+    {
+      "expected": "\u03b1\u754c",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 2,
+      "name": "Truncate_unicode_2"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 3,
+      "name": "Truncate_unicode_3"
+    },
+    {
+      "expected": "\u03b1...",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 4,
+      "name": "Truncate_unicode_4"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 ...",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 7,
+      "name": "Truncate_unicode_7"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 12,
+      "name": "Truncate_unicode_12"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 34,
+      "name": "Truncate_unicode_34"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 35,
+      "name": "Truncate_unicode_35"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 36,
+      "name": "Truncate_unicode_36"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 37,
+      "name": "Truncate_unicode_37"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 40,
+      "name": "Truncate_unicode_40"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 80,
+      "name": "Truncate_unicode_80"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00 \u7d42 tail",
+      "function": "Truncate",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 200,
+      "name": "Truncate_unicode_200"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": -1,
+      "name": "Truncate_long_-1"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 0,
+      "name": "Truncate_long_0"
+    },
+    {
+      "expected": "\u03b1",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 1,
+      "name": "Truncate_long_1"
+    },
+    {
+      "expected": "\u03b1\u754c",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 2,
+      "name": "Truncate_long_2"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 3,
+      "name": "Truncate_long_3"
+    },
+    {
+      "expected": "\u03b1...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 4,
+      "name": "Truncate_long_4"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 7,
+      "name": "Truncate_long_7"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 12,
+      "name": "Truncate_long_12"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 34,
+      "name": "Truncate_long_34"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 35,
+      "name": "Truncate_long_35"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 36,
+      "name": "Truncate_long_36"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 37,
+      "name": "Truncate_long_37"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 40,
+      "name": "Truncate_long_40"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 80,
+      "name": "Truncate_long_80"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "Truncate",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 200,
+      "name": "Truncate_long_200"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": -1,
+      "name": "TruncateBytes_ascii_-1"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 0,
+      "name": "TruncateBytes_ascii_0"
+    },
+    {
+      "expected": " ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 1,
+      "name": "TruncateBytes_ascii_1"
+    },
+    {
+      "expected": "  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 2,
+      "name": "TruncateBytes_ascii_2"
+    },
+    {
+      "expected": "  a",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 3,
+      "name": "TruncateBytes_ascii_3"
+    },
+    {
+      "expected": " ...",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 4,
+      "name": "TruncateBytes_ascii_4"
+    },
+    {
+      "expected": "  al...",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 7,
+      "name": "TruncateBytes_ascii_7"
+    },
+    {
+      "expected": "  alpha\nb...",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 12,
+      "name": "TruncateBytes_ascii_12"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 34,
+      "name": "TruncateBytes_ascii_34"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 35,
+      "name": "TruncateBytes_ascii_35"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 36,
+      "name": "TruncateBytes_ascii_36"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 37,
+      "name": "TruncateBytes_ascii_37"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 40,
+      "name": "TruncateBytes_ascii_40"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 80,
+      "name": "TruncateBytes_ascii_80"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateBytes",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 200,
+      "name": "TruncateBytes_ascii_200"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": -1,
+      "name": "TruncateBytes_unicode_-1"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 0,
+      "name": "TruncateBytes_unicode_0"
+    },
+    {
+      "expected": " ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 1,
+      "name": "TruncateBytes_unicode_1"
+    },
+    {
+      "expected": "  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 2,
+      "name": "TruncateBytes_unicode_2"
+    },
+    {
+      "expected": "  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 3,
+      "name": "TruncateBytes_unicode_3"
+    },
+    {
+      "expected": " ...",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 4,
+      "name": "TruncateBytes_unicode_4"
+    },
+    {
+      "expected": "  \u03b1...",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 7,
+      "name": "TruncateBytes_unicode_7"
+    },
+    {
+      "expected": "  \u03b1\u754c...",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 12,
+      "name": "TruncateBytes_unicode_12"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 34,
+      "name": "TruncateBytes_unicode_34"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 35,
+      "name": "TruncateBytes_unicode_35"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 36,
+      "name": "TruncateBytes_unicode_36"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 37,
+      "name": "TruncateBytes_unicode_37"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 40,
+      "name": "TruncateBytes_unicode_40"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 80,
+      "name": "TruncateBytes_unicode_80"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateBytes",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 200,
+      "name": "TruncateBytes_unicode_200"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": -1,
+      "name": "TruncateBytes_long_-1"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 0,
+      "name": "TruncateBytes_long_0"
+    },
+    {
+      "expected": "",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 1,
+      "name": "TruncateBytes_long_1"
+    },
+    {
+      "expected": "\u03b1",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 2,
+      "name": "TruncateBytes_long_2"
+    },
+    {
+      "expected": "\u03b1",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 3,
+      "name": "TruncateBytes_long_3"
+    },
+    {
+      "expected": "...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 4,
+      "name": "TruncateBytes_long_4"
+    },
+    {
+      "expected": "\u03b1...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 7,
+      "name": "TruncateBytes_long_7"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 12,
+      "name": "TruncateBytes_long_12"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 34,
+      "name": "TruncateBytes_long_34"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 35,
+      "name": "TruncateBytes_long_35"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 36,
+      "name": "TruncateBytes_long_36"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 37,
+      "name": "TruncateBytes_long_37"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 40,
+      "name": "TruncateBytes_long_40"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 80,
+      "name": "TruncateBytes_long_80"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c...",
+      "function": "TruncateBytes",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 200,
+      "name": "TruncateBytes_long_200"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": -1,
+      "name": "TruncateMiddle_ascii_-1"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 0,
+      "name": "TruncateMiddle_ascii_0"
+    },
+    {
+      "expected": " ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 1,
+      "name": "TruncateMiddle_ascii_1"
+    },
+    {
+      "expected": "  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 2,
+      "name": "TruncateMiddle_ascii_2"
+    },
+    {
+      "expected": "  a",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 3,
+      "name": "TruncateMiddle_ascii_3"
+    },
+    {
+      "expected": "  al",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 4,
+      "name": "TruncateMiddle_ascii_4"
+    },
+    {
+      "expected": "  alpha",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 7,
+      "name": "TruncateMiddle_ascii_7"
+    },
+    {
+      "expected": "  alpha\nbeta",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 12,
+      "name": "TruncateMiddle_ascii_12"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 34,
+      "name": "TruncateMiddle_ascii_34"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 35,
+      "name": "TruncateMiddle_ascii_35"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 36,
+      "name": "TruncateMiddle_ascii_36"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 37,
+      "name": "TruncateMiddle_ascii_37"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 40,
+      "name": "TruncateMiddle_ascii_40"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 80,
+      "name": "TruncateMiddle_ascii_80"
+    },
+    {
+      "expected": "  alpha\nbeta gamma  ",
+      "function": "TruncateMiddle",
+      "input": "  alpha\nbeta gamma  ",
+      "limit": 200,
+      "name": "TruncateMiddle_ascii_200"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": -1,
+      "name": "TruncateMiddle_unicode_-1"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 0,
+      "name": "TruncateMiddle_unicode_0"
+    },
+    {
+      "expected": " ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 1,
+      "name": "TruncateMiddle_unicode_1"
+    },
+    {
+      "expected": "  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 2,
+      "name": "TruncateMiddle_unicode_2"
+    },
+    {
+      "expected": "  \u03b1",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 3,
+      "name": "TruncateMiddle_unicode_3"
+    },
+    {
+      "expected": "  \u03b1\u754c",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 4,
+      "name": "TruncateMiddle_unicode_4"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 7,
+      "name": "TruncateMiddle_unicode_7"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 12,
+      "name": "TruncateMiddle_unicode_12"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 34,
+      "name": "TruncateMiddle_unicode_34"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 35,
+      "name": "TruncateMiddle_unicode_35"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 36,
+      "name": "TruncateMiddle_unicode_36"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 37,
+      "name": "TruncateMiddle_unicode_37"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 40,
+      "name": "TruncateMiddle_unicode_40"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 80,
+      "name": "TruncateMiddle_unicode_80"
+    },
+    {
+      "expected": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "function": "TruncateMiddle",
+      "input": "  \u03b1\u754c\ud83d\ude00\n\u7d42 tail  ",
+      "limit": 200,
+      "name": "TruncateMiddle_unicode_200"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": -1,
+      "name": "TruncateMiddle_long_-1"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 0,
+      "name": "TruncateMiddle_long_0"
+    },
+    {
+      "expected": "\u03b1",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 1,
+      "name": "TruncateMiddle_long_1"
+    },
+    {
+      "expected": "\u03b1\u754c",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 2,
+      "name": "TruncateMiddle_long_2"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 3,
+      "name": "TruncateMiddle_long_3"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 4,
+      "name": "TruncateMiddle_long_4"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 7,
+      "name": "TruncateMiddle_long_7"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 12,
+      "name": "TruncateMiddle_long_12"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 34,
+      "name": "TruncateMiddle_long_34"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 35,
+      "name": "TruncateMiddle_long_35"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 36,
+      "name": "TruncateMiddle_long_36"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 37,
+      "name": "TruncateMiddle_long_37"
+    },
+    {
+      "expected": "\u03b1\u754c\n\u2026[elided 117 chars]\u2026\na",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 40,
+      "name": "TruncateMiddle_long_40"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\n\u2026[elided 77 chars]\u2026\n\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 80,
+      "name": "TruncateMiddle_long_80"
+    },
+    {
+      "expected": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "function": "TruncateMiddle",
+      "input": "\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a\u03b1\u754c\ud83d\ude00a",
+      "limit": 200,
+      "name": "TruncateMiddle_long_200"
+    },
+    {
+      "expected": "kept",
+      "function": "ExtractPath",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"path\":\"kept\"}",
+      "limit": 0,
+      "name": "path_depth_9999"
+    },
+    {
+      "expected": "",
+      "function": "ExtractPath",
+      "input": "{\"unknown\":[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[0]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]],\"path\":\"kept\"}",
+      "limit": 0,
+      "name": "path_depth_10000"
+    },
+    {
+      "expected": "a\ufffd\ufffd.rs",
+      "function": "ExtractFilePath",
+      "input_bytes": [
+        123,
+        34,
+        102,
+        105,
+        108,
+        101,
+        95,
+        112,
+        97,
+        116,
+        104,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        46,
+        114,
+        115,
+        34,
+        44,
+        34,
+        100,
+        101,
+        115,
+        99,
+        114,
+        105,
+        112,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        44,
+        34,
+        113,
+        117,
+        101,
+        115,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        125
+      ],
+      "limit": 0,
+      "name": "ExtractFilePath_invalid_utf8"
+    },
+    {
+      "expected": {
+        "Description": "a\ufffd\ufffd",
+        "Isolation": "",
+        "Model": "",
+        "Prompt": "",
+        "SubagentType": ""
+      },
+      "function": "ExtractAgentMeta",
+      "input_bytes": [
+        123,
+        34,
+        102,
+        105,
+        108,
+        101,
+        95,
+        112,
+        97,
+        116,
+        104,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        46,
+        114,
+        115,
+        34,
+        44,
+        34,
+        100,
+        101,
+        115,
+        99,
+        114,
+        105,
+        112,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        44,
+        34,
+        113,
+        117,
+        101,
+        115,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        125
+      ],
+      "limit": 0,
+      "name": "ExtractAgentMeta_invalid_utf8"
+    },
+    {
+      "expected": "a\ufffd\ufffd",
+      "function": "ExtractAskUserQuestion",
+      "input_bytes": [
+        123,
+        34,
+        102,
+        105,
+        108,
+        101,
+        95,
+        112,
+        97,
+        116,
+        104,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        46,
+        114,
+        115,
+        34,
+        44,
+        34,
+        100,
+        101,
+        115,
+        99,
+        114,
+        105,
+        112,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        44,
+        34,
+        113,
+        117,
+        101,
+        115,
+        116,
+        105,
+        111,
+        110,
+        34,
+        58,
+        34,
+        97,
+        255,
+        254,
+        34,
+        125
+      ],
+      "limit": 0,
+      "name": "ExtractAskUserQuestion_invalid_utf8"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/progress-reference/cases.json": "8ef96578cd2ede8954ec41c8a549b150cc9e07d29d764c2fe65d5f2822addc06",
+      "scripts/progress-reference/helper_reference_test.go": "bcd55b1474925d6e3c85e11061bfbb0fed86321335e0c23edee5e97dfcbcb050",
+      "scripts/progress-reference/reference_test.go": "0410c0a5cc82d04f2281c93e6e19d6ba87cfedb3d6b071fa3d53a59f429c3d4a",
+      "scripts/progress-reference/run.py": "a0dd695bc97dd2b43263ae2e8d9f150eb157e908515adbbeda6c5b403b2b0fe5",
+      "scripts/progress-reference/runtime_reference_test.go": "aa5d66baa06c7e95f9397a5074fe66a2f22e8f58c7163fa016150c7c95196848"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/platform_hooks.go": "10890d4ce8d334251b6e3228048a5a465c75b4108c12b107717978844dc4d06b",
+      "internal/agent/record.go": "06c679941976c5c5ecfcb9e8e7946137b01d30ec88476c10d544bd5195f5d414",
+      "internal/agent/record_forwarding_test.go": "78fb6c8291415c25f7c6f9f8c646c036b3c4e68718d33f5c72b5a09524c9cb91",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/stream.go": "e965af45e4650dfdff38df948e38cc06dbfbea5aa86a8f1bd7fe51751be2be09",
+      "internal/agent/stream_test.go": "bb91a188b3eabdd77e51bf180052774468d3e4751de7cb64e6c0917bf957276d",
+      "internal/agent/tracing.go": "14cca4c3521f33afb9c432f2ea41968e0183ba5fbabf4673da954ed5b56b2717",
+      "internal/agent/usage.go": "619655758f961e8bd5bd004cea7127bcc0ed916013cdaf785959f7edb1839d37"
+    }
+  }
+}

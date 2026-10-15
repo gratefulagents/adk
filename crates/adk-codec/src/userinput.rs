@@ -23,7 +23,10 @@ pub(crate) fn go_utf8(mut input: &[u8]) -> String {
     text
 }
 
-pub(crate) fn decode<T: serde::de::DeserializeOwned>(input: &[u8]) -> Result<T, serde_json::Error> {
+/// Decode SDK JSON with Go-compatible replacement of malformed UTF-8 and lone
+/// UTF-16 surrogates. The requested target still controls field/type handling.
+#[doc(hidden)]
+pub fn decode<T: serde::de::DeserializeOwned>(input: &[u8]) -> Result<T, serde_json::Error> {
     let mut bytes = go_utf8(input).into_bytes();
     let mut inside = false;
     let mut i = 0;

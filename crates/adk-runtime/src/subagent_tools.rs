@@ -1,5 +1,6 @@
 //! Model-facing adapters over an explicitly owned child session.
 
+use crate::progress::{ProgressChild, ProgressChildEnd, RuntimeProgress};
 use crate::runner::Runner;
 use crate::subagent::*;
 use adk_core::*;
@@ -1001,6 +1002,7 @@ pub struct RunnerChildExecutor {
     runners: HashMap<String, Runner>,
     host: Arc<dyn Host>,
     output_extractors: HashMap<String, Arc<ChildOutputExtractor>>,
+    progress: Option<Arc<ChildProgressRegistry>>,
 }
 impl RunnerChildExecutor {
     pub fn new(runners: HashMap<String, Runner>, host: Arc<dyn Host>) -> Self {
@@ -1008,7 +1010,14 @@ impl RunnerChildExecutor {
             runners,
             host,
             output_extractors: HashMap::new(),
+            progress: None,
         }
+    }
+
+    /// Bind this executor's root while sharing parent bindings with other generations.
+    pub fn with_progress(mut self, registry: Arc<ChildProgressRegistry>) -> Self {
+        self.progress = Some(registry);
+        self
     }
 
     /// Applies to this registration on both named and managed delegation surfaces.
@@ -1036,9 +1045,134 @@ impl ChildExecutor for RunnerChildExecutor {
                 .output_extractors
                 .get(&invocation.agent_name)
                 .map(Arc::as_ref);
-            runner
-                .run_child(invocation, control, self.host.clone(), extractor)
-                .await
+            let mut scope = self
+                .progress
+                .as_ref()
+                .and_then(|registry| registry.fork(&invocation, runner.progress_model()));
+            let progress = scope.as_ref().and_then(|scope| scope.observer.clone());
+            let result = runner
+                .run_child(invocation, control, self.host.clone(), extractor, progress)
+                .await;
+            if let Some(scope) = &mut scope {
+                scope.finish(match &result {
+                    Ok(outcome) => ProgressChildEnd::Finished(outcome),
+                    Err(error) => ProgressChildEnd::Failed(&error.info),
+                });
+            }
+            result
         })
+    }
+}
+
+// A present None preserves an unobserved parent across later root rebindings.
+type ChildProgressBindings = HashMap<String, Option<Arc<dyn RuntimeProgress>>>;
+
+/// Session-scoped progress bindings. Nested invocations fork from their immediate parent.
+/// Missing ancestors are restored without replaying their execution, using the
+/// scheduler's validated ancestry regardless of executor startup order.
+#[derive(Default)]
+pub struct ChildProgressRegistry {
+    root: Option<Arc<dyn RuntimeProgress>>,
+    active: Arc<Mutex<ChildProgressBindings>>,
+}
+impl ChildProgressRegistry {
+    pub fn new(root: Arc<dyn RuntimeProgress>) -> Self {
+        Self {
+            root: Some(root),
+            ..Default::default()
+        }
+    }
+    /// Create a generation-local root, retaining immediate-parent bindings and their gate.
+    pub fn rebind(&self, root: Option<Arc<dyn RuntimeProgress>>) -> Self {
+        Self {
+            root,
+            active: self.active.clone(),
+        }
+    }
+    fn fork(
+        self: &Arc<Self>,
+        invocation: &ChildInvocation,
+        model: &str,
+    ) -> Option<ChildProgressScope> {
+        let mut active = self.active.lock().unwrap();
+        let missing_from = invocation
+            .ancestors
+            .iter()
+            .rposition(|ancestor| active.contains_key(&ancestor.task_id))
+            .map_or(0, |index| index + 1);
+        for ancestor in &invocation.ancestors[missing_from..] {
+            let parent = match &ancestor.parent_task_id {
+                Some(id) => active.get(id)?.clone(),
+                None => self.root.clone(),
+            };
+            let observer = parent.and_then(|parent| {
+                parent.restore_child(ProgressChild {
+                    task_id: &ancestor.task_id,
+                    parent_task_id: ancestor.parent_task_id.as_deref(),
+                    agent_name: &ancestor.agent_name,
+                    agent_model: "",
+                })
+            });
+            active.insert(ancestor.task_id.clone(), observer);
+        }
+        let parent = match &invocation.parent_task_id {
+            Some(id) => active.get(id).cloned()?,
+            None => self.root.clone(),
+        };
+        let child = ProgressChild {
+            task_id: &invocation.task_id,
+            parent_task_id: invocation.parent_task_id.as_deref(),
+            agent_name: &invocation.agent_name,
+            agent_model: model,
+        };
+        let observer = parent.as_ref().and_then(|parent| parent.fork_child(child));
+        active.insert(invocation.task_id.clone(), observer.clone());
+        Some(ChildProgressScope {
+            registry: self.clone(),
+            parent,
+            observer,
+            task_id: invocation.task_id.clone(),
+            parent_task_id: invocation.parent_task_id.clone(),
+            agent_name: invocation.agent_name.clone(),
+            model: model.into(),
+            finished: false,
+        })
+    }
+}
+struct ChildProgressScope {
+    registry: Arc<ChildProgressRegistry>,
+    parent: Option<Arc<dyn RuntimeProgress>>,
+    observer: Option<Arc<dyn RuntimeProgress>>,
+    task_id: String,
+    parent_task_id: Option<String>,
+    agent_name: String,
+    model: String,
+    finished: bool,
+}
+impl ChildProgressScope {
+    fn finish(&mut self, end: ProgressChildEnd<'_>) {
+        if self.finished {
+            return;
+        }
+        self.finished = true;
+        let mut active = self.registry.active.lock().unwrap();
+        active.remove(&self.task_id);
+        if let (Some(parent), Some(_)) = (&self.parent, &self.observer) {
+            parent.child_finished(
+                ProgressChild {
+                    task_id: &self.task_id,
+                    parent_task_id: self.parent_task_id.as_deref(),
+                    agent_name: &self.agent_name,
+                    agent_model: &self.model,
+                },
+                end,
+            );
+        }
+        drop(active);
+    }
+}
+impl Drop for ChildProgressScope {
+    fn drop(&mut self) {
+        self.finish(ProgressChildEnd::Dropped);
     }
 }

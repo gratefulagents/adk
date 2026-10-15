@@ -474,8 +474,19 @@ impl ChildOutcome {
     }
 }
 
+/// An ancestor from the scheduler's validated task graph, not a replayable execution.
+#[derive(Debug, Clone)]
+pub struct ChildAncestor {
+    pub task_id: String,
+    pub parent_task_id: Option<String>,
+    pub agent_name: String,
+}
+
 pub struct ChildInvocation {
     pub task_id: String,
+    pub parent_task_id: Option<String>,
+    /// Root-to-immediate-parent order, including ancestors not yet resumed.
+    pub ancestors: Vec<ChildAncestor>,
     pub agent_name: String,
     pub context: Context,
     pub request: RunRequest,
@@ -1988,8 +1999,26 @@ async fn execute_once(
         cancellation: Arc::new(token.clone()),
         deadline: handle.inner.context.deadline,
     };
+    let mut ancestors = Vec::new();
+    let mut parent_id = record.parent_id.as_ref();
+    while let Some(id) = parent_id {
+        let parent = state
+            .records
+            .iter()
+            .find(|ancestor| &ancestor.task.id == id)
+            .expect("validated child scope parent");
+        ancestors.push(ChildAncestor {
+            task_id: parent.task.id.clone(),
+            parent_task_id: parent.parent_id.clone(),
+            agent_name: parent.task.agent_name.clone(),
+        });
+        parent_id = parent.parent_id.as_ref();
+    }
+    ancestors.reverse();
     let invocation = ChildInvocation {
         task_id: id.clone(),
+        parent_task_id: record.parent_id.clone(),
+        ancestors,
         agent_name: record.task.agent_name,
         context,
         request: RunRequest {

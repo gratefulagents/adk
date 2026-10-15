@@ -1,0 +1,425 @@
+{
+  "cases": [
+    {
+      "depth": 0,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_false_failed_false_depth_0",
+      "streamed": false
+    },
+    {
+      "depth": 1,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_false_failed_false_depth_1",
+      "streamed": false
+    },
+    {
+      "depth": 2,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_false_failed_false_depth_2",
+      "streamed": false
+    },
+    {
+      "depth": 0,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_false_failed_true_depth_0",
+      "streamed": false
+    },
+    {
+      "depth": 1,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_false_failed_true_depth_1",
+      "streamed": false
+    },
+    {
+      "depth": 2,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_false_failed_true_depth_2",
+      "streamed": false
+    },
+    {
+      "depth": 0,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_true_failed_false_depth_0",
+      "streamed": true
+    },
+    {
+      "depth": 1,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_true_failed_false_depth_1",
+      "streamed": true
+    },
+    {
+      "depth": 2,
+      "expected": [
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": ""
+        },
+        {
+          "cache_create": 3,
+          "cache_read": 5,
+          "cost": 0.125,
+          "input": 13,
+          "models": {
+            "configured-label": {
+              "cache_creation_input_tokens": 3,
+              "cache_read_input_tokens": 5,
+              "input_tokens": 13,
+              "output_tokens": 7
+            }
+          },
+          "output": 7,
+          "text": "accepted text"
+        }
+      ],
+      "failed": false,
+      "name": "streamed_true_failed_false_depth_2",
+      "streamed": true
+    },
+    {
+      "depth": 0,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_true_failed_true_depth_0",
+      "streamed": true
+    },
+    {
+      "depth": 1,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_true_failed_true_depth_1",
+      "streamed": true
+    },
+    {
+      "depth": 2,
+      "expected": [
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        },
+        {
+          "cache_create": 0,
+          "cache_read": 0,
+          "cost": 0,
+          "input": 0,
+          "models": null,
+          "output": 0,
+          "text": ""
+        }
+      ],
+      "failed": true,
+      "name": "streamed_true_failed_true_depth_2",
+      "streamed": true
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/progress-reference/cases.json": "8ef96578cd2ede8954ec41c8a549b150cc9e07d29d764c2fe65d5f2822addc06",
+      "scripts/progress-reference/helper_reference_test.go": "bcd55b1474925d6e3c85e11061bfbb0fed86321335e0c23edee5e97dfcbcb050",
+      "scripts/progress-reference/reference_test.go": "0410c0a5cc82d04f2281c93e6e19d6ba87cfedb3d6b071fa3d53a59f429c3d4a",
+      "scripts/progress-reference/run.py": "a0dd695bc97dd2b43263ae2e8d9f150eb157e908515adbbeda6c5b403b2b0fe5",
+      "scripts/progress-reference/runtime_reference_test.go": "aa5d66baa06c7e95f9397a5074fe66a2f22e8f58c7163fa016150c7c95196848"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/platform_hooks.go": "10890d4ce8d334251b6e3228048a5a465c75b4108c12b107717978844dc4d06b",
+      "internal/agent/record.go": "06c679941976c5c5ecfcb9e8e7946137b01d30ec88476c10d544bd5195f5d414",
+      "internal/agent/record_forwarding_test.go": "78fb6c8291415c25f7c6f9f8c646c036b3c4e68718d33f5c72b5a09524c9cb91",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/stream.go": "e965af45e4650dfdff38df948e38cc06dbfbea5aa86a8f1bd7fe51751be2be09",
+      "internal/agent/stream_test.go": "bb91a188b3eabdd77e51bf180052774468d3e4751de7cb64e6c0917bf957276d",
+      "internal/agent/tracing.go": "14cca4c3521f33afb9c432f2ea41968e0183ba5fbabf4673da954ed5b56b2717",
+      "internal/agent/usage.go": "619655758f961e8bd5bd004cea7127bcc0ed916013cdaf785959f7edb1839d37"
+    }
+  }
+}

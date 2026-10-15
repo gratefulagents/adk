@@ -10113,6 +10113,1906 @@
         "child_tool_projection_matches_pinned_sdk"
       ],
       "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-17FD266E3CE02A48": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Get",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::get"
+      ],
+      "rust_test_identifiers": [
+        "get_returns_none_for_missing_name_even_when_allowlisted"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Get (apis) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-96F8D6496ABFA2F4": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Names",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::names"
+      ],
+      "rust_test_identifiers": [
+        "built_registry_names_and_tools_are_sorted_and_match_observed_membership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Names (apis) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A71FDC71E6F33A9D": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Tools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::tools"
+      ],
+      "rust_test_identifiers": [
+        "built_registry_names_and_tools_are_sorted_and_match_observed_membership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Tools (apis) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-341B3041FCAC4162": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.allowPrivateNetworkURLs",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build",
+        "crates/adk-tools/src/web.rs::builtin"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state",
+        "public_policy_cannot_be_overridden_by_arguments",
+        "html_pagination_status_and_request_headers"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes Registry.allowPrivateNetworkURLs as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. The host configuration boolean is explicit; no network-destination enforcement claim is made by the selection fixture. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names. Separate native Registry-built WebFetch loopback tests prove the host private-network flag reaches execution and cannot be overridden through model arguments; this does not claim complete Go URL-policy equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-64CF7AB797CD48AD": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.asyncShell",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes Registry.asyncShell as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. BashStart/BashPoll/BashKill selection retains the permission gates. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-DD924FD1C792EF08": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.browser",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryAdaptsBrowserForReadOnlyMode",
+      "rationale": "Closes Registry.browser as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Browser selection and metadata only; native resource construction and Vision screenshot-directory propagation remain separately unresolved. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FA04CBBEF20A5672": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.disableWeb",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryWithoutWebTools",
+      "rationale": "Closes Registry.disableWeb as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. WebFetch is removed while independent families remain selected. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-DB8D98616ED98D7A": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.interactiveTerminal",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestInteractiveTerminalRequiresDangerFullAccess",
+      "rationale": "Closes Registry.interactiveTerminal as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Terminal requires danger-full-access and enabled remote writes; allowlisting cannot override this gate. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-D60CDD5C977FE213": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.signals",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.signals as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Only AskUserQuestion and present_plan are selected; Finish is not implicitly enabled. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A8D867CDDEDE37F4": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.thinkTool",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes Registry.thinkTool as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Think is independent and opt-in. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7C9EDD9AD261BADD": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithAsyncShellTools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes WithAsyncShellTools as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. BashStart/BashPoll/BashKill selection retains the permission gates. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-3035F63F21FE80FF": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithBrowserTools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryAdaptsBrowserForReadOnlyMode",
+      "rationale": "Closes WithBrowserTools as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Browser selection and metadata only; native resource construction and Vision screenshot-directory propagation remain separately unresolved. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-2304560FE139E746": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithInteractiveTerminal",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestInteractiveTerminalRequiresDangerFullAccess",
+      "rationale": "Closes WithInteractiveTerminal as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Terminal requires danger-full-access and enabled remote writes; allowlisting cannot override this gate. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-56802796E04E050F": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithPrivateNetworkURLs",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build",
+        "crates/adk-tools/src/web.rs::builtin"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state",
+        "public_policy_cannot_be_overridden_by_arguments",
+        "html_pagination_status_and_request_headers"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes WithPrivateNetworkURLs as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. The host configuration boolean is explicit; no network-destination enforcement claim is made by the selection fixture. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names. Separate native Registry-built WebFetch loopback tests prove the host private-network flag reaches execution and cannot be overridden through model arguments; this does not claim complete Go URL-policy equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0926DC6AADE7DBE9": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithSignalTools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes WithSignalTools as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Only AskUserQuestion and present_plan are selected; Finish is not implicitly enabled. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-151C9E5CC7630D0E": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithThinkTool",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes WithThinkTool as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. Think is independent and opt-in. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-6618403B01B3A110": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "WithoutWebTools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "explicit_option_values_match_actual_pinned_registry_state"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryWithoutWebTools",
+      "rationale": "Closes WithoutWebTools as an idiomatic explicitly configured Rust feature/option, using independent on/off and combination stimuli crossed with three permissions and both remote-write settings. WebFetch is removed while independent families remain selected. Go default selection is mapped explicitly; native Strict(empty) and default remote-write denial are not changed or represented as matching Go NewRegistry. No full tool execution or registry-constructor parity is claimed. Actual pinned registry option-state booleans are observed and compared with the explicitly mapped native configuration, rather than inferred solely from visible names.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A4C168431F5D6FE0": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Get",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::get"
+      ],
+      "rust_test_identifiers": [
+        "get_returns_none_for_missing_name_even_when_allowlisted"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Get (configuration) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-48FEF1782B2694D4": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Names",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::names"
+      ],
+      "rust_test_identifiers": [
+        "built_registry_names_and_tools_are_sorted_and_match_observed_membership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Names (configuration) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-28429458A053F782": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": "Registry.Tools",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::Registry::tools"
+      ],
+      "rust_test_identifiers": [
+        "built_registry_names_and_tools_are_sorted_and_match_observed_membership"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes Registry.Tools (configuration) only: real native registry lookup/enumeration is compared with independently executed pinned Go Get/Names/Tools across 79 configurations. Names and tool definitions have ascending unique name order; missing lookup stays absent even when allowlisted. No duplicate Register replacement, default constructor or tool execution equivalence is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-9474BE1D24C55158": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 272: r.Register(&shell.BashPollTool{Manager: manager}). The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-51122C7DB2202A0C": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 272: shell.BashPollTool{Manager: manager}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-905602DEB1516969": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 273: r.Register(&shell.BashKillTool{Manager: manager}). The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-05AD0E0F3F4520F8": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 273: shell.BashKillTool{Manager: manager}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5A25F1BEAE41C70D": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestInteractiveTerminalRequiresDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 280: r.Register(&shell.TerminalTool{Manager: manager, Mode: r.permissionMode, GitRemoteWrites: r.gitRemoteWrites}). The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-16E32B4556826698": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestInteractiveTerminalRequiresDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 280: shell.TerminalTool{Manager: manager, Mode: r.permissionMode, GitRemoteWrites: r.gitRemoteWrites}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B3EB9E2349A368C7": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes this registration occurrence at line 283: r.Register(&signal.ThinkTool{}). The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-695769470CCF81C6": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestRegistryOptionsHaveExplicitCapabilityClassification",
+      "rationale": "Closes this registration occurrence at line 283: signal.ThinkTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C8137550F4970B8B": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 220: search.ListFilesTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-651C9230FCDCF5C2": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 221: search.ReadFileTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-87C901D8B834E007": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 222: search.GlobTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-F3716883E70F6AD3": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 223: search.GrepTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-CBD8D495B8263276": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 225: shell.WorkspaceWriteBashTool{BashTool: shell.BashTool{ Executor: r.bashExecutor(), GitRemoteWrites: r.gitRemoteWrites, }}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FF5B6DF817942412": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 225: shell.BashTool{ Executor: r.bashExecutor(), GitRemoteWrites: r.gitRemoteWrites, }. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-1B696E66ADB5B8E5": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 229: fs.WorkspaceWriteFileTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-9BAE200986877DC0": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 230: fs.WorkspaceEditTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-EBD444317E072380": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 231: fs.ApplyPatchTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A08EF243E441F0BC": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 232: fs.MoveTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-488946A89A27682A": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 233: fs.DeleteTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5EE9226DCBCE97D8": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 237: search.ListFilesTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-61AEBA6678C9C889": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 238: search.ReadFileTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-3DBE01E534C0CBD8": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 239: search.GlobTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5392ECB2EDCDDFCA": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 240: search.GrepTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5B3FA3ED2C29FBD8": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 244: shell.ReadOnlyBashTool{BashTool: shell.BashTool{ Executor: r.bashExecutor(), GitRemoteWrites: r.gitRemoteWrites, }}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-6F8FEA7D362E7CA0": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryReadOnly",
+      "rationale": "Closes this registration occurrence at line 244: shell.BashTool{ Executor: r.bashExecutor(), GitRemoteWrites: r.gitRemoteWrites, }. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A58DCC770D634BEF": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 250: shell.BashTool{Executor: r.bashExecutor(), GitRemoteWrites: r.gitRemoteWrites}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-75407F6EBA5CFC56": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 251: fs.FileWriteTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-9C10FFA1B58F3FF8": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 252: fs.FileEditTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-2BCCBFA3AE3A5280": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 253: fs.ApplyPatchTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-73667FD82D403082": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 254: fs.MoveTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-150F142E0D204971": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDangerFullAccess",
+      "rationale": "Closes this registration occurrence at line 255: fs.DeleteTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-6DE811E15B7C8D80": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build",
+        "crates/adk-tools/src/web.rs::builtin"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction",
+        "public_policy_cannot_be_overridden_by_arguments",
+        "html_pagination_status_and_request_headers"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 260: web.FetchTool{AllowPrivateNetworkURLs: r.allowPrivateNetworkURLs}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim. Separate native Registry-built WebFetch loopback tests prove the host private-network flag reaches execution and cannot be overridden through model arguments; this does not claim complete Go URL-policy equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-34A6E7ECAFB04371": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 263: signal.AskUserQuestionTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-CAE9C8E5F82B29AC": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryDefaultTools",
+      "rationale": "Closes this registration occurrence at line 263: signal.PresentPlanTool{}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7FFEAD561AB1C756": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 271: r.Register(&shell.BashStartTool{Manager: manager, Mode: r.permissionMode, GitRemoteWrites: r.gitRemoteWrites}). The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B61FF8881AC584FD": {
+      "source": "pkg/agentsdk/tools/registry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::select",
+        "crates/adk-tools/src/lib.rs::Registry::build"
+      ],
+      "rust_test_identifiers": [
+        "explicit_selection_matches_every_runtime_observed_name_without_exceptions",
+        "selected_modes_match_actual_go_constructor_types",
+        "selected_contracts_match_runtime_go_definitions_including_browser_selection",
+        "built_registry_definitions_match_actual_go_objects_except_excluded_browser_construction"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/TestNewRegistryAsyncShellTools",
+      "rationale": "Closes this registration occurrence at line 271: shell.BashStartTool{Manager: manager, Mode: r.permissionMode, GitRemoteWrites: r.gitRemoteWrites}. The 79-case independently executed constructor matrix proves selected name, permission-specific source constructor type and full registered definition; real native nonbrowser construction is compared, using explicit host-owned shell/LSP dependencies. Nested Bash literals at225/244 belong to their enclosing workspace-write/read-only wrapper, not an additional plain Bash registration. This is registration/metadata assembly, not execution, sandbox authorization or network-policy equivalence; no whole-registry/default-constructor claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C4CDCE7C84730B17": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractAgentMeta",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_agent_meta"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractAgentMeta: Projects all five metadata strings, returns unknown only on decode errors, falls back to prompt for empty description, and applies the80-scalar normalized description limit. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-D8B073FE75D993F2": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractBashCommand",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_bash_command"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractBashCommand: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-8AF1D02DE89065D5": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractFilePath",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_file_path"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractFilePath: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-E999C85B6FC96867": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractGlobPattern",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_glob_pattern"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractGlobPattern: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-546C01F10BFC9FD5": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractGrepPattern",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_grep_pattern"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractGrepPattern: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6BBC2CE21C6AA8DC": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractLSPOperation",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_lsp_operation"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractLSPOperation: Returns operation and filePath and retains successfully decoded fields after other field type errors, including later duplicate updates; invalid syntax discards all updates. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-37C2876C74B33F5B": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ExtractPath",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_path"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractPath: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-DFB90DE479EE9AA9": {
+      "source": "internal/agent/stream.go",
+      "source_name": "Truncate",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncate",
+      "rationale": "Closes Truncate and its Rust-native UTF-8 text/signed-limit contract. Trims Unicode whitespace, replaces newlines, disables truncation for nonpositive limits, uses scalar limits and short-limit versus ellipsis branches. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-648122C1ABF680A4": {
+      "source": "internal/agent/stream.go",
+      "source_name": "TruncateBytes",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncateBytes",
+      "rationale": "Closes TruncateBytes and its Rust-native UTF-8 text/signed-limit contract. Preserves whitespace, disables truncation for nonpositive limits, respects UTF-8 byte boundaries and short-limit versus ellipsis branches. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-51E9DEC1E9748F0E": {
+      "source": "internal/agent/stream.go",
+      "source_name": "TruncateMiddle",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate_middle"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncateMiddle",
+      "rationale": "Closes TruncateMiddle and its Rust-native UTF-8 text/signed-limit contract. Preserves whitespace, uses the exact UTF-8 byte-count marker reservation plus12, small-limit prefix fallback, two-thirds head allocation and exact elided-scalar count. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-4326F2E4B3C84A85": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractAgentMeta",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_agent_meta"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractAgentMeta: Projects all five metadata strings, returns unknown only on decode errors, falls back to prompt for empty description, and applies the80-scalar normalized description limit. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6C189D134519E923": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractBashCommand",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_bash_command"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractBashCommand: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-721D368CDD9FBE2E": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractFilePath",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_file_path"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractFilePath: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-4F34281F1EAB6525": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractGlobPattern",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_glob_pattern"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractGlobPattern: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-46D26744AAB6844D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractGrepPattern",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_grep_pattern"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractGrepPattern: Extracts the corresponding nullable scalar string, returning empty on syntax/root/type errors. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-C49BBCD486745F3B": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ExtractLSPOperation",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::extract_lsp_operation"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "tool_extractors_preserve_order_null_and_go_error_rules",
+        "extractor_unknown_nesting_obeys_go_limit_without_value_recursion"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers",
+      "rationale": "Closes ExtractLSPOperation: Returns operation and filePath and retains successfully decoded fields after other field type errors, including later duplicate updates; invalid syntax discards all updates. Raw-byte decoding preserves duplicate/case-alias order, ignores null scalar updates, retains first type-error status, ignores unknown huge numbers/deep values up to Go10000 nesting, and replaces malformed UTF-8/lone UTF-16 surrogates. The236-case independently executed Go helper fixture and focused regressions compare actual output; this does not authorize tool execution or claim complete ProgressTracker/type/file parity. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-AC3367DE9A0D4657": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "Truncate",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncate",
+      "rationale": "Closes Truncate and its Rust-native UTF-8 text/signed-limit contract. Trims Unicode whitespace, replaces newlines, disables truncation for nonpositive limits, uses scalar limits and short-limit versus ellipsis branches. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-AA1B2FC424E93F0B": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "TruncateBytes",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncateBytes",
+      "rationale": "Closes TruncateBytes and its Rust-native UTF-8 text/signed-limit contract. Preserves whitespace, disables truncation for nonpositive limits, respects UTF-8 byte boundaries and short-limit versus ellipsis branches. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6136778D8FA0546A": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "TruncateMiddle",
+      "implementation_symbols": [
+        "crates/adk/src/progress/helpers.rs::truncate_middle"
+      ],
+      "rust_test_identifiers": [
+        "pinned_progress_helpers_match_independent_go_observations",
+        "sdk_text_limits_keep_utf8_and_document_marker_reservation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestTruncateMiddle",
+      "rationale": "Closes TruncateMiddle and its Rust-native UTF-8 text/signed-limit contract. Preserves whitespace, uses the exact UTF-8 byte-count marker reservation plus12, small-limit prefix fallback, two-thirds head allocation and exact elided-scalar count. The independent pinned Go helper oracle compares negative/zero,1/2/3/4, multibyte, marker-boundary and large limits. Rust &str intentionally represents valid UTF-8; no arbitrary invalid-byte Go string API is claimed. This public Go alias resolves to that same helper; Rust exposes the snake_case function under adk::progress rather than a root-level alias variable.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-D81D5F85D57E68BE": {
+      "source": "internal/agent/stream.go",
+      "source_name": "NewChildTracker",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::child"
+      ],
+      "rust_test_identifiers": [
+        "nested_usage_forwards_without_parent_activity",
+        "descendant_usage_and_tools_only_forward_and_completion_never_double_counts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewChildTracker",
+      "rationale": "Closes the NewChildTracker operation only through progress::ProgressTracker::child, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario nested_usage_forwards_without_parent_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression descendant_usage_and_tools_only_forward_and_completion_never_double_counts adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-FCE3D2711D53A554": {
+      "source": "internal/agent/stream.go",
+      "source_name": "NewProgressTracker",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::new"
+      ],
+      "rust_test_identifiers": [
+        "empty_snapshot",
+        "sdk_wire_names_null_map_arrays_signed_fields_and_float_rejection"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewProgressTracker",
+      "rationale": "Closes the NewProgressTracker operation only through progress::ProgressTracker::new, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario empty_snapshot compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression sdk_wire_names_null_map_arrays_signed_fields_and_float_rejection adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-7BE77450478ED258": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.CurrentStep",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::current_step"
+      ],
+      "rust_test_identifiers": [
+        "tool_step_inference",
+        "exact_case_sensitive_step_inference_and_event_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_InferStep",
+      "rationale": "Closes the ProgressTracker.CurrentStep operation only through progress::ProgressTracker::current_step, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario tool_step_inference compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression exact_case_sensitive_step_inference_and_event_order adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6C3FA7071BD8F9BD": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.DrainPendingEvents",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::drain_pending_events"
+      ],
+      "rust_test_identifiers": [
+        "ring_eviction_does_not_drain_pending",
+        "event_ring_and_independent_unbounded_session_drain"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_DrainPendingEvents",
+      "rationale": "Closes the ProgressTracker.DrainPendingEvents operation only through progress::ProgressTracker::drain_pending_events, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario ring_eviction_does_not_drain_pending compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression event_ring_and_independent_unbounded_session_drain adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-B7546665B92D47FA": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.LastAssistantText",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::last_assistant_text"
+      ],
+      "rust_test_identifiers": [
+        "assistant_thinking_does_not_replace_activity",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordAssistantText",
+      "rationale": "Closes the ProgressTracker.LastAssistantText operation only through progress::ProgressTracker::last_assistant_text, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario assistant_thinking_does_not_replace_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-9029B93CE96D8CBE": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.LastAssistantThinking",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::last_assistant_thinking"
+      ],
+      "rust_test_identifiers": [
+        "assistant_thinking_does_not_replace_activity",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordAssistantText",
+      "rationale": "Closes the ProgressTracker.LastAssistantThinking operation only through progress::ProgressTracker::last_assistant_thinking, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario assistant_thinking_does_not_replace_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-92A43BC879050205": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordAPIRetry",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_api_retry"
+      ],
+      "rust_test_identifiers": [
+        "retry_and_compaction_callbacks",
+        "concurrent_record_returns_only_after_its_callbacks_before_host_flush"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordSessionComplete",
+      "rationale": "Closes the ProgressTracker.RecordAPIRetry operation only through progress::ProgressTracker::record_api_retry, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario retry_and_compaction_callbacks compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression concurrent_record_returns_only_after_its_callbacks_before_host_flush adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-12FDD98E3C8FA169": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordAssistantText",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_assistant_text"
+      ],
+      "rust_test_identifiers": [
+        "assistant_thinking_does_not_replace_activity",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordAssistantText",
+      "rationale": "Closes the ProgressTracker.RecordAssistantText operation only through progress::ProgressTracker::record_assistant_text, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario assistant_thinking_does_not_replace_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-BA12E9F840CCFFC0": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordAssistantThinking",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_assistant_thinking"
+      ],
+      "rust_test_identifiers": [
+        "assistant_thinking_does_not_replace_activity",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordAssistantText",
+      "rationale": "Closes the ProgressTracker.RecordAssistantThinking operation only through progress::ProgressTracker::record_assistant_thinking, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario assistant_thinking_does_not_replace_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-B0DD7427717F057A": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordCompactBoundary",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_compact_boundary"
+      ],
+      "rust_test_identifiers": [
+        "retry_and_compaction_callbacks",
+        "structural_spans_pair_fallback_and_copy_child_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordCompactBoundary",
+      "rationale": "Closes the ProgressTracker.RecordCompactBoundary operation only through progress::ProgressTracker::record_compact_boundary, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario retry_and_compaction_callbacks compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression structural_spans_pair_fallback_and_copy_child_settings adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-B8AB86A3C3AB3EE8": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordHookDecision",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_hook_decision"
+      ],
+      "rust_test_identifiers": [
+        "hook_is_noop",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordLifecycleEvent",
+      "rationale": "Closes the ProgressTracker.RecordHookDecision operation only through progress::ProgressTracker::record_hook_decision, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario hook_is_noop compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery. The source method is explicitly a no-op; this is not hook-policy enforcement.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-FCD52150E620591C": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordLLMUsage",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_llm_usage"
+      ],
+      "rust_test_identifiers": [
+        "usage_accumulates_and_sorts_models",
+        "token_arithmetic_wraps_and_every_model_is_retained"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestChildTrackerForwardsLLMUsageToAncestors",
+      "rationale": "Closes the ProgressTracker.RecordLLMUsage operation only through progress::ProgressTracker::record_llm_usage, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario usage_accumulates_and_sorts_models compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression token_arithmetic_wraps_and_every_model_is_retained adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-67DE0A5E5DD0C5B4": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordLifecycleEvent",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_lifecycle_event"
+      ],
+      "rust_test_identifiers": [
+        "lifecycle_preserves_full_summary",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordLifecycleEvent",
+      "rationale": "Closes the ProgressTracker.RecordLifecycleEvent operation only through progress::ProgressTracker::record_lifecycle_event, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario lifecycle_preserves_full_summary compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-0C4FBAE6F18DE91C": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordSessionComplete",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_session_complete"
+      ],
+      "rust_test_identifiers": [
+        "session_completion_does_not_double_count",
+        "concurrent_record_returns_only_after_its_callbacks_before_host_flush"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordSessionComplete",
+      "rationale": "Closes the ProgressTracker.RecordSessionComplete operation only through progress::ProgressTracker::record_session_complete, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario session_completion_does_not_double_count compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression concurrent_record_returns_only_after_its_callbacks_before_host_flush adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-BB05281482AA5B4F": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordSubagentCompleted",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_subagent_completed"
+      ],
+      "rust_test_identifiers": [
+        "subagent_completion_reuses_start_span",
+        "descendant_usage_and_tools_only_forward_and_completion_never_double_counts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage",
+      "rationale": "Closes the ProgressTracker.RecordSubagentCompleted operation only through progress::ProgressTracker::record_subagent_completed, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario subagent_completion_reuses_start_span compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression descendant_usage_and_tools_only_forward_and_completion_never_double_counts adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-BCE565660A44116F": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordSubagentProgress",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_subagent_progress"
+      ],
+      "rust_test_identifiers": [
+        "subagent_completion_reuses_start_span",
+        "metadata_is_owned_spawn_count_cumulative_and_cleanup_exact"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordSubagentLifecycle",
+      "rationale": "Closes the ProgressTracker.RecordSubagentProgress operation only through progress::ProgressTracker::record_subagent_progress, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario subagent_completion_reuses_start_span compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression metadata_is_owned_spawn_count_cumulative_and_cleanup_exact adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-01642B611F6FCF57": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordSubagentStarted",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_subagent_started"
+      ],
+      "rust_test_identifiers": [
+        "subagent_completion_reuses_start_span",
+        "metadata_is_owned_spawn_count_cumulative_and_cleanup_exact"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordSubagentLifecycle",
+      "rationale": "Closes the ProgressTracker.RecordSubagentStarted operation only through progress::ProgressTracker::record_subagent_started, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario subagent_completion_reuses_start_span compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression metadata_is_owned_spawn_count_cumulative_and_cleanup_exact adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-941B4FA82C63C95D": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordSystemInit",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_system_init"
+      ],
+      "rust_test_identifiers": [
+        "session_and_step_deduplication",
+        "exact_case_sensitive_step_inference_and_event_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordSystemInitIncludesPermissionMode",
+      "rationale": "Closes the ProgressTracker.RecordSystemInit operation only through progress::ProgressTracker::record_system_init, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario session_and_step_deduplication compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression exact_case_sensitive_step_inference_and_event_order adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-6A4E40FBBEBC06EF": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordToolResult",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_tool_result"
+      ],
+      "rust_test_identifiers": [
+        "tool_result_success_and_error",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordToolResult",
+      "rationale": "Closes the ProgressTracker.RecordToolResult operation only through progress::ProgressTracker::record_tool_result, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario tool_result_success_and_error compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-BDF06C8DAA74D272": {
+      "source": "internal/agent/record.go",
+      "source_name": "ProgressTracker.RecordToolUse",
+      "implementation_symbols": [
+        "crates/adk/src/progress/record.rs::ProgressTracker::record_tool_use"
+      ],
+      "rust_test_identifiers": [
+        "tool_step_inference",
+        "descendant_usage_and_tools_only_forward_and_completion_never_double_counts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestChildTrackerForwardsToolCallCounts",
+      "rationale": "Closes the ProgressTracker.RecordToolUse operation only through progress::ProgressTracker::record_tool_use, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario tool_step_inference compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression descendant_usage_and_tools_only_forward_and_completion_never_double_counts adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-89A8E7D23785CACF": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.SessionNumber",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::session_number"
+      ],
+      "rust_test_identifiers": [
+        "session_and_step_deduplication",
+        "session_reset_preserves_aggregates_and_owned_snapshots"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_SetSession",
+      "rationale": "Closes the ProgressTracker.SessionNumber operation only through progress::ProgressTracker::session_number, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario session_and_step_deduplication compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression session_reset_preserves_aggregates_and_owned_snapshots adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-E1DA4AEA2C0FCD9A": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.SetSession",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::set_session"
+      ],
+      "rust_test_identifiers": [
+        "session_and_step_deduplication",
+        "session_reset_preserves_aggregates_and_owned_snapshots"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_SetSession",
+      "rationale": "Closes the ProgressTracker.SetSession operation only through progress::ProgressTracker::set_session, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario session_and_step_deduplication compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression session_reset_preserves_aggregates_and_owned_snapshots adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-004687E1551B3348": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.SetStep",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::set_step"
+      ],
+      "rust_test_identifiers": [
+        "session_and_step_deduplication",
+        "exact_case_sensitive_step_inference_and_event_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_InferStep",
+      "rationale": "Closes the ProgressTracker.SetStep operation only through progress::ProgressTracker::set_step, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario session_and_step_deduplication compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression exact_case_sensitive_step_inference_and_event_order adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-0855797B4ECA804E": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.Snapshot",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::snapshot"
+      ],
+      "rust_test_identifiers": [
+        "empty_snapshot",
+        "session_reset_preserves_aggregates_and_owned_snapshots"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewProgressTracker",
+      "rationale": "Closes the ProgressTracker.Snapshot operation only through progress::ProgressTracker::snapshot, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario empty_snapshot compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression session_reset_preserves_aggregates_and_owned_snapshots adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-3A4E283399A3A4E5": {
+      "source": "internal/agent/stream.go",
+      "source_name": "ProgressTracker.WriteResult",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::write_result"
+      ],
+      "rust_test_identifiers": [
+        "result_summary_field_order_and_fallback",
+        "full_text_thinking_and_source_summary_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_RecordLifecycleEvent",
+      "rationale": "Closes the ProgressTracker.WriteResult operation only through progress::ProgressTracker::write_result, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario result_summary_field_order_and_fallback compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression full_text_thinking_and_source_summary_normalization adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-F6ED788544CD52ED": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NewChildTracker",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::child"
+      ],
+      "rust_test_identifiers": [
+        "nested_usage_forwards_without_parent_activity",
+        "descendant_usage_and_tools_only_forward_and_completion_never_double_counts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewChildTracker",
+      "rationale": "Closes the NewChildTracker operation only through progress::ProgressTracker::child, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario nested_usage_forwards_without_parent_activity compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression descendant_usage_and_tools_only_forward_and_completion_never_double_counts adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
+    },
+    "SDK-64C4D138251E108D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "NewProgressTracker",
+      "implementation_symbols": [
+        "crates/adk/src/progress/state.rs::ProgressTracker::new"
+      ],
+      "rust_test_identifiers": [
+        "empty_snapshot",
+        "sdk_wire_names_null_map_arrays_signed_fields_and_float_rejection"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewProgressTracker",
+      "rationale": "Closes the NewProgressTracker operation only through progress::ProgressTracker::new, not the complete tracker type, platform hooks or runtime composition. Independently executed pinned Go scenario empty_snapshot compares snapshots/text/pending events and, when applicable, ordered structural callbacks with stable identity relationships. Native regression sdk_wire_names_null_map_arrays_signed_fields_and_float_rejection adds owned-state/concurrency/boundary evidence. SDK-shaped signed wrapping counters and per-model keys are distinct from native cumulative observability; children forward only usage/tool counts and completion never re-adds usage. Generated timestamps/UUIDs and measured subagent elapsed time are normalized, while explicit durations and wire field shapes remain compared. Host processors are nonpanicking, host-owned and never flushed by the tracker; same-thread reentry is a documented Rust extension with deferred callback delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
+      ]
     }
   }
 }

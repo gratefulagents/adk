@@ -51,6 +51,10 @@ pub mod content_stream;
 #[cfg(feature = "observability")]
 pub mod observability;
 
+/// SDK-shaped progress accounting, independent of native observability snapshots.
+#[cfg(feature = "observability")]
+pub mod progress;
+
 /// Compatible SDK trace documents and Linux confined category storage.
 #[cfg(feature = "observability")]
 pub mod tracestore;

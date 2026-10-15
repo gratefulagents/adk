@@ -12,8 +12,17 @@ use std::{
 pub(super) struct PendingExecutor(OnceLock<RunnerChildExecutor>);
 
 impl PendingExecutor {
-    pub(super) fn initialize(&self, runners: HashMap<String, Runner>, host: Arc<dyn Host>) {
-        assert!(self.0.set(RunnerChildExecutor::new(runners, host)).is_ok());
+    pub(super) fn initialize(
+        &self,
+        runners: HashMap<String, Runner>,
+        host: Arc<dyn Host>,
+        progress: Option<Arc<adk_runtime::subagent_tools::ChildProgressRegistry>>,
+    ) {
+        let mut executor = RunnerChildExecutor::new(runners, host);
+        if let Some(progress) = progress {
+            executor = executor.with_progress(progress);
+        }
+        assert!(self.0.set(executor).is_ok());
     }
 }
 

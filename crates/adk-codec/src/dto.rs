@@ -16,7 +16,7 @@ pub(crate) fn null_default_elements<'de, D: Deserializer<'de>, T: Deserialize<'d
         .map(Option::unwrap_or_default)
         .collect())
 }
-fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
+pub fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
     if !v.is_finite() {
         return Err(serde::ser::Error::custom("nonfinite Go float"));
     }

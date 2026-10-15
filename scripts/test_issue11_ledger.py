@@ -35,6 +35,8 @@ class EvidenceTests(unittest.TestCase):
                        "Pinned LLM summary observations reproduced exactly",
                        "Pinned autoloop observations reproduced exactly",
                        "Pinned child result-cost observations reproduced exactly",
+                       "Pinned progress observations reproduced exactly",
+                       "Pinned registry selection observations reproduced exactly",
                        "Pinned content event observations reproduced exactly",
                        "Pinned line writer observations reproduced exactly",
                        "Pinned content stream observations reproduced exactly",

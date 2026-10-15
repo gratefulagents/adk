@@ -2,6 +2,56 @@
 
 ## Current continuation evidence
 
+### SDK progress, runtime accounting and registry selection
+
+Added the separate `adk::progress::{ProgressTracker, RunProgress}` API without
+changing native observability. It preserves SDK snapshot fields, signed/wrapping
+accounting, per-model/cache totals, session resets, pending events versus the
+20-event ring, text/inference rules, nested forwarding and structural span
+pairing. Raw extraction/text helpers preserve ordered aliases/nulls, partial LSP
+decoding, malformed UTF-8/surrogates, deep ignored JSON and distinct truncation
+limits. See [ownership and usage](../observability.md#sdk-shaped-progress-state).
+
+An optional nonfallible runtime interface records per-call usage separately from
+policy hooks and generation/content observers. USD units are explicit; uncertain
+nonzero subtotals remain available. Accepted, compaction, genuinely superseded
+and retained failed-stream responses have distinct accounting boundaries. The
+SDK tracker excludes Complete → Error usage while native budget accounting
+retains it. Session completion status survives external span ownership.
+
+Child progress follows the immediate parent across executor generations and
+durable descendant-first recovery. Ancestor restoration replays neither usage
+nor lifecycle starts. Generation-local roots and shared bindings ensure new
+children follow refreshed/disabled observers while accepted old tasks and
+explicitly unobserved parents retain their original scope. Review found and
+regression tests fixed concurrent callback delivery returning before flush, and
+stale child observers after refresh. Focused re-review found no remaining blocker.
+
+Independent pinned SDK evidence now includes **16 tracker scenarios / 88
+observations**, **236 helper cases**, **12 real runner accounting cases**, and
+**79 registry configurations**. The latter compares actual constructor types,
+definitions, option booleans, sorted enumeration and missing lookups. It maps Go
+defaults explicitly to native selection; it does not relabel native empty/safe
+defaults, browser resource construction, duplicate registration or tool execution
+as equivalent. Harnesses and normalization limits are documented in
+`scripts/progress-reference/README.md` and `scripts/registry-reference/README.md`.
+
+Fresh Rust 1.88 workspace: **1,515 passed / 0 failed / 30 ignored**, across **153
+targets**, with **7 doctests** and no warnings. Strict workspace Clippy/rustdoc,
+the full facade feature matrix and platform-free standalone consumer/purity,
+fresh bound oracle evidence, **27 audit validators** and immutable source locks
+pass. Original pinned Go reference tests: **813 passed / 5 skipped**. A first run
+with an overridden temporary directory failed one upstream test that assumes
+paths beneath `/tmp`; rerunning with the host's default temporary-directory
+semantics passed, without changing the pinned source.
+
+Exactly **102 additional records** are closed: 56 registry selection/lookup
+records, 19 helper API/alias records and 27 tracker operation/alias records.
+Ledger: **679 verified / 8,212 unresolved / 251 excluded**. Whole tracker types,
+complete runtime/registry parity and the rest of the reusable ledger are not
+implicitly closed. Live provider/exporter credentials remain unverified.
+**Issue #11 and draft PR #33 remain incomplete.**
+
 ### Owned model-settings merge
 
 `snapshots::ModelSettings::merge` now matches the pinned helper's value-selection

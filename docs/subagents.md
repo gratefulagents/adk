@@ -120,3 +120,70 @@ This deliberately does not claim exactly-once external effects.
 See [inspected Rust/Go sources and design decisions](research/subagent-orchestration.md)
 for ownership tradeoffs and the reference-derived regression checklist. Tests
 live in `crates/adk-runtime/tests/subagent*.rs`.
+
+## Durable executor generations
+
+For a durable session that must refresh its child catalog without losing accepted
+work, opt into named generations from the beginning:
+
+- `Scheduler::new_with_generations(context, current, historical, store)` receives
+  a current `SchedulerGeneration` and any historical reconstruction bindings.
+- Each binding contains an immutable, nonempty host-defined `id`, its complete
+  `SchedulerConfig`, and an `Arc<dyn ChildExecutor>`.
+- `Scheduler::reconfigure_generation(next).await` activates a **new ID**. Accepted
+  tasks keep their original executor, security/turn limits and concurrency pool;
+  future submissions use the new generation. Graph/depth limits and the shared
+  accounting budget cannot change during refresh.
+
+Persist the host's reconstruction recipe **before** activating its ID. An ID
+identifies the complete model, instructions, tool catalog, host integration and
+executor assembly, not just a role name. The SDK serializes generation identities
+and scheduler configuration; it does **not** serialize executable callbacks,
+credentials, models, tools or hosts. Treat reconstruction bindings as trusted host
+configuration, not instructions to instantiate arbitrary checkpoint contents.
+
+Named refresh persists a fenced checkpoint before exposing its new wiring, even
+when no tasks exist yet. Failed or cancelled persistence poisons the owner rather
+than retrying an ambiguous activation. A newly constructed owner has no durable
+activation until its first persisted operation. The same CAS/lease requirements
+as ordinary scheduler persistence apply.
+
+On recovery, construct a fresh owner with the saved active generation and bindings
+for **every saved generation**, including generations with only terminal tasks.
+Reconstructed configurations must match saved descriptors exactly. Missing or
+changed bindings, reused IDs, malformed pool identities and implicit version
+migration are rejected. Equal-capacity consecutive refreshes share a concurrency
+pool; changing capacity creates a separate pool for the new generation. Recovery
+preserves those relationships rather than silently multiplying execution permits.
+Nonterminal records still require explicit queued resume, checkpoint resume or
+reconciliation; supplying bindings never authorizes replay of ambiguous effects.
+
+The public facade can name its automatically assembled current executor with
+`Builder::subagent_generation_id(id)`. A fresh owned recovery session can also
+receive `Builder::subagent_historical_generations(bindings)`. Hosts reconstruct
+historical runners explicitly (for example with `RunnerChildExecutor::new`) and
+must keep their tool/resource owners alive until session shutdown. Rebuilding the
+current executor alone does not reconstruct earlier models, instructions or tool
+owners. The same session handle is retained across a successful owned refresh;
+a failed owned Builder rebuild closes the transferred session rather than
+returning a usable old owner.
+
+Unnamed schedulers retain the legacy version-1 recovery contract. They cannot
+refresh tracked durable tasks or silently adopt named identities. Named sessions
+use version-2 checkpoints; start a new named session when adopting this feature
+instead of relabeling existing version-1 records.
+
+Runnable offline recovery examples are integration tests:
+
+```sh
+cargo test --locked -p adk --features builder --test catalog_handoffs \
+  named_builder_restart_uses_historical_native_binding_without_tool_replay
+cargo test --locked -p adk-runtime --test subagent \
+  named_activation_committed_before_cancel_recovers_authoritative_generation
+```
+
+The facade example includes recovery after the active catalog becomes empty:
+no new child tools are advertised, but previously accepted historical work can
+still be explicitly recovered. The second example models a store that commits
+activation and then loses its acknowledgement; the old owner is poisoned, and a
+fresh owner recovers the authoritative committed generation.

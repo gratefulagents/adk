@@ -2513,3 +2513,41 @@ source-bound evidence was regenerated after recording the exact claims. All 27
 audit validators and immutable source locks pass. Ledger: **564 verified /
 8,327 unresolved / 251 excluded**. This is input/default/schema acceptance, not
 whole-Execute, rollback, availability or exhaustive malformed-JSON parity.
+
+### Named durable scheduler generations
+
+Durable owned sessions can now opt into immutable host-defined executor generation
+IDs from construction. Version-2 checkpoints retain each accepted task's generation,
+complete scheduler configuration, active generation and concurrency-pool identity.
+Named refresh persists its activation before publishing wiring and poisons the owner
+on failed or cancelled acknowledgement. Fresh recovery requires exact explicit
+host reconstruction bindings; historical task execution, security and both resume
+paths use their accepted generation rather than the latest catalog. Equal-capacity
+consecutive generations retain shared permits across restart. Legacy v1 recovery
+and unnamed tracked-refresh rejection remain unchanged; no callback serialization
+or implicit v1 relabeling was introduced.
+
+The facade adds `subagent_generation_id` and `subagent_historical_generations`.
+A parent review caught that an empty refreshed active catalog could not be rebuilt
+for recovery. Named empty assembly now creates its scheduler without advertising
+new child tools; the offline continuation test covers both empty and replaced
+catalogs, historical native checkpoints and no replay of an already completed tool.
+A further store test commits activation, blocks before acknowledgement, then cancels:
+the original owner is poisoned and recovery uses the authoritative new generation.
+
+Independent security review found no additional blockers under the explicit trusted
+reconstruction/fenced-store contracts. Hosts remain responsible for retaining exact
+recipes and historical resource owners. Automatic serialization of historical
+assemblies and migration of existing unnamed v1 sessions are not supported. See
+`docs/subagents.md` for APIs, limits and runnable recovery test commands.
+
+Final Rust1.88 verification after these fixes: **1,440 passed / 0 failed / 30 ignored**,
+146 workspace targets, zero warnings; **7 doctests** pass. Strict workspace
+Clippy/rustdoc, formatting, full facade matrix, standalone consumer/dependency
+purity, fresh source-bound Go/Rust evidence, **27 audit validators** and immutable
+source locks pass. The earlier full job was intentionally stopped while the empty
+catalog fix was underway; only the final complete run is reported here. Ledger
+remains **564 verified / 8,327 unresolved / 251 excluded**: this implementation
+removes the tracked-task refresh limitation for named sessions but does not claim
+whole-ledger closure. All **46 remote checks** passed at the preceding `21e8322`
+checkpoint; that result is not remote verification of these new changes.

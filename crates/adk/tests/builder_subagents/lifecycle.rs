@@ -600,3 +600,56 @@ async fn owned_session_refresh_preserves_running_resources_and_updates_future_ch
             .is_err()
     );
 }
+
+#[tokio::test]
+async fn named_refresh_keeps_old_tool_resources_and_closes_transferred_owner_on_failure() {
+    let fixture = HostSessionFixture::new();
+    let owner = fixture
+        .builder(fixture.probe.clone())
+        .subagent_generation_id("original")
+        .build_session(&named_context("host-session"))
+        .await
+        .unwrap();
+    let handle = owner.handle();
+    let mut turn = fixture
+        .builder(Probe::new("roleProbe", true))
+        .session(handle.clone())
+        .build(&named_context("turn"))
+        .await
+        .unwrap();
+    let id = fixture.start(&turn, &named_context("turn")).await;
+    turn.close().await.unwrap();
+    let replacement_probe = Probe::new("roleProbe", true);
+    let owner = fixture
+        .builder(replacement_probe.clone())
+        .subagent_generation_id("replacement")
+        .owned_session(owner)
+        .build_session(&named_context("host-session"))
+        .await
+        .unwrap();
+    assert!(Arc::ptr_eq(
+        handle.subagents().unwrap(),
+        owner.handle().subagents().unwrap()
+    ));
+    fixture.finish(&handle, &id).await;
+    assert_eq!(replacement_probe.calls.load(Ordering::SeqCst), 0);
+    let error = invalid(
+        fixture
+            .builder(Probe::new("roleProbe", true))
+            .subagent_generation_id("original")
+            .owned_session(owner)
+            .build_session(&named_context("host-session"))
+            .await,
+    );
+    assert_eq!(error.info.category, ErrorCategory::InvalidInput);
+    assert!(handle.is_closed());
+    assert!(
+        handle
+            .subagents()
+            .unwrap()
+            .scheduler
+            .submit(Submission::new("reviewer", "closed"))
+            .await
+            .is_err()
+    );
+}

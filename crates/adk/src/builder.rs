@@ -889,6 +889,8 @@ pub struct Builder {
     owned_session: Option<SessionState>,
     subagent_host: Option<Arc<dyn Host>>,
     subagent_store: Option<Arc<dyn adk_runtime::subagent::SchedulerStore>>,
+    subagent_generation_id: Option<String>,
+    subagent_historical_generations: Vec<adk_runtime::subagent::SchedulerGeneration>,
     runner: RunnerConfig,
     compaction_metadata: Option<Arc<adk_providers::runtime::MetadataCompactionResolver>>,
     input_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
@@ -927,6 +929,8 @@ impl Builder {
             owned_session: None,
             subagent_host: None,
             subagent_store: None,
+            subagent_generation_id: None,
+            subagent_historical_generations: vec![],
             runner: RunnerConfig::default(),
             compaction_metadata: None,
             input_guardrails: vec![],
@@ -1001,6 +1005,22 @@ impl Builder {
     /// Requires a new nonempty automatic catalog; an existing scheduler's store is never replaced.
     pub fn subagent_store(mut self, store: Arc<dyn adk_runtime::subagent::SchedulerStore>) -> Self {
         self.subagent_store = Some(store);
+        self
+    }
+    /// Name the complete automatic child assembly. The host must durably retain its
+    /// reconstruction recipe before building; refresh requires a fresh immutable ID.
+    pub fn subagent_generation_id(mut self, id: impl Into<String>) -> Self {
+        self.subagent_generation_id = Some(id.into());
+        self
+    }
+    /// Supply historical host reconstruction bindings when creating a recovery owner.
+    /// Bindings are not inferred from the current catalog or serialized callbacks.
+    /// The host must keep any historical tool/resource owners alive until session close.
+    pub fn subagent_historical_generations(
+        mut self,
+        generations: Vec<adk_runtime::subagent::SchedulerGeneration>,
+    ) -> Self {
+        self.subagent_historical_generations = generations;
         self
     }
     pub fn owned_session(mut self, session: SessionState) -> Self {
@@ -1511,11 +1531,21 @@ impl Builder {
         }
         let catalog_names: BTreeSet<_> =
             target_roles.iter().map(|role| role.name.clone()).collect();
-        if self.subagent_store.is_some()
-            && (!automatic_subagents || catalog_names.is_empty() || session.subagents.is_some())
+        if (self.subagent_generation_id.is_some() && !automatic_subagents)
+            || (!self.subagent_historical_generations.is_empty()
+                && (self.subagent_generation_id.is_none() || session.subagents.is_some()))
         {
             return Err(invalid(
-                "subagent store requires a new automatically assembled scheduler with a nonempty catalog",
+                "named generations require automatic assembly; historical bindings require a new named scheduler",
+            ));
+        }
+        if self.subagent_store.is_some()
+            && (!automatic_subagents
+                || (catalog_names.is_empty() && self.subagent_generation_id.is_none())
+                || session.subagents.is_some())
+        {
+            return Err(invalid(
+                "subagent store requires a new automatically assembled scheduler with a nonempty catalog or explicit generation",
             ));
         }
         let mut targets = Vec::new();
@@ -1630,7 +1660,9 @@ impl Builder {
             }
         }
         let pending_children = if automatic_subagents
-            && (!catalog_names.is_empty() || session.subagents.is_some())
+            && (!catalog_names.is_empty()
+                || session.subagents.is_some()
+                || self.subagent_generation_id.is_some())
         {
             let executor = Arc::new(subagents::PendingExecutor::default());
             let security = adk_runtime::subagent::SecurityBaseline {
@@ -1666,12 +1698,25 @@ impl Builder {
             if owner.scheduler.is_some() {
                 Some((executor, Some(config)))
             } else {
-                let scheduler = Scheduler::new(
-                    session.context(context),
-                    config,
-                    executor.clone(),
-                    self.subagent_store.take(),
-                )?;
+                let scheduler = if let Some(id) = &self.subagent_generation_id {
+                    Scheduler::new_with_generations(
+                        session.context(context),
+                        adk_runtime::subagent::SchedulerGeneration {
+                            id: id.clone(),
+                            config,
+                            executor: executor.clone(),
+                        },
+                        std::mem::take(&mut self.subagent_historical_generations),
+                        self.subagent_store.take(),
+                    )?
+                } else {
+                    Scheduler::new(
+                        session.context(context),
+                        config,
+                        executor.clone(),
+                        self.subagent_store.take(),
+                    )?
+                };
                 owner.handle.subagents = Some(Arc::new(SubagentSession::new(scheduler.handle())));
                 owner.scheduler = Some(scheduler);
                 session = owner.handle();
@@ -2037,16 +2082,25 @@ impl Builder {
             }
         };
         if let Some((config, executor)) = reconfiguration {
-            if let Err(error) = self
+            let scheduler = self
                 .owned_session
                 .as_mut()
                 .unwrap()
                 .scheduler
                 .as_mut()
-                .unwrap()
-                .reconfigure(config, executor)
-                .await
-            {
+                .unwrap();
+            let result = if let Some(id) = self.subagent_generation_id.take() {
+                scheduler
+                    .reconfigure_generation(adk_runtime::subagent::SchedulerGeneration {
+                        id,
+                        config,
+                        executor,
+                    })
+                    .await
+            } else {
+                scheduler.reconfigure(config, executor).await
+            };
+            if let Err(error) = result {
                 tools.close().await.map_err(|e| {
                     Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
                 })?;

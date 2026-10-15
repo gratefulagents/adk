@@ -1852,3 +1852,404 @@ async fn replaced_executor_drops_outside_scheduler_locks() {
     assert_eq!(dropped.load(Ordering::SeqCst), 1);
     owner.shutdown().await.unwrap();
 }
+
+fn generation(
+    id: &str,
+    config: SchedulerConfig,
+) -> (SchedulerGeneration, mpsc::UnboundedReceiver<Started>) {
+    let (started, receiver) = mpsc::unbounded_channel();
+    (
+        SchedulerGeneration {
+            id: id.into(),
+            config,
+            executor: Arc::new(Executor {
+                started,
+                stats: Arc::new(Stats::default()),
+            }),
+        },
+        receiver,
+    )
+}
+
+#[tokio::test]
+async fn named_generations_restore_security_execution_and_pool_identity() {
+    for capacity in [1, 2] {
+        let mut original = config();
+        original.max_concurrency = 1;
+        original.max_turns = std::num::NonZeroU32::new(9).unwrap();
+        original
+            .security
+            .input_guardrails
+            .insert("old-input".into());
+        original
+            .security
+            .output_guardrails
+            .insert("old-output".into());
+        original.security.untrusted_tool_outputs = true;
+        original.security.max_output_bytes = Some(42);
+        let (old, mut old_events) = generation("old", original.clone());
+        let mut owner = Scheduler::new_with_generations(
+            context(),
+            old,
+            vec![],
+            Some(Arc::new(Store::default())),
+        )
+        .unwrap();
+        let handle = owner.handle();
+        handle.submit(request("blocker")).await.unwrap();
+        let _running = next(&mut old_events).await;
+        handle.submit(request("old-queued")).await.unwrap();
+        let mut updated = config();
+        updated.max_concurrency = capacity;
+        updated.max_turns = std::num::NonZeroU32::new(2).unwrap();
+        updated.agents = BTreeMap::from([("reviewer".into(), SecurityBaseline::default())]);
+        let (new, _new_events) = generation("new", updated.clone());
+        owner.reconfigure_generation(new).await.unwrap();
+        let mut future = Submission::new("reviewer", "new work");
+        future.id = "future".into();
+        handle.submit(future).await.unwrap();
+        let saved = handle.snapshot();
+        assert_eq!(saved.version, 2);
+        assert_eq!(
+            saved.generations[1].pool_id,
+            if capacity == 1 { "old" } else { "new" }
+        );
+        drop(owner);
+        tokio::task::yield_now().await;
+        let (old, mut old_events) = generation("old", original);
+        let (new, mut new_events) = generation("new", updated);
+        let owner = Scheduler::new_with_generations(context(), new, vec![old], None).unwrap();
+        let handle = owner.handle();
+        handle
+            .restore(&context(), serde_json::to_value(saved).unwrap())
+            .await
+            .unwrap();
+        assert!(old_events.try_recv().is_err());
+        assert!(new_events.try_recv().is_err());
+        assert!(handle.resume_queued("blocker").await.is_err());
+        handle
+            .reconcile("blocker", ChildOutcome::completed("reconciled"))
+            .await
+            .unwrap();
+        handle.resume_queued("old-queued").await.unwrap();
+        let old = next(&mut old_events).await;
+        assert_eq!(old.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            old.invocation.security.input_guardrails,
+            ["old-input".into()].into()
+        );
+        assert_eq!(
+            old.invocation.security.output_guardrails,
+            ["old-output".into()].into()
+        );
+        assert!(old.invocation.security.untrusted_tool_outputs);
+        assert_eq!(old.invocation.security.max_output_bytes, Some(42));
+        handle.resume_queued("future").await.unwrap();
+        let new = if capacity == 1 {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+            None
+        } else {
+            Some(next(&mut new_events).await)
+        };
+        old.done
+            .send(ChildOutcome::completed("old result"))
+            .unwrap();
+        let new = match new {
+            Some(new) => new,
+            None => next(&mut new_events).await,
+        };
+        assert_eq!(new.invocation.request.policy.max_turns.get(), 2);
+        assert!(new.invocation.security.input_guardrails.is_empty());
+        new.done
+            .send(ChildOutcome::completed("new result"))
+            .unwrap();
+        wait(&handle, &["old-queued", "future"]).await;
+        assert!(
+            handle
+                .snapshot()
+                .records
+                .iter()
+                .all(|r| r.generation_id.is_some())
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn named_restore_rejects_incomplete_or_mutated_descriptors_atomically() {
+    let (old, _events) = generation("old", config());
+    let mut owner = Scheduler::new_with_generations(context(), old, vec![], None).unwrap();
+    owner.handle().submit(request("queued")).await.unwrap();
+    let (new, _events) = generation("new", config());
+    owner.reconfigure_generation(new).await.unwrap();
+    let saved = serde_json::to_value(owner.handle().snapshot()).unwrap();
+    drop(owner);
+    for variant in 0..12 {
+        let mut value = saved.clone();
+        match variant {
+            0 => {
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("active_generation_id");
+            }
+            1 => {
+                value["records"][0]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("generation_id");
+            }
+            2 => value["records"][0]["generation_id"] = "unknown".into(),
+            3 => value["generations"][0]["config"]["max_turns"] = 7.into(),
+            4 => value["generations"][1]["pool_id"] = "new".into(),
+            5 => value["generations"][1] = value["generations"][0].clone(),
+            6 => value["generations"][0]["pool_id"] = "missing".into(),
+            7 => value["active_generation_id"] = "old".into(),
+            8 => value["version"] = 1.into(),
+            9 => value["generations"] = serde_json::json!([]),
+            10 | 11 => {}
+            _ => unreachable!(),
+        }
+        let (mut old, _events) = generation("old", config());
+        if variant == 11 {
+            old.config.security.max_output_bytes = Some(1);
+        }
+        let (new, _events) = generation("new", config());
+        let owner = Scheduler::new_with_generations(
+            context(),
+            new,
+            if variant == 10 { vec![] } else { vec![old] },
+            None,
+        )
+        .unwrap();
+        let handle = owner.handle();
+        assert!(
+            handle.restore(&context(), value).await.is_err(),
+            "variant {variant}"
+        );
+        assert!(handle.list().is_empty());
+        assert_eq!(handle.snapshot().revision, 0);
+        owner.shutdown().await.unwrap();
+    }
+    let (named, _events) = generation("named", config());
+    let mut named_owner =
+        Scheduler::new_with_generations(context(), named.clone(), vec![], None).unwrap();
+    assert!(
+        named_owner
+            .reconfigure_generation(named.clone())
+            .await
+            .is_err()
+    );
+    assert!(
+        Scheduler::new_with_generations(context(), named.clone(), vec![named.clone()], None)
+            .is_err()
+    );
+    assert!(
+        named_owner
+            .handle()
+            .restore(
+                &context(),
+                serde_json::to_value(queued_checkpoint().await).unwrap()
+            )
+            .await
+            .is_err()
+    );
+    let (mut legacy, _, _, _) = rig(config(), None);
+    assert!(legacy.reconfigure_generation(named).await.is_err());
+    legacy.shutdown().await.unwrap();
+    named_owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn named_activation_persists_before_publish_and_poison_is_latched() {
+    for mode in 0..3 {
+        let store = Arc::new(Store::default());
+        store.blocked_revision.store(1, Ordering::SeqCst);
+        if mode == 1 {
+            store.failed_revision.store(1, Ordering::SeqCst);
+        }
+        let (old, mut events) = generation("old", config());
+        let mut owner =
+            Scheduler::new_with_generations(context(), old, vec![], Some(store.clone())).unwrap();
+        let handle = owner.handle();
+        *store.reader.lock().unwrap() = Some(handle.clone());
+        let mut updated = config();
+        updated.agents.clear();
+        let (new, _) = generation("new", updated);
+        {
+            let activate = owner.reconfigure_generation(new);
+            tokio::pin!(activate);
+            tokio::select! {
+                result = &mut activate => panic!("unexpected activation: {result:?}"),
+                _ = store.entered.notified() => {}
+            }
+            assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["worker"]);
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("old")
+            );
+            assert_eq!(handle.checkpoint(&context()).await.unwrap()["revision"], 0);
+            assert!(
+                tokio::time::timeout(Duration::from_millis(10), handle.submit(request("blocked")))
+                    .await
+                    .is_err()
+            );
+            if mode != 2 {
+                store.release.add_permits(1);
+                assert_eq!(activate.await.is_ok(), mode == 0);
+            }
+        }
+        assert!(events.try_recv().is_err());
+        if mode == 0 {
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("new")
+            );
+            assert!(handle.agent_names().next().is_none());
+            assert_eq!(store.observed.lock().unwrap().as_slice(), [0]);
+            owner.shutdown().await.unwrap();
+        } else {
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("old")
+            );
+            assert!(handle.checkpoint(&context()).await.is_err());
+            assert!(handle.submit(request("poisoned")).await.is_err());
+            assert!(owner.shutdown().await.is_err());
+        }
+    }
+}
+
+#[tokio::test]
+async fn named_activation_fences_stale_owners_and_preserves_terminal_ids() {
+    let store = Arc::new(CasStore(AtomicU64::new(0)));
+    let (old, mut events) = generation("old", config());
+    let mut owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    let handle = owner.handle();
+    handle.submit(request("done")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("done"))
+        .unwrap();
+    wait(&handle, &["done"]).await;
+    let stale = handle.snapshot();
+    let (new, _) = generation("new", config());
+    owner.reconfigure_generation(new.clone()).await.unwrap();
+    let saved = handle.snapshot();
+    assert_eq!(saved.records[0].generation_id.as_deref(), Some("old"));
+    let mut stale_owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    stale_owner
+        .handle()
+        .restore(&context(), serde_json::to_value(stale).unwrap())
+        .await
+        .unwrap();
+    assert!(
+        stale_owner
+            .reconfigure_generation(new.clone())
+            .await
+            .is_err()
+    );
+    assert!(stale_owner.handle().checkpoint(&context()).await.is_err());
+    assert!(stale_owner.shutdown().await.is_err());
+    drop(owner);
+    let (rebound_old, _) = generation("old", config());
+    let owner =
+        Scheduler::new_with_generations(context(), new, vec![rebound_old], Some(store)).unwrap();
+    owner
+        .handle()
+        .restore(&context(), serde_json::to_value(saved).unwrap())
+        .await
+        .unwrap();
+    assert_eq!(
+        owner.handle().status("done", Detail::Full).unwrap().result,
+        "done"
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn named_activation_committed_before_cancel_recovers_authoritative_generation() {
+    #[derive(Default)]
+    struct CommitThenBlock {
+        latest: Mutex<Option<SchedulerCheckpoint>>,
+        committed: Notify,
+    }
+    impl SchedulerStore for CommitThenBlock {
+        fn persist<'a>(
+            &'a self,
+            _: &'a Context,
+            checkpoint: &'a SchedulerCheckpoint,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                {
+                    let mut latest = self.latest.lock().unwrap();
+                    let revision = latest.as_ref().map_or(0, |saved| saved.revision);
+                    assert_eq!(checkpoint.revision, revision + 1);
+                    *latest = Some(checkpoint.clone());
+                }
+                if checkpoint.revision == 1 {
+                    self.committed.notify_one();
+                    std::future::pending::<()>().await;
+                }
+                Ok(())
+            })
+        }
+    }
+    let store = Arc::new(CommitThenBlock::default());
+    let (old, mut old_events) = generation("old", config());
+    let (new, mut new_events) = generation("new", config());
+    let mut owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    let handle = owner.handle();
+    {
+        let activation = owner.reconfigure_generation(new.clone());
+        tokio::pin!(activation);
+        tokio::select! {
+            result = &mut activation => panic!("unexpected acknowledgement: {result:?}"),
+            _ = store.committed.notified() => {}
+        }
+        assert_eq!(
+            handle.snapshot().active_generation_id.as_deref(),
+            Some("old")
+        );
+    }
+    assert!(handle.checkpoint(&context()).await.is_err());
+    assert!(handle.submit(request("poisoned")).await.is_err());
+    let authoritative = store.latest.lock().unwrap().clone().unwrap();
+    assert_eq!(authoritative.active_generation_id.as_deref(), Some("new"));
+    drop(owner);
+
+    let recovered =
+        Scheduler::new_with_generations(context(), new, vec![old], Some(store)).unwrap();
+    let handle = recovered.handle();
+    handle
+        .restore(&context(), serde_json::to_value(authoritative).unwrap())
+        .await
+        .unwrap();
+    handle.submit(request("after-recovery")).await.unwrap();
+    next(&mut new_events)
+        .await
+        .done
+        .send(ChildOutcome::completed("new generation"))
+        .unwrap();
+    wait(&handle, &["after-recovery"]).await;
+    assert!(old_events.try_recv().is_err());
+    assert_eq!(
+        handle
+            .status("after-recovery", Detail::Full)
+            .unwrap()
+            .result,
+        "new generation"
+    );
+    recovered.shutdown().await.unwrap();
+}

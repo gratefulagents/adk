@@ -2074,3 +2074,21 @@ host-session, six doctests, pinned oracles, 19 ledger validators and eight audit
 tests pass. Original Go regression refresh: **787 pass / 5 skip**, 35 packages.
 Overlay: **455 verified / 8,436 unresolved / 251 excluded**. Full issue acceptance
 and credentialed live-provider checks remain open.
+
+### Child handoff-history configuration
+
+The pinned `internal/agent/subagent_registry.go` copies the parent's nested-run
+handoff-history policy into the child snapshot and child run config. Native
+automatic child construction now preserves that already-resolved policy instead
+of silently resetting it to disabled defaults. A four-variant regression failed
+on the original implementation and passes after the one-field correction in
+both minimal-builder and integrated configurations. The existing ten-case
+pinned builder-selection test also passes. This is construction-time inheritance,
+not session hot reconfiguration or a whole child-runner parity claim.
+
+Fresh workspace **1,392 passed / 0 failed / 30 ignored**; strict Clippy/rustdoc,
+matrix/platform-free consumer, 20 offline scenarios, host-session, six doctests,
+pinned oracles, 19 ledger validators, eight queue tests and source locks pass.
+Ledger remains **455 verified / 8,436 unresolved / 251 excluded**. At the preceding
+`f542bc7` checkpoint, CI reported 42 successful and four pending checks, no failures;
+that is not a completed-CI claim for this change. Full acceptance remains open.

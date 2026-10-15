@@ -50,8 +50,48 @@ pub(super) fn runner_config(parent: &RunnerConfig) -> RunnerConfig {
         hooks: parent.hooks.clone(),
         compaction: parent.compaction.clone(),
         local_compaction: parent.local_compaction,
+        handoff_history: parent.handoff_history,
         compaction_model_defaults: parent.compaction_model_defaults,
         compaction_model_resolver: parent.compaction_model_resolver.clone(),
         ..Default::default()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use adk_runtime::compaction::HandoffHistoryPolicy;
+
+    #[test]
+    fn children_preserve_resolved_handoff_history_policy() {
+        for policy in [
+            HandoffHistoryPolicy::default(),
+            HandoffHistoryPolicy {
+                enabled: true,
+                ..Default::default()
+            },
+            HandoffHistoryPolicy {
+                enabled: true,
+                max_tokens: 300,
+                target_tokens: 120,
+                preserve_recent_items: 3,
+                summary_bullet_limit: 2,
+            },
+            HandoffHistoryPolicy {
+                enabled: false,
+                max_tokens: 0,
+                target_tokens: 0,
+                preserve_recent_items: 0,
+                summary_bullet_limit: 0,
+            },
+        ] {
+            let parent = RunnerConfig {
+                handoff_history: policy,
+                ..Default::default()
+            };
+            let child = runner_config(&parent);
+            assert_eq!(child.handoff_history, policy);
+            assert_eq!(parent.handoff_history, policy);
+        }
     }
 }

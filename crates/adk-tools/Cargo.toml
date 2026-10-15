@@ -12,7 +12,7 @@ adk-sandbox = { version = "0.1.0", path = "../adk-sandbox" }
 adk-security = { version = "0.1.0", path = "../adk-security" }
 adk-project-state = { version = "0.1.0", path = "../adk-project-state" }
 serde.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
 thiserror.workspace = true
 uuid = { version = "1", features = ["v4"] }
 base64 = "0.22"

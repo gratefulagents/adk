@@ -2413,3 +2413,37 @@ JSON on stdout; it actually writes the fixture. That integration was corrected
 with the non-mutating check mode. Final reference/Rust verification, 27 validators,
 Python compilation, Go vet, source locks and whitespace checks pass. No Rust
 implementation changed after the 1,419-pass workspace verification above.
+
+### Edit diff regressions and JSON boundary follow-up
+
+All 19 pinned `editdiff_test.go` regressions now have native counterparts: exact
+line/hunk rendering, nearby and distant replacements, cumulative line-number
+shifts, newline joins/cascades, EOF behavior, no-match/truncation behavior and
+actual Edit result text in both access modes. Source tests and native tests pass.
+The 19 test records and their complete test file are closed, not the entire
+`editdiff.go` implementation/private-helper API or whole Edit tool.
+
+Further direct comparison exposed two valid-input bugs after the parameter audit:
+Go replaces lone UTF-16 surrogate escapes while serde_json rejects them, and Go
+accepts deeply nested ignored fields beyond serde_json Value's recursion limit.
+Both were reproduced as failing Go/Rust comparisons before fixing them. The
+filesystem decoder now normalizes lone surrogates without changing valid pairs,
+escaped text or ordered duplicates, and validates/retains raw field values rather
+than recursively allocating ignored values. It enforces Go's 10,000-level bound;
+malformed JSON diagnostic spelling remains unclaimed. The explicit raw-value
+feature is declared on adk-tools rather than relying on workspace unification.
+
+The permanent oracle now compares **200 filesystem + 18 skills** cases, including
+surrogate paths/content, ignored fields and depth-limit boundaries. All 218
+comparisons pass. Parameter evidence requires the additional surrogate/depth
+regressions. An exploratory 460-case deterministic Edit probe also passed against
+Go (plus 18 skills); its scratch inputs are not used to claim ledger closure.
+
+Final Rust 1.88 verification for this follow-up: **1,425 passed / 0 failed /
+30 ignored**, 146 targets, zero warnings; **seven doctests pass**. Strict workspace
+Clippy/rustdoc, formatting, full facade feature matrix and the external standalone
+consumer pass. The consumer's complete reusable dependency closure remains
+platform-free. Refreshed source-bound evidence, 27 audit validators and immutable
+source locks pass. Ledger: **506 verified / 8,385 unresolved / 251 excluded**.
+This closes 20 additional test/test-file records while strengthening, rather than
+broadening, the existing 15 parameter claims. Issue #11 remains incomplete.

@@ -161,6 +161,9 @@ RUST_INPUTS = ["crates/adk-runtime/src/workspace.rs", "fixtures/usage/generate.g
                "scripts/fileconfig-reference/go.mod", "scripts/fileconfig-reference/go.sum",
                "crates/adk-tools/src/bundle.rs", "crates/adk-tools/tests/role_views.rs",
                "crates/adk-tools/src/fs_input.rs", "crates/adk-tools/tests/fs_input.rs",
+               "crates/adk-tools/src/edit_diff.rs",
+               "crates/adk-tools/Cargo.toml",
+               "crates/adk-tools/src/workspace.rs", "crates/adk-tools/src/search.rs",
                "crates/adk-tools/src/manifest.json", "crates/adk-tools/tests/schema.rs",
                "crates/adk-tools/tests/edit.rs", "crates/adk-tools/tests/write.rs",
                "crates/adk-tools/tests/lifecycle.rs", "fixtures/tools/skills.json",
@@ -400,7 +403,7 @@ def apply_rust_evidence(entries, records, reference):
     if f"builtin guardrails reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust builtin guardrail evidence requires independently executed pinned fixtures")
     for marker in ("Pinned tool schemas reproduced exactly",
-                   "184 SDK lifecycle results and resulting filesystem trees verified",
+                   "218 SDK lifecycle results and resulting filesystem trees verified",
                    "Pinned specialist tools observations reproduced exactly",
                    "Pinned SDK MCP prompt observations reproduced exactly",
                    "Pinned SDK run instructions observations reproduced exactly",

@@ -8037,10 +8037,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "moves_files_and_directories_and_deletes_only_empty_directories",
         "failures_restore_source_and_never_replace_destination",
-        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only DeleteTool.path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only DeleteTool.path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8060,10 +8062,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8083,10 +8087,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8106,10 +8112,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8129,10 +8137,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8153,10 +8163,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
         "workspace_creates_parents_preserves_modes_and_replaces_inodes",
-        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only FileWriteTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileWriteTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8177,10 +8189,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
         "workspace_creates_parents_preserves_modes_and_replaces_inodes",
-        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only FileWriteTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileWriteTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8201,10 +8215,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "moves_files_and_directories_and_deletes_only_empty_directories",
         "failures_restore_source_and_never_replace_destination",
-        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only MoveTool.destination_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only MoveTool.destination_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8225,10 +8241,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "moves_files_and_directories_and_deletes_only_empty_directories",
         "failures_restore_source_and_never_replace_destination",
-        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only MoveTool.source_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only MoveTool.source_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8248,10 +8266,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8271,10 +8291,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8294,10 +8316,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8317,10 +8341,12 @@
         "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "exact_matching_preserves_binary_bytes_modes_and_line_endings",
-        "multiple_matches_require_opt_in_and_diff_is_bounded"
+        "multiple_matches_require_opt_in_and_diff_is_bounded",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8341,10 +8367,12 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
         "workspace_creates_parents_preserves_modes_and_replaces_inodes",
-        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only WorkspaceWriteFileTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceWriteFileTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8365,10 +8393,339 @@
         "folded_raw_paths_cannot_bypass_workspace_confinement",
         "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
         "workspace_creates_parents_preserves_modes_and_replaces_inodes",
-        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only WorkspaceWriteFileTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceWriteFileTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-39448480C9DF6225": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffAppendAtEOFWithoutTrailingNewline",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffAppendAtEOFWithoutTrailingNewline",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FCD0A0914BE22744": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffDeletionOfWholeLine",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffDeletionOfWholeLine",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FB6204FDD943CD8E": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B02ADFE3714E02F2": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffLineJoinWhenMatchConsumesNewline",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinWhenMatchConsumesNewline",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-10DC52A207D94579": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffLineJoinWithMidLinePrefix",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinWithMidLinePrefix",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-76DD31C163F1CF33": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffLineNumbersShiftAcrossHunks",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineNumbersShiftAcrossHunks",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-22A5C0E5F46D0062": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffMultiLineReplacementChangesLineCount",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffMultiLineReplacementChangesLineCount",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-D91EF5708028F505": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffNoLineJoinAtEOF",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffNoLineJoinAtEOF",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B597EB6EF67D2142": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffNoLineJoinWhenReplacementKeepsNewline",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffNoLineJoinWhenReplacementKeepsNewline",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C5C3BD9EFC5833FC": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffNoMatchReturnsEmpty",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffNoMatchReturnsEmpty",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-E34FA742F8FF4F96": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffPartialLineMatchExpandsToFullLines",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffPartialLineMatchExpandsToFullLines",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-8278A22DD8D22CE3": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffReplaceAllDistantMatchesEmitSeparateHunks",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffReplaceAllDistantMatchesEmitSeparateHunks",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0EB4EFBFF6770016": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffReplaceAllNearbyMatchesShareHunkWithInterleavedContext",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffReplaceAllNearbyMatchesShareHunkWithInterleavedContext",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-1CE02AE39AA1DB8F": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffReplaceAllSameLineMatchesMergeIntoOneRun",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffReplaceAllSameLineMatchesMergeIntoOneRun",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-63ABE7DA2CB0184B": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffSingleLineChange",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffSingleLineChange",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B11D41C6AF8D7708": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestBuildEditDiffTruncatesHugeDiffs",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_truncation_caps"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffTruncatesHugeDiffs",
+      "rationale": "Closes this pinned diff-rendering regression only. The native test reproduces its input and exact expected diff, or its original hunk/count/truncation assertions. It exercises native rendering with non-overlapping match offsets and the existing 256-match bound. Does not claim every private helper API, whole Edit behavior or the remaining tool-level tests in this source file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A8D6E5CCE4C3117C": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestFileEditToolResultIncludesDiff",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestFileEditToolResultIncludesDiff",
+      "rationale": "Closes this exact tool-result regression. Native tests reproduce the source inputs and summary/hunk/line-count assertions, including full-access absolute paths, workspace-relative paths and replace_all result text; they additionally inspect written content. Rendering cases cover joins, EOF, distant hunk shifts and truncation. This closes test coverage, not the entire Edit implementation or private helper API surface.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-F1B58F6D2E4465FB": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestWorkspaceEditToolReplaceAllResultIncludesDiff",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceEditToolReplaceAllResultIncludesDiff",
+      "rationale": "Closes this exact tool-result regression. Native tests reproduce the source inputs and summary/hunk/line-count assertions, including full-access absolute paths, workspace-relative paths and replace_all result text; they additionally inspect written content. Rendering cases cover joins, EOF, distant hunk shifts and truncation. This closes test coverage, not the entire Edit implementation or private helper API surface.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-90C560BAD392D79A": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": "TestWorkspaceEditToolResultIncludesDiff",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceEditToolResultIncludesDiff",
+      "rationale": "Closes this exact tool-result regression. Native tests reproduce the source inputs and summary/hunk/line-count assertions, including full-access absolute paths, workspace-relative paths and replace_all result text; they additionally inspect written content. Rendering cases cover joins, EOF, distant hunk shifts and truncation. This closes test coverage, not the entire Edit implementation or private helper API surface.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-4830BBD22EA118CC": {
+      "source": "pkg/agentsdk/tools/fs/editdiff_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes",
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestFileEditToolResultIncludesDiff",
+      "rationale": "All 19 regressions in this test file have native counterparts and source-bound claims. Native tests reproduce the source inputs and summary/hunk/line-count assertions, including full-access absolute paths, workspace-relative paths and replace_all result text; they additionally inspect written content. Rendering cases cover joins, EOF, distant hunk shifts and truncation. This closes test coverage, not the entire Edit implementation or private helper API surface.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"

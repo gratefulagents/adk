@@ -123,6 +123,32 @@ async fn pinned_edit_tool_results_include_diffs_for_both_access_modes() {
 }
 
 #[tokio::test]
+async fn diff_match_cap_does_not_truncate_actual_replacements() {
+    let root = tempfile::tempdir().unwrap();
+    for count in [256, 257] {
+        fs::write(root.path().join("a"), "x\n".repeat(count)).unwrap();
+        let output = call(
+            root.path(),
+            AccessMode::WorkspaceWrite,
+            json!({
+                "file_path":"a", "old_string":"x", "new_string":"y", "replace_all":true
+            }),
+        )
+        .await;
+        assert!(!output.is_error, "{output:?}");
+        let result = text(&output);
+        assert!(result.contains(&format!("Successfully replaced {count} occurrences")));
+        assert_eq!(result.matches("-x").count(), 256);
+        assert_eq!(result.matches("+y").count(), 256);
+        assert_eq!(result.ends_with("... [diff truncated]"), count == 257);
+        assert_eq!(
+            fs::read_to_string(root.path().join("a")).unwrap(),
+            "y\n".repeat(count)
+        );
+    }
+}
+
+#[tokio::test]
 async fn exact_matching_preserves_binary_bytes_modes_and_line_endings() {
     for access in [AccessMode::WorkspaceWrite, AccessMode::FullAccess] {
         let root = tempfile::tempdir().unwrap();

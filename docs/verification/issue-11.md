@@ -2447,3 +2447,31 @@ platform-free. Refreshed source-bound evidence, 27 audit validators and immutabl
 source locks pass. Ledger: **506 verified / 8,385 unresolved / 251 excluded**.
 This closes 20 additional test/test-file records while strengthening, rather than
 broadening, the existing 15 parameter claims. Issue #11 remains incomplete.
+
+### Private diff/input mapping and constructed-tool metadata
+
+Source review maps the private diff structures/builders and complete diff module
+to native byte-indexed Lines/Run/render code. Added independent Go/native cases
+cover empty new ranges, blank lines and the exact 256/257 rendered-match boundary;
+actual file replacement remains complete when only the display is truncated.
+Ten additional implementation/type/field/configuration/file records are verified.
+
+Thirteen private input type/field records now map to the typed native inputs and
+ordered decoder. New runtime tests and Go comparisons explicitly preserve zero
+values: omitted/null Write content and Edit replacement text are valid empty
+strings despite required schema metadata; omitted/null replace_all remains false;
+missing paths fail without mutation. Both write access variants are exercised.
+
+Thirty constant metadata-method records are verified using both the per-dimension
+schema tests and actual Registry-constructed filesystem tool instances across all
+three access modes and four environment samples. This checks names, descriptions,
+parameter schemas, read-only/approval flags and no per-tool timeout (Go zero maps
+to native None). It is not just a manifest comparison; IsEnabled predicates,
+Execute implementations and whole-tool records are not claimed by this slice.
+
+Fresh workspace: **1,429 passed / 0 failed / 30 ignored**, 146 targets, zero
+warnings. Strict Clippy on changed crate/tests, formatting, Python compilation,
+**244 Go/Rust comparisons**, refreshed bound evidence, 27 audit validators and
+source locks pass. No production implementation changed after the prior full
+facade matrix/consumer and strict workspace docs checks. Ledger: **559 verified /
+8,332 unresolved / 251 excluded**. The 53 new closures do not complete #11.

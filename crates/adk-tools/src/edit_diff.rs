@@ -302,6 +302,21 @@ mod tests {
     }
 
     #[test]
+    fn empty_new_ranges_and_match_cap_boundaries() {
+        for content in ["x", "x\n"] {
+            assert_eq!(diff(content, content, "", false), "@@ -1,1 +0,0 @@\n-x");
+        }
+        assert_eq!(diff("\n", "\n", "", false), "@@ -1,1 +0,0 @@\n-");
+        assert_eq!(diff("\n", "\n", "\n\n", false), "@@ -1,1 +1,2 @@\n-\n+\n+");
+        for count in [256, 257] {
+            let output = diff(&"x\n".repeat(count), "x", "y", true);
+            assert_eq!(output.matches("-x").count(), 256);
+            assert_eq!(output.matches("+y").count(), 256);
+            assert_eq!(output.ends_with("... [diff truncated]"), count == 257);
+        }
+    }
+
+    #[test]
     fn pinned_edit_diff_truncation_caps() {
         let content = format!("padding {}\ntarget\n", "x".repeat(70)).repeat(500);
         let output = diff(&content, "target", "changed", true);

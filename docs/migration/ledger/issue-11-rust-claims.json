@@ -8042,7 +8042,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only DeleteTool.path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only DeleteTool.path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8067,7 +8067,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8092,7 +8092,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8117,7 +8117,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8142,7 +8142,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only FileEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8168,7 +8168,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only FileWriteTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileWriteTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8194,7 +8194,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only FileWriteTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only FileWriteTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8220,7 +8220,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only MoveTool.destination_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only MoveTool.destination_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8246,7 +8246,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
-      "rationale": "Closes only MoveTool.source_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only MoveTool.source_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8271,7 +8271,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8296,7 +8296,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8321,7 +8321,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8346,7 +8346,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
-      "rationale": "Closes only WorkspaceEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8372,7 +8372,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only WorkspaceWriteFileTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceWriteFileTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8398,7 +8398,7 @@
         "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
-      "rationale": "Closes only WorkspaceWriteFileTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 200 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "rationale": "Closes only WorkspaceWriteFileTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 226 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors, lone-surrogate replacement, Go nesting limits and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"
@@ -8726,6 +8726,1057 @@
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestFileEditToolResultIncludesDiff",
       "rationale": "All 19 regressions in this test file have native counterparts and source-bound claims. Native tests reproduce the source inputs and summary/hunk/line-count assertions, including full-access absolute paths, workspace-relative paths and replace_all result text; they additionally inspect written content. Rendering cases cover joins, EOF, distant hunk shifts and truncation. This closes test coverage, not the entire Edit implementation or private helper API surface.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-20B901509A73B042": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "editRun.firstLine",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Run::first",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-A6E90E85AA0A047B": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "editRun.lastLine",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Run::last",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-EAB6B5F85C5B2D23": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "editRun.offsets",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Run::offsets",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-1FD6CBDD0C534FEB": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "editRun",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Run",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7106A71D8571085F": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "lineIndex.content",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Lines::content",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BB93907E3B48BC00": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "lineIndex.starts",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Lines::starts",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-1BA9B2CE612AAFEC": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "lineIndex",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::Lines",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B4D06F8A072E6BC0": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "buildEditDiff",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-635F72CDF14E348A": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": "buildEditRuns",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-811086C9B8E7C3F8": {
+      "source": "pkg/agentsdk/tools/fs/editdiff.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit_diff.rs::render",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "edit_diff::tests::pinned_edit_diff_line_and_join_examples",
+        "edit_diff::tests::pinned_edit_diff_distant_hunks_and_line_number_shifts",
+        "edit_diff::tests::pinned_edit_diff_truncation_caps",
+        "edit_diff::tests::empty_new_ranges_and_match_cap_boundaries",
+        "diff_match_cap_does_not_truncate_actual_replacements",
+        "pinned_edit_tool_results_include_diffs_for_both_access_modes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestBuildEditDiffLineJoinCascadesAcrossReplaceAll",
+      "rationale": "Maps the private diff implementation to native byte-indexed Lines/Run structures and render, with non-overlapping bounded offsets supplied by Edit::edit. Reviewed source algorithms retain trailing-newline handling, merged line ranges, cascading joins, three-line context, hunk deltas, zero-length range conventions, 256 rendered matches and the 8192-byte pre-JSON display cap. All 19 original source regressions have native counterparts; additional public-tool Go comparisons and native tests cover complete deletion, blank lines and the 256/257 boundary while verifying all replacements still reach the file. Go byte strings become UTF-8 display text at the JSON boundary. Private helpers remain private Rust implementation details, not new public configuration APIs. This closes this diff record only, not the entire filesystem group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-D5139EFF0C40982A": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "deleteInput.Path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Input::path",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-9D15BCED93BA9B88": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "deleteInput",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Input",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-EDBA43C29EC5F64F": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "fileEditInput.FilePath",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Input::file_path",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-4437064F172D8F93": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "fileEditInput.NewString",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Input::new_string",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-65AB3EDD1AE586FB": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "fileEditInput.OldString",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Input::old_string",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BC0423926C482133": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "fileEditInput.ReplaceAll",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Input::replace_all",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-8D4648AB6ACBFC09": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "fileEditInput",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Input",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-79090BAE334CE514": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "fileWriteInput.Content",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::Input::content",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C783E17AD7570426": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "fileWriteInput.FilePath",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::Input::file_path",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5A617552596017F7": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "fileWriteInput",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::Input",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-DECB314411F8D907": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "moveInput.DestinationPath",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Input::destination_path",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-EB8A627A5367C4C0": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "moveInput.SourcePath",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Input::source_path",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BEE4B2888EDF85F7": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "moveInput",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Input",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "omitted_fields_follow_go_zero_values_not_schema_required_flags",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "fs_input::tests::unknown_operation_fields_do_not_participate_in_decoding",
+        "fs_input::tests::surrogate_replacement_preserves_pairs_escaped_text_and_field_order",
+        "fs_input::tests::ignored_fields_use_go_depth_limit_without_recursive_value_decoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Maps this private input type/field to the native Input plus ordered Go-compatible decoding, not to a public Go-shaped Rust API. Empty strings and false are zero defaults; missing/null content and replacement text remain valid empty values despite required schema metadata. Native execution and independent Go comparisons cover both write modes, absent/null required paths, absent/null replace_all, aliases, duplicates, scalar type errors, surrogate replacement and deep ignored fields. Move/Delete share a native representation but only decode their own fields, preserving operation-specific unknown-field behavior. This does not close their entire Execute implementations or malformed-JSON diagnostic spelling.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-8D043EDB439A0D4F": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.Description",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "descriptions_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-F512A2E3C90EC9B1": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BB01F396031E4698": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "read_only_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0450E50CA01D87B2": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.Name",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "names_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-426CE4AD52BBDF86": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "approval_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0BC9EB77C7226D4F": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "ApplyPatchTool.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::ApplyPatch::definition",
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-core/src/contracts.rs::Tool::timeout"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "sdk_tool_timeouts_match_the_registry_zero_timeout_contract"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchMultiFileSuccess",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-D2FBAA675836C8E7": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.Description",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "descriptions_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-8FD4A8486F3D776E": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-67BF0BC199F653EA": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "read_only_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7703690AEDDBE122": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.Name",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "names_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-10E21A4D3A11567B": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "approval_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-5C0677DA56F97BB5": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "DeleteTool.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-core/src/contracts.rs::Tool::timeout"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "sdk_tool_timeouts_match_the_registry_zero_timeout_contract"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-E70721240D67EDEE": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.Description",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "descriptions_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-CE7C2366935BA540": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-E29CBB9A67E0186B": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "read_only_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-67EB44687A037565": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.Name",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "names_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BAC38FCC6D5F39BA": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "approval_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-E13D404385A97800": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "FileEditTool.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-tools/src/edit.rs::Edit::definition",
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-core/src/contracts.rs::Tool::timeout"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "sdk_tool_timeouts_match_the_registry_zero_timeout_contract"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-60D42AE31DCAB417": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.Description",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "descriptions_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-085E98AAA3055210": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FD5F8AD85CF9D8CA": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "read_only_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0AC1BC3C1FA9B52B": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.Name",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "names_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FBFAED670F069498": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "approval_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-3F1B6508CF2134AD": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "FileWriteTool.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-tools/src/write.rs::FileWrite::definition",
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-core/src/contracts.rs::Tool::timeout"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "sdk_tool_timeouts_match_the_registry_zero_timeout_contract"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-6FB27CF6036ED2F3": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.Description",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "descriptions_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C68AB644831758E3": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-D84B1B3B6069D4E9": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "read_only_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-380731C825354A3E": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.Name",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "names_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-8E39554627B2F829": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "approval_flags_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-EF2BF7294AF5C77F": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "MoveTool.TimeoutSeconds",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::definition",
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-core/src/contracts.rs::Tool::timeout"
+      ],
+      "rust_test_identifiers": [
+        "constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults",
+        "sdk_tool_timeouts_match_the_registry_zero_timeout_contract"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only this constant filesystem metadata method. Independently regenerated pinned SDK bundle definitions cover all three access modes and four environment samples. Native checks compare the metadata dimension and actual Registry-constructed filesystem Tool instances, including exact names/descriptions/schema values, read-only and approval flags, and no per-tool timeout (Go zero seconds maps to Rust None). This is not merely a manifest self-check. Feature selection, IsEnabled predicates, Execute behavior and whole-tool records remain separate obligations.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "tools"

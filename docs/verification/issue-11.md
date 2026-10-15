@@ -2115,3 +2115,14 @@ matrix/platform-free consumer, 20 offline scenarios, host-session, six doctests,
 pinned oracles, 19 ledger validators, eight audit tests and source locks pass.
 No additional whole cost-aggregation or live-provider claim is made. Ledger remains
 **455 verified / 8,436 unresolved / 251 excluded**; full issue acceptance is open.
+
+### Stateless prompt-constructor facets
+
+Separately reviewed the configuration records for `BuildWorkspaceContext` and
+`BuildAutoTurnCapPrompt`: both source bodies only format text, with no extra
+registration or configuration mutation. Existing exact helper/composition tests
+cover these same narrow contracts; their prior input/target limits still apply.
+Fresh claim-bound oracle/native evidence and all 27 ledger/audit tests pass.
+Overlay: **457 verified / 8,434 unresolved / 251 excluded**. The queue now has no
+same-declaration candidates; this does not close any remaining verification group
+or establish full SDK parity. No Rust behavior changed in this audit checkpoint.

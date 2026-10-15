@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8436,
-    "verified": 455
+    "unresolved": 8434,
+    "verified": 457
   },
   "groups": [
     {
@@ -6724,8 +6724,8 @@
       "counts": {
         "apis:unresolved": 132,
         "apis:verified": 12,
-        "configuration:unresolved": 2,
-        "configuration:verified": 3,
+        "configuration:unresolved": 1,
+        "configuration:verified": 4,
         "defaults:unresolved": 7,
         "files:unresolved": 10,
         "subtests:unresolved": 8,
@@ -6846,7 +6846,6 @@
         "SDK-7973BF19F44052D8",
         "SDK-79C859B86635D2D6",
         "SDK-7B21A138ADE85B6A",
-        "SDK-7BAADD4E29744AAD",
         "SDK-80F7DE7EEC920475",
         "SDK-81111CDCF384C81A",
         "SDK-85135CBC4E1BCC00",
@@ -6942,6 +6941,7 @@
         "SDK-69BDB6F8777C93B0",
         "SDK-7163FC10EFE1E704",
         "SDK-745F85035BCD34C3",
+        "SDK-7BAADD4E29744AAD",
         "SDK-82683BD2584D86E1",
         "SDK-A6FC28F7CFF9563A",
         "SDK-D2CD2B85DE634838",
@@ -7028,8 +7028,8 @@
       "counts": {
         "apis:unresolved": 389,
         "apis:verified": 6,
-        "configuration:unresolved": 76,
-        "configuration:verified": 1,
+        "configuration:unresolved": 75,
+        "configuration:verified": 2,
         "defaults:unresolved": 7,
         "files:unresolved": 14,
         "registrations:unresolved": 6,
@@ -7278,7 +7278,6 @@
         "SDK-5734622B7132BEE8",
         "SDK-575D08D98ABA38CD",
         "SDK-58057280C5B60F0A",
-        "SDK-58BF3EA4EA4DF174",
         "SDK-5947166653AEAC83",
         "SDK-5A0D6D43A854A633",
         "SDK-5A5D93D168B6F696",
@@ -7665,6 +7664,7 @@
       "verified_ids": [
         "SDK-24644F902E37CD43",
         "SDK-474E6E5441F8A871",
+        "SDK-58BF3EA4EA4DF174",
         "SDK-6EC733E77B94E5C4",
         "SDK-7756C66B060E9AFB",
         "SDK-9DD8971E0EE66C67",
@@ -10925,33 +10925,12 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "e56918d6a4331a15ac1ffc511f8f7ab9324d55a0c0836efc3e015edd3254908f",
-    "docs/migration/ledger/issue-11-rust-claims.json": "81073f3f9261085e9aafc35c5770898f3927c5aec030e809861971c1500887e3",
+    "docs/migration/ledger/issue-11-overlay.json": "9cf32da55e2a1d2f2886f9703b958b23a1b51d53c18e4664a97323d43dfb6af1",
+    "docs/migration/ledger/issue-11-rust-claims.json": "e6bb3efabf611d275729b1a96fd6d15ad4429d3f6c2d3ae17c7b1c0f407e5580",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
-  "same_declaration_review_candidates": [
-    {
-      "name": "BuildWorkspaceContext",
-      "review_required": [
-        "SDK-58BF3EA4EA4DF174"
-      ],
-      "source": "internal/agent/subagent_registry.go",
-      "verified_facets": [
-        "SDK-EE554F0337A2E891"
-      ]
-    },
-    {
-      "name": "BuildAutoTurnCapPrompt",
-      "review_required": [
-        "SDK-7BAADD4E29744AAD"
-      ],
-      "source": "pkg/agentsdk/userinput.go",
-      "verified_facets": [
-        "SDK-82683BD2584D86E1"
-      ]
-    }
-  ],
+  "same_declaration_review_candidates": [],
   "schema_version": 1,
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
 }

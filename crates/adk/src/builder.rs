@@ -1197,8 +1197,9 @@ impl Builder {
     /// `context` must describe the session lifetime, not the first turn: automatic
     /// children use its cancellation and run identity. Build each turn separately
     /// with [`Self::session`] and [`SessionState::handle`]; closing those borrowed
-    /// bundles does not close this session's resources. Child configuration is
-    /// fixed at construction, not replaced by later turn configurations.
+    /// bundles does not close this session's resources. To refresh future children,
+    /// transfer the owner with [`Self::owned_session`] and supply a child host;
+    /// accepted tasks retain their original runners and resources.
     ///
     /// A borrowed [`Self::session`] is rejected; [`Self::owned_session`] transfers
     /// its existing ownership as usual. Call [`SessionState::close`] before executor
@@ -1365,6 +1366,9 @@ impl Builder {
             }
             if let Some(constraints) = &mode.constraints {
                 if let Some(limit) = constraints.max_concurrent_subagents
+                    && !(features.subagents.enabled()
+                        && self.owned_session.is_some()
+                        && self.subagent_host.is_some())
                     && self
                         .session
                         .as_ref()
@@ -1483,7 +1487,7 @@ impl Builder {
         );
         agent.settings = settings;
         let automatic_subagents = features.subagents.enabled()
-            && session.subagents.is_none()
+            && (session.subagents.is_none() || self.owned_session.is_some())
             && self.subagent_host.is_some();
         if automatic_subagents && self.owned_session.is_none() {
             return Err(invalid("automatic subagents require an owned session"));
@@ -1610,7 +1614,9 @@ impl Builder {
                 ));
             }
         }
-        let pending_children = if automatic_subagents && !catalog_names.is_empty() {
+        let pending_children = if automatic_subagents
+            && (!catalog_names.is_empty() || session.subagents.is_some())
+        {
             let executor = Arc::new(subagents::PendingExecutor::default());
             let security = adk_runtime::subagent::SecurityBaseline {
                 tools: policy.tools.clone(),
@@ -1641,14 +1647,18 @@ impl Builder {
             if let Some(limit) = self.runner.subagent_max_turns {
                 config.max_turns = limit;
             }
-            let scheduler =
-                Scheduler::new(session.context(context), config, executor.clone(), None)?;
             let owner = self.owned_session.as_mut().unwrap();
-            owner.handle.subagents = Some(Arc::new(SubagentSession::new(scheduler.handle())));
-            owner.scheduler = Some(scheduler);
-            session = owner.handle();
-            self.session = Some(session.clone());
-            Some(executor)
+            if owner.scheduler.is_some() {
+                Some((executor, Some(config)))
+            } else {
+                let scheduler =
+                    Scheduler::new(session.context(context), config, executor.clone(), None)?;
+                owner.handle.subagents = Some(Arc::new(SubagentSession::new(scheduler.handle())));
+                owner.scheduler = Some(scheduler);
+                session = owner.handle();
+                self.session = Some(session.clone());
+                Some((executor, None))
+            }
         } else {
             None
         };
@@ -1663,18 +1673,17 @@ impl Builder {
             })?;
             self.runner.subagents = Some(children.clone());
             // Managed tools use ExtraTools registration, but cannot enable other extensions.
-            let default_agent = children
-                .scheduler
-                .agent_names()
+            let names: Vec<_> = if automatic_subagents {
+                catalog_names.iter().cloned().collect()
+            } else {
+                children.scheduler.agent_names().collect()
+            };
+            let default_agent = names
+                .iter()
                 .find(|name| *name == "agent")
-                .or_else(|| {
-                    children
-                        .scheduler
-                        .agent_names()
-                        .find(|name| !name.trim().is_empty())
-                })
-                .unwrap_or_default()
-                .to_owned();
+                .or_else(|| names.iter().find(|name| !name.trim().is_empty()))
+                .cloned()
+                .unwrap_or_default();
             let mut managed = adk_runtime::build_subagent_task_tools(children, default_agent);
             excluded.extend(managed.iter().map(|tool| tool.definition().name.clone()));
             managed.retain(|tool| match tool.definition().name.as_str() {
@@ -1974,7 +1983,7 @@ impl Builder {
             self.runner.cost_estimator =
                 Some(Arc::new(adk_providers::runtime::BaselineCosts(routes)));
         }
-        if let Some(executor) = pending_children {
+        let reconfiguration = if let Some((executor, config)) = pending_children {
             let children = specialists
                 .iter()
                 .filter(|(name, _)| catalog_names.contains(*name))
@@ -1995,7 +2004,10 @@ impl Builder {
                     return Err(error);
                 }
             }
-        }
+            config.map(|config| (config, executor))
+        } else {
+            None
+        };
         let runner = match Runner::new(agent.clone(), std::mem::take(&mut self.runner)) {
             Ok(runner) => runner,
             Err(error) => {
@@ -2005,6 +2017,23 @@ impl Builder {
                 return Err(error);
             }
         };
+        if let Some((config, executor)) = reconfiguration {
+            if let Err(error) = self
+                .owned_session
+                .as_mut()
+                .unwrap()
+                .scheduler
+                .as_mut()
+                .unwrap()
+                .reconfigure(config, executor)
+                .await
+            {
+                tools.close().await.map_err(|e| {
+                    Error::new(ErrorCategory::Host, "tool teardown failed").with_source(e)
+                })?;
+                return Err(error);
+            }
+        }
         Ok(Bundle {
             runner,
             agent,

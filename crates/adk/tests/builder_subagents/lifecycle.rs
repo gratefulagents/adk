@@ -527,3 +527,76 @@ async fn owned_automatic_children_stop_on_close_and_drop_with_escaped_handles() 
         );
     }
 }
+
+#[tokio::test]
+async fn owned_session_refresh_preserves_running_resources_and_updates_future_children() {
+    let old = HostSessionFixture::new();
+    let owner = old.owner().await;
+    let handle = owner.handle();
+    let scheduler = &handle.subagents().unwrap().scheduler;
+    let first = scheduler
+        .submit(Submission::new("reviewer", "old work"))
+        .await
+        .unwrap();
+    tokio::time::timeout(LIFECYCLE_TIMEOUT, old.child.started.notified())
+        .await
+        .unwrap();
+    let refreshed = HostSessionFixture::new();
+    let mut owner = refreshed
+        .builder(refreshed.probe.clone())
+        .owned_session(owner)
+        .build_session(&named_context("host-session"))
+        .await
+        .unwrap();
+    assert!(Arc::ptr_eq(
+        handle.subagents().unwrap(),
+        owner.handle().subagents().unwrap()
+    ));
+    assert_eq!(
+        scheduler.status(&first, Detail::Full).unwrap().status,
+        TaskStatus::Running
+    );
+    let second = scheduler
+        .submit(Submission::new("reviewer", "new work"))
+        .await
+        .unwrap();
+    tokio::time::timeout(LIFECYCLE_TIMEOUT, refreshed.child.started.notified())
+        .await
+        .unwrap();
+    assert_eq!(old.probe.calls.load(Ordering::SeqCst), 0);
+    assert_eq!(refreshed.probe.calls.load(Ordering::SeqCst), 0);
+    old.finish(&handle, &first).await;
+    refreshed.finish(&handle, &second).await;
+    assert_eq!(scheduler.list().len(), 2);
+    let mut empty = config();
+    empty.roles.clear();
+    empty.features = Some(Features {
+        subagents: SubagentFeatures {
+            task: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    });
+    owner = builder(empty, &refreshed.parent)
+        .subagent_host(Arc::new(TestHost::default()))
+        .owned_session(owner)
+        .build_session(&named_context("host-session"))
+        .await
+        .unwrap();
+    assert_eq!(scheduler.agent_names().count(), 0);
+    assert!(
+        scheduler
+            .submit(Submission::new("reviewer", "removed"))
+            .await
+            .is_err()
+    );
+    assert_eq!(scheduler.list().len(), 2);
+    owner.close().await.unwrap();
+    assert!(handle.is_closed());
+    assert!(
+        scheduler
+            .submit(Submission::new("reviewer", "closed"))
+            .await
+            .is_err()
+    );
+}

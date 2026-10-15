@@ -773,6 +773,28 @@ async fn handoffs_subagents() {
             assert!(!handle.is_closed());
         }
         assert_eq!(scheduler.scheduler.list().len(), 2);
+        let refreshed = Scripted::new(vec![answer("refreshed child")]);
+        owner = Builder::new(config)
+            .model(
+                "mock",
+                adk::providers::factory::Kind::Local,
+                refreshed.clone(),
+            )
+            .unwrap()
+            .subagent_host(host)
+            .owned_session(owner)
+            .build_session(&session_context)
+            .await
+            .unwrap();
+        assert!(Arc::ptr_eq(owner.handle().subagents().unwrap(), &scheduler));
+        let task = scheduler
+            .scheduler
+            .run(subagent::Submission::new("agent", "third"))
+            .await
+            .unwrap();
+        assert_eq!(task.result, "refreshed child");
+        assert_eq!(refreshed.requests.lock().unwrap().len(), 1);
+        assert_eq!(scheduler.scheduler.list().len(), 3);
         owner.close().await.unwrap();
         assert!(handle.is_closed());
     }

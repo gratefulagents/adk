@@ -583,15 +583,23 @@ depth four and 100 child turns. Use an injected `Scheduler` for custom shared
 budgets, limits or persistent `SchedulerStore` ownership; automatic assembly is
 in-memory, not a durable scheduler factory.
 
-Existing injected schedulers take precedence over `subagent_host`; they are not
-reconfigured. A borrowed session with no scheduler is rejected rather than
+Borrowed schedulers take precedence over `subagent_host`; shared handles cannot
+reconfigure them. Transferring an owner with `.owned_session(owner)` and supplying
+`subagent_host` refreshes future automatic children after construction succeeds.
+Accepted tasks retain their original executor, catalog-derived security, turn limit
+and semaphore. Equal concurrency capacities share their semaphore; changing the
+capacity creates a new generation, so old and new generations may overlap.
+Native graph/accounting bounds cannot change during refresh. Durable schedulers
+with tracked records reject refresh explicitly: the current checkpoint format
+cannot reconstruct multiple executor generations after restart.
+A borrowed session with no scheduler is rejected rather than
 silently mutated. An owned empty session may be initialized; use the resulting
 `bundle.session()` for subsequent builds (earlier handle clones retain their
 previous scheduler snapshot). Construction does not dispatch children. Failure
 closes the owned session; explicit bundle close cancels and joins active child
 work. Drop aborts the owner even when tool/session/scheduler handles escape.
-The executor is initialized once before any handle is exposed, with no mutable
-runtime registration or parent-session reference cycle.
+Each executor generation is initialized before registration; child runner
+configuration omits parent input-admission callbacks and transient turn context.
 
 For automatic children with **host-owned, cross-turn lifetime**, use
 `Builder::build_session(&session_context).await` to return a `SessionState`, then
@@ -604,15 +612,19 @@ children and tear down retained integrations; dropping it aborts/revokes but doe
 not promise asynchronous joining. Escaped handles do not extend owner lifetime.
 
 Use a session-lifetime context/deadline for the factory, **not a first-turn
-cancellation context**. Child configuration is a construction-time snapshot; later
-turn configuration does not reconfigure the existing scheduler/catalog. Factory
-input with a borrowed session is rejected: this API returns an exclusive owner, not
-mutable initialization through shared handles. Explicit `.owned_session(owner)`
-transfers its existing ownership and retains its earlier child resource sets. Manual `SessionState::with_scheduler`
+cancellation context**. Borrowed turn configurations do not reconfigure children.
+For a refresh, transfer the owner to a new builder and call `build_session` with
+`subagent_host`; the returned owner retains both old and new child resource sets.
+An explicitly empty refreshed catalog removes future registrations without deleting
+task history. Factory input with a borrowed session is rejected: this API returns
+an exclusive owner, not mutable initialization through shared handles.
+Manual `SessionState::with_scheduler`
 remains available. Separate session and turn tool resources may duplicate
 integrations; this explicit ownership prevents turn teardown from revoking child
 tools. The `handoffs_subagents` offline example demonstrates two independently
-closed turn bundles borrowing one automatically assembled host-owned session.
+closed turn bundles borrowing one automatically assembled host-owned session, then
+an owner-controlled refresh that runs a third child through a replacement model
+while retaining task history.
 
 Twelve pinned SDK compositions compare selected tools, registered child names,
 model/instruction definitions, empty/generic choices and actual synchronous child

@@ -2206,3 +2206,45 @@ composition change is not a whole-child-engine or full reusable-SDK closure clai
 Remaining session assembly/reconfiguration and ledger obligations are unfinished;
 credentialed live services remain unverified. No automatic turn-budget warning,
 CLI/evaluation/Terminal-Bench, production release or default-switch work was added.
+
+### Owner-controlled session refresh
+
+`Scheduler::reconfigure` now accepts a complete resolved future configuration and
+executor through the exclusive owner. Admission captures an executor/semaphore
+generation under the scheduler transaction lock. Queued and running tasks retain
+their original runner, security and turn cap; new tasks use the refreshed catalog
+and limits. Equal semaphore capacities reuse accounting; changed capacities create
+separate generations, matching the pinned SDK snapshot behavior. Structural native
+graph limits and the shared accounting budget remain immutable. Replaced host
+executors are dropped after releasing scheduler locks, with a regression proving
+that their destructors can reenter scheduler getters.
+
+`Builder::owned_session(owner).subagent_host(host).build_session(...)` refreshes
+future automatic children after all runner/tool construction succeeds. Both old
+and new tool/MCP/project-state owners remain retained by the session. Borrowed
+turns cannot reconfigure it. An explicitly empty catalog removes future admissions
+without deleting existing task history. The actual facade regression blocks an
+old child before tool dispatch, refreshes to a different model and owner-bound tool,
+then proves both generations complete against their own resources. The offline
+feature example now also demonstrates owner refresh and a third child call.
+
+Durable schedulers with tracked records **reject refresh without mutation**. Their
+checkpoint format cannot reconstruct multiple executor generations after restart;
+silently replacing an executor would either invalidate recovery fingerprints or
+resume against the wrong configuration. This is an explicit remaining acceptance
+blocker, not completed durable-reconfiguration parity. Hosts must use fresh-owner
+recovery with reconstructible wiring. In-memory refresh and immutable native
+safety ceilings are documented separately from Go partial-pointer/default rules.
+
+Fresh Rust 1.88 workspace: **1,404 passed / 0 failed / 30 ignored**, without compiler
+warnings. Scheduler/facade regressions cover running and queued generations,
+same/changed concurrency, catalog/security/turn updates, invalid-update rollback,
+empty catalogs, resource lifetime, durable rejection and destructor reentrancy.
+Pinned Go `TestSubAgentRegistryConfigurePreservesTrackedTasks` and
+`TestSubAgentRegistryConcurrentConfigureAndSpawn` pass. The all-feature facade
+matrix/platform-free consumer, 20 offline scenarios, host-session example, strict
+rustdoc and seven doctests pass. Final strict Clippy, formatting, source locks,
+regenerated claim-bound evidence and all 27 ledger/audit validators pass. Ledger
+counts remain 465 verified / 8,426 unresolved / 251 excluded. Existing claims are
+not broadened; full SDK acceptance, durable automatic assembly and live-provider
+evidence remain open.

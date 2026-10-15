@@ -1525,3 +1525,229 @@ async fn structured_activity_records_observed_tool_lifecycle() {
     wait(&handle, &["activity"]).await;
     owner.shutdown().await.unwrap();
 }
+
+#[tokio::test]
+async fn owner_reconfiguration_preserves_accepted_wiring_and_refreshes_future_submissions() {
+    for capacity in [1, 2] {
+        let mut original = config();
+        original.max_concurrency = 1;
+        original.max_turns = std::num::NonZeroU32::new(9).unwrap();
+        original.security.tools.access = adk_core::AccessMode::FullAccess;
+        original.agents.get_mut("worker").unwrap().tools.access = adk_core::AccessMode::FullAccess;
+        let (mut owner, handle, mut old_events, _) = rig(original.clone(), None);
+        let mut first = request("old-running");
+        first.policy.tools.access = adk_core::AccessMode::FullAccess;
+        handle.submit(first.clone()).await.unwrap();
+        let running = next(&mut old_events).await;
+        first.id = "old-queued".into();
+        handle.submit(first).await.unwrap();
+        let (sender, mut new_events) = mpsc::unbounded_channel();
+        let executor = Arc::new(Executor {
+            started: sender,
+            stats: Arc::new(Stats::default()),
+        });
+        let mut updated = original.clone();
+        updated.max_concurrency = capacity;
+        updated.max_turns = std::num::NonZeroU32::new(2).unwrap();
+        updated.security.tools.access = adk_core::AccessMode::ReadOnly;
+        updated.agents = BTreeMap::from([("reviewer".into(), SecurityBaseline::default())]);
+        owner.reconfigure(updated, executor).await.unwrap();
+        assert_eq!(handle.max_concurrency(), capacity);
+        assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["reviewer"]);
+        assert!(handle.submit(request("removed-agent")).await.is_err());
+        let mut future = Submission::new("reviewer", "new work");
+        future.id = "future".into();
+        future.policy.tools.access = adk_core::AccessMode::FullAccess;
+        handle.submit(future).await.unwrap();
+        assert_eq!(running.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            running.invocation.security.tools.access,
+            adk_core::AccessMode::FullAccess
+        );
+        let future = if capacity == 2 {
+            Some(next(&mut new_events).await)
+        } else {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+            None
+        };
+        assert!(old_events.try_recv().is_err());
+        running
+            .done
+            .send(ChildOutcome::completed("old running"))
+            .unwrap();
+        let queued = next(&mut old_events).await;
+        assert_eq!(queued.invocation.task_id, "old-queued");
+        assert_eq!(queued.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            queued.invocation.security.tools.access,
+            adk_core::AccessMode::FullAccess
+        );
+        if capacity == 1 {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+        }
+        queued
+            .done
+            .send(ChildOutcome::completed("old queued"))
+            .unwrap();
+        let future = match future {
+            Some(child) => child,
+            None => next(&mut new_events).await,
+        };
+        assert_eq!(future.invocation.request.policy.max_turns.get(), 2);
+        assert_eq!(
+            future.invocation.security.tools.access,
+            adk_core::AccessMode::ReadOnly
+        );
+        future.done.send(ChildOutcome::completed("new")).unwrap();
+        let results = wait(&handle, &["old-running", "old-queued", "future"]).await;
+        assert!(
+            results
+                .iter()
+                .all(|task| task.status == TaskStatus::Completed)
+        );
+        assert_eq!(handle.list().len(), 3);
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn invalid_owner_reconfiguration_leaves_live_configuration_unchanged() {
+    let original = config();
+    let (mut owner, handle, mut events, _) = rig(original.clone(), None);
+    for changed in [0, 1, 2] {
+        let mut invalid = original.clone();
+        match changed {
+            0 => invalid.max_concurrency = 0,
+            1 => invalid.max_tasks += 1,
+            _ => invalid.budget.tokens = Some(1),
+        }
+        let (sender, _) = mpsc::unbounded_channel();
+        let executor = Arc::new(Executor {
+            started: sender,
+            stats: Arc::new(Stats::default()),
+        });
+        assert_eq!(
+            owner
+                .reconfigure(invalid, executor)
+                .await
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+        assert_eq!(handle.max_concurrency(), original.max_concurrency);
+        assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["worker"]);
+    }
+    handle.submit(request("unchanged")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("original"))
+        .unwrap();
+    assert_eq!(wait(&handle, &["unchanged"]).await[0].result, "original");
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn durable_owner_rejects_unreconstructible_executor_generations() {
+    let original = config();
+    let (mut owner, handle, mut events, _) =
+        rig(original.clone(), Some(Arc::new(Store::default())));
+    handle.submit(request("durable")).await.unwrap();
+    let running = next(&mut events).await;
+    let before = handle.snapshot();
+    let (sender, mut changed_events) = mpsc::unbounded_channel();
+    let executor = Arc::new(Executor {
+        started: sender,
+        stats: Arc::new(Stats::default()),
+    });
+    assert_eq!(
+        owner
+            .reconfigure(original.clone(), executor)
+            .await
+            .unwrap_err()
+            .info
+            .category,
+        ErrorCategory::Unsupported
+    );
+    assert_eq!(handle.snapshot().revision, before.revision);
+    assert!(changed_events.try_recv().is_err());
+    running
+        .done
+        .send(ChildOutcome::completed("preserved"))
+        .unwrap();
+    assert_eq!(wait(&handle, &["durable"]).await[0].result, "preserved");
+    handle.submit(request("still-original")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("original executor"))
+        .unwrap();
+    assert_eq!(
+        wait(&handle, &["still-original"]).await[0].result,
+        "original executor"
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn replaced_executor_drops_outside_scheduler_locks() {
+    struct ReentrantDrop {
+        handle: Arc<Mutex<Option<SchedulerHandle>>>,
+        dropped: Arc<AtomicUsize>,
+    }
+    impl ChildExecutor for ReentrantDrop {
+        fn execute<'a>(
+            &'a self,
+            _: ChildInvocation,
+            _: ChildControl,
+        ) -> BoxFuture<'a, Result<ChildOutcome, Error>> {
+            Box::pin(async { Ok(ChildOutcome::completed("unused")) })
+        }
+    }
+    impl Drop for ReentrantDrop {
+        fn drop(&mut self) {
+            assert_eq!(
+                self.handle
+                    .lock()
+                    .unwrap()
+                    .as_ref()
+                    .unwrap()
+                    .max_concurrency(),
+                2
+            );
+            self.dropped.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+    let observer = Arc::new(Mutex::new(None));
+    let dropped = Arc::new(AtomicUsize::new(0));
+    let mut owner = Scheduler::new(
+        context(),
+        config(),
+        Arc::new(ReentrantDrop {
+            handle: observer.clone(),
+            dropped: dropped.clone(),
+        }),
+        None,
+    )
+    .unwrap();
+    *observer.lock().unwrap() = Some(owner.handle());
+    let (sender, _) = mpsc::unbounded_channel();
+    let executor = Arc::new(Executor {
+        started: sender,
+        stats: Arc::new(Stats::default()),
+    });
+    let mut next = config();
+    next.max_concurrency = 2;
+    owner.reconfigure(next, executor).await.unwrap();
+    assert_eq!(dropped.load(Ordering::SeqCst), 1);
+    owner.shutdown().await.unwrap();
+}

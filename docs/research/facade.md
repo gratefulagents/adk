@@ -251,7 +251,7 @@ GPL-3.0-only, independently executed by `scripts/llm-summary-reference/run.py`.
 
 Adopt the [pinned runtime's `defaultAsyncSubAgent` selection](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go#L802)
 (GPL-3.0-only): prefer exact `agent`, otherwise lexical first nonblank name.
-Use the native session scheduler's immutable registrations as the authoritative
+Use a snapshot of the native session scheduler's registrations as the authoritative
 catalog, not the parent name or separately configured handoff targets. Reject
 implicit parent-to-child identity coupling: the parent need not be a registered
 child. The disposable runtime reference harness executes eleven catalog cases;
@@ -260,11 +260,17 @@ overrides. Automatic owned scheduler construction remains separate work.
 
 ## Automatic child assembly
 
-Adopt explicit owned child-host injection and an immutable per-session registry,
-rather than the SDK's mutable scheduler reconfiguration. The embedding host may
-supply an existing scheduler; borrowed owners are never changed. A private
-`OnceLock<RunnerChildExecutor>` resolves tool/scheduler construction order and
-is populated before the bundle exposes its handles. Child runners deliberately
+Adopt explicit owned child-host injection and owner-controlled future-registration
+refresh. This supersedes the initial construction-only registry restriction.
+Borrowed handles cannot refresh a scheduler. A private
+`OnceLock<RunnerChildExecutor>` resolves each generation's construction order;
+accepted tasks retain its executor and semaphore snapshot, following the pinned
+SDK's `taskRunSnapshot` and unchanged-capacity semaphore reuse. Unlike Go's partial
+pointer configuration, native `Scheduler::reconfigure` accepts a complete resolved
+security configuration through the exclusive owner. Native graph/accounting bounds
+remain fixed. Durable refresh with tracked records is explicitly unsupported until
+executor generations can be reconstructed from persisted state; it is an open
+acceptance gap, not a parity claim. Child runners deliberately
 omit parent session/admission callbacks, preventing an ownership cycle and
 consumption of the parent's input queue. Keep native scheduler safety ceilings
 and explicit persistent-store injection instead of copying unlimited defaults.

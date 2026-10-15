@@ -522,16 +522,21 @@ pub trait SchedulerStore: Send + Sync {
 struct Inner {
     context: Context,
     config: SchedulerConfig,
-    executor: Arc<dyn ChildExecutor>,
+    wiring: Mutex<Arc<SchedulerWiring>>,
+    assignments: Mutex<BTreeMap<String, Arc<SchedulerWiring>>>,
     store: Option<Arc<dyn SchedulerStore>>,
     state: Mutex<SchedulerCheckpoint>,
     transaction: AsyncMutex<()>,
     cancellations: Mutex<BTreeMap<String, CancellationToken>>,
     changed: watch::Sender<u64>,
     wake: Notify,
-    slots: Arc<Semaphore>,
     closed: AtomicBool,
     poisoned: AtomicBool,
+}
+struct SchedulerWiring {
+    config: SchedulerConfig,
+    executor: Arc<dyn ChildExecutor>,
+    slots: Arc<Semaphore>,
 }
 #[derive(Clone)]
 pub struct SchedulerHandle {
@@ -593,7 +598,11 @@ impl Scheduler {
         store: Option<Arc<dyn SchedulerStore>>,
     ) -> Result<Self, Error> {
         context.check_active()?;
-        if context.run_id.is_empty() || config.max_concurrency == 0 || config.max_tasks == 0 {
+        if context.run_id.is_empty()
+            || config.max_concurrency == 0
+            || config.max_concurrency > Semaphore::MAX_PERMITS
+            || config.max_tasks == 0
+        {
             return Err(invalid(
                 "nonempty run ID and positive scheduler limits required",
             ));
@@ -612,15 +621,19 @@ impl Scheduler {
         let handle = SchedulerHandle {
             inner: Arc::new(Inner {
                 context,
-                config,
-                executor,
+                config: config.clone(),
+                wiring: Mutex::new(Arc::new(SchedulerWiring {
+                    config,
+                    executor,
+                    slots,
+                })),
+                assignments: Mutex::new(BTreeMap::new()),
                 store,
                 state: Mutex::new(state),
                 transaction: AsyncMutex::new(()),
                 cancellations: Mutex::new(BTreeMap::new()),
                 changed,
                 wake: Notify::new(),
-                slots,
                 closed: AtomicBool::new(false),
                 poisoned: AtomicBool::new(false),
             }),
@@ -633,6 +646,56 @@ impl Scheduler {
     }
     pub fn handle(&self) -> SchedulerHandle {
         self.handle.clone()
+    }
+    /// Replace wiring for future submissions; accepted tasks retain their generation.
+    /// Structural graph limits and the session-wide accounting budget cannot change.
+    /// The owner supplies a complete resolved security configuration, not a patch.
+    /// Durable owners with tracked records require a fresh owner and explicit recovery;
+    /// executor generations are not serializable in the scheduler checkpoint format.
+    pub async fn reconfigure(
+        &mut self,
+        config: SchedulerConfig,
+        executor: Arc<dyn ChildExecutor>,
+    ) -> Result<(), Error> {
+        let inner = &self.handle.inner;
+        let transaction = inner.transaction.lock().await;
+        self.handle.active()?;
+        if config.max_concurrency == 0
+            || config.max_concurrency > Semaphore::MAX_PERMITS
+            || config.max_tasks != inner.config.max_tasks
+            || config.max_depth != inner.config.max_depth
+            || config.parent_depth != inner.config.parent_depth
+            || config.budget != inner.config.budget
+        {
+            return Err(invalid(
+                "invalid concurrency or changed session graph/accounting limits",
+            ));
+        }
+        if inner.store.is_some() && !self.handle.snapshot().records.is_empty() {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "durable scheduler refresh requires reconstructible executor generations; recover with a fresh owner",
+            ));
+        }
+        let mut current = inner.wiring.lock().unwrap();
+        let slots = if config.max_concurrency == current.config.max_concurrency {
+            current.slots.clone()
+        } else {
+            Arc::new(Semaphore::new(config.max_concurrency))
+        };
+        let previous = std::mem::replace(
+            &mut *current,
+            Arc::new(SchedulerWiring {
+                config,
+                executor,
+                slots,
+            }),
+        );
+        // Host-owned executor destructors may reenter the scheduler.
+        drop(current);
+        drop(transaction);
+        drop(previous);
+        Ok(())
     }
     pub async fn shutdown(mut self) -> Result<(), Error> {
         self.handle.close();
@@ -650,14 +713,32 @@ impl Drop for Scheduler {
 }
 
 impl SchedulerHandle {
-    pub fn agent_names(&self) -> impl Iterator<Item = &str> {
-        self.inner.config.agents.keys().map(String::as_str)
+    pub fn agent_names(&self) -> impl Iterator<Item = String> {
+        self.inner
+            .wiring
+            .lock()
+            .unwrap()
+            .config
+            .agents
+            .keys()
+            .cloned()
+            .collect::<Vec<_>>()
+            .into_iter()
     }
 
-    /// The owner's immutable global concurrency ceiling, shared by all scopes.
-    /// Reading it grants no authority to resize an existing scheduler.
+    /// Concurrency ceiling for future submissions. Accepted tasks retain their slots.
     pub fn max_concurrency(&self) -> usize {
-        self.inner.config.max_concurrency
+        self.inner.wiring.lock().unwrap().config.max_concurrency
+    }
+
+    fn task_wiring(&self, id: &str) -> Arc<SchedulerWiring> {
+        self.inner
+            .assignments
+            .lock()
+            .unwrap()
+            .get(id)
+            .expect("accepted task has wiring")
+            .clone()
     }
 
     fn close(&self) {
@@ -769,13 +850,13 @@ impl SchedulerHandle {
         Ok(value)
     }
     fn security(&self, request: &Submission) -> Result<SecurityBaseline, Error> {
-        let agent = self
-            .inner
+        let wiring = self.inner.wiring.lock().unwrap().clone();
+        let agent = wiring
             .config
             .agents
             .get(&request.agent_name)
             .ok_or_else(|| denied("unknown or disallowed child agent"))?;
-        let mut security = self.inner.config.security.narrow(agent);
+        let mut security = wiring.config.security.narrow(agent);
         if let Some(parent) = &self.parent_task {
             let state = self.snapshot();
             let record = state
@@ -822,6 +903,7 @@ impl SchedulerHandle {
             return Err(denied("child depth limit exceeded"));
         }
         self.transact(|state| {
+            let wiring = self.inner.wiring.lock().unwrap().clone();
             if requests.len()
                 > self
                     .inner
@@ -864,7 +946,7 @@ impl SchedulerHandle {
                 }
                 submission.policy.tools = security.tools.clone();
                 submission.policy.max_turns =
-                    submission.policy.max_turns.min(self.inner.config.max_turns);
+                    submission.policy.max_turns.min(wiring.config.max_turns);
                 let task = TaskSnapshot {
                     id: submission.id.clone(),
                     agent_name: submission.agent_name.clone(),
@@ -910,6 +992,13 @@ impl SchedulerHandle {
                         return Err(denied("dependency outside child delegation scope"));
                     }
                 }
+            }
+            for id in &ids {
+                self.inner
+                    .assignments
+                    .lock()
+                    .unwrap()
+                    .insert(id.clone(), wiring.clone());
             }
             Ok(ids)
         })
@@ -1304,6 +1393,7 @@ fn apply_outcome(
 
 struct ExecutionSlot {
     permit: Mutex<Option<OwnedSemaphorePermit>>,
+    semaphore: Arc<Semaphore>,
 }
 struct ReleaseSlot {
     slot: Arc<ExecutionSlot>,
@@ -1347,7 +1437,7 @@ impl SuspendedSlot {
             biased;
             _ = token.cancelled() => return Err(Error::new(ErrorCategory::Cancelled, "child cancelled during suspended wait")),
             _ = self.handle.inner.context.cancellation.cancelled() => return Err(Error::new(ErrorCategory::Cancelled, "parent cancelled during suspended wait")),
-            permit = self.handle.inner.slots.clone().acquire_owned() => permit.map_err(|_| unavailable("scheduler execution slots closed"))?,
+            permit = self.slot.semaphore.clone().acquire_owned() => permit.map_err(|_| unavailable("scheduler execution slots closed"))?,
         };
         *self.slot.permit.lock().unwrap() = Some(permit);
         self.resumed = true;
@@ -1722,7 +1812,11 @@ async fn execute_once(
         active_tools: Arc::new(AsyncMutex::new(Vec::new())),
     };
     let work = std::panic::AssertUnwindSafe(async {
-        handle.inner.executor.execute(invocation, control).await
+        handle
+            .task_wiring(&id)
+            .executor
+            .execute(invocation, control)
+            .await
     })
     .catch_unwind();
     let deadline = async {
@@ -1748,7 +1842,7 @@ async fn execute_once(
 }
 
 impl SchedulerHandle {
-    async fn schedule_one(&self) -> Result<Option<CheckpointRecord>, Error> {
+    async fn schedule_one(&self) -> Result<Option<(CheckpointRecord, Arc<ExecutionSlot>)>, Error> {
         self.transact(|state| {
             let mut selected = None;
             let exhausted = state.budget.exhausted(&state.usage);
@@ -1802,9 +1896,16 @@ impl SchedulerHandle {
                     record.task.status = TaskStatus::Waiting;
                     continue;
                 }
+                let wiring = self.task_wiring(&id);
+                let Ok(permit) = wiring.slots.clone().try_acquire_owned() else {
+                    continue;
+                };
                 record.task.status = TaskStatus::Running;
                 record.dispatch = DispatchState::Started;
-                selected = Some(record.clone());
+                selected = Some((record.clone(), Arc::new(ExecutionSlot {
+                    permit: Mutex::new(Some(permit)),
+                    semaphore: wiring.slots.clone(),
+                })));
                 break;
             }
             Ok(selected)
@@ -1825,22 +1926,19 @@ async fn drive(handle: SchedulerHandle) -> Result<(), Error> {
             break;
         }
         loop {
-            let Ok(permit) = handle.inner.slots.clone().try_acquire_owned() else {
-                break;
-            };
             let snapshot = handle.snapshot();
             if !snapshot.records.iter().any(|r| {
                 matches!(r.task.status, TaskStatus::Pending | TaskStatus::Waiting)
-                    && (snapshot.budget.exhausted(&snapshot.usage) || self_ready(&snapshot, r))
+                    && (snapshot.budget.exhausted(&snapshot.usage)
+                        || handle.token(&r.task.id).is_cancelled()
+                        || (self_ready(&snapshot, r)
+                            && handle.task_wiring(&r.task.id).slots.available_permits() > 0))
             }) {
                 break;
             }
             match handle.schedule_one().await {
-                Ok(Some(record)) => {
+                Ok(Some((record, slot))) => {
                     let token = handle.token(&record.task.id);
-                    let slot = Arc::new(ExecutionSlot {
-                        permit: Mutex::new(Some(permit)),
-                    });
                     children.spawn(execute_once(handle.clone(), record, token, slot));
                 }
                 Ok(None) => break,
@@ -1947,6 +2045,7 @@ impl ChildCheckpointOwner for SchedulerHandle {
             if !self.snapshot().records.is_empty() {
                 return Err(invalid("restore requires an empty scheduler"));
             }
+            let wiring = self.inner.wiring.lock().unwrap().clone();
             if checkpoint.records.len() > self.inner.config.max_tasks
                 || !checkpoint
                     .budget
@@ -1985,7 +2084,7 @@ impl ChildCheckpointOwner for SchedulerHandle {
                     || record.submission.depends_on != record.task.depends_on
                     || record.depth == 0
                     || record.depth > self.inner.config.max_depth
-                    || record.submission.policy.max_turns > self.inner.config.max_turns
+                    || record.submission.policy.max_turns > wiring.config.max_turns
                     || record.submission.policy.tools != record.security_baseline.tools
                     || (record.result_delivered && !record.task.status.is_terminal())
                 {
@@ -2053,6 +2152,13 @@ impl ChildCheckpointOwner for SchedulerHandle {
                 return Err(invalid("shared child usage disagrees with records"));
             }
             checkpoint.budget = self.inner.config.budget.clone();
+            for record in &checkpoint.records {
+                self.inner
+                    .assignments
+                    .lock()
+                    .unwrap()
+                    .insert(record.task.id.clone(), wiring.clone());
+            }
             *self.inner.state.lock().unwrap() = checkpoint;
             self.signal();
             Ok(())

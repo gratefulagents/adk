@@ -66,7 +66,7 @@ RUST_INPUTS = ["crates/adk-runtime/src/workspace.rs", "fixtures/usage/generate.g
                "crates/adk-runtime/tests/fixtures/checkpoint.go",
                "crates/adk-runtime/tests/fixtures/go-checkpoint.json",
                "crates/adk-runtime/tests/fixtures/go-stop-gate.json",
-               "crates/adk-runtime/tests/runner.rs", "crates/adk-runtime/tests/subagent_integration.rs",
+               "crates/adk-runtime/tests/runner.rs", "crates/adk-runtime/tests/subagent.rs", "crates/adk-runtime/tests/subagent_integration.rs",
                "crates/adk/src/observability.rs",
                "crates/adk/tests/observability.rs",
                "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
@@ -324,7 +324,7 @@ def verify_rust() -> None:
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
-               "--test", "guardrails", "--test", "runner", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup", "--test", "llm_compaction", "--test", "local_compaction", "--test", "autoloop", "--test", "content_events", "--test", "line_writer", "--test", "specialists", "--test", "generation_content", "--test", "content_stream", "--test", "content_logger", "--test", "agent_logger"]
+               "--test", "guardrails", "--test", "runner", "--test", "subagent", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup", "--test", "llm_compaction", "--test", "local_compaction", "--test", "autoloop", "--test", "content_events", "--test", "line_writer", "--test", "specialists", "--test", "generation_content", "--test", "content_stream", "--test", "content_logger", "--test", "agent_logger"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
                             env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")

@@ -161,6 +161,11 @@ RUST_INPUTS = ["crates/adk-runtime/src/workspace.rs", "fixtures/usage/generate.g
                "scripts/fileconfig-reference/go.mod", "scripts/fileconfig-reference/go.sum",
                "crates/adk-tools/src/bundle.rs", "crates/adk-tools/tests/role_views.rs",
                "crates/adk-tools/src/fs_input.rs", "crates/adk-tools/tests/fs_input.rs",
+               "crates/adk-tools/src/manifest.json", "crates/adk-tools/tests/schema.rs",
+               "crates/adk-tools/tests/edit.rs", "crates/adk-tools/tests/write.rs",
+               "crates/adk-tools/tests/lifecycle.rs", "fixtures/tools/skills.json",
+               "fixtures/tools/skill-catalog.json", "fixtures/tools/schema-definitions.json",
+               "fixtures/tools/schema-generate.go",
                "crates/adk-tools/src/edit.rs", "crates/adk-tools/src/write.rs",
                "crates/adk-tools/src/lifecycle.rs", "crates/adk-tools/src/lib.rs",
                "crates/adk-tools/examples/lifecycle_replay.rs",
@@ -267,6 +272,14 @@ def module_reference_map() -> dict[str, dict[str, object]]:
 
 def verify_rust() -> None:
     claims = read_json(RUST_CLAIMS)
+    subprocess.run(["go", "run", "../../fixtures/tools/schema-generate.go", "--check"],
+                   cwd=ROOT / "repos/sdk", text=True, capture_output=True, check=True)
+    subprocess.run([os.environ.get("CARGO", "cargo"), "build", "--locked", "-p", "adk-tools",
+                    "--example", "lifecycle_replay"], cwd=ROOT, check=True)
+    target = Path(os.environ.get("CARGO_TARGET_DIR", ROOT / "target"))
+    lifecycle_check = subprocess.run(["go", "run", "../../fixtures/tools/verify-lifecycle.go",
+                                     str(target.resolve() / "debug/examples/lifecycle_replay")],
+                                    cwd=ROOT / "repos/sdk", text=True, capture_output=True, check=True)
     fixture_check = subprocess.run([sys.executable, str(ROOT / "scripts/trace-reference/check.py")],
                                    cwd=ROOT, text=True, capture_output=True, check=True)
     record_check = subprocess.run([sys.executable, str(ROOT / "scripts/check-record-fixtures.py")],
@@ -326,6 +339,7 @@ def verify_rust() -> None:
                "--test", "client", "--test", "session", "--test", "end_to_end", "--test", "diagnostics",
                "--test", "role_views", "--test", "bundle", "--test", "shell", "--test", "shell_security",
                "--test", "fs_input", "--test", "edit", "--test", "write", "--test", "lifecycle",
+               "--test", "schema",
                "--test", "observability", "--test", "tracestore", "--test", "telemetry", "--test", "telemetry_spans",
                "--test", "tracewriter", "--test", "request_snapshot", "--test", "native_snapshot", "--lib",
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
@@ -353,7 +367,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + specialist_tools_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
+        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + specialist_tools_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -385,7 +399,9 @@ def apply_rust_evidence(entries, records, reference):
         raise SystemExit("Rust immediate signal evidence requires independently executed pinned fixtures")
     if f"builtin guardrails reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust builtin guardrail evidence requires independently executed pinned fixtures")
-    for marker in ("Pinned specialist tools observations reproduced exactly",
+    for marker in ("Pinned tool schemas reproduced exactly",
+                   "184 SDK lifecycle results and resulting filesystem trees verified",
+                   "Pinned specialist tools observations reproduced exactly",
                    "Pinned SDK MCP prompt observations reproduced exactly",
                    "Pinned SDK run instructions observations reproduced exactly",
                    "Pinned SDK workspace context observations reproduced exactly",

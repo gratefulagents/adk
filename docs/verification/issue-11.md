@@ -2392,3 +2392,24 @@ no warnings. Strict Clippy, rustdoc, doctests, formatting and whitespace checks
 pass. Bound Rust evidence, all 27 audit validators and immutable source locks
 pass. Ledger counts remain **471 verified / 8,420 unresolved / 251 excluded**;
 this bounded decoder correction does not close the whole filesystem group.
+
+### Filesystem parameter acceptance
+
+The evidence runner now independently regenerates the pinned SDK tool schemas
+with a non-mutating `--check` mode and runs the 184 lifecycle/tree comparisons
+before recording Rust evidence. It binds the schema manifest, generators, inputs
+and independent schema/runtime regression tests. Validator regressions reject
+missing schema or lifecycle execution markers.
+
+Exactly **15 parameter records** for Write/Edit (both access variants), Move and
+Delete are now verified: advertised property types/descriptions, required/default
+metadata, typed decoding and runtime parameter semantics. ApplyPatch parameters,
+whole-tool records, malformed-JSON diagnostic spelling and OS-specific errors are
+not covered by these closures. Ledger: **486 verified / 8,405 unresolved / 251
+excluded**. The immutable baseline is unchanged.
+
+An initial verification attempt incorrectly expected the schema generator to emit
+JSON on stdout; it actually writes the fixture. That integration was corrected
+with the non-mutating check mode. Final reference/Rust verification, 27 validators,
+Python compilation, Go vet, source locks and whitespace checks pass. No Rust
+implementation changed after the 1,419-pass workspace verification above.

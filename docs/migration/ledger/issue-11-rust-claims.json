@@ -8021,6 +8021,358 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-F0C38F35F7DD3A90": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::execute_inner"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "moves_files_and_directories_and_deletes_only_empty_directories",
+        "failures_restore_source_and_never_replace_destination",
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only DeleteTool.path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-130E433384B43F25": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "file_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only FileEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C1C76B62F106A3BB": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "new_string",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only FileEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-CF8249F02ADDA3C9": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "old_string",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only FileEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-72F1BB41B8CFBA77": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "replace_all",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only FileEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-B85CEDCFB6DCE486": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "content",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/write.rs::FileWrite::write"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
+        "workspace_creates_parents_preserves_modes_and_replaces_inodes",
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only FileWriteTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-CB89ED1C17B257A1": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "file_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/write.rs::FileWrite::write"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
+        "workspace_creates_parents_preserves_modes_and_replaces_inodes",
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only FileWriteTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-FC68FD11FE5ECE62": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "destination_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::execute_inner"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "moves_files_and_directories_and_deletes_only_empty_directories",
+        "failures_restore_source_and_never_replace_destination",
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only MoveTool.destination_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-07EFEE4B4EAA86DF": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "source_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/lifecycle.rs::Lifecycle::execute_inner"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "moves_files_and_directories_and_deletes_only_empty_directories",
+        "failures_restore_source_and_never_replace_destination",
+        "read_only_selection_cancellation_and_invalid_inputs_do_not_mutate"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestMoveAndDeleteToolsSupportDirectories",
+      "rationale": "Closes only MoveTool.source_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Move/Delete retain workspace-relative path validation, non-existing destination and existing-parent requirements, and empty-directory deletion semantics. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-E813330817A0FD30": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "file_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only WorkspaceEditTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7D7BFC02FA543A9C": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "new_string",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only WorkspaceEditTool.new_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-BC751B1E7DA62D02": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "old_string",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only WorkspaceEditTool.old_string: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-7B685EF6D12617B7": {
+      "source": "pkg/agentsdk/tools/fs/fileedit.go",
+      "source_name": "replace_all",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/edit.rs::Edit::edit"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "exact_matching_preserves_binary_bytes_modes_and_line_endings",
+        "multiple_matches_require_opt_in_and_diff_is_bounded"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestEditToolsIdenticalStringsMessage",
+      "rationale": "Closes only WorkspaceEditTool.replace_all: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Edit rejects empty old_string, permits empty new_string, defaults replace_all to false and requires explicit true for multiple matches. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-75E675B777183DE4": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "content",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/write.rs::FileWrite::write"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
+        "workspace_creates_parents_preserves_modes_and_replaces_inodes",
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only WorkspaceWriteFileTool.content: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-AEA3980F3596892A": {
+      "source": "pkg/agentsdk/tools/fs/filewrite.go",
+      "source_name": "file_path",
+      "implementation_symbols": [
+        "crates/adk-tools/src/lib.rs::capabilities",
+        "crates/adk-tools/src/fs_input.rs::decode",
+        "crates/adk-tools/src/write.rs::FileWrite::write"
+      ],
+      "rust_test_identifiers": [
+        "parameter_schemas_match_actual_sdk_bundle_definitions",
+        "fs_input::tests::ordered_aliases_and_nulls_preserve_go_field_updates",
+        "fs_input::tests::earlier_type_errors_are_not_erased_by_later_valid_duplicates",
+        "folded_raw_paths_cannot_bypass_workspace_confinement",
+        "invalid_inputs_and_directories_do_not_write_and_read_only_excludes_write",
+        "workspace_creates_parents_preserves_modes_and_replaces_inodes",
+        "full_access_retains_direct_write_semantics_and_refuses_final_symlinks"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestWorkspaceWriteFileToolPreservesExistingMode",
+      "rationale": "Closes only WorkspaceWriteFileTool.file_path: exact advertised schema, required/default metadata and runtime parameter semantics. The verifier independently regenerates pinned SDK bundle schemas and executes all 166 filesystem/18 skills comparisons with resulting trees; Rust independently checks schemas, ordered aliases/duplicates/nulls, scalar type errors and workspace path confinement. Write rejects an empty file_path and retains empty/default content as an empty write, including Unicode byte counts and both write access variants. Does not close the full tool, malformed-JSON diagnostic spelling or OS-specific filesystem errors.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
     }
   }
 }

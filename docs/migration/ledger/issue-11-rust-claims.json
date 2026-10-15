@@ -7166,6 +7166,474 @@
         "x86_64-unknown-linux-gnu",
         "runtime (fixture test); helpers available without default features"
       ]
+    },
+    "SDK-CDB3113DD1B0CB7C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Control",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::control"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-88D77CBEBEB7E843": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Status",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::status"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-4DDEEA62297E3FAE": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Task",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::task"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-DE766FA538C178E8": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowAllServers",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allow_all_servers"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-203546EF23F56ABD": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowAllTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allow_all_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-5C9E074BCFE5976E": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowedServers",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allowed_servers"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-8C9B1512742B4448": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowedTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allowed_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-9F1ABE9A29FB2439": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.Enabled",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::enabled"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-331AA71640F22195": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.ResourceTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::resource_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-3E2D41058441BD02": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.MemoryTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::memory_tools"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-6189F02F2A2A3719": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.PrimeTool",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::prime_tool"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-BD5333B3687C6E3C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.TaskTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::task_tools"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-98AC64B1F2B335C6": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Control",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::control"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-DCFF6E9534D9E917": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Status",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::status"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-AAC6DBEE4FE35BE1": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures.Task",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures::task"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-F7B636852D8D951B": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowAllServers",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allow_all_servers"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-552CD9C0736F2164": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowAllTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allow_all_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-BDD4538E69FB8637": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowedServers",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allowed_servers"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-A6A3BBE3753E477C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.AllowedTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::allowed_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-1A3408F9966D8154": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.Enabled",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::enabled"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-25F496B1A1DD3F30": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures.ResourceTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures::resource_tools"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Individual runtime-selection field: independently executed pinned builder cases compare selected server names, raw/final tool names and catalogs. Disabled/empty/absent selections do not start a failing process; real composed tools retain host policy and readonly specialist restrictions. Native sets represent selection membership, not source slice identity. No MCP protocol, ordering beyond the compared catalog, or whole-builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-4F829C258AC351AF": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.MemoryTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::memory_tools"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-02FA26124A2D317C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.PrimeTool",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::prime_tool"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-759F156EED31999E": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "ProjectStateFeatures.TaskTools",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::ProjectStateFeatures::task_tools"
+      ],
+      "rust_test_identifiers": [
+        "project_state_composition::all_project_state_feature_combinations_open_only_when_needed",
+        "project_state_composition::legacy_project_state_and_read_only_policy_use_composed_registration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleStrictProjectStateCanExposeMemoryOnly",
+      "rationale": "Individual project-state selection field: all sixteen feature combinations compare actual tool names and store creation with the independent pinned public-builder oracle; legacy/read-only regression checks composed registration and effective restrictions. Does not claim all project-state tool operations or automatic context delivery.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
     }
   }
 }

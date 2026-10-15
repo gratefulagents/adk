@@ -149,3 +149,14 @@ whereas this ledger remains pinned to v0.0.115
 (`1dc92b73900fac74dc357a938e4b5eee6392b418`). See
 [`docs/verification/issue-11.md`](../../verification/issue-11.md) for evidence
 limits and the parent-owned final-validation section.
+
+### Current review queue
+
+`scripts/issue11-audit.py` derives
+[`issue-11-audit.json`](../../verification/issue-11-audit.json) from the immutable
+inventory, current overlay and explicit claims. Run it after regenerating the
+overlay; `--check` rejects stale output in CI. The queue groups unresolved IDs and
+identifies same-declaration facets for manual review. It never changes a
+disposition or treats an unresolved ID as a missing feature. An API field and its
+configuration record require separate review even when they name the same source
+declaration. Input hashes make the queue's checkpoint explicit.

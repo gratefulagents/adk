@@ -2037,3 +2037,24 @@ claims here come from the parent/direct-driver verification.
 No broad SDK scheduler/reconfiguration closure is claimed. Ledger remains **424
 verified / 8,467 unresolved / 251 excluded**. Full acceptance and credentialed live
 provider checks remain open; no CLI/evaluation/release/default-switch work.
+
+### Feature-selection field audit and review queue
+
+Reviewed twelve selection fields in the pinned `runtime/features.go`: three
+managed-subagent gates, six MCP selectors and three project-state tool gates.
+Their API and configuration facets have separate claims backed by existing
+independent Go matrices and native registration/host-policy tests. These 24
+closures do not establish whole scheduler, MCP protocol or project-store parity.
+
+Added a deterministic, CI-checked review queue covering all 88 verification
+groups. It preserves all IDs and dispositions and only identifies related
+declarations for review, never automatic closure. Eight negative/determinism
+tests pass. The initial evidence run rejected incorrect module-qualified test
+names in the pending claims; corrected names passed the fresh evidence run.
+
+Fresh workspace: **1,390 passed / 0 failed / 30 ignored**; strict Rust 1.88
+Clippy/rustdoc, feature matrix, standalone consumer, 20 offline scenarios,
+host-session example, six doctests, pinned oracles, 19 ledger validators and
+source locks pass. Overlay: **448 verified / 8,443 unresolved / 251 excluded**.
+Unresolved inventory IDs are not a count of missing capabilities. Full issue
+acceptance and credentialed live checks remain open.

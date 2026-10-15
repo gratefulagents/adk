@@ -577,11 +577,18 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
     #[derive(Default)]
     struct Price(Mutex<Vec<String>>);
     impl CostEstimator for Price {
-        fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
+        fn cost(&self, _: &str, _: &adk_core::Usage) -> f64 {
+            panic!("native compaction must preserve the optional price")
+        }
+        fn estimate_cost(&self, model: &str, usage: &adk_core::Usage) -> Option<f64> {
             assert_eq!(usage.input_tokens, 12);
             assert_eq!(usage.output_tokens, 2);
             self.0.lock().unwrap().push(model.into());
-            0.25
+            match model {
+                "work/vendor/model" => None,
+                "small" => Some(0.0),
+                _ => Some(0.25),
+            }
         }
     }
     let costs = Arc::new(Price::default());
@@ -615,7 +622,15 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
             )
             .await
             .unwrap();
-        assert_eq!(result.cost, 0.25);
+        assert_eq!(
+            result.cost,
+            if matches!(binding, "work/vendor/model" | "small") {
+                0.0
+            } else {
+                0.25
+            }
+        );
+        assert_eq!(result.cost_known, binding != "work/vendor/model");
         assert!(
             result.history_provenance.is_empty(),
             "replacement history has no proven attribution correspondence"

@@ -1041,6 +1041,7 @@ impl Compactor for Compact {
                 context_tokens: 4,
                 usage: Usage::default(),
                 cost: 0.0,
+                cost_known: true,
             })
         })
     }
@@ -1416,7 +1417,7 @@ async fn raw_hook_failure_retains_completion_but_withholds_output() {
     assert_ne!(output.content, tool.output.content);
 }
 
-struct BilledCompaction;
+struct BilledCompaction(bool);
 impl Compactor for BilledCompaction {
     fn compact<'a>(
         &'a self,
@@ -1434,51 +1435,55 @@ impl Compactor for BilledCompaction {
                     ..Usage::default()
                 },
                 cost: 2.0,
+                cost_known: self.0,
             })
         })
     }
 }
 #[tokio::test]
 async fn provider_compaction_is_charged_before_the_next_model_turn() {
-    for limits in [
-        Limits {
-            max_tokens: Some(30),
-            max_cost: None,
-        },
-        Limits {
-            max_tokens: None,
-            max_cost: Some(2.5),
-        },
-    ] {
-        let model = TestModel::with(vec![Ok(response(
-            vec![message(Role::Assistant, "more")],
-            Some(false),
-        ))]);
-        let config = RunnerConfig {
-            limits,
-            cost_estimator: Some(Arc::new(UnitCost)),
-            compaction: Some(CompactionConfig {
-                trigger_tokens: 10,
-                target_tokens: 5,
-                compactor: Arc::new(BilledCompaction),
-            }),
-            ..RunnerConfig::default()
-        };
-        let error = Runner::new(agent(model.clone()), config)
-            .unwrap()
-            .run(context(), request(3), Arc::new(TestHost::default()))
-            .await
-            .err()
-            .unwrap();
-        assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
-        assert_eq!(model.completes.load(Ordering::SeqCst), 1);
-        let partial = error.partial.unwrap();
-        assert_eq!(partial.usage.input_tokens, 30);
-        assert_eq!(partial.usage.output_tokens, 7);
-        let metrics = partial.metrics.as_ref().unwrap();
-        assert_eq!(metrics.turns, 1);
-        assert_eq!(metrics.cost_usd, 3.0);
-        assert_eq!(partial.history, vec![message(Role::User, "summary")]);
+    for known in [false, true] {
+        for limits in [
+            Limits {
+                max_tokens: Some(30),
+                max_cost: None,
+            },
+            Limits {
+                max_tokens: None,
+                max_cost: Some(2.5),
+            },
+        ] {
+            let model = TestModel::with(vec![Ok(response(
+                vec![message(Role::Assistant, "more")],
+                Some(false),
+            ))]);
+            let config = RunnerConfig {
+                limits,
+                cost_estimator: Some(Arc::new(UnitCost)),
+                compaction: Some(CompactionConfig {
+                    trigger_tokens: 10,
+                    target_tokens: 5,
+                    compactor: Arc::new(BilledCompaction(known)),
+                }),
+                ..RunnerConfig::default()
+            };
+            let error = Runner::new(agent(model.clone()), config)
+                .unwrap()
+                .run(context(), request(3), Arc::new(TestHost::default()))
+                .await
+                .err()
+                .unwrap();
+            assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
+            assert_eq!(model.completes.load(Ordering::SeqCst), 1);
+            let partial = error.partial.unwrap();
+            assert_eq!(partial.usage.input_tokens, 30);
+            assert_eq!(partial.usage.output_tokens, 7);
+            let metrics = partial.metrics.as_ref().unwrap();
+            assert_eq!(metrics.turns, 1);
+            assert_eq!(metrics.cost_usd, 3.0);
+            assert_eq!(metrics.cost_known, known);
+            assert_eq!(partial.history, vec![message(Role::User, "summary")]);
+        }
     }
 }
 
@@ -2461,6 +2466,7 @@ async fn custom_compaction_without_provenance_does_not_guess_retained_authorship
                     context_tokens: 4,
                     usage: Usage::default(),
                     cost: 0.0,
+                    cost_known: true,
                 })
             })
         }

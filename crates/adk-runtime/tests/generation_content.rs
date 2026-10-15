@@ -560,7 +560,9 @@ async fn generation_cost_distinguishes_unknown_zero_and_priced_retained_response
                     Err(error) => *error.partial.unwrap(),
                 };
                 assert_eq!(result.responses.len(), 1);
-                assert_eq!(result.metrics.unwrap().cost_usd, estimate.unwrap_or(0.0));
+                let metrics = result.metrics.unwrap();
+                assert_eq!(metrics.cost_usd, estimate.unwrap_or(0.0));
+                assert_eq!(metrics.cost_known, estimate.is_some());
                 assert_eq!(costs.calls.load(Ordering::SeqCst), 1);
                 let seen = seen.lock().unwrap();
                 let ended = seen.iter().find(|event| event.event == "end").unwrap();
@@ -579,6 +581,62 @@ async fn generation_cost_distinguishes_unknown_zero_and_priced_retained_response
 }
 
 struct NumericCost(AtomicUsize);
+
+#[tokio::test]
+async fn cumulative_cost_sums_responses_without_losing_unknown_prices() {
+    struct Costs(Mutex<VecDeque<Option<f64>>>);
+    impl CostEstimator for Costs {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            panic!("optional cost must be retained")
+        }
+        fn estimate_cost(&self, _: &str, _: &Usage) -> Option<f64> {
+            self.0
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("duplicate estimate")
+        }
+    }
+    for estimates in [
+        [Some(0.25), Some(0.75)],
+        [Some(0.25), None],
+        [None, Some(0.75)],
+        [Some(0.0), Some(0.0)],
+    ] {
+        let mut first = answer();
+        first.items = vec![RunItem::ToolCall {
+            call: ToolCall {
+                id: "missing".into(),
+                name: "missing".into(),
+                arguments: serde_json::json!({}),
+                raw_arguments: None,
+            },
+        }];
+        let model = Offline::new(vec![
+            vec![Step::Event(ModelEvent::Complete { response: first })],
+            vec![complete()],
+        ]);
+        let seen = Arc::new(Mutex::new(vec![]));
+        let sink = Arc::new(Sink::default());
+        let costs = Arc::new(Costs(Mutex::new(estimates.into())));
+        let mut cfg = config(&seen, &sink);
+        cfg.cost_estimator = Some(costs.clone());
+        let result = runner(&model, cfg)
+            .run(context(&CancellationToken::new()), request(), sink)
+            .await
+            .unwrap()
+            .result;
+        assert_eq!(result.responses.len(), 2);
+        let metrics = result.metrics.unwrap();
+        assert_eq!(
+            metrics.cost_usd,
+            estimates.into_iter().flatten().sum::<f64>()
+        );
+        assert_eq!(metrics.cost_known, estimates.iter().all(Option::is_some));
+        assert!(costs.0.lock().unwrap().is_empty());
+    }
+}
+
 impl CostEstimator for NumericCost {
     fn cost(&self, _: &str, _: &Usage) -> f64 {
         self.0.fetch_add(1, Ordering::SeqCst);

@@ -817,6 +817,7 @@ impl Compactor for ReplaceOld {
                 context_tokens: 10,
                 usage: Usage::default(),
                 cost: 0.0,
+                cost_known: true,
             })
         })
     }

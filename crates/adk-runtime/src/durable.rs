@@ -85,6 +85,8 @@ pub struct RuntimeCheckpoint {
     #[serde(default)]
     last_model: Option<String>,
     cost: f64,
+    #[serde(default)]
+    cost_known: bool,
     tool_calls: u64,
     tool_pause: bool,
     #[serde(default)]
@@ -582,6 +584,7 @@ impl Runner {
             engine.last_model = saved.last_model;
             engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
+            engine.cost_known = saved.cost_known;
             engine.tool_pause = saved.tool_pause;
             engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
@@ -1160,6 +1163,7 @@ impl Engine {
                 turns: self.turns,
                 last_model: self.last_model.clone(),
                 cost: self.cost,
+                cost_known: self.cost_known,
                 tool_calls: state.tool_calls,
                 tool_pause: self.tool_pause,
                 summary_turn: self.summary_turn,
@@ -1486,6 +1490,7 @@ impl Runner {
             turns: recovery.turns,
             last_model: None,
             cost: recovery.cost,
+            cost_known: false,
             tool_calls: recovery.tool_calls,
             tool_pause: false,
             summary_turn: false,

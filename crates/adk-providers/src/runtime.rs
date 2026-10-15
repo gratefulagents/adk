@@ -10,7 +10,7 @@ pub use metadata::{MetadataCompactionResolver, MetadataCompactionWarning};
 /// Baseline USD accounting for the runner's actual selected binding, including
 /// named routes and fallbacks. The runner requires a number: unknown prices use
 /// zero, as in baseline CalculateCost. `estimate_cost` retains the known/unknown
-/// distinction for generation traces; budgets cannot constrain unknown prices.
+/// distinction for traces and cumulative metrics; budgets cannot constrain unknown prices.
 pub struct BaselineCosts(pub Arc<crate::routing::Routes>);
 impl CostEstimator for BaselineCosts {
     fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
@@ -52,7 +52,8 @@ impl Compactor for NativeCompactor {
             input.input = request.history;
             input.input_provenance = request.history_provenance;
             let response = self.provider.compact(context, input).await?;
-            let cost = self.costs.cost(&request.model, &response.usage);
+            let estimate = self.costs.estimate_cost(&request.model, &response.usage);
+            let cost = estimate.unwrap_or(0.0);
             if !cost.is_finite() || cost < 0.0 {
                 return Err(Error::new(
                     ErrorCategory::InvalidInput,
@@ -67,6 +68,7 @@ impl Compactor for NativeCompactor {
                 history: response.items,
                 usage: response.usage,
                 cost,
+                cost_known: estimate.is_some(),
             })
         })
     }

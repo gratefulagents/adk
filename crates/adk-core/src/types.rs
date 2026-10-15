@@ -366,6 +366,9 @@ pub struct RunMetrics {
     pub model: Option<String>,
     pub turns: u32,
     pub cost_usd: f64,
+    /// False when any charged usage has no price, or historical certainty is unavailable.
+    #[serde(default)]
+    pub cost_known: bool,
     pub elapsed_ms: u64,
 }
 

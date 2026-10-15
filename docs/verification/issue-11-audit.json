@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8423,
-    "verified": 468
+    "unresolved": 8420,
+    "verified": 471
   },
   "groups": [
     {
@@ -10762,9 +10762,9 @@
     {
       "counts": {
         "apis:verified": 9,
-        "files:unresolved": 2,
-        "files:verified": 1,
-        "tests:unresolved": 2,
+        "files:unresolved": 1,
+        "files:verified": 2,
+        "tests:verified": 2,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::usage",
@@ -10775,9 +10775,6 @@
         "pkg/agentsdk/aliases.go"
       ],
       "unresolved_ids": [
-        "SDK-5DC87F0A3A08880C",
-        "SDK-7F515DBA4052A49B",
-        "SDK-A44EB9612F2A5359",
         "SDK-BBB10D36D7BFA90F",
         "SDK-D942754BB910F2F3"
       ],
@@ -10785,9 +10782,12 @@
         "SDK-132DD02CC5240D89",
         "SDK-1489A4F19F26475A",
         "SDK-25A907095FAA58D6",
+        "SDK-5DC87F0A3A08880C",
         "SDK-7AB1DCFD60AEF2AC",
         "SDK-7B6CA2A7BA28D07F",
+        "SDK-7F515DBA4052A49B",
         "SDK-90F2C7B7D0A6DCBB",
+        "SDK-A44EB9612F2A5359",
         "SDK-C02C9D4F8A1DC0CD",
         "SDK-C3E29FD631C84BDE",
         "SDK-C9567C2AC89003E8",
@@ -10925,8 +10925,8 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "71d9747e3c82e49b991a30647557f4d3a03727ee13f6142c0a08e61aae115b45",
-    "docs/migration/ledger/issue-11-rust-claims.json": "ffce945761e991e6b1516d649d9dd6aae44990e18712e45da035f317adcb280a",
+    "docs/migration/ledger/issue-11-overlay.json": "1b807c254321be40bfda2cabf2b34497ced56f810f8cccdec508c17df32d60da",
+    "docs/migration/ledger/issue-11-rust-claims.json": "bb364b42fca525e4a4ed0949ca380f2a739af03cbf5244bdd86e1daec50ec791",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",

@@ -216,6 +216,53 @@ fn runner(model: Arc<ModelImpl>, config: RunnerConfig) -> Runner {
 }
 
 #[tokio::test]
+async fn summary_cost_uncertainty_is_preserved_in_cumulative_metrics() {
+    struct Cost {
+        summary: Option<f64>,
+        response: Option<f64>,
+        calls: AtomicUsize,
+    }
+    impl CostEstimator for Cost {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            panic!("summary must use the optional estimate")
+        }
+        fn estimate_cost(&self, _: &str, usage: &Usage) -> Option<f64> {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            match usage.input_tokens {
+                7 => self.summary,
+                11 => self.response,
+                other => panic!("unexpected usage {other}"),
+            }
+        }
+    }
+    for summary in [None, Some(0.25)] {
+        for response in [None, Some(0.75)] {
+            let costs = Arc::new(Cost {
+                summary,
+                response,
+                calls: AtomicUsize::new(0),
+            });
+            let mut config = config(false);
+            config.cost_estimator = Some(costs.clone());
+            let result = runner(ModelImpl::new(Summary::Good, false), config)
+                .run(context(), request(), Arc::new(HostImpl))
+                .await
+                .unwrap()
+                .result;
+            assert_eq!(result.responses.len(), 1);
+            assert_eq!(result.usage.requests, 2);
+            let metrics = result.metrics.unwrap();
+            assert_eq!(
+                metrics.cost_usd,
+                summary.unwrap_or(0.0) + response.unwrap_or(0.0)
+            );
+            assert_eq!(metrics.cost_known, summary.is_some() && response.is_some());
+            assert_eq!(costs.calls.load(Ordering::SeqCst), 2);
+        }
+    }
+}
+
+#[tokio::test]
 async fn llm_summary_normal_and_forced_request_usage_provenance_and_trace_contract() {
     for forced in [false, true] {
         let model = ModelImpl::new(Summary::Good, forced);

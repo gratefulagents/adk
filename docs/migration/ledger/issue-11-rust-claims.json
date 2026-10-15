@@ -7961,6 +7961,66 @@
         "x86_64-unknown-linux-gnu",
         "adk-codec; facade compat feature"
       ]
+    },
+    "SDK-A44EB9612F2A5359": {
+      "source": "internal/agent/cost_test.go",
+      "source_name": "TestEstimateRunResultCostPropagatesUnknownCost",
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunMetrics",
+        "crates/adk-runtime/src/runner.rs::Engine::account_usage"
+      ],
+      "rust_test_identifiers": [
+        "cumulative_cost_sums_responses_without_losing_unknown_prices",
+        "generation_cost_distinguishes_unknown_zero_and_priced_retained_responses",
+        "cost_certainty_survives_resume_and_old_checkpoints_remain_unknown",
+        "summary_cost_uncertainty_is_preserved_in_cumulative_metrics"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostPropagatesUnknownCost",
+      "rationale": "The complete two-test source file asserts summed known response costs (0.25 + 0.75 = 1.0, known) and propagation of unknown response cost (0.25 + 0 = 0.25, unknown). Native cumulative response accounting tests execute those exact cases, reversed unknown order and known zero, asserting both amount and certainty with one estimate per response. Separate regressions preserve certainty for retained failed responses, LLM-summary usage and durable resume; legacy checkpoints remain unknown. Only these two regressions and their test file are closed, not cost.go, its no-response/fallback/residual algorithm, child outcome projection, or the entire usage group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-5DC87F0A3A08880C": {
+      "source": "internal/agent/cost_test.go",
+      "source_name": "TestEstimateRunResultCostSumsResponseCosts",
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunMetrics",
+        "crates/adk-runtime/src/runner.rs::Engine::account_usage"
+      ],
+      "rust_test_identifiers": [
+        "cumulative_cost_sums_responses_without_losing_unknown_prices",
+        "generation_cost_distinguishes_unknown_zero_and_priced_retained_responses",
+        "cost_certainty_survives_resume_and_old_checkpoints_remain_unknown",
+        "summary_cost_uncertainty_is_preserved_in_cumulative_metrics"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "The complete two-test source file asserts summed known response costs (0.25 + 0.75 = 1.0, known) and propagation of unknown response cost (0.25 + 0 = 0.25, unknown). Native cumulative response accounting tests execute those exact cases, reversed unknown order and known zero, asserting both amount and certainty with one estimate per response. Separate regressions preserve certainty for retained failed responses, LLM-summary usage and durable resume; legacy checkpoints remain unknown. Only these two regressions and their test file are closed, not cost.go, its no-response/fallback/residual algorithm, child outcome projection, or the entire usage group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7F515DBA4052A49B": {
+      "source": "internal/agent/cost_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunMetrics",
+        "crates/adk-runtime/src/runner.rs::Engine::account_usage"
+      ],
+      "rust_test_identifiers": [
+        "cumulative_cost_sums_responses_without_losing_unknown_prices",
+        "generation_cost_distinguishes_unknown_zero_and_priced_retained_responses",
+        "cost_certainty_survives_resume_and_old_checkpoints_remain_unknown",
+        "summary_cost_uncertainty_is_preserved_in_cumulative_metrics"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostPropagatesUnknownCost",
+      "rationale": "The complete two-test source file asserts summed known response costs (0.25 + 0.75 = 1.0, known) and propagation of unknown response cost (0.25 + 0 = 0.25, unknown). Native cumulative response accounting tests execute those exact cases, reversed unknown order and known zero, asserting both amount and certainty with one estimate per response. Separate regressions preserve certainty for retained failed responses, LLM-summary usage and durable resume; legacy checkpoints remain unknown. Only these two regressions and their test file are closed, not cost.go, its no-response/fallback/residual algorithm, child outcome projection, or the entire usage group.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

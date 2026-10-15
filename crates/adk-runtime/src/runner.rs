@@ -326,7 +326,7 @@ pub struct Limits {
 pub trait CostEstimator: Send + Sync {
     fn cost(&self, model: &str, usage: &Usage) -> f64;
 
-    /// Unknown prices contribute zero to accounting without claiming a known trace cost.
+    /// Unknown prices contribute zero without claiming known trace or cumulative cost.
     fn estimate_cost(&self, model: &str, usage: &Usage) -> Option<f64> {
         Some(self.cost(model, usage))
     }
@@ -466,6 +466,7 @@ pub struct CompactedHistory {
     pub usage: Usage,
     /// In the same units as CostEstimator; local compaction costs zero.
     pub cost: f64,
+    pub cost_known: bool,
 }
 
 pub trait Compactor: Send + Sync {
@@ -1075,6 +1076,7 @@ impl Runner {
             resolved_compaction: None,
             fallbacks: HashMap::new(),
             cost: 0.0,
+            cost_known: true,
             last_response_cost: None,
             tool_pause: false,
             summary_turn: false,
@@ -1162,6 +1164,7 @@ struct Engine {
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
     last_response_cost: Option<f64>,
+    cost_known: bool,
     tool_pause: bool,
     summary_turn: bool,
     tool_final: Option<String>,
@@ -1459,6 +1462,7 @@ impl Engine {
             model: self.last_model.clone(),
             turns: self.turns,
             cost_usd: self.cost,
+            cost_known: self.cost_known && !self.result.responses.is_empty(),
             elapsed_ms: elapsed.as_millis().min(u64::MAX as u128) as u64,
         });
     }
@@ -1921,7 +1925,8 @@ impl Engine {
                 return Err(error);
             }
         };
-        self.account_usage(&compacted.usage, compacted.cost)?;
+        self.cost_known &= compacted.cost_known;
+        self.account_usage(&compacted.usage, Some(compacted.cost))?;
         self.charge_child_usage().await?;
         self.observe(Observation::Usage {
             usage: self.result.usage.clone(),
@@ -2060,12 +2065,9 @@ impl Engine {
                 }
             };
             let applied = if let Ok(response) = response {
-                let cost = self
-                    .config
-                    .cost_estimator
-                    .as_ref()
-                    .map_or(0.0, |estimator| {
-                        estimator.cost(binding.name(), &response.usage)
+                let cost =
+                    self.config.cost_estimator.as_ref().and_then(|estimator| {
+                        estimator.estimate_cost(binding.name(), &response.usage)
                     });
                 self.account_usage(&response.usage, cost)?;
                 self.charge_child_usage().await?;
@@ -2336,7 +2338,7 @@ impl Engine {
         self.checkpoint(Boundary::ModelPrepared, None).await?;
         let exposed_tools: HashSet<_> =
             request.tools.iter().map(|tool| tool.name.clone()).collect();
-        let Some((response, model, streamed, cost, generation)) =
+        let Some((response, streamed, cost, generation)) =
             self.model_response(request, declared_tool_timeouts).await?
         else {
             self.phase = Phase::Model;
@@ -2351,7 +2353,7 @@ impl Engine {
             response: response.clone(),
         })
         .await?;
-        self.record_response(response.clone(), &model, cost)?;
+        self.record_response(response.clone(), cost)?;
         self.charge_child_usage().await?;
         self.publish_committed().await?;
         if !streamed {
@@ -2679,7 +2681,9 @@ impl Engine {
         }
         Ok(())
     }
-    fn account_usage(&mut self, used: &Usage, cost: f64) -> Result<(), Error> {
+    fn account_usage(&mut self, used: &Usage, estimate: Option<f64>) -> Result<(), Error> {
+        self.cost_known &= estimate.is_some_and(|cost| cost.is_finite() && cost >= 0.0);
+        let cost = estimate.unwrap_or(0.0);
         let usage = &mut self.result.usage;
         usage.requests = usage.requests.saturating_add(used.requests);
         usage.input_tokens = usage.input_tokens.saturating_add(used.input_tokens);
@@ -2692,6 +2696,7 @@ impl Engine {
             .saturating_add(used.cache_creation_tokens);
         usage.context_tokens = used.context_tokens;
         if !cost.is_finite() || cost < 0.0 || !(self.cost + cost).is_finite() {
+            self.cost_known = false;
             return Err(Error::new(
                 ErrorCategory::InvalidInput,
                 "invalid provider cost",
@@ -2703,20 +2708,13 @@ impl Engine {
     fn record_response(
         &mut self,
         response: ModelResponse,
-        model: &str,
-        known_cost: Option<f64>,
+        estimate: Option<f64>,
     ) -> Result<(), Error> {
         for item in &response.items {
             self.append(item.clone());
         }
-        let estimate = known_cost.or_else(|| {
-            self.config
-                .cost_estimator
-                .as_ref()
-                .and_then(|c| c.estimate_cost(model, &response.usage))
-        });
         self.last_response_cost = estimate.filter(|cost| cost.is_finite() && *cost >= 0.0);
-        let accounting = self.account_usage(&response.usage, estimate.unwrap_or(0.0));
+        let accounting = self.account_usage(&response.usage, estimate);
         self.result.responses.push(response);
         accounting
     }
@@ -2786,16 +2784,7 @@ impl Engine {
         &mut self,
         mut request: ModelRequest,
         mut declared_tool_timeouts: Vec<Option<Duration>>,
-    ) -> Result<
-        Option<(
-            ModelResponse,
-            String,
-            bool,
-            Option<f64>,
-            Option<GenerationRecord>,
-        )>,
-        Error,
-    > {
+    ) -> Result<Option<(ModelResponse, bool, Option<f64>, Option<GenerationRecord>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
@@ -2978,9 +2967,8 @@ impl Engine {
                         }
                         return Ok(Some((
                             response,
-                            binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
-                            Some(cost.unwrap_or(0.0)),
+                            cost,
                             generation
                                 .as_ref()
                                 .map(|generation| generation.record.clone()),
@@ -3262,7 +3250,10 @@ impl Engine {
                         if let Some(response) = complete {
                             // Retaining an authoritative response must not replay its history or usage.
                             committed = true;
-                            let _ = self.record_response(response, binding.name(), None);
+                            let cost = self.config.cost_estimator.as_ref().and_then(|estimator| {
+                                estimator.estimate_cost(binding.name(), &response.usage)
+                            });
+                            let _ = self.record_response(response, cost);
                             let _ = self.charge_child_usage().await;
                         } else {
                             if !delta_text.is_empty() {

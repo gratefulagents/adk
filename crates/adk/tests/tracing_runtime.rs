@@ -844,6 +844,7 @@ async fn runner_compaction_counts_are_child_of_active_agent() {
                     context_tokens: 30,
                     usage: Usage::default(),
                     cost: 0.0,
+                    cost_known: true,
                 })
             })
         }

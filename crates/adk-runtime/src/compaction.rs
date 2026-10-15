@@ -221,6 +221,7 @@ impl Compactor for LocalCompactor {
                 context_tokens,
                 usage: Usage::default(),
                 cost: 0.0,
+                cost_known: true,
             })
         })
     }

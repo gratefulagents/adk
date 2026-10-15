@@ -90,6 +90,17 @@ settings. It installs baseline provider cost accounting unless the host supplies
 an estimator. Unknown prices retain the existing baseline zero-cost behavior;
 they are not a reliable hard budget boundary.
 
+`RunResult::metrics.cost_known` distinguishes a known zero from a partial total
+containing unpriced usage. Response, provider-compaction and LLM-summary prices
+preserve that distinction, including retained responses from failed streams.
+Custom `Compactor` implementations must set `CompactedHistory::cost_known`
+explicitly; deterministic local compaction has known zero cost. Native durable
+checkpoints retain cumulative certainty. Older checkpoints and reconciled Go
+checkpoints without price-certainty evidence remain unknown after resume.
+Runs without a recorded model response also report unknown rather than assuming
+a priced zero. This is native cumulative accounting, not full equivalence to the
+SDK's residual-usage/fallback-model display estimator.
+
 ## Model-routing helpers
 
 The `runtime` feature alone exposes `adk::runtime::settings::{reasoning_settings,

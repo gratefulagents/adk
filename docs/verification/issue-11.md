@@ -2307,3 +2307,41 @@ Final Rust 1.88 all-feature/all-target workspace: **1,408 passed / 0 failed /
 preceding implementation head `2956f24` passed, including Linux/macOS enforcing
 backends and durable PostgreSQL; that result does not establish remote CI for
 this subsequent audit-only change.
+
+### Cumulative price certainty, compaction and durable restoration
+
+Native `RunMetrics::cost_known` now preserves the distinction between known zero
+and a partial numeric total containing unknown prices. Response accounting keeps
+the optional estimate instead of replacing it with a known zero before recording
+usage, and still invokes the estimator exactly once per response. Retained failed
+stream responses preserve the same distinction. Unknown prices cannot become known
+merely because a later response has a price.
+
+The audit also found two compaction paths that called the numeric-only estimator:
+LLM summaries and the provider `NativeCompactor`. Both now use optional estimates.
+`CompactedHistory::cost_known` lets custom compactors retain a partial numeric charge
+without presenting it as a complete estimate; deterministic local compaction sets
+known zero explicitly. A budget regression checks that an uncertain nonzero
+compaction charge is still enforced, not discarded. Native checkpoint restoration
+retains certainty; missing historical fields and reconciled Go checkpoints remain
+unknown. No-response fallback display pricing and child outcome projection remain
+separate parity obligations.
+
+Independent pinned Go execution reports **790 passing tests/subtests and five
+skips**, including both `cost_test.go` regressions. Native tests reproduce their
+exact 0.25+0.75 known sum and 0.25+unknown partial sum, plus reversed unknown order,
+known zero, failed streams, summary prices, provider price routing and checkpoint
+restoration. Only those two source tests and their complete test file are closed:
+**471 verified / 8,420 unresolved / 251 excluded**. The `cost.go` implementation
+file and entire usage group remain unresolved rather than treating this bounded
+cost-reporting fix as full helper equivalence.
+
+An initial strict Clippy run caught the model-name tuple element made unused by
+single-pass estimate recording. It was removed, not suppressed. The corrected
+workspace passes strict Clippy, strict rustdoc and seven doctests. Final bound
+evidence, all 27 audit validators and immutable source locks pass.
+
+Final all-feature/all-target Rust 1.88 verification: **1,411 passed / 0 failed /
+30 ignored**, 145 targets, no warnings. The full facade feature matrix,
+platform-free independent consumer, all 20 offline feature scenarios and the
+host-session example pass with the updated compaction contract.

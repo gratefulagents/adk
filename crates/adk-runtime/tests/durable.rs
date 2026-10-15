@@ -377,6 +377,57 @@ async fn persistence_faults_before_and_after_commit_never_cross_boundary() {
 }
 
 #[tokio::test]
+async fn cost_certainty_survives_resume_and_old_checkpoints_remain_unknown() {
+    struct Cost(std::sync::atomic::AtomicBool);
+    impl CostEstimator for Cost {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            panic!("optional cost must be retained")
+        }
+        fn estimate_cost(&self, _: &str, _: &Usage) -> Option<f64> {
+            self.0.load(Ordering::SeqCst).then_some(1.25)
+        }
+    }
+    for known in [false, true] {
+        for legacy in [false, true] {
+            let (_, model, tool) = setup(vec![call("one")], false, false);
+            let mut agent =
+                AgentConfig::new("agent", ModelBinding::complete("model", model.clone()));
+            agent.tools.push(tool.clone());
+            let cost = Arc::new(Cost(std::sync::atomic::AtomicBool::new(known)));
+            let runner = Runner::new(
+                agent,
+                RunnerConfig {
+                    cost_estimator: Some(cost.clone()),
+                    ..Default::default()
+                },
+            )
+            .unwrap();
+            let store = Arc::new(Store::default());
+            *store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+            assert!(run(&runner, store.clone(), None).await.is_err());
+            let mut saved = serde_json::to_value(store.latest()).unwrap();
+            assert_eq!(saved["runtime"]["cost_known"], known);
+            if legacy {
+                saved["runtime"]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("cost_known");
+            }
+            let checkpoint =
+                RunnerCheckpoint::decode(&serde_json::to_vec(&saved).unwrap()).unwrap();
+            *store.fail.lock().unwrap() = None;
+            cost.0.store(true, Ordering::SeqCst);
+            let result = run(&runner, store, Some(checkpoint)).await.unwrap().result;
+            let metrics = result.metrics.unwrap();
+            assert_eq!(metrics.cost_usd, if known { 2.5 } else { 1.25 });
+            assert_eq!(metrics.cost_known, known && !legacy);
+            assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+            assert_eq!(tool.keys.lock().unwrap().len(), 1);
+        }
+    }
+}
+
+#[tokio::test]
 async fn completed_model_and_tool_boundaries_resume_remaining_work_once() {
     let (runner, _, _) = setup(vec![call("one"), call("two")], false, false);
     let store = Arc::new(Store::default());

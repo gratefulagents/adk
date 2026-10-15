@@ -1482,6 +1482,13 @@ async fn provider_compaction_is_charged_before_the_next_model_turn() {
             assert_eq!(metrics.turns, 1);
             assert_eq!(metrics.cost_usd, 3.0);
             assert_eq!(metrics.cost_known, known);
+            assert_eq!(
+                metrics.response_cost,
+                Some(ResponseCostSummary {
+                    cost_usd: 1.0,
+                    cost_known: true
+                })
+            );
             assert_eq!(partial.history, vec![message(Role::User, "summary")]);
         }
     }
@@ -4468,5 +4475,56 @@ async fn mcp_prompt_matches_pinned_normal_streamed_and_structured_requests() {
             case["instructions"].as_str().unwrap(),
             "{case}"
         );
+    }
+}
+
+#[tokio::test]
+async fn invalid_response_prices_keep_consumed_usage_and_finite_frozen_subtotals() {
+    struct Costs(Mutex<VecDeque<f64>>);
+    impl CostEstimator for Costs {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            self.0
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("response re-estimated")
+        }
+    }
+    for invalid in [-1.0, f64::NAN, f64::INFINITY, f64::MAX] {
+        let model = TestModel::with(vec![
+            Ok(response(
+                vec![message(Role::Assistant, "more")],
+                Some(false),
+            )),
+            Ok(answer("done")),
+        ]);
+        let costs = Arc::new(Costs(Mutex::new(vec![f64::MAX, invalid].into())));
+        let error = Runner::new(
+            agent(model),
+            RunnerConfig {
+                cost_estimator: Some(costs.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap()
+        .run(context(), request(3), Arc::new(TestHost::default()))
+        .await
+        .err()
+        .unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::InvalidInput);
+        let result = error.partial.unwrap();
+        assert_eq!(result.usage.input_tokens, 20);
+        assert_eq!(result.responses.len(), 2);
+        let metrics = result.metrics.unwrap();
+        assert_eq!(metrics.cost_usd, f64::MAX);
+        assert!(!metrics.cost_known);
+        assert_eq!(
+            metrics.response_cost,
+            Some(ResponseCostSummary {
+                cost_usd: f64::MAX,
+                cost_known: false
+            })
+        );
+        assert!(costs.0.lock().unwrap().is_empty());
     }
 }

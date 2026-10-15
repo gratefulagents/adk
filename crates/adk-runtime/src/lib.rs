@@ -11,6 +11,7 @@
 
 pub mod autoloop;
 pub mod compaction;
+mod cost;
 pub mod guardrails;
 pub use guardrails::{
     Guardrail, GuardrailInput, GuardrailOutcome, GuardrailResult, GuardrailTripwire,

@@ -87,6 +87,8 @@ pub struct RuntimeCheckpoint {
     cost: f64,
     #[serde(default)]
     cost_known: bool,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    response_cost: Option<ResponseCostSummary>,
     tool_calls: u64,
     tool_pause: bool,
     #[serde(default)]
@@ -107,6 +109,22 @@ pub struct RuntimeCheckpoint {
 }
 impl RuntimeCheckpoint {
     fn restore_provenance(&mut self) -> Result<(), Error> {
+        let valid = |cost: f64| cost.is_finite() && cost >= 0.0;
+        if !valid(self.cost)
+            || self
+                .response_cost
+                .as_ref()
+                .is_some_and(|cost| !valid(cost.cost_usd))
+            || self.result.metrics.as_ref().is_some_and(|metrics| {
+                !valid(metrics.cost_usd)
+                    || metrics
+                        .response_cost
+                        .as_ref()
+                        .is_some_and(|cost| !valid(cost.cost_usd))
+            })
+        {
+            return Err(invalid("invalid durable cost counter"));
+        }
         match self.version {
             1 => {
                 // V1 exported fabricated current-agent names; only native data is trusted.
@@ -585,6 +603,10 @@ impl Runner {
             engine.applied_child_messages = saved.applied_child_messages;
             engine.cost = saved.cost;
             engine.cost_known = saved.cost_known;
+            engine.response_cost = saved.response_cost;
+            if let Some(metrics) = &mut engine.result.metrics {
+                metrics.response_cost = engine.response_cost.clone();
+            }
             engine.tool_pause = saved.tool_pause;
             engine.summary_turn = saved.summary_turn;
             engine.tool_final = saved.tool_final;
@@ -637,6 +659,10 @@ impl Runner {
             if execution_boundary == "run_completed" {
                 if engine.result.status != RunStatus::Completed {
                     return Err(invalid("completed checkpoint has an incomplete result").into());
+                }
+                if engine.result.metrics.is_none() {
+                    engine.durable_state = Some(state);
+                    engine.record_metrics();
                 }
                 return Ok(RunOutcome {
                     result: engine.result,
@@ -1164,6 +1190,7 @@ impl Engine {
                 last_model: self.last_model.clone(),
                 cost: self.cost,
                 cost_known: self.cost_known,
+                response_cost: self.response_cost.clone(),
                 tool_calls: state.tool_calls,
                 tool_pause: self.tool_pause,
                 summary_turn: self.summary_turn,
@@ -1491,6 +1518,7 @@ impl Runner {
             last_model: None,
             cost: recovery.cost,
             cost_known: false,
+            response_cost: None,
             tool_calls: recovery.tool_calls,
             tool_pause: false,
             summary_turn: false,

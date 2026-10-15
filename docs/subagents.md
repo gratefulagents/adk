@@ -187,3 +187,29 @@ no new child tools are advertised, but previously accepted historical work can
 still be explicitly recovered. The second example models a store that commits
 activation and then loses its acknowledgement; the old owner is poisoned, and a
 fresh owner recovers the authoritative committed generation.
+
+## Display estimates versus actual accounting
+
+A completed child's `cost_usd`/`cost_known` follow the SDK's display-estimation
+rule: preserve the prices captured for its model responses, then estimate any
+remaining token/cache usage once using the child's original model. Requests-only
+residuals do not trigger an estimate. This can differ from the cumulative amount
+actually charged for compaction under a different model or a nonlinear estimator.
+Failed, cancelled and nonterminal outcomes retain cumulative accounting instead.
+
+`RunMetrics.cost_usd` and scheduler budget micro-units remain **actual cumulative
+accounting**; the residual display estimate is never charged again. The optional
+`RunMetrics.response_cost` freezes the response subtotal and certainty, avoiding
+re-estimation of past responses. Native checkpoints retain it. Older/reconciled
+checkpoints without that provenance retain their valid cumulative amount but
+cannot claim known display pricing merely because a later response is priced.
+
+Custom estimators can override `CostEstimator::estimate_display_cost` to return
+an amount with explicit certainty, including a nonzero uncertain estimate. Its
+default calls the existing `estimate_cost` once. This extension affects display
+projection only, not actual accounting or budget enforcement. Negative,
+nonfinite or overflowing display estimates do not enter published totals; valid
+available subtotal is retained with unknown certainty. Native context-size
+metadata is not included in residual pricing inputs.
+
+See `fixtures/costs/README.md` for the independently generated pinned-Go cases.

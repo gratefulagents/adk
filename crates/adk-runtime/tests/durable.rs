@@ -407,11 +407,16 @@ async fn cost_certainty_survives_resume_and_old_checkpoints_remain_unknown() {
             assert!(run(&runner, store.clone(), None).await.is_err());
             let mut saved = serde_json::to_value(store.latest()).unwrap();
             assert_eq!(saved["runtime"]["cost_known"], known);
+            assert_eq!(saved["runtime"]["response_cost"]["cost_known"], known);
             if legacy {
                 saved["runtime"]
                     .as_object_mut()
                     .unwrap()
                     .remove("cost_known");
+                saved["runtime"]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("response_cost");
             }
             let checkpoint =
                 RunnerCheckpoint::decode(&serde_json::to_vec(&saved).unwrap()).unwrap();
@@ -421,6 +426,13 @@ async fn cost_certainty_survives_resume_and_old_checkpoints_remain_unknown() {
             let metrics = result.metrics.unwrap();
             assert_eq!(metrics.cost_usd, if known { 2.5 } else { 1.25 });
             assert_eq!(metrics.cost_known, known && !legacy);
+            assert_eq!(
+                metrics.response_cost,
+                (!legacy).then_some(ResponseCostSummary {
+                    cost_usd: if known { 2.5 } else { 1.25 },
+                    cost_known: known,
+                })
+            );
             assert_eq!(model.calls.load(Ordering::SeqCst), 2);
             assert_eq!(tool.keys.lock().unwrap().len(), 1);
         }
@@ -656,6 +668,16 @@ async fn terminal_recovery_never_reexecutes_or_writes() {
     assert_eq!(restored.result, first.result);
     assert_eq!(model.calls.load(Ordering::SeqCst), 1);
     assert_eq!(store.checkpoints.lock().unwrap().len(), 5);
+
+    let mut saved = serde_json::to_value(store.latest()).unwrap();
+    saved["runtime"]
+        .as_object_mut()
+        .unwrap()
+        .remove("response_cost");
+    let legacy = RunnerCheckpoint::decode(&serde_json::to_vec(&saved).unwrap()).unwrap();
+    let restored = run(&runner, store, Some(legacy)).await.unwrap();
+    assert!(restored.result.metrics.unwrap().response_cost.is_none());
+    assert_eq!(model.calls.load(Ordering::SeqCst), 1);
 }
 
 #[tokio::test]
@@ -740,6 +762,15 @@ async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() 
         .migrate_go_checkpoint(cp.clone(), verified())
         .unwrap();
     let result = run(&runner, store.clone(), Some(migrated)).await.unwrap();
+    assert!(
+        result
+            .result
+            .metrics
+            .as_ref()
+            .unwrap()
+            .response_cost
+            .is_none()
+    );
     assert_eq!(result.result.usage.input_tokens, 21);
     assert_eq!(result.result.usage.requests, 3);
     assert_eq!(store.latest().usage.requests, 3);
@@ -763,6 +794,10 @@ async fn actual_go_fixture_requires_explicit_migration_and_preserves_counters() 
     recovery.final_output = Some(json!("verified Go result"));
     let migrated = runner.migrate_go_checkpoint(completed, recovery).unwrap();
     let result = run(&runner, store, Some(migrated)).await.unwrap();
+    let metrics = result.result.metrics.as_ref().unwrap();
+    assert_eq!(metrics.cost_usd, 0.25);
+    assert!(!metrics.cost_known);
+    assert!(metrics.response_cost.is_none());
     assert_eq!(
         result.result.final_output,
         Some(json!("verified Go result"))
@@ -3850,4 +3885,31 @@ async fn handoff_compaction_preserves_approval_identity_and_committed_recovery()
     );
     assert_eq!(hooks.0.load(Ordering::SeqCst), 1);
     assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+}
+
+#[tokio::test]
+async fn malformed_persisted_response_totals_are_rejected() {
+    let (runner, _, _) = setup(vec![message(Role::Assistant, "done")], false, false);
+    let store = Arc::new(Store::default());
+    run(&runner, store.clone(), None).await.unwrap();
+    for pointer in [
+        "/runtime/cost",
+        "/runtime/response_cost/cost_usd",
+        "/runtime/result/metrics/cost_usd",
+        "/runtime/result/metrics/response_cost/cost_usd",
+    ] {
+        for invalid in [
+            json!(-0.1),
+            json!("NaN"),
+            Value::Null,
+            serde_json::from_str::<Value>("1e999").unwrap(),
+        ] {
+            let mut saved = serde_json::to_value(store.latest()).unwrap();
+            *saved.pointer_mut(pointer).unwrap() = invalid;
+            assert!(
+                RunnerCheckpoint::decode(&serde_json::to_vec(&saved).unwrap()).is_err(),
+                "{pointer}"
+            );
+        }
+    }
 }

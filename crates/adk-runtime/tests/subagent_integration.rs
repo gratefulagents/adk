@@ -2318,3 +2318,194 @@ async fn final_join_includes_active_descendants_of_an_already_delivered_child() 
     );
     owner.shutdown().await.unwrap();
 }
+
+#[tokio::test]
+async fn successful_child_projects_frozen_prices_but_errors_and_budgets_keep_actual_charges() {
+    struct Overloaded;
+    impl Model for Overloaded {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::Provider, "overloaded")) })
+        }
+        fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+            Some(ModelRetryAdvice {
+                should_retry: true,
+                retry_after: Duration::ZERO,
+                reason: "overloaded".into(),
+            })
+        }
+    }
+    struct DisplayCost {
+        prices: Mutex<VecDeque<f64>>,
+        display: f64,
+        known: bool,
+        calls: Mutex<Vec<(String, Usage)>>,
+    }
+    impl CostEstimator for DisplayCost {
+        fn cost(&self, model: &str, _: &Usage) -> f64 {
+            assert_eq!(model, "active");
+            self.prices
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("response re-estimated")
+        }
+        fn estimate_display_cost(&self, model: &str, usage: &Usage) -> ResponseCostSummary {
+            self.calls
+                .lock()
+                .unwrap()
+                .push((model.into(), usage.clone()));
+            ResponseCostSummary {
+                cost_usd: self.display,
+                cost_known: self.known,
+            }
+        }
+    }
+    struct CompactionPrice {
+        amount: f64,
+        known: bool,
+    }
+    impl Compactor for CompactionPrice {
+        fn compact<'a>(
+            &'a self,
+            _: &'a Context,
+            request: CompactionRequest,
+        ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+            assert_eq!(request.model, "active");
+            Box::pin(async move {
+                Ok(CompactedHistory {
+                    history: vec![message(Role::User, "summary")],
+                    history_provenance: vec![],
+                    context_tokens: 1,
+                    usage: Usage {
+                        requests: 1,
+                        input_tokens: 20,
+                        ..Default::default()
+                    },
+                    cost: self.amount,
+                    cost_known: self.known,
+                })
+            })
+        }
+    }
+    for (failed, compaction_known, display, display_known, response_price, compaction_price) in [
+        (false, true, 1.0, true, 0.375, 0.25),
+        (false, false, 1.0, true, 0.375, 0.25),
+        (true, true, 1.0, true, 0.375, 0.25),
+        (true, false, 1.0, true, 0.375, 0.25),
+        (false, true, 0.25, false, 0.375, 0.25),
+        (false, true, -1.0, true, 0.375, 0.25),
+        (false, true, f64::NAN, true, 0.375, 0.25),
+        (false, true, f64::INFINITY, true, 0.375, 0.25),
+        (false, true, 1.0, true, 0.0000004, 1e12),
+    ] {
+        let costs = Arc::new(DisplayCost {
+            prices: Mutex::new(
+                if failed {
+                    vec![response_price; 2]
+                } else {
+                    vec![response_price, response_price, 0.0]
+                }
+                .into(),
+            ),
+            display,
+            known: display_known,
+            calls: Mutex::new(vec![]),
+        });
+        let mut more = answer("more");
+        more.end_turn = Some(false);
+        more.usage = Usage {
+            requests: 1,
+            input_tokens: 10,
+            context_tokens: Some(12),
+            ..Default::default()
+        };
+        let mut done = answer("done");
+        done.usage = Usage {
+            requests: 1,
+            input_tokens: 10,
+            ..Default::default()
+        };
+        let active = FakeModel::new(vec![more.clone(), more, done], Duration::ZERO);
+        let mut agent = AgentConfig::new(
+            "worker",
+            ModelBinding::complete("original", Arc::new(Overloaded)),
+        );
+        agent
+            .fallbacks
+            .push(ModelBinding::complete("active", active));
+        let child = Runner::new(
+            agent,
+            RunnerConfig {
+                cost_estimator: Some(costs.clone()),
+                limits: Limits {
+                    max_cost: failed.then_some(1.1),
+                    ..Default::default()
+                },
+                compaction: Some(CompactionConfig {
+                    trigger_tokens: 10,
+                    target_tokens: 5,
+                    compactor: Arc::new(CompactionPrice {
+                        amount: compaction_price,
+                        known: compaction_known,
+                    }),
+                }),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let (owner, session) = session_with_runner(child, None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(
+            task.status,
+            if failed {
+                TaskStatus::Failed
+            } else {
+                TaskStatus::Completed
+            },
+            "{:?}",
+            task.error
+        );
+        let actual = ((response_price + compaction_price) + response_price) + compaction_price;
+        assert_eq!(task.usage.cost_micros, (actual * 1_000_000.0).ceil() as u64);
+        assert_eq!(
+            session.scheduler.snapshot().usage.cost_micros,
+            task.usage.cost_micros
+        );
+        assert_eq!(task.usage.tokens, if failed { 60 } else { 70 });
+        if failed {
+            assert_eq!((task.cost_usd, task.cost_known), (actual, compaction_known));
+            assert!(costs.calls.lock().unwrap().is_empty());
+        } else {
+            let valid = display.is_finite() && display >= 0.0;
+            assert_eq!(
+                task.cost_usd,
+                response_price * 2.0 + if valid { display } else { 0.0 }
+            );
+            assert_eq!(task.cost_known, valid && display_known);
+            assert_eq!(
+                *costs.calls.lock().unwrap(),
+                vec![(
+                    "original".into(),
+                    Usage {
+                        requests: 2,
+                        input_tokens: 40,
+                        ..Default::default()
+                    }
+                )]
+            );
+        }
+        assert!(costs.prices.lock().unwrap().is_empty());
+        owner.shutdown().await.unwrap();
+    }
+}

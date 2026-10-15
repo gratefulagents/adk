@@ -360,6 +360,13 @@ pub struct GuardrailReport {
     pub tripwire_triggered: bool,
 }
 
+/// Frozen response prices, excluding compaction and other residual usage.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
+pub struct ResponseCostSummary {
+    pub cost_usd: f64,
+    pub cost_known: bool,
+}
+
 /// Cumulative engine accounting, including retries and provider compaction.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunMetrics {
@@ -369,6 +376,9 @@ pub struct RunMetrics {
     /// False when any charged usage has no price, or historical certainty is unavailable.
     #[serde(default)]
     pub cost_known: bool,
+    /// None when historical response-price provenance is unavailable.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub response_cost: Option<ResponseCostSummary>,
     pub elapsed_ms: u64,
 }
 

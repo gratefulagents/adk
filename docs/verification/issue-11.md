@@ -2551,3 +2551,37 @@ remains **564 verified / 8,327 unresolved / 251 excluded**: this implementation
 removes the tracked-task refresh limitation for named sessions but does not claim
 whole-ledger closure. All **46 remote checks** passed at the preceding `21e8322`
 checkpoint; that result is not remote verification of these new changes.
+
+### Successful-child residual display estimates
+
+Completed child outcomes now preserve frozen response prices and estimate the
+remaining nonnegative token/cache usage once with the original child model, as
+in the pinned SDK cost helper. Requests-only residuals do not trigger pricing.
+Actual cumulative cost and shared budget micro-units remain unchanged; failed,
+cancelled and nonterminal outcomes retain their accounting projection.
+
+`RunMetrics.response_cost` and native checkpoints retain the response subtotal
+and certainty. Missing legacy/reconciled provenance stays unavailable: valid
+cumulative USD remains visible but unknown, without re-estimating or double-pricing
+history. `CostEstimator::estimate_display_cost` is default-compatible and can
+represent a nonzero uncertain display estimate, which the previous Option-only
+pricing hook could not express. Invalid/overflowing display prices retain only
+valid available amounts and mark certainty unknown.
+
+The independently executed Go oracle calls the original private helper in an
+immutable source archive and records **21 cases**, including exact fallback usage
+arguments/call counts; both original Go cost regressions pass. The native comparator
+matches every case. Integration tests cover different actual versus display prices,
+original versus active models, native durable restoration, small-price precision,
+error separation and invalid persisted amounts. Independent review found no concrete
+blockers under the existing trusted-checkpoint model; cross-field corruption bounds
+are not claimed as a new integrity guarantee.
+
+Final Rust1.88 workspace: **1,451 passed / 0 failed / 30 ignored**, 146 targets,
+zero warnings; **7 doctests** pass. Strict whole-workspace Clippy/rustdoc,
+formatting, full facade feature matrix, standalone consumer/dependency purity,
+refreshed source-bound evidence, **27 audit validators** and immutable source locks
+pass. Source/harness/native-helper inputs and independent execution markers are
+bound into the evidence runner. Ledger remains **564 verified / 8,327 unresolved /
+251 excluded**: these implementation and fixture results do not silently close
+whole cost methods, signed-overflow behavior or unrelated retained contracts.

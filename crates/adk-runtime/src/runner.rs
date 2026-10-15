@@ -330,6 +330,16 @@ pub trait CostEstimator: Send + Sync {
     fn estimate_cost(&self, model: &str, usage: &Usage) -> Option<f64> {
         Some(self.cost(model, usage))
     }
+
+    /// Display-only projection; an uncertain price may still contribute an amount.
+    /// Actual accounting and budget charges continue to use `estimate_cost`.
+    fn estimate_display_cost(&self, model: &str, usage: &Usage) -> ResponseCostSummary {
+        let cost = self.estimate_cost(model, usage);
+        ResponseCostSummary {
+            cost_usd: cost.unwrap_or(0.0),
+            cost_known: cost.is_some(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1077,6 +1087,10 @@ impl Runner {
             fallbacks: HashMap::new(),
             cost: 0.0,
             cost_known: true,
+            response_cost: Some(ResponseCostSummary {
+                cost_usd: 0.0,
+                cost_known: true,
+            }),
             last_response_cost: None,
             tool_pause: false,
             summary_turn: false,
@@ -1165,6 +1179,7 @@ struct Engine {
     cost: f64,
     last_response_cost: Option<f64>,
     cost_known: bool,
+    response_cost: Option<ResponseCostSummary>,
     tool_pause: bool,
     summary_turn: bool,
     tool_final: Option<String>,
@@ -1463,6 +1478,7 @@ impl Engine {
             turns: self.turns,
             cost_usd: self.cost,
             cost_known: self.cost_known && !self.result.responses.is_empty(),
+            response_cost: self.response_cost.clone(),
             elapsed_ms: elapsed.as_millis().min(u64::MAX as u128) as u64,
         });
     }
@@ -2714,6 +2730,12 @@ impl Engine {
             self.append(item.clone());
         }
         self.last_response_cost = estimate.filter(|cost| cost.is_finite() && *cost >= 0.0);
+        if let Some(summary) = &mut self.response_cost {
+            match self.last_response_cost {
+                Some(cost) if (summary.cost_usd + cost).is_finite() => summary.cost_usd += cost,
+                _ => summary.cost_known = false,
+            }
+        }
         let accounting = self.account_usage(&response.usage, estimate);
         self.result.responses.push(response);
         accounting
@@ -4318,9 +4340,17 @@ impl Runner {
             .filter(|_| status == TaskStatus::Completed)
             .map(|extract| extract(&snapshot))
             .filter(|text| !text.is_empty());
-        let (cost_usd, cost_known) = snapshot.metrics.as_ref().map_or((0.0, false), |metrics| {
-            (metrics.cost_usd, metrics.cost_known)
-        });
+        let (cost_usd, cost_known) = if status == TaskStatus::Completed {
+            crate::cost::estimate_result_cost(
+                &snapshot,
+                self.initial.model.name(),
+                self.config.cost_estimator.as_deref(),
+            )
+        } else {
+            snapshot.metrics.as_ref().map_or((0.0, false), |metrics| {
+                (metrics.cost_usd, metrics.cost_known)
+            })
+        };
         Ok(ChildOutcome {
             cost_usd,
             cost_known,

@@ -26,6 +26,7 @@ class EvidenceTests(unittest.TestCase):
         original = self.evidence["reference_fixture_check"]
         for marker in ("Pinned tool schemas reproduced exactly",
                        "272 SDK lifecycle results and resulting filesystem trees verified",
+                       "1176 SDK ApplyPatch results and resulting filesystem trees verified",
                        "Pinned SDK MCP prompt observations reproduced exactly",
                        "Pinned SDK run instructions observations reproduced exactly",
                        "Pinned SDK workspace context observations reproduced exactly",
@@ -33,6 +34,7 @@ class EvidenceTests(unittest.TestCase):
                        "Pinned metadata compaction observations reproduced exactly",
                        "Pinned LLM summary observations reproduced exactly",
                        "Pinned autoloop observations reproduced exactly",
+                       "Pinned child result-cost observations reproduced exactly",
                        "Pinned content event observations reproduced exactly",
                        "Pinned line writer observations reproduced exactly",
                        "Pinned content stream observations reproduced exactly",

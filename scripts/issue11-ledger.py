@@ -70,6 +70,8 @@ RUST_INPUTS = ["crates/adk-runtime/src/workspace.rs", "fixtures/usage/generate.g
                "crates/adk/src/observability.rs",
                "crates/adk/tests/observability.rs",
                "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
+               "crates/adk-runtime/src/cost.rs", "fixtures/costs/sdk-result-cost.json",
+               "scripts/cost-reference/run.py", "scripts/cost-reference/reference_test.go",
                "crates/adk/tests/usage.rs",
                "crates/adk-core/src/contracts.rs", "crates/adk-core/src/types.rs",
                "crates/adk-core/tests/contracts.rs", "crates/adk-providers/src/wire.rs",
@@ -317,6 +319,7 @@ def verify_rust() -> None:
     content_logger_check = subprocess.run([sys.executable, str(ROOT / "scripts/content-logger-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     content_stream_check = subprocess.run([sys.executable, str(ROOT / "scripts/content-stream-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     line_writer_check = subprocess.run([sys.executable, str(ROOT / "scripts/line-writer-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
+    cost_check = subprocess.run([sys.executable, str(ROOT / "scripts/cost-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     content_event_check = subprocess.run([sys.executable, str(ROOT / "scripts/content-event-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     autoloop_check = subprocess.run([sys.executable, str(ROOT / "scripts/autoloop-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     specialist_tools_check = subprocess.run([sys.executable, str(ROOT / "scripts/specialist-tools-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
@@ -377,7 +380,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + specialist_tools_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
+        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + metadata_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + specialist_tools_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + cost_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -420,6 +423,7 @@ def apply_rust_evidence(entries, records, reference):
                    "Pinned metadata compaction observations reproduced exactly",
                    "Pinned LLM summary observations reproduced exactly",
                    "Pinned autoloop observations reproduced exactly",
+                   "Pinned child result-cost observations reproduced exactly",
                    "Pinned content event observations reproduced exactly",
                    "Pinned line writer observations reproduced exactly",
                    "Pinned content stream observations reproduced exactly",

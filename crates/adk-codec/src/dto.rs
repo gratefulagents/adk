@@ -351,6 +351,24 @@ pub struct Usage {
     pub cache_create_tokens: i64,
 }
 
+impl Usage {
+    /// Input plus output tokens, with the SDK's signed wrapping arithmetic.
+    pub fn total_tokens(&self) -> i64 {
+        self.input_tokens.wrapping_add(self.output_tokens)
+    }
+
+    /// Merge all five counters using the SDK's 64-bit signed arithmetic.
+    pub fn add(&mut self, other: &Self) {
+        self.requests = self.requests.wrapping_add(other.requests);
+        self.input_tokens = self.input_tokens.wrapping_add(other.input_tokens);
+        self.output_tokens = self.output_tokens.wrapping_add(other.output_tokens);
+        self.cache_read_tokens = self.cache_read_tokens.wrapping_add(other.cache_read_tokens);
+        self.cache_create_tokens = self
+            .cache_create_tokens
+            .wrapping_add(other.cache_create_tokens);
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(default)]
 pub struct ResponseSnapshot {

@@ -22,6 +22,19 @@ unspecified, unknown and future labels before constructing executable state.
 open string. This does not claim all snapshot-decoder edge cases or provider
 response conversion are equivalent.
 
+## Signed usage arithmetic
+
+`adk::codec::dto::Usage` (facade `compat` feature) retains all five signed SDK
+counters. `add(&other)` merges them in place without changing `other`;
+`total_tokens()` sums input and output only, not cache counters. Both use explicit
+wrapping arithmetic, including in debug builds, matching the pinned SDK on
+64-bit targets. `requests` models a 64-bit Go `int`; this is not a 32-bit Go
+compatibility claim. Native `adk::core::Usage` remains unsigned and unchanged.
+
+`fixtures/usage/generate.go` executes the pinned public SDK alias to produce 64
+operand pairs, including negative values, cache-only counters and signed extrema.
+The typed-record fixture check reproduces the output before ledger verification.
+
 ## Settings composition
 
 With the facade's `compat` feature, `adk::codec::snapshots::ModelSettings::merge`

@@ -15,11 +15,11 @@
       "-json",
       "./internal/agent",
       "-run",
-      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestCompactionDefaultsForModel|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize)$"
+      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestCompactionDefaultsForModel|TestEstimateRunResultCostSumsResponseCosts|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize)$"
     ]
   ],
   "counts": {
-    "pass": 786,
+    "pass": 787,
     "skip": 5
   },
   "exit_code": 0,
@@ -94,6 +94,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/openai/gpt-5.6-terra": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/openai/gpt-6-astra": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/unknown-model": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestFinalAnswerVerifierSingleRefutationRound": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestHandoffInputFilterSeesCurrentTurnItems": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestHandoffIsEnabledGatesTool": "pass",

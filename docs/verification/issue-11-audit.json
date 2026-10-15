@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8443,
-    "verified": 448
+    "unresolved": 8436,
+    "verified": 455
   },
   "groups": [
     {
@@ -10761,7 +10761,8 @@
     },
     {
       "counts": {
-        "apis:unresolved": 9,
+        "apis:unresolved": 2,
+        "apis:verified": 7,
         "files:unresolved": 3,
         "tests:unresolved": 2,
         "verification_groups:unresolved": 1
@@ -10774,23 +10775,24 @@
         "pkg/agentsdk/aliases.go"
       ],
       "unresolved_ids": [
-        "SDK-132DD02CC5240D89",
-        "SDK-1489A4F19F26475A",
-        "SDK-25A907095FAA58D6",
         "SDK-5DC87F0A3A08880C",
         "SDK-7AB1DCFD60AEF2AC",
-        "SDK-7B6CA2A7BA28D07F",
         "SDK-7F515DBA4052A49B",
         "SDK-90F2C7B7D0A6DCBB",
         "SDK-A44EB9612F2A5359",
         "SDK-BBB10D36D7BFA90F",
         "SDK-C02C9D4F8A1DC0CD",
-        "SDK-C3E29FD631C84BDE",
-        "SDK-C9567C2AC89003E8",
-        "SDK-D5F52A13A0A30AFB",
         "SDK-D942754BB910F2F3"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-132DD02CC5240D89",
+        "SDK-1489A4F19F26475A",
+        "SDK-25A907095FAA58D6",
+        "SDK-7B6CA2A7BA28D07F",
+        "SDK-C3E29FD631C84BDE",
+        "SDK-C9567C2AC89003E8",
+        "SDK-D5F52A13A0A30AFB"
+      ]
     },
     {
       "counts": {
@@ -10923,8 +10925,8 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "21591b8b2c2acbfc1709eb4b6f8404ad9425e9eb4343a7fe5d3fbe2b99c05989",
-    "docs/migration/ledger/issue-11-rust-claims.json": "1df11556fc4079fb7e6ec4a12d17b6b27405cb3fbe2a734efaf2bd557cb47dd2",
+    "docs/migration/ledger/issue-11-overlay.json": "e56918d6a4331a15ac1ffc511f8f7ab9324d55a0c0836efc3e015edd3254908f",
+    "docs/migration/ledger/issue-11-rust-claims.json": "81073f3f9261085e9aafc35c5770898f3927c5aec030e809861971c1500887e3",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",

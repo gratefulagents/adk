@@ -7634,6 +7634,118 @@
         "mcp",
         "project-state"
       ]
+    },
+    "SDK-1489A4F19F26475A": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.Add",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::add"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-7B6CA2A7BA28D07F": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.CacheCreateTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::cache_create_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-132DD02CC5240D89": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.CacheReadTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::cache_read_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-D5F52A13A0A30AFB": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.InputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::input_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-25A907095FAA58D6": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::output_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-C3E29FD631C84BDE": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.Requests",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::requests"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
+    },
+    "SDK-C9567C2AC89003E8": {
+      "source": "internal/agent/usage.go",
+      "source_name": "Usage.TotalTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::total_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Signed compatibility DTO, not native unsigned runtime usage. Independently executed pinned public Usage produces 64 ordered operand combinations: zero, positive, negative, cache-only and signed extrema. Rust compares all five serialized counters, wrapping addition and input/output-only total, preserving the borrowed operand. Requests matches 64-bit Go int only; no 32-bit target claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "adk-codec; facade compat feature"
+      ]
     }
   }
 }

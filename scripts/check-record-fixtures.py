@@ -17,6 +17,9 @@ def main():
     go = os.environ.get("GO", "go")
     with tempfile.TemporaryDirectory(prefix=".record-check-", dir=ROOT / "fixtures") as scratch:
         output = Path(scratch)
+        usage = subprocess.check_output([go, "run", str(ROOT / "fixtures/usage/generate.go")], cwd=SDK)
+        if usage != (ROOT / "fixtures/usage/observations.json").read_bytes():
+            raise SystemExit("usage arithmetic oracle mismatch")
         subprocess.run([go, "run", str(ROOT / "fixtures/durable/generate.go"), "generate", str(output / "durable")], cwd=SDK, check=True)
         for expected in sorted((ROOT / "fixtures/durable").glob("*.json")):
             actual = output / "durable" / expected.name

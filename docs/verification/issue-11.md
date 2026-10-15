@@ -2058,3 +2058,19 @@ host-session example, six doctests, pinned oracles, 19 ledger validators and
 source locks pass. Overlay: **448 verified / 8,443 unresolved / 251 excluded**.
 Unresolved inventory IDs are not a count of missing capabilities. Full issue
 acceptance and credentialed live checks remain open.
+
+### Signed SDK usage helpers
+
+Added `codec::dto::Usage::{add,total_tokens}` with explicit wrapping signed
+arithmetic, independent of native unsigned runtime accounting. A new pinned-Go
+generator produces 64 operand pairs covering zero, negative, cache-only and
+signed extrema; Rust checks every serialized result and total. The borrowed
+operand is unchanged. Request counters match 64-bit Go `int`, not 32-bit Go.
+Seven member claims are closed; no whole cost-estimator/runtime claim is made.
+
+Fresh workspace: **1,391 passed / 0 failed / 30 ignored**; strict Clippy/rustdoc,
+feature matrix, platform-free standalone consumer, 20 offline scenarios,
+host-session, six doctests, pinned oracles, 19 ledger validators and eight audit
+tests pass. Original Go regression refresh: **787 pass / 5 skip**, 35 packages.
+Overlay: **455 verified / 8,436 unresolved / 251 excluded**. Full issue acceptance
+and credentialed live-provider checks remain open.

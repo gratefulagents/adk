@@ -575,7 +575,13 @@ async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_mod
         }
     }
     #[derive(Default)]
-    struct Costs(Mutex<Vec<f64>>);
+    struct Costs(Mutex<Vec<f64>>, Mutex<Vec<Option<f64>>>);
+    impl adk_runtime::tracing::GenerationObserver for Costs {
+        fn start(&self, _: &Context, _: &adk_runtime::tracing::GenerationRecord) {}
+        fn end(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+            self.1.lock().unwrap().push(record.cost_usd);
+        }
+    }
     impl RunHooks for Costs {
         fn observe<'a>(
             &'a self,
@@ -590,58 +596,68 @@ async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_mod
             })
         }
     }
-    for streaming in [false, true] {
-        let primary = Arc::new(Probe {
-            fail: true,
-            ..Default::default()
-        });
-        let backup = Arc::new(Probe::default());
-        let mut routes = Routes::new("primary");
-        routes
-            .register_kind("primary", Kind::OpenAi, primary.clone())
+    for (backup_model, backup_kind, expected_cost) in [
+        ("claude-sonnet-5", Kind::Anthropic, Some(0.003165)),
+        ("unknown", Kind::OpenAi, None),
+    ] {
+        for streaming in [false, true] {
+            let primary = Arc::new(Probe {
+                fail: true,
+                ..Default::default()
+            });
+            let backup = Arc::new(Probe::default());
+            let mut routes = Routes::new("primary");
+            routes
+                .register_kind("primary", Kind::OpenAi, primary.clone())
+                .unwrap();
+            routes
+                .register_kind("backup", backup_kind, backup.clone())
+                .unwrap();
+            let routes = Arc::new(routes);
+            let mut agent = AgentConfig::new(
+                "fixture",
+                ModelBinding::streaming("primary/gpt-5.6", routes.clone()),
+            );
+            agent.fallbacks.push(ModelBinding::streaming(
+                format!("backup/{backup_model}"),
+                routes.clone(),
+            ));
+            let observed = Arc::new(Costs::default());
+            let config = RunnerConfig {
+                cost_estimator: Some(Arc::new(adk_providers::runtime::BaselineCosts(routes))),
+                generation_observer: Some(observed.clone()),
+                hooks: Some(observed.clone()),
+                ..Default::default()
+            };
+            let runner = Runner::new(agent, config).unwrap();
+            let request = RunRequest {
+                input_provenance: Vec::new(),
+                input: vec![],
+                policy: RunPolicy {
+                    max_turns: 2.try_into().unwrap(),
+                    tools: ToolPolicy::default(),
+                    tool_use: ToolUseBehavior::Continue,
+                },
+            };
+            let outcome = if streaming {
+                runner
+                    .stream(context(), request, Arc::new(HostFixture))
+                    .finish()
+                    .await
+            } else {
+                runner.run(context(), request, Arc::new(HostFixture)).await
+            }
             .unwrap();
-        routes
-            .register_kind("backup", Kind::Anthropic, backup.clone())
-            .unwrap();
-        let routes = Arc::new(routes);
-        let mut agent = AgentConfig::new(
-            "fixture",
-            ModelBinding::streaming("primary/gpt-5.6", routes.clone()),
-        );
-        agent.fallbacks.push(ModelBinding::streaming(
-            "backup/claude-sonnet-5",
-            routes.clone(),
-        ));
-        let observed = Arc::new(Costs::default());
-        let config = RunnerConfig {
-            cost_estimator: Some(Arc::new(adk_providers::runtime::BaselineCosts(routes))),
-            hooks: Some(observed.clone()),
-            ..Default::default()
-        };
-        let runner = Runner::new(agent, config).unwrap();
-        let request = RunRequest {
-            input_provenance: Vec::new(),
-            input: vec![],
-            policy: RunPolicy {
-                max_turns: 2.try_into().unwrap(),
-                tools: ToolPolicy::default(),
-                tool_use: ToolUseBehavior::Continue,
-            },
-        };
-        let outcome = if streaming {
-            runner
-                .stream(context(), request, Arc::new(HostFixture))
-                .finish()
-                .await
-        } else {
-            runner.run(context(), request, Arc::new(HostFixture)).await
+            assert_eq!(outcome.result.responses.len(), 1);
+            assert_eq!(outcome.result.usage.input_tokens, 1000);
+            assert_eq!(*primary.requests.lock().unwrap(), ["gpt-5.6"]);
+            assert_eq!(*backup.requests.lock().unwrap(), [backup_model]);
+            near(
+                *observed.0.lock().unwrap().last().unwrap(),
+                expected_cost.unwrap_or(0.0),
+            );
+            assert_eq!(*observed.1.lock().unwrap().last().unwrap(), expected_cost);
         }
-        .unwrap();
-        assert_eq!(outcome.result.responses.len(), 1);
-        assert_eq!(outcome.result.usage.input_tokens, 1000);
-        assert_eq!(*primary.requests.lock().unwrap(), ["gpt-5.6"]);
-        assert_eq!(*backup.requests.lock().unwrap(), ["claude-sonnet-5"]);
-        near(*observed.0.lock().unwrap().last().unwrap(), 0.003165);
     }
 }
 
@@ -717,5 +733,7 @@ fn numeric_runner_adapter_does_not_claim_unknown_prices_are_known() {
     let costs = adk_providers::runtime::BaselineCosts(Arc::new(routes));
     assert_eq!(costs.0.estimate_cost("unknown", &usage()), None);
     assert_eq!(costs.cost("unknown", &usage()), 0.0);
+    assert_eq!(costs.estimate_cost("unknown", &usage()), None);
     near(costs.cost("gpt-5.6", &usage()), 0.00533);
+    near(costs.estimate_cost("gpt-5.6", &usage()).unwrap(), 0.00533);
 }

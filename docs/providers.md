@@ -55,8 +55,14 @@ max→xhigh→high and none→minimal→low ladders. Anthropic heals at most onc
 request and remembers shape/effort caps per provider/model instance. Foreign
 compaction retains its context summary but cannot replay an incompatible
 encrypted blob. Unknown opaque reasoning fails closed. `NativeCompactor` and
-`BaselineCosts` are opt-in runner adapters; unknown cost remains `None` in routing
-and becomes zero only at the runner's documented numeric estimator boundary.
+`BaselineCosts` are opt-in runner adapters. Unknown prices remain `None` through
+`CostEstimator::estimate_cost` into generation traces (`cost_known: false`), while
+numeric accounting still charges zero. A known free price remains `Some(0.0)`.
+Existing numeric-only estimators default to a known estimate and are evaluated
+once per response. Retained completions from failed streams preserve the same
+distinction and exact per-response amount, rather than subtracting cumulative
+floating-point totals. Provider-specific fallback prices still apply: an unknown
+Anthropic model can have a known default price; an unknown OpenAI model does not.
 `NativeCompactor` takes the runner's `Routes` registry and resolves named routes
 and size aliases before sending a provider-local model ID. Register its shared
 `Arc<Provider>` with `Routes::register_kind` (or `register` for literal IDs).

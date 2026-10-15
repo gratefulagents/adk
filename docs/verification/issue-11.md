@@ -2092,3 +2092,26 @@ pinned oracles, 19 ledger validators, eight queue tests and source locks pass.
 Ledger remains **455 verified / 8,436 unresolved / 251 excluded**. At the preceding
 `f542bc7` checkpoint, CI reported 42 successful and four pending checks, no failures;
 that is not a completed-CI claim for this change. Full acceptance remains open.
+
+### Unknown provider costs in automatic generation traces
+
+`CostEstimator::estimate_cost` now preserves absent prices; numeric-only host
+estimators default to known values. `BaselineCosts` forwards the route's optional
+estimate instead of turning an unknown zero into a known generation cost.
+Accounting remains numeric with zero for unknown prices. Retained completions
+from failed streams preserve the exact per-response estimate instead of deriving
+it by subtracting cumulative floating-point totals. Host estimators run once per
+response, not once for accounting and again for tracing.
+
+Three new runtime regressions cover twelve unknown/zero/priced × run/stream ×
+success/failure combinations, default numeric estimators, and a 0.25 failed-response
+cost after a 1e16 prior total. Extended provider integration checks named fallback
+routes and generation observers in both modes. The initial unknown-Anthropic test
+assumption was corrected: that provider has a known default price; unknown OpenAI
+pricing is the actual absent-price case. Existing provider pricing was unchanged.
+
+Fresh full workspace: **1,395 passed / 0 failed / 30 ignored**. Strict Clippy/rustdoc,
+matrix/platform-free consumer, 20 offline scenarios, host-session, six doctests,
+pinned oracles, 19 ledger validators, eight audit tests and source locks pass.
+No additional whole cost-aggregation or live-provider claim is made. Ledger remains
+**455 verified / 8,436 unresolved / 251 excluded**; full issue acceptance is open.

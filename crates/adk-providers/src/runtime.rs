@@ -9,12 +9,16 @@ pub use metadata::{MetadataCompactionResolver, MetadataCompactionWarning};
 
 /// Baseline USD accounting for the runner's actual selected binding, including
 /// named routes and fallbacks. The runner requires a number: unknown prices use
-/// zero, as in baseline CalculateCost. Use Routes::estimate_cost to retain the
-/// known/unknown distinction; this adapter cannot enforce budgets for unknowns.
+/// zero, as in baseline CalculateCost. `estimate_cost` retains the known/unknown
+/// distinction for generation traces; budgets cannot constrain unknown prices.
 pub struct BaselineCosts(pub Arc<crate::routing::Routes>);
 impl CostEstimator for BaselineCosts {
     fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
         self.0.estimate_cost(model, usage).unwrap_or(0.0)
+    }
+
+    fn estimate_cost(&self, model: &str, usage: &adk_core::Usage) -> Option<f64> {
+        self.0.estimate_cost(model, usage)
     }
 }
 

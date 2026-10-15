@@ -511,7 +511,145 @@ async fn cancellation_and_dropped_future_flush_and_close_once() {
         );
     }
 }
+struct OptionalCost {
+    estimate: Option<f64>,
+    calls: AtomicUsize,
+}
+impl CostEstimator for OptionalCost {
+    fn cost(&self, _: &str, _: &Usage) -> f64 {
+        panic!("runner must preserve the optional estimate")
+    }
+    fn estimate_cost(&self, _: &str, _: &Usage) -> Option<f64> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        self.estimate
+    }
+}
+
+#[tokio::test]
+async fn generation_cost_distinguishes_unknown_zero_and_priced_retained_responses() {
+    for estimate in [None, Some(0.0), Some(0.25)] {
+        for streamed in [false, true] {
+            for fail in [false, true] {
+                let mut steps = vec![complete()];
+                if fail {
+                    steps.push(Step::Fail);
+                }
+                let model = Offline::new(vec![steps]);
+                let seen = Arc::new(Mutex::new(vec![]));
+                let sink = Arc::new(Sink::default());
+                let costs = Arc::new(OptionalCost {
+                    estimate,
+                    calls: AtomicUsize::new(0),
+                });
+                let mut cfg = config(&seen, &sink);
+                cfg.cost_estimator = Some(costs.clone());
+                let runner = runner(&model, cfg);
+                let result = if streamed {
+                    runner
+                        .stream(context(&CancellationToken::new()), request(), sink)
+                        .finish()
+                        .await
+                } else {
+                    runner
+                        .run(context(&CancellationToken::new()), request(), sink)
+                        .await
+                };
+                assert_eq!(result.is_err(), fail);
+                let result = match result {
+                    Ok(outcome) => outcome.result,
+                    Err(error) => *error.partial.unwrap(),
+                };
+                assert_eq!(result.responses.len(), 1);
+                assert_eq!(result.metrics.unwrap().cost_usd, estimate.unwrap_or(0.0));
+                assert_eq!(costs.calls.load(Ordering::SeqCst), 1);
+                let seen = seen.lock().unwrap();
+                let ended = seen.iter().find(|event| event.event == "end").unwrap();
+                assert_eq!(ended.record.cost_usd, estimate);
+                assert_eq!(
+                    ended.record.status,
+                    if fail {
+                        GenerationStatus::Failed
+                    } else {
+                        GenerationStatus::Completed
+                    }
+                );
+            }
+        }
+    }
+}
+
+struct NumericCost(AtomicUsize);
+impl CostEstimator for NumericCost {
+    fn cost(&self, _: &str, _: &Usage) -> f64 {
+        self.0.fetch_add(1, Ordering::SeqCst);
+        0.5
+    }
+}
+
+#[tokio::test]
+async fn numeric_cost_estimators_remain_known_and_are_called_once() {
+    let seen = Arc::new(Mutex::new(vec![]));
+    let sink = Arc::new(Sink::default());
+    let costs = Arc::new(NumericCost(AtomicUsize::new(0)));
+    let mut cfg = config(&seen, &sink);
+    cfg.cost_estimator = Some(costs.clone());
+    cfg.blocking_reasoning = false;
+    let result = runner(&Offline::new(vec![]), cfg)
+        .run(context(&CancellationToken::new()), request(), sink)
+        .await
+        .unwrap();
+    assert_eq!(result.result.metrics.unwrap().cost_usd, 0.5);
+    assert_eq!(
+        seen.lock().unwrap().last().unwrap().record.cost_usd,
+        Some(0.5)
+    );
+    assert_eq!(costs.0.load(Ordering::SeqCst), 1);
+}
+
 struct Signal(Arc<tokio::sync::Notify>);
+
+#[tokio::test]
+async fn failed_stream_keeps_exact_response_cost_after_large_prior_total() {
+    struct SequenceCost(Mutex<VecDeque<f64>>);
+    impl CostEstimator for SequenceCost {
+        fn cost(&self, _: &str, _: &Usage) -> f64 {
+            self.0
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("duplicate estimate")
+        }
+    }
+    let mut first = answer();
+    first.items = vec![RunItem::ToolCall {
+        call: ToolCall {
+            id: "unavailable".into(),
+            name: "unavailable".into(),
+            arguments: serde_json::json!({}),
+            raw_arguments: None,
+        },
+    }];
+    let model = Offline::new(vec![
+        vec![Step::Event(ModelEvent::Complete { response: first })],
+        vec![complete(), Step::Fail],
+    ]);
+    let seen = Arc::new(Mutex::new(vec![]));
+    let sink = Arc::new(Sink::default());
+    let costs = Arc::new(SequenceCost(Mutex::new([1e16, 0.25].into())));
+    let mut cfg = config(&seen, &sink);
+    cfg.cost_estimator = Some(costs.clone());
+    let error = runner(&model, cfg)
+        .run(context(&CancellationToken::new()), request(), sink)
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.partial.unwrap().responses.len(), 2);
+    assert!(costs.0.lock().unwrap().is_empty());
+    let seen = seen.lock().unwrap();
+    let last = &seen.last().unwrap().record;
+    assert_eq!(last.status, GenerationStatus::Failed);
+    assert_eq!(last.cost_usd, Some(0.25));
+}
 impl ImmediateInputSignal for Signal {
     fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
         Box::pin(self.0.notified())

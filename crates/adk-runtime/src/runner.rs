@@ -325,6 +325,11 @@ pub struct Limits {
 
 pub trait CostEstimator: Send + Sync {
     fn cost(&self, model: &str, usage: &Usage) -> f64;
+
+    /// Unknown prices contribute zero to accounting without claiming a known trace cost.
+    fn estimate_cost(&self, model: &str, usage: &Usage) -> Option<f64> {
+        Some(self.cost(model, usage))
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -1068,6 +1073,7 @@ impl Runner {
             resolved_compaction: None,
             fallbacks: HashMap::new(),
             cost: 0.0,
+            last_response_cost: None,
             tool_pause: false,
             summary_turn: false,
             tool_final: None,
@@ -1153,6 +1159,7 @@ struct Engine {
     resolved_compaction: Option<ResolvedCompaction>,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
+    last_response_cost: Option<f64>,
     tool_pause: bool,
     summary_turn: bool,
     tool_final: Option<String>,
@@ -2700,14 +2707,14 @@ impl Engine {
         for item in &response.items {
             self.append(item.clone());
         }
-        let cost = known_cost.unwrap_or_else(|| {
+        let estimate = known_cost.or_else(|| {
             self.config
                 .cost_estimator
                 .as_ref()
-                .map(|c| c.cost(model, &response.usage))
-                .unwrap_or(0.0)
+                .and_then(|c| c.estimate_cost(model, &response.usage))
         });
-        let accounting = self.account_usage(&response.usage, cost);
+        self.last_response_cost = estimate.filter(|cost| cost.is_finite() && *cost >= 0.0);
+        let accounting = self.account_usage(&response.usage, estimate.unwrap_or(0.0));
         self.result.responses.push(response);
         accounting
     }
@@ -2882,7 +2889,6 @@ impl Engine {
                     )
                 });
                 let responses_before = self.result.responses.len();
-                let cost_before = self.cost;
                 let control = self.child_control.clone();
                 let signal = self.config.immediate_input_signal.clone();
                 let context = self.context.clone();
@@ -2941,20 +2947,14 @@ impl Engine {
                     generation.returned();
                     if self.result.responses.len() > responses_before {
                         generation.record.response = self.result.responses.last().cloned();
-                        generation.record.cost_usd = self
-                            .config
-                            .cost_estimator
-                            .as_ref()
-                            .map(|_| self.cost - cost_before);
+                        generation.record.cost_usd = self.last_response_cost;
                     }
                 }
                 match attempt_result {
                     Ok(response) => {
-                        let cost = self
-                            .config
-                            .cost_estimator
-                            .as_ref()
-                            .map(|estimator| estimator.cost(binding.name(), &response.usage));
+                        let cost = self.config.cost_estimator.as_ref().and_then(|estimator| {
+                            estimator.estimate_cost(binding.name(), &response.usage)
+                        });
                         if let Some(generation) = &mut generation {
                             generation.record.response = Some(response.clone());
                             generation.record.cost_usd =
@@ -2978,7 +2978,7 @@ impl Engine {
                             response,
                             binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
-                            cost,
+                            Some(cost.unwrap_or(0.0)),
                             generation
                                 .as_ref()
                                 .map(|generation| generation.record.clone()),

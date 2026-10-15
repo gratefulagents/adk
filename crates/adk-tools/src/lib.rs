@@ -17,6 +17,8 @@ pub mod bundle;
 mod edit;
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 mod edit_diff;
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+mod fs_input;
 pub mod git;
 #[cfg(any(target_os = "linux", target_os = "macos"))]
 pub mod git_host;

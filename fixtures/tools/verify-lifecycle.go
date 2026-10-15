@@ -71,12 +71,13 @@ func main() {
 	data, err := os.ReadFile("../../fixtures/tools/lifecycle.json")
 	must(err)
 	type Case struct {
-		Name       string          `json:"name"`
-		Arguments  json.RawMessage `json:"arguments"`
-		ErrorOnly  bool            `json:"error_only"`
-		FullAccess bool            `json:"full_access"`
-		Content    *string         `json:"content"`
-		Config     json.RawMessage `json:"config"`
+		Name         string          `json:"name"`
+		Arguments    json.RawMessage `json:"arguments"`
+		RawArguments *string         `json:"raw_arguments,omitempty"`
+		ErrorOnly    bool            `json:"error_only"`
+		FullAccess   bool            `json:"full_access"`
+		Content      *string         `json:"content"`
+		Config       json.RawMessage `json:"config"`
 	}
 	var cases []Case
 	must(json.Unmarshal(data, &cases))
@@ -130,9 +131,13 @@ func main() {
 		if test.Name == "Edit" && test.FullAccess {
 			implementation = &tools.FileEditTool{}
 		}
-		expected, err := implementation.Execute(context.Background(), test.Arguments, goRoot)
+		arguments := test.Arguments
+		if test.RawArguments != nil {
+			arguments = json.RawMessage(*test.RawArguments)
+		}
+		expected, err := implementation.Execute(context.Background(), arguments, goRoot)
 		must(err)
-		must(encoder.Encode(map[string]any{"name": test.Name, "arguments": test.Arguments, "work_dir": rustRoot, "full_access": test.FullAccess}))
+		must(encoder.Encode(map[string]any{"name": test.Name, "arguments": test.Arguments, "raw_arguments": test.RawArguments, "work_dir": rustRoot, "full_access": test.FullAccess}))
 		if !scanner.Scan() {
 			panic("Rust replay stopped")
 		}

@@ -1,4 +1,8 @@
-use crate::{Capability, workspace::Workspace};
+use crate::{
+    Capability,
+    fs_input::{self, Kind},
+    workspace::Workspace,
+};
 use adk_core::{
     AccessMode, BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
 };
@@ -6,7 +10,6 @@ use rustix::fs::{
     AtFlags, FileType, Mode, OFlags, fchmod, mkdirat, open, openat, renameat, statat, unlinkat,
 };
 use serde::Deserialize;
-use serde_json::{Value, json};
 use std::{
     fs::File,
     io::{self, Write},
@@ -173,15 +176,13 @@ pub(crate) fn resolve_existing(path: &Path) -> io::Result<PathBuf> {
 }
 
 impl FileWrite {
-    fn write(&self, context: &ToolContext, mut arguments: Value) -> Result<String, String> {
-        if arguments.is_null() {
-            arguments = json!({});
-        }
-        if let Some(fields) = arguments.as_object_mut() {
-            fields.retain(|_, value| !value.is_null());
-        }
-        let input: Input =
-            serde_json::from_value(arguments).map_err(|e| format!("Invalid input: {e}"))?;
+    fn write(&self, context: &ToolContext, call: &ToolCall) -> Result<String, String> {
+        let arguments = fs_input::decode(
+            call,
+            "fileWriteInput",
+            &[("file_path", Kind::String), ("content", Kind::String)],
+        )?;
+        let input: Input = serde_json::from_value(arguments).expect("validated write fields");
         if input.file_path.is_empty() {
             return Err("file_path is required".into());
         }
@@ -254,7 +255,7 @@ impl Tool for FileWrite {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
-            let (text, is_error) = match self.write(context, call.arguments) {
+            let (text, is_error) = match self.write(context, &call) {
                 Ok(text) => (text, false),
                 Err(text) => (text, true),
             };

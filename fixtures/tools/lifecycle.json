@@ -701,5 +701,683 @@
       "new_string": "new"
     },
     "error_only": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "a",
+      "CONTENT": "upper"
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"a\",\"CONTENT\":\"upper\"}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "FILE_PATH": "dir/file",
+      "content": "last path"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"FILE_PATH\":\"dir/file\",\"content\":\"last path\"}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "dir/file",
+      "file_path": "a",
+      "content": "last path"
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"dir/file\",\"file_path\":\"a\",\"content\":\"last path\"}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "last"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"first\",\"content\":\"last\"}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"first\",\"content\":null}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "valid"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":false,\"content\":\"valid\"}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "x",
+      "source_path": [],
+      "unknown": {
+        "nested": 1
+      }
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"x\",\"source_path\":[],\"unknown\":{\"nested\":1}}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": 42
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":42}"
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":null}"
+  },
+  {
+    "name": "Write",
+    "arguments": null,
+    "raw_arguments": "null"
+  },
+  {
+    "name": "Write",
+    "arguments": true,
+    "raw_arguments": "true"
+  },
+  {
+    "name": "Write",
+    "arguments": 123,
+    "raw_arguments": "123"
+  },
+  {
+    "name": "Write",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\""
+  },
+  {
+    "name": "Write",
+    "arguments": [],
+    "raw_arguments": "[]"
+  },
+  {
+    "name": "Write",
+    "arguments": null,
+    "raw_arguments": ""
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "a",
+      "CONTENT": "upper"
+    }
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "a",
+      "CONTENT": "upper"
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"a\",\"CONTENT\":\"upper\"}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "FILE_PATH": "dir/file",
+      "content": "last path"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"FILE_PATH\":\"dir/file\",\"content\":\"last path\"}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "dir/file",
+      "file_path": "a",
+      "content": "last path"
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"dir/file\",\"file_path\":\"a\",\"content\":\"last path\"}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "last"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"first\",\"content\":\"last\"}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"first\",\"content\":null}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "valid"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":false,\"content\":\"valid\"}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": "x",
+      "source_path": [],
+      "unknown": {
+        "nested": 1
+      }
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":\"x\",\"source_path\":[],\"unknown\":{\"nested\":1}}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": 42
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":42}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "file_path": "a",
+      "content": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"content\":null}",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": null,
+    "raw_arguments": "null",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": true,
+    "raw_arguments": "true",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": 123,
+    "raw_arguments": "123",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\"",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": [],
+    "raw_arguments": "[]",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": null,
+    "raw_arguments": "",
+    "full_access": true
+  },
+  {
+    "name": "Write",
+    "arguments": {
+      "FILE_PATH": "a",
+      "CONTENT": "upper"
+    },
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "FILE_PATH": "a",
+      "OLD_STRING": "alpha",
+      "NEW_STRING": "omega",
+      "REPLACE_ALL": false
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"a\",\"OLD_STRING\":\"alpha\",\"NEW_STRING\":\"omega\",\"REPLACE_ALL\":false}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_ſtring": "alpha",
+      "new_ſtring": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_ſtring\":\"alpha\",\"new_ſtring\":\"omega\"}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "OLD_STRING": "missing",
+      "old_string": "alpha",
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"OLD_STRING\":\"missing\",\"old_string\":\"alpha\",\"new_string\":\"omega\"}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "OLD_STRING": "missing",
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"OLD_STRING\":\"missing\",\"new_string\":\"omega\"}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": null,
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"old_string\":null,\"new_string\":\"omega\"}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": "omega",
+      "replace_all": true
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":\"omega\",\"replace_all\":\"bad\",\"replace_all\":true}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": null,
+      "replace_all": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":null,\"replace_all\":null}"
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": "omega",
+      "unknown": {
+        "nested": 1
+      }
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":\"omega\",\"unknown\":{\"nested\":1}}"
+  },
+  {
+    "name": "Edit",
+    "arguments": null,
+    "raw_arguments": "null"
+  },
+  {
+    "name": "Edit",
+    "arguments": true,
+    "raw_arguments": "true"
+  },
+  {
+    "name": "Edit",
+    "arguments": 123,
+    "raw_arguments": "123"
+  },
+  {
+    "name": "Edit",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\""
+  },
+  {
+    "name": "Edit",
+    "arguments": [],
+    "raw_arguments": "[]"
+  },
+  {
+    "name": "Edit",
+    "arguments": null,
+    "raw_arguments": ""
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "FILE_PATH": "a",
+      "OLD_STRING": "alpha",
+      "NEW_STRING": "omega",
+      "REPLACE_ALL": false
+    }
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "FILE_PATH": "a",
+      "OLD_STRING": "alpha",
+      "NEW_STRING": "omega",
+      "REPLACE_ALL": false
+    },
+    "raw_arguments": "{\"FILE_PATH\":\"a\",\"OLD_STRING\":\"alpha\",\"NEW_STRING\":\"omega\",\"REPLACE_ALL\":false}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_ſtring": "alpha",
+      "new_ſtring": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_ſtring\":\"alpha\",\"new_ſtring\":\"omega\"}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "OLD_STRING": "missing",
+      "old_string": "alpha",
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"OLD_STRING\":\"missing\",\"old_string\":\"alpha\",\"new_string\":\"omega\"}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "OLD_STRING": "missing",
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"OLD_STRING\":\"missing\",\"new_string\":\"omega\"}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": null,
+      "new_string": "omega"
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"old_string\":null,\"new_string\":\"omega\"}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": "omega",
+      "replace_all": true
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":\"omega\",\"replace_all\":\"bad\",\"replace_all\":true}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": null,
+      "replace_all": null
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":null,\"replace_all\":null}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "file_path": "a",
+      "old_string": "alpha",
+      "new_string": "omega",
+      "unknown": {
+        "nested": 1
+      }
+    },
+    "raw_arguments": "{\"file_path\":\"a\",\"old_string\":\"alpha\",\"new_string\":\"omega\",\"unknown\":{\"nested\":1}}",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": null,
+    "raw_arguments": "null",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": true,
+    "raw_arguments": "true",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": 123,
+    "raw_arguments": "123",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\"",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": [],
+    "raw_arguments": "[]",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": null,
+    "raw_arguments": "",
+    "full_access": true
+  },
+  {
+    "name": "Edit",
+    "arguments": {
+      "FILE_PATH": "a",
+      "OLD_STRING": "alpha",
+      "NEW_STRING": "omega",
+      "REPLACE_ALL": false
+    },
+    "full_access": true
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "SOURCE_PATH": "a",
+      "DESTINATION_PATH": "b"
+    },
+    "raw_arguments": "{\"SOURCE_PATH\":\"a\",\"DESTINATION_PATH\":\"b\"}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "ſource_path": "a",
+      "deſtination_path": "b"
+    },
+    "raw_arguments": "{\"ſource_path\":\"a\",\"deſtination_path\":\"b\"}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "source_path": "a",
+      "SOURCE_PATH": "dir/file",
+      "destination_path": "b"
+    },
+    "raw_arguments": "{\"source_path\":\"a\",\"SOURCE_PATH\":\"dir/file\",\"destination_path\":\"b\"}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "SOURCE_PATH": "dir/file",
+      "source_path": "a",
+      "destination_path": "b"
+    },
+    "raw_arguments": "{\"SOURCE_PATH\":\"dir/file\",\"source_path\":\"a\",\"destination_path\":\"b\"}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "source_path": null,
+      "destination_path": "b"
+    },
+    "raw_arguments": "{\"source_path\":\"a\",\"source_path\":null,\"destination_path\":\"b\"}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "source_path": "a",
+      "destination_path": "b",
+      "path": {},
+      "content": false
+    },
+    "raw_arguments": "{\"source_path\":\"a\",\"destination_path\":\"b\",\"path\":{},\"content\":false}"
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "source_path": "a",
+      "destination_path": true
+    },
+    "raw_arguments": "{\"source_path\":\"a\",\"destination_path\":true}"
+  },
+  {
+    "name": "Move",
+    "arguments": null,
+    "raw_arguments": "null"
+  },
+  {
+    "name": "Move",
+    "arguments": true,
+    "raw_arguments": "true"
+  },
+  {
+    "name": "Move",
+    "arguments": 123,
+    "raw_arguments": "123"
+  },
+  {
+    "name": "Move",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\""
+  },
+  {
+    "name": "Move",
+    "arguments": [],
+    "raw_arguments": "[]"
+  },
+  {
+    "name": "Move",
+    "arguments": null,
+    "raw_arguments": ""
+  },
+  {
+    "name": "Move",
+    "arguments": {
+      "SOURCE_PATH": "a",
+      "DESTINATION_PATH": "b"
+    }
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "PATH": "a"
+    },
+    "raw_arguments": "{\"PATH\":\"a\"}"
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "path": "a",
+      "PATH": "dir/file"
+    },
+    "raw_arguments": "{\"path\":\"a\",\"PATH\":\"dir/file\"}"
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "PATH": "dir/file",
+      "path": "a"
+    },
+    "raw_arguments": "{\"PATH\":\"dir/file\",\"path\":\"a\"}"
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "path": null
+    },
+    "raw_arguments": "{\"path\":\"a\",\"path\":null}"
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "path": "a",
+      "source_path": {},
+      "destination_path": false
+    },
+    "raw_arguments": "{\"path\":\"a\",\"source_path\":{},\"destination_path\":false}"
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "path": "a"
+    },
+    "raw_arguments": "{\"path\":false,\"path\":\"a\"}"
+  },
+  {
+    "name": "Delete",
+    "arguments": null,
+    "raw_arguments": "null"
+  },
+  {
+    "name": "Delete",
+    "arguments": true,
+    "raw_arguments": "true"
+  },
+  {
+    "name": "Delete",
+    "arguments": 123,
+    "raw_arguments": "123"
+  },
+  {
+    "name": "Delete",
+    "arguments": "scalar",
+    "raw_arguments": "\"scalar\""
+  },
+  {
+    "name": "Delete",
+    "arguments": [],
+    "raw_arguments": "[]"
+  },
+  {
+    "name": "Delete",
+    "arguments": null,
+    "raw_arguments": ""
+  },
+  {
+    "name": "Delete",
+    "arguments": {
+      "PATH": "a"
+    }
   }
 ]

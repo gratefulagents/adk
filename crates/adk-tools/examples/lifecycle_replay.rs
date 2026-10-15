@@ -14,6 +14,8 @@ struct Request {
     name: String,
     arguments: Value,
     #[serde(default)]
+    raw_arguments: Option<String>,
+    #[serde(default)]
     full_access: bool,
 }
 
@@ -63,7 +65,7 @@ async fn main() {
             .execute(
                 &context,
                 ToolCall {
-                    raw_arguments: None,
+                    raw_arguments: request.raw_arguments,
                     id: "fixture".into(),
                     name: request.name,
                     arguments: request.arguments,

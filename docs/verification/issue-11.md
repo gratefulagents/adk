@@ -2369,3 +2369,26 @@ oracles/evidence, 27 audit validators, source locks and formatting pass. The led
 remains **471 verified / 8,420 unresolved / 251 excluded**: this completes native
 price propagation but does not claim source residual/fallback display estimation,
 every other child outcome field, or complete SDK acceptance.
+
+### Ordered filesystem argument decoding
+
+Write, Edit, Move and Delete now retain raw JSON field order during typed input
+updates, including duplicate fields, case-folded aliases (with Go's Unicode
+folding), null scalar no-ops and first scalar type errors. Operation-specific
+unknown fields are ignored instead of being decoded as another operation's
+parameters. Raw/parsed projection disagreement fails before filesystem mutation.
+The workspace boundary still checks the final decoded path; an independent
+regression covers conflicting path aliases for all four operations and verifies
+both internal and external files remain unchanged on rejection.
+
+Pinned Go comparison passes **166 filesystem + 18 skills cases**, comparing
+results and resulting trees/modes. The 89 added filesystem cases exercise ordered
+input decoding. Malformed JSON diagnostic parity remains unclaimed. The Go
+telemetry sidecar reports unavailable `/proc/self/exe` in this environment; the
+comparison process itself exits zero after all 184 comparisons pass.
+
+Fresh Rust 1.88 workspace: **1,419 passed / 0 failed / 30 ignored**, 146 targets,
+no warnings. Strict Clippy, rustdoc, doctests, formatting and whitespace checks
+pass. Bound Rust evidence, all 27 audit validators and immutable source locks
+pass. Ledger counts remain **471 verified / 8,420 unresolved / 251 excluded**;
+this bounded decoder correction does not close the whole filesystem group.

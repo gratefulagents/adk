@@ -37,10 +37,12 @@ cd repos/sdk
 go run ../../fixtures/tools/verify-lifecycle.go ../../target/debug/examples/lifecycle_replay
 ```
 
-The verifier runs 77 filesystem cases plus 18 cases from `skills.json`, using the
+The verifier runs 166 filesystem cases plus 18 cases from `skills.json`, using the
 host catalog in `skill-catalog.json`. Filesystem cases exercise both write-access
 variants, exact matching, merged and truncated Edit diffs, directory lifecycle,
-hard links, symlinks, and failure restoration. Skills cases compare search,
+hard links, symlinks, and failure restoration. Ordered raw-input cases cover
+case-folded field aliases, duplicate fields, null updates, scalar type errors
+and operation-specific unknown fields. Skills cases compare search,
 Unicode matching, installation/reinstallation merges, listing, and config bytes. Temporary workspace roots are normalized in result strings;
 `error_only` cases compare error status and filesystem effects, not OS diagnostics.
 

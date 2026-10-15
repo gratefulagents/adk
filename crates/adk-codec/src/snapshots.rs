@@ -140,6 +140,47 @@ pub struct OutputSchema {
     pub strict: bool,
 }
 
+pub(crate) fn compact_raw_bytes<W: std::io::Write + ?Sized>(
+    writer: &mut W,
+    fragment: &[u8],
+) -> std::io::Result<()> {
+    let mut quoted = false;
+    let mut escaped = false;
+    let mut i = 0;
+    while i < fragment.len() {
+        let byte = fragment[i];
+        if !quoted && byte.is_ascii_whitespace() {
+            i += 1;
+            continue;
+        }
+        match byte {
+            b'<' => writer.write_all(b"\\u003c")?,
+            b'>' => writer.write_all(b"\\u003e")?,
+            b'&' => writer.write_all(b"\\u0026")?,
+            0xe2 if fragment.get(i + 1) == Some(&0x80)
+                && matches!(fragment.get(i + 2), Some(0xa8 | 0xa9)) =>
+            {
+                writer.write_all(if fragment[i + 2] == 0xa8 {
+                    b"\\u2028"
+                } else {
+                    b"\\u2029"
+                })?;
+                i += 2;
+            }
+            _ => writer.write_all(&[byte])?,
+        }
+        if escaped {
+            escaped = false;
+        } else if quoted && byte == b'\\' {
+            escaped = true;
+        } else if byte == b'"' {
+            quoted = !quoted;
+        }
+        i += 1;
+    }
+    Ok(())
+}
+
 struct GoFormatter;
 impl serde_json::ser::Formatter for GoFormatter {
     fn write_raw_fragment<W: std::io::Write + ?Sized>(
@@ -147,32 +188,7 @@ impl serde_json::ser::Formatter for GoFormatter {
         writer: &mut W,
         fragment: &str,
     ) -> std::io::Result<()> {
-        let mut quoted = false;
-        let mut escaped = false;
-        for character in fragment.chars() {
-            if !quoted && character.is_ascii_whitespace() {
-                continue;
-            }
-            match character {
-                '<' => writer.write_all(b"\\u003c")?,
-                '>' => writer.write_all(b"\\u003e")?,
-                '&' => writer.write_all(b"\\u0026")?,
-                '\u{2028}' => writer.write_all(b"\\u2028")?,
-                '\u{2029}' => writer.write_all(b"\\u2029")?,
-                character => {
-                    let mut bytes = [0; 4];
-                    writer.write_all(character.encode_utf8(&mut bytes).as_bytes())?;
-                }
-            }
-            if escaped {
-                escaped = false;
-            } else if quoted && character == '\\' {
-                escaped = true;
-            } else if character == '"' {
-                quoted = !quoted;
-            }
-        }
-        Ok(())
+        compact_raw_bytes(writer, fragment.as_bytes())
     }
 
     fn write_f64<W: std::io::Write + ?Sized>(

@@ -111,8 +111,7 @@ impl AgentLogger {
     }
 
     /// Tool-call/output variants require their matching payload, as in the SDK.
-    /// Uses UTF-8 DTO text and validated `RawJson`; arbitrary invalid Go raw
-    /// messages or outer JSON whitespace cannot be represented by this API.
+    /// Raw tool inputs retain their bytes, including invalid UTF-8.
     pub fn input_items(&self, items: &[RunItem]) -> io::Result<()> {
         let header = format!("[turn] input_items={}", items.len()).into_bytes();
         let lines = items
@@ -152,7 +151,11 @@ impl AgentLogger {
                     .into_bytes();
                     if self.is_debug() {
                         line.extend_from_slice(b" input=");
-                        line.extend(preview(&call.input.text(), 300));
+                        let input = call.input.bytes();
+                        line.extend_from_slice(&input[..input.len().min(300)]);
+                        if input.len() > 300 {
+                            line.extend_from_slice("…".as_bytes());
+                        }
                     }
                     line
                 }

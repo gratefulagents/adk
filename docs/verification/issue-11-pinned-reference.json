@@ -15,11 +15,11 @@
       "-json",
       "./internal/agent",
       "-run",
-      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestBuildRunBudgetContext|TestBuildSubAgentBudgetContext|TestChildTrackerForwardsLLMUsageToAncestors|TestChildTrackerForwardsToolCallCounts|TestCompactionDefaultsForModel|TestEstimateRunResultCostPropagatesUnknownCost|TestEstimateRunResultCostSumsResponseCosts|TestExtractHelpers|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestNewChildTracker|TestNewProgressTracker|TestProgressTracker_DrainPendingEvents|TestProgressTracker_InferStep|TestProgressTracker_RecordAssistantText|TestProgressTracker_RecordCompactBoundary|TestProgressTracker_RecordLifecycleEvent|TestProgressTracker_RecordSessionComplete|TestProgressTracker_RecordSubagentLifecycle|TestProgressTracker_RecordSystemInitIncludesPermissionMode|TestProgressTracker_RecordToolResult|TestProgressTracker_SetSession|TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize|TestTruncate|TestTruncateBytes|TestTruncateMiddle)$"
+      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildLLMResponseSnapshotCapturesReasoningAndRaw|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestBuildRunBudgetContext|TestBuildSubAgentBudgetContext|TestChildTrackerForwardsLLMUsageToAncestors|TestChildTrackerForwardsToolCallCounts|TestCompactionDefaultsForModel|TestEstimateRunResultCostPropagatesUnknownCost|TestEstimateRunResultCostSumsResponseCosts|TestExtractHelpers|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestNewChildTracker|TestNewProgressTracker|TestProgressTracker_DrainPendingEvents|TestProgressTracker_InferStep|TestProgressTracker_RecordAssistantText|TestProgressTracker_RecordCompactBoundary|TestProgressTracker_RecordLifecycleEvent|TestProgressTracker_RecordSessionComplete|TestProgressTracker_RecordSubagentLifecycle|TestProgressTracker_RecordSystemInitIncludesPermissionMode|TestProgressTracker_RecordToolResult|TestProgressTracker_SetSession|TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRestoreRequeuesInFlightSteeringBeforeQueued|TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestSubAgentActivity_CurrentTool|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize|TestTruncate|TestTruncateBytes|TestTruncateMiddle)$"
     ]
   ],
   "counts": {
-    "pass": 813,
+    "pass": 817,
     "skip": 5
   },
   "exit_code": 0,
@@ -67,6 +67,7 @@
   "tests": {
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextEmpty": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext": "pass",
@@ -133,6 +134,8 @@
     "github.com/gratefulagents/sdk/internal/agent/TestRequireCompletionConfirmation": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRequireCompletionConfirmationOffByDefault": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestRestoreRequeuesInFlightSteeringBeforeQueued": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunStreamedDoesNotEmitThinkingDeltaEvents": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerInputGuardrailTripwire": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerRecoversFromPanickingInputGuardrail": "pass",
@@ -144,6 +147,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestSanitizeMCPServerName": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestSubAgentActivity_CurrentTool": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterFlushesOnSize": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestTruncate": "pass",

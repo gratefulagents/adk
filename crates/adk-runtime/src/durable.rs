@@ -1358,7 +1358,7 @@ impl Runner {
                         approved: approval.approved,
                     };
                     approval_journal.push(crate::compat::ApprovalJournalEntry {
-                        argument_text: Some(data.input.text().into_owned()),
+                        argument_text: Some(data.input.try_text().map_err(invalid)?.into_owned()),
                         marker: adk_codec::approval::ApprovalMarker {
                             phase: if data.approved {
                                 adk_codec::approval::ApprovalPhase::Approved

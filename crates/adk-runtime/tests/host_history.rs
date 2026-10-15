@@ -183,13 +183,14 @@ async fn seeded_history_preserves_snapshot_order_and_provenance_without_replayin
 
 #[tokio::test]
 async fn malformed_markers_fail_before_model_or_commit() {
-    for case in 0..3 {
+    for case in 0..4 {
         let probe = Arc::new(Probe::default());
         let (request, mut markers) = history();
         match case {
             0 => markers[1].before_item = 3,
             1 => markers[1].before_item = 0,
-            _ => markers[0].marker.data.approved = true,
+            2 => markers[0].marker.data.approved = true,
+            _ => markers[0].marker.data.input = dto::RawJson::EncodedBytes(b"\"\xff\"".to_vec()),
         }
         let error = runner(&probe)
             .run_with_approval_history(context(), request, probe.clone(), markers)
@@ -247,7 +248,7 @@ async fn durable_restore_retains_historical_only_markers_without_republishing() 
         markers
             .iter()
             .map(|boundary| adk_runtime::compat::ApprovalJournalEntry {
-                argument_text: Some(boundary.marker.data.input.text().into_owned()),
+                argument_text: Some(boundary.marker.data.input.try_text().unwrap().into_owned()),
                 marker: boundary.marker.clone(),
                 new_items_before: 0,
                 history_before: Some(boundary.before_item),
@@ -319,4 +320,17 @@ async fn missing_marker_input_has_explicit_provenance_and_is_not_fabricated_as_n
     };
     assert_eq!(call.raw_arguments.as_deref(), Some(""));
     assert_eq!(call.argument_text(), "");
+}
+
+#[test]
+fn approval_estimates_count_each_invalid_utf8_byte_as_a_go_rune() {
+    let (_, mut markers) = history();
+    markers.truncate(1);
+    markers[0].before_item = 0;
+    markers[0].marker.data.tool_name.clear();
+    markers[0].marker.data.input = dto::RawJson::EncodedBytes(b"\"\xf0\x90\x80\"".to_vec());
+    assert_eq!(
+        adk_runtime::compaction::estimate_history_tokens_with_approvals(&[], &markers),
+        10
+    );
 }

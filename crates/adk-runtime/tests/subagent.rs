@@ -730,35 +730,267 @@ async fn restored_running_effect_and_steering_journal_require_reconciliation() {
     owner.shutdown().await.unwrap();
 }
 
-#[tokio::test]
-async fn cancel_wins_while_resume_persistence_is_blocked() {
-    let checkpoint = queued_checkpoint().await;
+async fn started_checkpoint() -> SchedulerCheckpoint {
     let store = Arc::new(Store::default());
-    store
-        .blocked_revision
-        .store(checkpoint.revision + 1, Ordering::SeqCst);
+    let owner = Scheduler::new(
+        context(),
+        config(),
+        native_executor(Arc::new(AtomicUsize::new(0))),
+        Some(store.clone()),
+    )
+    .unwrap();
+    owner.handle().submit(request("a")).await.unwrap();
+    wait(&owner.handle(), &["a"]).await;
+    owner.shutdown().await.unwrap();
+    let checkpoint = store
+        .snapshots
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|snapshot| {
+            snapshot.records[0]
+                .durable_checkpoint
+                .as_ref()
+                .is_some_and(|c| c.execution_boundary() == "model_prepared")
+        })
+        .unwrap()
+        .clone();
+    assert_eq!(checkpoint.records[0].dispatch, DispatchState::Started);
+    checkpoint
+}
+
+#[tokio::test]
+async fn restored_steering_redelivers_in_flight_before_queued_with_clone_isolation() {
+    let mut checkpoint = started_checkpoint().await;
+    let record = &mut checkpoint.records[0];
+    record.in_flight_messages = vec![SteeringMessage {
+        id: "one".into(),
+        text: "first".into(),
+    }];
+    record.queued_messages = vec![SteeringMessage {
+        id: "two".into(),
+        text: "second".into(),
+    }];
+    record.task.messages_received = 2;
+    let mut caller_checkpoint = serde_json::to_value(checkpoint).unwrap();
+    let (owner, handle, mut starts, _) = rig(config(), None);
+    handle
+        .restore(&context(), caller_checkpoint.clone())
+        .await
+        .unwrap();
+    caller_checkpoint["records"][0]["in_flight_messages"][0]["text"] = "caller mutation".into();
+    assert!(handle.resume_queued("a").await.is_err());
+    handle.resume_checkpoint("a").await.unwrap();
+    let a = next(&mut starts).await;
+    let mut id = "three".to_owned();
+    let mut text = "third".to_owned();
+    handle.steer("a", &id, &text).await.unwrap();
+    id.clear();
+    text.clear();
+    let mut snapshot = handle.snapshot();
+    snapshot.records[0].in_flight_messages[0].text = "snapshot mutation".into();
+    snapshot.records[0].queued_messages.clear();
+    let expected = vec![
+        SteeringMessage {
+            id: "one".into(),
+            text: "first".into(),
+        },
+        SteeringMessage {
+            id: "two".into(),
+            text: "second".into(),
+        },
+        SteeringMessage {
+            id: "three".into(),
+            text: "third".into(),
+        },
+    ];
+    let mut delivery = a.control.take_messages().await.unwrap();
+    assert_eq!(delivery, expected);
+    delivery[0].text = "delivery mutation".into();
+    delivery.pop();
+    assert_eq!(a.control.take_messages().await.unwrap(), expected);
+    assert_eq!(handle.snapshot().records[0].in_flight_messages, expected);
+    a.control
+        .acknowledge_messages(&["one".into(), "two".into(), "three".into()])
+        .await
+        .unwrap();
+    a.done.send(ChildOutcome::completed("done")).unwrap();
+    wait(&handle, &["a"]).await;
+    owner.shutdown().await.unwrap();
+}
+
+async fn cancellation_during_resume(native: bool, failed_write: Option<u64>) {
+    let checkpoint = if native {
+        started_checkpoint().await
+    } else {
+        queued_checkpoint().await
+    };
+    let revision = checkpoint.revision;
+    let store = Arc::new(Store::default());
+    store.blocked_revision.store(revision + 1, Ordering::SeqCst);
+    if let Some(offset) = failed_write {
+        store
+            .failed_revision
+            .store(revision + offset, Ordering::SeqCst);
+    }
     let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
     handle
         .restore(&context(), serde_json::to_value(checkpoint).unwrap())
         .await
         .unwrap();
-    let resume = handle.resume_queued("a");
+    let committed = handle.checkpoint(&context()).await.unwrap();
+    let resume = async {
+        if native {
+            handle.resume_checkpoint("a").await
+        } else {
+            handle.resume_queued("a").await
+        }
+    };
     let concurrent = async {
         store.entered.notified().await;
         let cancel = handle.cancel("a");
         tokio::pin!(cancel);
-        tokio::select! { result = &mut cancel => panic!("cancel unexpectedly completed: {result:?}"), _ = tokio::task::yield_now() => {} }
+        assert!(futures_util::poll!(&mut cancel).is_pending());
+        let repeated = handle.cancel("a");
+        tokio::pin!(repeated);
+        assert!(futures_util::poll!(&mut repeated).is_pending());
+        for task in [
+            handle.status("a", Detail::Full).unwrap(),
+            handle.list().remove(0),
+        ] {
+            assert_eq!(task.status, TaskStatus::Cancelled);
+            assert_eq!(task.error.as_deref(), Some("cancellation requested"));
+            assert!(task.waiting_on.is_empty());
+        }
+        assert_eq!(handle.checkpoint(&context()).await.unwrap(), committed);
+        assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+        assert!(starts.try_recv().is_err());
+        assert!(store.snapshots.lock().unwrap().is_empty());
+        let ids = ["a".into()];
+        let wait_all = handle.wait(&ids, WaitMode::All, None);
+        let wait_any = handle.wait(&ids, WaitMode::Any, None);
+        tokio::pin!(wait_all, wait_any);
+        assert!(futures_util::poll!(&mut wait_all).is_pending());
+        assert!(futures_util::poll!(&mut wait_any).is_pending());
         store.release.add_permits(1);
-        cancel.await.unwrap();
+        if failed_write.is_some() {
+            assert_eq!(cancel.await.unwrap_err().info.category, ErrorCategory::Host);
+            assert_eq!(
+                repeated.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert_eq!(
+                wait_all.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert_eq!(
+                wait_any.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert!(handle.cancel("a").await.is_err());
+            assert!(handle.collect().await.is_err());
+            assert!(handle.submit(request("b")).await.is_err());
+            assert!(!handle.snapshot().records[0].task.status.is_terminal());
+            assert!(!handle.snapshot().records[0].result_delivered);
+        } else {
+            cancel.await.unwrap();
+            repeated.await.unwrap();
+            assert_eq!(wait_all.await.unwrap()[0].status, TaskStatus::Cancelled);
+            assert_eq!(wait_any.await.unwrap()[0].status, TaskStatus::Cancelled);
+            assert_eq!(
+                handle.snapshot().records[0].task.status,
+                TaskStatus::Cancelled
+            );
+            assert!(
+                store
+                    .snapshots
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .any(|s| s.records[0].task.status == TaskStatus::Cancelled)
+            );
+            assert_eq!(
+                handle.collect().await.unwrap()[0].status,
+                TaskStatus::Cancelled
+            );
+        }
     };
     let (result, ()) = tokio::join!(resume, concurrent);
-    result.unwrap();
+    if failed_write == Some(1) {
+        assert!(result.is_err());
+        assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+    } else {
+        result.unwrap();
+    }
     tokio::task::yield_now().await;
     assert_eq!(
         handle.status("a", Detail::Full).unwrap().status,
         TaskStatus::Cancelled
     );
     assert!(starts.try_recv().is_err());
+    if failed_write.is_some() {
+        assert!(owner.shutdown().await.is_err());
+    } else {
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn cancel_wins_while_resume_persistence_is_blocked() {
+    cancellation_during_resume(false, None).await;
+}
+
+#[tokio::test]
+async fn cancel_wins_while_resume_checkpoint_persistence_is_blocked() {
+    cancellation_during_resume(true, None).await;
+}
+
+#[tokio::test]
+async fn cancellation_intent_does_not_acknowledge_failed_resume_or_cancel_writes() {
+    for native in [false, true] {
+        for failed_write in [1, 2] {
+            cancellation_during_resume(native, Some(failed_write)).await;
+        }
+    }
+}
+
+#[tokio::test]
+async fn cancellation_observation_clears_waiting_without_changing_checkpoint() {
+    let store = Arc::new(Store::default());
+    let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
+    let mut dependent = request("b");
+    dependent.depends_on = vec!["a".into()];
+    handle
+        .submit_dag(vec![request("a"), dependent])
+        .await
+        .unwrap();
+    let a = next(&mut starts).await;
+    assert_eq!(
+        handle.status("b", Detail::Full).unwrap().waiting_on,
+        vec!["a"]
+    );
+    let committed = serde_json::to_value(handle.snapshot()).unwrap();
+    store
+        .blocked_revision
+        .store(handle.snapshot().revision + 1, Ordering::SeqCst);
+    let cancel = handle.cancel("b");
+    tokio::pin!(cancel);
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    for task in [
+        handle.status("b", Detail::Full).unwrap(),
+        handle.list().remove(1),
+    ] {
+        assert_eq!(task.status, TaskStatus::Cancelled);
+        assert_eq!(task.error.as_deref(), Some("cancellation requested"));
+        assert!(task.waiting_on.is_empty());
+    }
+    assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+    assert!(starts.try_recv().is_err());
+    store.release.add_permits(1);
+    cancel.await.unwrap();
+    assert!(handle.snapshot().records[1].task.waiting_on.is_empty());
+    a.done.send(ChildOutcome::completed("done")).unwrap();
+    wait(&handle, &["a", "b"]).await;
     owner.shutdown().await.unwrap();
 }
 

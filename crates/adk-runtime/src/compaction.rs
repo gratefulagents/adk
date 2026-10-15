@@ -486,7 +486,18 @@ fn estimate_mixed_tokens(items: &[HistoryItem]) -> u64 {
                 estimate_string_tokens(&compaction.encrypted_content).min(20_000) + 8
             }
             HistoryItem::Approval(marker) => {
-                let input = marker.data.input.text();
+                let input: String = marker
+                    .data
+                    .input
+                    .bytes()
+                    .utf8_chunks()
+                    .flat_map(|chunk| {
+                        chunk
+                            .valid()
+                            .chars()
+                            .chain(std::iter::repeat_n('\u{fffd}', chunk.invalid().len()))
+                    })
+                    .collect();
                 estimate_string_tokens(&marker.data.tool_name) + estimate_string_tokens(&input) + 8
             }
         })

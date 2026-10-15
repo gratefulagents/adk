@@ -85,9 +85,15 @@ pub fn approval_call(data: &dto::ToolApprovalData) -> Result<ToolCall, BridgeErr
         name: data.tool_name.clone(),
         arguments: data
             .input
-            .value()
+            .try_value()
+            .map_err(|_| BridgeError("raw input cannot be projected to native JSON"))?
             .map_or(serde_json::Value::Null, |value| value.into_owned()),
-        raw_arguments: Some(data.input.text().into_owned()),
+        raw_arguments: Some(
+            data.input
+                .try_text()
+                .map_err(|_| BridgeError("raw input is not UTF-8"))?
+                .into_owned(),
+        ),
     })
 }
 
@@ -256,11 +262,17 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                 .ok_or(BridgeError("missing ToolCall"))?;
             let arguments = call
                 .input
-                .value()
+                .try_value()
+                .map_err(|_| BridgeError("raw input cannot be projected to native JSON"))?
                 .map_or(serde_json::Value::Null, |value| value.into_owned());
             RunItem::ToolCall {
                 call: ToolCall {
-                    raw_arguments: Some(call.input.text().into_owned()),
+                    raw_arguments: Some(
+                        call.input
+                            .try_text()
+                            .map_err(|_| BridgeError("raw input is not UTF-8"))?
+                            .into_owned(),
+                    ),
                     id: call.id.clone(),
                     name: call.name.clone(),
                     arguments,

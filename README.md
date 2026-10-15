@@ -35,6 +35,26 @@ boundaries, research, cancellation ownership, license decisions and limitations.
 The [migration baseline](docs/migration/README.md) contains source pins, upstream
 contracts, original Go fixture provenance and unverified migration obligations.
 
+## Bounded Go payload codecs
+
+With `compat`, `adk::codec::{from_go_json, to_go_json_bytes}` supports
+`MessageOutput`, `ImageAttachment`, `ToolCallData`, `ToolOutputData`,
+`HandoffCallData`, `HandoffOutputData`, `ReasoningData`, `CompactionData`,
+`ToolApprovalData`, and `RunItemType`. These sealed entrypoints do not accept
+`RunItem` or `Agent`. Typed strings use Go's replacement rules; raw `input`
+preserves original bytes, duplicate keys, number spellings, and escapes,
+including invalid UTF-8. The byte encoder compacts raw JSON and applies Go's
+HTML and U+2028/U+2029 escaping without normalizing invalid raw bytes.
+
+`RawJson::bytes()` is lossless; `try_text()` rejects invalid UTF-8 and
+`try_value()` is a strict, fallible projection, not the raw syntax authority.
+Valid UTF-8 raw inputs retain `Encoded`; invalid UTF-8 uses `EncodedBytes`.
+Ordinary Serde serialization and native tool/approval bridges reject invalid
+UTF-8 rather than silently replacing it. Public `EncodedBytes` values are
+syntax-checked by the byte encoder. Decode errors return no partial state;
+Go error text and partial mutations are not reproduced. Existing `Vec` image
+fields collapse nil and empty slices (both omitted on marshal).
+
 ## Reproducible development
 
 Install [rustup](https://rustup.rs/); `rust-toolchain.toml` pins Rust **1.88.0**,

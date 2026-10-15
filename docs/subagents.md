@@ -96,6 +96,18 @@ ambiguous and closes admission; do not retry effects on that owner. Committed
 snapshot reads may reenter persistence callbacks. No filesystem or distributed
 lease policy is invented by this scheduler.
 
+Cancellation has separate live-observation and durable-acknowledgement boundaries.
+After a cancellation future is polled, `status`/`list` can show `Cancelled` with
+`cancellation requested` and no waiting dependencies while a resume/checkpoint
+write is still blocked. This is an intent projection, not a committed result:
+`snapshot`, waits, result collection, results-detail tool responses and parent
+final joins continue to use committed state. Neither the first nor a repeated
+cancel call acknowledges success before terminal persistence. Failed writes keep
+the owner poisoned; live cancellation never authorizes replay or early delivery.
+Restored steering retains separate in-flight and queued journals, but redelivers
+unacknowledged in-flight messages before queued messages. Checkpoint, snapshot
+and delivery values are owned copies.
+
 `SchedulerHandle` implements `ChildCheckpointOwner`. A parent `run_durable` with
 `RunnerConfig.subagents` binds that owner automatically and requires a durable
 scheduler store: occasional parent snapshots alone cannot prove that a child has

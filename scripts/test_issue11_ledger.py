@@ -37,6 +37,8 @@ class EvidenceTests(unittest.TestCase):
                        "Pinned child result-cost observations reproduced exactly",
                        "Pinned progress observations reproduced exactly",
                        "Pinned registry selection observations reproduced exactly",
+                       "Pinned payload observations reproduced exactly",
+                       "Go subagents: 6 scenarios verified unchanged",
                        "Pinned content event observations reproduced exactly",
                        "Pinned line writer observations reproduced exactly",
                        "Pinned content stream observations reproduced exactly",

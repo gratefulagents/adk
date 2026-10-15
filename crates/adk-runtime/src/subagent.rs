@@ -574,6 +574,7 @@ struct Inner {
     state: Mutex<SchedulerCheckpoint>,
     transaction: AsyncMutex<()>,
     cancellations: Mutex<BTreeMap<String, CancellationToken>>,
+    cancellation_intents: Mutex<BTreeSet<String>>,
     changed: watch::Sender<u64>,
     wake: Notify,
     closed: AtomicBool,
@@ -715,6 +716,7 @@ impl Scheduler {
                 state: Mutex::new(state),
                 transaction: AsyncMutex::new(()),
                 cancellations: Mutex::new(BTreeMap::new()),
+                cancellation_intents: Mutex::new(BTreeSet::new()),
                 changed,
                 wake: Notify::new(),
                 closed: AtomicBool::new(false),
@@ -1214,6 +1216,26 @@ impl SchedulerHandle {
         Ok(results.remove(0))
     }
     pub fn status(&self, id: &str, detail: Detail) -> Result<TaskSnapshot, Error> {
+        let mut task = self.committed_status(id, detail)?;
+        self.observe_cancellation(&mut task);
+        Ok(task)
+    }
+    fn observe_cancellation(&self, task: &mut TaskSnapshot) {
+        if !task.status.is_terminal()
+            && self
+                .inner
+                .cancellation_intents
+                .lock()
+                .unwrap()
+                .contains(&task.id)
+        {
+            task.status = TaskStatus::Cancelled;
+            task.error = Some("cancellation requested".into());
+            task.waiting_on.clear();
+        }
+    }
+    // Waits, joins and result delivery must not treat live intent as a durable result.
+    pub(crate) fn committed_status(&self, id: &str, detail: Detail) -> Result<TaskSnapshot, Error> {
         self.check_visible(id)?;
         let mut task = self
             .snapshot()
@@ -1234,6 +1256,13 @@ impl SchedulerHandle {
         Ok(task)
     }
     pub fn list(&self) -> Vec<TaskSnapshot> {
+        let mut tasks = self.committed_list();
+        for task in &mut tasks {
+            self.observe_cancellation(task);
+        }
+        tasks
+    }
+    pub(crate) fn committed_list(&self) -> Vec<TaskSnapshot> {
         let state = self.snapshot();
         state
             .records
@@ -1264,7 +1293,7 @@ impl SchedulerHandle {
             loop {
                 let tasks = ids
                     .iter()
-                    .map(|id| self.status(id, Detail::Full))
+                    .map(|id| self.committed_status(id, Detail::Full))
                     .collect::<Result<Vec<_>, _>>()?;
                 let done = match mode {
                     WaitMode::Any => {
@@ -1313,7 +1342,7 @@ impl SchedulerHandle {
     /// Atomically marks only the returned terminal results delivered.
     pub async fn collect(&self) -> Result<Vec<TaskSnapshot>, Error> {
         let ids = self
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect::<Vec<_>>();
@@ -1383,12 +1412,17 @@ impl SchedulerHandle {
         .await
     }
     pub async fn cancel(&self, id: &str) -> Result<(), Error> {
-        let status = self.status(id, Detail::Summary)?.status;
+        let status = self.committed_status(id, Detail::Summary)?.status;
         if status.is_terminal() {
             return Ok(());
         }
         // Intent is synchronous so cancellation beats a blocked resume/dispatch write.
         self.token(id).cancel();
+        self.inner
+            .cancellation_intents
+            .lock()
+            .unwrap()
+            .insert(id.into());
         self.transact(|state| {
             let record = record_mut(state, id)?;
             if !record.task.status.is_terminal() {
@@ -1677,7 +1711,7 @@ impl ChildControl {
     }
     pub fn usage(&self) -> BudgetUsage {
         self.handle
-            .status(&self.id, Detail::Summary)
+            .committed_status(&self.id, Detail::Summary)
             .expect("owned child record")
             .usage
     }
@@ -1760,7 +1794,12 @@ impl ChildControl {
                 return Ok(());
             }
             self.handle.active()?;
-            if self.handle.status(&self.id, Detail::Summary)?.status != TaskStatus::Running {
+            if self
+                .handle
+                .committed_status(&self.id, Detail::Summary)?
+                .status
+                != TaskStatus::Running
+            {
                 return Err(invalid("child is not running"));
             }
             tokio::select! {

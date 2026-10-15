@@ -12013,6 +12013,1719 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-2A4BAB39B4236B3C": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentTool.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentTool.Name. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1FB1B51E8F87486B": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentTool.IsReadOnly. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E1953931C8EB59D7": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentTool.InputSchema. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-82B825FBAF30F261": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentStatusTool.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentStatusTool.Name. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7677D87AC7800586": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentStatusTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentStatusTool.IsReadOnly. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E574EF92B8CED0E9": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentStatusTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentStatusTool.InputSchema. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1512C641493AAC95": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentWaitTool.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentWaitBlocksUntilTaskFinishesAndDeliversResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentWaitTool.Name. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-893960ECA6A152DC": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentWaitTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentWaitBlocksUntilTaskFinishesAndDeliversResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentWaitTool.IsReadOnly. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-BEA8D55A732DD319": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentWaitTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentWaitBlocksUntilTaskFinishesAndDeliversResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentWaitTool.InputSchema. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-56987AD8FFFFD90F": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentControlTool.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentControlMessageAndCancel",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentControlTool.Name. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-067DE76616DD8F93": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentControlTool.IsReadOnly",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentControlMessageAndCancel",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentControlTool.IsReadOnly. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-036BCBBB9B16298E": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentControlTool.InputSchema",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentControlMessageAndCancel",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentControlTool.InputSchema. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-867C9EA73532D341": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentTaskToolBase.NeedsApproval",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "model_facing_schemas_match_pinned_go",
+        "tool_metadata_matches_pinned_go",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "rationale": "Closes only the complete literal schema or constant metadata/name function subagentTaskToolBase.NeedsApproval. Independent pinned subagent generator invokes actual Name/InputSchema/IsReadOnly/NeedsApproval methods; native comparisons check complete schemas, metadata and exact advertised-name resolution. Associated original Go regression is a behavioral anchor, not a dedicated schema assertion. Does not close whole tools, descriptions, parameter execution semantics or enclosing test records. Generated task identities and elapsed timestamps are normalized; no response fields are removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-19472140A24044D1": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentTool.PreserveResultOnTimeout",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools",
+        "crates/adk-runtime/src/runner.rs::Runner::run"
+      ],
+      "rust_test_identifiers": [
+        "tool_policy_timeout_preserves_managed_pending_results"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolPreservesPendingResultThroughRunnerToolPolicyTimeout",
+      "rationale": "Closes only the constant-true PreserveResultOnTimeout method. Native source-reviewed test explicitly iterates subagent and subagent_wait, asserts managed non-error timed_out/wait_complete fields, surviving task identity and later evidence delivery. This is a behavioral native replacement for the source method, not closure of every assertion in the associated original Go regression.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-01855747C125167D": {
+      "source": "pkg/agentsdk/subagent_tools.go",
+      "source_name": "subagentWaitTool.PreserveResultOnTimeout",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools",
+        "crates/adk-runtime/src/runner.rs::Runner::run"
+      ],
+      "rust_test_identifiers": [
+        "tool_policy_timeout_preserves_managed_pending_results"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentWaitBlocksUntilTaskFinishesAndDeliversResult",
+      "rationale": "Closes only the constant-true PreserveResultOnTimeout method. Native source-reviewed test explicitly iterates subagent and subagent_wait, asserts managed non-error timed_out/wait_complete fields, surviving task identity and later evidence delivery. This is a behavioral native replacement for the source method, not closure of every assertion in the associated original Go regression.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-8D7A3C65088B981C": {
+      "source": "internal/agent/subagent_registry_test.go",
+      "source_name": "TestSubAgentActivity_CurrentTool",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent.rs::Activity::record_tool_start",
+        "crates/adk-runtime/src/subagent.rs::Activity::record_tool_end"
+      ],
+      "rust_test_identifiers": [
+        "structured_activity_records_observed_tool_lifecycle",
+        "native_runner_persists_observed_file_activity"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestSubAgentActivity_CurrentTool",
+      "rationale": "Native replacement starts an observed Write/read tool rather than Bash; asserts actual current tool name/input then clearing after completion. Closes this original current-tool test only, not activity inference/ring/snapshot families.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-F76C443B99788F1D": {
+      "source": "pkg/agentsdk/subagent_tools_test.go",
+      "source_name": "TestSubagentToolBackgroundModeManagedJoinProviderReturnsResultOnce",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools",
+        "crates/adk-runtime/src/subagent.rs::SchedulerHandle::collect"
+      ],
+      "rust_test_identifiers": [
+        "background_final_answer_waits_and_delivers_exactly_once",
+        "shared_concurrency_budget_and_incremental_delivery"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolBackgroundModeManagedJoinProviderReturnsResultOnce",
+      "rationale": "Composite native replacement verifies one child execution, background evidence injected into parent exactly once, and repeated collection empty. Closes original managed-join exactly-once regression, not all scheduler delivery guarantees.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C9D599D9BA2B6B9E": {
+      "source": "pkg/agentsdk/subagent_tools_test.go",
+      "source_name": "TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "explicit_wait_any_returns_when_every_result_was_already_delivered",
+        "sync_result_is_not_injected_again_and_readonly_clamps_live_policy",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentToolSyncModeWaitsAndReturnsResult",
+      "rationale": "Native sync assertions plus full-response pinned single_sync comparator establish completed status and exact child result; only generated IDs/timing normalize. Does not claim unrelated sync timeout or policy contracts.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-8D0A1B9FB68E0FE1": {
+      "source": "pkg/agentsdk/subagent_tools_test.go",
+      "source_name": "TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "explicit_wait_any_returns_when_every_result_was_already_delivered",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentStatusSummaryReturnsReportableSnapshot",
+      "rationale": "Native terminal-status assertions and full pinned summary response comparison establish completed counts, reportable status and absence of result content outside expected fields. Closes this reportable-summary test only.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-30F5D0D87B6F50F7": {
+      "source": "pkg/agentsdk/subagent_tools_test.go",
+      "source_name": "TestSubagentStatusResultsRefetchesDeliveredResults",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent_tools.rs::build_subagent_task_tools"
+      ],
+      "rust_test_identifiers": [
+        "sync_timeout_keeps_child_alive_across_runs_and_status_can_reread",
+        "tool_result_fields_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSubagentStatusResultsRefetchesDeliveredResults",
+      "rationale": "Native reread assertion combined with pinned generator views sequence results/reread/empty_wait compares exact result text, task identity, completed status and consumed-delivery state. Closes this original refetch regression only; reread does not redeliver to parent.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-2A8ADB00BA91087E": {
+      "source": "internal/agent/items.go",
+      "source_name": "CompactionData.Content",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData.Content (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-34736B2C03BC94D8": {
+      "source": "internal/agent/items.go",
+      "source_name": "CompactionData.CreatedBy",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData.CreatedBy (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-16FA8EAC43CE7DA0": {
+      "source": "internal/agent/items.go",
+      "source_name": "CompactionData.EncryptedContent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData.EncryptedContent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-23F4B7A5ECA62ED8": {
+      "source": "internal/agent/items.go",
+      "source_name": "CompactionData.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData.ID (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FA0603C217D1F3DA": {
+      "source": "internal/agent/items.go",
+      "source_name": "CompactionData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3216AA868ACD2E83": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffCallData.FromAgent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffCallData.FromAgent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4434488B809D61DF": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffCallData.ToAgent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffCallData.ToAgent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-206C6B88343B1693": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffCallData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffCallData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-253FE8762647B160": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffOutputData.FromAgent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffOutputData.FromAgent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E360DA93FED199ED": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffOutputData.ToAgent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffOutputData.ToAgent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D3DA242F7CB1B981": {
+      "source": "internal/agent/items.go",
+      "source_name": "HandoffOutputData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffOutputData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2853AD508494F9AB": {
+      "source": "internal/agent/items.go",
+      "source_name": "ImageAttachment.Data",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ImageAttachment",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ImageAttachment.Data (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1A43D7CEACC38AE8": {
+      "source": "internal/agent/items.go",
+      "source_name": "ImageAttachment.Detail",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ImageAttachment",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ImageAttachment.Detail (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1496D3F50C625D54": {
+      "source": "internal/agent/items.go",
+      "source_name": "ImageAttachment.MediaType",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ImageAttachment",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ImageAttachment.MediaType (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9ECF4333B22DAF73": {
+      "source": "internal/agent/items.go",
+      "source_name": "ImageAttachment",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ImageAttachment",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ImageAttachment (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3D1877FA1157141E": {
+      "source": "internal/agent/items.go",
+      "source_name": "MessageOutput.Images",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::MessageOutput",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration MessageOutput.Images (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AE8934D130B1D057": {
+      "source": "internal/agent/items.go",
+      "source_name": "MessageOutput.Phase",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::MessageOutput",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration MessageOutput.Phase (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-86B38D832FE9CEC8": {
+      "source": "internal/agent/items.go",
+      "source_name": "MessageOutput.Text",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::MessageOutput",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration MessageOutput.Text (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-60D6C4D43EF79DCC": {
+      "source": "internal/agent/items.go",
+      "source_name": "MessageOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::MessageOutput",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration MessageOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-43D8949A156EB60E": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData.EncryptedContent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData.EncryptedContent (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-720F80A7040F676D": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData.ID (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6792D97EA88E54EF": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData.RedactedData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData.RedactedData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1106279EA397B193": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData.Signature",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData.Signature (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AF65650074595D64": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData.Text",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData.Text (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8706091F566B72AF": {
+      "source": "internal/agent/items.go",
+      "source_name": "ReasoningData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C819473A2A8424C9": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemCompaction",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemCompaction (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-992B907406889A06": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemHandoffCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemHandoffCall (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-63EBA844F4867B31": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemHandoffOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemHandoffOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-86658550C9A62165": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemMessage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemMessage (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5663C36043883A60": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemReasoning",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemReasoning (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DA0A477EEFF2D3BB": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemToolApproval",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolApproval (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E4A87EC95912611D": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemToolCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolCall (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B81EF75549B91EF0": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemToolOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4C2D0348B680FDC3": {
+      "source": "internal/agent/items.go",
+      "source_name": "RunItemType",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemType (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-47A5DF630E02C265": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolApprovalData.Approved",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData.Approved (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FAE738CEF5D2DFE4": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolApprovalData.CallID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData.CallID (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-69DB389551A05979": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolApprovalData.Input",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData.Input (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C5259B26350BD34C": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolApprovalData.ToolName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData.ToolName (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-27CAA346D6A7144B": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolApprovalData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AE8D568BCCE05395": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolCallData.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolCallData.ID (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-41E34C211328187D": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolCallData.Input",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolCallData.Input (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A24C34E502D5FA0D": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolCallData.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolCallData.Name (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F29D82D524568F14": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolCallData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolCallData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F868546AC78821FB": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolOutputData.CallID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData.CallID (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C14601F77E913C10": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolOutputData.Content",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData.Content (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EA4F811746E274E7": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolOutputData.Images",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData.Images (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-370B43A6CB81BCDC": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolOutputData.IsError",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData.IsError (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-79662DE1D1CBB305": {
+      "source": "internal/agent/items.go",
+      "source_name": "ToolOutputData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B1B27A5BA3708411": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "CompactionData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration CompactionData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-50EBEAED4A0FBDD0": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "HandoffCallData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffCallData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1C076FE895D1CB7E": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "HandoffOutputData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::HandoffOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration HandoffOutputData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FF0DDEA189111E24": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ImageAttachment",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ImageAttachment",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ImageAttachment (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5AA8C816C24658CC": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "MessageOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::MessageOutput",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration MessageOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0D54CF962461A595": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ReasoningData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FB3DA236EE6DB36D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemCompaction",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemCompaction (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E45E708167198C8B": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemHandoffCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemHandoffCall (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FD736231CB56AFD3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemHandoffOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemHandoffOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C74689F4F3CD478E": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemMessage",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemMessage (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6628303EF11A9B49": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemReasoning",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemReasoning (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D6476D961FA5AB76": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemToolApproval",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolApproval (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7F8BF118E579005F": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemToolCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolCall (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8B3B4EA5626F1B9D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemToolOutput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemToolOutput (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4C616F0A06D53B83": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunItemType",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemType",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration RunItemType (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4FDB364DB763A661": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ToolApprovalData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9A865A7D1FFF8D65": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ToolCallData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolCallData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C0445AF8376B19C5": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ToolOutputData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolOutputData",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "payload_decoder_is_available_through_standalone_facade",
+        "public_raw_representations_share_go_marshal_depth_limit"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Closes the bounded item payload/discriminant declaration ToolOutputData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3A46C3D3F0E90179": {
+      "source": "internal/agent/subagent_durable_test.go",
+      "source_name": "TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent.rs::SchedulerHandle::cancel",
+        "crates/adk-runtime/src/subagent.rs::SchedulerHandle::status"
+      ],
+      "rust_test_identifiers": [
+        "cancel_wins_while_resume_persistence_is_blocked",
+        "cancel_wins_while_resume_checkpoint_persistence_is_blocked",
+        "cancellation_intent_does_not_acknowledge_failed_resume_or_cancel_writes",
+        "cancellation_observation_does_not_publish_results_or_finish_parent_join"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch",
+      "rationale": "Live status exposes Cancelled before blocked resume persistence is released, while cancellation futures and committed-only waits/parent joins remain pending. Both resume entrypoints retain unchanged published checkpoint and zero dispatch before release; successful persistence commits cancellation and failed writes preserve poisoning. This implements the original visibility/no-dispatch assertions without weakening native durable acknowledgements.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-784AAE7FB01C3BEB": {
+      "source": "internal/agent/subagent_durable_test.go",
+      "source_name": "TestRestoreRequeuesInFlightSteeringBeforeQueued",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/subagent.rs::SchedulerHandle::resume_checkpoint",
+        "crates/adk-runtime/src/subagent.rs::ChildControl::take_messages"
+      ],
+      "rust_test_identifiers": [
+        "restored_steering_redelivers_in_flight_before_queued_with_clone_isolation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRestoreRequeuesInFlightSteeringBeforeQueued",
+      "rationale": "Restores valid Started/native safe continuation with distinct in-flight and queued messages; resumes and observes exact in-flight-before-queued delivery. Mutating caller-owned checkpoint, returned snapshots and delivery vectors does not mutate retained state. Rust preserves separate journals rather than Go queue layout; the observable redelivery order and clone isolation are asserted. Ambiguous-effect resume restrictions remain intact.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

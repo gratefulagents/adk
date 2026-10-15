@@ -168,10 +168,10 @@ impl ApprovalJournal {
                 ));
             }
             boundary.marker.validate()?;
-            approval::approval_call(&boundary.marker.data)?;
+            let call = approval::approval_call(&boundary.marker.data)?;
             previous = boundary.before_item;
             entries.push(ApprovalJournalEntry {
-                argument_text: Some(boundary.marker.data.input.text().into_owned()),
+                argument_text: call.raw_arguments,
                 marker: boundary.marker,
                 new_items_before: 0,
                 historical_only: true,

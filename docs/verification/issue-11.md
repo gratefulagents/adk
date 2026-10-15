@@ -2,6 +2,50 @@
 
 ## Current continuation evidence
 
+### Payload byte fidelity and cancellation visibility
+
+Added sealed `adk::codec::{from_go_json, to_go_json_bytes}` boundaries for nine
+item payload structs and the open signed `RunItemType`, excluding `RunItem` and
+`Agent`. Shared decoding preserves ordered/folded duplicate fields, scalar null
+updates, root null, reused image slots and Go string replacement. Raw input
+retains lexical JSON, duplicate keys, number spelling and malformed UTF-8 through
+`RawJson::EncodedBytes`; `bytes()` is lossless and text/value projections are
+fallible. Generic Serde and native tool/approval admission remain strict.
+
+The independently executed pinned oracle compares **all 1,267 cases**, including
+all 16 malformed-UTF-8 raw cases, without unsupported-case exemptions. It compares
+decoded fields, raw presence/bytes and marshaled bytes separately. Direct public
+RawMessage construction additionally verifies the 10,000/10,001 encoding boundary
+for both raw-bearing payloads. Review found a UTF-8 `RawValue` depth bypass;
+representation-independent validation and Go/native regressions fixed it, with
+scoped re-review approval. Nil/empty image vectors have the same omitted wire
+form; Rust errors do not expose Go partial mutation or promise identical text.
+See `scripts/payload-reference/README.md` and the root README.
+
+Cancellation status now exposes live intent while resume persistence is blocked,
+without treating that projection as a committed result. Both resume paths retain
+checkpoint publication, no-dispatch fencing, failed-write poisoning, committed
+waits/parent joins and durable cancellation acknowledgement. Restored steering
+tests prove in-flight-before-queued delivery and clone isolation. Independent
+security review found no blocking issue in these boundaries. Existing scheduler
+schema/metadata and narrow behavior proofs were freshly rebound to their exact
+source obligations; the six-scenario Go fixture changed only toolchain provenance
+from Go 1.26.2 to 1.26.8, not observations.
+
+Fresh Rust 1.88: **1,533 passed / 0 failed / 30 ignored**, **155 targets**, **9
+doctests**, no warnings. Strict workspace Clippy/rustdoc, formatting, full facade
+feature matrix, standalone consumer/purity, all bound independent oracles and
+**27 audit validators** pass. Original pinned Go regressions: **817 passed / 5
+skipped**. All 46 remote checks passed at preceding `7855a883`; this checkpoint's
+latest remote checks are not yet claimed complete.
+
+Exactly **88 additional records** are verified: 66 payload declarations/aliases,
+20 narrow scheduler metadata/behavior records and two restored-task regressions.
+Ledger: **767 verified / 8,124 unresolved / 251 excluded**. Issue #11 remains
+incomplete. The next confirmed implementation gap is failed-child partial
+findings missing from the error projection; full reusable acceptance remains
+active work, not an external blocker. No CLI/evaluation/release scope was added.
+
 ### SDK progress, runtime accounting and registry selection
 
 Added the separate `adk::progress::{ProgressTracker, RunProgress}` API without

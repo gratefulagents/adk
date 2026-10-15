@@ -47,22 +47,42 @@ pub enum RawJson {
     Missing,
     Present(Value),
     Encoded(Box<serde_json::value::RawValue>),
+    EncodedBytes(Vec<u8>),
 }
 impl RawJson {
-    pub fn text(&self) -> std::borrow::Cow<'_, str> {
+    /// Original lexical bytes, or the JSON encoding of a parsed value.
+    pub fn bytes(&self) -> std::borrow::Cow<'_, [u8]> {
         match self {
-            Self::Missing => std::borrow::Cow::Borrowed(""),
-            Self::Present(value) => std::borrow::Cow::Owned(value.to_string()),
-            Self::Encoded(raw) => std::borrow::Cow::Borrowed(raw.get()),
+            Self::Missing => std::borrow::Cow::Borrowed(b""),
+            Self::Present(value) => std::borrow::Cow::Owned(value.to_string().into_bytes()),
+            Self::Encoded(raw) => std::borrow::Cow::Borrowed(raw.get().as_bytes()),
+            Self::EncodedBytes(bytes) => std::borrow::Cow::Borrowed(bytes),
         }
     }
-    pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
+    pub fn try_text(&self) -> Result<std::borrow::Cow<'_, str>, std::str::Utf8Error> {
         match self {
-            Self::Missing => None,
-            Self::Present(value) => Some(std::borrow::Cow::Borrowed(value)),
-            Self::Encoded(raw) => Some(std::borrow::Cow::Owned(
-                serde_json::from_str(raw.get()).expect("validated JSON"),
-            )),
+            Self::Missing => Ok(std::borrow::Cow::Borrowed("")),
+            Self::Present(value) => Ok(std::borrow::Cow::Owned(value.to_string())),
+            Self::Encoded(raw) => Ok(std::borrow::Cow::Borrowed(raw.get())),
+            Self::EncodedBytes(bytes) => std::str::from_utf8(bytes).map(std::borrow::Cow::Borrowed),
+        }
+    }
+    /// Returns no projection for missing or non-projectable raw JSON. Use
+    /// `try_value` when the distinction matters.
+    pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
+        self.try_value().ok().flatten()
+    }
+    pub fn try_value(&self) -> Result<Option<std::borrow::Cow<'_, Value>>, serde_json::Error> {
+        match self {
+            Self::Missing => Ok(None),
+            Self::Present(value) => Ok(Some(std::borrow::Cow::Borrowed(value))),
+            Self::Encoded(raw) => {
+                serde_json::from_str(raw.get()).map(|value| Some(std::borrow::Cow::Owned(value)))
+            }
+            Self::EncodedBytes(bytes) => {
+                let text = std::str::from_utf8(bytes).map_err(serde::de::Error::custom)?;
+                serde_json::from_str(text).map(|value| Some(std::borrow::Cow::Owned(value)))
+            }
         }
     }
     pub fn is_missing(&self) -> bool {
@@ -71,7 +91,11 @@ impl RawJson {
 }
 impl PartialEq for RawJson {
     fn eq(&self, other: &Self) -> bool {
-        self.value() == other.value()
+        match (self.try_value(), other.try_value()) {
+            (Ok(left), Ok(right)) => left == right,
+            (Err(_), Err(_)) => self.bytes() == other.bytes(),
+            _ => false,
+        }
     }
 }
 impl Serialize for RawJson {
@@ -80,6 +104,12 @@ impl Serialize for RawJson {
             Self::Missing => s.serialize_none(),
             Self::Present(v) => v.serialize(s),
             Self::Encoded(raw) => raw.serialize(s),
+            Self::EncodedBytes(bytes) => {
+                let text = std::str::from_utf8(bytes).map_err(serde::ser::Error::custom)?;
+                let raw: &serde_json::value::RawValue =
+                    serde_json::from_str(text).map_err(serde::ser::Error::custom)?;
+                raw.serialize(s)
+            }
         }
     }
 }
@@ -97,9 +127,20 @@ impl JsonSchema for RawJson {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(transparent)]
 pub struct RunItemType(pub i64);
+
+impl RunItemType {
+    pub const MESSAGE: Self = Self(0);
+    pub const TOOL_CALL: Self = Self(1);
+    pub const TOOL_OUTPUT: Self = Self(2);
+    pub const HANDOFF_CALL: Self = Self(3);
+    pub const HANDOFF_OUTPUT: Self = Self(4);
+    pub const REASONING: Self = Self(5);
+    pub const TOOL_APPROVAL: Self = Self(6);
+    pub const COMPACTION: Self = Self(7);
+}
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
 #[serde(from = "String", into = "String")]
@@ -167,7 +208,7 @@ impl From<RunItemType> for SnapshotType {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct MessageOutput {
     #[serde(rename = "text", deserialize_with = "null_default")]
@@ -186,7 +227,7 @@ pub struct MessageOutput {
     pub images: Vec<ImageAttachment>,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ImageAttachment {
     #[serde(rename = "media_type", deserialize_with = "null_default")]
@@ -201,7 +242,7 @@ pub struct ImageAttachment {
     pub detail: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolCallData {
     #[serde(rename = "id", deserialize_with = "null_default")]
@@ -212,7 +253,7 @@ pub struct ToolCallData {
     pub input: RawJson,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolOutputData {
     #[serde(
@@ -233,7 +274,7 @@ pub struct ToolOutputData {
     pub is_error: bool,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct HandoffCallData {
     #[serde(rename = "from_agent", deserialize_with = "null_default")]
@@ -242,7 +283,7 @@ pub struct HandoffCallData {
     pub to_agent: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct HandoffOutputData {
     #[serde(rename = "from_agent", deserialize_with = "null_default")]
@@ -251,7 +292,7 @@ pub struct HandoffOutputData {
     pub to_agent: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ReasoningData {
     #[serde(
@@ -286,7 +327,7 @@ pub struct ReasoningData {
     pub encrypted_content: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct CompactionData {
     #[serde(
@@ -315,7 +356,7 @@ pub struct CompactionData {
     pub created_by: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolApprovalData {
     #[serde(rename = "tool_name", deserialize_with = "null_default")]

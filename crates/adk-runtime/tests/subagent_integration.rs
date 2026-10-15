@@ -2509,3 +2509,122 @@ async fn successful_child_projects_frozen_prices_but_errors_and_budgets_keep_act
         owner.shutdown().await.unwrap();
     }
 }
+
+#[tokio::test(start_paused = true)]
+async fn cancellation_observation_does_not_publish_results_or_finish_parent_join() {
+    struct CancelBarrier {
+        blocked: std::sync::atomic::AtomicBool,
+        release: tokio::sync::Semaphore,
+    }
+    impl SchedulerStore for CancelBarrier {
+        fn persist<'a>(
+            &'a self,
+            _: &'a Context,
+            checkpoint: &'a SchedulerCheckpoint,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if checkpoint
+                    .records
+                    .iter()
+                    .any(|r| r.task.status == TaskStatus::Cancelled)
+                    && !self.blocked.swap(true, std::sync::atomic::Ordering::SeqCst)
+                {
+                    self.release.acquire().await.unwrap().forget();
+                }
+                Ok(())
+            })
+        }
+    }
+    let store = Arc::new(CancelBarrier {
+        blocked: std::sync::atomic::AtomicBool::new(false),
+        release: tokio::sync::Semaphore::new(0),
+    });
+    let child = FakeModel::new(vec![answer("must not finish")], Duration::from_secs(3600));
+    let (owner, session) =
+        session_with_runner(runner("worker", child.clone()), Some(store.clone())).await;
+    let id = session
+        .scheduler
+        .submit(Submission::new("worker", "work"))
+        .await
+        .unwrap();
+    while child.requests.lock().unwrap().is_empty() {
+        tokio::task::yield_now().await;
+    }
+    let committed = serde_json::to_value(session.scheduler.snapshot()).unwrap();
+    let cancel = session.scheduler.cancel(&id);
+    tokio::pin!(cancel);
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    assert!(store.blocked.load(std::sync::atomic::Ordering::SeqCst));
+    let tools = build_subagent_task_tools(session.clone(), "worker");
+    let tool_context = ToolContext {
+        operation: context(),
+        work_dir: ".".into(),
+        policy: ToolPolicy::default(),
+        idempotency_key: None,
+    };
+    for (name, arguments) in [
+        ("subagent_status", json!({"detail":"summary"})),
+        ("subagent_status", json!({"detail":"graph"})),
+        ("subagent_status", json!({"detail":"results"})),
+        ("subagent_wait", json!({"task_ids":[id], "timeout_ms":1})),
+    ] {
+        let tool = tools.iter().find(|t| t.definition().name == name).unwrap();
+        let result = tool
+            .execute(
+                &tool_context,
+                ToolCall {
+                    raw_arguments: None,
+                    id: "observe".into(),
+                    name: name.into(),
+                    arguments: arguments.clone(),
+                },
+            )
+            .await
+            .unwrap();
+        assert!(!result.is_error);
+        let Content::Text { text } = &result.content[0] else {
+            panic!("expected text")
+        };
+        let value: Value = serde_json::from_str(text).unwrap();
+        match arguments["detail"].as_str() {
+            Some("summary") => assert_eq!(value["tasks"][0]["status"], "cancelled"),
+            Some("graph") => assert_eq!(value["nodes"][0]["status"], "cancelled"),
+            Some("results") => {
+                assert_eq!(value["results"], json!([]));
+                assert_eq!(value["still_active"], json!([id]));
+            }
+            _ => {
+                assert_eq!(value["wait_complete"], false);
+                assert_eq!(value["timed_out"], true);
+                assert_eq!(value["still_active"][0]["status"], "running");
+                assert!(value.get("finished").is_none());
+            }
+        }
+    }
+    let model = FakeModel::new(vec![answer("premature"), answer("joined")], Duration::ZERO);
+    let runner = parent(model.clone(), session.clone());
+    let run = runner.run(context(), request(), Arc::new(TestHost));
+    tokio::pin!(run);
+    assert!(
+        tokio::time::timeout(Duration::from_secs(1), &mut run)
+            .await
+            .is_err()
+    );
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
+    assert!(!history_text(&model.requests.lock().unwrap()[0].input).contains("Sub-agent result"));
+    assert_eq!(
+        serde_json::to_value(session.scheduler.snapshot()).unwrap(),
+        committed
+    );
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    store.release.add_permits(1);
+    cancel.await.unwrap();
+    let result = run.await.unwrap();
+    assert_eq!(result.result.final_output, Some(json!("joined")));
+    {
+        let requests = model.requests.lock().unwrap();
+        assert!(history_text(&requests[1].input).contains("cancellation requested"));
+    }
+    assert!(session.scheduler.snapshot().records[0].result_delivered);
+    owner.shutdown().await.unwrap();
+}

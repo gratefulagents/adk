@@ -520,7 +520,7 @@ impl SubagentSession {
         let snapshot = self.scheduler.snapshot();
         let visible: HashSet<_> = self
             .scheduler
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect();
@@ -541,7 +541,7 @@ impl SubagentSession {
     fn pending_ids(&self) -> Vec<String> {
         let visible: HashSet<_> = self
             .scheduler
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect();
@@ -580,7 +580,7 @@ impl SubagentSession {
         !self.pending_ids().is_empty()
             || self
                 .scheduler
-                .list()
+                .committed_list()
                 .iter()
                 .any(|task| !task.status.is_terminal())
     }
@@ -589,7 +589,7 @@ impl SubagentSession {
         // A direct child may intentionally end a no-output turn while its own
         // background descendants still run. Final answers must join those too,
         // without stealing their results from their immediate parent.
-        for task in self.scheduler.list() {
+        for task in self.scheduler.committed_list() {
             if !task.status.is_terminal() && !ids.contains(&task.id) {
                 ids.push(task.id);
             }
@@ -599,7 +599,7 @@ impl SubagentSession {
         }
         if self
             .scheduler
-            .list()
+            .committed_list()
             .iter()
             .any(|t| ids.contains(&t.id) && t.status == TaskStatus::Reconciling)
         {
@@ -789,7 +789,13 @@ impl SubagentSession {
         }
         let tasks = ids
             .iter()
-            .map(|id| self.scheduler.status(id, Detail::Full))
+            .map(|id| {
+                if detail == "results" {
+                    self.scheduler.committed_status(id, Detail::Full)
+                } else {
+                    self.scheduler.status(id, Detail::Full)
+                }
+            })
             .collect::<Result<Vec<_>, _>>()?;
         let response = match detail.as_str() {
             "graph" => {
@@ -895,7 +901,7 @@ impl SubagentSession {
         };
         let tasks = ids
             .iter()
-            .map(|id| self.scheduler.status(id, Detail::Full))
+            .map(|id| self.scheduler.committed_status(id, Detail::Full))
             .collect::<Result<Vec<_>, _>>()?;
         let timed_out = timed_out && tasks.iter().any(|task| !task.status.is_terminal());
         Ok((tasks, timed_out))

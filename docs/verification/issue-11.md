@@ -2503,3 +2503,13 @@ reference checkouts initially drifted; both exact source pins and the SDK tag we
 restored, then immutable locks and all **27 audit validators** passed again.
 Ledger remains **559 verified / 8,332 unresolved / 251 excluded**. This safety fix
 does not complete #11 or remove the remaining durable-generation recovery work.
+
+### ApplyPatch input acceptance
+
+Five additional records now map the private two-field input type, its Patch and
+DryRun fields, and the corresponding two schema parameters. This uses the preview
+safety tests and both independently executed Go corpora above; the complete
+source-bound evidence was regenerated after recording the exact claims. All 27
+audit validators and immutable source locks pass. Ledger: **564 verified /
+8,327 unresolved / 251 excluded**. This is input/default/schema acceptance, not
+whole-Execute, rollback, availability or exhaustive malformed-JSON parity.

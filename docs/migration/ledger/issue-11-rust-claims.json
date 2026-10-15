@@ -9781,6 +9781,111 @@
         "x86_64-unknown-linux-gnu",
         "tools"
       ]
+    },
+    "SDK-73FC57B61B8BDE11": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "applyPatchInput.DryRun",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::Input",
+        "crates/adk-tools/src/patch.rs::ApplyPatch::run",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation",
+        "raw_patch_type_errors_and_projection_mismatch_prevent_mutation",
+        "pinned_sdk_fixtures",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchDryRunDoesNotMutate",
+      "rationale": "Maps only the two-field ApplyPatch input type/field or schema parameter identified by this record. Native String patch and bool dry_run retain Go zero values and tagged keys through the shared ordered decoder. Independent schema regeneration verifies required patch metadata and dry_run=false default; 28 added live-Go lifecycle cases verify ordered aliases/duplicates, null retention, scalar errors, ignored fields, root values and Unicode/depth boundaries. Native raw/projection regressions prevent mutation on rejected inputs; 1,176 live-Go patch result/tree comparisons exercise both supported patch formats and dry-run versus mutation. This does not claim the entire Execute method, mutation/rollback implementation, availability predicates or every malformed-JSON diagnostic.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-0015068DB8C5B783": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "applyPatchInput.Patch",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::Input",
+        "crates/adk-tools/src/patch.rs::ApplyPatch::run",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation",
+        "raw_patch_type_errors_and_projection_mismatch_prevent_mutation",
+        "pinned_sdk_fixtures",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchDryRunDoesNotMutate",
+      "rationale": "Maps only the two-field ApplyPatch input type/field or schema parameter identified by this record. Native String patch and bool dry_run retain Go zero values and tagged keys through the shared ordered decoder. Independent schema regeneration verifies required patch metadata and dry_run=false default; 28 added live-Go lifecycle cases verify ordered aliases/duplicates, null retention, scalar errors, ignored fields, root values and Unicode/depth boundaries. Native raw/projection regressions prevent mutation on rejected inputs; 1,176 live-Go patch result/tree comparisons exercise both supported patch formats and dry-run versus mutation. This does not claim the entire Execute method, mutation/rollback implementation, availability predicates or every malformed-JSON diagnostic.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-166F07D0E9D58F7A": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "applyPatchInput",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::Input",
+        "crates/adk-tools/src/patch.rs::ApplyPatch::run",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation",
+        "raw_patch_type_errors_and_projection_mismatch_prevent_mutation",
+        "pinned_sdk_fixtures",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchDryRunDoesNotMutate",
+      "rationale": "Maps only the two-field ApplyPatch input type/field or schema parameter identified by this record. Native String patch and bool dry_run retain Go zero values and tagged keys through the shared ordered decoder. Independent schema regeneration verifies required patch metadata and dry_run=false default; 28 added live-Go lifecycle cases verify ordered aliases/duplicates, null retention, scalar errors, ignored fields, root values and Unicode/depth boundaries. Native raw/projection regressions prevent mutation on rejected inputs; 1,176 live-Go patch result/tree comparisons exercise both supported patch formats and dry-run versus mutation. This does not claim the entire Execute method, mutation/rollback implementation, availability predicates or every malformed-JSON diagnostic.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-1A6C3CB0C4C74B15": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "dry_run",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::Input",
+        "crates/adk-tools/src/patch.rs::ApplyPatch::run",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation",
+        "raw_patch_type_errors_and_projection_mismatch_prevent_mutation",
+        "pinned_sdk_fixtures",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchDryRunDoesNotMutate",
+      "rationale": "Maps only the two-field ApplyPatch input type/field or schema parameter identified by this record. Native String patch and bool dry_run retain Go zero values and tagged keys through the shared ordered decoder. Independent schema regeneration verifies required patch metadata and dry_run=false default; 28 added live-Go lifecycle cases verify ordered aliases/duplicates, null retention, scalar errors, ignored fields, root values and Unicode/depth boundaries. Native raw/projection regressions prevent mutation on rejected inputs; 1,176 live-Go patch result/tree comparisons exercise both supported patch formats and dry-run versus mutation. This does not claim the entire Execute method, mutation/rollback implementation, availability predicates or every malformed-JSON diagnostic.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
+    },
+    "SDK-C3C8B006B35C2D7F": {
+      "source": "pkg/agentsdk/tools/fs/patch.go",
+      "source_name": "patch",
+      "implementation_symbols": [
+        "crates/adk-tools/src/patch.rs::Input",
+        "crates/adk-tools/src/patch.rs::ApplyPatch::run",
+        "crates/adk-tools/src/fs_input.rs::decode"
+      ],
+      "rust_test_identifiers": [
+        "ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation",
+        "raw_patch_type_errors_and_projection_mismatch_prevent_mutation",
+        "pinned_sdk_fixtures",
+        "parameter_schemas_match_actual_sdk_bundle_definitions"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchDryRunDoesNotMutate",
+      "rationale": "Maps only the two-field ApplyPatch input type/field or schema parameter identified by this record. Native String patch and bool dry_run retain Go zero values and tagged keys through the shared ordered decoder. Independent schema regeneration verifies required patch metadata and dry_run=false default; 28 added live-Go lifecycle cases verify ordered aliases/duplicates, null retention, scalar errors, ignored fields, root values and Unicode/depth boundaries. Native raw/projection regressions prevent mutation on rejected inputs; 1,176 live-Go patch result/tree comparisons exercise both supported patch formats and dry-run versus mutation. This does not claim the entire Execute method, mutation/rollback implementation, availability predicates or every malformed-JSON diagnostic.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "tools"
+      ]
     }
   }
 }

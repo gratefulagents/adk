@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8332,
-    "verified": 559
+    "unresolved": 8327,
+    "verified": 564
   },
   "groups": [
     {
@@ -8409,8 +8409,8 @@
     },
     {
       "counts": {
-        "apis:unresolved": 77,
-        "apis:verified": 50,
+        "apis:unresolved": 74,
+        "apis:verified": 53,
         "capabilities:unresolved": 1,
         "configuration:verified": 2,
         "files:unresolved": 5,
@@ -8420,8 +8420,7 @@
         "subtests:unresolved": 1,
         "tests:unresolved": 38,
         "tests:verified": 19,
-        "tool_parameters:unresolved": 2,
-        "tool_parameters:verified": 15,
+        "tool_parameters:verified": 17,
         "tools:unresolved": 7,
         "verification_groups:unresolved": 1
       },
@@ -8437,7 +8436,6 @@
         "pkg/agentsdk/tools/registry.go"
       ],
       "unresolved_ids": [
-        "SDK-0015068DB8C5B783",
         "SDK-0030B9CF1599F05A",
         "SDK-01023B32DF39E061",
         "SDK-040F83F34E1D1CF7",
@@ -8455,9 +8453,7 @@
         "SDK-121CC3D72CBDD620",
         "SDK-15E813473505A4A0",
         "SDK-16684643FD86AA83",
-        "SDK-166F07D0E9D58F7A",
         "SDK-17C04C6B7C7D8A6A",
-        "SDK-1A6C3CB0C4C74B15",
         "SDK-1EFF821529E4601C",
         "SDK-1F9BD1BF0460CF4C",
         "SDK-201F5C2FCE852EBF",
@@ -8501,7 +8497,6 @@
         "SDK-69B6A3F00FB5A217",
         "SDK-6A1972CD3DE37C91",
         "SDK-6A76C90E5F9022D4",
-        "SDK-73FC57B61B8BDE11",
         "SDK-75C170CCD599070C",
         "SDK-77714E377B2E8F2F",
         "SDK-79B6001F15A15064",
@@ -8545,7 +8540,6 @@
         "SDK-B9DC8FA71715AB6D",
         "SDK-BE9EF70C8F21C0E6",
         "SDK-C0228FEBF6D5CA5A",
-        "SDK-C3C8B006B35C2D7F",
         "SDK-C66ED83B1D3C8EC4",
         "SDK-C7BA8F5DC545C7CA",
         "SDK-C8CC69FDB74F9DFB",
@@ -8591,6 +8585,7 @@
         "SDK-FF3E350BE593E7B1"
       ],
       "verified_ids": [
+        "SDK-0015068DB8C5B783",
         "SDK-0450E50CA01D87B2",
         "SDK-07EFEE4B4EAA86DF",
         "SDK-085E98AAA3055210",
@@ -8600,6 +8595,8 @@
         "SDK-10DC52A207D94579",
         "SDK-10E21A4D3A11567B",
         "SDK-130E433384B43F25",
+        "SDK-166F07D0E9D58F7A",
+        "SDK-1A6C3CB0C4C74B15",
         "SDK-1BA9B2CE612AAFEC",
         "SDK-1CE02AE39AA1DB8F",
         "SDK-1FD6CBDD0C534FEB",
@@ -8622,6 +8619,7 @@
         "SDK-6FB27CF6036ED2F3",
         "SDK-7106A71D8571085F",
         "SDK-72F1BB41B8CFBA77",
+        "SDK-73FC57B61B8BDE11",
         "SDK-75E675B777183DE4",
         "SDK-76DD31C163F1CF33",
         "SDK-7703690AEDDBE122",
@@ -8651,6 +8649,7 @@
         "SDK-BC751B1E7DA62D02",
         "SDK-BEE4B2888EDF85F7",
         "SDK-C1C76B62F106A3BB",
+        "SDK-C3C8B006B35C2D7F",
         "SDK-C5C3BD9EFC5833FC",
         "SDK-C68AB644831758E3",
         "SDK-C783E17AD7570426",
@@ -10930,8 +10929,8 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "ea839358912126de358f5f93c60f62f955e668f33210d29aab6b6b8f505cc349",
-    "docs/migration/ledger/issue-11-rust-claims.json": "b4340816e67c58f01b277a277a7e87d651a2e075a28735bf3d8f890b333179ce",
+    "docs/migration/ledger/issue-11-overlay.json": "5eee67dcdb9c10cec82020d6232e0c0cb6b75f10059d45edcf5222b0c02f8235",
+    "docs/migration/ledger/issue-11-rust-claims.json": "424e1dc72f69fb1cb912b25218f39cb8f0ca7cba06c38aa03ed457b110112797",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",

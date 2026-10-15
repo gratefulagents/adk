@@ -2126,3 +2126,25 @@ Fresh claim-bound oracle/native evidence and all 27 ledger/audit tests pass.
 Overlay: **457 verified / 8,434 unresolved / 251 excluded**. The queue now has no
 same-declaration candidates; this does not close any remaining verification group
 or establish full SDK parity. No Rust behavior changed in this audit checkpoint.
+
+### Explicit public budget-context helpers
+
+Added `codec::userinput::{build_run_budget_context,build_subagent_budget_context}`.
+Seven independent pinned public-alias inputs per helper compare complete prompt
+text, signed extrema and nonpositive defaults (100 top-level, 50 child). Original
+SDK helper regressions execute alongside the oracle; source and harness hashes
+retain provenance. Eight API/alias/configuration/test facets are individually
+closed. Rust functions replace Go alias indirection, not mutable global callbacks.
+
+These helpers do not set/enforce limits or inject prompts. Source review confirms
+that `subagent_run.go` separately appends child guidance and forces final summary;
+that native composition work remains open. Do not infer warning behavior from
+legacy prose: the source runner regression explicitly forbids turn-budget warning
+injection. No automatic warning behavior was added.
+
+Fresh workspace **1,396 passed / 0 failed / 30 ignored**, strict Clippy/rustdoc,
+feature matrix, standalone consumer, 20 offline scenarios, host-session, six
+doctests, source locks, pinned oracles and all 27 ledger/audit tests pass. Original
+Go regression refresh: **789 pass / 5 skip**, 35 packages. Ledger: **465 verified /
+8,426 unresolved / 251 excluded**. Full acceptance and credentialed live checks
+remain open; this checkpoint does not claim automatic child composition parity.

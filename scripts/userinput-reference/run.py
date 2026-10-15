@@ -29,7 +29,7 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['pkg/agentsdk/userinput.go', 'pkg/agentsdk/userinput_test.go', 'internal/agent/stream.go', 'go.mod', 'go.sum']
+        paths = ['pkg/agentsdk/userinput.go', 'pkg/agentsdk/userinput_test.go', 'pkg/agentsdk/aliases.go', 'internal/agent/subagent_registry.go', 'internal/agent/subagent_registry_test.go', 'internal/agent/run_config.go', 'internal/agent/stream.go', 'go.mod', 'go.sum']
         provenance = {'repository': 'https://github.com/gratefulagents/sdk', 'commit': SHA,
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
@@ -41,6 +41,7 @@ def main():
         execution = subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeUserInputReference|TestQuickActionHelpers|TestExtractAskUserChoices|TestExtractPresentPlanData|TestDetectUserInputPause|TestBuildAutoTurnCapPrompt)$', './pkg/agentsdk'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(execution.stdout.decode('utf-8', errors='backslashreplace'), end='')
         execution.check_returncode()
+        subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestBuildSubAgentBudgetContext|TestBuildRunBudgetContext)$', './internal/agent'], cwd=source, env=env, check=True)
         result = dict(provenance=provenance, **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/userinput/observations.json'

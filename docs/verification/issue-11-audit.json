@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8434,
-    "verified": 457
+    "unresolved": 8426,
+    "verified": 465
   },
   "groups": [
     {
@@ -7026,16 +7026,16 @@
     },
     {
       "counts": {
-        "apis:unresolved": 389,
-        "apis:verified": 6,
-        "configuration:unresolved": 75,
-        "configuration:verified": 2,
+        "apis:unresolved": 385,
+        "apis:verified": 10,
+        "configuration:unresolved": 73,
+        "configuration:verified": 4,
         "defaults:unresolved": 7,
         "files:unresolved": 14,
         "registrations:unresolved": 6,
         "subtests:unresolved": 10,
-        "tests:unresolved": 77,
-        "tests:verified": 1,
+        "tests:unresolved": 75,
+        "tests:verified": 3,
         "tool_parameters:unresolved": 18,
         "tools:unresolved": 4,
         "verification_groups:unresolved": 1
@@ -7164,7 +7164,6 @@
         "SDK-262B009DB8FCFC0A",
         "SDK-2660E384FC66E664",
         "SDK-26610C3FF1E532C6",
-        "SDK-27199820FF21C0B2",
         "SDK-27B6991ED776E301",
         "SDK-27DF97CE38FD6809",
         "SDK-28072303BD335466",
@@ -7309,7 +7308,6 @@
         "SDK-653B87982099E3E5",
         "SDK-654A34D9EC1B18BA",
         "SDK-65991684D2E2507E",
-        "SDK-65F50177FB91706E",
         "SDK-6641D8077A0679E0",
         "SDK-6649FD3B30FDCF28",
         "SDK-665D1A112DA795D7",
@@ -7385,14 +7383,12 @@
         "SDK-84AF209CA0E9E5F7",
         "SDK-850412DF09F32AF6",
         "SDK-8536037C45C8A1F1",
-        "SDK-856A82BE5C0DA4A7",
         "SDK-86383C8380400475",
         "SDK-8645AE0D53ABF74D",
         "SDK-86472C4F712F6AB2",
         "SDK-866DB044D8D51146",
         "SDK-867C9EA73532D341",
         "SDK-86BF38F31EF2EB9F",
-        "SDK-877D47BCBC28A8BD",
         "SDK-87B46843DE0277D5",
         "SDK-87B7A2A1C5B817BA",
         "SDK-883F37EB37D8064F",
@@ -7531,7 +7527,6 @@
         "SDK-C69DB5DC2A08E533",
         "SDK-C6C1AD2462031593",
         "SDK-C79ECFE161D4C9C9",
-        "SDK-C8097D3E42E3BBEA",
         "SDK-C826AEE8EDEF6655",
         "SDK-C82C13667484285D",
         "SDK-C841533F5B43D63D",
@@ -7560,7 +7555,6 @@
         "SDK-D2C49CA5215001EC",
         "SDK-D2D9DFA87E4327CE",
         "SDK-D31C2956034D62FB",
-        "SDK-D42ED92FC360AF0B",
         "SDK-D46AE7F80BEF80A5",
         "SDK-D47CCC665873A0CA",
         "SDK-D4FEE981A2F7E06D",
@@ -7587,13 +7581,11 @@
         "SDK-DC5425C7262A6083",
         "SDK-DD01002B1EF8DE9E",
         "SDK-DD1BB4116593E6B7",
-        "SDK-DD3217D51660148C",
         "SDK-DD86E0B6F65844BC",
         "SDK-DE2929B593F1A5DE",
         "SDK-DE6303FCF2C454BD",
         "SDK-DEC99900B0703668",
         "SDK-DECFAECD7F22FE53",
-        "SDK-DF4BD54C8F6404CF",
         "SDK-DF66FE45BAF57F0C",
         "SDK-DF727D7D3522A282",
         "SDK-E00D6603E0FA64B2",
@@ -7663,12 +7655,20 @@
       ],
       "verified_ids": [
         "SDK-24644F902E37CD43",
+        "SDK-27199820FF21C0B2",
         "SDK-474E6E5441F8A871",
         "SDK-58BF3EA4EA4DF174",
+        "SDK-65F50177FB91706E",
         "SDK-6EC733E77B94E5C4",
         "SDK-7756C66B060E9AFB",
+        "SDK-856A82BE5C0DA4A7",
+        "SDK-877D47BCBC28A8BD",
         "SDK-9DD8971E0EE66C67",
         "SDK-B445D759DBEF599A",
+        "SDK-C8097D3E42E3BBEA",
+        "SDK-D42ED92FC360AF0B",
+        "SDK-DD3217D51660148C",
+        "SDK-DF4BD54C8F6404CF",
         "SDK-E1AA9FD9E55D1763",
         "SDK-EE554F0337A2E891"
       ]
@@ -10925,8 +10925,8 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "9cf32da55e2a1d2f2886f9703b958b23a1b51d53c18e4664a97323d43dfb6af1",
-    "docs/migration/ledger/issue-11-rust-claims.json": "e6bb3efabf611d275729b1a96fd6d15ad4429d3f6c2d3ae17c7b1c0f407e5580",
+    "docs/migration/ledger/issue-11-overlay.json": "c1b955e158333802df7816df8147a8c9051b9ff6e654e90fa79a70259e06571a",
+    "docs/migration/ledger/issue-11-rust-claims.json": "45322abcab2194c9e17e2ca5d362334267d72379da4bb3c7f33c02d0cfb81ec7",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",

@@ -22,6 +22,23 @@ unspecified, unknown and future labels before constructing executable state.
 open string. This does not claim all snapshot-decoder edge cases or provider
 response conversion are equivalent.
 
+## Explicit budget guidance
+
+With `compat`, `adk::codec::userinput::{build_run_budget_context,
+build_subagent_budget_context}` return the pinned SDK's complete guidance text.
+They accept signed 64-bit turn counts; positive counts pass through, and zero or
+negative values select the SDK defaults of 100 top-level or 50 child turns.
+The public Go aliases map to ordinary Rust functions, not mutable global callbacks.
+
+These are text helpers, not limit setters or enforcement mechanisms. Their text
+does not guarantee that a host delivers turn-budget warnings. The legacy
+top-level helper is never automatically injected, matching its deprecated source
+status. The native automatic child runner's prompt assembly and default ceiling
+are separate contracts; exposing this helper does not establish their parity.
+Seven pinned-Go inputs per helper include both signed endpoints and compare every
+byte of the returned text. Source attribution remains GPL-3.0-only as recorded in
+the fixture provenance and repository licensing notices.
+
 ## Signed usage arithmetic
 
 `adk::codec::dto::Usage` (facade `compat` feature) retains all five signed SDK

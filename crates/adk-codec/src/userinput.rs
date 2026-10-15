@@ -366,3 +366,39 @@ pub fn detect_user_input_pause(items: &[RunItem], final_text: &str) -> UserInput
 pub fn build_auto_turn_cap_prompt(max_turns: i64) -> String {
     format!("Auto mode global turn cap ({max_turns}) reached.")
 }
+
+/// Explicit SDK child-budget guidance; this does not configure or enforce a runner limit.
+pub fn build_subagent_budget_context(max_turns: i64) -> String {
+    let max_turns = if max_turns > 0 { max_turns } else { 50 };
+    format!(
+        r#"<sub_agent_budget>
+Turn budget: {max_turns} LLM turns for this sub-agent.
+A turn is one model response, not one tool call. Tool calls happen inside a turn.
+Act, don't announce: when you intend to use tools, include those tool calls in the SAME turn. Never end a turn with only a statement of intent ("I'll start by…", "Let me…"); a turn that contains no tool calls is treated as your final answer and ends the task.
+This is a hard ceiling, not a target. Do not try to use the full budget.
+Finish as soon as the requested output is evidence-backed enough to be useful.
+You will receive a [SYSTEM] turn-budget warning shortly before the cap: treat it as the signal to stop exploring and return your findings immediately.
+If the task is broader than the remaining budget, stop exploring and return a concise partial summary with: files checked, concrete findings, gaps/unknowns, and recommended next steps.
+</sub_agent_budget>
+
+<result_contract>
+Your final message goes back to a coordinating agent, so make it self-contained and concise.
+If your deliverable is large (long reports, generated code listings, full logs), write the complete artifact to a file under the working directory and return a short summary plus the file path instead of pasting everything inline.
+Always state in your final message: what you did, the key findings/decisions, file paths you created or modified, and anything still unresolved.
+</result_contract>"#
+    )
+}
+
+/// Legacy SDK top-level guidance, retained for explicit callers, not automatic injection.
+pub fn build_run_budget_context(max_turns: i64) -> String {
+    let max_turns = if max_turns > 0 { max_turns } else { 100 };
+    format!(
+        r#"<run_budget>
+Turn budget: {max_turns} LLM turns for this top-level run.
+A turn is one model response, not one tool call. Tool calls happen inside a turn.
+This is a hard ceiling, not a target. Do not try to use the full budget.
+Finish as soon as the requested outcome is complete and verified.
+You will receive a [SYSTEM] turn-budget warning shortly before the budget runs out: when it appears, persist anything that must survive (commit and push work in progress, record durable notes/tasks), then deliver your best final answer from what you already have.
+</run_budget>"#
+    )
+}

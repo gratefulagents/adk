@@ -68,7 +68,7 @@ func TestNativeUserInputReference(t *testing.T) {
 	}
 	var caps []map[string]any
 	for _, value := range []int{-9223372036854775808, -12, -1, 0, 1, 123, 9223372036854775807} {
-		caps = append(caps, map[string]any{"value": value, "text": BuildAutoTurnCapPrompt(value)})
+		caps = append(caps, map[string]any{"value": value, "text": BuildAutoTurnCapPrompt(value), "run_budget": BuildRunBudgetContext(value), "subagent_budget": BuildSubAgentBudgetContext(value)})
 	}
 	result := map[string]any{"caps": caps, "cases": cases, "marshal_nil": string(MarshalQuickActions()), "marshal_empty": string(MarshalQuickActions([]QuickAction{}...)), "cap": BuildAutoTurnCapPrompt(-12)}
 	data, err := json.MarshalIndent(result, "", "  ")

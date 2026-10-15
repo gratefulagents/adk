@@ -11,6 +11,24 @@ fn actions(value: Option<Vec<u8>>) -> Value {
 }
 
 #[test]
+fn budget_context_helpers_match_pinned_go() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/userinput/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["caps"].as_array().unwrap();
+    assert_eq!(cases.len(), 7);
+    for case in cases {
+        let value = case["value"].as_i64().unwrap();
+        assert_eq!(build_run_budget_context(value), case["run_budget"]);
+        assert_eq!(
+            build_subagent_budget_context(value),
+            case["subagent_budget"]
+        );
+    }
+}
+
+#[test]
 fn pinned_userinput_helpers() {
     let fixture: Value = serde_json::from_str(include_str!(
         "../../../fixtures/userinput/observations.json"

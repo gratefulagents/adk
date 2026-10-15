@@ -7779,6 +7779,134 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-65F50177FB91706E": {
+      "source": "internal/agent/subagent_registry.go",
+      "source_name": "BuildRunBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_run_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C8097D3E42E3BBEA": {
+      "source": "internal/agent/subagent_registry.go",
+      "source_name": "BuildSubAgentBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_subagent_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildSubAgentBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-856A82BE5C0DA4A7": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "BuildRunBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_run_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DD3217D51660148C": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "BuildSubAgentBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_subagent_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildSubAgentBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-27199820FF21C0B2": {
+      "source": "internal/agent/subagent_registry.go",
+      "source_name": "BuildRunBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_run_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D42ED92FC360AF0B": {
+      "source": "internal/agent/subagent_registry.go",
+      "source_name": "BuildSubAgentBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_subagent_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildSubAgentBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-877D47BCBC28A8BD": {
+      "source": "internal/agent/subagent_registry_test.go",
+      "source_name": "TestBuildRunBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_run_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DF4BD54C8F6404CF": {
+      "source": "internal/agent/subagent_registry_test.go",
+      "source_name": "TestBuildSubAgentBudgetContext",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_subagent_budget_context"
+      ],
+      "rust_test_identifiers": [
+        "budget_context_helpers_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildSubAgentBudgetContext",
+      "rationale": "Explicit stateless prompt formatter. Seven independently executed pinned public-alias inputs cover signed64bit extrema, negative, zero and positive limits; Rust compares complete text and default normalization (run100/child50). Original helper regression executes too. API/config/test facets were separately reviewed: no registration or cap mutation occurs in these bodies. Public Go alias maps to a Rust function, not mutable process-global function replacement. This does not claim automatic prompt injection, warning delivery, native scheduler default parity or budget enforcement; deprecated top-level guidance stays opt-in.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

@@ -15,11 +15,11 @@
       "-json",
       "./internal/agent",
       "-run",
-      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestCompactionDefaultsForModel|TestEstimateRunResultCostSumsResponseCosts|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize)$"
+      "^(TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestBuildRunBudgetContext|TestBuildSubAgentBudgetContext|TestCompactionDefaultsForModel|TestEstimateRunResultCostSumsResponseCosts|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestModeReasoningSettings|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveRoleModeRouting|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize)$"
     ]
   ],
   "counts": {
-    "pass": 787,
+    "pass": 789,
     "skip": 5
   },
   "exit_code": 0,
@@ -69,6 +69,8 @@
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextEmpty": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestBuildRunBudgetContext": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestBuildSubAgentBudgetContext": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/#00": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel/anthropic/claude-opus-4-6": "pass",

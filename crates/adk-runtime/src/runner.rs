@@ -4318,7 +4318,12 @@ impl Runner {
             .filter(|_| status == TaskStatus::Completed)
             .map(|extract| extract(&snapshot))
             .filter(|text| !text.is_empty());
+        let (cost_usd, cost_known) = snapshot.metrics.as_ref().map_or((0.0, false), |metrics| {
+            (metrics.cost_usd, metrics.cost_known)
+        });
         Ok(ChildOutcome {
+            cost_usd,
+            cost_known,
             status,
             result: if status == TaskStatus::Completed {
                 extracted.unwrap_or_else(|| match snapshot.final_text() {

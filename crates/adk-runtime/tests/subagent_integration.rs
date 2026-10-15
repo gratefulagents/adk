@@ -1854,36 +1854,57 @@ async fn native_child_resume_preserves_tool_cursor_and_narrows_policy() {
     owner.shutdown().await.unwrap();
 }
 
-struct FractionalCost;
+struct FractionalCost(Mutex<VecDeque<Option<f64>>>);
 impl CostEstimator for FractionalCost {
     fn cost(&self, _: &str, _: &Usage) -> f64 {
-        0.0000004
+        panic!("child prices must retain certainty")
+    }
+    fn estimate_cost(&self, _: &str, _: &Usage) -> Option<f64> {
+        self.0
+            .lock()
+            .unwrap()
+            .pop_front()
+            .expect("duplicate estimate")
     }
 }
 #[tokio::test]
 async fn cost_is_reported_cumulatively_not_rounded_per_response() {
-    let model = FakeModel::new(
-        vec![call("mutate", json!({})), answer("done")],
-        Duration::ZERO,
-    );
-    let child = Runner::new(
-        AgentConfig::new("worker", ModelBinding::complete("fake", model)),
-        RunnerConfig {
-            cost_estimator: Some(Arc::new(FractionalCost)),
-            ..Default::default()
-        },
-    )
-    .unwrap();
-    let (owner, session) = session_with_runner(child, None).await;
-    let task = session
-        .scheduler
-        .run(Submission::new("worker", "start"))
-        .await
+    for estimates in [
+        [Some(0.0000004), Some(0.0000004)],
+        [Some(0.0), Some(0.0)],
+        [Some(0.0000004), None],
+        [None, Some(0.0000004)],
+        [None, None],
+    ] {
+        let costs = Arc::new(FractionalCost(Mutex::new(estimates.into())));
+        let model = FakeModel::new(
+            vec![call("mutate", json!({})), answer("done")],
+            Duration::ZERO,
+        );
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("fake", model)),
+            RunnerConfig {
+                cost_estimator: Some(costs.clone()),
+                ..Default::default()
+            },
+        )
         .unwrap();
-    assert_eq!(task.status, TaskStatus::Completed);
-    assert_eq!(task.usage.cost_micros, 1);
-    assert_eq!(session.scheduler.snapshot().usage.cost_micros, 1);
-    owner.shutdown().await.unwrap();
+        let (owner, session) = session_with_runner(child, None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Completed);
+        let expected = estimates.into_iter().flatten().sum::<f64>();
+        let micros = (expected * 1_000_000.0).ceil() as u64;
+        assert_eq!(task.usage.cost_micros, micros);
+        assert_eq!(task.cost_usd, expected);
+        assert_eq!(task.cost_known, estimates.iter().all(Option::is_some));
+        assert_eq!(session.scheduler.snapshot().usage.cost_micros, micros);
+        assert!(costs.0.lock().unwrap().is_empty());
+        owner.shutdown().await.unwrap();
+    }
 }
 
 #[tokio::test]

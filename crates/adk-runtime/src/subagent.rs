@@ -375,6 +375,10 @@ pub struct TaskSnapshot {
     pub result: String,
     pub error: Option<String>,
     pub usage: BudgetUsage,
+    #[serde(default)]
+    pub cost_usd: f64,
+    #[serde(default)]
+    pub cost_known: bool,
     pub activity: Option<Activity>,
     pub messages_received: usize,
     #[serde(default)]
@@ -420,6 +424,10 @@ pub struct ChildOutcome {
     pub error: Option<String>,
     /// Cumulative totals, including consumption already charged through ChildControl.
     pub usage: BudgetUsage,
+    #[serde(default)]
+    pub cost_usd: f64,
+    #[serde(default)]
+    pub cost_known: bool,
 }
 impl ChildOutcome {
     pub fn completed(result: impl Into<String>) -> Self {
@@ -428,6 +436,8 @@ impl ChildOutcome {
             result: result.into(),
             error: None,
             usage: BudgetUsage::default(),
+            cost_usd: 0.0,
+            cost_known: false,
         }
     }
     pub fn failed(error: impl Into<String>) -> Self {
@@ -436,6 +446,8 @@ impl ChildOutcome {
             result: String::new(),
             error: Some(error.into()),
             usage: BudgetUsage::default(),
+            cost_usd: 0.0,
+            cost_known: false,
         }
     }
     fn cancelled() -> Self {
@@ -961,6 +973,8 @@ impl SchedulerHandle {
                     result: String::new(),
                     error: None,
                     usage: BudgetUsage::default(),
+                    cost_usd: 0.0,
+                    cost_known: false,
                     activity: Some(Activity::default()),
                     messages_received: 0,
                     started_at: Some(Utc::now()),
@@ -1283,6 +1297,9 @@ impl SchedulerHandle {
         if !outcome.status.is_terminal() {
             return Err(invalid("reconciliation requires a terminal outcome"));
         }
+        if !outcome.cost_usd.is_finite() || outcome.cost_usd < 0.0 {
+            return Err(invalid("invalid child cost estimate"));
+        }
         self.transact(|state| {
             if record_mut(state, id)?.task.status != TaskStatus::Reconciling {
                 return Err(invalid("child is not reconciling"));
@@ -1292,6 +1309,8 @@ impl SchedulerHandle {
             let delta = record.task.usage.remaining_delta(&outcome.usage);
             record.task.usage.add(&delta)?;
             record.task.status = outcome.status;
+            record.task.cost_usd = outcome.cost_usd;
+            record.task.cost_known = outcome.cost_known;
             record.task.freeze_duration();
             record.task.result = outcome.result;
             record.task.error = outcome.error;
@@ -1365,6 +1384,8 @@ fn apply_outcome(
     let record = record_mut(state, id)?;
     let delta = record.task.usage.remaining_delta(&outcome.usage);
     record.task.usage.add(&delta)?;
+    record.task.cost_usd = outcome.cost_usd;
+    record.task.cost_known = outcome.cost_known;
     if !record.task.status.is_terminal() {
         record.task.status = if outcome.status == TaskStatus::Completed
             && (!record.queued_messages.is_empty() || !record.in_flight_messages.is_empty())
@@ -1832,7 +1853,16 @@ async fn execute_once(
         _ = handle.inner.context.cancellation.cancelled() => ChildOutcome::cancelled(),
         _ = deadline => ChildOutcome::failed("child deadline exceeded"),
         result = work => match result {
-            Ok(Ok(outcome)) if outcome.status.is_terminal() => outcome,
+            Ok(Ok(outcome)) if outcome.status.is_terminal() => {
+                if !outcome.cost_usd.is_finite() || outcome.cost_usd < 0.0 {
+                    ChildOutcome {
+                        usage: outcome.usage,
+                        ..ChildOutcome::failed("invalid child cost estimate")
+                    }
+                } else {
+                    outcome
+                }
+            },
             Ok(Ok(_)) => ChildOutcome::failed("executor returned nonterminal outcome"),
             Ok(Err(error)) => ChildOutcome::failed(error.to_string()),
             Err(_) => ChildOutcome::failed("child executor panicked"),
@@ -2078,6 +2108,9 @@ impl ChildCheckpointOwner for SchedulerHandle {
             }
             let mut total = BudgetUsage::default();
             for record in &mut checkpoint.records {
+                if !record.task.cost_usd.is_finite() || record.task.cost_usd < 0.0 {
+                    return Err(invalid("invalid child cost estimate"));
+                }
                 if record.submission.id != record.task.id
                     || record.submission.agent_name != record.task.agent_name
                     || record.submission.message != record.task.message

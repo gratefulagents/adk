@@ -2345,3 +2345,27 @@ Final all-feature/all-target Rust 1.88 verification: **1,411 passed / 0 failed /
 30 ignored**, 145 targets, no warnings. The full facade feature matrix,
 platform-free independent consumer, all 20 offline feature scenarios and the
 host-session example pass with the updated compaction contract.
+
+### Child completion price projection and persistence
+
+Managed child outcomes and scheduler task snapshots now carry exact `cost_usd`
+and `cost_known` from run metrics, independently of rounded budget micros. The
+fractional-price regression now covers priced fractions, known zero, unknown
+prices in either response order and fully unknown prices. It verifies the exact
+display sum, single estimation per response and unchanged cumulative budget
+rounding. Completion and explicit host reconciliation preserve both display
+fields in persisted task snapshots. Legacy snapshots retain budget counters but
+do not fabricate a known display price.
+
+Host executor prices are validated before publication: negative/nonfinite values
+fail the task while preserving separately reported consumption. Reconciliation
+and restore reject invalid prices without partially publishing state. Tests cover
+each boundary and durable round trips. Model-facing task-tool JSON is deliberately
+unchanged; the source adapter does not expose these fields in those projections.
+
+Fresh Rust 1.88 workspace: **1,413 passed / 0 failed / 30 ignored**, 145 targets,
+no warnings. Strict Clippy/rustdoc and seven doctests pass. Refreshed claim-bound
+oracles/evidence, 27 audit validators, source locks and formatting pass. The ledger
+remains **471 verified / 8,420 unresolved / 251 excluded**: this completes native
+price propagation but does not claim source residual/fallback display estimation,
+every other child outcome field, or complete SDK acceptance.

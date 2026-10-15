@@ -575,6 +575,107 @@ async fn queued_checkpoint() -> SchedulerCheckpoint {
 }
 
 #[tokio::test]
+async fn invalid_executor_prices_fail_without_discarding_reported_usage() {
+    for price in [-1.0, f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        let store = Arc::new(Store::default());
+        let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
+        handle.submit(request("a")).await.unwrap();
+        next(&mut starts)
+            .await
+            .done
+            .send(ChildOutcome {
+                cost_usd: price,
+                cost_known: true,
+                usage: BudgetUsage {
+                    cost_micros: 7,
+                    ..Default::default()
+                },
+                ..ChildOutcome::completed("must not publish")
+            })
+            .unwrap();
+        let tasks = wait(&handle, &["a"]).await;
+        assert_eq!(tasks[0].status, TaskStatus::Failed);
+        assert_eq!(
+            tasks[0].error.as_deref(),
+            Some("invalid child cost estimate")
+        );
+        assert!(tasks[0].result.is_empty());
+        assert_eq!(tasks[0].cost_usd, 0.0);
+        assert!(!tasks[0].cost_known);
+        assert_eq!(tasks[0].usage.cost_micros, 7);
+        assert_eq!(handle.snapshot().usage.cost_micros, 7);
+        assert!(serde_json::to_vec(store.snapshots.lock().unwrap().last().unwrap()).is_ok());
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn reconciled_prices_persist_and_legacy_snapshots_remain_unknown() {
+    let queued = queued_checkpoint().await;
+    for known in [false, true] {
+        let store = Arc::new(Store::default());
+        let (owner, handle, _, _) = rig(config(), Some(store.clone()));
+        handle
+            .restore(&context(), serde_json::to_value(&queued).unwrap())
+            .await
+            .unwrap();
+        for price in [-1.0, f64::NAN, f64::INFINITY] {
+            let outcome = ChildOutcome {
+                cost_usd: price,
+                cost_known: true,
+                ..ChildOutcome::completed("invalid")
+            };
+            assert!(handle.reconcile("a", outcome).await.is_err());
+            assert_eq!(handle.snapshot().revision, queued.revision);
+            assert_eq!(
+                handle.status("a", Detail::Full).unwrap().status,
+                TaskStatus::Reconciling
+            );
+        }
+        handle
+            .reconcile(
+                "a",
+                ChildOutcome {
+                    cost_usd: 0.25,
+                    cost_known: known,
+                    usage: BudgetUsage {
+                        cost_micros: 250_000,
+                        ..Default::default()
+                    },
+                    ..ChildOutcome::completed("confirmed")
+                },
+            )
+            .await
+            .unwrap();
+        let saved = store.snapshots.lock().unwrap().last().unwrap().clone();
+        assert_eq!(saved.records[0].task.cost_usd, 0.25);
+        assert_eq!(saved.records[0].task.cost_known, known);
+        owner.shutdown().await.unwrap();
+        for legacy in [false, true] {
+            let mut value = serde_json::to_value(&saved).unwrap();
+            if legacy {
+                let task = value["records"][0]["task"].as_object_mut().unwrap();
+                task.remove("cost_usd");
+                task.remove("cost_known");
+            }
+            let (owner, handle, _, _) = rig(config(), None);
+            handle.restore(&context(), value).await.unwrap();
+            let task = handle.status("a", Detail::Full).unwrap();
+            assert_eq!(task.cost_usd, if legacy { 0.0 } else { 0.25 });
+            assert_eq!(task.cost_known, known && !legacy);
+            assert_eq!(task.usage.cost_micros, 250_000);
+            owner.shutdown().await.unwrap();
+        }
+        let mut invalid = serde_json::to_value(&saved).unwrap();
+        invalid["records"][0]["task"]["cost_usd"] = serde_json::json!(-0.25);
+        let (owner, handle, _, _) = rig(config(), None);
+        assert!(handle.restore(&context(), invalid).await.is_err());
+        assert!(handle.snapshot().records.is_empty());
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn restore_never_dispatches_queued_work_without_explicit_resume() {
     let checkpoint = queued_checkpoint().await;
     let (owner, handle, mut starts, _) = rig(config(), None);

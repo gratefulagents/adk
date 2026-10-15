@@ -101,6 +101,16 @@ Runs without a recorded model response also report unknown rather than assuming
 a priced zero. This is native cumulative accounting, not full equivalence to the
 SDK's residual-usage/fallback-model display estimator.
 
+Managed child `ChildOutcome` and `TaskSnapshot` retain the exact completion
+estimate in `cost_usd` and its certainty in `cost_known`; these are distinct from
+the rounded budget charge in `usage.cost_micros`. Completion and explicit
+reconciliation persist the estimate. Legacy task checkpoints without those fields
+retain their budget counters but report unknown display cost. Host executors must
+report finite, nonnegative estimates; invalid estimates fail the task without
+discarding separately reported budget usage. Reconciliation and checkpoint restore
+reject invalid estimates without publishing partial state. Existing model-facing
+task-tool JSON remains unchanged.
+
 ## Model-routing helpers
 
 The `runtime` feature alone exposes `adk::runtime::settings::{reasoning_settings,

@@ -1549,6 +1549,79 @@ impl Tool for CountTool {
         })
     }
 }
+#[tokio::test]
+async fn child_engine_reserves_final_turn_without_changing_registered_runner() {
+    for (turns, hallucinate) in [(1, false), (1, true), (2, false)] {
+        let mut responses = Vec::new();
+        if turns == 2 || hallucinate {
+            responses.push(call("count", json!({})));
+        }
+        if !hallucinate {
+            responses.push(answer("done"));
+        }
+        let model = FakeModel::new(responses, Duration::ZERO);
+        let count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let mut agent = AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+        agent.tools.push(Arc::new(CountTool {
+            definition: ToolDefinition {
+                name: "count".into(),
+                description: "count".into(),
+                input_schema: schemars::schema_for!(Value),
+                read_only: false,
+                requires_approval: false,
+            },
+            count: count.clone(),
+        }));
+        let child = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let (owner, session) = session_with_runner(child.clone(), None).await;
+        let mut submission = Submission::new("worker", "start");
+        submission.policy.max_turns = std::num::NonZeroU32::new(turns).unwrap();
+        submission.policy.tools.access = AccessMode::FullAccess;
+        let task = session.scheduler.run(submission).await.unwrap();
+        assert_eq!(
+            task.status,
+            if hallucinate {
+                TaskStatus::Failed
+            } else {
+                TaskStatus::Completed
+            }
+        );
+        assert_eq!(
+            count.load(std::sync::atomic::Ordering::SeqCst),
+            usize::from(turns == 2)
+        );
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), turns as usize);
+            let last = requests.last().unwrap();
+            assert!(last.tools.is_empty());
+            assert!(last.instructions.contains("<final_turn>"));
+            if turns == 2 {
+                assert_eq!(requests[0].tools.len(), 1);
+                assert!(!requests[0].instructions.contains("<final_turn>"));
+            }
+        }
+        owner.shutdown().await.unwrap();
+        model.responses.lock().unwrap().push_back(answer("direct"));
+        let mut direct = request();
+        direct.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+        direct.policy.tools.access = AccessMode::FullAccess;
+        child
+            .run(context(), direct, Arc::new(TestHost))
+            .await
+            .unwrap();
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.last().unwrap().tools.len(), 1);
+        assert!(
+            !requests
+                .last()
+                .unwrap()
+                .instructions
+                .contains("<final_turn>")
+        );
+    }
+}
+
 struct CrashAfterTool {
     saved: Mutex<Option<SchedulerCheckpoint>>,
     reached: tokio::sync::Notify,

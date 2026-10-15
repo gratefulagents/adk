@@ -4201,6 +4201,7 @@ impl Runner {
         }
         let mut config = self.config.as_ref().clone();
         config.subagents = Some(session.clone());
+        config.force_final_summary_turn = true;
         let scoped = Runner {
             initial: bind_agent(&self.initial, &session, &mut HashMap::new())?,
             config: Arc::new(config),

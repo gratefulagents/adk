@@ -2148,3 +2148,21 @@ doctests, source locks, pinned oracles and all 27 ledger/audit tests pass. Origi
 Go regression refresh: **789 pass / 5 skip**, 35 packages. Ledger: **465 verified /
 8,426 unresolved / 251 excluded**. Full acceptance and credentialed live checks
 remain open; this checkpoint does not claim automatic child composition parity.
+
+### Child final-summary selection
+
+Matched the unconditional `ForceFinalSummaryTurn = true` in pinned
+`internal/agent/subagent_run.go` within the native child execution scope. The
+registered runner remains unchanged for direct invocations. A new actual-scheduler
+regression covers one- and two-turn children, denial of hallucinated final-turn
+tools, earlier-turn tool execution and reuse of the unmodified registered runner.
+It reproduced the missing directive before the fix. All 26 child-integration
+tests pass, including descendant joins, steering and durable child recovery.
+Original Go final-summary and child partial-progress regressions also pass.
+
+Fresh workspace **1,397 passed / 0 failed / 30 ignored**; strict Clippy/rustdoc,
+feature matrix, platform-free consumer, 20 offline scenarios, host-session, six
+doctests, pinned oracles, 27 ledger/audit validators and source locks pass.
+Ledger remains **465 verified / 8,426 unresolved / 251 excluded**. Automatic child
+workspace/budget guidance, dynamic instruction wrapping and complete ledger
+acceptance remain open. No turn-budget warning injection or live-provider claim.

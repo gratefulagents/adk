@@ -573,7 +573,10 @@ and parent durable state are not inherited. Children retain selected tool
 security/guardrails, output policy, retry/cost settings, hooks/observers and
 compaction policy/resolver, including the resolved handoff-history policy and all
 its thresholds. Child construction preserves that policy verbatim rather than
-resetting it to disabled defaults. Their own scheduler provides steering and joins.
+resetting it to disabled defaults. The child execution scope reserves its final
+turn for a no-tool summary, unless it must still join descendants; this does not
+change the registered runner's behavior when invoked directly. Their own scheduler
+provides steering and joins.
 Mode concurrency limits configure the new scheduler; child-turn limits are
 inherited. Native default ceilings are four concurrent tasks, 256 total tasks,
 depth four and 100 child turns. Use an injected `Scheduler` for custom shared

@@ -40,9 +40,16 @@ async fn main() {
                     adk_core::AccessMode::WorkspaceWrite
                 },
                 features: Features::Strict(
-                    ["Move", "Delete", "Write", "Edit", "ExtraTools"]
-                        .map(String::from)
-                        .into(),
+                    [
+                        "Move",
+                        "Delete",
+                        "Write",
+                        "Edit",
+                        "ApplyPatch",
+                        "ExtraTools",
+                    ]
+                    .map(String::from)
+                    .into(),
                 ),
                 ..Default::default()
             },

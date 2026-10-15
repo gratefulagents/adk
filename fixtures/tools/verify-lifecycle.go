@@ -105,7 +105,7 @@ func main() {
 	defer func() { _ = command.Process.Kill(); _ = command.Wait() }()
 	encoder := json.NewEncoder(stdin)
 	scanner := bufio.NewScanner(stdout)
-	implementations := map[string]agentsdk.Tool{"Move": &tools.MoveTool{}, "Delete": &tools.DeleteTool{}, "Write": &tools.WorkspaceWriteFileTool{}, "Edit": &tools.WorkspaceEditTool{}}
+	implementations := map[string]agentsdk.Tool{"Move": &tools.MoveTool{}, "Delete": &tools.DeleteTool{}, "Write": &tools.WorkspaceWriteFileTool{}, "Edit": &tools.WorkspaceEditTool{}, "ApplyPatch": &tools.ApplyPatchTool{}}
 	for _, tool := range skills.Tools(catalog, skills.NewInstaller(catalog), "") {
 		implementations[tool.Name()] = tool
 	}

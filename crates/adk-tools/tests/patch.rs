@@ -58,6 +58,79 @@ fn text(output: &ToolOutput) -> &str {
         _ => panic!("expected text"),
     }
 }
+#[tokio::test]
+async fn ordered_raw_dry_run_aliases_cannot_turn_preview_into_mutation() {
+    let patch = serde_json::to_string("*** Begin Patch\n*** Add File: new\n+safe\n*** End Patch\n")
+        .unwrap();
+    for (fields, dry_run) in [
+        (r#""dry_run":false,"DRY_RUN":true"#, true),
+        (r#""dry_run":true,"dry_run":null"#, true),
+        (r#""dry_run":true,"DRY_RUN":false"#, false),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let raw = format!(r#"{{"patch":{patch},{fields}}}"#);
+        let output = registry(AccessMode::WorkspaceWrite)
+            .get("ApplyPatch")
+            .unwrap()
+            .execute(
+                &context(root.path()),
+                ToolCall {
+                    id: "preview".into(),
+                    name: "ApplyPatch".into(),
+                    arguments: serde_json::from_str(&raw).unwrap(),
+                    raw_arguments: Some(raw),
+                },
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            root.path().join("new").exists(),
+            !dry_run,
+            "preview/mutation mismatch: {output:?}"
+        );
+        assert!(!output.is_error, "{output:?}");
+        assert_eq!(
+            serde_json::from_str::<Value>(text(&output)).unwrap()["dry_run"],
+            dry_run
+        );
+    }
+}
+#[tokio::test]
+async fn raw_patch_type_errors_and_projection_mismatch_prevent_mutation() {
+    let patch = serde_json::to_string("*** Begin Patch\n*** Add File: new\n+safe\n*** End Patch\n")
+        .unwrap();
+    for (raw, mismatch) in [
+        (format!(r#"{{"patch":false,"patch":{patch}}}"#), false),
+        (
+            format!(r#"{{"patch":{patch},"dry_run":"bad","dry_run":false}}"#),
+            false,
+        ),
+        (format!(r#"{{"patch":{patch},"dry_run":false}}"#), true),
+    ] {
+        let root = tempfile::tempdir().unwrap();
+        let mut arguments: Value = serde_json::from_str(&raw).unwrap();
+        if mismatch {
+            arguments["dry_run"] = json!(true);
+        }
+        let output = registry(AccessMode::WorkspaceWrite)
+            .get("ApplyPatch")
+            .unwrap()
+            .execute(
+                &context(root.path()),
+                ToolCall {
+                    id: "invalid".into(),
+                    name: "ApplyPatch".into(),
+                    arguments,
+                    raw_arguments: Some(raw),
+                },
+            )
+            .await
+            .unwrap();
+        assert!(output.is_error, "{output:?}");
+        assert!(!root.path().join("new").exists());
+        assert!(text(&output).starts_with("Invalid input:"));
+    }
+}
 #[derive(Deserialize, Default)]
 #[serde(default)]
 struct File {

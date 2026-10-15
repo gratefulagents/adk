@@ -25,7 +25,7 @@ class EvidenceTests(unittest.TestCase):
     def test_builder_fixture_execution_markers_are_required(self):
         original = self.evidence["reference_fixture_check"]
         for marker in ("Pinned tool schemas reproduced exactly",
-                       "244 SDK lifecycle results and resulting filesystem trees verified",
+                       "272 SDK lifecycle results and resulting filesystem trees verified",
                        "Pinned SDK MCP prompt observations reproduced exactly",
                        "Pinned SDK run instructions observations reproduced exactly",
                        "Pinned SDK workspace context observations reproduced exactly",

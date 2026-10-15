@@ -2475,3 +2475,31 @@ warnings. Strict Clippy on changed crate/tests, formatting, Python compilation,
 source locks pass. No production implementation changed after the prior full
 facade matrix/consumer and strict workspace docs checks. Ledger: **559 verified /
 8,332 unresolved / 251 excluded**. The 53 new closures do not complete #11.
+
+### ApplyPatch raw-input preview safety
+
+A native regression and independent pinned-Go probe reproduced an unsafe input
+projection mismatch: `"dry_run":false,"DRY_RUN":true` previewed in Go but wrote
+files in Rust because ApplyPatch interpreted sorted projected fields. ApplyPatch
+now uses the same ordered raw decoder as the other filesystem tools. Null scalar
+updates retain prior values, aliases obey input order, and the first type error
+or inconsistent raw projection prevents mutation.
+
+Two new native tests cover preview/mutation ordering, null updates, scalar type
+errors and projection mismatches. Twenty-eight new independent lifecycle cases
+cover aliases, duplicates, defaults, root types, lone/paired surrogates and the
+10,000-level JSON nesting boundary. All **272 lifecycle results/trees** and
+**1,176 ApplyPatch results/trees** match the immutable Go SDK. The evidence runner
+now binds the full patch implementation, replay, tests, inputs and live oracle,
+and requires both comparison counts; no additional acceptance IDs are claimed.
+
+Rust 1.88 verification: **1,431 passed / 0 failed / 30 ignored**, 146 workspace
+targets and zero warnings; **7 doctests** pass. Strict workspace Clippy/rustdoc,
+facade feature matrix, standalone consumer/dependency purity and Go vet pass.
+The replay example's final formatting was corrected and all source-bound evidence
+regenerated. After a runtime restart, the scratch toolchain/logs were lost but
+the final evidence survived and validates against the restored sources. Restarted
+reference checkouts initially drifted; both exact source pins and the SDK tag were
+restored, then immutable locks and all **27 audit validators** passed again.
+Ledger remains **559 verified / 8,332 unresolved / 251 excluded**. This safety fix
+does not complete #11 or remove the remaining durable-generation recovery work.

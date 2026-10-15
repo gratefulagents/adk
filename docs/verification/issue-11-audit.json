@@ -10930,8 +10930,8 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "87fa1650a5e1a891ed0add78aa9b4e1c9d5eb6ef4a7cbdd77c2adf2153219479",
-    "docs/migration/ledger/issue-11-rust-claims.json": "403880f471ccba2ede33072614d7eb538d0ac4410cc1772fbbaad1b41e4cf84a",
+    "docs/migration/ledger/issue-11-overlay.json": "ea839358912126de358f5f93c60f62f955e668f33210d29aab6b6b8f505cc349",
+    "docs/migration/ledger/issue-11-rust-claims.json": "b4340816e67c58f01b277a277a7e87d651a2e075a28735bf3d8f890b333179ce",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",

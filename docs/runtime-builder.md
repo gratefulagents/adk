@@ -580,8 +580,22 @@ provides steering and joins.
 Mode concurrency limits configure the new scheduler; child-turn limits are
 inherited. Native default ceilings are four concurrent tasks, 256 total tasks,
 depth four and 100 child turns. Use an injected `Scheduler` for custom shared
-budgets, limits or persistent `SchedulerStore` ownership; automatic assembly is
-in-memory, not a durable scheduler factory.
+budgets and graph limits. Automatic assembly is in-memory by default; supplying
+`Builder::subagent_store(Arc<dyn SchedulerStore>)` binds a host-owned persistent
+store before the scheduler is exposed. This requires `subagent_host`, enabled
+subagents and a nonempty catalog on a new scheduler. Supplying a store when it
+would be ignored, or trying to replace an existing scheduler's store, is an error.
+
+The host store must implement the runtime's atomic revision/fencing contract;
+this method does not create a database, choose a file location or invent a lease.
+A failed admission checkpoint dispatches no model/tool work and poisons the owner;
+explicit close still reports the ambiguous persistence failure. For recovery,
+construct a fresh session with the same stable child configuration and host store,
+call `ChildCheckpointOwner::restore` on its scheduler with the authoritative
+checkpoint, then explicitly resume or reconcile each task. Restore alone never
+dispatches. Native durable callback/fingerprint constraints still apply. The
+facade recovery regression crashes after a persisted tool completion and proves
+that a freshly assembled session resumes without replaying that tool.
 
 Borrowed schedulers take precedence over `subagent_host`; shared handles cannot
 reconfigure them. Transferring an owner with `.owned_session(owner)` and supplying

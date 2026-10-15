@@ -2248,3 +2248,36 @@ regenerated claim-bound evidence and all 27 ledger/audit validators pass. Ledger
 counts remain 465 verified / 8,426 unresolved / 251 excluded. Existing claims are
 not broadened; full SDK acceptance, durable automatic assembly and live-provider
 evidence remain open.
+
+### Explicit persistence for automatically assembled children
+
+`Builder::subagent_store` now binds a host-owned `SchedulerStore` to a new
+automatically assembled scheduler before admission. This makes the existing native
+durable child engine reachable through ordinary facade assembly without requiring
+the host to hand-build every child runner. It does not supply a database, file path
+or lease; hosts still implement the documented atomic revision/fencing contract.
+Missing child hosts, disabled/empty catalogs and attempts to replace an existing
+scheduler's store are rejected rather than silently ignoring the store.
+
+The new facade crash/recovery test uses a revision-checking journal. It suspends
+after a tool completion has been persisted, drops the original owner, rebuilds a
+fresh session, restores the authoritative checkpoint and explicitly resumes. The
+tool executes exactly once and the second model call produces the recovered result.
+A separate failed-admission test proves no model dispatch and preserves the host
+error from explicit close after ambiguous persistence failure. Borrowed-session
+rejection preserves its owner; failed construction with transferred ownership
+closes that owner, as required by the existing lifecycle contract.
+
+Fresh Rust 1.88 workspace: **1,407 passed / 0 failed / 30 ignored**, no warnings.
+Strict Clippy/rustdoc, seven doctests, the full facade feature matrix and standalone
+consumer, 20 offline scenarios and host-session example pass. Claim-bound pinned
+oracles/evidence, all 27 ledger/audit validators, formatting and source locks pass.
+The source mapping is documented accurately: Go exposes its public scheduler's
+checkpoint callback, not a `runtime.Builder.Config` store field; Rust binds it at
+construction instead of allowing unsafe live store replacement.
+
+The ledger remains **465 verified / 8,426 unresolved / 251 excluded**. Persistent
+assembly and explicit recovery are now implemented, but refreshing a durable
+scheduler with tracked executor generations is still unsupported and must not be
+called complete. Full per-record SDK acceptance and live-provider evidence remain
+open; CLI/evaluation/Terminal-Bench and production release/defaults are unchanged.

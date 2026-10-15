@@ -888,6 +888,7 @@ pub struct Builder {
     session: Option<SessionHandle>,
     owned_session: Option<SessionState>,
     subagent_host: Option<Arc<dyn Host>>,
+    subagent_store: Option<Arc<dyn adk_runtime::subagent::SchedulerStore>>,
     runner: RunnerConfig,
     compaction_metadata: Option<Arc<adk_providers::runtime::MetadataCompactionResolver>>,
     input_guardrails: Vec<Arc<dyn adk_runtime::Guardrail>>,
@@ -925,6 +926,7 @@ impl Builder {
             session: None,
             owned_session: None,
             subagent_host: None,
+            subagent_store: None,
             runner: RunnerConfig::default(),
             compaction_metadata: None,
             input_guardrails: vec![],
@@ -993,6 +995,12 @@ impl Builder {
     /// Child tasks can outlive a parent turn, so their host must be owned rather than borrowed.
     pub fn subagent_host(mut self, host: Arc<dyn Host>) -> Self {
         self.subagent_host = Some(host);
+        self
+    }
+    /// Persist an automatically assembled child scheduler through a host-owned fenced store.
+    /// Requires a new nonempty automatic catalog; an existing scheduler's store is never replaced.
+    pub fn subagent_store(mut self, store: Arc<dyn adk_runtime::subagent::SchedulerStore>) -> Self {
+        self.subagent_store = Some(store);
         self
     }
     pub fn owned_session(mut self, session: SessionState) -> Self {
@@ -1503,6 +1511,13 @@ impl Builder {
         }
         let catalog_names: BTreeSet<_> =
             target_roles.iter().map(|role| role.name.clone()).collect();
+        if self.subagent_store.is_some()
+            && (!automatic_subagents || catalog_names.is_empty() || session.subagents.is_some())
+        {
+            return Err(invalid(
+                "subagent store requires a new automatically assembled scheduler with a nonempty catalog",
+            ));
+        }
         let mut targets = Vec::new();
         if features.handoffs || automatic_subagents {
             let mut names = BTreeSet::new();
@@ -1651,8 +1666,12 @@ impl Builder {
             if owner.scheduler.is_some() {
                 Some((executor, Some(config)))
             } else {
-                let scheduler =
-                    Scheduler::new(session.context(context), config, executor.clone(), None)?;
+                let scheduler = Scheduler::new(
+                    session.context(context),
+                    config,
+                    executor.clone(),
+                    self.subagent_store.take(),
+                )?;
                 owner.handle.subagents = Some(Arc::new(SubagentSession::new(scheduler.handle())));
                 owner.scheduler = Some(scheduler);
                 session = owner.handle();

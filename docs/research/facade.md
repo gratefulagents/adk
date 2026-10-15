@@ -275,6 +275,16 @@ omit parent session/admission callbacks, preventing an ownership cycle and
 consumption of the parent's input queue. Keep native scheduler safety ceilings
 and explicit persistent-store injection instead of copying unlimited defaults.
 
+For automatic assembly, expose `Builder::subagent_store` as the native equivalent
+of providing the public SDK scheduler's
+[`SubAgentSchedulerConfig.Checkpoint`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/scheduler.go)
+(GPL-3.0-only). This is not a claim that Go's runtime `Builder.Config` has a store
+field: Go also exposes its assembled scheduler for subsequent configuration.
+Bind the native fenced store before admission instead of allowing a live store
+replacement, which could lose revision history or weaken recovery fencing.
+Fresh-owner restore remains an explicit host decision; persisted callbacks are
+not fabricated or serialized.
+
 The pinned GPL-3.0-only [runtime assembly](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/runtime/builder.go),
 [specialist construction](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/specialists.go)
 and [child run configuration](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/subagent_registry.go)

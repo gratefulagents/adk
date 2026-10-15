@@ -1622,6 +1622,121 @@ async fn child_engine_reserves_final_turn_without_changing_registered_runner() {
     }
 }
 
+#[tokio::test]
+async fn child_context_guidance_wraps_static_and_dynamic_instructions_without_mutation() {
+    struct Dynamic;
+    impl InstructionProvider for Dynamic {
+        fn durable_key(&self) -> Option<&str> {
+            Some("dynamic-child-test")
+        }
+        fn instructions<'a>(
+            &'a self,
+            context: InstructionContext<'a>,
+        ) -> BoxFuture<'a, Result<String, Error>> {
+            Box::pin(async move {
+                assert!(context.agent.instructions.starts_with("static"));
+                Ok("dynamic".into())
+            })
+        }
+    }
+    for dynamic in [false, true] {
+        for durable in [false, true] {
+            for work_dir in ["", "/tmp/child workspace"] {
+                for access in [AccessMode::ReadOnly, AccessMode::FullAccess] {
+                    let model = FakeModel::new(
+                        vec![
+                            answer("one"),
+                            answer("two"),
+                            answer("capped"),
+                            answer("direct"),
+                        ],
+                        Duration::ZERO,
+                    );
+                    let mut agent =
+                        AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+                    agent.instructions = "static".into();
+                    if dynamic {
+                        agent.instruction_provider = Some(Arc::new(Dynamic));
+                    }
+                    agent.tool_access_ceiling = Some(access);
+                    let child = Runner::new(
+                        agent,
+                        RunnerConfig {
+                            work_dir: work_dir.into(),
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap();
+                    let store = durable.then(|| {
+                        Arc::new(SchedulerCheckpoints::default()) as Arc<dyn SchedulerStore>
+                    });
+                    let (owner, session) = session_with_runner(child.clone(), store).await;
+                    for (turns, effective_turns) in [(3, 3), (7, 7), (1000, 100)] {
+                        let mut submission = Submission::new("worker", "inspect");
+                        submission.policy.tools.access = AccessMode::FullAccess;
+                        submission.policy.max_turns = std::num::NonZeroU32::new(turns).unwrap();
+                        let task = session.scheduler.run(submission).await.unwrap();
+                        assert_eq!(task.status, TaskStatus::Completed);
+                        let requests = model.requests.lock().unwrap();
+                        assert_eq!(
+                            requests.last().unwrap().instructions,
+                            format!(
+                                "{}{}\n\n{}",
+                                if dynamic { "dynamic" } else { "static" },
+                                if work_dir.is_empty() {
+                                    String::new()
+                                } else {
+                                    format!("\n\n{}", workspace_context(work_dir, access))
+                                },
+                                adk_codec::userinput::build_subagent_budget_context(i64::from(
+                                    effective_turns
+                                ))
+                            )
+                        );
+                    }
+                    owner.shutdown().await.unwrap();
+                    child
+                        .run(context(), request(), Arc::new(TestHost))
+                        .await
+                        .unwrap();
+                    assert_eq!(
+                        model.requests.lock().unwrap().last().unwrap().instructions,
+                        if dynamic { "dynamic" } else { "static" }
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn child_context_does_not_leak_into_handoff_targets() {
+    let model = FakeModel::new(
+        vec![call("transfer_to_target", json!({})), answer("done")],
+        Duration::ZERO,
+    );
+    let mut target = AgentConfig::new("target", ModelBinding::complete("fake", model.clone()));
+    target.instructions = "target instructions".into();
+    let mut initial = AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+    initial.handoffs.push(Handoff::new(Arc::new(target)));
+    let child = Runner::new(initial, RunnerConfig::default()).unwrap();
+    let (owner, session) = session_with_runner(child, None).await;
+    let task = session
+        .scheduler
+        .run(Submission::new("worker", "inspect"))
+        .await
+        .unwrap();
+    assert_eq!(task.status, TaskStatus::Completed);
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert!(requests[0].instructions.contains("<sub_agent_budget>"));
+        assert!(requests[0].instructions.contains("<environment>"));
+        assert_eq!(requests[1].instructions, "target instructions");
+    }
+    owner.shutdown().await.unwrap();
+}
+
 struct CrashAfterTool {
     saved: Mutex<Option<SchedulerCheckpoint>>,
     reached: tokio::sync::Notify,
@@ -1726,6 +1841,16 @@ async fn native_child_resume_preserves_tool_cursor_and_narrows_policy() {
     assert_eq!(count.load(std::sync::atomic::Ordering::SeqCst), 1);
     assert_eq!(model.requests.lock().unwrap().len(), 2);
     assert!(model.requests.lock().unwrap()[1].tools.is_empty());
+    assert!(
+        model.requests.lock().unwrap()[0]
+            .instructions
+            .contains("Tool access: full")
+    );
+    assert!(
+        model.requests.lock().unwrap()[1]
+            .instructions
+            .contains("Tool access: read-only")
+    );
     owner.shutdown().await.unwrap();
 }
 

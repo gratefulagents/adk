@@ -2166,3 +2166,43 @@ doctests, pinned oracles, 27 ledger/audit validators and source locks pass.
 Ledger remains **465 verified / 8,426 unresolved / 251 excluded**. Automatic child
 workspace/budget guidance, dynamic instruction wrapping and complete ledger
 acceptance remain open. No turn-budget warning injection or live-provider claim.
+
+### Automatic child workspace and budget guidance
+
+The shared child engine now appends the pinned workspace and child-budget blocks
+to its cloned initial agent. Dynamic providers receive the cloned agent and have
+the same suffix appended to their output. The workspace formatter is shared with
+the facade through `adk-runtime`; its existing public facade path is unchanged.
+An empty workdir omits only the workspace block. Budget guidance uses the resolved
+scheduler limit, including scheduler-clamped submissions. Read-only child ceilings
+are reflected in the guidance; prompt text itself grants no tool authority.
+
+The new scheduler matrix covers static/dynamic instructions, durable/non-durable
+execution, empty/nonempty workdirs, full/read-only ceilings, repeated invocations,
+three requested/resolved limits and subsequent direct runner reuse. A separate
+handoff regression verifies that the suffix is not inherited by handoff targets.
+All **28 child-integration tests** pass. The initial workspace implementation
+exposed a real durable-resume regression: narrowing access changed generated
+instructions and therefore the configuration fingerprint. The fingerprint now
+uses the registered instruction graph, while the execution graph regenerates
+policy-derived guidance. The crash/recovery regression verifies both preserved
+tool cursors and the change from full to read-only prompt guidance.
+
+Fresh pinned Rust **1.88** workspace results: **1,399 passed / 0 failed / 30 ignored**.
+Strict Clippy on both changed crates and their dependencies, strict rustdoc,
+**seven doctests**, changed-file format checks and diff hygiene pass. The full
+facade feature matrix, independent platform-free consumer, **20 offline feature
+scenarios** and host-session example pass. The example script's `cargo clippy`
+launcher hit the worker's missing `/proc/self/exe`; equivalent direct-driver
+Clippy and offline example commands passed. Claim-bound pinned Go oracles and Rust evidence were
+regenerated; all **27 ledger/audit validators** and source locks pass. The attached
+SDK/platform checkouts initially drifted and were restored to their clean recorded
+revisions; the inspected child-engine source was identical at the newer and pinned
+SDK revisions. System Rust 1.97 strict Clippy reported an existing unrelated
+`collapsible_if` lint; authoritative checks use the repository-pinned compiler.
+
+Ledger counts remain **465 verified / 8,426 unresolved / 251 excluded**. This
+composition change is not a whole-child-engine or full reusable-SDK closure claim.
+Remaining session assembly/reconfiguration and ledger obligations are unfinished;
+credentialed live services remain unverified. No automatic turn-budget warning,
+CLI/evaluation/Terminal-Bench, production release or default-switch work was added.

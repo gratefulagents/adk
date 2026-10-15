@@ -732,6 +732,7 @@ impl Default for RunnerConfig {
 #[derive(Clone)]
 pub struct Runner {
     initial: Arc<AgentConfig>,
+    child_base: Option<Arc<AgentConfig>>,
     config: Arc<RunnerConfig>,
 }
 
@@ -997,6 +998,7 @@ impl Runner {
         }
         Ok(Self {
             initial: Arc::new(agent),
+            child_base: None,
             config: Arc::new(config),
         })
     }
@@ -4202,8 +4204,51 @@ impl Runner {
         let mut config = self.config.as_ref().clone();
         config.subagents = Some(session.clone());
         config.force_final_summary_turn = true;
+        struct ChildInstructions {
+            provider: Arc<dyn InstructionProvider>,
+            suffix: String,
+        }
+        impl InstructionProvider for ChildInstructions {
+            fn durable_key(&self) -> Option<&str> {
+                self.provider.durable_key()
+            }
+            fn instructions<'a>(
+                &'a self,
+                context: InstructionContext<'a>,
+            ) -> BoxFuture<'a, Result<String, Error>> {
+                Box::pin(
+                    async move { Ok(self.provider.instructions(context).await? + &self.suffix) },
+                )
+            }
+        }
+        let child_base = bind_agent(&self.initial, &session, &mut HashMap::new())?;
+        let mut initial = child_base.as_ref().clone();
+        let mut suffix = String::new();
+        if !config.work_dir.as_os_str().is_empty() {
+            let access = if initial.tool_access_ceiling == Some(AccessMode::ReadOnly) {
+                AccessMode::ReadOnly
+            } else {
+                invocation.security.tools.access
+            };
+            suffix.push_str("\n\n");
+            suffix.push_str(&crate::workspace_context(
+                &config.work_dir.to_string_lossy(),
+                access,
+            ));
+        }
+        suffix.push_str(&format!(
+            "\n\n{}",
+            adk_codec::userinput::build_subagent_budget_context(i64::from(
+                invocation.request.policy.max_turns.get()
+            ))
+        ));
+        initial.instructions.push_str(&suffix);
+        if let Some(provider) = initial.instruction_provider.take() {
+            initial.instruction_provider = Some(Arc::new(ChildInstructions { provider, suffix }));
+        }
         let scoped = Runner {
-            initial: bind_agent(&self.initial, &session, &mut HashMap::new())?,
+            initial: Arc::new(initial),
+            child_base: Some(child_base),
             config: Arc::new(config),
         };
         let security = &invocation.security;

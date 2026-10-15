@@ -693,7 +693,9 @@ impl Runner {
                 "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates, final answer verifiers or hooks",
             ));
         }
-        let mut agents = vec![self.initial.clone()];
+        // Policy-derived child guidance must change when restore narrows access;
+        // fingerprint the registered instructions rather than the generated suffix.
+        let mut agents = vec![self.child_base.as_ref().unwrap_or(&self.initial).clone()];
         let mut seen = HashSet::new();
         let mut names = HashSet::new();
         let mut catalog = vec![];

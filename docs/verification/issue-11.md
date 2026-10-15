@@ -2585,3 +2585,21 @@ pass. Source/harness/native-helper inputs and independent execution markers are
 bound into the evidence runner. Ledger remains **564 verified / 8,327 unresolved /
 251 excluded**: these implementation and fixture results do not silently close
 whole cost methods, signed-overflow behavior or unrelated retained contracts.
+
+### Bounded child-event and collection-field mappings
+
+Thirteen additional event records are verified: nine owned UTF-8 ChildToolEvent
+projection fields and the ContentEvent tools/MCP-server/dependency/waiting collection
+fields. Child projections use twelve complete pinned-Go input/output cases, including
+rejection, zero-value field presence, start/end exclusivity, signed duration extremes,
+uncapped payloads and ownership after input mutation. Each collection has separate
+canonical and compatibility-parser cases for nil/empty/populated values, null
+string elements and wrong types. Tools-specific duplicate/backing-array cases are
+not generalized as independent test evidence for the other collections.
+
+These are field/projection/parser claims, not whole DTO decoding/type closure,
+invalid-UTF8 Go string support, timestamp parity, runtime producers or in-memory
+nil-versus-empty identity. Existing source-bound tests and live Go oracles were
+re-executed after recording the exact claims; all **27 validators** and immutable
+source locks pass. No runtime implementation changed after the 1,451-test workspace
+verification above. Ledger: **577 verified / 8,314 unresolved / 251 excluded**.

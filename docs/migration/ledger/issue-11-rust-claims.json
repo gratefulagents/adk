@@ -9886,6 +9886,233 @@
         "x86_64-unknown-linux-gnu",
         "tools"
       ]
+    },
+    "SDK-00AF1FE5AC824CBA": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.McpServers",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::mcp_servers",
+        "crates/adk-codec/src/events.rs::parse_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_lines_match_pinned_sdk"
+      ],
+      "rationale": "Only the named collection field canonical wire mapping and compatibility-parser behavior are closed. Independently generated Go observations assign this field nil, empty and populated slices and compare exact canonical bytes; parser inputs separately exercise null, [], [null,\"x\"] and wrong types for each field. Nil/empty omit, null string elements become empty strings, numeric fields reject. Tools-specific duplicate/backing-array cases are additional evidence only for Tools, not an independent duplicate-case claim for every collection. This does not preserve an in-memory nil/empty distinction, claim arbitrary direct Serde decoding, timestamps, runtime producers or either whole ContentEvent type."
+    },
+    "SDK-02544296C42A2464": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentDependsOn",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_depends_on",
+        "crates/adk-codec/src/events.rs::parse_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_lines_match_pinned_sdk",
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "rationale": "Only the named collection field canonical wire mapping and compatibility-parser behavior are closed. Independently generated Go observations assign this field nil, empty and populated slices and compare exact canonical bytes; parser inputs separately exercise null, [], [null,\"x\"] and wrong types for each field. Nil/empty omit, null string elements become empty strings, numeric fields reject. Tools-specific duplicate/backing-array cases are additional evidence only for Tools, not an independent duplicate-case claim for every collection. This does not preserve an in-memory nil/empty distinction, claim arbitrary direct Serde decoding, timestamps, runtime producers or either whole ContentEvent type."
+    },
+    "SDK-F4B62545BD270FA6": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.SubagentWaitingOn",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::subagent_waiting_on",
+        "crates/adk-codec/src/events.rs::parse_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_lines_match_pinned_sdk",
+        "subagent_progress_matches_pinned_sdk"
+      ],
+      "rationale": "Only the named collection field canonical wire mapping and compatibility-parser behavior are closed. Independently generated Go observations assign this field nil, empty and populated slices and compare exact canonical bytes; parser inputs separately exercise null, [], [null,\"x\"] and wrong types for each field. Nil/empty omit, null string elements become empty strings, numeric fields reject. Tools-specific duplicate/backing-array cases are additional evidence only for Tools, not an independent duplicate-case claim for every collection. This does not preserve an in-memory nil/empty distinction, claim arbitrary direct Serde decoding, timestamps, runtime producers or either whole ContentEvent type."
+    },
+    "SDK-DAB95A74223A6D0A": {
+      "source": "internal/agent/event_stream.go",
+      "source_name": "ContentEvent.Tools",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ContentEvent::tools",
+        "crates/adk-codec/src/events.rs::parse_content_event_line"
+      ],
+      "rust_test_identifiers": [
+        "canonical_content_event_fields_match_pinned_sdk",
+        "content_event_lines_match_pinned_sdk"
+      ],
+      "rationale": "Only the named collection field canonical wire mapping and compatibility-parser behavior are closed. Independently generated Go observations assign this field nil, empty and populated slices and compare exact canonical bytes; parser inputs separately exercise null, [], [null,\"x\"] and wrong types for each field. Nil/empty omit, null string elements become empty strings, numeric fields reject. Tools-specific duplicate/backing-array cases are additional evidence only for Tools, not an independent duplicate-case claim for every collection. This does not preserve an in-memory nil/empty distinction, claim arbitrary direct Serde decoding, timestamps, runtime producers or either whole ContentEvent type."
+    },
+    "SDK-0AC65809F5550A71": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.AgentName",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::agent_name",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-E32897C3C1B666C6": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.CallID",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::call_id",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-A7507E661666599A": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.DurationMS",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::duration_ms",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-19EB82C9F50D87CE": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.InputRaw",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::input_raw",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-D8EEC78668627DAF": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.IsError",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::is_error",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-7B9B097A99D8C459": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.Output",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::output",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-19B529DE46BF46D8": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.ParentCallID",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::parent_call_id",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-93C25183A6B0EF98": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.Phase",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::phase",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
+    },
+    "SDK-9FBACE2C03BECCA3": {
+      "source": "pkg/agentsdk/session_event_stream.go",
+      "source_name": "ChildToolEvent.Tool",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestContentEventLineHelpers",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ChildToolEvent::tool",
+        "crates/adk-codec/src/lib.rs::child_event"
+      ],
+      "rust_test_identifiers": [
+        "child_tool_projection_matches_pinned_sdk"
+      ],
+      "rationale": "Only this owned UTF-8 child-tool projection field is mapped. Twelve independently executed pinned Go input/output cases verify full projected JSON: exact kind/parent rejection, preserved whitespace identities, zero/empty/false field presence, exclusive start input versus end output, error status, signed int64 duration extremes and uncapped Unicode payloads. Native output survives input mutation. This follows the separately verified projection helper and does not claim general DTO deserialization, the whole ChildToolEvent type, arbitrary invalid-UTF8 Go strings or runtime event producers."
     }
   }
 }

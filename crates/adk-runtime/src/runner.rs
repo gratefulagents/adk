@@ -1227,9 +1227,6 @@ fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), 
         compile_schema(&definition.input_schema)?;
     }
     for handoff in &agent.handoffs {
-        if let Some(input_type) = &handoff.input_type {
-            compile_schema(&input_type.schema)?;
-        }
         if handoff.history_filter.is_some() && handoff.input_filter != HandoffInputFilter::Preserve
         {
             return Err(Error::new(
@@ -3751,7 +3748,7 @@ impl Engine {
                 if !input.is_empty()
                     && handoff.input_type.as_ref().is_some_and(|input_type| {
                         input_type.parser.as_ref().map_or_else(
-                            || serde_json::from_str::<Value>(&input).is_err(),
+                            || adk_codec::userinput::decode::<Value>(input.as_bytes()).is_err(),
                             |parser| parser.parse(&input).is_err(),
                         )
                     })

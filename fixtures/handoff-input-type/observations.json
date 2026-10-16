@@ -267,6 +267,58 @@
     },
     {
       "callback_inputs": [
+        "{\"reason\":\"\\ud800\"}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": false,
+      "parser_inputs": [],
+      "raw": "{\"reason\":\"\\ud800\"}",
+      "scenario": "unicode",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "callback_inputs": [
+        "{\"reason\":\"billing\"}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "{\"reason\":\"billing\"}",
+      "scenario": "invalid_schema",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "callback_inputs": [
         "\"billing\""
       ],
       "custom_parser": false,
@@ -529,6 +581,58 @@
       },
       "streamed": true,
       "warning": true
+    },
+    {
+      "callback_inputs": [
+        "{\"reason\":\"\\ud800\"}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": false,
+      "parser_inputs": [],
+      "raw": "{\"reason\":\"\\ud800\"}",
+      "scenario": "unicode",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "callback_inputs": [
+        "{\"reason\":\"billing\"}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "{\"reason\":\"billing\"}",
+      "scenario": "invalid_schema",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
     }
   ],
   "output_cases": [
@@ -1289,7 +1393,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "84ddc48bbf2861fcb6b6343cfa5d6dd3fac6f6f88edaaf51a79f22e3e2a32d29",
+      "scripts/handoff-input-type-reference/reference_test.go": "14ab8e1b83dd54abcf50794dde0654dff9bed013dc014b62fd7ac40c849c6f14",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

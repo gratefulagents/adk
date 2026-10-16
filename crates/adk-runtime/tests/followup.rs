@@ -2823,13 +2823,13 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
     ))
     .unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 18);
+    assert_eq!(cases.len(), 22);
     assert_eq!(
         cases
             .iter()
             .filter(|case| case["native_value_representable"] == false)
             .count(),
-        4
+        6
     );
     for case in cases {
         for validate_tool_arguments in [false, true] {
@@ -2920,7 +2920,8 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
             assert_eq!(json!(*parser.inputs.lock().unwrap()), case["parser_inputs"]);
             assert_eq!(
                 diagnostics.0.load(Ordering::SeqCst),
-                usize::from(case["warning"] == true)
+                usize::from(case["warning"] == true),
+                "{case}"
             );
             assert_eq!(
                 callback.inputs.lock().unwrap().len(),

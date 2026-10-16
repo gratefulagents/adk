@@ -17,7 +17,7 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 	original := log.Writer()
 	defer log.SetOutput(original)
 	for _, streamed := range []bool{false, true} {
-		for _, name := range []string{"no_type", "shape_valid", "shape_invalid", "json_null", "parse_accept", "parse_reject", "no_callback", "missing", "invalid_json"} {
+		for _, name := range []string{"no_type", "shape_valid", "shape_invalid", "json_null", "parse_accept", "parse_reject", "no_callback", "missing", "invalid_json", "unicode", "invalid_schema"} {
 			var logs bytes.Buffer
 			log.SetOutput(&logs)
 			raw := `{"reason":"billing"}`
@@ -33,6 +33,9 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			if name == "invalid_json" {
 				raw = "{"
 			}
+			if name == "unicode" {
+				raw = `{"reason":"\ud800"}`
+			}
 			target := &Agent{Name: "expert"}
 			h := NewHandoff(target)
 			events := []string{}
@@ -40,6 +43,9 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			callbackInputs := []string{}
 			if name != "no_type" {
 				h.InputType = NewOutputSchema("handoff", json.RawMessage(`{"type":"object","properties":{"reason":{"type":"string"}},"required":["reason"]}`))
+			}
+			if name == "invalid_schema" {
+				h.InputType.Schema = json.RawMessage(`{"type":27}`)
 			}
 			custom := name == "parse_accept" || name == "parse_reject" || name == "no_callback" || name == "missing"
 			if custom {
@@ -78,7 +84,7 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			if result.LastAgent != target || result.FinalText() != "done" || warned != (name == "parse_reject" || name == "invalid_json") {
 				t.Fatalf("%s: result=%v logs=%s", name, result, logs.String())
 			}
-			cases = append(cases, map[string]any{"scenario": name, "streamed": streamed, "raw": raw, "schema": json.RawMessage(model.requests[0].Tools[0].InputSchema()), "custom_parser": custom, "has_type": h.InputType != nil, "has_callback": h.OnHandoff != nil, "events": events, "parser_inputs": parserInputs, "callback_inputs": callbackInputs, "warning": warned, "last_agent": result.LastAgent.Name, "final_text": result.FinalText(), "native_value_representable": name != "missing" && name != "invalid_json"})
+			cases = append(cases, map[string]any{"scenario": name, "streamed": streamed, "raw": raw, "schema": json.RawMessage(model.requests[0].Tools[0].InputSchema()), "custom_parser": custom, "has_type": h.InputType != nil, "has_callback": h.OnHandoff != nil, "events": events, "parser_inputs": parserInputs, "callback_inputs": callbackInputs, "warning": warned, "last_agent": result.LastAgent.Name, "final_text": result.FinalText(), "native_value_representable": name != "missing" && name != "invalid_json" && name != "unicode"})
 		}
 	}
 	outputCases := []map[string]any{}

@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Handoff input-schema construction and Unicode
+
+The handoff input-type path now also forwards its optional schema without local
+compilation and uses Go-compatible string replacement during default advisory
+parsing. Parser return values remain discarded and callbacks retain the original
+raw input, even when the existing `ToolCall` value projection is null because
+ordinary Serde cannot represent that input. The projection is not input authority.
+
+Four new actual-Go buffered/streamed observations bring the handoff matrix to
+**22 cases**, including a lone escaped surrogate and `{"type":27}`. Every case
+runs natively with ordinary-tool argument validation both enabled and disabled,
+asserting exact callback text, event/parser order, warning count, declared schema,
+last agent and final text. The Unicode case first produced an extra warning;
+after that fix, the schema case exposed a separate constructor rejection. Both
+regressions now pass. Custom-parser behavior and ordinary tool validation are
+unchanged. Native schema shapes, arbitrary numeric/depth behavior and broader
+provider/raw-byte parity remain unclaimed.
+
+Fresh full workspace: **1,586 passed /0 failed /30 ignored**, **9 doctests**.
+Strict workspace Clippy/rustdoc, formatting, facade matrix, standalone consumer
+and purity, all 20 feature scenarios and host-session example passed. Independent
+Go/native bound evidence,51 validators, artifact reviews, ledger/audit and source
+locks passed. Ledger unchanged: **842 verified /8,049 unresolved /251 excluded**.
+
 ### Output-schema construction without local compilation
 
 Removed native output-schema compilation from `Runner::new`. The pinned SDK

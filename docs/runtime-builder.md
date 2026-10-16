@@ -1213,8 +1213,9 @@ Optional `Handoff::input_type` supplies `HandoffInputType { schema, parser }`.
 `handoff.tool_definition()` returns the effective definition used for model
 requests: the optional schema overrides `definition.input_schema`. This declaration
 does **not** enforce schema conformance of callback arguments. SDK `OutputSchema`
-only parses JSON by default; native parsing uses `ToolCall::argument_text()` and
-skips absent input, just like the SDK.
+only parses JSON by default; native parsing uses `ToolCall::argument_text()`,
+replaces lone escaped UTF-16 surrogates and skips absent input, just like the SDK.
+The optional schema is forwarded without local JSON Schema compilation.
 A custom `OutputParser` is invoked only when both the input type and callback are
 present. Its returned value is discarded, preserving the original callback input.
 Parser errors emit `HandoffInputValidationFailed` but do not prevent transfer;
@@ -1304,13 +1305,14 @@ preserves native history/security invariants rather than accepting arbitrary
 invalid Go item graphs or fabricated approval markers.
 
 
-The 18-case pinned input-type oracle additionally proves that valid JSON with the
-wrong schema shape and JSON null do not warn by default; parser failure is
-advisory and parser transformations never replace callback arguments. All 18
-cases, including missing and malformed input in normal/streamed execution, are
-compared with strict ordinary-tool argument validation both on and off. Native
-configuration still requires a well-formed JSON Schema; arbitrary malformed Go
-schema bytes are not claimed as equivalent. Provider adapters retain their
+The 22-case pinned input-type oracle additionally proves that valid JSON with the
+wrong schema shape, JSON null and lone escaped surrogates do not warn by default;
+parser failure is advisory and parser transformations never replace callback
+arguments. All 22 cases, including missing/malformed input and unsupported schema
+keywords in normal/streamed execution, are compared with strict ordinary-tool
+argument validation both on and off. Native schemas remain restricted to JSON
+objects or booleans; arbitrary raw Go schema bytes, generic JSON numbers and depth
+are not claimed as equivalent. Provider adapters retain their
 existing malformed-argument normalization/rejection policies; raw handoff tests
 do not establish complete provider parity. Valid Chat/Responses string arguments
 and Anthropic tool input retain lexical text where available; Anthropic outbound

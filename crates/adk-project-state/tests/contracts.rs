@@ -409,7 +409,17 @@ fn separate_handles_do_not_lose_updates_or_initialization() {
                 let id = t.id.clone();
                 let barrier = barrier.clone();
                 thread::spawn(move || {
-                    let s = open(&path, sqlite);
+                    let s = if sqlite {
+                        open(&path, true)
+                    } else {
+                        ProjectStore::filesystem(FilesystemOptions {
+                            state_dir: path.join("state"),
+                            store: options(),
+                            // This stress test checks lost updates, not latency on slow CI disks.
+                            lock_timeout: Duration::from_secs(120),
+                        })
+                        .unwrap()
+                    };
                     barrier.wait();
                     for j in 0..8 {
                         s.add_comment(&id, &format!("actor-{i}"), &format!("comment-{j}"))
@@ -419,8 +429,9 @@ fn separate_handles_do_not_lose_updates_or_initialization() {
                 })
             })
             .collect();
-        for h in handles {
-            h.join().unwrap();
+        // Keep the temporary directory alive until every writer has stopped, even after a panic.
+        for result in handles.into_iter().map(|h| h.join()).collect::<Vec<_>>() {
+            result.unwrap();
         }
         let s = open(temp.path(), sqlite);
         assert_eq!(s.get_task(&t.id).unwrap().comments.len(), 48);

@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Filesystem contention stress-test budget
+
+Windows CI job117228622620 on1b645024 failed in the six-writer project-state
+stress test after a default30-second lock wait; the same-head duplicate job
+passed. The test now gives its filesystem writers120 seconds, while retaining
+all48-comment/48-memory and single-initialization assertions. Production defaults
+and the separate25ms lock-timeout regressions are unchanged. Every writer is
+joined before a panic is propagated, keeping the temporary directory alive
+rather than causing secondary missing-file failures in still-running writers.
+
+Fresh Linux project-state all-feature/all-target checks: **39 passed /0 failed**;
+strict Clippy and formatting passed. Ledger/audit remain valid at848/8043/251.
+Windows verification of this adjustment is pending CI; it is not yet claimed
+passed. No additional acceptance IDs are closed.
+
 ### Turn-limit error text and retained partial results
 
 All three native turn-limit exits now include the effective limit using the

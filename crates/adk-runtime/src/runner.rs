@@ -2719,7 +2719,7 @@ impl Engine {
                     }
                 };
             }
-            match adk_codec::userinput::decode::<Value>(output.as_bytes()) {
+            match adk_codec::value::decode(output.as_bytes()) {
                 Ok(value) => Ok(value),
                 Err(error) => {
                     self.observe(Observation::OutputValidationFailed {
@@ -3748,7 +3748,7 @@ impl Engine {
                 if !input.is_empty()
                     && handoff.input_type.as_ref().is_some_and(|input_type| {
                         input_type.parser.as_ref().map_or_else(
-                            || adk_codec::userinput::decode::<Value>(input.as_bytes()).is_err(),
+                            || adk_codec::value::decode(input.as_bytes()).is_err(),
                             |parser| parser.parse(&input).is_err(),
                         )
                     })

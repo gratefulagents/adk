@@ -76,6 +76,7 @@ RUST_INPUTS = ["scripts/providers/generate.sh", "scripts/providers/continuation_
                "crates/adk-codec/Cargo.toml", "crates/adk-codec/src/snapshots.rs",
                "crates/adk-codec/src/dto.rs", "crates/adk-codec/src/lib.rs",
                "crates/adk-codec/src/items.rs", "crates/adk-codec/tests/items.rs",
+               "crates/adk-codec/src/value.rs",
                "fixtures/item-helpers/observations.json", "scripts/item-helpers-reference/run.py",
                "scripts/item-helpers-reference/reference_test.go",
                "crates/adk-codec/tests/baseline.rs", "crates/adk-platform/src/codec.rs",

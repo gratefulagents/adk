@@ -573,9 +573,12 @@ Validation remains observational, not fail-closed: invalid JSON or parser failur
 retains the original text and emits `OutputValidationFailed`. Without a custom
 parser, validation checks JSON syntax only, matching the pinned SDK; parseable
 JSON that violates the schema does not emit a failure. Empty final text bypasses
-validation. A custom parser replaces default validation. Fourteen independent
-pinned builder/runner cases
-compare schema placement, request fields and final values, not schema diagnostic
+validation. Default numbers use finite float64 semantics, including rounding
+large integers; overflow remains an error even if a later duplicate key replaces
+that value. The native nesting bound remains 127 containers, not Go's 10,000.
+A custom parser replaces default validation. Fourteen independent pinned
+builder/runner cases compare schema placement, request fields and final values,
+not schema diagnostic
 messages, raw schema whitespace or provider wire formats.
 
 ## Automatic owned subagents
@@ -1305,14 +1308,15 @@ preserves native history/security invariants rather than accepting arbitrary
 invalid Go item graphs or fabricated approval markers.
 
 
-The 22-case pinned input-type oracle additionally proves that valid JSON with the
-wrong schema shape, JSON null and lone escaped surrogates do not warn by default;
-parser failure is advisory and parser transformations never replace callback
-arguments. All 22 cases, including missing/malformed input and unsupported schema
-keywords in normal/streamed execution, are compared with strict ordinary-tool
-argument validation both on and off. Native schemas remain restricted to JSON
-objects or booleans; arbitrary raw Go schema bytes, generic JSON numbers and depth
-are not claimed as equivalent. Provider adapters retain their
+The 26-case pinned input-type oracle additionally proves that valid JSON with the
+wrong schema shape, JSON null and lone escaped surrogates do not warn by default.
+Numeric overflow, including an overwritten duplicate, warns without preventing
+transfer. Parser transformations never replace callback arguments. All 26 cases,
+including missing/malformed input and unsupported schema keywords in normal and
+streamed execution, run with strict ordinary-tool argument validation both on and
+off. Native schemas remain restricted to JSON objects or booleans, and default
+JSON parsing retains the native 127-container bound; arbitrary raw Go schema bytes
+and deeper inputs are not claimed as equivalent. Provider adapters retain their
 existing malformed-argument normalization/rejection policies; raw handoff tests
 do not establish complete provider parity. Valid Chat/Responses string arguments
 and Anthropic tool input retain lexical text where available; Anthropic outbound

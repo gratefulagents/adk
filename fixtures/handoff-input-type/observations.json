@@ -319,6 +319,66 @@
     },
     {
       "callback_inputs": [
+        "1e400"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "1e400",
+      "scenario": "numeric_overflow",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "callback_inputs": [
+        "{\"n\":1e400,\"n\":1}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "scenario": "duplicate_overflow",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "callback_inputs": [
         "\"billing\""
       ],
       "custom_parser": false,
@@ -633,13 +693,71 @@
       },
       "streamed": true,
       "warning": false
+    },
+    {
+      "callback_inputs": [
+        "1e400"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "1e400",
+      "scenario": "numeric_overflow",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "callback_inputs": [
+        "{\"n\":1e400,\"n\":1}"
+      ],
+      "custom_parser": false,
+      "events": [
+        "callback"
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_type": true,
+      "last_agent": "expert",
+      "native_value_representable": true,
+      "parser_inputs": [],
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "scenario": "duplicate_overflow",
+      "schema": {
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": true
     }
   ],
   "output_cases": [
     {
-      "output": {
-        "n": 1
-      },
+      "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "additionalProperties": false,
@@ -658,9 +776,7 @@
       "warning": false
     },
     {
-      "output": {
-        "n": -1
-      },
+      "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "additionalProperties": false,
@@ -679,7 +795,7 @@
       "warning": false
     },
     {
-      "output": "text",
+      "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "additionalProperties": false,
@@ -698,7 +814,7 @@
       "warning": false
     },
     {
-      "output": null,
+      "output_json": "null",
       "raw": "null",
       "schema": {
         "additionalProperties": false,
@@ -717,7 +833,7 @@
       "warning": false
     },
     {
-      "output": [],
+      "output_json": "[]",
       "raw": "[]",
       "schema": {
         "additionalProperties": false,
@@ -736,7 +852,7 @@
       "warning": false
     },
     {
-      "output": true,
+      "output_json": "true",
       "raw": "true",
       "schema": {
         "additionalProperties": false,
@@ -755,7 +871,7 @@
       "warning": false
     },
     {
-      "output": "not json",
+      "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "additionalProperties": false,
@@ -774,7 +890,7 @@
       "warning": true
     },
     {
-      "output": "",
+      "output_json": "\"\"",
       "raw": "",
       "schema": {
         "additionalProperties": false,
@@ -793,7 +909,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd",
+      "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "additionalProperties": false,
@@ -812,9 +928,7 @@
       "warning": false
     },
     {
-      "output": {
-        "\ufffd": "\ufffd"
-      },
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "additionalProperties": false,
@@ -833,7 +947,7 @@
       "warning": false
     },
     {
-      "output": "\ud83d\ude00",
+      "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "additionalProperties": false,
@@ -852,7 +966,7 @@
       "warning": false
     },
     {
-      "output": "\\ud800",
+      "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "additionalProperties": false,
@@ -871,7 +985,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd\ud800\udc00",
+      "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
         "additionalProperties": false,
@@ -890,9 +1004,140 @@
       "warning": false
     },
     {
-      "output": {
-        "n": 1
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
       },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "additionalProperties": false,
@@ -911,9 +1156,7 @@
       "warning": false
     },
     {
-      "output": {
-        "n": -1
-      },
+      "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "additionalProperties": false,
@@ -932,7 +1175,7 @@
       "warning": false
     },
     {
-      "output": "text",
+      "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "additionalProperties": false,
@@ -951,7 +1194,7 @@
       "warning": false
     },
     {
-      "output": null,
+      "output_json": "null",
       "raw": "null",
       "schema": {
         "additionalProperties": false,
@@ -970,7 +1213,7 @@
       "warning": false
     },
     {
-      "output": [],
+      "output_json": "[]",
       "raw": "[]",
       "schema": {
         "additionalProperties": false,
@@ -989,7 +1232,7 @@
       "warning": false
     },
     {
-      "output": true,
+      "output_json": "true",
       "raw": "true",
       "schema": {
         "additionalProperties": false,
@@ -1008,7 +1251,7 @@
       "warning": false
     },
     {
-      "output": "not json",
+      "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "additionalProperties": false,
@@ -1027,7 +1270,7 @@
       "warning": true
     },
     {
-      "output": "",
+      "output_json": "\"\"",
       "raw": "",
       "schema": {
         "additionalProperties": false,
@@ -1046,7 +1289,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd",
+      "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "additionalProperties": false,
@@ -1065,9 +1308,7 @@
       "warning": false
     },
     {
-      "output": {
-        "\ufffd": "\ufffd"
-      },
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "additionalProperties": false,
@@ -1086,7 +1327,7 @@
       "warning": false
     },
     {
-      "output": "\ud83d\ude00",
+      "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "additionalProperties": false,
@@ -1105,7 +1346,7 @@
       "warning": false
     },
     {
-      "output": "\\ud800",
+      "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "additionalProperties": false,
@@ -1124,7 +1365,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd\ud800\udc00",
+      "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
         "additionalProperties": false,
@@ -1143,9 +1384,140 @@
       "warning": false
     },
     {
-      "output": {
-        "n": 1
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
       },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "type": 27
@@ -1154,9 +1526,7 @@
       "warning": false
     },
     {
-      "output": {
-        "n": -1
-      },
+      "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "type": 27
@@ -1165,7 +1535,7 @@
       "warning": false
     },
     {
-      "output": "text",
+      "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "type": 27
@@ -1174,7 +1544,7 @@
       "warning": false
     },
     {
-      "output": null,
+      "output_json": "null",
       "raw": "null",
       "schema": {
         "type": 27
@@ -1183,7 +1553,7 @@
       "warning": false
     },
     {
-      "output": [],
+      "output_json": "[]",
       "raw": "[]",
       "schema": {
         "type": 27
@@ -1192,7 +1562,7 @@
       "warning": false
     },
     {
-      "output": true,
+      "output_json": "true",
       "raw": "true",
       "schema": {
         "type": 27
@@ -1201,7 +1571,7 @@
       "warning": false
     },
     {
-      "output": "not json",
+      "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "type": 27
@@ -1210,7 +1580,7 @@
       "warning": true
     },
     {
-      "output": "",
+      "output_json": "\"\"",
       "raw": "",
       "schema": {
         "type": 27
@@ -1219,7 +1589,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd",
+      "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "type": 27
@@ -1228,9 +1598,7 @@
       "warning": false
     },
     {
-      "output": {
-        "\ufffd": "\ufffd"
-      },
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "type": 27
@@ -1239,7 +1607,7 @@
       "warning": false
     },
     {
-      "output": "\ud83d\ude00",
+      "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "type": 27
@@ -1248,7 +1616,7 @@
       "warning": false
     },
     {
-      "output": "\\ud800",
+      "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "type": 27
@@ -1257,7 +1625,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd\ud800\udc00",
+      "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
         "type": 27
@@ -1266,9 +1634,70 @@
       "warning": false
     },
     {
-      "output": {
-        "n": 1
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": {
+        "type": 27
       },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "type": 27
@@ -1277,9 +1706,7 @@
       "warning": false
     },
     {
-      "output": {
-        "n": -1
-      },
+      "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "type": 27
@@ -1288,7 +1715,7 @@
       "warning": false
     },
     {
-      "output": "text",
+      "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "type": 27
@@ -1297,7 +1724,7 @@
       "warning": false
     },
     {
-      "output": null,
+      "output_json": "null",
       "raw": "null",
       "schema": {
         "type": 27
@@ -1306,7 +1733,7 @@
       "warning": false
     },
     {
-      "output": [],
+      "output_json": "[]",
       "raw": "[]",
       "schema": {
         "type": 27
@@ -1315,7 +1742,7 @@
       "warning": false
     },
     {
-      "output": true,
+      "output_json": "true",
       "raw": "true",
       "schema": {
         "type": 27
@@ -1324,7 +1751,7 @@
       "warning": false
     },
     {
-      "output": "not json",
+      "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "type": 27
@@ -1333,7 +1760,7 @@
       "warning": true
     },
     {
-      "output": "",
+      "output_json": "\"\"",
       "raw": "",
       "schema": {
         "type": 27
@@ -1342,7 +1769,7 @@
       "warning": false
     },
     {
-      "output": "\ufffd",
+      "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "type": 27
@@ -1351,9 +1778,7 @@
       "warning": false
     },
     {
-      "output": {
-        "\ufffd": "\ufffd"
-      },
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "type": 27
@@ -1362,7 +1787,7 @@
       "warning": false
     },
     {
-      "output": "\ud83d\ude00",
+      "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "type": 27
@@ -1371,7 +1796,7 @@
       "warning": false
     },
     {
-      "output": "\\ud800",
+      "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "type": 27
@@ -1380,8 +1805,71 @@
       "warning": false
     },
     {
-      "output": "\ufffd\ud800\udc00",
+      "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
       "schema": {
         "type": 27
       },
@@ -1393,7 +1881,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "14ab8e1b83dd54abcf50794dde0654dff9bed013dc014b62fd7ac40c849c6f14",
+      "scripts/handoff-input-type-reference/reference_test.go": "a9b65dfcf88fe48c07b26f241b79b7fb644d3ab4e56d7e9601cfddb13be555b9",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

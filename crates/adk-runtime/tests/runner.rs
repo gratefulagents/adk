@@ -994,7 +994,7 @@ async fn structured_output_validation_preserves_baseline_result() {
     ))
     .unwrap();
     let cases = fixture["output_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 52);
+    assert_eq!(cases.len(), 80);
     for case in cases {
         let output = case["raw"].as_str().unwrap();
         let model = TestModel::with(vec![Ok(answer(output))]);
@@ -1024,8 +1024,14 @@ async fn structured_output_validation_preserves_baseline_result() {
                 .await
         };
         assert_eq!(
-            result.unwrap().result.final_output,
-            Some(case["output"].clone()),
+            String::from_utf8(
+                adk_codec::snapshots::to_go_json(
+                    result.unwrap().result.final_output.as_ref().unwrap(),
+                )
+                .unwrap()
+            )
+            .unwrap(),
+            case["output_json"].as_str().unwrap(),
             "{case}"
         );
         assert_eq!(

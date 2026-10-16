@@ -13,6 +13,7 @@ pub mod snapshots;
 mod state;
 pub mod timestamp;
 pub mod userinput;
+pub mod value;
 
 use dto::*;
 use schemars::{JsonSchema, Schema};

@@ -43,6 +43,15 @@ fn item_helpers_are_available_through_standalone_facade() {
     assert!(extract_tool_calls(&[]).is_none());
 }
 
+#[test]
+fn untyped_value_decoder_is_available_through_standalone_facade() {
+    let value = adk::codec::value::decode(b"[9007199254740993,-0]").unwrap();
+    assert_eq!(
+        adk::codec::snapshots::to_go_json(&value).unwrap(),
+        b"[9007199254740992,-0]"
+    );
+}
+
 #[cfg(feature = "observability")]
 #[test]
 fn logger_preserves_and_byte_truncates_invalid_raw_input() {

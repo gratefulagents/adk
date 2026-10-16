@@ -63,6 +63,12 @@ call values, preserving raw input bytes without validating them. Mutable Go
 backing-array aliases are not reproduced. These helpers do not add `RunItem`
 support to the sealed Go JSON decoder.
 
+`adk::codec::value::decode` parses untyped JSON with Go string replacement and
+finite float64 number semantics, preserving ordinary object keys and validating
+duplicate entries before replacement. Parsed numbers use Go JSON spelling rather
+than original lexical bytes. This decoder retains the native 127-container depth
+bound, not Go's 10,000; it is used for default output/handoff advisory validation.
+
 ## Reproducible development
 
 Install [rustup](https://rustup.rs/); `rust-toolchain.toml` pins Rust **1.88.0**,

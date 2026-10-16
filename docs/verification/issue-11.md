@@ -2,6 +2,38 @@
 
 ## Current continuation evidence
 
+### Untyped JSON numbers, duplicates and ordinary object keys
+
+Added `adk::codec::value::decode` and used it for default output/handoff parsing.
+It normalizes Go strings, decodes finite float64 numbers, validates duplicate
+object entries before replacement, and preserves literal Serde marker names as
+ordinary keys. Parsed numbers use Go JSON spelling. Re-parsing the generated
+number spelling lost negative zero in the first implementation; the decoder now
+constructs the number only from validated finite-float serializer output, retaining
+`-0`. Custom parsers and callback raw input remain unchanged.
+
+The independent actual-Go matrix has **80 final-output cases** and **26 handoff
+cases**, the latter each run natively with tool validation on and off. Output
+assertions now compare exact Go JSON stored as a string, not Python-normalized
+JSON values. Cases include 2^53 rounding, overflow, overflow hidden by a later
+duplicate, negative zero, float notation and private marker keys. The regression
+first retained `9007199254740993` rather than Go's `9007199254740992`; after fixing
+that, the exact-byte check exposed the negative-zero loss. Both now pass.
+
+Three codec tests cover ordered validation, marker keys and the unchanged native
+nesting bound; a compat-only facade test checks rounding and negative zero.
+The decoder deliberately retains the existing **127-container** limit. Go's
+10,000-container limit, schema shape restrictions and complete generic-value,
+durable-serialization or provider equivalence remain unclaimed.
+
+Fresh Rust1.88 validation: **1,590 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc, formatting, facade matrix, independent consumer
+and purity, all 20 feature scenarios and host-session example passed. Bound
+reference/native evidence,51 validators, ledger/audit and source locks passed.
+The new source is hash-bound; license artifact evidence was separately refreshed
+after changing the validator inputs. Ledger remains **842 verified /8,049
+unresolved /251 excluded**. This is not full issue11 completion.
+
 ### Handoff input-schema construction and Unicode
 
 The handoff input-type path now also forwards its optional schema without local

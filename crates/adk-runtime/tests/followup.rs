@@ -2823,7 +2823,7 @@ async fn handoff_input_types_match_pinned_advisory_parsing_and_do_not_transform_
     ))
     .unwrap();
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 22);
+    assert_eq!(cases.len(), 26);
     assert_eq!(
         cases
             .iter()

@@ -22,8 +22,13 @@ Ten further Responses tool-pairing cases compare complete input arrays: orphans,
 matched/prior/future calls, trimmed/generated/blank IDs, repeated results,
 whitespace-only outputs and images attached to matched or orphan results.
 Orphan outputs are omitted without dropping their separate image blocks.
-The Rust SSE differentials check every byte split. JSON
-member order is not significant; opaque continuation strings are unchanged.
+Four buffered Chat cases preserve OpenRouter reasoning-details signatures byte
+for byte, including member order, whitespace, number spelling, escapes and
+duplicate fields. Native conversion and loopback HTTP compare those Go signatures
+in both reasoning items and diagnostic snapshots. Streaming signatures and
+outbound structured JSON byte preservation are not established by these cases.
+The Rust SSE differentials check every byte split. Other JSON comparisons are
+semantic; opaque continuation strings are unchanged.
 Regenerate with `bash scripts/providers/generate.sh /path/to/pinned/sdk`.
 The script checks the source revision and tracked-source cleanliness, and removes
 its temporary Go test on exit. Add `--check` to regenerate into a temporary

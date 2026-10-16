@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Buffered OpenRouter reasoning signature bytes
+
+A new independently executed four-case Go oracle reproduced byte loss in buffered
+Chat reasoning signatures: canonical JSON reordered detail members before base64
+encoding. Native reasoning and diagnostic snapshots now encode the original
+`reasoning_details` bytes on the HTTP/`response_json` path. Tests cover ordering,
+whitespace, number spelling, escapes and duplicate members, including actual
+loopback HTTP responses. The regression failed before the fix and passes after.
+Value-only callers retain their already-canonical representation. Streaming and
+outbound structured-detail byte preservation remain unresolved; no original
+roundtrip test or broader ledger obligation is newly promoted by this fix.
+
+Fresh full workspace: **1,578 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, feature matrix,
+standalone consumer and platform-purity checks pass. Bound oracle/native evidence,
+51 validators and source locks pass. The first evidence run failed in the
+unchanged subagent exporter; isolated reproduction and the complete rerun passed
+without fixture changes. Its intermittent failure remains unexplained, not
+silently waived. Ledger remains **834 verified /8,057 unresolved /251 excluded**.
+
 ### Responses tool-output pairing
 
 The adapter now drops results without a previously emitted call, normalizes call

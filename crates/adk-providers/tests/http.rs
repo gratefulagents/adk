@@ -1587,3 +1587,38 @@ async fn complete_profiles_match_executed_public_sdk_over_http() {
     }
     assert_eq!(count, 8);
 }
+
+#[tokio::test]
+async fn buffered_chat_http_preserves_reasoning_signature_bytes() {
+    use adk_core::RunItem;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    for case in fixture["buffered_chat_details"].as_array().unwrap() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let body = case["body"].as_str().unwrap().to_owned();
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            captured
+        });
+        let response = provider(&endpoint)
+            .complete(&context(), request())
+            .await
+            .unwrap();
+        let RunItem::Reasoning { reasoning } = &response.items[0] else {
+            panic!("missing reasoning")
+        };
+        assert_eq!(reasoning.signature, case["signature"].as_str().unwrap());
+        let snapshot: serde_json::Value =
+            serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
+        assert_eq!(snapshot["content"][0]["signature"], case["signature"]);
+        assert_eq!(
+            server.join().unwrap().lines().next(),
+            Some("POST /v1/chat/completions HTTP/1.1")
+        );
+    }
+}

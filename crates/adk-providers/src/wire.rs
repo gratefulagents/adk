@@ -13,6 +13,22 @@ pub fn encode_reasoning_details(details: &Value) -> String {
         STANDARD_NO_PAD.encode(details.to_string())
     )
 }
+pub(crate) fn chat_reasoning_details_signature(details: &Value, source: Option<&str>) -> String {
+    fn original_details(source: &str) -> Option<&str> {
+        use serde_json::value::RawValue;
+        type Object<'a> = std::collections::BTreeMap<String, &'a RawValue>;
+        let body: Object<'_> = serde_json::from_str(source).ok()?;
+        let choices: Vec<&RawValue> = serde_json::from_str(body.get("choices")?.get()).ok()?;
+        let choice: Object<'_> = serde_json::from_str(choices.first()?.get()).ok()?;
+        let message: Object<'_> = serde_json::from_str(choice.get("message")?.get()).ok()?;
+        Some(message.get("reasoning_details")?.get())
+    }
+    match source.and_then(original_details) {
+        Some(raw) => format!("{DETAILS_PREFIX}{}", STANDARD_NO_PAD.encode(raw)),
+        None => encode_reasoning_details(details),
+    }
+}
+
 pub(crate) fn reasoning_details_text(details: &Value) -> String {
     details
         .as_array()
@@ -795,7 +811,7 @@ fn response_inner(
             let signature = msg
                 .get("reasoning_details")
                 .filter(|value| !value.is_null())
-                .map(encode_reasoning_details)
+                .map(|details| chat_reasoning_details_signature(details, source))
                 .unwrap_or_else(|| {
                     msg["reasoning_opaque"]
                         .as_str()

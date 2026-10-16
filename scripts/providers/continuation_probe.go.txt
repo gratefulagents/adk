@@ -41,6 +41,21 @@ func TestADKContinuationGolden(t *testing.T) {
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var bufferedDetails []map[string]any
+    for _, raw := range []string{
+        `[{"type":"reasoning.text","text":"inspect state"},{"type":"reasoning.encrypted","data":"opaque"}]`,
+        `[ { "type" : "reasoning.encrypted", "data" : "opaque", "index" : 0 } ]`,
+        `[{"z":1e+02,"type":"reasoning.encrypted","data":"\\u0061","a":-0}]`,
+        `[{"type":"reasoning.text","text":"hé🙂","text":"last"}]`,
+    } {
+        body := `{"id":"gen-1","choices":[{"message":{"role":"assistant","reasoning":"inspect state","reasoning_details":` + raw + `,"content":"answer"},"finish_reason":"stop"}]}`
+        var chat chatCompletionResponse
+        if err := json.Unmarshal([]byte(body), &chat); err != nil { t.Fatal(err) }
+        response, err := toAnthropicResponseFromChat(chat)
+        if err != nil { t.Fatal(err) }
+        bufferedDetails = append(bufferedDetails, map[string]any{"body":body, "details":raw, "signature":response.Content[0].Signature})
+    }
+    golden["buffered_chat_details"] = bufferedDetails
     var reasoningGates []map[string]any
     for _, kind := range []string{"enabled", "disabled", "adaptive", "", " ENABLED "} {
         for _, budget := range []int{-1, 0, 2048} {

@@ -121,6 +121,28 @@
       }
     }
   ],
+  "buffered_chat_details": [
+    {
+      "body": "{\"id\":\"gen-1\",\"choices\":[{\"message\":{\"role\":\"assistant\",\"reasoning\":\"inspect state\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"inspect state\"},{\"type\":\"reasoning.encrypted\",\"data\":\"opaque\"}],\"content\":\"answer\"},\"finish_reason\":\"stop\"}]}",
+      "details": "[{\"type\":\"reasoning.text\",\"text\":\"inspect state\"},{\"type\":\"reasoning.encrypted\",\"data\":\"opaque\"}]",
+      "signature": "openrouter-reasoning-details:W3sidHlwZSI6InJlYXNvbmluZy50ZXh0IiwidGV4dCI6Imluc3BlY3Qgc3RhdGUifSx7InR5cGUiOiJyZWFzb25pbmcuZW5jcnlwdGVkIiwiZGF0YSI6Im9wYXF1ZSJ9XQ"
+    },
+    {
+      "body": "{\"id\":\"gen-1\",\"choices\":[{\"message\":{\"role\":\"assistant\",\"reasoning\":\"inspect state\",\"reasoning_details\":[ { \"type\" : \"reasoning.encrypted\", \"data\" : \"opaque\", \"index\" : 0 } ],\"content\":\"answer\"},\"finish_reason\":\"stop\"}]}",
+      "details": "[ { \"type\" : \"reasoning.encrypted\", \"data\" : \"opaque\", \"index\" : 0 } ]",
+      "signature": "openrouter-reasoning-details:WyB7ICJ0eXBlIiA6ICJyZWFzb25pbmcuZW5jcnlwdGVkIiwgImRhdGEiIDogIm9wYXF1ZSIsICJpbmRleCIgOiAwIH0gXQ"
+    },
+    {
+      "body": "{\"id\":\"gen-1\",\"choices\":[{\"message\":{\"role\":\"assistant\",\"reasoning\":\"inspect state\",\"reasoning_details\":[{\"z\":1e+02,\"type\":\"reasoning.encrypted\",\"data\":\"\\\\u0061\",\"a\":-0}],\"content\":\"answer\"},\"finish_reason\":\"stop\"}]}",
+      "details": "[{\"z\":1e+02,\"type\":\"reasoning.encrypted\",\"data\":\"\\\\u0061\",\"a\":-0}]",
+      "signature": "openrouter-reasoning-details:W3sieiI6MWUrMDIsInR5cGUiOiJyZWFzb25pbmcuZW5jcnlwdGVkIiwiZGF0YSI6IlxcdTAwNjEiLCJhIjotMH1d"
+    },
+    {
+      "body": "{\"id\":\"gen-1\",\"choices\":[{\"message\":{\"role\":\"assistant\",\"reasoning\":\"inspect state\",\"reasoning_details\":[{\"type\":\"reasoning.text\",\"text\":\"hé🙂\",\"text\":\"last\"}],\"content\":\"answer\"},\"finish_reason\":\"stop\"}]}",
+      "details": "[{\"type\":\"reasoning.text\",\"text\":\"hé🙂\",\"text\":\"last\"}]",
+      "signature": "openrouter-reasoning-details:W3sidHlwZSI6InJlYXNvbmluZy50ZXh0IiwidGV4dCI6ImjDqfCfmYIiLCJ0ZXh0IjoibGFzdCJ9XQ"
+    }
+  ],
   "chat_request": {
     "model": "gpt-5.6",
     "messages": [

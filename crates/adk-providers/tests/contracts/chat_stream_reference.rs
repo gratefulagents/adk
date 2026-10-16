@@ -214,3 +214,34 @@ fn openrouter_stream_details_semantics_and_cache_usage() {
     assert_eq!(native.usage.cache_read_tokens, 70);
     assert_eq!(native.usage.cache_creation_tokens, 5);
 }
+
+#[test]
+fn buffered_reasoning_signatures_preserve_pinned_go_bytes() {
+    use base64::{Engine, engine::general_purpose::STANDARD_NO_PAD};
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["buffered_chat_details"].as_array().unwrap();
+    assert_eq!(cases.len(), 4);
+    for case in cases {
+        let response =
+            wire::response_json(case["body"].as_str().unwrap().as_bytes(), Protocol::Chat).unwrap();
+        let RunItem::Reasoning { reasoning } = &response.items[0] else {
+            panic!("missing reasoning")
+        };
+        assert_eq!(reasoning.signature, case["signature"].as_str().unwrap());
+        let raw = STANDARD_NO_PAD
+            .decode(
+                reasoning
+                    .signature
+                    .strip_prefix("openrouter-reasoning-details:")
+                    .unwrap(),
+            )
+            .unwrap();
+        assert_eq!(raw, case["details"].as_str().unwrap().as_bytes());
+        let snapshot: Value =
+            serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
+        assert_eq!(snapshot["content"][0]["signature"], case["signature"]);
+    }
+}

@@ -351,7 +351,10 @@ pub(crate) fn document(
                     .as_array()
                     .is_some_and(|a| !a.is_empty())
                 {
-                    crate::wire::encode_reasoning_details(&message["reasoning_details"])
+                    crate::wire::chat_reasoning_details_signature(
+                        &message["reasoning_details"],
+                        source,
+                    )
                 } else {
                     text(message, "reasoning_opaque")
                 };

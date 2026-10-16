@@ -10,6 +10,7 @@ publish.workspace = true
 runtime = ["dep:adk-runtime"]
 
 [dependencies]
+adk-codec.workspace = true
 adk-core.workspace = true
 adk-runtime = { workspace = true, optional = true }
 serde.workspace = true
@@ -26,4 +27,3 @@ time = { version = "=0.3.47", features = ["parsing", "formatting"] }
 [dev-dependencies]
 tokio = { workspace = true, features = ["test-util"] }
 adk-runtime.workspace = true
-adk-codec.workspace = true

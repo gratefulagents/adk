@@ -216,13 +216,23 @@ live image understanding remain **unverified**.
 
 `ModelResponse::raw` still contains native provider data. The independent optional
 `snapshot_raw: Option<adk_core::JsonDocument>` carries an ordered, normalized raw
-response for compatibility trace snapshots. `JsonDocument::new` validates JSON
-without rewriting member order, number spellings or duplicate keys. Its native
+response for compatibility trace snapshots. `JsonDocument::new` validates syntax
+without requiring a `Value` projection or rewriting member order, number spellings
+or duplicate keys. Lone surrogates and deeply nested raw payloads are representable;
+format-specific depth limits are enforced by codecs, not this text container. Its native
 serde representation is a string, so a checkpoint round-trip through
 `serde_json::Value` does not silently reorder it. The codec embeds its content as
 JSON when producing a compatibility snapshot; custom models may leave it `None`
 and retain the existing native-raw fallback (including explicit JSON null).
 Neither field authorizes disclosure: full trace capture is still opt-in.
+
+Chat and Responses tool arguments use Go syntax validity, including the 10,000
+container limit, rather than requiring a Serde `Value`. Valid raw arguments are
+retained for tool execution, follow-up requests and snapshots; empty or invalid
+JSON normalizes to `{}`. A valid raw payload that Serde cannot project has a
+`Null` argument projection, consistent with `ToolCall::validate_argument_projection`.
+Native opt-in schema validation still checks that projection. This does not change
+Anthropic argument handling or claim whole-provider Unicode/depth parity.
 
 Providers additionally set `snapshot_projection: Option<SnapshotProjection>` to
 explicitly identify the pinned OpenAI or Anthropic normalized-message format.

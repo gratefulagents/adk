@@ -602,17 +602,19 @@ fn call(
 ) -> Result<RunItem, Error> {
     let raw = match &value[arguments] {
         Value::String(raw) if raw.trim().is_empty() => "{}".into(),
-        Value::String(raw) if normalize && serde_json::from_str::<Value>(raw).is_err() => {
+        Value::String(raw)
+            if normalize && adk_codec::value::validate(raw.trim().as_bytes()).is_err() =>
+        {
             "{}".into()
         }
         Value::String(raw) => raw.trim().to_owned(),
         input => input.to_string(),
     };
     let arguments = match &value[arguments] {
+        Value::String(_) if normalize => serde_json::from_str(&raw).unwrap_or(Value::Null),
         Value::String(raw) if raw.trim().is_empty() => json!({}),
         Value::String(raw) => match serde_json::from_str(raw) {
             Ok(value) => value,
-            Err(_) if normalize => json!({}),
             Err(_) => {
                 return Err(Error::new(
                     ErrorCategory::ModelBehavior,

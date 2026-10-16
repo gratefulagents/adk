@@ -41,6 +41,19 @@ func TestADKContinuationGolden(t *testing.T) {
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var normalizedArguments []map[string]string
+    for _, raw := range []string{
+        "", " \t\n", "\u0085{}\u00a0", ` {"q":1} `, `{"q":"\ud800"}`, `{"q":"\udc00"}`,
+        `{"q":"\ud83d\ude00"}`, `{"q":1e999}`, `{"q":1,"q":2}`, `null`, `42`,
+        `{"q":}`, `{} {}`, strings.Repeat("[", 128) + "0" + strings.Repeat("]", 128),
+        strings.Repeat("[", 10000) + "0" + strings.Repeat("]", 10000),
+        strings.Repeat("[", 10001) + "0" + strings.Repeat("]", 10001),
+    } {
+        normalizedArguments = append(normalizedArguments, map[string]string{
+            "input": raw, "normalized": string(normalizeArguments(raw)),
+        })
+    }
+    golden["normalized_arguments"] = normalizedArguments
     var bufferedDetails []map[string]any
     var streamedDetails []map[string]any
     for _, raw := range []string{

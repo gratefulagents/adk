@@ -854,6 +854,97 @@ fn chat_reasoning_precedes_text_and_reused_tool_indices_keep_both_calls() {
 }
 
 #[test]
+fn raw_tool_arguments_match_pinned_go_normalization() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    for (index, vector) in golden["normalized_arguments"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
+        for protocol in [Protocol::Chat, Protocol::Responses] {
+            let body = match protocol {
+                Protocol::Chat => json!({"choices":[{"message":{"tool_calls":[{
+                    "id":"call", "function":{"name":"lookup", "arguments":vector["input"]}
+                }]}, "finish_reason":"tool_calls"}]}),
+                Protocol::Responses => json!({"output":[{"type":"function_call", "call_id":"call",
+                    "name":"lookup", "arguments":vector["input"]}], "status":"completed"}),
+                Protocol::Anthropic => unreachable!(),
+            };
+            let response =
+                wire::response_json(&serde_json::to_vec(&body).unwrap(), protocol).unwrap();
+            let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+                panic!("missing tool call");
+            };
+            assert_eq!(
+                call.argument_text(),
+                vector["normalized"].as_str().unwrap(),
+                "{protocol:?} vector {index}"
+            );
+            call.validate_argument_projection().unwrap();
+            assert!(
+                response
+                    .snapshot_raw
+                    .as_ref()
+                    .unwrap()
+                    .as_str()
+                    .contains(&format!(
+                        "\"input\":{}",
+                        vector["normalized"].as_str().unwrap()
+                    )),
+                "{protocol:?} snapshot vector {index}"
+            );
+            let mut stream = StreamState::new(protocol);
+            let events = match protocol {
+                Protocol::Chat => {
+                    stream.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{
+                        "index":0,"id":"call","function":{"name":"lookup","arguments":vector["input"]}
+                    }]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+                    stream.event("[DONE]").unwrap()
+                }
+                Protocol::Responses => stream
+                    .event(&json!({"type":"response.completed","response":body}).to_string())
+                    .unwrap(),
+                Protocol::Anthropic => unreachable!(),
+            };
+            let adk_core::ModelEvent::Complete { response: streamed } = events.last().unwrap()
+            else {
+                panic!("missing completed stream");
+            };
+            let adk_core::RunItem::ToolCall {
+                call: streamed_call,
+            } = &streamed.items[0]
+            else {
+                panic!("missing streamed tool call");
+            };
+            assert_eq!(
+                streamed_call.argument_text().trim(),
+                vector["normalized"].as_str().unwrap(),
+                "{protocol:?} vector {index}"
+            );
+            streamed_call.validate_argument_projection().unwrap();
+            let mut input = request();
+            input.input = response.items;
+            let followup = wire::request(&input, protocol, false).unwrap();
+            let arguments = match protocol {
+                Protocol::Chat => {
+                    &followup["messages"][1]["tool_calls"][0]["function"]["arguments"]
+                }
+                Protocol::Responses => &followup["input"][0]["arguments"],
+                Protocol::Anthropic => unreachable!(),
+            };
+            assert_eq!(
+                arguments, &vector["normalized"],
+                "{protocol:?} vector {index}"
+            );
+        }
+    }
+}
+
+#[test]
 fn executed_go_cost_catalog_and_retry_goldens_match() {
     let golden: serde_json::Value = serde_json::from_str(include_str!(
         "../../../fixtures/providers/continuation.json"

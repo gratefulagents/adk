@@ -147,7 +147,7 @@ fn anthropic_terminal_defaults_do_not_accept_unfinished_blocks() {
 
 #[test]
 fn snapshot_capture_does_not_fail_tolerated_invalid_model_arguments() {
-    for input in [r#"{"x":"\uD800"}"#, r#"{"x":"\uDC00"}"#, "{", ""] {
+    for input in ["{", ""] {
         let body = serde_json::json!({"choices":[{"message":{"tool_calls":[{"id":"c","function":{"name":"f","arguments":input}}]}}]});
         let response = wire::response(&body, Protocol::Chat).unwrap();
         assert!(
@@ -159,6 +159,26 @@ fn snapshot_capture_does_not_fail_tolerated_invalid_model_arguments() {
                 .unwrap()
                 .as_str()
                 .contains(r#""input":{}"#)
+        );
+    }
+}
+
+#[test]
+fn snapshot_capture_preserves_go_valid_surrogate_arguments() {
+    for input in [r#"{"x":"\uD800"}"#, r#"{"x":"\uDC00"}"#] {
+        let body = serde_json::json!({"choices":[{"message":{"tool_calls":[{"id":"c","function":{"name":"f","arguments":input}}]}}]});
+        let response = wire::response(&body, Protocol::Chat).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!("missing tool call");
+        };
+        assert_eq!(call.argument_text(), input);
+        assert_eq!(call.arguments, Value::Null);
+        assert!(
+            response
+                .snapshot_raw
+                .unwrap()
+                .as_str()
+                .contains(&format!("\"input\":{input}"))
         );
     }
 }

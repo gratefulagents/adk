@@ -2,7 +2,9 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-/// Validated JSON text retaining member order, number spellings and duplicate keys.
+/// Syntax-validated JSON text retaining member order, number spellings and duplicate keys.
+/// Does not require a `Value` projection: lone surrogates and deeply nested raw
+/// payloads remain representable. Format-specific depth limits belong to codecs.
 /// Native serde encodes this as a string so checkpoints that pass through `Value`
 /// do not reorder the document. Consumers explicitly choose when to embed its JSON.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, JsonSchema)]
@@ -11,7 +13,7 @@ pub struct JsonDocument(String);
 
 impl JsonDocument {
     pub fn new(text: String) -> Result<Self, serde_json::Error> {
-        serde_json::from_str::<Value>(&text)?;
+        serde_json::from_str::<&serde_json::value::RawValue>(&text)?;
         Ok(Self(text))
     }
 

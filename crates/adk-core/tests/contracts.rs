@@ -371,7 +371,7 @@ fn raw_response_preserves_missing_null_and_provider_data() {
 
 #[test]
 fn json_document_validates_construction_and_deserialization() {
-    for invalid in ["", "{", "null true", "{\"a\":}", "[1,]", "\"\\uD800\""] {
+    for invalid in ["", "{", "null true", "{\"a\":}", "[1,]", "\"\\uXYZW\""] {
         assert!(JsonDocument::new(invalid.into()).is_err(), "{invalid}");
         assert!(serde_json::from_value::<JsonDocument>(json!(invalid)).is_err());
         assert!(
@@ -388,6 +388,8 @@ fn json_document_preserves_exact_text_through_json_and_value() {
         "null",
         "[true, false, 1.00]",
         "\"text\"",
+        "\"\\uD800\"",
+        "\"\\uDC00\"",
     ] {
         let document = JsonDocument::new(text.into()).unwrap();
         assert_eq!(document.as_str(), text);
@@ -407,6 +409,18 @@ fn json_document_preserves_exact_text_through_json_and_value() {
     assert_ne!(
         JsonDocument::new("{\"z\":1,\"a\":2}".into()).unwrap(),
         JsonDocument::new("{\"a\":2,\"z\":1}".into()).unwrap()
+    );
+}
+
+#[test]
+fn json_document_preserves_deep_raw_payloads_without_a_value_projection() {
+    let text = format!("{}0{}", "[".repeat(10_003), "]".repeat(10_003));
+    let document = JsonDocument::new(text.clone()).unwrap();
+    assert_eq!(document.as_str(), text);
+    let encoded = serde_json::to_value(&document).unwrap();
+    assert_eq!(
+        serde_json::from_value::<JsonDocument>(encoded).unwrap(),
+        document
     );
 }
 

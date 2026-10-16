@@ -158,10 +158,7 @@ fn arguments(value: &Value) -> Box<RawValue> {
         return RawValue::from_string(value.to_string()).expect("serialized JSON object");
     }
     let input = value.as_str().map(str::trim).unwrap_or_default();
-    // Match the native call parser before retaining lexical JSON. RawValue alone
-    // accepts escapes (such as an unpaired surrogate) that Value rejects; those
-    // model-generated arguments already normalize to {} in the native response.
-    let input = if serde_json::from_str::<Value>(input).is_ok() {
+    let input = if adk_codec::value::validate(input.as_bytes()).is_ok() {
         input
     } else {
         "{}"

@@ -72,7 +72,7 @@ pub fn to_go_json_bytes<T: GoJsonEncode>(value: &T) -> Result<Vec<u8>, serde_jso
     value.encode_bytes()
 }
 
-fn check_depth(input: &[u8]) -> Result<(), serde_json::Error> {
+pub(crate) fn check_depth(input: &[u8]) -> Result<(), serde_json::Error> {
     let mut depth = 0usize;
     let mut i = 0;
     while i < input.len() {

@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Go-valid raw provider arguments and snapshots
+
+Chat/Responses normalization and snapshot capture now validate Go JSON syntax,
+not Serde Value representability. Sixteen independently executed pinned Go
+vectors cover empty/malformed input, Unicode whitespace, lone/pair surrogates,
+overflowing numeric tokens, duplicates, scalar values and depths128/10000/10001.
+Native tests check buffered results, snapshot raw input, streamed arguments and
+follow-up requests. Existing streamed outer-whitespace preservation is unchanged.
+Valid raw payloads survive even when their native projection is Null.
+
+JsonDocument now validates RawValue syntax rather than constructing a Value;
+raw surrogate/deep documents round-trip unchanged through checkpoint-style Value
+serialization. Format-specific depth limits remain in codecs. Tests formerly
+classifying lone surrogates as malformed were corrected against the Go oracle;
+malformed syntax still fails. The provider regression failed before the fix
+(`{}` instead of the original surrogate-bearing object). The standalone lockfile
+was refreshed for the provider's shared codec dependency.
+
+Fresh Rust1.88: **1,606 passed /0 failed /30 ignored**, **9 doctests**; strict
+Clippy/rustdoc/format, facade matrix, locked standalone consumer/purity, all20
+scenarios and host-session passed. The example script's cargo-clippy launcher
+cannot read /proc/self/exe in this host; equivalent checks passed with the direct
+Clippy driver. Independent Go reproduction, bound evidence,51 validators,
+artifact checks and source locks passed. No additional acceptance IDs claimed:
+**851 verified /8,040 unresolved /251 excluded**. Anthropic handling, opt-in
+native schema validation of argument projections and whole-provider parity remain
+outside this fix; issue11 is still incomplete.
+
 ### Original agent helper examples
 
 Added original-test counterparts for scalar clone overrides, generated handoff

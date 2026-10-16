@@ -3,6 +3,17 @@
 use serde::{Deserialize, Deserializer};
 use serde_json::{Map, Value, value::RawValue};
 
+/// Validate Go JSON syntax without projecting raw values into typed numbers or strings.
+///
+/// Accepts lone surrogates and invalid UTF-8 inside strings, with Go's 10,000
+/// container depth limit. This does not require numbers to fit a finite float64.
+pub fn validate(input: &[u8]) -> Result<(), serde_json::Error> {
+    crate::payload_decode::check_depth(input)?;
+    let normalized = crate::go_decode::normalize_strings(input);
+    let _: &RawValue = serde_json::from_slice(&normalized)?;
+    Ok(())
+}
+
 /// Decode with Go string replacement and finite float64 number semantics.
 ///
 /// Duplicate object entries are validated before later entries replace them.
@@ -80,6 +91,16 @@ impl<'de> Deserialize<'de> for Object<'de> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn syntax_validation_does_not_require_a_value_projection() {
+        for input in [b"\"\xff\"".as_slice(), br#""\ud800""#, b"1e999"] {
+            validate(input).unwrap();
+        }
+        for input in [b"\xff".as_slice(), br#""\uXYZW""#, b"1e", b"{} {}"] {
+            assert!(validate(input).is_err());
+        }
+    }
 
     #[test]
     fn nesting_bound_matches_existing_native_value_decoder() {

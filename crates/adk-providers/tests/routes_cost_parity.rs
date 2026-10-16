@@ -436,6 +436,107 @@ fn metadata_catalog_picker_lookup_and_compaction_match_baseline() {
     }
 }
 
+#[test]
+fn metadata_source_parse_codex_shape() {
+    let models = parse_model_metadata(
+        br#"{
+            "models": [{
+                "slug": "gpt-5.5",
+                "context_window": 272000,
+                "max_context_window": 272000,
+                "auto_compact_token_limit": null,
+                "effective_context_window_percent": 95
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models.len(), 1);
+    let got = &models[0];
+    assert_eq!(got.id, "gpt-5.5");
+    assert_eq!(got.context_window, Some(272000));
+    assert_eq!(got.resolved_context_window(), Some(272000));
+    assert_eq!(got.auto_compact_token_limit, None);
+    assert_eq!(got.effective_context_window_percent, Some(95));
+}
+
+#[test]
+fn metadata_source_parse_copilot_capabilities_shape() {
+    let models = parse_model_metadata(
+        br#"{
+            "data": [{
+                "id": "gpt-5.3-codex-spark",
+                "capabilities": {
+                    "family": "gpt-5",
+                    "limits": {
+                        "max_context_window_tokens": 128000,
+                        "max_prompt_tokens": 96000,
+                        "max_output_tokens": 32000
+                    }
+                }
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models.len(), 1);
+    let got = &models[0];
+    assert_eq!(got.id, "gpt-5.3-codex-spark");
+    assert_eq!(got.context_window, Some(128000));
+    assert_eq!(got.resolved_context_window(), Some(128000));
+    assert_eq!(got.max_output_tokens, Some(32000));
+}
+
+#[test]
+fn metadata_source_picker_mirrors_codex_picker() {
+    let models = parse_model_metadata(
+        br#"{
+            "models": [
+                {"slug": "gpt-5.6-sol", "visibility": "list", "priority": 6, "display_name": "GPT-5.6 Sol"},
+                {"slug": "gpt-reserve", "visibility": "hide", "priority": 3},
+                {"slug": "gpt-6-astra", "visibility": "list", "priority": 1, "display_name": "GPT-6-Astra",
+                 "description": "Our most capable model for complex, demanding work.",
+                 "default_reasoning_level": "low",
+                 "supported_reasoning_levels": [{"effort":"low","description":""},{"effort":"max","description":""},{"effort":"ultra","description":""}],
+                 "context_window": 272000, "max_context_window": 872000, "minimal_client_version": "0.153.0"},
+                {"slug": "gpt-5.4-mini", "visibility": "list", "priority": 23, "upgrade": {"model": "gpt-5.6-luna"}},
+                {"slug": "codex-auto-review", "visibility": "hide", "priority": 43}
+            ]
+        }"#,
+    )
+    .unwrap();
+    let picker = picker_model_metadata(&models);
+    assert_eq!(
+        picker.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(),
+        ["gpt-6-astra", "gpt-5.6-sol", "gpt-5.4-mini"]
+    );
+    let astra = &picker[0];
+    assert_eq!(astra.display_name, "GPT-6-Astra");
+    assert!(!astra.description.is_empty());
+    assert_eq!(astra.default_reasoning_level, "low");
+    assert_eq!(astra.supported_reasoning_levels.len(), 3);
+    assert_eq!(astra.supported_reasoning_levels[2], "ultra");
+    assert_eq!(astra.resolved_context_window(), Some(272000));
+    assert_eq!(picker[2].upgrade_model.as_deref(), Some("gpt-5.6-luna"));
+    assert!(
+        models
+            .iter()
+            .find(|m| m.id == "gpt-reserve")
+            .unwrap()
+            .hidden()
+    );
+}
+
+#[test]
+fn metadata_source_plain_openai_alphabetical() {
+    let models =
+        parse_model_metadata(br#"{"data":[{"id":"gpt-5.5"},{"id":"gpt-4.1"},{"id":"o3"}]}"#)
+            .unwrap();
+    let picker = picker_model_metadata(&models);
+    assert_eq!(
+        picker.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(),
+        ["gpt-4.1", "gpt-5.5", "o3"]
+    );
+}
+
 struct Store(Mutex<Material>);
 impl CredentialStore for Store {
     fn load<'a>(&'a self, _: &'a Context, _: &'a Scope) -> BoxFuture<'a, Result<Material, Error>> {
@@ -489,6 +590,68 @@ fn session(endpoint: &str, mode: AuthMode) -> Session {
         Arc::new(Rotate),
     )
     .unwrap()
+}
+
+#[tokio::test]
+async fn metadata_source_fetch_standard_openai_shape() {
+    use std::io::{Read, Write};
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let address = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        socket
+            .set_read_timeout(Some(std::time::Duration::from_secs(3)))
+            .unwrap();
+        let mut bytes = Vec::new();
+        loop {
+            let mut chunk = [0u8; 1024];
+            let n = socket.read(&mut chunk).unwrap();
+            assert!(n > 0);
+            bytes.extend_from_slice(&chunk[..n]);
+            if bytes.windows(4).any(|w| w == b"\r\n\r\n") {
+                break;
+            }
+        }
+        let body = r#"{"data":[{"id":"gpt-test"}]}"#;
+        write!(
+            socket,
+            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        )
+        .unwrap();
+        String::from_utf8(bytes).unwrap()
+    });
+    let session = Session::new(
+        Scope::new(
+            "catalog",
+            &format!("http://{address}"),
+            None,
+            AuthMode::ApiKey,
+        )
+        .unwrap(),
+        Arc::new(Store(Mutex::new(Material {
+            access_token: Secret::new("test-key"),
+            refresh_token: None,
+            id_token: None,
+            email: None,
+            account: None,
+            expires_at: None,
+            last_refresh: None,
+            revision: 0,
+        }))),
+        Arc::new(Rotate),
+    )
+    .unwrap();
+    let models = fetch_model_metadata(&context(), &session).await.unwrap();
+    let request = server.join().unwrap();
+    assert_eq!(models.len(), 1);
+    assert_eq!(models[0].id, "gpt-test");
+    assert!(request.lines().any(|line| {
+        line.split_once(':').is_some_and(|(name, value)| {
+            name.eq_ignore_ascii_case("authorization") && value.trim() == "Bearer test-key"
+        })
+    }));
+    assert_eq!(request.lines().next(), Some("GET /v1/models HTTP/1.1"));
 }
 
 #[tokio::test]
@@ -558,6 +721,122 @@ async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
 }
 
 #[test]
+fn metadata_endpoint_normalization_matrix() {
+    for (endpoint, expected) in [
+        ("https://api.openai.com", "https://api.openai.com/v1/models"),
+        (
+            "https://api.openai.com/",
+            "https://api.openai.com/v1/models",
+        ),
+        ("http://127.0.0.1:1234", "http://127.0.0.1:1234/v1/models"),
+        (
+            "https://example.test/proxy",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy///",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy/responses/",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy/chat/completions/",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/responses",
+            "https://example.test/v1/models",
+        ),
+        (
+            "https://example.test/chat/completions",
+            "https://example.test/v1/models",
+        ),
+        (
+            "https://example.test/proxy/v1",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/v1/proxy/responses",
+            "https://example.test/v1/proxy/models",
+        ),
+        (
+            "https://example.test/v10",
+            "https://example.test/v10/models",
+        ),
+        (
+            "https://example.test/V1",
+            "https://example.test/V1/v1/models",
+        ),
+        (
+            "https://example.test/responses/chat/completions",
+            "https://example.test/v1/models",
+        ),
+        ("https://chatgpt.com", "https://chatgpt.com/v1/models"),
+        (
+            "https://chatgpt.com/backend-api/codex/responses",
+            "https://chatgpt.com/backend-api/codex/models",
+        ),
+        (
+            "https://API.CHATGPT.COM:8443/custom/chat/completions",
+            "https://api.chatgpt.com:8443/custom/models",
+        ),
+        (
+            "https://notchatgpt.com/custom",
+            "https://notchatgpt.com/custom/v1/models",
+        ),
+        (
+            "https://chatgpt.com.evil.test/custom",
+            "https://chatgpt.com.evil.test/custom/v1/models",
+        ),
+        (
+            "https://api.githubcopilot.com",
+            "https://api.githubcopilot.com/models",
+        ),
+        (
+            "https://api.individual.githubcopilot.com/",
+            "https://api.individual.githubcopilot.com/models",
+        ),
+        (
+            "https://api.githubcopilot.com/chat/completions",
+            "https://api.githubcopilot.com/models",
+        ),
+        (
+            "https://API.GITHUBCOPILOT.COM:8443/custom/responses",
+            "https://api.githubcopilot.com:8443/custom/models",
+        ),
+        (
+            "https://api.individual.githubcopilot.com/custom",
+            "https://api.individual.githubcopilot.com/custom/models",
+        ),
+        (
+            "https://other.githubcopilot.com",
+            "https://other.githubcopilot.com/v1/models",
+        ),
+        (
+            "https://api.githubcopilot.com.evil.test",
+            "https://api.githubcopilot.com.evil.test/v1/models",
+        ),
+    ] {
+        let session = session(endpoint, AuthMode::ApiKey);
+        assert_eq!(
+            model_metadata_endpoint(&session).unwrap().as_str(),
+            expected,
+            "{endpoint}"
+        );
+    }
+    for endpoint in [
+        "https://example.test/proxy?key=value",
+        "https://example.test/proxy?",
+        "https://example.test/proxy#fragment",
+        "https://example.test/proxy#",
+    ] {
+        assert!(Scope::new("catalog", endpoint, None, AuthMode::ApiKey).is_err());
+    }
+}
+
+#[test]
 fn metadata_codex_client_version_is_session_owned_and_guarded() {
     for (configured, expected) in [
         (None, "0.153.4"),
@@ -596,9 +875,11 @@ fn metadata_codex_client_version_is_session_owned_and_guarded() {
                     }
                     assert_eq!(session.scope(), &scope);
                     assert_eq!(session.codex_client_version(), expected);
-                    let base =
-                        reqwest::Url::parse(&format!("https://{host}/backend-api/codex/models"))
-                            .unwrap();
+                    let version_path = if accepted { "" } else { "/v1" };
+                    let base = reqwest::Url::parse(&format!(
+                        "https://{host}/backend-api/codex{version_path}/models"
+                    ))
+                    .unwrap();
                     let expected_url = if accepted && mode == AuthMode::OpenAiOAuth {
                         format!("{base}?client_version={expected}")
                     } else {

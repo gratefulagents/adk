@@ -14250,6 +14250,86 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-5EC0F87DDD3A2513": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestParseModelMetadataCodexShape",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_source_parse_codex_shape"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCodexShape",
+      "rationale": "Exact original singleton Codex fixture; successful parse, count, ID, context, resolved context, explicit null auto limit and percent95 asserted. Closes only this original test, not the parser/type/file or transport family.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-700C56F11889FB0B": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestParseModelMetadataCopilotCapabilitiesShape",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_source_parse_copilot_capabilities_shape"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCopilotCapabilitiesShape",
+      "rationale": "Exact original singleton Copilot fixture retains competing prompt96000/context128000 limits; asserts parse, count, ID, context, resolved context and output32000. Closes only this original test, not the parser/type/file or transport family.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-5CD64BBE3CF6201B": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestPickerModelMetadataMirrorsCodexPicker",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::picker_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_source_picker_mirrors_codex_picker"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Exact original five-model fixture; asserts complete picker IDs/order, selected display name/description/default and all three efforts, resolved context, upgrade and hidden reserve lookup. Closes only this original test, not the parser/type/file or transport family.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1A4B8EE282CE0FA0": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestFetchModelMetadataStandardOpenAIShape",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::fetch_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_source_fetch_standard_openai_shape"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestFetchModelMetadataStandardOpenAIShape",
+      "rationale": "Exact root-loopback API-key fetch observes GET /v1/models and Bearer test-key, returns original singleton response and checks successful parse, count and ID. Fixes missing root-base /v1 normalization; does not claim complete Go URL normalization equivalence. Closes only this original test, not the parser/type/file or transport family.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-F3B8B8FC3E27A50B": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::picker_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_source_plain_openai_alphabetical"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical",
+      "rationale": "Exact original three-model data-array fixture; successful parse and exact alphabetical picker IDs including length asserted. Closes only this original test, not the parser/type/file or transport family.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

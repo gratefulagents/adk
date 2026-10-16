@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestEstimateCost|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary)$"
+      "^(TestCalculateCost|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary)$"
     ]
   ],
   "counts": {
-    "pass": 865,
+    "pass": 867,
     "skip": 5
   },
   "exit_code": 0,
@@ -203,12 +203,14 @@
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/prefixed_Daybreak_Blue_alias_uses_sol_pricing": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/unknown_model_is_not_known": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/whitespace_trimmed": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestFetchModelMetadataStandardOpenAIShape": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointUsesCodexClientVersionOverride": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCodexShape": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCopilotCapabilitiesShape": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCopilotFallsBackToMaxPromptTokens": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestResponsesCacheWriteTokensNonStreaming": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToResponseParams_EffortNoneSkipsSummary": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestApprovedSubagentSharesParentContext": "pass",

@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Standard metadata discovery and exact source regressions
+
+Five additional native regressions reproduce every assertion in the original
+Codex/Copilot catalog, picker, alphabetical-list and standard HTTP discovery tests.
+The HTTP regression exposed and fixed root-base discovery requesting `/models`
+instead of `/v1/models`. Parsed-path normalization now retains ordinary versioned
+base paths and the ChatGPT/Copilot exceptions, with a 26-case endpoint matrix.
+Configured queries/fragments remain rejected and hostname guards ignore explicit
+ports; complete Go URL normalization equivalence is not claimed.
+
+Scoped independent review approved the five test mappings and production fix.
+Rust1.88 workspace: **1,550 passed /0 failed /30 ignored** across156 non-doc
+targets, plus **9 doctests**. Strict workspace Clippy/rustdoc, full facade matrix,
+standalone consumer/purity, all bound oracles,51 validators and source locks pass.
+Pinned Go: **867 passed /5 skipped**,36 packages.
+
+Ledger: **802 verified (800 executable-tested +2 artifact-reviewed) /8,089
+unresolved /251 excluded**. These five original tests—not the enclosing metadata
+file/type/parser or general transport—are newly closed. Issue11 remains incomplete.
+
 ### Codex client version and exact OpenAI regressions
 
 Added immutable session-owned Codex client-version configuration, shared by the

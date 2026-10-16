@@ -9,14 +9,23 @@ use std::collections::BTreeMap;
 pub const DEFAULT_CODEX_CLIENT_VERSION: &str = "0.153.4";
 
 pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error> {
-    let scope = session.scope();
-    let base = scope
-        .endpoint
-        .trim_end_matches('/')
-        .trim_end_matches("/responses")
-        .trim_end_matches("/chat/completions");
-    let mut url = reqwest::Url::parse(&format!("{base}/models"))
+    let mut url = reqwest::Url::parse(&session.scope().endpoint)
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
+    // Match session Codex decoration by hostname, independently of explicit ports.
+    let host = url.host_str().unwrap_or_default();
+    let chatgpt = host == "chatgpt.com" || host.ends_with(".chatgpt.com");
+    let copilot = matches!(
+        host,
+        "api.githubcopilot.com" | "api.individual.githubcopilot.com"
+    );
+    let path = url.path().trim_end_matches('/');
+    let path = path.strip_suffix("/chat/completions").unwrap_or(path);
+    let path = path.strip_suffix("/responses").unwrap_or(path);
+    let mut base = path.to_owned();
+    if (base.is_empty() && !copilot) || (!chatgpt && !copilot && !base.contains("/v1")) {
+        base = format!("{}/v1", base.trim_end_matches('/'));
+    }
+    url.set_path(&format!("{}/models", base.trim_end_matches('/')));
     crate::auth::decorate_codex_url(&mut url, session);
     Ok(url)
 }

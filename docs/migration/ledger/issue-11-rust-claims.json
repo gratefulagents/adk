@@ -14653,6 +14653,78 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-D9878A6029858662": {
+      "source": "internal/openai/chat_reasoning_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "chat_reasoning_original_budget_and_effort_cases",
+        "thinking_type_gate_matches_pinned_chat_and_responses"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningBudget",
+      "rationale": "The complete original file contains one enabled-budget assertion and one seven-case effort table. Native tests preserve model/max-token values, all original effort cases and exact serialized reasoning fragments or omission. Additional independently generated30-case/60-projection fixture verifies the production fix: Chat uses a nested budget only for exact type enabled, while Responses ignores type; positive budgets, omitted/disabled/adaptive/case-varied types, nonpositive budgets and explicit-effort precedence are compared against actual pinned Go execution. Only original test/subtest/file obligations are closed, not general client/codec API parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-2CC373324FF45D2E": {
+      "source": "internal/openai/chat_reasoning_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "chat_reasoning_original_budget_and_effort_cases",
+        "thinking_type_gate_matches_pinned_chat_and_responses"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort",
+      "rationale": "The complete original file contains one enabled-budget assertion and one seven-case effort table. Native tests preserve model/max-token values, all original effort cases and exact serialized reasoning fragments or omission. Additional independently generated30-case/60-projection fixture verifies the production fix: Chat uses a nested budget only for exact type enabled, while Responses ignores type; positive budgets, omitted/disabled/adaptive/case-varied types, nonpositive budgets and explicit-effort precedence are compared against actual pinned Go execution. Only original test/subtest/file obligations are closed, not general client/codec API parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-37AC52123A69B2B1": {
+      "source": "internal/openai/chat_reasoning_test.go",
+      "source_name": "TestToChatRequestEmitsReasoningBudget",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "chat_reasoning_original_budget_and_effort_cases",
+        "thinking_type_gate_matches_pinned_chat_and_responses"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningBudget",
+      "rationale": "The complete original file contains one enabled-budget assertion and one seven-case effort table. Native tests preserve model/max-token values, all original effort cases and exact serialized reasoning fragments or omission. Additional independently generated30-case/60-projection fixture verifies the production fix: Chat uses a nested budget only for exact type enabled, while Responses ignores type; positive budgets, omitted/disabled/adaptive/case-varied types, nonpositive budgets and explicit-effort precedence are compared against actual pinned Go execution. Only original test/subtest/file obligations are closed, not general client/codec API parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-5BF6F96B82CC2F72": {
+      "source": "internal/openai/chat_reasoning_test.go",
+      "source_name": "TestToChatRequestEmitsReasoningEffort",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "chat_reasoning_original_budget_and_effort_cases",
+        "thinking_type_gate_matches_pinned_chat_and_responses"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort",
+      "rationale": "The complete original file contains one enabled-budget assertion and one seven-case effort table. Native tests preserve model/max-token values, all original effort cases and exact serialized reasoning fragments or omission. Additional independently generated30-case/60-projection fixture verifies the production fix: Chat uses a nested budget only for exact type enabled, while Responses ignores type; positive budgets, omitted/disabled/adaptive/case-varied types, nonpositive budgets and explicit-effort precedence are compared against actual pinned Go execution. Only original test/subtest/file obligations are closed, not general client/codec API parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

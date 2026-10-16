@@ -1071,6 +1071,310 @@
     }
   ],
   "reasoning_details_signature": "openrouter-reasoning-details:W3sidHlwZSI6InJlYXNvbmluZy5lbmNyeXB0ZWQiLCJkYXRhIjoib3BhcXVlIiwiaW5kZXgiOjB9XQ",
+  "reasoning_gates": [
+    {
+      "budget": -1,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "enabled"
+    },
+    {
+      "budget": -1,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "enabled"
+    },
+    {
+      "budget": 0,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "enabled"
+    },
+    {
+      "budget": 0,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "enabled"
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "max_tokens": 2048
+      },
+      "effort": "",
+      "responses": {
+        "effort": "low",
+        "summary": "auto"
+      },
+      "type": "enabled"
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "enabled"
+    },
+    {
+      "budget": -1,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "disabled"
+    },
+    {
+      "budget": -1,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "disabled"
+    },
+    {
+      "budget": 0,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "disabled"
+    },
+    {
+      "budget": 0,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "disabled"
+    },
+    {
+      "budget": 2048,
+      "chat": null,
+      "effort": "",
+      "responses": {
+        "effort": "low",
+        "summary": "auto"
+      },
+      "type": "disabled"
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "disabled"
+    },
+    {
+      "budget": -1,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "adaptive"
+    },
+    {
+      "budget": -1,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "adaptive"
+    },
+    {
+      "budget": 0,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": "adaptive"
+    },
+    {
+      "budget": 0,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "adaptive"
+    },
+    {
+      "budget": 2048,
+      "chat": null,
+      "effort": "",
+      "responses": {
+        "effort": "low",
+        "summary": "auto"
+      },
+      "type": "adaptive"
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": "adaptive"
+    },
+    {
+      "budget": -1,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": ""
+    },
+    {
+      "budget": -1,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": ""
+    },
+    {
+      "budget": 0,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": ""
+    },
+    {
+      "budget": 0,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": ""
+    },
+    {
+      "budget": 2048,
+      "chat": null,
+      "effort": "",
+      "responses": {
+        "effort": "low",
+        "summary": "auto"
+      },
+      "type": ""
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": ""
+    },
+    {
+      "budget": -1,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": " ENABLED "
+    },
+    {
+      "budget": -1,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": " ENABLED "
+    },
+    {
+      "budget": 0,
+      "chat": null,
+      "effort": "",
+      "responses": null,
+      "type": " ENABLED "
+    },
+    {
+      "budget": 0,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": " ENABLED "
+    },
+    {
+      "budget": 2048,
+      "chat": null,
+      "effort": "",
+      "responses": {
+        "effort": "low",
+        "summary": "auto"
+      },
+      "type": " ENABLED "
+    },
+    {
+      "budget": 2048,
+      "chat": {
+        "effort": "high"
+      },
+      "effort": " high ",
+      "responses": {
+        "effort": "high",
+        "summary": "auto"
+      },
+      "type": " ENABLED "
+    }
+  ],
   "responses_input": [
     {
       "id": "r",

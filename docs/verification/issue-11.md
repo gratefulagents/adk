@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Chat thinking-type gate fixed against independently executed Go
+
+A new 30-input/60-projection oracle reproduced Chat incorrectly emitting a nested
+budget when thinking was disabled. The one-line fix gates nested Chat budgets on
+exact type `enabled`, while retaining the pinned Responses behavior that ignores
+type. Negative/zero/positive budgets, empty/disabled/adaptive/case-varied types,
+and explicit-effort precedence match Go. Explicit `thinking_budget` settings are
+unchanged. The original enabled-budget test and all seven original effort cases
+also pass; four exact test/subtest/file obligations are newly verified.
+
+Provider continuation fixture generation now has a non-overwriting `--check`
+mode. Evidence requires independent reproduction and binds generator/probe/fixture
+hashes; the validator rejects a missing reproduction marker.
+
+Fresh Rust1.88 full workspace: **1,563 passed /0 failed /30 ignored**,156 targets,
+plus **9 doctests**, zero warnings. Strict workspace Clippy/rustdoc, facade feature
+matrix, standalone consumer/purity, all bound oracles,51 validators, formatting,
+shell syntax and source locks pass. Original pinned Go: **892 passed /5 skipped**,
+36 packages. The regression failed before the fix and passed afterward.
+
+Ledger: **823 verified (821 executable-tested +2 artifact-reviewed) /8,068
+unresolved /251 excluded**. Issue11 remains incomplete; no broader client or
+metadata-parser closure is claimed.
+
 ### Original chat audit regressions
 
 Five native tests now reproduce every assertion in the original

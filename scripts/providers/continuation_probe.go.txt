@@ -41,6 +41,30 @@ func TestADKContinuationGolden(t *testing.T) {
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var reasoningGates []map[string]any
+    for _, kind := range []string{"enabled", "disabled", "adaptive", "", " ENABLED "} {
+        for _, budget := range []int{-1, 0, 2048} {
+            for _, effort := range []string{"", " high "} {
+                req := anthropic.CreateMessageRequest{Model: "gpt-5.6", MaxTokens: 8192,
+                    Thinking: &anthropic.ThinkingConfig{Type: kind, BudgetTokens: budget}, ReasoningEffort: effort}
+                chat, err := toChatRequest(req)
+                if err != nil { t.Fatal(err) }
+                response, err := toResponseParams(req)
+                if err != nil { t.Fatal(err) }
+                projections := map[string]any{}
+                for name, value := range map[string]any{"chat": chat, "responses": response} {
+                    encoded, err := json.Marshal(value)
+                    if err != nil { t.Fatal(err) }
+                    var body map[string]any
+                    if err := json.Unmarshal(encoded, &body); err != nil { t.Fatal(err) }
+                    projections[name] = body["reasoning"]
+                }
+                reasoningGates = append(reasoningGates, map[string]any{"type": kind, "budget": budget,
+                    "effort": effort, "chat": projections["chat"], "responses": projections["responses"]})
+            }
+        }
+    }
+    golden["reasoning_gates"] = reasoningGates
     var prices []map[string]any
     var models []string
     for model := range modelPricing { models = append(models, model) }

@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamSurfacesRefusalDeltas|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToChatMessagesForwardsImages|TestToChatMessagesTextOnlyStaysString|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
+      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamSurfacesRefusalDeltas|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToChatMessagesForwardsImages|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
     ]
   ],
   "counts": {
-    "pass": 883,
+    "pass": 892,
     "skip": 5
   },
   "exit_code": 0,
@@ -220,6 +220,15 @@
     "github.com/gratefulagents/sdk/internal/openai/TestResponsesCacheWriteTokensNonStreaming": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesForwardsImages": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesTextOnlyStaysString": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningBudget": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/empty_omits_field": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/high": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/low": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/max": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/none_disables_reasoning": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/whitespace_omits_field": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort/xhigh": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToResponseParams_EffortNoneSkipsSummary": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel/accepts_chat_model": "pass",

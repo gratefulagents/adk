@@ -1154,6 +1154,78 @@ fn chat_original_stream_surfaces_refusal_deltas() {
 }
 
 #[test]
+fn chat_reasoning_original_budget_and_effort_cases() {
+    let mut input = request();
+    input.model = "anthropic/claude-sonnet-4.6".into();
+    input.settings.insert("max_tokens".into(), json!(8192));
+    input.settings.insert(
+        "thinking".into(),
+        json!({"type":"enabled", "budget_tokens":2048}),
+    );
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(
+        serde_json::to_string(&body)
+            .unwrap()
+            .contains("\"reasoning\":{\"max_tokens\":2048}")
+    );
+    let cases = [
+        ("none disables reasoning", "none", Some("none")),
+        ("low", "low", Some("low")),
+        ("high", "high", Some("high")),
+        ("xhigh", "xhigh", Some("xhigh")),
+        ("max", "max", Some("max")),
+        ("empty omits field", "", None),
+        ("whitespace omits field", "   ", None),
+    ];
+    assert_eq!(cases.len(), 7);
+    for (name, effort, expected) in cases {
+        let mut input = request();
+        input.model = "openrouter/some-reasoning-model".into();
+        input.instructions.clear();
+        input.settings.insert("max_tokens".into(), json!(1024));
+        input
+            .settings
+            .insert("reasoning_effort".into(), json!(effort));
+        let body = wire::request(&input, Protocol::Chat, false).unwrap();
+        let text = serde_json::to_string(&body).unwrap();
+        if let Some(expected) = expected {
+            assert!(
+                text.contains(&format!("\"reasoning\":{{\"effort\":\"{expected}\"}}")),
+                "{name}"
+            );
+        } else {
+            assert!(!text.contains("\"reasoning\""), "{name}");
+        }
+    }
+}
+
+#[test]
+fn thinking_type_gate_matches_pinned_chat_and_responses() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["reasoning_gates"].as_array().unwrap();
+    assert_eq!(cases.len(), 30);
+    for case in cases {
+        let mut input = request();
+        input.model = "gpt-5.6".into();
+        input.settings.insert("max_tokens".into(), json!(8192));
+        input.settings.insert(
+            "thinking".into(),
+            json!({"type":case["type"], "budget_tokens":case["budget"]}),
+        );
+        input
+            .settings
+            .insert("reasoning_effort".into(), case["effort"].clone());
+        for (protocol, name) in [(Protocol::Chat, "chat"), (Protocol::Responses, "responses")] {
+            let body = wire::request(&input, protocol, false).unwrap();
+            assert_eq!(body["reasoning"], case[name], "{name}: {case}");
+        }
+    }
+}
+
+#[test]
 fn responses_done_only_tracking_is_per_content_part() {
     let mut stream = StreamState::new(Protocol::Responses);
     for part in 0..2 {

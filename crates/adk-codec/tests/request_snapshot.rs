@@ -24,6 +24,26 @@ fn request_snapshot_field_records_match_independent_pinned_go() {
 }
 
 #[test]
+fn model_settings_merge_preserves_original_sdk_example() {
+    let base = ModelSettings {
+        temperature: Some(0.5),
+        max_tokens: 1000,
+        ..Default::default()
+    };
+    let overrides = ModelSettings {
+        max_tokens: 2000,
+        reasoning_effort: "high".into(),
+        text_verbosity: "low".into(),
+        ..Default::default()
+    };
+    let merged = base.merge(&overrides);
+    assert_eq!(merged.temperature, Some(0.5));
+    assert_eq!(merged.max_tokens, 2000);
+    assert_eq!(merged.reasoning_effort, "high");
+    assert_eq!(merged.text_verbosity, "low");
+}
+
+#[test]
 fn model_settings_merge_matches_pinned_sdk_without_aliasing_inputs() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

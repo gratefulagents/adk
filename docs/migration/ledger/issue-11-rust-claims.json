@@ -15073,6 +15073,39 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-1234ED341B4506BF": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestModelSettingsMerge",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge"
+      ],
+      "rust_test_identifiers": [
+        "model_settings_merge_preserves_original_sdk_example",
+        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModelSettingsMerge",
+      "rationale": "Closes only the exact original test: temperature 0.5 is retained, max tokens changes from1000 to2000, and reasoning high/text verbosity low override the base. The native test repeats all four assertions; independent existing Go merge observations additionally exercise field selection. This does not close the entire Merge API, enclosing types/file, pointer or mutable slice aliases, or decoder behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EEA66CC5D9D09949": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestOutputSchemaNew",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::Builder::build"
+      ],
+      "rust_test_identifiers": [
+        "output_schema_name_and_strict_default_match_original_sdk_test"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestOutputSchemaNew",
+      "rationale": "Closes only the original name and strict-default assertions through the idiomatic Rust facade builder: an object schema named test reaches the constructed agent with strict=true without an explicit strict override. The owned bundle is closed. This does not close NewOutputSchema or OutputSchema API equivalence, arbitrary raw schema bytes, callback behavior, schema decoding, ownership aliases or the entire source test file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
     }
   }
 }

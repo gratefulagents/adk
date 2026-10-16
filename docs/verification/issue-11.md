@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Original model-settings merge and output-schema constructor tests
+
+Added exact native counterparts for pinned SDK `TestModelSettingsMerge` and
+`TestOutputSchemaNew`: preserve temperature, override max tokens, carry reasoning
+and verbosity, and retain the supplied schema name with strict mode enabled by
+default. These close only the two original test IDs, not the complete constructor,
+raw-schema or mutable-alias API contracts.
+
+Fresh Rust1.88 workspace verification: **1,592 passed /0 failed /30 ignored**,
+**9 doctests**. Strict Clippy/rustdoc, formatting, facade matrix, standalone
+consumer/purity, all20 feature scenarios and host-session example passed.
+Pinned original Go execution: **909 passed /5 skipped**,36 packages. Bound
+reference/native evidence,51 ledger tests, artifact checks and source locks
+passed. Ledger: **844 verified /8,047 unresolved /251 excluded** across9,142 IDs.
+Issue11 remains incomplete and PR33 remains draft.
+
 ### Untyped JSON numbers, duplicates and ordinary object keys
 
 Added `adk::codec::value::decode` and used it for default output/handoff parsing.

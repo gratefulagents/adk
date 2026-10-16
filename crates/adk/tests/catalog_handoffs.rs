@@ -1499,6 +1499,18 @@ async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
 }
 
 #[tokio::test]
+async fn output_schema_name_and_strict_default_match_original_sdk_test() {
+    let model = Script::new(vec![]);
+    let mut c = config();
+    c.output_schema = Some(json!({"type":"object"}).try_into().unwrap());
+    c.output_schema_name = "test".into();
+    let mut bundle = builder(c, &model).build(&context()).await.unwrap();
+    assert_eq!(bundle.agent().output_schema_name, "test");
+    assert!(bundle.agent().output_schema_strict);
+    bundle.close().await.unwrap();
+}
+
+#[tokio::test]
 async fn builder_forwards_output_schema_without_local_compilation() {
     let model = Script::new(vec![response(vec![message("{\"n\":1}")])]);
     let owner = SessionState::new();

@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Deterministic cancellation reference observation
+
+Reproduced the intermittent pinned-Go subagent exporter failure and captured the
+actual diff: four cancellation views sometimes contained `agent "slow" cancelled:
+context canceled` instead of `cancellation requested`. The model could return
+between cancellation and view collection; waiting on the cancelled registry task
+was not a runner-return barrier. The fixture now holds that model return until
+its intended cancellation-requested observations have been captured, then releases
+it. No errors are normalized away and no alternative output is accepted.
+
+**200 consecutive independent Go regenerations matched** after the barrier.
+The golden changed only its generator provenance hash; all six scenarios and
+their expected response fields are unchanged. This resolves the previously
+unexplained exporter race documented below, not a production scheduler change.
+Go vet/build and formatting pass; all six native subagent-reference tests, the
+complete bound native/oracle evidence run,51 validators, source locks and
+ledger/audit checks pass. Ledger remains834 verified/8,057 unresolved/251 excluded.
+
 ### Buffered OpenRouter reasoning signature bytes
 
 A new independently executed four-case Go oracle reproduced byte loss in buffered

@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Failed-child findings in errors
+
+Child runner partial-error outcomes now append the pinned progress heading and
+latest trimmed nonblank/non-`[SYSTEM]` message, using the 1,600-character Unicode
+middle excerpt. This covers ordinary/phased message items without introducing a
+role filter absent from the source. Native retained result text and named-tool
+recovery envelopes are unchanged; complete failure-envelope parity is not claimed.
+
+Four new integration tests cover empty/tool-only input, latest/system/phased
+selection, exact Unicode boundaries, actual findings → echo → provider failure,
+and the enriched error in named/managed parent requests and summary views. Scoped
+review found no blocking issue or missing assertion for the two original Go
+tests. Broader scheduler cancellation can still select a separate cancellation
+outcome and is not newly claimed by these failure tests.
+
+Fresh Rust 1.88 workspace: **1,537 passed / 0 failed / 30 ignored**,155 targets,
+no warnings; strict workspace Clippy and all source-bound oracle evidence pass.
+Original pinned Go: **819 passed / 5 skipped**;27 validators pass. The preceding
+payload checkpoint's9doctests, strict docs and full matrix/consumer checks remain
+the latest such checks; no public API or feature configuration changed here.
+All46 remote checks passed for `b1a1a981`.
+
+Three exact records close the two original regressions and their complete
+two-test source file: **770 verified / 8,121 unresolved / 251 excluded**. Full
+issue acceptance remains incomplete. The next tooling slice is a strictly scoped
+artifact-review route already permitted by the acceptance contract, initially
+limited to retained SDK LICENSE bytes—not a waiver for executable obligations.
+
 ### Payload byte fidelity and cancellation visibility
 
 Added sealed `adk::codec::{from_go_json, to_go_json_bytes}` boundaries for nine

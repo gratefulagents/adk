@@ -2156,6 +2156,272 @@ async fn steering_does_not_interrupt_started_tool() {
     assert_eq!(input.matches("safe boundary directive").count(), 1);
     owner.shutdown().await.unwrap();
 }
+struct FindingsThenFailure(Mutex<Option<Vec<RunItem>>>);
+impl Model for FindingsThenFailure {
+    fn provider(&self) -> &str {
+        "fake"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            if let Some(mut items) = self.0.lock().unwrap().take() {
+                items.extend(call("echo", json!({"text":"echo completed"})).items);
+                Ok(response(items))
+            } else {
+                assert!(request.input.iter().any(|item| matches!(
+                    item,
+                    RunItem::ToolResult { call_id, output }
+                        if call_id == "call-echo" && !output.is_error
+                            && output.content.iter().any(|content| matches!(
+                                content, Content::Text { text } if text.contains("echo completed")
+                            ))
+                )));
+                Err(Error::new(ErrorCategory::Provider, "provider failed"))
+            }
+        })
+    }
+}
+struct EchoTool(ToolDefinition);
+impl Tool for EchoTool {
+    fn definition(&self) -> &ToolDefinition {
+        &self.0
+    }
+    fn execute<'a>(
+        &'a self,
+        _: &'a ToolContext,
+        call: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            Ok(ToolOutput {
+                content: vec![Content::Text {
+                    text: call.arguments["text"].as_str().unwrap().into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+fn findings_then_failure(items: Vec<RunItem>) -> Runner {
+    let mut agent = AgentConfig::new(
+        "worker",
+        ModelBinding::complete(
+            "fake",
+            Arc::new(FindingsThenFailure(Mutex::new(Some(items)))),
+        ),
+    );
+    agent.tools.push(Arc::new(EchoTool(ToolDefinition {
+        name: "echo".into(),
+        description: "echo".into(),
+        input_schema: schemars::schema_for!(Value),
+        read_only: true,
+        requires_approval: false,
+    })));
+    Runner::new(agent, RunnerConfig::default()).unwrap()
+}
+
+#[tokio::test]
+async fn failed_child_without_partial_findings_keeps_bare_error() {
+    let (owner, session) =
+        session(Arc::new(RetryOnce(std::sync::atomic::AtomicUsize::new(0)))).await;
+    let task = session
+        .scheduler
+        .run(Submission::new("worker", "input is not progress"))
+        .await
+        .unwrap();
+    assert_eq!(task.status, TaskStatus::Failed);
+    assert!(task.result.is_empty());
+    assert_eq!(
+        task.error.as_deref(),
+        Some("agent \"worker\" failed: model call failed on turn 0: retry me")
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn failed_child_error_selects_last_nonblank_non_system_message() {
+    for (items, expected) in [
+        (vec![], None),
+        (
+            vec![
+                message(Role::Assistant, " \n\t"),
+                message(Role::Assistant, "  [SYSTEM] budget reminder"),
+            ],
+            None,
+        ),
+        (
+            vec![
+                message(Role::Assistant, "first finding"),
+                message(Role::Assistant, "  latest finding \n"),
+                message(Role::Assistant, "\n [SYSTEM] budget reminder"),
+                message(Role::Assistant, " \t"),
+            ],
+            Some("latest finding"),
+        ),
+        (
+            vec![
+                message(Role::Assistant, "older finding"),
+                RunItem::PhasedMessage {
+                    message: Message {
+                        role: Role::Assistant,
+                        content: vec![Content::Text {
+                            text: "  phased finding [SYSTEM] is not a prefix \n".into(),
+                        }],
+                    },
+                    phase: "commentary".into(),
+                },
+                message(Role::Assistant, "[SYSTEM] final reminder"),
+            ],
+            Some("phased finding [SYSTEM] is not a prefix"),
+        ),
+    ] {
+        let (owner, session) = session_with_runner(findings_then_failure(items), None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "input is not progress"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Failed);
+        assert_eq!(task.usage.tool_calls, 1);
+        let mut error =
+            "agent \"worker\" failed: model call failed on turn 1: provider failed".to_owned();
+        if let Some(expected) = expected {
+            error.push_str("\nPartial progress before the run ended:\n");
+            error.push_str(expected);
+        }
+        assert_eq!(task.error.as_deref(), Some(error.as_str()));
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn failed_child_error_truncates_unicode_progress_with_exact_counted_elision() {
+    for length in [1600, 1601, 5000] {
+        let finding = format!("{}{}", "界".repeat(1100), "🦀".repeat(length - 1100));
+        let expected = if length == 1600 {
+            finding.clone()
+        } else {
+            let tail = if length == 1601 {
+                format!("{}{}", "界".repeat(20), "🦀".repeat(501))
+            } else {
+                "🦀".repeat(521)
+            };
+            format!(
+                "{}\n…[elided {} chars]…\n{tail}",
+                "界".repeat(1042),
+                length - 1563
+            )
+        };
+        let (owner, session) = session_with_runner(
+            findings_then_failure(vec![RunItem::PhasedMessage {
+                message: Message {
+                    role: Role::Assistant,
+                    content: vec![Content::Text {
+                        text: format!(" \n{finding}\t "),
+                    }],
+                },
+                phase: "commentary".into(),
+            }]),
+            None,
+        )
+        .await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Failed);
+        assert_eq!(
+            task.error.unwrap(),
+            format!(
+                "agent \"worker\" failed: model call failed on turn 1: provider failed\nPartial progress before the run ended:\n{expected}"
+            )
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn failed_child_findings_reach_named_and_managed_sync_parent_requests_and_summary() {
+    for tool_name in ["specialist", "subagent"] {
+        let (owner, session) = session_with_runner(
+            findings_then_failure(vec![message(Role::Assistant, "found the root cause")]),
+            None,
+        )
+        .await;
+        let model = FakeModel::new(
+            vec![
+                call(tool_name, json!({"message":"inspect", "mode":"sync"})),
+                call("subagent_status", json!({"detail":"summary"})),
+                answer("findings recovered"),
+            ],
+            Duration::ZERO,
+        );
+        let mut agent = AgentConfig::new("parent", ModelBinding::complete("fake", model.clone()));
+        agent.tools = build_subagent_task_tools(session.clone(), "worker");
+        agent.tools.push(Arc::new(AgentAsTool::new(
+            "specialist",
+            "specialist task",
+            "worker",
+            session.clone(),
+        )));
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                subagents: Some(session),
+                output: adk_runtime::output::OutputPolicy {
+                    untrusted: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        runner
+            .run(context(), request(), Arc::new(TestHost))
+            .await
+            .unwrap();
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 3);
+            let error = "agent \"worker\" failed: model call failed on turn 1: provider failed\nPartial progress before the run ended:\nfound the root cause";
+            for (index, name) in [(1, tool_name), (2, "subagent_status")] {
+                let output = requests[index]
+                    .input
+                    .iter()
+                    .find_map(|item| match item {
+                        RunItem::ToolResult { call_id, output }
+                            if call_id == &format!("call-{name}") =>
+                        {
+                            Some(output)
+                        }
+                        _ => None,
+                    })
+                    .unwrap();
+                assert_eq!(output.is_error, index == 1, "{tool_name}: {output:?}");
+                let Content::Text { text } = &output.content[0] else {
+                    panic!("expected text output")
+                };
+                let value: Value = serde_json::from_str(text).unwrap();
+                let task = if index == 1 {
+                    &value
+                } else {
+                    &value["tasks"][0]
+                };
+                assert_eq!(task["status"], "failed");
+                assert_eq!(task["error"], error);
+                if index == 2 {
+                    assert!(task.get("result").is_none());
+                }
+            }
+        }
+        owner.shutdown().await.unwrap();
+    }
+}
+
 struct ProgressThenFailure(std::sync::atomic::AtomicUsize);
 impl Model for ProgressThenFailure {
     fn provider(&self) -> &str {

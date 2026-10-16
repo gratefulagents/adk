@@ -13726,6 +13726,65 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-39BF3C84DE7EF7C7": {
+      "source": "internal/agent/subagent_run_test.go",
+      "source_name": "TestPartialProgressTail",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::child_partial_progress",
+        "crates/adk-runtime/src/runner.rs::Runner::run_child"
+      ],
+      "rust_test_identifiers": [
+        "failed_child_without_partial_findings_keeps_bare_error",
+        "failed_child_error_selects_last_nonblank_non_system_message",
+        "failed_child_error_truncates_unicode_progress_with_exact_counted_elision"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPartialProgressTail",
+      "rationale": "Replaces the complete original nil/empty, tool-only and first/latest/trailing-system selection assertions with actual child executions; empty findings leave the original error unchanged. Ordinary/phased message content is trimmed and latest nonblank/non-system content wins. Additional Unicode1600/1601/5000 assertions establish exact counted middle elision.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-80ECF8E0A2A1ED02": {
+      "source": "internal/agent/subagent_run_test.go",
+      "source_name": "TestRunSubAgentOnceModelFailureSurfacesPartialProgress",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::child_partial_progress",
+        "crates/adk-runtime/src/runner.rs::Runner::run_child"
+      ],
+      "rust_test_identifiers": [
+        "failed_child_findings_reach_named_and_managed_sync_parent_requests_and_summary",
+        "failed_child_without_partial_findings_keeps_bare_error",
+        "failed_child_error_selects_last_nonblank_non_system_message",
+        "failed_child_error_truncates_unicode_progress_with_exact_counted_elision"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunSubAgentOnceModelFailureSurfacesPartialProgress",
+      "rationale": "Reproduces findings, successful echo, then provider failure through RunnerChildExecutor. Failed status and progress heading/findings are asserted in the error, including named and managed-sync parent model requests and summary without result. Existing native4096-tail result retention and named failure envelope remain separate documented behavior; this closes only original progress-in-error assertions, not whole response parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3B83EE02EE3874E1": {
+      "source": "internal/agent/subagent_run_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::child_partial_progress",
+        "crates/adk-runtime/src/runner.rs::Runner::run_child"
+      ],
+      "rust_test_identifiers": [
+        "failed_child_without_partial_findings_keeps_bare_error",
+        "failed_child_error_selects_last_nonblank_non_system_message",
+        "failed_child_error_truncates_unicode_progress_with_exact_counted_elision",
+        "failed_child_findings_reach_named_and_managed_sync_parent_requests_and_summary"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunSubAgentOnceModelFailureSurfacesPartialProgress",
+      "rationale": "Complete original subagent_run_test.go contains exactly TestPartialProgressTail and TestRunSubAgentOnceModelFailureSurfacesPartialProgress; source-reviewed native counterparts cover every assertion from both: empty/tool-only selection, latest non-system message, failed model call retaining findings in error. Extra tests cover Unicode middle elision and parent-visible named/managed/summary projections. Does not close the production source file or full subagent outcome wire parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

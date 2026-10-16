@@ -54,6 +54,14 @@ The callback is scoped to an executor registration, not a tool wrapper, so both
 named and managed delegation to that registration receive the transformed result.
 Use separate registrations when only a named tool should transform output.
 Failed/cancelled runs never invoke it; scheduler panic containment still applies.
+
+When a failed child returns partial run state, its error includes the latest
+trimmed, nonblank message that does not begin with `[SYSTEM]`, under
+`Partial progress before the run ended:`. The excerpt uses the SDK's
+1,600-character head/tail elision, so summary views retain the finding even
+when they omit `result`. Native retained result text remains a separate
+4,096-character tail fallback; named-tool recovery envelopes remain as described
+above. This error projection does not claim complete Go failure-envelope parity.
 Extractors should be deterministic: durable completion recovery may run the
 projection again. They do not change child history, usage or checkpoint contents.
 

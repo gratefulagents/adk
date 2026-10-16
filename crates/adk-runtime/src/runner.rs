@@ -4298,6 +4298,30 @@ impl durable::CheckpointStore for ChildRunnerStore {
     }
 }
 
+fn child_partial_progress(items: &[RunItem]) -> Option<String> {
+    let progress = items.iter().rev().find_map(|item| {
+        let message = match item {
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => message,
+            _ => return None,
+        };
+        let text = text(&message.content);
+        let text = text.trim();
+        (!text.is_empty() && !text.starts_with("[SYSTEM]")).then(|| text.to_owned())
+    })?;
+    let chars: Vec<_> = progress.chars().collect();
+    if chars.len() <= 1600 {
+        return Some(progress);
+    }
+    // Match the SDK's byte-sized marker reserve while counting content as Unicode scalars.
+    let keep = 1600 - ("\n…[elided %d chars]…\n".len() + 12);
+    let head = keep * 2 / 3;
+    let tail = keep - head;
+    let mut progress: String = chars[..head].iter().collect();
+    progress.push_str(&format!("\n…[elided {} chars]…\n", chars.len() - keep));
+    progress.extend(&chars[chars.len() - tail..]);
+    Some(progress)
+}
+
 impl Runner {
     pub(crate) async fn run_child(
         &self,
@@ -4449,7 +4473,7 @@ impl Runner {
                 let Some(snapshot) = error.partial else {
                     return Err(error.error);
                 };
-                let message = if status == TaskStatus::Failed {
+                let mut message = if status == TaskStatus::Failed {
                     format!(
                         "agent {child_agent_name:?} failed: {}",
                         error.error.info.message
@@ -4457,6 +4481,10 @@ impl Runner {
                 } else {
                     error.error.info.message
                 };
+                if let Some(progress) = child_partial_progress(&snapshot.new_items) {
+                    message.push_str("\nPartial progress before the run ended:\n");
+                    message.push_str(&progress);
+                }
                 (*snapshot, status, Some(message))
             }
         };

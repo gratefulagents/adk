@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Explicit Chat Completions model validation
+
+Added `factory::validate_chat_completions_model` for host-invoked validation,
+using the existing compatibility predicate and actionable `InvalidInput` errors.
+Diagnostics omit caller-supplied model text consistently with the Rust provider
+boundary; exact Go error-string equivalence remains unresolved. Requests are not
+implicitly rejected or rerouted by this helper.
+
+The original test file's two assertions are now reproduced in Rust, closing
+four test/subtest/file records, not the full API contract. Fresh checks: **156
+provider tests +1 doctest**, strict provider all-target/all-feature Clippy and
+rustdoc, formatting, all bound native/reference evidence,51 validators and
+source locks pass. Original pinned Go: **870 passed /5 skipped**,36 packages.
+The first evidence attempt failed at the unrelated subagent fixture check;
+its isolated check and the complete evidence rerun passed without fixture changes.
+No full-workspace rerun is claimed for this small helper addition.
+
+Ledger: **807 verified (805 executable-tested +2 artifact-reviewed) /8,084
+unresolved /251 excluded**. Issue11 remains incomplete.
+
 ### Complete original metadata test-file coverage
 
 Added an isolated counterpart of the original Copilot max-prompt-token fallback

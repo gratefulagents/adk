@@ -13,6 +13,12 @@ traits, typed history and pull-owned async streams remain independent of HTTP
 clients and secret storage. See the compiled example in `adk_providers` and the
 [client research](migration/provider-research.md).
 
+Hosts requiring Chat Completions only can call
+`adk_providers::factory::validate_chat_completions_model` before selecting a model.
+It uses `supports_chat_completions` and returns an actionable `InvalidInput` error
+for Codex-family names. Unlike the Go diagnostic, it does not echo caller-supplied
+model text. This is explicit host validation, not automatic request-path rejection.
+
 ## Baseline capability and evidence map
 
 Reference: SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`,

@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary)$"
+      "^(TestCalculateCost|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel)$"
     ]
   ],
   "counts": {
-    "pass": 867,
+    "pass": 870,
     "skip": 5
   },
   "exit_code": 0,
@@ -213,6 +213,9 @@
     "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestResponsesCacheWriteTokensNonStreaming": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToResponseParams_EffortNoneSkipsSummary": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel/accepts_chat_model": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel/rejects_codex_model": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestApprovedSubagentSharesParentContext": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsIdenticalCallLoop": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall": "pass",

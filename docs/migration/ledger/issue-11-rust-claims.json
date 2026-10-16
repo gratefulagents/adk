@@ -14363,6 +14363,74 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-545610CA697ACFAF": {
+      "source": "internal/openai/models_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::validate_chat_completions_model"
+      ],
+      "rust_test_identifiers": [
+        "validate_chat_completions_original_cases",
+        "validate_chat_completions_diagnostics_and_predicate_agree"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel",
+      "rationale": "The complete original test file has one test and exactly two subtests: gpt-4.1 returns no error and gpt-5.2-codex returns an error. Native Result assertions reproduce both. Additional native checks bind validation to the existing predicate and actionable InvalidInput diagnostics. Only these original test obligations are closed; the full ValidateChatCompletionsModel API/error-string contract remains unresolved because native diagnostics deliberately omit the caller-provided model rather than reproduce Go interpolation. No automatic request-path validation is added.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-603621AB54383FC6": {
+      "source": "internal/openai/models_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::validate_chat_completions_model"
+      ],
+      "rust_test_identifiers": [
+        "validate_chat_completions_original_cases",
+        "validate_chat_completions_diagnostics_and_predicate_agree"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel",
+      "rationale": "The complete original test file has one test and exactly two subtests: gpt-4.1 returns no error and gpt-5.2-codex returns an error. Native Result assertions reproduce both. Additional native checks bind validation to the existing predicate and actionable InvalidInput diagnostics. Only these original test obligations are closed; the full ValidateChatCompletionsModel API/error-string contract remains unresolved because native diagnostics deliberately omit the caller-provided model rather than reproduce Go interpolation. No automatic request-path validation is added.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-FCF0AD2D4A035E2F": {
+      "source": "internal/openai/models_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::validate_chat_completions_model"
+      ],
+      "rust_test_identifiers": [
+        "validate_chat_completions_original_cases",
+        "validate_chat_completions_diagnostics_and_predicate_agree"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel",
+      "rationale": "The complete original test file has one test and exactly two subtests: gpt-4.1 returns no error and gpt-5.2-codex returns an error. Native Result assertions reproduce both. Additional native checks bind validation to the existing predicate and actionable InvalidInput diagnostics. Only these original test obligations are closed; the full ValidateChatCompletionsModel API/error-string contract remains unresolved because native diagnostics deliberately omit the caller-provided model rather than reproduce Go interpolation. No automatic request-path validation is added.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-6E469B69CB538627": {
+      "source": "internal/openai/models_test.go",
+      "source_name": "TestValidateChatCompletionsModel",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::validate_chat_completions_model"
+      ],
+      "rust_test_identifiers": [
+        "validate_chat_completions_original_cases",
+        "validate_chat_completions_diagnostics_and_predicate_agree"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel",
+      "rationale": "The complete original test file has one test and exactly two subtests: gpt-4.1 returns no error and gpt-5.2-codex returns an error. Native Result assertions reproduce both. Additional native checks bind validation to the existing predicate and actionable InvalidInput diagnostics. Only these original test obligations are closed; the full ValidateChatCompletionsModel API/error-string contract remains unresolved because native diagnostics deliberately omit the caller-provided model rather than reproduce Go interpolation. No automatic request-path validation is added.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

@@ -437,6 +437,34 @@ fn metadata_catalog_picker_lookup_and_compaction_match_baseline() {
 }
 
 #[test]
+fn validate_chat_completions_original_cases() {
+    use adk_providers::factory::validate_chat_completions_model;
+    assert!(validate_chat_completions_model("gpt-4.1").is_ok());
+    assert!(validate_chat_completions_model("gpt-5.2-codex").is_err());
+}
+
+#[test]
+fn validate_chat_completions_diagnostics_and_predicate_agree() {
+    use adk_providers::factory::validate_chat_completions_model;
+    for model in [
+        "",
+        " \t\n",
+        "gpt-4.1",
+        " GPT-5.2-CODEX ",
+        "private/codex-secret",
+    ] {
+        let result = validate_chat_completions_model(model);
+        assert_eq!(result.is_ok(), supports_chat_completions(model));
+        if let Err(error) = result {
+            assert_eq!(error.info.category, ErrorCategory::InvalidInput);
+            let diagnostic = format!("{error:?}");
+            assert!(diagnostic.contains("gpt-4.1 or gpt-4.1-mini"));
+            assert!(!diagnostic.contains(model));
+        }
+    }
+}
+
+#[test]
 fn metadata_source_parse_codex_shape() {
     let models = parse_model_metadata(
         br#"{

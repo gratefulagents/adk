@@ -570,9 +570,10 @@ tool-only construction does not inspect an agent's output schema.
 
 Validation remains observational, not fail-closed: invalid JSON or parser failure
 retains the original text and emits `OutputValidationFailed`. Without a custom
-parser, native runtime also reports JSON Schema violations; the pinned SDK's
-fallback only validates JSON syntax. A custom parser replaces default validation,
-matching the runtime contract. Fourteen independent pinned builder/runner cases
+parser, validation checks JSON syntax only, matching the pinned SDK; parseable
+JSON that violates the schema does not emit a failure. Empty final text bypasses
+validation. A custom parser replaces default validation. Fourteen independent
+pinned builder/runner cases
 compare schema placement, request fields and final values, not schema diagnostic
 messages, raw schema whitespace or provider wire formats.
 

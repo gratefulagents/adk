@@ -47,7 +47,7 @@ boundaries are deliberately explicit.
 | `chatloop` | `run_go_chat` resolves a deferred approval through a gate exactly once; a second invocation receives stored first-turn history without replaying the tool. | In-memory history is host-owned, not a new public ChatLoop/session persistence adapter. |
 | `handoffs_subagents` | Shared host state gates transfer exposure, an awaited callback receives arguments, and a custom filter retains message provenance while leaving emitted handoff items intact. Disabling the same gate hides the tool on a subsequent run. Transfer changes `last_agent`; explicit child-host injection automatically builds a generic child/scheduler and closes the owned session. A separate host-owned automatic session survives two independently closed/rebuilt turn bundles with the same scheduler and retained task history. A manual scheduler plus `RunnerChildExecutor` and `AgentAsTool` also executes a nested runner and delivers evidence before shutdown. | No distributed workers or external task queues. |
 | `guardrails` | Safe text passes secret detection; synthetic credential text returns `Guardrail` without leaking the secret; authorized subprocess output is blocked by the execution facade. Public built-in tool guards redact a synthetic output and trip on destructive shell input without executing it. | The scenario covers built-in helpers, not every custom callback combination or shell language construct; see below. |
-| `structured_output` | Facade builder supplies the named schema and owns bundle closure. Valid JSON is returned as a parsed object; wrong-type JSON emits exactly one `OutputValidationFailed` observation, whereas valid output emits none. | Validation is observational, **not fail-closed**; see below. |
+| `structured_output` | Facade builder supplies the named schema and owns bundle closure. Valid JSON is returned parsed, including schema-invalid JSON without a warning. Invalid JSON remains raw text and emits exactly one `OutputValidationFailed` observation. | Validation is observational, **not fail-closed**; see below. |
 | `streaming` | A real pull-stream runner delivers two ordered text deltas, exactly one terminal event, and the same complete final answer. | Scripted stream, not an SSE/HTTP integration test. |
 | `context_compaction` | Real deterministic local compaction shrinks history, generates a summary, preserves the first goal and latest question; disabled compaction leaves history unchanged. | No paid LLM summary or native provider compaction request. |
 | `settings_routing` | Public `Builder` applies mode model/settings/instructions and read-only access; a role override selects a different model and verbosity. Assert actual dispatched requests and owned-session closure. | Uses host-supplied mode snapshots rather than file loading. |
@@ -67,8 +67,8 @@ boundaries are deliberately explicit.
   tested separately. Built-in shell checks are a bounded, fail-closed syntax
   policy, not an OS sandbox or full shell interpreter. See
   [runtime builder](runtime-builder.md) for defaults and semantic limits.
-- **Structured output:** `Runner::validate_output` reports schema/parser violations
-  through `RunHooks`, then returns parsed JSON or raw text. The executable asserts
+- **Structured output:** `Runner::validate_output` reports JSON syntax/custom-parser
+  failures through `RunHooks`, then returns parsed JSON or raw text. The executable asserts
   this current contract. Applications needing fail-closed validation must not assume
   the schema alone blocks the answer.
 - **Trace persistence:** `observability::FilesystemTraceStore` writes the native

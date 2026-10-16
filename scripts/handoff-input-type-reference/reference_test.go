@@ -81,7 +81,32 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			cases = append(cases, map[string]any{"scenario": name, "streamed": streamed, "raw": raw, "schema": json.RawMessage(model.requests[0].Tools[0].InputSchema()), "custom_parser": custom, "has_type": h.InputType != nil, "has_callback": h.OnHandoff != nil, "events": events, "parser_inputs": parserInputs, "callback_inputs": callbackInputs, "warning": warned, "last_agent": result.LastAgent.Name, "final_text": result.FinalText(), "native_value_representable": name != "missing" && name != "invalid_json"})
 		}
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": cases}, "", "  ")
+	outputCases := []map[string]any{}
+	for _, streamed := range []bool{false, true} {
+		for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``} {
+			var logs bytes.Buffer
+			log.SetOutput(&logs)
+			schema := json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`)
+			source := &Agent{Name: "output", OutputType: NewOutputSchema("final", schema)}
+			model := &subagentToolMockModel{responses: []*ModelResponse{{Items: []RunItem{{Type: RunItemMessage, Message: &MessageOutput{Text: raw}}}}}}
+			runner := NewRunnerWithModel(model)
+			var result *RunResult
+			var err error
+			if streamed {
+				s := runner.RunStreamed(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+				for range s.Events {
+				}
+				result, err = s.FinalResult(), s.Err()
+			} else {
+				result, err = runner.Run(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			outputCases = append(outputCases, map[string]any{"raw": raw, "streamed": streamed, "schema": schema, "output": result.FinalOutput, "warning": strings.Contains(logs.String(), "output schema validation failed")})
+		}
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

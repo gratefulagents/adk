@@ -926,7 +926,11 @@ async fn guardrails() {
     assert!(!error.info.message.contains(&secret));
 }
 async fn structured_output() {
-    for (raw, valid) in [(r#"{"answer":42}"#, true), (r#"{"answer":"wrong"}"#, false)] {
+    for (raw, valid) in [
+        (r#"{"answer":42}"#, true),
+        (r#"{"answer":"wrong"}"#, true),
+        ("not json", false),
+    ] {
         let hooks = Arc::new(Hooks::default());
         let mut bundle = adk::builder::Builder::new(adk::builder::Config {
             model: "mock/base".into(),
@@ -950,7 +954,7 @@ async fn structured_output() {
             .unwrap();
         assert_eq!(
             result.result.final_output,
-            Some(serde_json::from_str(raw).unwrap())
+            Some(serde_json::from_str(raw).unwrap_or_else(|_| json!(raw)))
         );
         let violations = hooks
             .0

@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Structured-output parsing does not enforce JSON Schema
+
+Removed the extra native `OutputValidationFailed` observation for parseable JSON
+that violates the output schema. The pinned SDK's default validator parses JSON;
+it does not enforce the schema. Empty final text also bypasses validation. Custom
+parser success/failure handling is unchanged. The executable feature example and
+builder/example documentation now reflect this behavior instead of asserting the
+incorrect extra warning.
+
+The existing independent handoff/input-schema probe now also executes **16 final
+output cases** through the actual Go runner, buffered and streamed. Cases cover
+schema-valid and schema-invalid objects, strings, arrays, booleans, null, malformed
+JSON and empty output. The native regression failed before the fix (one warning
+versus Go's zero for `{"n":-1}`), then matched all final values and warning counts.
+Constructor-time schema rejection, arbitrary JSON number/Unicode/depth behavior
+and complete output-schema API equivalence remain unclaimed.
+
+Fresh full workspace: **1,586 passed /0 failed /30 ignored**, plus **9 doctests**;
+strict workspace Clippy/rustdoc, formatting, facade matrix/standalone consumer and
+purity passed. All **20 executable feature scenarios** and the owned host-session
+example passed after correcting the example expectation. Final full workspace,
+bound reference/native evidence, ledger/audit and source locks passed again.
+The 51 ledger validators passed. An initial evidence invocation lacked explicit
+`GOROOT` and failed before running its Go schema probe; setting `GOROOT=/usr/local/go`
+restored the probe and the complete evidence run passed. All 46 remote checks for
+the preceding pushed head `20029370` passed; this is not a claim about a later head.
+No new ledger closure: **842 verified /8,049 unresolved /251 excluded**.
+
 ### Explicit compatibility item extraction helpers
 
 Added `adk::codec::items::{extract_text, extract_last_text, extract_tool_calls}`

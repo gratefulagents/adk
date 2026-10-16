@@ -2712,7 +2712,7 @@ impl Engine {
         }
     }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
-        if let Some(schema) = &self.agent.output_schema {
+        if self.agent.output_schema.is_some() && !output.is_empty() {
             if let Some(parser) = &self.agent.output_parser {
                 return match parser.parse(&output) {
                     Ok(value) => Ok(value),
@@ -2726,15 +2726,7 @@ impl Engine {
                 };
             }
             match serde_json::from_str::<Value>(&output) {
-                Ok(value) => {
-                    if !compile_schema(schema)?.is_valid(&value) {
-                        self.observe(Observation::OutputValidationFailed {
-                            message: "output does not match its JSON schema".into(),
-                        })
-                        .await?;
-                    }
-                    Ok(value)
-                }
+                Ok(value) => Ok(value),
                 Err(error) => {
                     self.observe(Observation::OutputValidationFailed {
                         message: format!("output is not JSON: {error}"),

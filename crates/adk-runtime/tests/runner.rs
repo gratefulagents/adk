@@ -987,11 +987,21 @@ fn duplicate_names_and_invalid_schema_are_rejected() {
 
 #[tokio::test]
 async fn structured_output_validation_preserves_baseline_result() {
-    for output in ["not json", "{\"n\":-1}", "{\"n\":1}"] {
-        let mut a = agent(TestModel::with(vec![Ok(answer(output))]));
-        a.output_schema = Some(
-            schemars::json_schema!({"type":"object", "required":["n"], "properties":{"n":{"type":"integer", "minimum":0}}, "additionalProperties":false}),
-        );
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-input-type/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["output_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 16);
+    for case in cases {
+        let output = case["raw"].as_str().unwrap();
+        let model = TestModel::with(vec![Ok(answer(output))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer(output),
+        })]]
+        .into();
+        let mut a = agent(model);
+        a.output_schema = Some(serde_json::from_value(case["schema"].clone()).unwrap());
         let hooks = Arc::new(Observations::default());
         let result = Runner::new(
             a,
@@ -1000,12 +1010,21 @@ async fn structured_output_validation_preserves_baseline_result() {
                 ..RunnerConfig::default()
             },
         )
-        .unwrap()
-        .run(context(), request(1), Arc::new(TestHost::default()))
-        .await;
+        .unwrap();
+        let result = if case["streamed"].as_bool().unwrap() {
+            result
+                .stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+        } else {
+            result
+                .run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+        };
         assert_eq!(
             result.unwrap().result.final_output,
-            Some(serde_json::from_str(output).unwrap_or_else(|_| json!(output)))
+            Some(case["output"].clone()),
+            "{case}"
         );
         assert_eq!(
             hooks
@@ -1015,7 +1034,8 @@ async fn structured_output_validation_preserves_baseline_result() {
                 .iter()
                 .filter(|event| matches!(event, Observation::OutputValidationFailed { .. }))
                 .count(),
-            usize::from(output != "{\"n\":1}")
+            usize::from(case["warning"].as_bool().unwrap()),
+            "{case}"
         );
     }
 }

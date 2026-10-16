@@ -15106,6 +15106,56 @@
         "x86_64-unknown-linux-gnu",
         "builder"
       ]
+    },
+    "SDK-DB63116BF4E93353": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestRunResultFinalText",
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunResult::final_text"
+      ],
+      "rust_test_identifiers": [
+        "final_text_matches_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunResultFinalText",
+      "rationale": "Only the original string hello versus non-string 42 test is closed. Native final_text borrows the string or returns empty; this does not close all RunResult representation or raw JSON origin contracts.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-08DFCC5C8F308FF5": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestRunResultIsInterrupted",
+      "implementation_symbols": [
+        "crates/adk-core/src/types.rs::RunResult::is_interrupted"
+      ],
+      "rust_test_identifiers": [
+        "interruption_matches_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunResultIsInterrupted",
+      "rationale": "Only the original absent versus present bash interruption test is closed through native unified pending approvals. Contradictory singular/plural Go interruption fields and full result structure parity are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-737165878CDB3E03": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestUsageAddAndTotal",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::add",
+        "crates/adk-codec/src/dto.rs::Usage::total_tokens"
+      ],
+      "rust_test_identifiers": [
+        "usage_add_and_total_match_original_sdk_example",
+        "signed_usage_arithmetic_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestUsageAddAndTotal",
+      "rationale": "Exact original usage example adds 200 input and 100 output to 100 input and 50 output, asserting 300 input and 450 total. Existing independent Go observations additionally cover signed wrapping arithmetic; no unrelated usage types are claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

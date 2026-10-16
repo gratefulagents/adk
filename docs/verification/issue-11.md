@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Original result and usage helper examples
+
+Added exact counterparts for `TestRunResultFinalText`, `TestRunResultIsInterrupted`
+and `TestUsageAddAndTotal`. The tests retain the original hello/42 outputs,
+absent/present bash interruption, and 100+200 input /50+100 output arithmetic.
+The interruption example maps to native unified pending approvals; it does not
+claim equivalence for contradictory Go singular/plural interruption fields.
+Only these three original test IDs are newly closed.
+
+Fresh Rust1.88 validation: **1,595 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc, formatting, facade matrix, independent
+consumer/purity, all20 scenarios and host-session example passed. Original Go:
+**912 passed /5 skipped**,36 packages. Bound evidence,51 validators, artifact
+checks and source locks passed. Ledger: **847 verified /8,044 unresolved /251
+excluded**. Full issue11 acceptance remains incomplete.
+
 ### Original model-settings merge and output-schema constructor tests
 
 Added exact native counterparts for pinned SDK `TestModelSettingsMerge` and

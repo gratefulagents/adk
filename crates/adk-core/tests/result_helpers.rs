@@ -20,6 +20,31 @@ fn result() -> RunResult {
 }
 
 #[test]
+fn final_text_matches_original_sdk_example() {
+    let mut result = result();
+    result.final_output = Some(json!("hello"));
+    assert_eq!(result.final_text(), "hello");
+    result.final_output = Some(json!(42));
+    assert_eq!(result.final_text(), "");
+}
+
+#[test]
+fn interruption_matches_original_sdk_example() {
+    let mut result = result();
+    assert!(!result.is_interrupted());
+    result.pending_approvals.push(ApprovalRequest {
+        call: ToolCall {
+            raw_arguments: None,
+            id: String::new(),
+            name: "bash".into(),
+            arguments: json!(null),
+        },
+        reason: String::new(),
+    });
+    assert!(result.is_interrupted());
+}
+
+#[test]
 fn final_text_does_not_serialize_structured_values() {
     let mut result = result();
     for value in [

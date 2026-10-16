@@ -2,6 +2,23 @@ use adk_codec::{dto::*, replay, schema, timestamp::GoTimestamp};
 use serde_json::{Value, json};
 
 #[test]
+fn usage_add_and_total_match_original_sdk_example() {
+    let mut usage = Usage {
+        input_tokens: 100,
+        output_tokens: 50,
+        ..Default::default()
+    };
+    usage.add(&Usage {
+        input_tokens: 200,
+        output_tokens: 100,
+        requests: 1,
+        ..Default::default()
+    });
+    assert_eq!(usage.input_tokens, 300);
+    assert_eq!(usage.total_tokens(), 450);
+}
+
+#[test]
 fn signed_usage_arithmetic_matches_pinned_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/usage/observations.json")).unwrap();

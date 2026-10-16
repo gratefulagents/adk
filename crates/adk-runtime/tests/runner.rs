@@ -753,6 +753,64 @@ impl CostEstimator for UnitCost {
     }
 }
 #[tokio::test]
+async fn turn_limit_error_includes_limit_and_preserves_partial_history() {
+    for (limit, streamed) in [(10, false), (50, false), (10, true), (50, true)] {
+        let replies: Vec<_> = (0..limit)
+            .map(|turn| response(vec![call(&format!("call-{turn}"), "echo")], None))
+            .collect();
+        let model = TestModel::with(replies.iter().cloned().map(Ok).collect());
+        *model.streams.lock().unwrap() = replies
+            .into_iter()
+            .map(|response| vec![StreamStep::Event(ModelEvent::Complete { response })])
+            .collect();
+        let tool = TestTool::new("echo", false, false);
+        let mut a = agent(model.clone());
+        a.tools.push(tool.clone());
+        let runner = runner(a);
+        let outcome = if streamed {
+            runner
+                .stream(context(), request(limit), Arc::new(TestHost::default()))
+                .finish()
+                .await
+        } else {
+            runner
+                .run(context(), request(limit), Arc::new(TestHost::default()))
+                .await
+        };
+        let error = outcome.err().unwrap();
+        assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+        assert_eq!(error.to_string(), format!("max turns exceeded: {limit}"));
+        assert_eq!(
+            model.completes.load(Ordering::SeqCst) + model.starts.load(Ordering::SeqCst),
+            limit as usize
+        );
+        assert_eq!(tool.calls.load(Ordering::SeqCst), limit as usize);
+        let partial = error.partial.unwrap();
+        assert!(!partial.new_items.is_empty());
+        assert!(partial.final_output.is_none());
+        assert_eq!(partial.responses.len(), limit as usize);
+        let calls = partial
+            .history
+            .iter()
+            .filter(|item| matches!(item, RunItem::ToolCall { .. }))
+            .count();
+        let outputs = partial
+            .history
+            .iter()
+            .filter(|item| matches!(item, RunItem::ToolResult { .. }))
+            .count();
+        assert_eq!(calls, limit as usize);
+        assert_eq!(outputs, calls);
+        assert!(partial.new_items.iter().all(|item| match item {
+            RunItem::Message { message } => message.content.iter().all(
+                |content| !matches!(content, Content::Text { text } if text.contains("Turn budget"))
+            ),
+            _ => true,
+        }));
+    }
+}
+
+#[tokio::test]
 async fn turn_token_and_cost_limits_keep_partial_usage() {
     let r = runner(agent(TestModel::with(vec![Ok(response(
         vec![message(Role::Assistant, "continue")],

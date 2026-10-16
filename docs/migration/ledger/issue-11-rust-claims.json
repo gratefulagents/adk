@@ -15156,6 +15156,23 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-7CE6741854FC35D5": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestMaxTurnsExceededError",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Engine::model_turn",
+        "crates/adk-runtime/src/runner.rs::Engine::model_response"
+      ],
+      "rust_test_identifiers": [
+        "turn_limit_error_includes_limit_and_preserves_partial_history"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestMaxTurnsExceededError",
+      "rationale": "Closes only the original error-format example at limit50. Native buffered/streamed runs at limits10 and50 assert exact SDK error text, category, call counts and retained paired partial history. TestRunnerMaxTurnsExceeded is not claimed: its repeated call IDs conflict with the unchanged native cross-history duplicate guard. Whole error types and turn-budget semantics remain separate obligations.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

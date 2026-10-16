@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Turn-limit error text and retained partial results
+
+All three native turn-limit exits now include the effective limit using the
+SDK's `max turns exceeded: N` spelling. A regression first observed the old
+`maximum model turns exceeded` text. Buffered and streamed runs at limits10/50
+now verify exact text, category, call counts, retained responses, paired partial
+history and absence of an injected turn-budget warning. Budgeting is unchanged.
+Only original `TestMaxTurnsExceededError` is newly closed.
+
+The first attempt also exposed a separate boundary: pinned
+`TestRunnerMaxTurnsExceeded` repeats the same call ID each turn, while native
+history validation rejects cross-turn duplicate IDs. Both original Go tests
+passed independently. Native coverage uses unique IDs; the original runner test
+remains unresolved. Durable checkpoint validation also requires unique IDs, so
+relaxing that guard needs separate execution/approval-correlation review.
+
+Fresh Rust1.88: **1,596 passed /0 failed /30 ignored**, **9 doctests**; strict
+Clippy/rustdoc, formatting, facade matrix, standalone consumer/purity, all20
+scenarios and host-session passed. Original Go: **913 passed /5 skipped**,36
+packages. Bound evidence,51 validators, artifacts and source locks passed.
+Ledger: **848 verified /8,043 unresolved /251 excluded**.
+
+Remote CI on preceding1b645024 reported a Windows stress-test failure:
+`separate_handles_do_not_lose_updates_or_initialization` hit the30-second
+filesystem `LockTimeout`; its duplicate same-head Windows job passed. This
+failure remains under investigation, not a clean CI claim. Full issue11
+acceptance remains incomplete.
+
 ### Original result and usage helper examples
 
 Added exact counterparts for `TestRunResultFinalText`, `TestRunResultIsInterrupted`

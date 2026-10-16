@@ -2308,7 +2308,7 @@ impl Engine {
             if !self.finalize_immediate_input().await? {
                 return Err(Error::new(
                     ErrorCategory::MaxTurns,
-                    "maximum model turns exceeded",
+                    format!("max turns exceeded: {}", self.policy.max_turns),
                 ));
             }
         }
@@ -2331,7 +2331,7 @@ impl Engine {
         if self.turns >= self.policy.max_turns.get() {
             return Err(Error::new(
                 ErrorCategory::MaxTurns,
-                "maximum model turns exceeded",
+                format!("max turns exceeded: {}", self.policy.max_turns),
             ));
         }
         self.check_budget()?;
@@ -2874,7 +2874,7 @@ impl Engine {
                 if self.turns >= self.policy.max_turns.get() {
                     return Err(Error::new(
                         ErrorCategory::MaxTurns,
-                        "maximum model turns exceeded",
+                        format!("max turns exceeded: {}", self.policy.max_turns),
                     ));
                 }
                 let force_summary = !self.summary_turn && self.final_summary_required();

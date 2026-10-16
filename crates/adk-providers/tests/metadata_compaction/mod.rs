@@ -393,6 +393,21 @@ fn metadata_nondefault_port_classification_matches_pinned_sdk() {
     }
 }
 
+#[test]
+fn metadata_endpoint_paths_match_pinned_sdk_with_nondefault_ports() {
+    let fixture = fixture();
+    let cases = fixture["endpoint_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 50);
+    for case in cases {
+        let session = session(case["raw"].as_str().unwrap(), AuthMode::ApiKey);
+        assert_eq!(
+            model_metadata_endpoint(&session).unwrap(),
+            reqwest::Url::parse(case["endpoint"].as_str().unwrap()).unwrap(),
+            "{case}"
+        );
+    }
+}
+
 #[tokio::test]
 async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
     let fixture = fixture();

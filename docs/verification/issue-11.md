@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Direct endpoint oracle and Copilot non-default ports
+
+A new independent pinned internal-Go probe executes `modelMetadataEndpoint`
+directly for50 ChatGPT/Copilot/ordinary-host and base-path combinations. This
+exposed the analogous Copilot-port error: metadata discovery used `/models`
+instead of `/v1/models` for `api.githubcopilot.com:8443`. Both recognized Copilot
+hosts now use the ordinary versioned path when a non-default port is present.
+The pre-existing native matrix's incorrect port expectation was corrected, not
+skipped. The new regression failed before the fix and passes afterward.
+
+The oracle's source and new harness file are hash-bound in the evidence runner;
+separate license artifact evidence was refreshed after that validator edit.
+Explicit default ports removed by `Scope::new`, arbitrary raw URL normalization
+and full auth/inference behavior remain unverified; no new broad claim is made.
+
+Fresh full workspace: **1,583 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full feature matrix,
+standalone consumer/purity, bound native/oracle evidence,51 validators, artifact
+reviews and source locks pass. Ledger remains **837 verified /8,054 unresolved
+/251 excluded**. Issue11 is not complete.
+
 ### Non-default-port ChatGPT classification
 
 Ten independently executed Go backend-classification vectors exposed incorrect

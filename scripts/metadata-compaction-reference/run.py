@@ -34,13 +34,17 @@ def main():
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
                       'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
-                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/metadata-compaction-reference/run.py', 'scripts/metadata-compaction-reference/reference_test.go']}}
+                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/metadata-compaction-reference/run.py', 'scripts/metadata-compaction-reference/reference_test.go', 'scripts/metadata-compaction-reference/endpoints_test.go']}}
         shutil.copyfile(ROOT / 'scripts/metadata-compaction-reference/reference_test.go', source / 'pkg/agentsdk/providers/openai/native_reference_test.go')
         output = source / 'observations.json'
         env['METADATA_OUTPUT'] = str(output)
         subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeMetadataReference|TestCompactionDefaultsFromModelMetadata.*)$', './pkg/agentsdk/providers/openai'], cwd=source, env=env, check=True)
         subprocess.run([go, 'test', '-count=1', '-v', '-run', '^TestCompactionDefaultsForModel$', './internal/agent'], cwd=source, env=env, check=True)
-        result = dict(provenance=provenance, **json.loads(output.read_text()))
+        shutil.copyfile(ROOT / 'scripts/metadata-compaction-reference/endpoints_test.go', source / 'internal/openai/native_endpoints_test.go')
+        endpoints = source / 'endpoints.json'
+        env['METADATA_ENDPOINT_OUTPUT'] = str(endpoints)
+        subprocess.run([go, 'test', '-count=1', '-v', '-run', '^TestNativeMetadataEndpoints$', './internal/openai'], cwd=source, env=env, check=True)
+        result = dict(provenance=provenance, endpoint_cases=json.loads(endpoints.read_text()), **json.loads(output.read_text()))
         serialized = json.dumps(result, indent=2, sort_keys=True) + '\n'
         destination = ROOT / 'fixtures/metadata-compaction/observations.json'
         if args.check:

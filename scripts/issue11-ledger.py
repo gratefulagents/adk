@@ -139,6 +139,7 @@ RUST_INPUTS = ["scripts/providers/generate.sh", "scripts/providers/continuation_
                "fixtures/metadata-compaction/observations.json",
                "scripts/metadata-compaction-reference/run.py",
                "scripts/metadata-compaction-reference/reference_test.go",
+               "scripts/metadata-compaction-reference/endpoints_test.go",
                "fixtures/workspace-context/observations.json", "scripts/workspace-context-reference/run.py",
                "scripts/workspace-context-reference/reference_test.go",
                "crates/adk/src/builder/project_state.rs", "crates/adk/tests/builder_project_state/mod.rs",

@@ -1749,6 +1749,208 @@
       "picker": []
     }
   ],
+  "endpoint_cases": [
+    {
+      "endpoint": "https://chatgpt.com/v1/models",
+      "raw": "https://chatgpt.com"
+    },
+    {
+      "endpoint": "https://chatgpt.com/custom/models",
+      "raw": "https://chatgpt.com/custom"
+    },
+    {
+      "endpoint": "https://chatgpt.com/custom/models",
+      "raw": "https://chatgpt.com/custom/responses"
+    },
+    {
+      "endpoint": "https://chatgpt.com/custom/models",
+      "raw": "https://chatgpt.com/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://chatgpt.com/v1/models",
+      "raw": "https://chatgpt.com/v1"
+    },
+    {
+      "endpoint": "https://api.chatgpt.com/v1/models",
+      "raw": "https://api.chatgpt.com"
+    },
+    {
+      "endpoint": "https://api.chatgpt.com/custom/models",
+      "raw": "https://api.chatgpt.com/custom"
+    },
+    {
+      "endpoint": "https://api.chatgpt.com/custom/models",
+      "raw": "https://api.chatgpt.com/custom/responses"
+    },
+    {
+      "endpoint": "https://api.chatgpt.com/custom/models",
+      "raw": "https://api.chatgpt.com/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.chatgpt.com/v1/models",
+      "raw": "https://api.chatgpt.com/v1"
+    },
+    {
+      "endpoint": "https://chatgpt.com:8443/v1/models",
+      "raw": "https://chatgpt.com:8443"
+    },
+    {
+      "endpoint": "https://chatgpt.com:8443/custom/v1/models",
+      "raw": "https://chatgpt.com:8443/custom"
+    },
+    {
+      "endpoint": "https://chatgpt.com:8443/custom/v1/models",
+      "raw": "https://chatgpt.com:8443/custom/responses"
+    },
+    {
+      "endpoint": "https://chatgpt.com:8443/custom/v1/models",
+      "raw": "https://chatgpt.com:8443/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://chatgpt.com:8443/v1/models",
+      "raw": "https://chatgpt.com:8443/v1"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/models",
+      "raw": "https://api.githubcopilot.com"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "https://api.githubcopilot.com/custom"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "https://api.githubcopilot.com/custom/responses"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "https://api.githubcopilot.com/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/v1/models",
+      "raw": "https://api.githubcopilot.com/v1"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com/models",
+      "raw": "https://api.individual.githubcopilot.com"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com/custom/models",
+      "raw": "https://api.individual.githubcopilot.com/custom"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com/custom/models",
+      "raw": "https://api.individual.githubcopilot.com/custom/responses"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com/custom/models",
+      "raw": "https://api.individual.githubcopilot.com/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com/v1/models",
+      "raw": "https://api.individual.githubcopilot.com/v1"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com:8443/v1/models",
+      "raw": "https://api.githubcopilot.com:8443"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.githubcopilot.com:8443/custom"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.githubcopilot.com:8443/custom/responses"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.githubcopilot.com:8443/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com:8443/v1/models",
+      "raw": "https://api.githubcopilot.com:8443/v1"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com:8443/v1/models",
+      "raw": "https://api.individual.githubcopilot.com:8443"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.individual.githubcopilot.com:8443/custom"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.individual.githubcopilot.com:8443/custom/responses"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com:8443/custom/v1/models",
+      "raw": "https://api.individual.githubcopilot.com:8443/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.individual.githubcopilot.com:8443/v1/models",
+      "raw": "https://api.individual.githubcopilot.com:8443/v1"
+    },
+    {
+      "endpoint": "https://API.GITHUBCOPILOT.COM/models",
+      "raw": "https://API.GITHUBCOPILOT.COM"
+    },
+    {
+      "endpoint": "https://API.GITHUBCOPILOT.COM/custom/models",
+      "raw": "https://API.GITHUBCOPILOT.COM/custom"
+    },
+    {
+      "endpoint": "https://API.GITHUBCOPILOT.COM/custom/models",
+      "raw": "https://API.GITHUBCOPILOT.COM/custom/responses"
+    },
+    {
+      "endpoint": "https://API.GITHUBCOPILOT.COM/custom/models",
+      "raw": "https://API.GITHUBCOPILOT.COM/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://API.GITHUBCOPILOT.COM/v1/models",
+      "raw": "https://API.GITHUBCOPILOT.COM/v1"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com.evil.test/v1/models",
+      "raw": "https://api.githubcopilot.com.evil.test"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com.evil.test/custom/v1/models",
+      "raw": "https://api.githubcopilot.com.evil.test/custom"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com.evil.test/custom/v1/models",
+      "raw": "https://api.githubcopilot.com.evil.test/custom/responses"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com.evil.test/custom/v1/models",
+      "raw": "https://api.githubcopilot.com.evil.test/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com.evil.test/v1/models",
+      "raw": "https://api.githubcopilot.com.evil.test/v1"
+    },
+    {
+      "endpoint": "https://example.test/v1/models",
+      "raw": "https://example.test"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "https://example.test/custom"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "https://example.test/custom/responses"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "https://example.test/custom/chat/completions"
+    },
+    {
+      "endpoint": "https://example.test/v1/models",
+      "raw": "https://example.test/v1"
+    }
+  ],
   "lifecycle_cases": [
     {
       "context": "cancelled",
@@ -8354,8 +8556,9 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
+      "scripts/metadata-compaction-reference/endpoints_test.go": "26fc4fa9e03f9bc6bf1338387099c3370b04f76c8fd40a19b324ddc0bf1236b3",
       "scripts/metadata-compaction-reference/reference_test.go": "9ef1a2be49cd7be67fbd570c5a83cf4c5a36e76f6529e6e44ca72c01e97d518c",
-      "scripts/metadata-compaction-reference/run.py": "7142bb5e81aa76b44999dd8ebebe2ee17b8eb1ea1c3a43b48fef763bc3141923"
+      "scripts/metadata-compaction-reference/run.py": "c9f57daed23de9b434d3d01549e3708261b5967859835a08274157e2d0dafdaa"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",

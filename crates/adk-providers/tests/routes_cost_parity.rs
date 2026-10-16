@@ -846,7 +846,7 @@ fn metadata_endpoint_normalization_matrix() {
         ),
         (
             "https://API.GITHUBCOPILOT.COM:8443/custom/responses",
-            "https://api.githubcopilot.com:8443/custom/models",
+            "https://api.githubcopilot.com:8443/custom/v1/models",
         ),
         (
             "https://api.individual.githubcopilot.com/custom",

@@ -14,10 +14,11 @@ pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error>
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
     let host = url.host_str().unwrap_or_default();
     let chatgpt = url.port().is_none() && (host == "chatgpt.com" || host.ends_with(".chatgpt.com"));
-    let copilot = matches!(
-        host,
-        "api.githubcopilot.com" | "api.individual.githubcopilot.com"
-    );
+    let copilot = url.port().is_none()
+        && matches!(
+            host,
+            "api.githubcopilot.com" | "api.individual.githubcopilot.com"
+        );
     let path = url.path().trim_end_matches('/');
     let path = path.strip_suffix("/chat/completions").unwrap_or(path);
     let path = path.strip_suffix("/responses").unwrap_or(path);

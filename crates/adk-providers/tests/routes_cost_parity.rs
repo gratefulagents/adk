@@ -486,6 +486,20 @@ fn metadata_source_parse_copilot_capabilities_shape() {
 }
 
 #[test]
+fn metadata_source_copilot_falls_back_to_max_prompt_tokens() {
+    let models = parse_model_metadata(
+        br#"{
+            "data": [{
+                "id": "some-model",
+                "capabilities": {"limits": {"max_prompt_tokens": 200000}}
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models[0].context_window, Some(200000));
+}
+
+#[test]
 fn metadata_source_picker_mirrors_codex_picker() {
     let models = parse_model_metadata(
         br#"{

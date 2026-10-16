@@ -2,6 +2,19 @@
 
 ## Current continuation evidence
 
+### Complete original metadata test-file coverage
+
+Added an isolated counterpart of the original Copilot max-prompt-token fallback
+regression, preserving its payload and exact 200000 context-window assertion.
+All eight original metadata tests now support the test-file acceptance claim;
+this does not close the production parser, transport, or provider package.
+
+Fresh pinned Go execution: **867 passed /5 skipped**,36 packages. Native bound
+evidence, strict provider all-feature/all-target Clippy, Rust2024 formatting,
+51 ledger/audit validator tests and overlay/audit checks pass. No production code
+changed in this checkpoint. Ledger: **803 verified (801 executable-tested +2
+artifact-reviewed) /8,088 unresolved /251 excluded**. Issue11 remains incomplete.
+
 ### Standard metadata discovery and exact source regressions
 
 Five additional native regressions reproduce every assertion in the original

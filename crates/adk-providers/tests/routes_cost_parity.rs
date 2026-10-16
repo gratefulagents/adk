@@ -391,7 +391,7 @@ fn metadata_catalog_picker_lookup_and_compaction_match_baseline() {
     assert!(!by_id.contains_key("openai/gpt-6-astra"));
     let astra = &by_id["gpt-6-astra"];
     assert_eq!(astra.priority, Some(1));
-    assert_eq!(astra.resolved_context_window(), Some(272000));
+    assert_eq!(astra.resolved_context_window(), 272000);
     assert_eq!(astra.compaction_defaults(), Some((244800, 136000)));
     assert_eq!(astra.supported_reasoning_levels, ["low", "ultra"]);
     assert_eq!(astra.default_reasoning_level, "high");
@@ -482,7 +482,7 @@ fn metadata_source_parse_codex_shape() {
     let got = &models[0];
     assert_eq!(got.id, "gpt-5.5");
     assert_eq!(got.context_window, Some(272000));
-    assert_eq!(got.resolved_context_window(), Some(272000));
+    assert_eq!(got.resolved_context_window(), 272000);
     assert_eq!(got.auto_compact_token_limit, None);
     assert_eq!(got.effective_context_window_percent, Some(95));
 }
@@ -509,7 +509,7 @@ fn metadata_source_parse_copilot_capabilities_shape() {
     let got = &models[0];
     assert_eq!(got.id, "gpt-5.3-codex-spark");
     assert_eq!(got.context_window, Some(128000));
-    assert_eq!(got.resolved_context_window(), Some(128000));
+    assert_eq!(got.resolved_context_window(), 128000);
     assert_eq!(got.max_output_tokens, Some(32000));
 }
 
@@ -556,7 +556,7 @@ fn metadata_source_picker_mirrors_codex_picker() {
     assert_eq!(astra.default_reasoning_level, "low");
     assert_eq!(astra.supported_reasoning_levels.len(), 3);
     assert_eq!(astra.supported_reasoning_levels[2], "ultra");
-    assert_eq!(astra.resolved_context_window(), Some(272000));
+    assert_eq!(astra.resolved_context_window(), 272000);
     assert_eq!(picker[2].upgrade_model.as_deref(), Some("gpt-5.6-luna"));
     assert!(
         models

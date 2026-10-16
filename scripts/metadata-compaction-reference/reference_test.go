@@ -118,7 +118,7 @@ func nativeThresholdObservations() []map[string]any {
 		{ID: "gpt-test", ContextWindow: 1000, AutoCompactTokenLimit: 950},
 	}
 	for _, contextWindow := range []int{-1, 0, 1, 2, 3, 10000, 1 << 60, maxInt, minInt} {
-		for _, maxWindow := range []int{-1, 0, 10000} {
+		for _, maxWindow := range []int{-1, 0, 10000, minInt, maxInt} {
 			for _, autoLimit := range []int{-1, 0, 1, 2, 4500, 99999, maxInt, minInt} {
 				models = append(models, ModelMetadata{ID: "grid", ContextWindow: contextWindow, MaxContextWindow: maxWindow, AutoCompactTokenLimit: autoLimit, EffectiveContextWindowPercent: 95})
 			}
@@ -127,7 +127,7 @@ func nativeThresholdObservations() []map[string]any {
 	var out []map[string]any
 	for _, model := range models {
 		trigger, target, valid := CompactionDefaultsFromModelMetadata(model)
-		out = append(out, map[string]any{"id": model.ID, "context": model.ContextWindow, "max_context": model.MaxContextWindow, "auto_limit": model.AutoCompactTokenLimit, "percent": model.EffectiveContextWindowPercent, "trigger": trigger, "target": target, "valid": valid})
+		out = append(out, map[string]any{"id": model.ID, "context": model.ContextWindow, "max_context": model.MaxContextWindow, "auto_limit": model.AutoCompactTokenLimit, "percent": model.EffectiveContextWindowPercent, "resolved_context": model.ResolvedContextWindow(), "trigger": trigger, "target": target, "valid": valid})
 	}
 	return out
 }

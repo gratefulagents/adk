@@ -121,23 +121,23 @@ impl ModelMetadata {
     pub fn hidden(&self) -> bool {
         self.visibility.trim().eq_ignore_ascii_case("hide")
     }
-    pub fn resolved_context_window(&self) -> Option<u64> {
+    pub fn resolved_context_window(&self) -> i64 {
         self.context_window
             .filter(|v| *v > 0)
-            .or(self.max_context_window.filter(|v| *v > 0))
-            .map(|value| value as u64)
+            .unwrap_or(self.max_context_window.unwrap_or(0))
     }
     /// Baseline compaction trigger and target, in tokens.
     pub fn compaction_defaults(&self) -> Option<(u64, u64)> {
         let mut trigger = self.auto_compact_token_limit.unwrap_or(0);
         let mut target = trigger / 2;
-        if let Some(context) = self.resolved_context_window() {
+        let context = self.resolved_context_window();
+        if context > 0 {
             // Preserve the pinned 64-bit SDK arithmetic for reported metadata limits.
-            let limit = (context as i64).wrapping_mul(9) / 10;
+            let limit = context.wrapping_mul(9) / 10;
             if trigger <= 0 || trigger > limit {
                 trigger = limit;
             }
-            target = context as i64 / 2;
+            target = context / 2;
         }
         if trigger <= 0 {
             return None;

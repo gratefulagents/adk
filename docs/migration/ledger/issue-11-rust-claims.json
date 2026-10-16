@@ -3399,7 +3399,7 @@
         "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexLimit",
-      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 219 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
+      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 363 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
@@ -3415,7 +3415,7 @@
         "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexLimit",
-      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 219 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
+      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 363 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
@@ -3431,7 +3431,7 @@
         "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexLimit",
-      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 219 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
+      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 363 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
@@ -3447,7 +3447,7 @@
         "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataClampsConfiguredLimit",
-      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 219 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
+      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 363 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
@@ -3463,7 +3463,7 @@
         "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexGPT56Limit",
-      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 219 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
+      "rationale": "Only the pure metadata-derived threshold helper and its three upstream regressions are closed on the recorded 64-bit target. Independent pinned SDK execution supplies 363 observations: the exact upstream Codex/GPT-5.6/clamping inputs plus a signed boundary grid covering context/max-context selection, absent/nonpositive/positive auto limits, target normalization, effective-percent non-use, and signed 64-bit overflow. Native signed metadata fields and wrapping arithmetic reproduce the SDK branches; invalid defaults map to None and valid trigger/target values to Some. This does not close catalog JSON decoding, fetch/auth/cache behavior, builder composition or whole provider parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
@@ -14950,6 +14950,22 @@
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "providers"
+      ]
+    },
+    "SDK-CF7DC89EFCC601CF": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.ResolvedContextWindow",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::resolved_context_window"
+      ],
+      "rust_test_identifiers": [
+        "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexLimit",
+      "rationale": "Closes only the signed resolved-context helper on the recorded 64-bit target. Independent pinned Go execution records its exact return alongside compaction outcomes for363 cases covering positive primary precedence, nonpositive primary fallback, zero and both signed extrema. The native helper now returns i64, retaining negative maximum values instead of discarding them into None; absent optional fields map to Go zero. The regression failed before the fix (0 versus -1) and verifies compaction still ignores nonpositive windows. The original compaction test is a source association; direct custom-oracle helper observations are the behavior evidence. No enclosing metadata type, parser, fetch or provider closure is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime"
       ]
     }
   }

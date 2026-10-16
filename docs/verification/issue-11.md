@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Signed resolved-context helper
+
+The pinned SDK returns `MaxContextWindow` unchanged when `ContextWindow` is
+nonpositive, including a negative maximum. The previous Rust helper discarded
+that result. Its public return type is now `i64` rather than `Option<u64>`;
+missing fields resolve to zero. Consumers requiring a usable capacity should
+check `> 0`. Compaction retains that positive-window guard and its existing
+signed wrapping arithmetic.
+
+Independent Go observations now cover 363 helper/compaction cases, including
+both signed extrema for primary and maximum windows. The native regression
+failed before the correction (`0` versus `-1`) and passes afterward. This closes
+only `ModelMetadata.ResolvedContextWindow`, not the enclosing type or parser.
+
+Fresh full workspace: **1,580 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, feature matrix,
+standalone consumer/purity, bound native/oracle evidence,51 validators, artifact
+reviews and source locks pass. Ledger: **836 verified /8,055 unresolved /251
+excluded**. Issue11 remains incomplete.
+
 ### Metadata Unicode replacement and original HTTP bytes
 
 Twelve new independently executed Go cases exposed rejection of lone UTF-16

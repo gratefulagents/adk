@@ -298,7 +298,16 @@ fn catalog_shapes_and_nullable_fields_match_pinned_sdk() {
 fn metadata_thresholds_match_pinned_sdk_signed_boundary_grid() {
     let fixture = fixture();
     let cases = fixture["threshold_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 219);
+    assert_eq!(cases.len(), 363);
+    assert_eq!(ModelMetadata::default().resolved_context_window(), 0);
+    assert_eq!(
+        ModelMetadata {
+            max_context_window: Some(-1),
+            ..Default::default()
+        }
+        .resolved_context_window(),
+        -1
+    );
     for case in cases {
         let metadata = ModelMetadata {
             id: case["id"].as_str().unwrap().into(),
@@ -315,6 +324,11 @@ fn metadata_thresholds_match_pinned_sdk_signed_boundary_grid() {
             )
         });
         assert_eq!(metadata.compaction_defaults(), expected, "{case}");
+        assert_eq!(
+            metadata.resolved_context_window(),
+            case["resolved_context"].as_i64().unwrap(),
+            "{case}"
+        );
     }
 }
 

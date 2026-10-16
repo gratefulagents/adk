@@ -1809,7 +1809,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/metadata-compaction-reference/reference_test.go": "5533b7cc35554f2077936aa879a0a66692fb84dc0d36dd9713d4f3768a776b54",
+      "scripts/metadata-compaction-reference/reference_test.go": "1478e564b980756a2e8c633bcc6cdcf29529a3198400b8fb31ab8c597e83ffd0",
       "scripts/metadata-compaction-reference/run.py": "4a31146bf2897207ad3dcb31c9446eb099726c092cd2ad43f9cbaefbb304948d"
     },
     "license": "GPL-3.0-only",
@@ -2072,6 +2072,7 @@
       "id": "gpt-5.5",
       "max_context": 272000,
       "percent": 0,
+      "resolved_context": 272000,
       "target": 136000,
       "trigger": 244800,
       "valid": true
@@ -2082,6 +2083,7 @@
       "id": "gpt-5.6-sol",
       "max_context": 372000,
       "percent": 0,
+      "resolved_context": 372000,
       "target": 186000,
       "trigger": 334800,
       "valid": true
@@ -2092,6 +2094,7 @@
       "id": "gpt-test",
       "max_context": 0,
       "percent": 0,
+      "resolved_context": 1000,
       "target": 500,
       "trigger": 900,
       "valid": true
@@ -2102,6 +2105,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2112,6 +2116,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2122,6 +2127,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2132,6 +2138,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2142,6 +2149,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2152,6 +2160,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -2162,6 +2171,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -2172,6 +2182,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2182,6 +2193,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2192,6 +2204,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2202,6 +2215,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2212,6 +2226,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2222,6 +2237,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2232,6 +2248,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -2242,6 +2259,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -2252,6 +2270,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2262,6 +2281,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2272,6 +2292,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2282,6 +2303,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2292,6 +2314,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2302,6 +2325,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2312,6 +2336,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2322,6 +2347,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2332,8 +2358,185 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
       "valid": true
     },
     {
@@ -2342,6 +2545,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2352,6 +2556,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2362,6 +2567,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2372,6 +2578,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2382,6 +2589,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2392,6 +2600,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -2402,6 +2611,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -2412,6 +2622,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2422,6 +2633,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2432,6 +2644,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2442,6 +2655,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2452,6 +2666,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2462,6 +2677,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2472,6 +2688,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -2482,6 +2699,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -2492,6 +2710,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2502,6 +2721,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2512,6 +2732,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2522,6 +2743,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2532,6 +2754,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -2542,6 +2765,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -2552,6 +2776,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2562,6 +2787,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -2572,16 +2798,194 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
     },
     {
       "auto_limit": -1,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 0,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 0,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
       "context": 1,
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2592,6 +2996,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2602,6 +3007,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2612,6 +3018,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2622,6 +3029,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2632,6 +3040,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2642,6 +3051,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2652,6 +3062,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2662,6 +3073,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2672,6 +3084,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2682,6 +3095,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2692,6 +3106,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2702,6 +3117,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2712,6 +3128,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2722,6 +3139,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2732,6 +3150,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2742,6 +3161,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2752,6 +3172,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2762,6 +3183,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2772,6 +3194,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2782,6 +3205,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2792,6 +3216,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2802,6 +3227,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2812,6 +3238,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -2822,6 +3425,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2832,6 +3436,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2842,6 +3447,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2852,6 +3458,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2862,6 +3469,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2872,6 +3480,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2882,6 +3491,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2892,6 +3502,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2902,6 +3513,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2912,6 +3524,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2922,6 +3535,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2932,6 +3546,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2942,6 +3557,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2952,6 +3568,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2962,6 +3579,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2972,6 +3590,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2982,6 +3601,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -2992,6 +3612,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3002,6 +3623,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3012,6 +3634,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3022,6 +3645,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3032,6 +3656,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3042,6 +3667,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3052,6 +3678,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 2,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 2,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 2,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3062,6 +3865,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3072,6 +3876,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3082,6 +3887,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3092,6 +3898,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3102,6 +3909,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3112,6 +3920,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3122,6 +3931,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3132,6 +3942,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3142,6 +3953,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3152,6 +3964,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3162,6 +3975,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3172,6 +3986,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3182,6 +3997,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3192,6 +4008,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3202,6 +4019,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3212,6 +4030,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3222,6 +4041,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3232,6 +4052,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3242,6 +4063,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3252,6 +4074,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3262,6 +4085,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3272,6 +4096,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3282,6 +4107,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3292,6 +4118,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 3,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 3,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 3,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3302,6 +4305,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3312,6 +4316,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3322,6 +4327,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3332,6 +4338,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3342,6 +4349,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3352,6 +4360,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3362,6 +4371,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3372,6 +4382,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3382,6 +4393,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3392,6 +4404,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3402,6 +4415,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3412,6 +4426,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3422,6 +4437,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3432,6 +4448,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3442,6 +4459,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3452,6 +4470,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3462,6 +4481,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3472,6 +4492,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3482,6 +4503,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3492,6 +4514,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3502,6 +4525,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3512,6 +4536,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3522,6 +4547,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3532,6 +4558,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 10000,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
+      "target": 5000,
+      "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 10000,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -3542,6 +4745,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3552,6 +4756,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3562,6 +4767,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3572,6 +4778,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3582,6 +4789,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3592,6 +4800,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3602,6 +4811,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3612,6 +4822,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3622,6 +4833,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3632,6 +4844,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3642,6 +4855,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3652,6 +4866,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3662,6 +4877,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3672,6 +4888,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3682,6 +4899,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3692,6 +4910,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3702,6 +4921,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3712,6 +4932,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3722,6 +4943,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3732,6 +4954,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3742,6 +4965,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3752,6 +4976,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3762,6 +4987,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3772,6 +4998,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 2,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 4500,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 99999,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 1152921504606846976,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 1152921504606846976,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -3782,6 +5185,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3792,6 +5196,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3802,6 +5207,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3812,6 +5218,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3822,6 +5229,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3832,6 +5240,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -3842,6 +5251,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3852,6 +5262,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3862,6 +5273,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3872,6 +5284,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3882,6 +5295,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3892,6 +5306,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3902,6 +5317,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3912,6 +5328,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -3922,6 +5339,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3932,6 +5350,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3942,6 +5361,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3952,6 +5372,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -3962,6 +5383,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -3972,6 +5394,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -3982,6 +5405,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -3992,6 +5416,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -4002,6 +5427,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -4012,6 +5438,183 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": 9223372036854775807,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
       "target": 461168601842738789,
       "trigger": 922337203685477579,
       "valid": true
@@ -4022,6 +5625,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4032,6 +5636,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4042,6 +5647,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -4052,6 +5658,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -4062,6 +5669,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -4072,6 +5680,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -4082,6 +5691,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -4092,6 +5702,7 @@
       "id": "grid",
       "max_context": -1,
       "percent": 95,
+      "resolved_context": -1,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4102,6 +5713,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4112,6 +5724,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4122,6 +5735,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -4132,6 +5746,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -4142,6 +5757,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -4152,6 +5768,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 49999,
       "trigger": 99999,
       "valid": true
@@ -4162,6 +5779,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 4611686018427387903,
       "trigger": 9223372036854775807,
       "valid": true
@@ -4172,6 +5790,7 @@
       "id": "grid",
       "max_context": 0,
       "percent": 95,
+      "resolved_context": 0,
       "target": 0,
       "trigger": 0,
       "valid": false
@@ -4182,6 +5801,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -4192,6 +5812,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -4202,6 +5823,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 0,
       "trigger": 1,
       "valid": true
@@ -4212,6 +5834,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 1,
       "trigger": 2,
       "valid": true
@@ -4222,6 +5845,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 2250,
       "trigger": 4500,
       "valid": true
@@ -4232,6 +5856,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -4242,6 +5867,7 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
       "valid": true
@@ -4252,8 +5878,185 @@
       "id": "grid",
       "max_context": 10000,
       "percent": 95,
+      "resolved_context": 10000,
       "target": 5000,
       "trigger": 9000,
+      "valid": true
+    },
+    {
+      "auto_limit": -1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 0,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": 1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 4611686018427387903,
+      "trigger": 9223372036854775807,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": -9223372036854775808,
+      "percent": 95,
+      "resolved_context": -9223372036854775808,
+      "target": 0,
+      "trigger": 0,
+      "valid": false
+    },
+    {
+      "auto_limit": -1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 0,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": 1,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 0,
+      "trigger": 1,
+      "valid": true
+    },
+    {
+      "auto_limit": 2,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 1,
+      "trigger": 2,
+      "valid": true
+    },
+    {
+      "auto_limit": 4500,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 2250,
+      "trigger": 4500,
+      "valid": true
+    },
+    {
+      "auto_limit": 99999,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 49999,
+      "trigger": 99999,
+      "valid": true
+    },
+    {
+      "auto_limit": 9223372036854775807,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
+      "valid": true
+    },
+    {
+      "auto_limit": -9223372036854775808,
+      "context": -9223372036854775808,
+      "id": "grid",
+      "max_context": 9223372036854775807,
+      "percent": 95,
+      "resolved_context": 9223372036854775807,
+      "target": 461168601842738789,
+      "trigger": 922337203685477579,
       "valid": true
     }
   ],

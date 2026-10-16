@@ -13,8 +13,9 @@ pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error>
     let mut url = reqwest::Url::parse(&session.scope().endpoint)
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
     let host = url.host_str().unwrap_or_default();
-    let chatgpt = url.port().is_none() && (host == "chatgpt.com" || host.ends_with(".chatgpt.com"));
-    let copilot = url.port().is_none()
+    let has_port = crate::auth::explicit_endpoint_port(&session.scope().endpoint).is_some();
+    let chatgpt = !has_port && (host == "chatgpt.com" || host.ends_with(".chatgpt.com"));
+    let copilot = !has_port
         && matches!(
             host,
             "api.githubcopilot.com" | "api.individual.githubcopilot.com"

@@ -113,7 +113,7 @@ func nativeCatalogObservations() []map[string]any {
 
 func nativeBackendObservations() []map[string]any {
 	var out []map[string]any
-	for _, host := range []string{"chatgpt.com", "CHATGPT.COM", "api.chatgpt.com", "chatgpt.com:8443", "a.b.chatgpt.com:8443", "api.openai.com", "notchatgpt.com", "chatgpt.com.evil.test", "chatgpt.com.", "127.0.0.1:8443"} {
+	for _, host := range []string{"chatgpt.com", "CHATGPT.COM", "api.chatgpt.com", "chatgpt.com:8443", "chatgpt.com:443", "chatgpt.com:", "api.chatgpt.com:00443", "a.b.chatgpt.com:8443", "api.openai.com", "notchatgpt.com", "chatgpt.com.evil.test", "chatgpt.com.", "127.0.0.1:8443"} {
 		endpoint := "https://" + host + "/backend-api/codex/responses"
 		out = append(out, map[string]any{"endpoint": endpoint, "chatgpt": internalopenai.IsChatGPTBackendBaseURL(endpoint)})
 	}

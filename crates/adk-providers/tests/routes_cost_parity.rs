@@ -896,7 +896,9 @@ fn metadata_codex_client_version_is_session_owned_and_guarded() {
         ] {
             for (host, accepted) in [
                 ("chatgpt.com", true),
-                ("chatgpt.com:443", true),
+                ("chatgpt.com:443", false),
+                ("chatgpt.com:", false),
+                ("api.chatgpt.com:00443", false),
                 ("CHATGPT.COM", true),
                 ("api.chatgpt.com", true),
                 ("a.b.chatgpt.com:8443", false),

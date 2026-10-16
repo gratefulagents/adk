@@ -92,6 +92,14 @@ for one rotating refresh token are **not** a distributed refresh lock. Storage
 implementations must enforce their own cross-process single-flight semantics.
 Store and refresh trait errors must be sanitized by the host.
 
+Canonical scopes retain explicit default and empty ports (`:443`, `:00443`, `:`)
+rather than merging them with an omitted port. Their credential and prompt-cache
+keys remain distinct, including after session reconstruction. This distinction is
+required by the SDK's raw-host backend predicates: an explicit port prevents
+ChatGPT/Copilot metadata special-casing and Codex client-version query decoration.
+The transport URL still uses reqwest's canonical representation; this is not a
+claim of byte-identical raw URL or HTTP Host-header formatting.
+
 For OpenAI OAuth, configure `Session::with_codex_client_version("0.999.0")`
 before wrapping the session in `Arc`, then share that session with the provider
 and metadata resolver. Values are trimmed; blank values use the pinned

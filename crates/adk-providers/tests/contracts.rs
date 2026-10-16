@@ -64,6 +64,40 @@ fn request() -> ModelRequest {
 }
 
 #[test]
+fn explicit_default_ports_remain_distinct_idempotent_credential_scopes() {
+    for (input, expected) in [
+        ("HTTPS://CHATGPT.COM:443/", "https://chatgpt.com:443"),
+        (
+            "https://api.chatgpt.com:00443/custom/",
+            "https://api.chatgpt.com:00443/custom",
+        ),
+        ("https://chatgpt.com:/", "https://chatgpt.com:"),
+        ("http://localhost:80/", "http://localhost:80"),
+        ("https://[::1]:443/custom/", "https://[::1]:443/custom"),
+        ("https://[::1]/custom/", "https://[::1]/custom"),
+    ] {
+        let scope = Scope::new("route", input, None, AuthMode::ApiKey).unwrap();
+        assert_eq!(scope.endpoint, expected);
+        assert_eq!(
+            Scope::new("route", &scope.endpoint, None, AuthMode::ApiKey).unwrap(),
+            scope
+        );
+        let canonical_transport = reqwest::Url::parse(input).unwrap();
+        assert_eq!(
+            reqwest::Url::parse(&scope.endpoint).unwrap().origin(),
+            canonical_transport.origin()
+        );
+    }
+    let implicit = Scope::new("route", "https://chatgpt.com", None, AuthMode::ApiKey).unwrap();
+    let explicit = Scope::new("route", "https://chatgpt.com:443", None, AuthMode::ApiKey).unwrap();
+    assert_ne!(implicit, explicit);
+    assert_ne!(
+        cache_scope(&implicit, &material(), "prompt"),
+        cache_scope(&explicit, &material(), "prompt")
+    );
+}
+
+#[test]
 fn sse_every_byte_boundary_including_unicode_crlf_and_bom() {
     let data =
         "\u{feff}: comment\r\nevent: delta\r\ndata: hé🙂\r\ndata: two\r\n\r\ndata: [DONE]\n\n";

@@ -77,13 +77,37 @@ impl Scope {
             return Err(crate::invalid("invalid credential route"));
         }
         url.set_path(url.path().trim_end_matches('/').to_owned().as_str());
+        // Url erases default ports, but their presence changes SDK backend classification.
+        let endpoint = match explicit_endpoint_port(endpoint) {
+            Some(port) if url.port().is_none() => {
+                format!(
+                    "{}:{port}{}",
+                    url.origin().ascii_serialization(),
+                    url.path()
+                )
+            }
+            _ => url.to_string(),
+        };
         Ok(Self {
             route: route.to_owned(),
-            endpoint: url.to_string().trim_end_matches('/').to_owned(),
+            endpoint: endpoint.trim_end_matches('/').to_owned(),
             account,
             mode,
         })
     }
+}
+
+pub(crate) fn explicit_endpoint_port(endpoint: &str) -> Option<&str> {
+    let authority = endpoint
+        .trim()
+        .split_once("://")?
+        .1
+        .split(['/', '\\', '?', '#'])
+        .next()?;
+    let (_, port) = authority.rsplit_once(':')?;
+    port.bytes()
+        .all(|byte| byte.is_ascii_digit())
+        .then_some(port)
 }
 
 #[derive(Debug, Clone)]
@@ -429,6 +453,7 @@ impl Session {
 }
 pub(crate) fn decorate_codex_url(url: &mut Url, session: &Session) {
     if session.scope().mode != AuthMode::OpenAiOAuth
+        || explicit_endpoint_port(&session.scope().endpoint).is_some()
         || url.port().is_some()
         || !url
             .host_str()

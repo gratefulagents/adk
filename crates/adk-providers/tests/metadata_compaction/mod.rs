@@ -369,7 +369,7 @@ fn public_picker_sort_matches_pinned_sdk_and_preserves_stable_ties() {
 fn metadata_nondefault_port_classification_matches_pinned_sdk() {
     let fixture = fixture();
     let cases = fixture["backend_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 10);
+    assert_eq!(cases.len(), 13);
     for case in cases {
         let endpoint = case["endpoint"].as_str().unwrap();
         let chatgpt = case["chatgpt"].as_bool().unwrap();
@@ -397,7 +397,7 @@ fn metadata_nondefault_port_classification_matches_pinned_sdk() {
 fn metadata_endpoint_paths_match_pinned_sdk_with_nondefault_ports() {
     let fixture = fixture();
     let cases = fixture["endpoint_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 50);
+    assert_eq!(cases.len(), 80);
     for case in cases {
         let session = session(case["raw"].as_str().unwrap(), AuthMode::ApiKey);
         assert_eq!(

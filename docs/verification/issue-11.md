@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Explicit default ports retain backend and credential-scope distinctions
+
+Scope canonicalization now retains explicit default/empty ports before reqwest
+can erase them. Metadata classification and Codex query decoration use that
+preserved distinction. Pinned Go observations expanded to13 backend cases and80
+endpoint cases, including443,00443 and empty ports on ChatGPT/Copilot hosts.
+Native tests cover API-key/OAuth metadata paths, all auth-mode query guards,
+prepared inference/compaction URLs, IPv6/loopback normalization, idempotence and
+distinct credential/prompt-cache scopes. The old expectation treating explicit
+ChatGPT443 as special was corrected against the independently executed Go result.
+Native transport URLs remain canonicalized; no raw URL/Host-header byte claim.
+
+Fresh Rust1.88: **1,607 passed /0 failed /30 ignored**, **9 doctests**; strict
+Clippy/rustdoc, Rust/Go formatting, facade matrix, locked consumer/purity, all20
+scenarios and host-session passed. Independent metadata reproduction, bound
+evidence,51 validators, artifact checks and source locks passed. All46 CI checks
+passed on preceding1549abbb; this new tranche's CI is not yet claimed. Ledger
+unchanged: **851 verified /8,040 unresolved /251 excluded**; issue11 is incomplete.
+
 ### Go-valid raw provider arguments and snapshots
 
 Chat/Responses normalization and snapshot capture now validate Go JSON syntax,

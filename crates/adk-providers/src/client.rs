@@ -1453,6 +1453,9 @@ mod tests {
         ] {
             for (host, accepted) in [
                 ("chatgpt.com", true),
+                ("chatgpt.com:443", false),
+                ("chatgpt.com:", false),
+                ("api.chatgpt.com:00443", false),
                 ("a.b.chatgpt.com:8443", false),
                 ("api.openai.com", false),
                 ("chatgpt.com.evil.test", false),
@@ -1487,8 +1490,11 @@ mod tests {
                         ""
                     };
                     assert_eq!(
-                        request.url().as_str(),
-                        format!("https://{host}/backend-api/codex{path}{suffix}")
+                        request.url(),
+                        &reqwest::Url::parse(&format!(
+                            "https://{host}/backend-api/codex{path}{suffix}"
+                        ))
+                        .unwrap()
                     );
                 }
             }

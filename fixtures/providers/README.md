@@ -18,6 +18,10 @@ thinking-type/budget/effort cases with both Chat and Responses projections.
 Chat requires the exact nested thinking type `enabled`; Responses intentionally
 uses positive budgets regardless of type. Explicit effort takes precedence in
 both protocols. The native regression compares all 60 reasoning projections.
+Ten further Responses tool-pairing cases compare complete input arrays: orphans,
+matched/prior/future calls, trimmed/generated/blank IDs, repeated results,
+whitespace-only outputs and images attached to matched or orphan results.
+Orphan outputs are omitted without dropping their separate image blocks.
 The Rust SSE differentials check every byte split. JSON
 member order is not significant; opaque continuation strings are unchanged.
 Regenerate with `bash scripts/providers/generate.sh /path/to/pinned/sdk`.

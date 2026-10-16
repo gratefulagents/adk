@@ -1229,6 +1229,92 @@ fn thinking_type_gate_matches_pinned_chat_and_responses() {
 }
 
 #[test]
+fn responses_original_skips_orphan_tool_results() {
+    use adk_core::{Content, Message, Role, RunItem, ToolOutput};
+    let mut input = request();
+    input.input = vec![
+        RunItem::ToolResult {
+            call_id: "call_missing".into(),
+            output: ToolOutput {
+                content: vec![Content::Text {
+                    text: "/repo".into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            },
+        },
+        RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text {
+                    text: "continue".into(),
+                }],
+            },
+        },
+    ];
+    let body = wire::request(&input, Protocol::Responses, false).unwrap();
+    let items = body["input"].as_array().unwrap();
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0]["role"], "user");
+    assert_eq!(items[0]["content"], "continue");
+}
+
+#[test]
+fn responses_tool_pairing_matches_pinned_go() {
+    use adk_core::{Content, Message, Role, RunItem, ToolCall, ToolOutput};
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["responses_tool_pairs"].as_array().unwrap();
+    assert_eq!(cases.len(), 10);
+    for case in cases {
+        let mut input = request();
+        for op in case["operations"].as_array().unwrap() {
+            let id = op["id"].as_str().unwrap();
+            let text = op["text"].as_str().unwrap();
+            input.input.push(match op["kind"].as_str().unwrap() {
+                "call" => RunItem::ToolCall {
+                    call: ToolCall {
+                        id: id.into(),
+                        name: "Bash".into(),
+                        arguments: json!({"command":"pwd"}),
+                        raw_arguments: None,
+                    },
+                },
+                "result" => {
+                    let mut content = vec![Content::Text { text: text.into() }];
+                    if op["image"] == true {
+                        content.push(Content::Attachment {
+                            media_type: "image/png".into(),
+                            data: "cG5n".into(),
+                            detail: String::new(),
+                        });
+                    }
+                    RunItem::ToolResult {
+                        call_id: id.into(),
+                        output: ToolOutput {
+                            content,
+                            is_error: false,
+                            should_pause: false,
+                        },
+                    }
+                }
+                "text" => RunItem::Message {
+                    message: Message {
+                        role: Role::User,
+                        content: vec![Content::Text { text: text.into() }],
+                    },
+                },
+                kind => panic!("unknown fixture operation {kind}"),
+            });
+        }
+        let body = wire::request(&input, Protocol::Responses, false).unwrap();
+        assert_eq!(body["input"], case["items"], "{}", case["name"]);
+    }
+}
+
+#[test]
 fn responses_done_only_tracking_is_per_content_part() {
     let mut stream = StreamState::new(Protocol::Responses);
     for part in 0..2 {
@@ -1326,10 +1412,15 @@ fn compacted_history_and_multimodal_tool_results_replay_without_reordering() {
                 "aW1hZ2U="
             );
         } else {
-            let offset = usize::from(protocol == Protocol::Chat);
-            assert_eq!(entries[offset + 1]["role"], "user");
+            let image_index = if protocol == Protocol::Chat {
+                2
+            } else {
+                assert_eq!(entries.as_array().unwrap().len(), 1);
+                0
+            };
+            assert_eq!(entries[image_index]["role"], "user");
             assert_eq!(
-                entries[offset + 1]["content"][0]["type"],
+                entries[image_index]["content"][0]["type"],
                 if protocol == Protocol::Chat {
                     "image_url"
                 } else {

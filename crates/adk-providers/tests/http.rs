@@ -197,6 +197,57 @@ async fn copilot_original_stream_drops_nested_budget_reasoning() {
 }
 
 #[tokio::test]
+async fn responses_http_drops_orphan_output_without_losing_following_message() {
+    use adk_core::{Content, Message, Role, RunItem, ToolOutput};
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        let captured = read_request(&mut socket);
+        let body = r#"{"id":"resp_1","output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}]}"#;
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+        captured
+    });
+    let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+    let model = Provider::new(
+        "fixture",
+        Protocol::Responses,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    let mut input = request();
+    input.input = vec![
+        RunItem::ToolResult {
+            call_id: "missing".into(),
+            output: ToolOutput {
+                content: vec![Content::Text {
+                    text: "orphaned output".into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            },
+        },
+        RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text {
+                    text: "continue".into(),
+                }],
+            },
+        },
+    ];
+    model.complete(&context(), input).await.unwrap();
+    let captured = server.join().unwrap();
+    assert_eq!(captured.lines().next(), Some("POST /v1/responses HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+    assert_eq!(
+        body["input"],
+        serde_json::json!([{"role":"user","content":"continue"}])
+    );
+}
+
+#[tokio::test]
 async fn image_analysis_matches_pinned_public_helper() {
     use adk_providers::client::ImageAnalysisRequest;
     let fixture: serde_json::Value = serde_json::from_str(include_str!(

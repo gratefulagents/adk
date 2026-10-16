@@ -129,6 +129,7 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         return Err(crate::invalid("model name is empty"));
     }
     let mut entries = Vec::new();
+    let mut seen_tool_calls = std::collections::BTreeSet::new();
     let mut system = Vec::new();
     if !request.instructions.is_empty() {
         if protocol == Protocol::Anthropic {
@@ -199,7 +200,13 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
             }
             RunItem::ToolCall { call } => match protocol {
                 Protocol::Responses => {
-                    json!({"type":"function_call","call_id":call.id,"name":call.name,"arguments":call.argument_text().as_ref()})
+                    let id = if call.id.trim().is_empty() {
+                        format!("call_{}", entries.len())
+                    } else {
+                        call.id.trim().to_owned()
+                    };
+                    seen_tool_calls.insert(id.clone());
+                    json!({"type":"function_call","call_id":id,"name":call.name,"arguments":call.argument_text().as_ref()})
                 }
                 Protocol::Chat => {
                     json!({"role":"assistant","content":null,"tool_calls":[{"id":call.id,"type":"function","function":{"name":call.name,"arguments":call.argument_text().as_ref()}}]})
@@ -223,12 +230,18 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                         }
                     }
                     let text = texts.join("\n");
-                    let text = if text.is_empty() {
+                    let text = if text.is_empty()
+                        || (protocol == Protocol::Responses && text.trim().is_empty())
+                    {
                         "(no output)"
                     } else {
                         &text
                     };
                     if protocol == Protocol::Responses {
+                        let call_id = call_id.trim();
+                        if call_id.is_empty() || !seen_tool_calls.contains(call_id) {
+                            continue;
+                        }
                         json!({"type":"function_call_output","call_id":call_id,"output":text})
                     } else {
                         json!({"role":"tool","tool_call_id":call_id,"content":text})

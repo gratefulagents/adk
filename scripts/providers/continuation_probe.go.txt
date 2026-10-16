@@ -65,6 +65,46 @@ func TestADKContinuationGolden(t *testing.T) {
         }
     }
     golden["reasoning_gates"] = reasoningGates
+    type toolOperation struct {
+        Kind string `json:"kind"`
+        ID string `json:"id"`
+        Text string `json:"text"`
+        Image bool `json:"image"`
+    }
+    toolCases := []struct { name string; operations []toolOperation }{
+        {"orphan", []toolOperation{{"result", "call_missing", "/repo", false}, {"text", "", "continue", false}}},
+        {"matched", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", "/repo", false}}},
+        {"result-before-call", []toolOperation{{"result", "call_1", "/repo", false}, {"call", "call_1", "", false}}},
+        {"trimmed-identifiers", []toolOperation{{"call", " call_1 ", "", false}, {"result", "\tcall_1\n", "/repo", false}}},
+        {"generated-identifier", []toolOperation{{"call", " ", "", false}, {"result", "call_0", "/repo", false}}},
+        {"blank-result-identifier", []toolOperation{{"call", "", "", false}, {"result", " ", "/repo", false}}},
+        {"repeated-result", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", "first", false}, {"result", "call_1", "second", false}}},
+        {"orphan-image", []toolOperation{{"result", "orphan", "inspect", true}, {"text", "", "continue", false}}},
+        {"matched-image", []toolOperation{{"call", "image-call", "", false}, {"result", "image-call", "inspect", true}}},
+        {"blank-output", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", " \t\n", false}}},
+    }
+    var toolPairs []map[string]any
+    for _, tc := range toolCases {
+        var messages []anthropic.Message
+        for _, op := range tc.operations {
+            message := anthropic.Message{Role: anthropic.RoleUser}
+            switch op.Kind {
+            case "call":
+                message.Role = anthropic.RoleAssistant
+                message.Content = []anthropic.ContentBlock{anthropic.NewToolUseBlock(op.ID, "Bash", []byte(`{"command":"pwd"}`))}
+            case "result":
+                message.Content = []anthropic.ContentBlock{anthropic.NewToolResultBlock(op.ID, op.Text, false)}
+                if op.Image { message.Content = append(message.Content, anthropic.NewImageBlock("image/png", "cG5n")) }
+            case "text":
+                message.Content = []anthropic.ContentBlock{anthropic.NewTextBlock(op.Text)}
+            }
+            messages = append(messages, message)
+        }
+        items, err := toResponseInputItems(messages)
+        if err != nil { t.Fatal(err) }
+        toolPairs = append(toolPairs, map[string]any{"name": tc.name, "operations": tc.operations, "items": items})
+    }
+    golden["responses_tool_pairs"] = toolPairs
     var prices []map[string]any
     var models []string
     for model := range modelPricing { models = append(models, model) }

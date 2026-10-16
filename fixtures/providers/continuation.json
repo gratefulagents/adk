@@ -1443,6 +1443,315 @@
     },
     "end_turn": false
   },
+  "responses_tool_pairs": [
+    {
+      "items": [
+        {
+          "content": "continue",
+          "role": "user"
+        }
+      ],
+      "name": "orphan",
+      "operations": [
+        {
+          "kind": "result",
+          "id": "call_missing",
+          "text": "/repo",
+          "image": false
+        },
+        {
+          "kind": "text",
+          "id": "",
+          "text": "continue",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_1",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "call_1",
+          "output": "/repo",
+          "type": "function_call_output"
+        }
+      ],
+      "name": "matched",
+      "operations": [
+        {
+          "kind": "call",
+          "id": "call_1",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "call_1",
+          "text": "/repo",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_1",
+          "name": "Bash",
+          "type": "function_call"
+        }
+      ],
+      "name": "result-before-call",
+      "operations": [
+        {
+          "kind": "result",
+          "id": "call_1",
+          "text": "/repo",
+          "image": false
+        },
+        {
+          "kind": "call",
+          "id": "call_1",
+          "text": "",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_1",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "call_1",
+          "output": "/repo",
+          "type": "function_call_output"
+        }
+      ],
+      "name": "trimmed-identifiers",
+      "operations": [
+        {
+          "kind": "call",
+          "id": " call_1 ",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "\tcall_1\n",
+          "text": "/repo",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_0",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "call_0",
+          "output": "/repo",
+          "type": "function_call_output"
+        }
+      ],
+      "name": "generated-identifier",
+      "operations": [
+        {
+          "kind": "call",
+          "id": " ",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "call_0",
+          "text": "/repo",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_0",
+          "name": "Bash",
+          "type": "function_call"
+        }
+      ],
+      "name": "blank-result-identifier",
+      "operations": [
+        {
+          "kind": "call",
+          "id": "",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": " ",
+          "text": "/repo",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_1",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "call_1",
+          "output": "first",
+          "type": "function_call_output"
+        },
+        {
+          "call_id": "call_1",
+          "output": "second",
+          "type": "function_call_output"
+        }
+      ],
+      "name": "repeated-result",
+      "operations": [
+        {
+          "kind": "call",
+          "id": "call_1",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "call_1",
+          "text": "first",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "call_1",
+          "text": "second",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "content": [
+            {
+              "detail": "auto",
+              "image_url": "data:image/png;base64,cG5n",
+              "type": "input_image"
+            }
+          ],
+          "role": "user"
+        },
+        {
+          "content": "continue",
+          "role": "user"
+        }
+      ],
+      "name": "orphan-image",
+      "operations": [
+        {
+          "kind": "result",
+          "id": "orphan",
+          "text": "inspect",
+          "image": true
+        },
+        {
+          "kind": "text",
+          "id": "",
+          "text": "continue",
+          "image": false
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "image-call",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "image-call",
+          "output": "inspect",
+          "type": "function_call_output"
+        },
+        {
+          "content": [
+            {
+              "detail": "auto",
+              "image_url": "data:image/png;base64,cG5n",
+              "type": "input_image"
+            }
+          ],
+          "role": "user"
+        }
+      ],
+      "name": "matched-image",
+      "operations": [
+        {
+          "kind": "call",
+          "id": "image-call",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "image-call",
+          "text": "inspect",
+          "image": true
+        }
+      ]
+    },
+    {
+      "items": [
+        {
+          "arguments": "{\"command\":\"pwd\"}",
+          "call_id": "call_1",
+          "name": "Bash",
+          "type": "function_call"
+        },
+        {
+          "call_id": "call_1",
+          "output": "(no output)",
+          "type": "function_call_output"
+        }
+      ],
+      "name": "blank-output",
+      "operations": [
+        {
+          "kind": "call",
+          "id": "call_1",
+          "text": "",
+          "image": false
+        },
+        {
+          "kind": "result",
+          "id": "call_1",
+          "text": " \t\n",
+          "image": false
+        }
+      ]
+    }
+  ],
   "retry_headers": [
     {
       "capped_seconds": 1,

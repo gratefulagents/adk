@@ -14896,6 +14896,42 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-3B14FBC96DEABC6A": {
+      "source": "internal/openai/client_test.go",
+      "source_name": "TestToResponseInputItems_ConvertsToolResults",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "responses_original_skips_orphan_tool_results",
+        "responses_tool_pairing_matches_pinned_go",
+        "responses_http_drops_orphan_output_without_losing_following_message"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToResponseInputItems_ConvertsToolResults",
+      "rationale": "Complete original orphan-skip and matched-tool-result assertions, preserving call_1/Bash/command pwd/result /repo and orphan call_missing followed by continue. The original orphan test failed natively before the fix. An independently executed ten-case Go oracle compares entire Responses input arrays for ordering, preceding-call membership, trimmed/generated/blank IDs, repeated results, whitespace-only outputs, and matched/orphan images. A real HTTP request verifies the orphan is not sent and following text remains. Image blocks survive orphan filtering as in the public SDK adapter chain. Chat/Anthropic behavior is unchanged; the full input-conversion function/client API is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-768D992B59E37090": {
+      "source": "internal/openai/client_test.go",
+      "source_name": "TestToResponseInputItems_SkipsOrphanToolResults",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "responses_original_skips_orphan_tool_results",
+        "responses_tool_pairing_matches_pinned_go",
+        "responses_http_drops_orphan_output_without_losing_following_message"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToResponseInputItems_SkipsOrphanToolResults",
+      "rationale": "Complete original orphan-skip and matched-tool-result assertions, preserving call_1/Bash/command pwd/result /repo and orphan call_missing followed by continue. The original orphan test failed natively before the fix. An independently executed ten-case Go oracle compares entire Responses input arrays for ordering, preceding-call membership, trimmed/generated/blank IDs, repeated results, whitespace-only outputs, and matched/orphan images. A real HTTP request verifies the orphan is not sent and following text remains. Image blocks survive orphan filtering as in the public SDK adapter chain. Chat/Anthropic behavior is unchanged; the full input-conversion function/client API is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

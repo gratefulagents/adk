@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Responses tool-output pairing
+
+The adapter now drops results without a previously emitted call, normalizes call
+IDs, generates missing call IDs from the emitted input position, and substitutes
+`(no output)` for whitespace-only Responses results. Images survive orphan-result
+filtering. Chat and Anthropic behavior is unchanged. Ten independently executed
+pinned Go vectors compare complete input arrays, and a loopback HTTP regression
+checks the actual request. The original orphan-result regression failed before
+the fix and passed afterward. Only the two original orphan/matched-result tests
+are newly claimed; this does not close the enclosing provider implementation.
+
+Fresh Rust1.88 full workspace: **1,576 passed /0 failed /30 ignored**,156 targets,
+plus **9 doctests**. Strict workspace Clippy/rustdoc, formatting, facade feature
+matrix, standalone consumer and platform-purity checks pass. The first attempt
+found a borrow error in the new HTTP test; the corrected full rerun passed.
+Original pinned Go: **903 passed /5 skipped**,36 packages. All bound native/oracle
+evidence,51 validators, source locks and ledger/audit checks pass. Ledger:
+**834 verified (832 executable-tested +2 artifact-reviewed) /8,057 unresolved
+/251 excluded**. Issue11 remains incomplete; unavailable live/native-target
+checks below remain unverified.
+
 ### Original streamed Chat regression coverage
 
 Added nine exact original source-test mappings for streamed reasoning/text,

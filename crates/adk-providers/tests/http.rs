@@ -157,6 +157,46 @@ async fn chat_completions_original_fallback_requests() {
 }
 
 #[tokio::test]
+async fn copilot_original_stream_drops_nested_budget_reasoning() {
+    use adk_providers::factory::{Kind, RouteSpec};
+    use serde_json::json;
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        let captured = read_request(&mut socket);
+        let body = "data: [DONE]\n\n";
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+        captured
+    });
+    let spec = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: None,
+        endpoint: Some(endpoint),
+        protocol: Some(Protocol::Chat),
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    };
+    let model = spec
+        .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+        .unwrap();
+    let mut input = request();
+    input.model = "claude-sonnet-4.6".into();
+    input.instructions.clear();
+    input.settings.insert("max_tokens".into(), json!(4096));
+    input.settings.insert(
+        "thinking".into(),
+        json!({"type":"enabled", "budget_tokens":2048}),
+    );
+    let ctx = context();
+    let stream = model.stream(&ctx, input).await.unwrap();
+    drop(stream);
+    let captured = server.join().unwrap();
+    let body = captured.split_once("\r\n\r\n").unwrap().1;
+    assert!(!body.contains("\"reasoning\":"));
+}
+
+#[tokio::test]
 async fn image_analysis_matches_pinned_public_helper() {
     use adk_providers::client::ImageAnalysisRequest;
     let fixture: serde_json::Value = serde_json::from_str(include_str!(

@@ -14725,6 +14725,177 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-377BDAFABFE5100F": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderMultipleToolCalls",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_multiple_tool_calls"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderMultipleToolCalls",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-5FF01535A28BE49C": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderNarrationToolCallsQuirk",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_narration_tool_calls_quirk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderNarrationToolCallsQuirk",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-9F0C1004CFA24A7B": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderReasoningAndText",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_reasoning_and_text"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningAndText",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-DD6A8FC53B22E98D": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderReasoningThenTool",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_reasoning_then_tool"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningThenTool",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-ABDF6F5B2340D83B": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderToolCalls",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_tool_calls"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderToolCalls",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-0BCD91279491B983": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "copilot_original_stream_drops_nested_budget_reasoning"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-E35A8F51535E2B64": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestToAnthropicResponseFromChatReasoning",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_complete_chat_reasoning"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToAnthropicResponseFromChatReasoning",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-98097200BE9AC4EE": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestToChatMessagesPreservesPlaintextReasoning",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_reasoning_round_trip_and_plaintext"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesPreservesPlaintextReasoning",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-45C5D5513236AB5C": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestToChatMessagesRoundTripsReasoning",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/snapshot.rs::document"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_reasoning_round_trip_and_plaintext"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesRoundTripsReasoning",
+      "rationale": "Complete assertions of this original regression with original synthetic inputs, model names, text/signatures, token counts and tool IDs/arguments. Stream tests feed actual SSE decoding in17-byte chunks and compare provider-neutral complete snapshot blocks/order, stop reason and usage. Request roundtrips compare actual Chat message fields; Copilot uses a real loopback request with exact nested enabled2048 budget, model and max_tokens4096 and confirms nested reasoning omission at stream creation. Only this named source test is closed. OpenRouter raw-detail byte preservation and choice-error body assertions remain unverified, so the enclosing source file is not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

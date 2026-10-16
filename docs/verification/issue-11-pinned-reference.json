@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamSurfacesRefusalDeltas|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToChatMessagesForwardsImages|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
+      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamReaderMultipleToolCalls|TestChatStreamReaderNarrationToolCallsQuirk|TestChatStreamReaderReasoningAndText|TestChatStreamReaderReasoningThenTool|TestChatStreamReaderToolCalls|TestChatStreamSurfacesRefusalDeltas|TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToAnthropicResponseFromChatReasoning|TestToChatMessagesForwardsImages|TestToChatMessagesPreservesPlaintextReasoning|TestToChatMessagesRoundTripsReasoning|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
     ]
   ],
   "counts": {
-    "pass": 892,
+    "pass": 901,
     "skip": 5
   },
   "exit_code": 0,
@@ -192,7 +192,13 @@
     "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionsSendsModelsArrayWithFallbacks": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatResponseSurfacesRefusal": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStopReasonPrefersTruncationOverToolCalls": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderMultipleToolCalls": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderNarrationToolCallsQuirk": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningAndText": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningThenTool": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderToolCalls": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamSurfacesRefusalDeltas": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/Daybreak_Blue_alias_uses_sol_pricing": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/Daybreak_Red_alias_uses_cyber_pricing": "pass",
@@ -218,7 +224,10 @@
     "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestResponsesCacheWriteTokensNonStreaming": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToAnthropicResponseFromChatReasoning": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesForwardsImages": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesPreservesPlaintextReasoning": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesRoundTripsReasoning": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesTextOnlyStaysString": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningBudget": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestToChatRequestEmitsReasoningEffort": "pass",

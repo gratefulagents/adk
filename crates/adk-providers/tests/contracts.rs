@@ -1,3 +1,6 @@
+#[path = "contracts/chat_stream_reference.rs"]
+mod chat_stream_reference;
+
 use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest};
 use adk_providers::{
     auth::*,

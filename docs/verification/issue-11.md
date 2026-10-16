@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Original streamed Chat regression coverage
+
+Added nine exact original source-test mappings for streamed reasoning/text,
+opaque signatures, narration-only tool-call finish reasons, fragmented and
+multiple tools, reasoning followed by tools, complete reasoning conversion,
+plaintext/signature request roundtrips, and Copilot nested-budget omission.
+The SSE cases run through the actual decoder in17-byte chunks; Copilot checks
+an actual loopback request at stream creation. Production code is unchanged.
+
+Two additional OpenRouter tests establish semantic JSON/detail/cache roundtrips
+only. Their original byte-preservation assertions and the choice-error body
+assertions remain unverified; the enclosing source file is not closed.
+
+Fresh bound native/reference evidence, strict provider all-target Clippy,
+formatting,51 validators and source locks pass. Original pinned Go: **901 passed
+/5 skipped**,36 packages. Full workspace/matrix results below apply to53e8db66,
+before these ten additional native test cases. Ledger: **832 verified (830
+executable-tested +2 artifact-reviewed) /8,059 unresolved /251 excluded**.
+Issue11 remains incomplete.
+
 ### Chat thinking-type gate fixed against independently executed Go
 
 A new 30-input/60-projection oracle reproduced Chat incorrectly emitting a nested

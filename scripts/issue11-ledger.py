@@ -116,7 +116,7 @@ RUST_INPUTS = ["scripts/providers/generate.sh", "scripts/providers/continuation_
                "crates/adk/tests/usage.rs",
                "crates/adk-core/src/contracts.rs", "crates/adk-core/src/types.rs",
                "crates/adk-core/tests/contracts.rs", "crates/adk-providers/src/wire.rs",
-               "crates/adk-providers/tests/contracts.rs", "crates/adk-providers/tests/http.rs",
+               "crates/adk-providers/tests/contracts.rs", "crates/adk-providers/tests/contracts/chat_stream_reference.rs", "crates/adk-providers/tests/http.rs",
                "crates/adk-runtime/Cargo.toml", "crates/adk-runtime/src/lib.rs",
                "crates/adk-runtime/tests/error_contracts.rs", "crates/adk-runtime/src/settings.rs",
                "crates/adk-runtime/tests/settings.rs", "crates/adk/src/builder.rs",

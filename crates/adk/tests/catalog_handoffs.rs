@@ -1499,21 +1499,30 @@ async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
 }
 
 #[tokio::test]
-async fn builder_invalid_output_schema_closes_owned_session_without_dispatch() {
-    let model = Script::new(vec![]);
+async fn builder_forwards_output_schema_without_local_compilation() {
+    let model = Script::new(vec![response(vec![message("{\"n\":1}")])]);
     let owner = SessionState::new();
     let handle = owner.handle();
     let mut c = config();
     c.output_schema = Some(json!({"type":27}).try_into().unwrap());
-    let error = invalid(
-        builder(c.clone(), &model)
-            .owned_session(owner)
-            .build(&context())
-            .await,
-    );
-    assert!(error.info.message.contains("invalid JSON schema"));
-    assert!(handle.is_closed());
+    let mut bundle = builder(c.clone(), &model)
+        .owned_session(owner)
+        .build(&context())
+        .await
+        .unwrap();
+    assert!(!handle.is_closed());
     assert!(model.requests.lock().unwrap().is_empty());
+    let outcome = bundle
+        .run(context(), vec![], Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(outcome.result.final_output, Some(json!({"n":1})));
+    assert_eq!(
+        model.requests.lock().unwrap()[0].output_schema,
+        c.output_schema
+    );
+    bundle.close().await.unwrap();
+    assert!(handle.is_closed());
     builder(c, &model)
         .build_tools(&context())
         .await

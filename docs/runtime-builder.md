@@ -565,8 +565,9 @@ Schema selection is independent of runtime/tool feature switches.
 Normal and streamed runs carry the schema/name/strict flag in `ModelRequest` and
 return parsed `RunResult::final_output`. The `structured_output` offline feature
 example demonstrates builder configuration, observational validation and explicit
-bundle closure. Invalid schema definitions fail build and close owned resources;
-tool-only construction does not inspect an agent's output schema.
+bundle closure. Output schemas are forwarded without local JSON Schema compilation,
+matching the SDK; providers may reject unsupported schemas. Native schemas must be
+JSON objects or booleans. Tool-only construction does not inspect output schemas.
 
 Validation remains observational, not fail-closed: invalid JSON or parser failure
 retains the original text and emits `OutputValidationFailed`. Without a custom

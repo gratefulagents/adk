@@ -2,6 +2,33 @@
 
 ## Current continuation evidence
 
+### Output-schema construction without local compilation
+
+Removed native output-schema compilation from `Runner::new`. The pinned SDK
+accepts the schema as supplied and its default output validation only parses JSON.
+The independent Go runner matrix now has **52 cases**, applying both the ordinary
+object schema and `{"type":27}` to all buffered/streamed output cases. The native
+regression first failed during construction; it now matches Go final values and
+warnings. A facade regression separately verifies no dispatch during construction,
+unchanged schema forwarding, successful parsed output and explicit owned closure.
+Tool-schema validation remains intact; handoff input-type compilation is unchanged.
+The native `schemars::Schema` object/boolean restriction, arbitrary JSON numbers
+and depth, and complete output-schema equivalence remain unclaimed.
+
+Three late-parent-failure lifecycle regressions previously used the now-accepted
+output schema as their failure trigger. They now enable a parent input signal
+without a poller and assert the exact configuration error. Automatic children do
+not inherit input admission, so initialization still succeeds before the parent
+fails; owned graph cleanup and borrowed-session/task preservation assertions are
+retained. No cleanup test was skipped or weakened to permit a successful build.
+
+Fresh Rust1.88 checks: **1,586 workspace tests passed /0 failed /30 ignored**, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full facade matrix,
+standalone consumer/purity, all20 feature scenarios and the host-session example
+passed. Bound Go/native evidence,51 validators, artifact reviews, ledger/audit and
+source locks passed. No new ledger closure: **842 verified /8,049 unresolved
+/251 excluded**; issue11 remains incomplete.
+
 ### Structured-output Unicode replacement
 
 Default structured-output parsing now reuses the existing codec string

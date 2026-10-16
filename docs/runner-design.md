@@ -94,7 +94,7 @@ Relevant references: [runner](https://github.com/gratefulagents/sdk/blob/1dc92b7
 | Idle/deadline | Slow active stream survives idle limit; stalled stream and total deadline terminate distinctly |
 | Cap/trust/spill | Default 16 KiB, UTF-8 boundaries, private files only in writable mode, drop cleanup, raw hook fidelity |
 | Compaction/cache | Stable prefix/key; transient context absent from history; observable effective-history replacement |
-| Schema | Invalid schema/config and invalid structured output classified explicitly; response retained |
+| Schema | Invalid tool schema/config rejected; output schemas forwarded without local compilation; JSON/parser failures observed with response retained |
 | Streaming | Ordered deltas/terminal events, bounded producer advance, dropped consumer releases owned work |
 | Handoff | Target dispatch and last agent, tool queue ordering, turn accounting |
 
@@ -256,7 +256,7 @@ and streamed final results.
 | Provider advice | `provider_advice_controls_policy_retries_and_caps_delay_at_five_minutes`, `provider_advised_retries_are_bounded_within_the_model_turn_budget`, `fallback_precedes_error_handler_which_precedes_advice_retry` |
 | Retry/limits/timeouts | `fallback_precedes_policy_retries_and_each_attempt_spends_a_turn`, `sticky_fallback_survives_approval_resume_and_reprobes_after_three_successes`, `fallback_state_is_per_agent_identity_not_display_name`, `turn_token_and_cost_limits_keep_partial_usage`, `cancellation_deadline_idle_and_tool_timeout_interrupt_pending_work` |
 | Compaction/cache/context | `compaction_replaces_history_and_hints_cache_prefix_are_request_only` |
-| Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |
+| Policy/schema/handoff | `authorization_and_argument_validation_precede_effects`, `duplicate_names_and_invalid_tool_schema_are_rejected`, `structured_output_validation_preserves_baseline_result`, `handoff_preempts_siblings_and_pairs_all_calls` |
 | Hooks/spill lifetimes | `raw_hooks_precede_processing_and_spills_live_across_pause_and_error`, `durable_failure_before_effect_fails_closed_after_effect_preserves_result`, 12 `output.rs` unit tests |
 | Sentinel/wire adapters | `adk-codec/tests/runner_codecs.rs` and explicitly executed `go_runner_differential.rs`: 21 Go config vectors and denial marker ordering; runtime `tests/compat.rs`: 13 integration tests |
 | Error and callback contracts | `tests/error_contracts.rs`: 10 tests implementing the E01–E12 map in `docs/runner-error-contracts.md` |

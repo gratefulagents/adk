@@ -82,28 +82,29 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 		}
 	}
 	outputCases := []map[string]any{}
-	for _, streamed := range []bool{false, true} {
-		for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``, `"\ud800"`, `{"\ud800":"\udc00"}`, `"\ud83d\ude00"`, `"\\ud800"`, `"\ud800\uD800\udc00"`} {
-			var logs bytes.Buffer
-			log.SetOutput(&logs)
-			schema := json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`)
-			source := &Agent{Name: "output", OutputType: NewOutputSchema("final", schema)}
-			model := &subagentToolMockModel{responses: []*ModelResponse{{Items: []RunItem{{Type: RunItemMessage, Message: &MessageOutput{Text: raw}}}}}}
-			runner := NewRunnerWithModel(model)
-			var result *RunResult
-			var err error
-			if streamed {
-				s := runner.RunStreamed(context.Background(), source, nil, RunConfig{MaxTurns: 1})
-				for range s.Events {
+	for _, schema := range []json.RawMessage{json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`), json.RawMessage(`{"type":27}`)} {
+		for _, streamed := range []bool{false, true} {
+			for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``, `"\ud800"`, `{"\ud800":"\udc00"}`, `"\ud83d\ude00"`, `"\\ud800"`, `"\ud800\uD800\udc00"`} {
+				var logs bytes.Buffer
+				log.SetOutput(&logs)
+				source := &Agent{Name: "output", OutputType: NewOutputSchema("final", schema)}
+				model := &subagentToolMockModel{responses: []*ModelResponse{{Items: []RunItem{{Type: RunItemMessage, Message: &MessageOutput{Text: raw}}}}}}
+				runner := NewRunnerWithModel(model)
+				var result *RunResult
+				var err error
+				if streamed {
+					s := runner.RunStreamed(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+					for range s.Events {
+					}
+					result, err = s.FinalResult(), s.Err()
+				} else {
+					result, err = runner.Run(context.Background(), source, nil, RunConfig{MaxTurns: 1})
 				}
-				result, err = s.FinalResult(), s.Err()
-			} else {
-				result, err = runner.Run(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+				if err != nil {
+					t.Fatal(err)
+				}
+				outputCases = append(outputCases, map[string]any{"raw": raw, "streamed": streamed, "schema": schema, "output": result.FinalOutput, "warning": strings.Contains(logs.String(), "output schema validation failed")})
 			}
-			if err != nil {
-				t.Fatal(err)
-			}
-			outputCases = append(outputCases, map[string]any{"raw": raw, "streamed": streamed, "schema": schema, "output": result.FinalOutput, "warning": strings.Contains(logs.String(), "output schema validation failed")})
 		}
 	}
 	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases}, "", "  ")

@@ -328,18 +328,25 @@ async fn failed_host_session_factory_releases_resources_after_runner_validation(
     let mut c = config();
     c.features.as_mut().unwrap().subagents.task = true;
     c.features.as_mut().unwrap().tools = ["ExtraTools".into()].into();
-    // Parent Runner::new validates this only after ToolBundle construction and
-    // automatic child runner initialization, exercising the late failure path.
-    c.output_schema = Some(json!({"type":27}).try_into().unwrap());
+    // Children do not inherit input admission, so only the parent fails after
+    // ToolBundle construction and automatic child runner initialization.
+    c.features.as_mut().unwrap().immediate_input_polling = true;
     let error = invalid(
         builder(c, &model)
             .owned_session(owner)
             .subagent_host(host.clone())
             .extra_tools([probe.clone() as Arc<dyn Tool>])
+            .runner_config(RunnerConfig {
+                immediate_input_signal: Some(Arc::new(UnpairedInputSignal)),
+                ..Default::default()
+            })
             .build_session(&named_context("host-session"))
             .await,
     );
-    assert!(error.info.message.contains("invalid JSON schema"));
+    assert_eq!(
+        error.info.message,
+        "immediate input signal requires a poller"
+    );
     assert!(handle.is_closed());
     assert_eq!(Arc::strong_count(&host), 1);
     assert_eq!(Arc::strong_count(&model), 1);
@@ -363,14 +370,21 @@ async fn failed_borrowed_turn_build_preserves_host_session_and_existing_child() 
     drop(first);
     let mut bad = config();
     bad.features.as_mut().unwrap().subagents.task = true;
-    bad.output_schema = Some(json!({"type":27}).try_into().unwrap());
+    bad.features.as_mut().unwrap().immediate_input_polling = true;
     let error = invalid(
         builder(bad, &fixture.parent)
             .session(handle.clone())
+            .runner_config(RunnerConfig {
+                immediate_input_signal: Some(Arc::new(UnpairedInputSignal)),
+                ..Default::default()
+            })
             .build(&named_context("failed-turn"))
             .await,
     );
-    assert!(error.info.message.contains("invalid JSON schema"));
+    assert_eq!(
+        error.info.message,
+        "immediate input signal requires a poller"
+    );
     assert!(!handle.is_closed());
     assert_eq!(fixture.child.dropped.load(Ordering::SeqCst), 0);
     let mut next = fixture

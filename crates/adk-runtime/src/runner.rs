@@ -1226,9 +1226,6 @@ fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), 
         }
         compile_schema(&definition.input_schema)?;
     }
-    if let Some(schema) = &agent.output_schema {
-        compile_schema(schema)?;
-    }
     for handoff in &agent.handoffs {
         if let Some(input_type) = &handoff.input_type {
             compile_schema(&input_type.schema)?;

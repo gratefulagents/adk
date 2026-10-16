@@ -3,6 +3,13 @@ mod durable;
 mod lifecycle;
 use std::num::NonZeroU32;
 
+struct UnpairedInputSignal;
+impl adk::runtime::ImmediateInputSignal for UnpairedInputSignal {
+    fn wait<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, ()> {
+        Box::pin(std::future::pending())
+    }
+}
+
 #[tokio::test]
 async fn automatic_catalog_and_managed_tools_match_pinned_builder_stages() {
     let fixture: serde_json::Value = serde_json::from_str(include_str!(
@@ -286,13 +293,21 @@ async fn automatic_children_release_owned_graph_on_failed_parent_validation() {
     let host = Arc::new(TestHost::default());
     let mut c = config();
     c.features.as_mut().unwrap().subagents.task = true;
-    c.output_schema = Some(json!({"type":27}).try_into().unwrap());
-    invalid(
+    c.features.as_mut().unwrap().immediate_input_polling = true;
+    let error = invalid(
         builder(c, &model)
             .owned_session(owner)
             .subagent_host(host.clone())
+            .runner_config(RunnerConfig {
+                immediate_input_signal: Some(Arc::new(UnpairedInputSignal)),
+                ..Default::default()
+            })
             .build(&context())
             .await,
+    );
+    assert_eq!(
+        error.info.message,
+        "immediate input signal requires a poller"
     );
     assert!(handle.is_closed());
     assert_eq!(Arc::strong_count(&host), 1);

@@ -1037,13 +1037,259 @@
       },
       "streamed": true,
       "warning": false
+    },
+    {
+      "output": {
+        "n": 1
+      },
+      "raw": "{\"n\":1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": {
+        "n": -1
+      },
+      "raw": "{\"n\":-1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "text",
+      "raw": "\"text\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": null,
+      "raw": "null",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": [],
+      "raw": "[]",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": true,
+      "raw": "true",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "not json",
+      "raw": "not json",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "output": "",
+      "raw": "",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\ufffd",
+      "raw": "\"\\ud800\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": {
+        "\ufffd": "\ufffd"
+      },
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\ud83d\ude00",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\\ud800",
+      "raw": "\"\\\\ud800\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\ufffd\ud800\udc00",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": {
+        "n": 1
+      },
+      "raw": "{\"n\":1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": {
+        "n": -1
+      },
+      "raw": "{\"n\":-1}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "text",
+      "raw": "\"text\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": null,
+      "raw": "null",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": [],
+      "raw": "[]",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": true,
+      "raw": "true",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "not json",
+      "raw": "not json",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "output": "",
+      "raw": "",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\ufffd",
+      "raw": "\"\\ud800\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": {
+        "\ufffd": "\ufffd"
+      },
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\ud83d\ude00",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\\ud800",
+      "raw": "\"\\\\ud800\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\ufffd\ud800\udc00",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": {
+        "type": 27
+      },
+      "streamed": true,
+      "warning": false
     }
   ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "d6e95d0e8fff172af3ea43e4b38fdf4b7d3f82ee0d7a5424302b2b90b497f19b",
+      "scripts/handoff-input-type-reference/reference_test.go": "84ddc48bbf2861fcb6b6343cfa5d6dd3fac6f6f88edaaf51a79f22e3e2a32d29",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

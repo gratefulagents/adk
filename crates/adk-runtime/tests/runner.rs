@@ -966,7 +966,7 @@ async fn handoff_preempts_siblings_and_pairs_all_calls() {
 }
 
 #[test]
-fn duplicate_names_and_invalid_schema_are_rejected() {
+fn duplicate_names_and_invalid_tool_schema_are_rejected() {
     let mut a = agent(TestModel::with(vec![]));
     a.tools = vec![
         TestTool::new("same", false, false),
@@ -981,7 +981,9 @@ fn duplicate_names_and_invalid_schema_are_rejected() {
         ErrorCategory::InvalidInput
     );
     let mut a = agent(TestModel::with(vec![]));
-    a.output_schema = Some(schemars::json_schema!({"type":27}));
+    let mut tool = TestTool::new("invalid", false, false);
+    Arc::get_mut(&mut tool).unwrap().definition.input_schema = schemars::json_schema!({"type":27});
+    a.tools = vec![tool];
     assert!(Runner::new(a, RunnerConfig::default()).is_err());
 }
 
@@ -992,7 +994,7 @@ async fn structured_output_validation_preserves_baseline_result() {
     ))
     .unwrap();
     let cases = fixture["output_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 26);
+    assert_eq!(cases.len(), 52);
     for case in cases {
         let output = case["raw"].as_str().unwrap();
         let model = TestModel::with(vec![Ok(answer(output))]);

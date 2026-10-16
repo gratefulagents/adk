@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Metadata Unicode replacement and original HTTP bytes
+
+Twelve new independently executed Go cases exposed rejection of lone UTF-16
+surrogates and invalid UTF-8 that Go accepts with replacement. Metadata input now
+preserves valid surrogate pairs and replaces lone surrogates and each invalid
+UTF-8 byte as Go does. Literal escaped backslashes remain literal; malformed
+escapes and invalid structural bytes still fail. The regression failed before
+the fix and passed afterward.
+
+The catalog oracle contains57 cases. Five non-UTF-8 responses carry explicit
+base64 originals because Go's fixture JSON encoder would otherwise replace their
+invalid bytes. Both direct decoding and actual Rust HTTP fetches use those original
+bytes, not the normalized display string. Authentication and the original-byte
+8MiB response limit are unchanged. No complete parser/type/file claim is added.
+
+Fresh full workspace: **1,580 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full feature matrix,
+standalone consumer/purity, all bound oracles,51 validators, artifact reviews and
+source locks pass. Ledger remains **835 verified /8,056 unresolved /251 excluded**.
+Issue11 remains incomplete.
+
 ### Metadata JSON field and merge semantics
 
 The pinned-Go catalog oracle now contains45 cases, including27 new cases for

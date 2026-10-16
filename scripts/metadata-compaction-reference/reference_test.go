@@ -4,6 +4,7 @@ package openai
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
@@ -64,6 +65,18 @@ func nativeCatalogObservations() []map[string]any {
 		{"null-root", `null`},
 		{"wrong-root", `[]`},
 		{"unicode-folded-limits", `{"data":[{"id":"k","capabilities":{"limits":{"max_context_window_toKens":5555}}}]}`},
+		{"lone-high-surrogate", `{"models":[{"slug":"x\ud800","display_name":"\udc00"}]}`},
+		{"paired-surrogates", `{"models":[{"slug":"\ud83d\ude42"}]}`},
+		{"surrogate-key", `{"models":[{"slug":"ok","\ud800":"ignored"}]}`},
+		{"escaped-surrogate-text", `{"models":[{"slug":"x","description":"\\ud800"}]}`},
+		{"malformed-surrogate-escape", `{"models":[{"slug":"x\uD80X"}]}`},
+		{"unpaired-high-followed-by-escape", `{"models":[{"slug":"\ud800\u0061"}]}`},
+		{"low-before-high", `{"models":[{"slug":"\udc00\ud800"}]}`},
+		{"invalid-utf8-value", `{"models":[{"slug":"` + string([]byte{0xff, 0xe2, 0x82}) + `"}]}`},
+		{"invalid-utf8-key", `{"models":[{"slug":"ok","` + string([]byte{0xff}) + `":"ignored"}]}`},
+		{"invalid-utf8-structural", `{` + string([]byte{0xff}) + `"models":[{"slug":"valid"}]}`},
+		{"invalid-utf8-surrogate-encoding", `{"models":[{"slug":"x` + string([]byte{0xed, 0xa0, 0x80}) + `"}]}`},
+		{"invalid-utf8-overlong", `{"models":[{"slug":"x` + string([]byte{0xc0, 0xaf}) + `"}]}`},
 	}
 	for _, depth := range []int{9999, 10000} {
 		name := "depth-boundary"
@@ -87,7 +100,11 @@ func nativeCatalogObservations() []map[string]any {
 		for _, model := range PickerModelMetadata(models) {
 			picker = append(picker, model.ID)
 		}
-		out = append(out, map[string]any{"picker": picker, "name": item.name, "body": item.body, "error": err != nil, "models": models, "defaults": defaults})
+		observation := map[string]any{"picker": picker, "name": item.name, "body": item.body, "error": err != nil, "models": models, "defaults": defaults}
+		if !utf8.ValidString(item.body) {
+			observation["body_base64"] = base64.StdEncoding.EncodeToString([]byte(item.body))
+		}
+		out = append(out, observation)
 	}
 	return out
 }

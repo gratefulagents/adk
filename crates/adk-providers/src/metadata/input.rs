@@ -154,7 +154,48 @@ object!(Catalog {
 });
 
 pub(super) fn decode(body: &[u8]) -> Result<Catalog> {
-    let raw: Box<RawValue> = serde_json::from_slice(body).map_err(|_| ())?;
+    let mut normalized = Vec::with_capacity(body.len());
+    for chunk in body.utf8_chunks() {
+        normalized.extend_from_slice(chunk.valid().as_bytes());
+        // Go replaces each invalid byte, not each maximal invalid UTF-8 sequence.
+        for _ in chunk.invalid() {
+            normalized.extend_from_slice("\u{fffd}".as_bytes());
+        }
+    }
+    let mut quoted = false;
+    let mut index = 0;
+    while index < normalized.len() {
+        if normalized[index] == b'"' {
+            quoted = !quoted;
+        } else if quoted && normalized[index] == b'\\' {
+            if normalized.get(index + 1) == Some(&b'u') {
+                let hex = |start| {
+                    normalized
+                        .get(start..start + 4)
+                        .and_then(|digits| std::str::from_utf8(digits).ok())
+                        .and_then(|digits| u16::from_str_radix(digits, 16).ok())
+                };
+                if let Some(code) = hex(index + 2) {
+                    if (0xd800..=0xdbff).contains(&code)
+                        && normalized.get(index + 6..index + 8) == Some(b"\\u")
+                        && hex(index + 8).is_some_and(|low| (0xdc00..=0xdfff).contains(&low))
+                    {
+                        index += 12;
+                        continue;
+                    }
+                    if (0xd800..=0xdfff).contains(&code) {
+                        normalized[index + 2..index + 6].copy_from_slice(b"fffd");
+                    }
+                    index += 6;
+                    continue;
+                }
+            }
+            index += 2;
+            continue;
+        }
+        index += 1;
+    }
+    let raw: Box<RawValue> = serde_json::from_slice(&normalized).map_err(|_| ())?;
     let mut depth = 0;
     let mut quoted = false;
     let mut escaped = false;

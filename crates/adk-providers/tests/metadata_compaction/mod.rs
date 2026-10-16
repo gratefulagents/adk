@@ -16,6 +16,16 @@ fn fixture() -> serde_json::Value {
 fn server(
     responses: Vec<(u16, String)>,
 ) -> (Arc<Session>, Arc<AtomicUsize>, std::thread::JoinHandle<()>) {
+    server_bytes(
+        responses
+            .into_iter()
+            .map(|(status, body)| (status, body.into_bytes()))
+            .collect(),
+    )
+}
+fn server_bytes(
+    responses: Vec<(u16, Vec<u8>)>,
+) -> (Arc<Session>, Arc<AtomicUsize>, std::thread::JoinHandle<()>) {
     let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
     let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
     let calls = Arc::new(AtomicUsize::new(0));
@@ -37,7 +47,13 @@ fn server(
             assert!(request.starts_with("get /v1/models "));
             assert!(request.contains("authorization: bearer catalog-initial"));
             count.fetch_add(1, Ordering::SeqCst);
-            write!(socket, "HTTP/1.1 {status} fixture\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            write!(
+                socket,
+                "HTTP/1.1 {status} fixture\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            )
+            .unwrap();
+            socket.write_all(&body).unwrap();
         }
     });
     (Arc::new(session(&endpoint, AuthMode::ApiKey)), calls, task)
@@ -210,10 +226,22 @@ async fn independent_session_scopes_never_share_catalogs() {
     server_b.join().unwrap();
 }
 
+fn catalog_body(case: &serde_json::Value) -> Vec<u8> {
+    use base64::{Engine, engine::general_purpose::STANDARD};
+    match case["body_base64"].as_str() {
+        Some(encoded) => {
+            let bytes = STANDARD.decode(encoded).unwrap();
+            assert!(std::str::from_utf8(&bytes).is_err());
+            bytes
+        }
+        None => case["body"].as_str().unwrap().as_bytes().to_vec(),
+    }
+}
+
 #[test]
 fn catalog_shapes_and_nullable_fields_match_pinned_sdk() {
     for case in fixture()["catalog_cases"].as_array().unwrap() {
-        let result = parse_model_metadata(case["body"].as_str().unwrap().as_bytes());
+        let result = parse_model_metadata(&catalog_body(case));
         assert_eq!(
             result.is_err(),
             case["error"].as_bool().unwrap(),
@@ -373,10 +401,10 @@ async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
 async fn catalog_http_decoding_matches_pinned_sdk() {
     let fixture = fixture();
     let cases = fixture["catalog_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 45);
+    assert_eq!(cases.len(), 57);
     for case in cases {
-        let body = case["body"].as_str().unwrap();
-        let (session, calls, server) = server(vec![(200, body.into())]);
+        let body = catalog_body(case);
+        let (session, calls, server) = server_bytes(vec![(200, body.clone())]);
         let actual = adk_providers::metadata::fetch_model_metadata(&context(), &session).await;
         assert_eq!(
             actual.is_err(),
@@ -387,7 +415,7 @@ async fn catalog_http_decoding_matches_pinned_sdk() {
         if let Ok(models) = actual {
             assert_eq!(
                 models,
-                parse_model_metadata(body.as_bytes()).unwrap(),
+                parse_model_metadata(&body).unwrap(),
                 "{}",
                 case["name"]
             );

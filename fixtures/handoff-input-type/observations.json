@@ -689,6 +689,103 @@
       "warning": false
     },
     {
+      "output": "\ufffd",
+      "raw": "\"\\ud800\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": {
+        "\ufffd": "\ufffd"
+      },
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\ud83d\ude00",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\\ud800",
+      "raw": "\"\\\\ud800\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "output": "\ufffd\ud800\udc00",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": false,
+      "warning": false
+    },
+    {
       "output": {
         "n": 1
       },
@@ -843,13 +940,110 @@
       },
       "streamed": true,
       "warning": false
+    },
+    {
+      "output": "\ufffd",
+      "raw": "\"\\ud800\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": {
+        "\ufffd": "\ufffd"
+      },
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\ud83d\ude00",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\\ud800",
+      "raw": "\"\\\\ud800\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "output": "\ufffd\ud800\udc00",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": {
+        "additionalProperties": false,
+        "properties": {
+          "n": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "n"
+        ],
+        "type": "object"
+      },
+      "streamed": true,
+      "warning": false
     }
   ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "43c9f5c1e0f2bd93c3f51fe0e43677ddec3ae6d1a495439db0b00ca84667f7d6",
+      "scripts/handoff-input-type-reference/reference_test.go": "d6e95d0e8fff172af3ea43e4b38fdf4b7d3f82ee0d7a5424302b2b90b497f19b",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

@@ -83,7 +83,7 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 	}
 	outputCases := []map[string]any{}
 	for _, streamed := range []bool{false, true} {
-		for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``} {
+		for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``, `"\ud800"`, `{"\ud800":"\udc00"}`, `"\ud83d\ude00"`, `"\\ud800"`, `"\ud800\uD800\udc00"`} {
 			var logs bytes.Buffer
 			log.SetOutput(&logs)
 			schema := json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`)

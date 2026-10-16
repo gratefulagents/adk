@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Structured-output Unicode replacement
+
+Default structured-output parsing now reuses the existing codec string
+normalization, replacing lone escaped UTF-16 surrogates instead of rejecting
+Go-valid JSON. Custom parsers still receive the original text unchanged. Ten
+additional buffered/streamed Go observations bring the final-output matrix to
+**26 cases**: lone high/low surrogates in values and keys, valid pairs, escaped
+literal backslashes and a lone surrogate followed by a valid pair. The native
+regression first returned the original quoted escape instead of Go's replacement
+character, then passed with the fix. This is not a claim about arbitrary JSON
+number/depth behavior, non-UTF-8 native strings or constructor equivalence.
+
+Fresh full Rust validation: **1,586 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc, formatting, full facade matrix, standalone
+consumer/purity, all20 feature scenarios and the host-session example passed.
+Bound independent/native evidence,51 ledger validators, audit and source locks
+passed. No new ledger closure: **842 verified /8,049 unresolved /251 excluded**.
+
 ### Structured-output parsing does not enforce JSON Schema
 
 Removed the extra native `OutputValidationFailed` observation for parseable JSON

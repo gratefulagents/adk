@@ -2725,7 +2725,7 @@ impl Engine {
                     }
                 };
             }
-            match serde_json::from_str::<Value>(&output) {
+            match adk_codec::userinput::decode::<Value>(output.as_bytes()) {
                 Ok(value) => Ok(value),
                 Err(error) => {
                     self.observe(Observation::OutputValidationFailed {

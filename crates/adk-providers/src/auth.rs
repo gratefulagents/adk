@@ -429,6 +429,7 @@ impl Session {
 }
 pub(crate) fn decorate_codex_url(url: &mut Url, session: &Session) {
     if session.scope().mode != AuthMode::OpenAiOAuth
+        || url.port().is_some()
         || !url
             .host_str()
             .is_some_and(|host| host == "chatgpt.com" || host.ends_with(".chatgpt.com"))

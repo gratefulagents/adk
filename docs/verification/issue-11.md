@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Non-default-port ChatGPT classification
+
+Ten independently executed Go backend-classification vectors exposed incorrect
+native handling of `chatgpt.com:8443` and its subdomains. Go's host predicate
+includes the port. Metadata discovery now adds the ordinary `/v1` segment for
+these URLs, and shared Codex URL decoration no longer adds `client_version`.
+Existing native metadata and prepared-inference tests that incorrectly expected
+port-independent classification were corrected against this source evidence.
+The new regression failed before the fix; the complete final rerun passes.
+
+This is deliberately bounded: `Scope::new` still canonicalizes explicit default
+ports away, and complete original-input URL normalization, Copilot port handling
+and general host/auth parity remain unresolved. No broader endpoint/helper
+ledger record is promoted. The Go oracle now additionally binds the exact
+`auth_session.go` and `client.go` source hashes.
+
+Fresh full workspace: **1,582 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full feature matrix,
+standalone consumer/purity, bound native/oracle evidence,51 validators, artifact
+reviews and source locks pass. Ledger remains **837 verified /8,054 unresolved
+/251 excluded**. Issue11 is not complete.
+
 ### Public in-place metadata ordering
 
 Added `sort_model_metadata_for_picker(&mut [ModelMetadata])` and reused it in

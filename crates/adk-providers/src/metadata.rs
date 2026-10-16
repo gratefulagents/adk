@@ -12,9 +12,8 @@ pub const DEFAULT_CODEX_CLIENT_VERSION: &str = "0.153.4";
 pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error> {
     let mut url = reqwest::Url::parse(&session.scope().endpoint)
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
-    // Match session Codex decoration by hostname, independently of explicit ports.
     let host = url.host_str().unwrap_or_default();
-    let chatgpt = host == "chatgpt.com" || host.ends_with(".chatgpt.com");
+    let chatgpt = url.port().is_none() && (host == "chatgpt.com" || host.ends_with(".chatgpt.com"));
     let copilot = matches!(
         host,
         "api.githubcopilot.com" | "api.individual.githubcopilot.com"

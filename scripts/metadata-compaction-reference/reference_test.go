@@ -111,6 +111,15 @@ func nativeCatalogObservations() []map[string]any {
 	return out
 }
 
+func nativeBackendObservations() []map[string]any {
+	var out []map[string]any
+	for _, host := range []string{"chatgpt.com", "CHATGPT.COM", "api.chatgpt.com", "chatgpt.com:8443", "a.b.chatgpt.com:8443", "api.openai.com", "notchatgpt.com", "chatgpt.com.evil.test", "chatgpt.com.", "127.0.0.1:8443"} {
+		endpoint := "https://" + host + "/backend-api/codex/responses"
+		out = append(out, map[string]any{"endpoint": endpoint, "chatgpt": internalopenai.IsChatGPTBackendBaseURL(endpoint)})
+	}
+	return out
+}
+
 func nativePickerObservations() []map[string]any {
 	cases := [][]ModelMetadata{
 		nil,
@@ -266,7 +275,7 @@ func TestNativeMetadataReference(t *testing.T) {
 		hash.Write([]byte(key))
 		count++
 	}
-	out := map[string]any{"picker_cases": nativePickerObservations(), "lifecycle_cases": nativeLifecycleObservations(), "static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
+	out := map[string]any{"backend_cases": nativeBackendObservations(), "picker_cases": nativePickerObservations(), "lifecycle_cases": nativeLifecycleObservations(), "static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
 	data, err := json.Marshal(out)
 	if err != nil {
 		t.Fatal(err)

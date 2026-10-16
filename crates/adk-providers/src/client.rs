@@ -1453,7 +1453,7 @@ mod tests {
         ] {
             for (host, accepted) in [
                 ("chatgpt.com", true),
-                ("a.b.chatgpt.com:8443", true),
+                ("a.b.chatgpt.com:8443", false),
                 ("api.openai.com", false),
                 ("chatgpt.com.evil.test", false),
                 ("notchatgpt.com", false),

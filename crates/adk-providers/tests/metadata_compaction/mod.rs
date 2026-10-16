@@ -365,6 +365,34 @@ fn public_picker_sort_matches_pinned_sdk_and_preserves_stable_ties() {
     }
 }
 
+#[test]
+fn metadata_nondefault_port_classification_matches_pinned_sdk() {
+    let fixture = fixture();
+    let cases = fixture["backend_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 10);
+    for case in cases {
+        let endpoint = case["endpoint"].as_str().unwrap();
+        let chatgpt = case["chatgpt"].as_bool().unwrap();
+        for mode in [AuthMode::ApiKey, AuthMode::OpenAiOAuth] {
+            let session = session(endpoint, mode);
+            let mut expected = reqwest::Url::parse(endpoint).unwrap();
+            expected.set_path(if chatgpt {
+                "/backend-api/codex/models"
+            } else {
+                "/backend-api/codex/v1/models"
+            });
+            if chatgpt && mode == AuthMode::OpenAiOAuth {
+                expected.set_query(Some("client_version=0.153.4"));
+            }
+            assert_eq!(
+                model_metadata_endpoint(&session).unwrap(),
+                expected,
+                "{case}"
+            );
+        }
+    }
+}
+
 #[tokio::test]
 async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
     let fixture = fixture();

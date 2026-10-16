@@ -822,7 +822,7 @@ fn metadata_endpoint_normalization_matrix() {
         ),
         (
             "https://API.CHATGPT.COM:8443/custom/chat/completions",
-            "https://api.chatgpt.com:8443/custom/models",
+            "https://api.chatgpt.com:8443/custom/v1/models",
         ),
         (
             "https://notchatgpt.com/custom",
@@ -899,7 +899,7 @@ fn metadata_codex_client_version_is_session_owned_and_guarded() {
                 ("chatgpt.com:443", true),
                 ("CHATGPT.COM", true),
                 ("api.chatgpt.com", true),
-                ("a.b.chatgpt.com:8443", true),
+                ("a.b.chatgpt.com:8443", false),
                 ("api.openai.com", false),
                 ("example.test", false),
                 ("notchatgpt.com", false),

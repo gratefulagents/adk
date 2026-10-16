@@ -100,6 +100,63 @@ fn read_request(socket: &mut TcpStream) -> String {
     String::from_utf8(bytes).unwrap()
 }
 #[tokio::test]
+async fn chat_completions_original_fallback_requests() {
+    use adk_core::{Content, Message, Role, RunItem};
+    use serde_json::json;
+    for with_fallbacks in [true, false] {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            let response = r#"{"id":"x","model":"m","choices":[{"index":0,"message":{"role":"assistant","content":"ok"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}"#;
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{response}", response.len()).unwrap();
+            captured
+        });
+        let mut input = request();
+        input.model = "deepseek/deepseek-v4-pro".into();
+        input.instructions.clear();
+        input.settings.insert("max_tokens".into(), json!(16));
+        input.input = vec![RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text { text: "hi".into() }],
+            },
+        }];
+        if with_fallbacks {
+            input.settings.insert(
+                "model_fallbacks".into(),
+                json!(["deepseek/deepseek-chat:free", "openrouter/auto"]),
+            );
+        }
+        provider(&endpoint)
+            .complete(&context(), input)
+            .await
+            .unwrap();
+        let captured = server.join().unwrap();
+        assert_eq!(
+            captured.lines().next(),
+            Some("POST /v1/chat/completions HTTP/1.1")
+        );
+        let body: serde_json::Value =
+            serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+        assert_eq!(body["model"], "deepseek/deepseek-v4-pro");
+        if with_fallbacks {
+            assert_eq!(
+                body["models"],
+                json!([
+                    "deepseek/deepseek-v4-pro",
+                    "deepseek/deepseek-chat:free",
+                    "openrouter/auto"
+                ])
+            );
+        } else {
+            assert!(body.get("models").is_none());
+        }
+    }
+}
+
+#[tokio::test]
 async fn image_analysis_matches_pinned_public_helper() {
     use adk_providers::client::ImageAnalysisRequest;
     let fixture: serde_json::Value = serde_json::from_str(include_str!(

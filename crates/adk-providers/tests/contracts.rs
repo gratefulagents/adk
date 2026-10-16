@@ -953,6 +953,65 @@ fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
 }
 
 #[test]
+fn model_fallbacks_original_table() {
+    let cases = [
+        ("no fallbacks returns nil", "a", None, None),
+        (
+            "primary first then fallbacks",
+            "openrouter/qwen/qwen3-coder:free",
+            Some(json!([
+                "openrouter/deepseek/deepseek-chat",
+                "openrouter/openrouter/auto"
+            ])),
+            Some(json!([
+                "openrouter/qwen/qwen3-coder:free",
+                "openrouter/deepseek/deepseek-chat",
+                "openrouter/openrouter/auto"
+            ])),
+        ),
+        (
+            "dedupes and drops blanks",
+            "a",
+            Some(json!([" ", "a", "b", "b"])),
+            Some(json!(["a", "b"])),
+        ),
+        (
+            "single distinct model returns nil",
+            "a",
+            Some(json!(["a", "  "])),
+            None,
+        ),
+    ];
+    assert_eq!(cases.len(), 4);
+    for (name, primary, fallbacks, expected) in cases {
+        let mut input = request();
+        input.model = primary.into();
+        if let Some(fallbacks) = fallbacks {
+            input.settings.insert("model_fallbacks".into(), fallbacks);
+        }
+        let body = wire::request(&input, Protocol::Chat, false).unwrap();
+        assert_eq!(body.get("models"), expected.as_ref(), "{name}");
+    }
+}
+
+#[test]
+fn chat_completion_request_original_models_serialization() {
+    let mut input = request();
+    input.model = "a".into();
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(!serde_json::to_string(&body).unwrap().contains("\"models\""));
+    input
+        .settings
+        .insert("model_fallbacks".into(), json!(["a", "b"]));
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(
+        serde_json::to_string(&body)
+            .unwrap()
+            .contains("\"models\":[\"a\",\"b\"]")
+    );
+}
+
+#[test]
 fn responses_done_only_tracking_is_per_content_part() {
     let mut stream = StreamState::new(Protocol::Responses);
     for part in 0..2 {

@@ -14431,6 +14431,116 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-F4164B164C663295": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "model_fallbacks_original_table",
+        "chat_completion_request_original_models_serialization",
+        "chat_completions_original_fallback_requests"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks",
+      "rationale": "Complete original test file (four tests and one four-case table-subtest site). Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-B744CE618C1E2E3D": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "model_fallbacks_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks",
+      "rationale": "Complete original four-case table-subtest site. Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-FD5B163CA7CD975F": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": "TestWithModelFallbacks",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "model_fallbacks_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks",
+      "rationale": "Complete original four-case named table. Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-2D56D043B686B21D": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": "TestChatCompletionRequestOmitsEmptyModels",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "chat_completion_request_original_models_serialization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionRequestOmitsEmptyModels",
+      "rationale": "Complete original JSON omission and exact serialized models-array assertions. Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-44DE6681FB501545": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": "TestChatCompletionsOmitsModelsWithoutFallbacks",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "chat_completions_original_fallback_requests"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionsOmitsModelsWithoutFallbacks",
+      "rationale": "Complete original successful HTTP call and absent-models assertion. Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-9BAADD096B18AEA6": {
+      "source": "internal/openai/model_fallback_test.go",
+      "source_name": "TestChatCompletionsSendsModelsArrayWithFallbacks",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "chat_completions_original_fallback_requests"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionsSendsModelsArrayWithFallbacks",
+      "rationale": "Complete original HTTP path, successful call, primary model and ordered three-model array assertions. Native tests preserve original names, model/fallback literals, lengths/order, duplicate/blank removal and no-fallback omission. Actual loopback HTTP complete calls retain the original user hi, max_tokens16 and fixed success response, not merely wire-shape projections. Rust per-request model_fallbacks settings replace Go client configuration; configuration lifecycle and the full client API are not claimed. No automatic endpoint retry or model-switching inference is made from these array-shaping tests.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

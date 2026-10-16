@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel)$"
+      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
     ]
   ],
   "counts": {
-    "pass": 870,
+    "pass": 878,
     "skip": 5
   },
   "exit_code": 0,
@@ -187,6 +187,9 @@
     "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost/gpt-6-astra_long-context_input_above_272K_uses_doubled_rates": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost/gpt-6-astra_output": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost/unknown_model_has_zero_cost": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionRequestOmitsEmptyModels": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionsOmitsModelsWithoutFallbacks": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatCompletionsSendsModelsArrayWithFallbacks": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/Daybreak_Blue_alias_uses_sol_pricing": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost/Daybreak_Red_alias_uses_cyber_pricing": "pass",
@@ -216,6 +219,11 @@
     "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel/accepts_chat_model": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestValidateChatCompletionsModel/rejects_codex_model": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks/dedupes_and_drops_blanks": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks/no_fallbacks_returns_nil": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks/primary_first_then_fallbacks": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestWithModelFallbacks/single_distinct_model_returns_nil": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestApprovedSubagentSharesParentContext": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsIdenticalCallLoop": "pass",
     "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall": "pass",

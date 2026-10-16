@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Model fallback serialization and actual HTTP calls
+
+Added all four original fallback-table cases, the exact JSON omission/array
+assertions, and actual loopback HTTP calls with and without fallback models.
+These reproduce all four original tests in `model_fallback_test.go`; six
+source-test/subtest/file records are closed without claiming complete client
+configuration or retry behavior. Existing production behavior passed unchanged.
+
+Fresh Rust1.88 workspace: **1,556 passed /0 failed /30 ignored**,156 targets,
+plus **9 doctests**, zero warnings. Strict workspace Clippy/rustdoc, facade feature
+matrix, standalone consumer/purity, bound independent evidence,51 validators and
+source locks pass. Original pinned Go: **878 passed /5 skipped**,36 packages.
+Ledger: **813 verified (811 executable-tested +2 artifact-reviewed) /8,078
+unresolved /251 excluded**. Issue11 remains incomplete.
+
 ### Explicit Chat Completions model validation
 
 Added `factory::validate_chat_completions_model` for host-invoked validation,

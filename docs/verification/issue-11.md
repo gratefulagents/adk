@@ -2,6 +2,38 @@
 
 ## Current continuation evidence
 
+### Codex client version and exact OpenAI regressions
+
+Added immutable session-owned Codex client-version configuration, shared by the
+metadata resolver and the actual inference/compaction/retry request path. Blank
+values restore 0.153.4; nonblank values are trimmed and URL-encoded. OAuth/ChatGPT
+host guards, endpoint validation, auth headers and credential/cache identity stay
+intact. First query-value semantics match Go; arbitrary preexisting-query byte
+ordering is not claimed, and configured endpoint queries remain prohibited.
+Scoped review approved the production wiring and refresh/rotation isolation.
+
+Added exact native counterparts for all **21 CalculateCost +15 EstimateCost**
+source cases, including every expected amount/known flag and the original 1e-9
+tolerance. Original internal OpenAI tests now run from explicit, package-bound
+claim selections; tests reject regex/subtest expansion and preserve historical
+agent regressions. Existing metadata catalog evidence is rebound only to ten
+specific fields/methods and four complete original regressions, not whole parser
+or metadata-type parity.
+
+Fresh Rust1.88 workspace: **1,544 passed /0 failed /30 ignored**,156 targets,
+**9 doctests**, no warnings. Strict workspace Clippy/rustdoc, full facade matrix,
+standalone consumer/purity, every bound oracle, separate license artifact proof,
+and **51 validators** pass. Original pinned Go: **865 passed /5 skipped** across
+36 packages. All46 remote checks passed at preceding `1ea305a6`; latest-head CI
+is not yet claimed complete.
+
+Exactly **25 further records** are verified:14 existing narrow provider records,
+five complete cost-test/table/file obligations, and six exact version/default
+configuration mappings. Ledger: **797 verified (795 executable-tested +2
+artifact-reviewed) /8,094 unresolved /251 excluded**. Remaining metadata source
+assertions and full reusable acceptance continue; no external blocker or new
+scope exclusion is asserted.
+
 ### Strict license-artifact evidence
 
 The acceptance contract permits explicit artifact review for nonexecutable

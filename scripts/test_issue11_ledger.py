@@ -11,6 +11,34 @@ ledger = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(ledger)
 
 
+class ReferenceSelectionTests(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location(
+            "sdk_reference", Path(__file__).parent / "trace-reference/test-sdk.py")
+        self.reference = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.reference)
+
+    def test_claimed_internal_tests_keep_exact_package_and_prior_regressions(self):
+        selected = {"internal/agent": {"TestHistorical"}}
+        claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
+            "github.com/gratefulagents/sdk/internal/agent/TestRunner",
+            "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
+            "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
+            "github.com/gratefulagents/sdk/pkg/agentsdk/TestPublic",
+            "github.com/gratefulagents/sdk/internal/unrelated/TestNotSelected",
+        ])}}
+        self.reference.add_claimed_internal_tests(claims, selected)
+        self.assertEqual(selected, {"internal/agent": {"TestHistorical", "TestRunner"},
+                                    "internal/openai": {"TestMetadata"}})
+
+    def test_internal_reference_patterns_and_subtests_cannot_expand_execution(self):
+        for name in ("TestAny|TestOther", "TestAny/subtest", "TestAny$", "../TestOther", ""):
+            with self.subTest(name=name), self.assertRaises(SystemExit):
+                self.reference.add_claimed_internal_tests({"claims": {
+                    "id": {"reference_test": "github.com/gratefulagents/sdk/internal/openai/" + name}
+                }}, {})
+
+
 class EvidenceTests(unittest.TestCase):
     def setUp(self):
         self.claims = ledger.read_json(ledger.RUST_CLAIMS)

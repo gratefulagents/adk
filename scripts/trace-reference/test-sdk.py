@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute pinned public SDK and bounded internal guardrail tests and retain per-test reference evidence, not Rust closure."""
+"""Execute pinned public SDK and explicitly claimed internal tests; retain reference evidence, not Rust closure."""
 import argparse
 from collections import Counter
 import hashlib
@@ -13,6 +13,18 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 SDK = ROOT / "repos/sdk"
 PIN = "1dc92b73900fac74dc357a938e4b5eee6392b418"
+
+def add_claimed_internal_tests(claims, selected):
+    """Only explicitly supported packages and exact top-level Go test names."""
+    for claim in claims["claims"].values():
+        reference = claim["reference_test"]
+        for package in ("internal/agent", "internal/openai"):
+            prefix = "github.com/gratefulagents/sdk/" + package + "/"
+            if reference.startswith(prefix):
+                name = reference[len(prefix):]
+                if not re.fullmatch(r"Test[A-Za-z0-9_]+", name):
+                    sys.exit(f"unsupported internal reference identifier: {name}")
+                selected.setdefault(package, set()).add(name)
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -44,20 +56,14 @@ def main():
         "TestRunnerStreamsThinkingDeltasToEventStream", "TestRunStreamedDoesNotEmitThinkingDeltaEvents",
     }
     claims = json.loads((ROOT / "docs/migration/ledger/issue-11-rust-claims.json").read_text())
-    prefix = "github.com/gratefulagents/sdk/internal/agent/"
-    for claim in claims["claims"].values():
-        reference = claim["reference_test"]
-        if reference.startswith(prefix):
-            name = reference[len(prefix):]
-            if not re.fullmatch(r"Test[A-Za-z0-9_]+", name):
-                sys.exit(f"unsupported internal reference identifier: {name}")
-            internal_tests.add(name)
-    internal_pattern = "^(" + "|".join(sorted(internal_tests)) + ")$"
+    selected = {"internal/agent": internal_tests}
+    add_claimed_internal_tests(claims, selected)
 
-    commands = [
-        [go, "test", "-count=1", "-json", "./pkg/agentsdk/..."],
-        [go, "test", "-count=1", "-json", "./internal/agent", "-run", internal_pattern],
-    ]
+    commands = [[go, "test", "-count=1", "-json", "./pkg/agentsdk/..."]]
+    for package, names in sorted(selected.items()):
+        if names:
+            pattern = "^(" + "|".join(sorted(names)) + ")$"
+            commands.append([go, "test", "-count=1", "-json", "./" + package, "-run", pattern])
     tests = {}
     packages = {}
     results = []

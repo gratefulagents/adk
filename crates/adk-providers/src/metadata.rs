@@ -17,14 +17,7 @@ pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error>
         .trim_end_matches("/chat/completions");
     let mut url = reqwest::Url::parse(&format!("{base}/models"))
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
-    if scope.mode == AuthMode::OpenAiOAuth
-        && url
-            .host_str()
-            .is_some_and(|host| host == "chatgpt.com" || host.ends_with(".chatgpt.com"))
-    {
-        url.query_pairs_mut()
-            .append_pair("client_version", DEFAULT_CODEX_CLIENT_VERSION);
-    }
+    crate::auth::decorate_codex_url(&mut url, session);
     Ok(url)
 }
 

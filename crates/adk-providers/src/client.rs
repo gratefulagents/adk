@@ -289,35 +289,9 @@ impl Provider {
                         .to_owned();
                 }
             }
-            let endpoint = format!("{}{path}", resolved.endpoint);
-            let mut outgoing = body.clone();
-            if let Some(key) = outgoing.get("prompt_cache_key").and_then(Value::as_str) {
-                let key = crate::auth::cache_scope(&resolved, &material, key);
-                if key.is_empty() {
-                    outgoing.as_object_mut().unwrap().remove("prompt_cache_key");
-                } else {
-                    outgoing["prompt_cache_key"] = key.into();
-                }
-            }
-            let mut headers =
-                crate::auth::headers(&resolved, &material, self.protocol == Protocol::Anthropic)?;
-            if self.protocol == Protocol::Anthropic && scope.mode != AuthMode::CopilotOAuth {
-                let betas = crate::anthropic::beta(
-                    body["model"].as_str().unwrap_or_default(),
-                    scope.mode == AuthMode::AnthropicOAuth,
-                );
-                headers.insert(
-                    "anthropic-beta",
-                    reqwest::header::HeaderValue::from_str(&betas)
-                        .map_err(|_| crate::invalid("invalid beta header"))?,
-                );
-            }
             let response = crate::active(
                 context,
-                self.client
-                    .post(&endpoint)
-                    .headers(headers)
-                    .json(&outgoing)
+                self.prepare_request(&resolved, &material, path, &body)?
                     .send(),
             )
             .await?
@@ -373,6 +347,40 @@ impl Provider {
             ErrorCategory::PermissionDenied,
             "provider authentication retry exhausted",
         ))
+    }
+    fn prepare_request(
+        &self,
+        scope: &crate::auth::Scope,
+        material: &crate::auth::Material,
+        path: &str,
+        body: &Value,
+    ) -> Result<reqwest::RequestBuilder, Error> {
+        let mut endpoint = reqwest::Url::parse(&format!("{}{path}", scope.endpoint))
+            .map_err(|_| crate::invalid("invalid provider request endpoint"))?;
+        crate::auth::decorate_codex_url(&mut endpoint, &self.session);
+        let mut outgoing = body.clone();
+        if let Some(key) = outgoing.get("prompt_cache_key").and_then(Value::as_str) {
+            let key = crate::auth::cache_scope(scope, material, key);
+            if key.is_empty() {
+                outgoing.as_object_mut().unwrap().remove("prompt_cache_key");
+            } else {
+                outgoing["prompt_cache_key"] = key.into();
+            }
+        }
+        let mut headers =
+            crate::auth::headers(scope, material, self.protocol == Protocol::Anthropic)?;
+        if self.protocol == Protocol::Anthropic && scope.mode != AuthMode::CopilotOAuth {
+            let betas = crate::anthropic::beta(
+                body["model"].as_str().unwrap_or_default(),
+                scope.mode == AuthMode::AnthropicOAuth,
+            );
+            headers.insert(
+                "anthropic-beta",
+                reqwest::header::HeaderValue::from_str(&betas)
+                    .map_err(|_| crate::invalid("invalid beta header"))?,
+            );
+        }
+        Ok(self.client.post(endpoint).headers(headers).json(&outgoing))
     }
 }
 impl Model for Provider {
@@ -1291,4 +1299,265 @@ fn required(value: &Value, key: &str) -> Result<String, Error> {
         .as_str()
         .map(str::to_owned)
         .ok_or_else(|| protocol_error("stream event missing required field"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::auth::{CredentialStore, Material, Refresh, Scope, Secret, cache_scope};
+
+    struct Credentials(Mutex<Material>);
+    impl CredentialStore for Credentials {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async { Ok(self.0.lock().unwrap().clone()) })
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            revision: u64,
+            material: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            Box::pin(async move {
+                let mut current = self.0.lock().unwrap();
+                assert_eq!(current.revision, revision);
+                *current = material;
+                Ok(true)
+            })
+        }
+    }
+    struct Rotate;
+    impl Refresh for Rotate {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            mut material: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async move {
+                material.access_token = Secret::new("refreshed");
+                material.revision += 1;
+                Ok(material)
+            })
+        }
+    }
+    fn credentials() -> Arc<Credentials> {
+        Arc::new(Credentials(Mutex::new(Material {
+            access_token: Secret::new("initial"),
+            refresh_token: Some(Secret::new("refresh")),
+            id_token: None,
+            email: None,
+            account: Some("account".into()),
+            expires_at: None,
+            last_refresh: None,
+            revision: 0,
+        })))
+    }
+    fn session(endpoint: &str, mode: AuthMode, store: Arc<Credentials>) -> Session {
+        Session::new(
+            Scope::new("codex", endpoint, Some("account".into()), mode).unwrap(),
+            store,
+            Arc::new(Rotate),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn codex_url_query_get_set_encoding_and_idempotence() {
+        let session = session("https://chatgpt.com", AuthMode::OpenAiOAuth, credentials())
+            .with_codex_client_version(" 0.999.0 +&/?=#%β ");
+        let encoded = "client_version=0.999.0+%2B%26%2F%3F%3D%23%25%CE%B2";
+        for (query, expected) in [
+            ("".to_owned(), encoded.to_owned()),
+            ("client_version".into(), encoded.into()),
+            ("client_version=".into(), encoded.into()),
+            (
+                "client_version=&client_version=existing".into(),
+                encoded.into(),
+            ),
+            ("client_version=&client_version=".into(), encoded.into()),
+            (
+                "client_version=existing&client_version=".into(),
+                "client_version=existing&client_version=".into(),
+            ),
+            (
+                "client_version=%20&keep=%2f".into(),
+                "client_version=%20&keep=%2f".into(),
+            ),
+            (
+                "client%5Fversion=existing".into(),
+                "client%5Fversion=existing".into(),
+            ),
+            (
+                "x=a%26b&client_version=&x=c%2Bd&empty=".into(),
+                format!("x=a%26b&x=c%2Bd&empty=&{encoded}"),
+            ),
+            (
+                "Client_Version=other".into(),
+                format!("Client_Version=other&{encoded}"),
+            ),
+        ] {
+            let mut url =
+                reqwest::Url::parse(&format!("https://chatgpt.com/responses?{query}#keep"))
+                    .unwrap();
+            crate::auth::decorate_codex_url(&mut url, &session);
+            assert_eq!(
+                url.as_str(),
+                format!("https://chatgpt.com/responses?{expected}#keep")
+            );
+            let once = url.clone();
+            crate::auth::decorate_codex_url(&mut url, &session);
+            assert_eq!(url, once);
+        }
+    }
+
+    #[test]
+    fn prepared_inference_urls_obey_host_and_mode_guards() {
+        for mode in [
+            AuthMode::OpenAiOAuth,
+            AuthMode::ApiKey,
+            AuthMode::Anonymous,
+            AuthMode::AnthropicOAuth,
+            AuthMode::CopilotOAuth,
+        ] {
+            for (host, accepted) in [
+                ("chatgpt.com", true),
+                ("a.b.chatgpt.com:8443", true),
+                ("api.openai.com", false),
+                ("chatgpt.com.evil.test", false),
+                ("notchatgpt.com", false),
+                ("127.0.0.1", false),
+            ] {
+                let store = credentials();
+                let session = Arc::new(
+                    session(
+                        &format!("https://{host}/backend-api/codex"),
+                        mode,
+                        store.clone(),
+                    )
+                    .with_codex_client_version("0.999.0"),
+                );
+                let provider =
+                    Provider::new("codex", Protocol::Responses, session.clone()).unwrap();
+                for path in ["/responses", "/responses/compact"] {
+                    let request = provider
+                        .prepare_request(
+                            session.scope(),
+                            &store.0.lock().unwrap(),
+                            path,
+                            &json!({}),
+                        )
+                        .unwrap()
+                        .build()
+                        .unwrap();
+                    let suffix = if accepted && mode == AuthMode::OpenAiOAuth {
+                        "?client_version=0.999.0"
+                    } else {
+                        ""
+                    };
+                    assert_eq!(
+                        request.url().as_str(),
+                        format!("https://{host}/backend-api/codex{path}{suffix}")
+                    );
+                }
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn prepared_requests_share_metadata_version_across_refresh_and_external_rotation() {
+        let context = Context {
+            run_id: "codex-version".into(),
+            cancellation: Arc::new(adk_runtime::CancellationToken::new()),
+            deadline: None,
+        };
+        let store = credentials();
+        let baseline = session(
+            "https://chatgpt.com/backend-api/codex",
+            AuthMode::OpenAiOAuth,
+            store.clone(),
+        );
+        let scope = baseline.scope().clone();
+        let initial = baseline.material_for_request(&context).await.unwrap();
+        let cache = cache_scope(&scope, &initial, "prompt");
+        let baseline_headers = crate::auth::headers(&scope, &initial, false).unwrap();
+        for (configured, expected) in [
+            (None, "0.153.4"),
+            (Some(" \t0.999.0\n"), "0.999.0"),
+            (Some(" \t"), "0.153.4"),
+        ] {
+            let mut configured_session = session(&scope.endpoint, scope.mode, store.clone());
+            if let Some(version) = configured {
+                configured_session = configured_session.with_codex_client_version(version);
+            }
+            let session = Arc::new(configured_session);
+            let provider = Provider::new("codex", Protocol::Responses, session.clone()).unwrap();
+            assert!(Arc::ptr_eq(&provider.session, &session));
+            for rotation in 0..3 {
+                let material = session.material_for_request(&context).await.unwrap();
+                assert_eq!(session.scope(), &scope);
+                assert_eq!(cache_scope(session.scope(), &material, "prompt"), cache);
+                assert_eq!(session.codex_client_version(), expected);
+                assert_eq!(
+                    crate::metadata::model_metadata_endpoint(&session)
+                        .unwrap()
+                        .as_str(),
+                    format!(
+                        "https://chatgpt.com/backend-api/codex/models?client_version={expected}"
+                    )
+                );
+                for path in [Protocol::Responses.path(), "/responses/compact"] {
+                    let body = json!({"model":"gpt-5.6", "prompt_cache_key":"prompt"});
+                    let request = provider
+                        .prepare_request(session.scope(), &material, path, &body)
+                        .unwrap()
+                        .build()
+                        .unwrap();
+                    assert_eq!(request.method(), reqwest::Method::POST);
+                    assert_eq!(
+                        request.url().as_str(),
+                        format!(
+                            "https://chatgpt.com/backend-api/codex{path}?client_version={expected}"
+                        )
+                    );
+                    let outgoing: Value =
+                        serde_json::from_slice(request.body().unwrap().as_bytes().unwrap())
+                            .unwrap();
+                    assert_eq!(outgoing["prompt_cache_key"], cache);
+                    assert_eq!(body["prompt_cache_key"], "prompt");
+                    let headers = crate::auth::headers(&scope, &material, false).unwrap();
+                    assert_eq!(request.headers().len(), headers.len() + 1);
+                    for (key, value) in &headers {
+                        assert_eq!(request.headers().get(key), Some(value));
+                    }
+                }
+                match rotation {
+                    0 => {
+                        session
+                            .reject(&context, &material.access_token)
+                            .await
+                            .unwrap();
+                        let refreshed = session.material_for_request(&context).await.unwrap();
+                        assert_eq!(refreshed.access_token.expose(), "refreshed");
+                        assert_eq!(refreshed.revision, material.revision + 1);
+                    }
+                    1 => {
+                        let mut current = store.0.lock().unwrap();
+                        current.access_token = Secret::new("external");
+                        current.revision += 1;
+                    }
+                    _ => assert_eq!(material.access_token.expose(), "external"),
+                }
+            }
+            assert_eq!(baseline.codex_client_version(), "0.153.4");
+            assert_eq!(
+                crate::auth::headers(&scope, &initial, false).unwrap(),
+                baseline_headers
+            );
+        }
+    }
 }

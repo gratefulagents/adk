@@ -557,6 +557,99 @@ async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
     );
 }
 
+#[test]
+fn metadata_codex_client_version_is_session_owned_and_guarded() {
+    for (configured, expected) in [
+        (None, "0.153.4"),
+        (Some("0.999.0"), "0.999.0"),
+        (Some(" \t0.999.0\n"), "0.999.0"),
+        (Some(""), "0.153.4"),
+        (Some(" \t\r\n"), "0.153.4"),
+    ] {
+        for mode in [
+            AuthMode::OpenAiOAuth,
+            AuthMode::ApiKey,
+            AuthMode::Anonymous,
+            AuthMode::AnthropicOAuth,
+            AuthMode::CopilotOAuth,
+        ] {
+            for (host, accepted) in [
+                ("chatgpt.com", true),
+                ("chatgpt.com:443", true),
+                ("CHATGPT.COM", true),
+                ("api.chatgpt.com", true),
+                ("a.b.chatgpt.com:8443", true),
+                ("api.openai.com", false),
+                ("example.test", false),
+                ("notchatgpt.com", false),
+                ("chatgpt.com.evil.test", false),
+                ("chatgpt.com.", false),
+                ("127.0.0.1", false),
+                ("[::1]", false),
+            ] {
+                for suffix in ["", "/", "/responses", "/chat/completions"] {
+                    let mut session =
+                        session(&format!("https://{host}/backend-api/codex{suffix}"), mode);
+                    let scope = session.scope().clone();
+                    if let Some(version) = configured {
+                        session = session.with_codex_client_version(version);
+                    }
+                    assert_eq!(session.scope(), &scope);
+                    assert_eq!(session.codex_client_version(), expected);
+                    let base =
+                        reqwest::Url::parse(&format!("https://{host}/backend-api/codex/models"))
+                            .unwrap();
+                    let expected_url = if accepted && mode == AuthMode::OpenAiOAuth {
+                        format!("{base}?client_version={expected}")
+                    } else {
+                        base.to_string()
+                    };
+                    assert_eq!(
+                        model_metadata_endpoint(&session).unwrap().as_str(),
+                        expected_url
+                    );
+                }
+            }
+        }
+    }
+    let reset = session("https://chatgpt.com", AuthMode::OpenAiOAuth)
+        .with_codex_client_version("0.999.0")
+        .with_codex_client_version(" \n ");
+    assert_eq!(reset.codex_client_version(), "0.153.4");
+    for endpoint in [
+        "https://chatgpt.com?client_version=0.999.0",
+        "https://chatgpt.com#fragment",
+        "https://user@chatgpt.com",
+        "https://user:password@chatgpt.com",
+        "http://chatgpt.com",
+    ] {
+        assert!(Scope::new("codex", endpoint, None, AuthMode::OpenAiOAuth).is_err());
+    }
+}
+
+#[cfg(feature = "runtime")]
+#[test]
+fn metadata_resolver_and_provider_share_configured_session() {
+    let session = Arc::new(
+        session(
+            "https://chatgpt.com/backend-api/codex",
+            AuthMode::OpenAiOAuth,
+        )
+        .with_codex_client_version("0.999.0"),
+    );
+    let resolver = adk_providers::runtime::MetadataCompactionResolver::new(session.clone());
+    let provider =
+        adk_providers::client::Provider::new("codex", Protocol::Responses, session.clone())
+            .unwrap();
+    assert_eq!(Arc::strong_count(&session), 3);
+    assert_eq!(
+        model_metadata_endpoint(&session).unwrap().as_str(),
+        "https://chatgpt.com/backend-api/codex/models?client_version=0.999.0"
+    );
+    drop((resolver, provider));
+    assert_eq!(Arc::strong_count(&session), 1);
+}
+
 #[cfg(feature = "runtime")]
 #[tokio::test]
 async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_modes() {

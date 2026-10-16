@@ -13785,6 +13785,471 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-F6ACA1FFFBE07377": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.ID",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::id",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCodexShape",
+      "rationale": "Closes only ModelMetadata.ID, not enclosing parser/type or whole original test. Exact normalized ID/slug projection, first-duplicate behavior and lookup without synthesized provider aliases. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-8569EFFEF39F73FD": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.ContextWindow",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::context_window",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCodexShape",
+      "rationale": "Closes only ModelMetadata.ContextWindow, not enclosing parser/type or whole original test. Resolved context272000, nested Copilot context128000 over prompt96000 and prompt-only200000 fallback, plus signed/default projection. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-BE6468A6E1107FAB": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.MaxOutputTokens",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::max_output_tokens",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCopilotCapabilitiesShape",
+      "rationale": "Closes only ModelMetadata.MaxOutputTokens, not enclosing parser/type or whole original test. Nested output limit32000 and absent/default/signed output-limit projection. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-183DC39A538D6FAE": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.DisplayName",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::display_name",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.DisplayName, not enclosing parser/type or whole original test. Supplied display labels retain trimmed content; null/default and foreign shapes project exactly. Not the separate Description contract. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-641517539613D368": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.Visibility",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::visibility",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.Visibility, not enclosing parser/type or whole original test. Normalized visibility including Unicode lowercase; hidden entries excluded while list and unspecified remain. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-0C5ABF5037133E0D": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.Priority",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::priority",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.Priority, not enclosing parser/type or whole original test. Signed/zero/absent priority projection and ordered picker output including tied priorities. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-079945B07DCB5B1E": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.DefaultReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::default_reasoning_level",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.DefaultReasoningLevel, not enclosing parser/type or whole original test. Trimmed/lowercase supplied reasoning level with null/default and Unicode normalization. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-6471E0DC9F6A7743": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.SupportedReasoningLevels",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::supported_reasoning_levels",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.SupportedReasoningLevels, not enclosing parser/type or whole original test. Ordered normalized efforts with blank/null entries, absent lists and Unicode handling; not whole original picker fixture closure. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-B7F906355C85A545": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.UpgradeModel",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::upgrade_model",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.UpgradeModel, not enclosing parser/type or whole original test. Nested replacement model is trimmed and retained; missing/null maps to source empty-string projection. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4D31C00386792E0D": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "ModelMetadata.Hidden",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::hidden",
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline",
+        "metadata_compaction::catalog_shapes_and_nullable_fields_match_pinned_sdk"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Closes only ModelMetadata.Hidden, not enclosing parser/type or whole original test. Complete hidden predicate observed through exclusion and survival across normalized visibility cases. Independently executed18-case pinned metadata catalog oracle compares every projected field, success/error, counts and picker membership; native assertions add exact baseline values. Original regression is a source association, while custom oracle is separate direct behavior evidence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-5256A30F60A18A81": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestParseModelMetadataCopilotFallsBackToMaxPromptTokens",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::parse_model_metadata"
+      ],
+      "rust_test_identifiers": [
+        "metadata_catalog_picker_lookup_and_compaction_match_baseline"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestParseModelMetadataCopilotFallsBackToMaxPromptTokens",
+      "rationale": "Complete original assertions: parse succeeds and max_prompt_tokens-only Copilot limit resolves to200000. Native unwrap plus exact context200000 assertion reproduce both.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-24511CC1CCE9A3CB": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestModelMetadataEndpointAppendsCodexClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::model_metadata_endpoint"
+      ],
+      "rust_test_identifiers": [
+        "explicit_metadata_get_refreshes_once_and_normalizes_endpoint"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion",
+      "rationale": "Complete default-version assertion compares exact ChatGPT OAuth metadata URL models?client_version=0.153.4. Does not infer the override regression from the default case.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-DC57637E08DBDBE0": {
+      "source": "internal/openai/client_test.go",
+      "source_name": "TestToResponseParams_EffortNoneSkipsSummary",
+      "implementation_symbols": [
+        "crates/adk-providers/src/openai.rs::shape",
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "responses_effort_none_budget_and_encrypted_include_are_preserved"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToResponseParams_EffortNoneSkipsSummary",
+      "rationale": "Complete original assertion mapping: request construction succeeds, explicit reasoning effort remains none, and summary is absent. Native test also checks encrypted-content include, but no unrelated request-default test is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-00CB1D57DA01CA51": {
+      "source": "internal/openai/cache_usage_test.go",
+      "source_name": "TestResponsesCacheWriteTokensNonStreaming",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::usage",
+        "crates/adk-providers/src/wire.rs::response"
+      ],
+      "rust_test_identifiers": [
+        "cache_usage_uses_provider_specific_subset_semantics",
+        "responses_cache_fixture_and_cost_aliases_preserve_subsets"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestResponsesCacheWriteTokensNonStreaming",
+      "rationale": "Complete original source response fixture parses/converts successfully, with cache read70 and creation11. Native full usage tuple100/20/70/11/Some100 explicitly proves read and creation rather than inferring them from price calculation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7D04C573272D57EE": {
+      "source": "internal/openai/cost_test.go",
+      "source_name": "TestCalculateCost",
+      "implementation_symbols": [
+        "crates/adk-providers/src/cost.rs::openai",
+        "crates/adk-providers/src/wire.rs::usage"
+      ],
+      "rust_test_identifiers": [
+        "openai_calculate_cost_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost",
+      "rationale": "Complete CalculateCost21-case original table. Native literal tables preserve source order, names, models, counters, expected amounts and known flags, with exact21/15 case-count assertions and original1e-9 absolute tolerance (plus NaN rejection). Counters pass through public Responses usage decoding and pricing through cost::openai. Native None is explicitly projected to zero only for the original unknown CalculateCost case; EstimateCost compares (0,false) for None and(amount,true) for Some. This does not turn unknown prices into known-free values or claim the whole provider/cost API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-589D22C9A53CDEE7": {
+      "source": "internal/openai/cost_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/cost.rs::openai",
+        "crates/adk-providers/src/wire.rs::usage"
+      ],
+      "rust_test_identifiers": [
+        "openai_calculate_cost_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost",
+      "rationale": "CalculateCost static table-subtest site, realized by all21 original named cases. Native literal tables preserve source order, names, models, counters, expected amounts and known flags, with exact21/15 case-count assertions and original1e-9 absolute tolerance (plus NaN rejection). Counters pass through public Responses usage decoding and pricing through cost::openai. Native None is explicitly projected to zero only for the original unknown CalculateCost case; EstimateCost compares (0,false) for None and(amount,true) for Some. This does not turn unknown prices into known-free values or claim the whole provider/cost API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-1758A45A322FB522": {
+      "source": "internal/openai/cost_test.go",
+      "source_name": "TestEstimateCost",
+      "implementation_symbols": [
+        "crates/adk-providers/src/cost.rs::openai",
+        "crates/adk-providers/src/wire.rs::usage"
+      ],
+      "rust_test_identifiers": [
+        "openai_estimate_cost_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost",
+      "rationale": "Complete EstimateCost15-case original table including known flags. Native literal tables preserve source order, names, models, counters, expected amounts and known flags, with exact21/15 case-count assertions and original1e-9 absolute tolerance (plus NaN rejection). Counters pass through public Responses usage decoding and pricing through cost::openai. Native None is explicitly projected to zero only for the original unknown CalculateCost case; EstimateCost compares (0,false) for None and(amount,true) for Some. This does not turn unknown prices into known-free values or claim the whole provider/cost API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-BFA9BB159146AFDA": {
+      "source": "internal/openai/cost_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/cost.rs::openai",
+        "crates/adk-providers/src/wire.rs::usage"
+      ],
+      "rust_test_identifiers": [
+        "openai_estimate_cost_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestEstimateCost",
+      "rationale": "EstimateCost static table-subtest site, realized by all15 original named cases. Native literal tables preserve source order, names, models, counters, expected amounts and known flags, with exact21/15 case-count assertions and original1e-9 absolute tolerance (plus NaN rejection). Counters pass through public Responses usage decoding and pricing through cost::openai. Native None is explicitly projected to zero only for the original unknown CalculateCost case; EstimateCost compares (0,false) for None and(amount,true) for Some. This does not turn unknown prices into known-free values or claim the whole provider/cost API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-A366DD4817E38E42": {
+      "source": "internal/openai/cost_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/cost.rs::openai",
+        "crates/adk-providers/src/wire.rs::usage"
+      ],
+      "rust_test_identifiers": [
+        "openai_calculate_cost_original_table",
+        "openai_estimate_cost_original_table"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestCalculateCost",
+      "rationale": "Complete cost_test.go source file, containing exactly the two21/15-case tables. Native literal tables preserve source order, names, models, counters, expected amounts and known flags, with exact21/15 case-count assertions and original1e-9 absolute tolerance (plus NaN rejection). Counters pass through public Responses usage decoding and pricing through cost::openai. Native None is explicitly projected to zero only for the original unknown CalculateCost case; EstimateCost compares (0,false) for None and(amount,true) for Some. This does not turn unknown prices into known-free values or claim the whole provider/cost API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-D43B17C9D0AC8757": {
+      "source": "internal/openai/model_metadata_test.go",
+      "source_name": "TestModelMetadataEndpointUsesCodexClientVersionOverride",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointUsesCodexClientVersionOverride",
+      "rationale": "Complete original override regression or ClientVersion field contract: immutable session-owned consuming configuration trims nonblank values, blanks restore default, and exact metadata URL uses0.999.0. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-B45C209BB3BE55D9": {
+      "source": "internal/openai/auth_session.go",
+      "source_name": "OAuthSessionConfig.ClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointUsesCodexClientVersionOverride",
+      "rationale": "Complete original override regression or ClientVersion field contract: immutable session-owned consuming configuration trims nonblank values, blanks restore default, and exact metadata URL uses0.999.0. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-718DAF97AF96B29D": {
+      "source": "internal/openai/auth_session.go",
+      "source_name": "CodexClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion",
+      "rationale": "Closes only the constant/default getter (including thin public wrapper/constant alias): pinned source returns literal0.153.4, represented idiomatically by the public native constant and session default accessor. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-99D0105F8DCAEA63": {
+      "source": "internal/openai/auth_session.go",
+      "source_name": "DefaultCodexClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion",
+      "rationale": "Closes only the constant/default getter (including thin public wrapper/constant alias): pinned source returns literal0.153.4, represented idiomatically by the public native constant and session default accessor. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C765A075FB14BF88": {
+      "source": "pkg/agentsdk/providers/openai/openai.go",
+      "source_name": "CodexClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion",
+      "rationale": "Closes only the constant/default getter (including thin public wrapper/constant alias): pinned source returns literal0.153.4, represented idiomatically by the public native constant and session default accessor. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-947F900BD9CC5579": {
+      "source": "pkg/agentsdk/providers/openai/openai.go",
+      "source_name": "DefaultCodexClientVersion",
+      "implementation_symbols": [
+        "crates/adk-providers/src/auth.rs::Session::with_codex_client_version",
+        "crates/adk-providers/src/auth.rs::Session::codex_client_version",
+        "crates/adk-providers/src/metadata.rs::DEFAULT_CODEX_CLIENT_VERSION",
+        "crates/adk-providers/src/client.rs::Provider::prepare_request"
+      ],
+      "rust_test_identifiers": [
+        "metadata_codex_client_version_is_session_owned_and_guarded",
+        "metadata_resolver_and_provider_share_configured_session",
+        "client::tests::codex_url_query_get_set_encoding_and_idempotence",
+        "client::tests::prepared_requests_share_metadata_version_across_refresh_and_external_rotation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestModelMetadataEndpointAppendsCodexClientVersion",
+      "rationale": "Closes only the constant/default getter (including thin public wrapper/constant alias): pinned source returns literal0.153.4, represented idiomatically by the public native constant and session default accessor. The same Arc session decorates actual prepared inference/compaction/retry URLs, not only metadata. Tests preserve OAuth/ChatGPT host guards, Go first-value query replacement, encoding/idempotence, credential scope/cache identity and version across refresh/external rotation. No global environment reads, version auth headers, public Scope/Material fields or complete session/provider type claims are introduced.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -86,6 +86,17 @@ for one rotating refresh token are **not** a distributed refresh lock. Storage
 implementations must enforce their own cross-process single-flight semantics.
 Store and refresh trait errors must be sanitized by the host.
 
+For OpenAI OAuth, configure `Session::with_codex_client_version("0.999.0")`
+before wrapping the session in `Arc`, then share that session with the provider
+and metadata resolver. Values are trimmed; blank values use the pinned
+`metadata::DEFAULT_CODEX_CLIENT_VERSION` (`0.153.4`). The same immutable setting
+adds `client_version` to ChatGPT metadata, inference and compaction URLs,
+including retries; it is not an authentication header or credential-material
+field. Refresh/rotation does not replace it, and credential/prompt-cache scope
+does not change. API-key routes and unrelated hosts do not receive the query.
+Configured endpoint query strings remain rejected; this option does not relax
+endpoint validation or read process-global environment variables.
+
 Copilot uses the pinned factory's fallback heuristic (Claude → Messages,
 GPT-5/Codex → Responses, others → Chat), not an implicit `/models` network lookup.
 An explicit `RouteSpec.protocol` overrides that heuristic, including the baseline

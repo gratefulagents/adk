@@ -261,6 +261,65 @@ fn runner(agent: AgentConfig) -> Runner {
     Runner::new(agent, RunnerConfig::default()).unwrap()
 }
 
+#[test]
+fn agent_clone_overrides_match_original_sdk_example() {
+    let mut original = agent(TestModel::with(vec![]));
+    original.name = "original".into();
+    original.instructions = "do stuff".into();
+    let mut cloned = original.clone();
+    cloned.name = "clone".into();
+    cloned.instructions = "do other stuff".into();
+    assert_eq!(cloned.name, "clone");
+    assert_eq!(cloned.instructions, "do other stuff");
+    assert_eq!(original.name, "original");
+    assert_eq!(original.instructions, "do stuff");
+}
+
+#[test]
+fn handoff_tool_definition_matches_original_sdk_example() {
+    let mut target = agent(TestModel::with(vec![]));
+    target.name = "expert".into();
+    let handoff = Handoff::new(Arc::new(target));
+    assert_eq!(handoff.definition.name, "transfer_to_expert");
+    assert!(handoff.definition.read_only);
+}
+
+#[test]
+fn stop_at_tools_membership_matches_original_sdk_example() {
+    let mut a = agent(TestModel::with(vec![]));
+    a.stop_at_tools = ["bash".into(), "read".into()].into();
+    assert!(a.stop_at_tools.contains("bash"));
+    assert!(!a.stop_at_tools.contains("write"));
+}
+
+#[tokio::test]
+async fn tool_exposure_orders_explicit_tools_before_handoffs() {
+    let model = TestModel::with(vec![Ok(answer("done"))]);
+    let mut target = agent(model.clone());
+    target.name = "helper".into();
+    target.handoff_description = "A helper agent".into();
+    let mut a = agent(model.clone());
+    let mut tool = TestTool::new("tool1", false, false);
+    Arc::get_mut(&mut tool).unwrap().definition.description = "desc1".into();
+    Arc::get_mut(&mut tool).unwrap().definition.read_only = false;
+    a.tools.push(tool);
+    a.handoffs.push(Handoff::new(Arc::new(target)));
+    let mut request = request(1);
+    request.policy.tools.access = AccessMode::FullAccess;
+    runner(a)
+        .run(context(), request, Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 1);
+    let names: Vec<_> = requests[0]
+        .tools
+        .iter()
+        .map(|tool| tool.name.as_str())
+        .collect();
+    assert_eq!(names, ["tool1", "transfer_to_helper"]);
+}
+
 #[tokio::test]
 async fn final_summary_turn_is_opt_in_and_request_only_in_run_and_stream() {
     let fixture: Value = serde_json::from_str(include_str!(

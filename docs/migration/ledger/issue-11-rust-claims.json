@@ -15173,6 +15173,54 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-D3AB4F694FEE94EE": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestAgentClone",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only the original scalar clone-override example is closed: name and instructions are overridden on the clone without changing the original. Go slice/backing-array aliases and complete Clone/option API contracts remain unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E6520F93D0D9C3F9": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestHandoffToTool",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::Handoff::new"
+      ],
+      "rust_test_identifiers": [
+        "handoff_tool_definition_matches_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffToTool",
+      "rationale": "Exact original assertions for expert target: transfer_to_expert name and read-only declaration. This closes only the original test, not every executable handoff wrapper contract.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-AEF5BE6BFD4DA076": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestStopAtToolsContains",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "stop_at_tools_membership_matches_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestStopAtToolsContains",
+      "rationale": "Original bash/read membership example through the native stop_at_tools BTreeSet: bash present, write absent. No nil Go receiver, arbitrary serialization or whole stop-policy API claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Original agent helper examples
+
+Added original-test counterparts for scalar clone overrides, generated handoff
+metadata, and stop-at-tools membership. A fourth native regression verifies
+explicit tools precede handoffs in a FullAccess model request; it does not claim
+Go's unconditional GetAllTools helper or mutable collection aliasing parity.
+
+Fresh Rust1.88 validation: **1,602 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc/format, facade matrix, standalone consumer/purity,
+all20 scenarios and host-session passed. Pinned Go report: **915 pass /5 skip**
+in36 packages. Bound evidence,51 validators, artifact checks and source locks
+passed. Ledger: **851 verified /8,040 unresolved /251 excluded**. All46 CI checks
+passed on preceding791e37f; this new tranche's remote checks are not yet claimed.
+Issue11 remains incomplete.
+
 ### Typed float negative-zero serialization
 
 The shared DTO float serializer no longer reparses its finite formatted number,

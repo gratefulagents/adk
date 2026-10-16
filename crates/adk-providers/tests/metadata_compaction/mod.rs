@@ -368,3 +368,31 @@ async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
         server.join().unwrap();
     }
 }
+
+#[tokio::test]
+async fn catalog_http_decoding_matches_pinned_sdk() {
+    let fixture = fixture();
+    let cases = fixture["catalog_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 45);
+    for case in cases {
+        let body = case["body"].as_str().unwrap();
+        let (session, calls, server) = server(vec![(200, body.into())]);
+        let actual = adk_providers::metadata::fetch_model_metadata(&context(), &session).await;
+        assert_eq!(
+            actual.is_err(),
+            case["error"].as_bool().unwrap(),
+            "{}",
+            case["name"]
+        );
+        if let Ok(models) = actual {
+            assert_eq!(
+                models,
+                parse_model_metadata(body.as_bytes()).unwrap(),
+                "{}",
+                case["name"]
+            );
+        }
+        assert_eq!(calls.load(Ordering::SeqCst), 1);
+        server.join().unwrap();
+    }
+}

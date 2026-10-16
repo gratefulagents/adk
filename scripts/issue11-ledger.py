@@ -127,7 +127,7 @@ RUST_INPUTS = ["scripts/providers/generate.sh", "scripts/providers/continuation_
                "crates/adk/tests/builder_compaction_resolver/mod.rs",
                "crates/adk/tests/builder_compaction_resolver/metadata.rs",
                "crates/adk-providers/src/runtime/metadata.rs",
-               "crates/adk-providers/src/metadata.rs", "crates/adk-providers/src/runtime.rs",
+               "crates/adk-providers/src/metadata.rs", "crates/adk-providers/src/metadata/input.rs", "crates/adk-providers/src/runtime.rs",
                "crates/adk-providers/tests/metadata_compaction/mod.rs",
                "crates/adk-providers/tests/routes_cost_parity.rs",
                "crates/adk-runtime/src/compaction.rs", "crates/adk-runtime/tests/followup.rs",

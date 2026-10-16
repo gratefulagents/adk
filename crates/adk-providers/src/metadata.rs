@@ -4,6 +4,7 @@ use crate::{
     error::RequestFailure,
 };
 use adk_core::{Context, Error, ErrorCategory};
+mod input;
 use std::collections::BTreeMap;
 
 pub const DEFAULT_CODEX_CLIENT_VERSION: &str = "0.153.4";
@@ -148,83 +149,19 @@ impl ModelMetadata {
     }
 }
 
-// Raw JSON preserves integer -0 without admitting fractions or exponent notation.
-fn metadata_integer<'de, D: serde::Deserializer<'de>>(
-    deserializer: D,
-) -> Result<Option<i64>, D::Error> {
-    use serde::Deserialize;
-    Option::<Box<serde_json::value::RawValue>>::deserialize(deserializer)?
-        .map(|raw| raw.get().parse().map_err(serde::de::Error::custom))
-        .transpose()
-}
-
-/// Decode the pinned OpenAI, Codex, or Copilot catalog shape. First duplicate
+/// Decode the pinned OpenAI, Codex, or Copilot catalog shape. First duplicate model ID
 /// wins case-insensitively; a nonempty Codex catalog takes precedence over data.
 /// The host owns fetching, authentication, refresh, and any catalog lifetime.
 pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
-    #[derive(Default, serde::Deserialize)]
-    #[serde(default)]
-    struct Limits {
-        #[serde(default, deserialize_with = "metadata_integer")]
-        max_context_window_tokens: Option<i64>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        max_prompt_tokens: Option<i64>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        max_output_tokens: Option<i64>,
-    }
-    #[derive(Default, serde::Deserialize)]
-    #[serde(default)]
-    struct Capabilities {
-        limits: Option<Limits>,
-    }
-    #[derive(serde::Deserialize)]
-    struct Effort {
-        effort: Option<String>,
-    }
-    #[derive(serde::Deserialize)]
-    struct Upgrade {
-        model: Option<String>,
-    }
-    #[derive(serde::Deserialize)]
-    struct CodexEntry {
-        slug: Option<String>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        context_window: Option<i64>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        max_context_window: Option<i64>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        auto_compact_token_limit: Option<i64>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        effective_context_window_percent: Option<i64>,
-        display_name: Option<String>,
-        description: Option<String>,
-        visibility: Option<String>,
-        #[serde(default, deserialize_with = "metadata_integer")]
-        priority: Option<i64>,
-        default_reasoning_level: Option<String>,
-        supported_reasoning_levels: Option<Vec<Option<Effort>>>,
-        upgrade: Option<Upgrade>,
-    }
-    #[derive(serde::Deserialize)]
-    struct DataEntry {
-        id: Option<String>,
-        capabilities: Option<Capabilities>,
-    }
-    #[derive(serde::Deserialize)]
-    struct Catalog {
-        models: Option<Vec<Option<CodexEntry>>>,
-        data: Option<Vec<Option<DataEntry>>>,
-    }
     if body.len() > 8 * 1024 * 1024 {
         return Err(crate::invalid("model metadata exceeds response limit"));
     }
-    let catalog: Catalog = serde_json::from_slice(body)
-        .map_err(|_| crate::invalid("invalid model metadata response"))?;
-    let models = catalog.models.unwrap_or_default();
+    let catalog =
+        input::decode(body).map_err(|_| crate::invalid("invalid model metadata response"))?;
+    let models = catalog.models;
     let entries: Vec<ModelMetadata> = if !models.is_empty() {
         models
             .into_iter()
-            .flatten()
             .map(|entry| ModelMetadata {
                 id: entry.slug.unwrap_or_default(),
                 context_window: entry.context_window,
@@ -240,9 +177,7 @@ pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
                 ),
                 supported_reasoning_levels: entry
                     .supported_reasoning_levels
-                    .unwrap_or_default()
                     .into_iter()
-                    .flatten()
                     .filter_map(|level| {
                         let effort = metadata_key(&level.effort.unwrap_or_default());
                         (!effort.is_empty()).then_some(effort)
@@ -257,15 +192,9 @@ pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
     } else {
         catalog
             .data
-            .unwrap_or_default()
             .into_iter()
-            .flatten()
             .map(|entry| {
-                let limits = entry
-                    .capabilities
-                    .unwrap_or_default()
-                    .limits
-                    .unwrap_or_default();
+                let limits = entry.capabilities.limits;
                 ModelMetadata {
                     id: entry.id.unwrap_or_default(),
                     context_window: limits

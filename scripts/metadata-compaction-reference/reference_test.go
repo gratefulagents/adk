@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -38,6 +39,39 @@ func nativeCatalogObservations() []map[string]any {
 		{"unicode-labels", `{"models":[{"slug":"x","visibility":" HİDE ","default_reasoning_level":" İ ","supported_reasoning_levels":[{"effort":" İ "}]}]}`},
 		{"unicode-first-duplicate", `{"models":[{"slug":"Δ","context_window":4000},{"slug":"δ","context_window":8000}]}`},
 		{"inactive-schema-validation", `{"models":[{"slug":"valid"}],"data":[{"id":7}]}`},
+		{"folded-codex-fields", `{"MoDeLs":[{"SLUG":" x ","CONTEXT_WINDOW":10000,"DISPLAY_NAME":" Name ","SUPPORTED_REASONING_LEVELS":[{"EFFORT":" HIGH "}],"UPGRADE":{"MODEL":"new"}}]}`},
+		{"unicode-folded-fields", `{"modelſ":[{"ſlug":"folded","priority":2}],"data":[{"id":"unused","capabilities":{"limits":{"max_context_window_toKens":123}}}]}`},
+		{"folded-data-fields", `{"DATA":[{"ID":"x","CAPABILITIES":{"LIMITS":{"MAX_PROMPT_TOKENS":12000,"MAX_OUTPUT_TOKENS":300}}}]}`},
+		{"duplicate-string-last", `{"models":[{"slug":"old","SLUG":"new","description":"old","DESCRIPTION":"new"}]}`},
+		{"null-string-retains", `{"models":[{"slug":"x","slug":null,"description":"kept","description":null}]}`},
+		{"null-integer-retains", `{"models":[{"slug":"x","context_window":10000,"CONTEXT_WINDOW":null,"priority":2,"priority":null}]}`},
+		{"duplicate-integer-last", `{"models":[{"slug":"x","context_window":10000,"context_window":20000}]}`},
+		{"upgrade-object-merges", `{"models":[{"slug":"x","upgrade":{"model":"kept"},"upgrade":{}}]}`},
+		{"upgrade-null-clears", `{"models":[{"slug":"x","upgrade":{"model":"old"},"upgrade":null,"upgrade":{}}]}`},
+		{"limits-object-merges", `{"data":[{"id":"x","capabilities":{"limits":{"max_prompt_tokens":10000}},"CAPABILITIES":{"LIMITS":{"max_output_tokens":500}}}]}`},
+		{"limits-null-retains", `{"data":[{"id":"x","capabilities":{"limits":{"max_prompt_tokens":10000},"limits":null},"capabilities":null}]}`},
+		{"models-array-reuses", `{"models":[{"slug":"old","context_window":10000}],"models":[{"slug":"new"}]}`},
+		{"models-array-null-element-reuses", `{"models":[{"slug":"old"}],"models":[null]}`},
+		{"models-array-shortens", `{"models":[{"slug":"a"},{"slug":"b"}],"models":[{}]}`},
+		{"models-array-regrows", `{"models":[{"slug":"a"},{"slug":"b"},{"slug":"c"}],"models":[{}],"models":[{},{},{}]}`},
+		{"models-empty-resets", `{"models":[{"slug":"a"}],"models":[],"models":[{}],"data":[{"id":"fallback"}]}`},
+		{"models-null-resets", `{"models":[{"slug":"a"}],"models":null,"models":[{}],"data":[{"id":"fallback"}]}`},
+		{"data-array-reuses", `{"data":[{"id":"x","capabilities":{"limits":{"max_prompt_tokens":10000}}}],"DATA":[{}]}`},
+		{"effort-array-reuses", `{"models":[{"slug":"x","supported_reasoning_levels":[{"effort":"high"},{"effort":"low"}],"supported_reasoning_levels":[null,{}]}]}`},
+		{"effort-empty-resets", `{"models":[{"slug":"x","supported_reasoning_levels":[{"effort":"high"}],"supported_reasoning_levels":[],"supported_reasoning_levels":[{}]}]}`},
+		{"earlier-type-error-retained", `{"models":[{"slug":7,"slug":"valid"}]}`},
+		{"earlier-array-type-error-retained", `{"models":[{"slug":false}],"models":[{"slug":"valid"}]}`},
+		{"null-root", `null`},
+		{"wrong-root", `[]`},
+		{"unicode-folded-limits", `{"data":[{"id":"k","capabilities":{"limits":{"max_context_window_toKens":5555}}}]}`},
+	}
+	for _, depth := range []int{9999, 10000} {
+		name := "depth-boundary"
+		if depth == 10000 {
+			name = "depth-overflow"
+		}
+		body := `{"models":[{"slug":"depth"}],"unknown":` + strings.Repeat("[", depth) + "0" + strings.Repeat("]", depth) + "}"
+		cases = append(cases, struct{ name, body string }{name, body})
 	}
 	var out []map[string]any
 	for _, item := range cases {

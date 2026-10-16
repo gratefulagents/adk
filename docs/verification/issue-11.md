@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Metadata JSON field and merge semantics
+
+The pinned-Go catalog oracle now contains45 cases, including27 new cases for
+case-insensitive/Unicode-folded field names, duplicate scalar/object merging,
+null retention versus pointer reset, reused slice elements after shortening and
+regrowing arrays, and retaining an earlier type error despite later valid values.
+The native regression failed on mixed-case Codex fields before the fix.
+
+A metadata-local ordered raw-field decoder now implements those merge rules.
+Output mapping, first model-ID deduplication, authentication and the8MiB response
+limit are unchanged. Unknown-field nesting matches Go at10,000 levels and rejects
+10,001. Every catalog case also traverses an actual Rust loopback HTTP fetch.
+Invalid UTF-8/lone-surrogate replacement remains unverified; no complete parser
+or enclosing file claim is promoted.
+
+Fresh full workspace: **1,580 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full feature matrix,
+standalone consumer and platform-purity checks pass. All bound native/oracle
+evidence,51 validators, license artifact reviews and source locks pass. Ledger
+remains **835 verified /8,056 unresolved /251 excluded**; issue11 is incomplete.
+
 ### Streamed OpenRouter reasoning detail bytes
 
 Stream assembly now retains raw reasoning-detail fragments and applies the

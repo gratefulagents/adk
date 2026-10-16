@@ -25,6 +25,24 @@ fn payload_decoder_is_available_through_standalone_facade() {
     );
 }
 
+#[test]
+fn item_helpers_are_available_through_standalone_facade() {
+    use adk::codec::items::{extract_last_text, extract_text, extract_tool_calls};
+    let items = [
+        serde_json::from_slice(br#"{"Message":{"text":"hello"}}"#).unwrap(),
+        serde_json::from_slice(br#"{"Type":1,"ToolCall":{"name":"bash","input":{"x":1e0}}}"#)
+            .unwrap(),
+        serde_json::from_slice(br#"{"Message":{"text":"world"}}"#).unwrap(),
+    ];
+    assert_eq!(extract_text(&items), "hello\nworld");
+    assert_eq!(extract_last_text(&items), "world");
+    let calls = extract_tool_calls(&items).unwrap();
+    assert_eq!(calls.len(), 1);
+    assert_eq!(calls[0].name, "bash");
+    assert_eq!(calls[0].input.bytes().as_ref(), br#"{"x":1e0}"#);
+    assert!(extract_tool_calls(&[]).is_none());
+}
+
 #[cfg(feature = "observability")]
 #[test]
 fn logger_preserves_and_byte_truncates_invalid_raw_input() {

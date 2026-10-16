@@ -55,6 +55,14 @@ syntax-checked by the byte encoder. Decode errors return no partial state;
 Go error text and partial mutations are not reproduced. Existing `Vec` image
 fields collapse nil and empty slices (both omitted on marshal).
 
+`adk::codec::items::{extract_text, extract_last_text, extract_tool_calls}`
+operates on constructed `dto::RunItem` values. Text extraction honors the item
+kind and missing payloads, including the SDK's empty-message separator behavior.
+Tool-call extraction returns `None` when no calls match and otherwise owns cloned
+call values, preserving raw input bytes without validating them. Mutable Go
+backing-array aliases are not reproduced. These helpers do not add `RunItem`
+support to the sealed Go JSON decoder.
+
 ## Reproducible development
 
 Install [rustup](https://rustup.rs/); `rust-toolchain.toml` pins Rust **1.88.0**,

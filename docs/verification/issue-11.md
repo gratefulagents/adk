@@ -2,6 +2,36 @@
 
 ## Current continuation evidence
 
+### Explicit compatibility item extraction helpers
+
+Added `adk::codec::items::{extract_text, extract_last_text, extract_tool_calls}`
+for constructed compatibility `RunItem` values. Text helpers preserve the SDK's
+accumulator-dependent separators and last-message selection, including empty
+messages and missing/mismatched payloads. Tool-call extraction preserves nil
+results as `None` and every raw input byte without validation; returned calls own
+cloned values. Mutable Go backing-array aliases remain unclaimed, as does the
+complete `ExtractToolCalls` API and enclosing item types/file.
+
+An independent pinned-Go probe supplies **136 item lists** (including all three
+original extraction regressions and 125 empty/whitespace/newline/Unicode triples)
+and **five raw-input cases**, including missing versus empty, invalid UTF-8 and
+invalid JSON. Native assertions check text, ordered call IDs/names/counts/nilness
+and exact raw hex bytes. The latter avoids Python fixture JSON normalization of
+`1e0` into `1.0`; a parsed numeric projection is not the raw-input authority.
+The initial test mistakenly used the sealed decoder on unsupported `RunItem`;
+canonical fixture construction now uses ordinary Serde without claiming general
+Go root-item decoding. The compat-only facade smoke test passes.
+
+Exactly **two text-helper APIs and three original source tests** are newly
+verified. Original pinned Go was freshly rerun: **907 passed /5 skipped** across
+36 packages. Fresh full Rust workspace: **1,586 passed /0 failed /30 ignored**,
+157 targets, plus **9 doctests**. Strict workspace Clippy/rustdoc, the feature
+matrix, standalone consumer and purity checks pass. A final formatting check
+caught module ordering; after correction, formatting and the complete workspace,
+bound oracle/evidence, 51 validators, artifact reviews and source locks passed
+again. Ledger: **842 verified /8,049 unresolved /251 excluded**. Issue11 remains
+incomplete.
+
 ### Direct endpoint oracle and Copilot non-default ports
 
 A new independent pinned internal-Go probe executes `modelMetadataEndpoint`

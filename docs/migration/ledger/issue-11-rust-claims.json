@@ -14983,6 +14983,96 @@
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
       ]
+    },
+    "SDK-5057F360E1699E64": {
+      "source": "internal/agent/items.go",
+      "source_name": "ItemHelpers.ExtractText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/items.rs::extract_text"
+      ],
+      "rust_test_identifiers": [
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "item_helpers_are_available_through_standalone_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestItemHelpersExtractText",
+      "rationale": "Closes only the named text extraction helper or exact original test assertions, not the enclosing item types, file or all Go mutable backing-array alias behavior.136 independently executed pinned Go item-list cases include the exact original hello/world, first/last and bash/read cases plus125 empty/whitespace/newline/Unicode message triples, nil/missing payloads, unknown and mismatched discriminants, image-only tails and simultaneous payload fields. The native comparator checks exact text and last text, tool-call nilness/order/count/ID/name, and every original input byte via hex rather than a float-normalized JSON projection. Five extra constructed raw-input cases cover missing/empty, invalid UTF8 and invalid JSON without validation. Standalone compat-only facade import is exercised. Text returns preserve the accumulator-dependent separator rule and last-message selection including an empty final message; tool results own cloned call values. The broader ExtractToolCalls API ownership contract remains unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9F17756492D4FE0B": {
+      "source": "internal/agent/items.go",
+      "source_name": "ItemHelpers.ExtractLastText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/items.rs::extract_last_text"
+      ],
+      "rust_test_identifiers": [
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "item_helpers_are_available_through_standalone_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestItemHelpersExtractLastText",
+      "rationale": "Closes only the named text extraction helper or exact original test assertions, not the enclosing item types, file or all Go mutable backing-array alias behavior.136 independently executed pinned Go item-list cases include the exact original hello/world, first/last and bash/read cases plus125 empty/whitespace/newline/Unicode message triples, nil/missing payloads, unknown and mismatched discriminants, image-only tails and simultaneous payload fields. The native comparator checks exact text and last text, tool-call nilness/order/count/ID/name, and every original input byte via hex rather than a float-normalized JSON projection. Five extra constructed raw-input cases cover missing/empty, invalid UTF8 and invalid JSON without validation. Standalone compat-only facade import is exercised. Text returns preserve the accumulator-dependent separator rule and last-message selection including an empty final message; tool results own cloned call values. The broader ExtractToolCalls API ownership contract remains unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B249B79764C72D84": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestItemHelpersExtractText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/items.rs::extract_text"
+      ],
+      "rust_test_identifiers": [
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "item_helpers_are_available_through_standalone_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestItemHelpersExtractText",
+      "rationale": "Closes only the named text extraction helper or exact original test assertions, not the enclosing item types, file or all Go mutable backing-array alias behavior.136 independently executed pinned Go item-list cases include the exact original hello/world, first/last and bash/read cases plus125 empty/whitespace/newline/Unicode message triples, nil/missing payloads, unknown and mismatched discriminants, image-only tails and simultaneous payload fields. The native comparator checks exact text and last text, tool-call nilness/order/count/ID/name, and every original input byte via hex rather than a float-normalized JSON projection. Five extra constructed raw-input cases cover missing/empty, invalid UTF8 and invalid JSON without validation. Standalone compat-only facade import is exercised. Text returns preserve the accumulator-dependent separator rule and last-message selection including an empty final message; tool results own cloned call values. The broader ExtractToolCalls API ownership contract remains unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EEE9D0133772C8A8": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestItemHelpersExtractLastText",
+      "implementation_symbols": [
+        "crates/adk-codec/src/items.rs::extract_last_text"
+      ],
+      "rust_test_identifiers": [
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "item_helpers_are_available_through_standalone_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestItemHelpersExtractLastText",
+      "rationale": "Closes only the named text extraction helper or exact original test assertions, not the enclosing item types, file or all Go mutable backing-array alias behavior.136 independently executed pinned Go item-list cases include the exact original hello/world, first/last and bash/read cases plus125 empty/whitespace/newline/Unicode message triples, nil/missing payloads, unknown and mismatched discriminants, image-only tails and simultaneous payload fields. The native comparator checks exact text and last text, tool-call nilness/order/count/ID/name, and every original input byte via hex rather than a float-normalized JSON projection. Five extra constructed raw-input cases cover missing/empty, invalid UTF8 and invalid JSON without validation. Standalone compat-only facade import is exercised. Text returns preserve the accumulator-dependent separator rule and last-message selection including an empty final message; tool results own cloned call values. The broader ExtractToolCalls API ownership contract remains unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6DE66863060EA8A2": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestItemHelpersExtractToolCalls",
+      "implementation_symbols": [
+        "crates/adk-codec/src/items.rs::extract_tool_calls"
+      ],
+      "rust_test_identifiers": [
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "item_helpers_are_available_through_standalone_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestItemHelpersExtractToolCalls",
+      "rationale": "Closes only the named text extraction helper or exact original test assertions, not the enclosing item types, file or all Go mutable backing-array alias behavior.136 independently executed pinned Go item-list cases include the exact original hello/world, first/last and bash/read cases plus125 empty/whitespace/newline/Unicode message triples, nil/missing payloads, unknown and mismatched discriminants, image-only tails and simultaneous payload fields. The native comparator checks exact text and last text, tool-call nilness/order/count/ID/name, and every original input byte via hex rather than a float-normalized JSON projection. Five extra constructed raw-input cases cover missing/empty, invalid UTF8 and invalid JSON without validation. Standalone compat-only facade import is exercised. Text returns preserve the accumulator-dependent separator rule and last-message selection including an empty final message; tool results own cloned call values. The broader ExtractToolCalls API ownership contract remains unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

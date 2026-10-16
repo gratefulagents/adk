@@ -14967,6 +14967,22 @@
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
       ]
+    },
+    "SDK-DB8EA9F2B1741139": {
+      "source": "internal/openai/model_metadata.go",
+      "source_name": "SortModelMetadataForPicker",
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::sort_model_metadata_for_picker"
+      ],
+      "rust_test_identifiers": [
+        "metadata_compaction::public_picker_sort_matches_pinned_sdk_and_preserves_stable_ties"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestPickerModelMetadataMirrorsCodexPicker",
+      "rationale": "Only the in-place stable metadata ordering helper is closed.26 independently executed pinned Go observations directly call internal/openai.SortModelMetadataForPicker and rotate inputs spanning empty/singleton, positive priorities ahead of unspecified/nonpositive priorities, signed extrema, equal-priority and case-folded-ID stable ties, Unicode simple lowercase, whitespace and empty IDs. Native full record equality verifies ordering and description identity; hidden entries are retained by the sort, while companion picker observations verify filtering without mutating the input. None priority corresponds to source zero. The original picker regression is a source association; direct custom-oracle sort observations provide independent behavior evidence. No complete metadata type, parsing, discovery transport or provider claim is added.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime"
+      ]
     }
   }
 }

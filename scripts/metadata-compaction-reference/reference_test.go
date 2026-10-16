@@ -8,10 +8,12 @@ import (
 	"encoding/binary"
 	"encoding/hex"
 	"encoding/json"
+	internalopenai "github.com/gratefulagents/sdk/internal/openai"
 	sdk "github.com/gratefulagents/sdk/pkg/agentsdk"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"testing"
@@ -105,6 +107,33 @@ func nativeCatalogObservations() []map[string]any {
 			observation["body_base64"] = base64.StdEncoding.EncodeToString([]byte(item.body))
 		}
 		out = append(out, observation)
+	}
+	return out
+}
+
+func nativePickerObservations() []map[string]any {
+	cases := [][]ModelMetadata{
+		nil,
+		{},
+		{{ID: "hidden", Visibility: "hide"}},
+		{{ID: "z", Priority: 1}, {ID: "a", Priority: 2}, {ID: "a", Priority: 0}, {ID: "b", Priority: -1}, {ID: "c", Priority: -1 << 63}, {ID: "d", Priority: 1<<63 - 1}},
+		{{ID: "B", Priority: 2}, {ID: "a", Priority: 2}, {ID: "A", Priority: 2}, {ID: "a", Priority: 2}},
+		{{ID: "İ"}, {ID: "i"}, {ID: "Β"}, {ID: "α"}, {ID: "K"}, {ID: "K"}, {ID: " Σ "}, {ID: ""}},
+		{{ID: "A", Priority: -1}, {ID: "a"}, {ID: "A", Priority: -1 << 63}, {ID: "z", Visibility: " HIDE "}, {ID: "y", Visibility: "HİDE"}},
+	}
+	var out []map[string]any
+	for _, original := range cases {
+		for rotation := 0; rotation < max(1, len(original)); rotation++ {
+			models := append([]ModelMetadata{}, original[rotation:]...)
+			models = append(models, original[:rotation]...)
+			for index := range models {
+				models[index].Description = strconv.Itoa(index)
+			}
+			input := append([]ModelMetadata{}, models...)
+			picker := PickerModelMetadata(models)
+			internalopenai.SortModelMetadataForPicker(models)
+			out = append(out, map[string]any{"input": input, "sorted": models, "picker": picker})
+		}
 	}
 	return out
 }
@@ -237,7 +266,7 @@ func TestNativeMetadataReference(t *testing.T) {
 		hash.Write([]byte(key))
 		count++
 	}
-	out := map[string]any{"lifecycle_cases": nativeLifecycleObservations(), "static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
+	out := map[string]any{"picker_cases": nativePickerObservations(), "lifecycle_cases": nativeLifecycleObservations(), "static_cases": nativeStaticObservations(), "threshold_cases": nativeThresholdObservations(), "catalog_cases": nativeCatalogObservations(), "unicode_version": unicode.Version, "scalar_count": count, "scalar_sha256": hex.EncodeToString(hash.Sum(nil)), "catalog": catalog, "cases": cases, "retry": map[string]any{"found": []bool{first, second, third}, "requests_before_cooldown": before, "requests_after_cooldown": failed.Load()}}
 	data, err := json.Marshal(out)
 	if err != nil {
 		t.Fatal(err)

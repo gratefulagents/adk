@@ -332,6 +332,39 @@ fn metadata_thresholds_match_pinned_sdk_signed_boundary_grid() {
     }
 }
 
+#[test]
+fn public_picker_sort_matches_pinned_sdk_and_preserves_stable_ties() {
+    let fixture = fixture();
+    let cases = fixture["picker_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 26);
+    let decode = |values: &serde_json::Value| {
+        values
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| ModelMetadata {
+                id: value["ID"].as_str().unwrap().into(),
+                priority: match value["Priority"].as_i64().unwrap() {
+                    0 => None,
+                    priority => Some(priority),
+                },
+                visibility: value["Visibility"].as_str().unwrap().into(),
+                description: value["Description"].as_str().unwrap().into(),
+                ..Default::default()
+            })
+            .collect::<Vec<_>>()
+    };
+    for case in cases {
+        let input = decode(&case["input"]);
+        let original = input.clone();
+        assert_eq!(picker_model_metadata(&input), decode(&case["picker"]));
+        assert_eq!(input, original);
+        let mut sorted = input;
+        adk_providers::metadata::sort_model_metadata_for_picker(&mut sorted);
+        assert_eq!(sorted, decode(&case["sorted"]), "{case}");
+    }
+}
+
 #[tokio::test]
 async fn public_lookup_inactive_context_lifecycle_matches_pinned_sdk() {
     let fixture = fixture();

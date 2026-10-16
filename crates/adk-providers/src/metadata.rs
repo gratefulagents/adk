@@ -266,6 +266,11 @@ pub fn picker_model_metadata(models: &[ModelMetadata]) -> Vec<ModelMetadata> {
         .filter(|meta| !meta.hidden())
         .cloned()
         .collect();
+    sort_model_metadata_for_picker(&mut models);
+    models
+}
+
+pub fn sort_model_metadata_for_picker(models: &mut [ModelMetadata]) {
     models.sort_by_key(|meta| {
         (
             meta.priority.filter(|priority| *priority > 0).is_none(),
@@ -273,7 +278,6 @@ pub fn picker_model_metadata(models: &[ModelMetadata]) -> Vec<ModelMetadata> {
             metadata_lower(&meta.id),
         )
     });
-    models
 }
 
 #[cfg(test)]

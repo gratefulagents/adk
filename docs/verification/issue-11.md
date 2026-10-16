@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Public in-place metadata ordering
+
+Added `sort_model_metadata_for_picker(&mut [ModelMetadata])` and reused it in
+the existing filtering picker. It retains hidden entries and stably orders by
+positive priority, then Go-compatible simple lowercase ID. Twenty-six independent
+Go observations rotate empty/singleton, signed-priority, Unicode, whitespace and
+case-folded tie inputs; description markers verify stable identity. Native tests
+compare both complete sorted records and filtered picker records and confirm the
+filtering picker leaves its input unchanged.
+
+The first oracle build exposed that the Go public provider wrapper does not
+re-export the in-place helper; the harness now calls the pinned internal helper
+directly. No source implementation was modified. Only that internal helper's
+ledger record is newly verified, not the complete metadata/provider surface.
+
+Fresh full workspace: **1,581 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Strict workspace Clippy/rustdoc, formatting, full feature matrix,
+standalone consumer/purity, bound native/oracle evidence,51 validators, artifact
+reviews and source locks pass. Ledger: **837 verified /8,054 unresolved /251
+excluded**. Issue11 remains incomplete.
+
 ### Signed resolved-context helper
 
 The pinned SDK returns `MaxContextWindow` unchanged when `ContextWindow` is

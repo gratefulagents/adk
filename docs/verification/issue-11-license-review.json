@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "approvals": {
+    "sdk-license-retention-v1": {
+      "responsible_agent": "code-reviewer task_45d4c901, parent AgentRun auto-adk-wkycbp",
+      "decision": "approved_artifact_retention",
+      "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+      "artifact_revision": "b1a1a981ead06d9c69eae4aaa713bb373a6fe2c3",
+      "reviewed_acceptance_ids": [
+        "SDK-B9810B40B3C11D74",
+        "SDK-0B2DC29E8C9CA68D"
+      ],
+      "source_sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+      "artifact_paths": {
+        "LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+        "docs/migration/licenses/sdk-LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+      },
+      "complete_source_review": "Independently decoded the complete archived LICENSE and compared all35149 bytes/674 lines against the immutable SDK Git blob and both retained destinations; all four byte sequences are identical. Recomputed sources/inventory manifest hashes and verified exact unique record identities. Compared preservation/provenance files against complete Git contents at the artifact revision; unchanged. inventory/validate.py and check-source-lock.py passed. No preservation/provenance defect found for these exact two IDs.",
+      "justification": "These two nonexecutable LICENSE records require complete license-text retention and provenance review, not fabricated Rust tests. Exact byte equality and source-bound command evidence satisfy only that artifact obligation under source-parity-v1.",
+      "scope": "SDK LICENSE byte retention and provenance preservation only",
+      "exclusions": [
+        "no legal-compliance conclusion",
+        "no release-approval conclusion",
+        "no relicensing conclusion"
+      ],
+      "preserved_inputs": {
+        "NOTICE.md": "02e24299af6e90c0eeeb4d461a32dea8b35dbb2eb02d5c88170b102b4d830d67",
+        "docs/migration/source-lock.json": "f5ccbe03a730d24d8fe85570b1de8d0f5d7127390ec01710e2c20b88b76e5087"
+      }
+    }
+  }
+}

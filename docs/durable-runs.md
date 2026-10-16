@@ -53,6 +53,10 @@ adapter report currency units, converted to micro-units in the persisted budget.
   Failure to persist prevents the next operation. Unknown schemas and unknown
   effect outcomes fail closed; cumulative budgets and the original deadline
   survive a restart.
+- Approval records pruned from the current history remain available for audit,
+  but cannot authorize later calls during recovery. A reused call ID after
+  pruning must satisfy the current approval policy again, even when its name
+  and arguments match.
 - A dispatched non-replayable effect is **not automatically retried**. Inspect
   the destination and explicitly reconcile it. Idempotency keys are stable,
   but only a destination that honors a key can deduplicate work. A lease cannot

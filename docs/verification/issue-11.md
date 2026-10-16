@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Pruned approvals cannot authorize later calls on recovery
+
+Fixed durable approval restoration to exclude journal entries with no current
+history anchor. These entries remain necessary for audit/new-item encoding,
+but pruning had left them eligible to authorize later identical calls. The
+regression uses real checkpoints: an approved handoff prunes tool history, the
+next agent emits the same ID/name/arguments, and recovery occurs before its
+approval. Before the fix, the fresh approval host was called zero times instead
+of once. Recovery now asks the host, pauses on defer, and transfers only after
+explicit new approval. No fabricated checkpoint or weakened duplicate-ID guard
+is involved. Existing completed-effect and paused-approval recovery tests pass.
+
+Fresh Rust1.88 validation: **1,597 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc, formatting, facade matrix, standalone consumer
+and purity, all20 scenarios and host-session example passed. Bound Go/native
+evidence,51 validators, artifact checks and source locks passed. Ledger remains
+**848 verified /8,043 unresolved /251 excluded**; this fix adds no broad parity
+claims and does not complete issue11.
+
 ### Filesystem contention stress-test budget
 
 Windows CI job117228622620 on1b645024 failed in the six-writer project-state
@@ -14,8 +33,10 @@ rather than causing secondary missing-file failures in still-running writers.
 
 Fresh Linux project-state all-feature/all-target checks: **39 passed /0 failed**;
 strict Clippy and formatting passed. Ledger/audit remain valid at848/8043/251.
-Windows verification of this adjustment is pending CI; it is not yet claimed
-passed. No additional acceptance IDs are closed.
+Both Windows unsupported-target jobs passed on c18596bc (117232061705 and
+117232048546), as did both macOS/Linux enforcing-backend jobs. At that check,
+22/46 jobs had passed,24 remained pending and none had failed; overall CI was
+not yet complete. No additional acceptance IDs are closed.
 
 ### Turn-limit error text and retained partial results
 

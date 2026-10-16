@@ -1136,6 +1136,88 @@ impl Host for DeferredHost {
     }
 }
 #[tokio::test]
+async fn pruned_handoff_approval_cannot_authorize_a_later_identical_call_on_recovery() {
+    let transfer = RunItem::ToolCall {
+        call: ToolCall {
+            raw_arguments: None,
+            id: "transfer".into(),
+            name: "transfer".into(),
+            arguments: json!({}),
+        },
+    };
+    let (_, model, _) = setup(vec![transfer.clone()], false, false);
+    model
+        .responses
+        .lock()
+        .unwrap()
+        .insert(1, response(vec![transfer]));
+    let binding = ModelBinding::complete("model", model.clone());
+    let leaf = Arc::new(AgentConfig::new("leaf", binding.clone()));
+    let mut second = Handoff::new(leaf);
+    second.definition.name = "transfer".into();
+    second.definition.requires_approval = true;
+    let mut target = AgentConfig::new("target", binding.clone());
+    target.handoffs.push(second);
+    let mut first = Handoff::new(Arc::new(target));
+    first.definition.name = "transfer".into();
+    first.definition.requires_approval = true;
+    first.input_filter = HandoffInputFilter::RemoveTools;
+    let mut agent = AgentConfig::new("agent", binding);
+    agent.handoffs.push(first);
+    let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
+
+    let first_store = Arc::new(Store::default());
+    *first_store.fail.lock().unwrap() = Some(("handoff_completed".into(), true));
+    let error = run(&runner, first_store.clone(), None).await.err().unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    let first_checkpoint = first_store.latest();
+    assert_eq!(first_checkpoint.agent_name, "target");
+    let state = serde_json::to_value(&first_checkpoint).unwrap();
+    assert_eq!(
+        state["runtime"]["approval_journal"]
+            .as_array()
+            .unwrap()
+            .len(),
+        1
+    );
+    assert!(state["runtime"]["approval_journal"][0]["history_before"].is_null());
+
+    let second_store = Arc::new(Store::default());
+    *second_store.fail.lock().unwrap() = Some(("model_completed".into(), true));
+    let error = run(&runner, second_store.clone(), Some(first_checkpoint))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "injected persistence failure");
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+
+    let host = Arc::new(DeferredHost(AtomicUsize::new(0)));
+    let resumed = runner
+        .run_durable(
+            context(),
+            request(true),
+            host.clone(),
+            durable(Arc::new(Store::default()), Some(second_store.latest())),
+        )
+        .await
+        .unwrap();
+    assert_eq!(host.0.load(Ordering::SeqCst), 1);
+    assert_eq!(resumed.result.status, RunStatus::Paused);
+    assert_eq!(resumed.result.last_agent.as_deref(), Some("target"));
+    assert_eq!(model.calls.load(Ordering::SeqCst), 2);
+    let approved = resumed
+        .continuation
+        .unwrap()
+        .resume(Some(ApprovalDecision::Approve))
+        .await
+        .unwrap();
+    assert_eq!(approved.result.status, RunStatus::Completed);
+    assert_eq!(approved.result.last_agent.as_deref(), Some("leaf"));
+    assert_eq!(host.0.load(Ordering::SeqCst), 1);
+    assert_eq!(model.calls.load(Ordering::SeqCst), 3);
+}
+
+#[tokio::test]
 async fn approval_pause_survives_restart_and_completed_approved_effect_is_not_replayed() {
     let (runner, model, tool) = setup(vec![call("one")], false, false);
     let store = Arc::new(Store::default());

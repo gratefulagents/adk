@@ -575,7 +575,7 @@ impl Runner {
                 .approval_journal
                 .entries()
                 .into_iter()
-                .filter(|entry| !entry.historical_only)
+                .filter(|entry| !entry.historical_only && entry.history_before.is_some())
             {
                 let call = entry.call().map_err(invalid)?;
                 if engine.calls.iter().any(|pending| *pending == call) {

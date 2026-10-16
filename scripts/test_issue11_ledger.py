@@ -1,5 +1,7 @@
 import copy
 import importlib.util
+import io
+import json
 from pathlib import Path
 import unittest
 from unittest.mock import patch
@@ -211,6 +213,243 @@ class EvidenceTests(unittest.TestCase):
     def test_snapshot_write_is_rejected(self):
         with self.assertRaises(SystemExit):
             ledger.reject_snapshot_path(ledger.SNAPSHOT / "inventory.json")
+
+
+class ArtifactEvidenceTests(unittest.TestCase):
+    def setUp(self):
+        self.claims = ledger.read_json(ledger.ARTIFACT_CLAIMS)
+        self.inventory = ledger.read_json(ledger.LEDGER)
+        self.sources = ledger.read_json(ledger.SNAPSHOT / "sources.json")
+        self.manifest = ledger.read_json(ledger.MANIFEST)
+        self.report = ledger.read_json(ledger.ROOT / ledger.ARTIFACT_REVIEW)
+        self.rust_claims = ledger.read_json(ledger.RUST_CLAIMS)
+        self.entries = {row["acceptance_id"]: {"scope": "in_scope", "disposition": "unresolved"}
+                        for rows in self.inventory["records"].values() for row in rows}
+        self.evidence = {
+            "schema_version": 1, "baseline_revision": ledger.BASELINE_REVISION,
+            "artifact_revision": ledger.ARTIFACT_REVISION, "evidence_kind": "artifact_review",
+            "command": ledger.ARTIFACT_COMMAND, "profile": ledger.ARTIFACT_PROFILE,
+            "platform": "test-platform", "python": "3.11.0", "exit_code": 0,
+            "results": {key: "pass" for key in ledger.ARTIFACT_ALLOWLIST},
+            "files": ledger.artifact_input_hashes(),
+        }
+        documents = {
+            ledger.ARTIFACT_CLAIMS: self.claims, ledger.LEDGER: self.inventory,
+            ledger.SNAPSHOT / "sources.json": self.sources, ledger.MANIFEST: self.manifest,
+            ledger.ROOT / ledger.ARTIFACT_REVIEW: self.report,
+            ledger.RUST_CLAIMS: self.rust_claims, ledger.ARTIFACT_EVIDENCE: self.evidence,
+        }
+        self.reader = patch.object(ledger, "read_json", side_effect=documents.__getitem__)
+        self.reader.start()
+        self.addCleanup(self.reader.stop)
+
+    def validate(self):
+        return ledger.validate_artifact_claims(self.claims, self.inventory["records"])
+
+    def apply(self):
+        ledger.apply_artifact_evidence(self.entries, self.inventory["records"])
+
+    def test_only_exact_license_ids_close_without_native_proof_or_inheritance(self):
+        self.apply()
+        verified = {key for key, row in self.entries.items() if row["disposition"] == "verified"}
+        self.assertEqual(verified, set(ledger.ARTIFACT_ALLOWLIST))
+        for key in verified:
+            entry = self.entries[key]
+            self.assertEqual(entry["evidence_kind"], "artifact_review")
+            self.assertEqual(entry["artifact_paths"], ledger.ARTIFACT_PATHS)
+            self.assertEqual(entry["review_approval_reference"], ledger.ARTIFACT_REVIEW_REFERENCE)
+            self.assertEqual(entry["implementation_symbols"], [])
+            self.assertEqual(entry["rust_test_identifiers"], [])
+            self.assertEqual(entry["target_features"], [])
+            self.assertIsNone(entry["approved_divergence_reference"])
+        group = next(row for row in self.inventory["records"]["verification_groups"]
+                     if row["rust_module"] == "sdk::distribution")
+        self.assertEqual(self.entries[group["acceptance_id"]]["disposition"], "unresolved")
+
+    def test_wrong_id_and_source_test_masquerade_are_rejected(self):
+        original = copy.deepcopy(self.claims["claims"])
+        for key in ("missing", self.inventory["records"]["tests"][0]["acceptance_id"]):
+            with self.subTest(key=key):
+                self.claims["claims"] = copy.deepcopy(original)
+                self.claims["claims"][key] = self.claims["claims"].pop(next(iter(original)))
+                with self.assertRaisesRegex(SystemExit, "allowlist"):
+                    self.validate()
+
+    def test_claim_fields_and_schema_are_strict(self):
+        key = next(iter(self.claims["claims"]))
+        original = copy.deepcopy(self.claims["claims"][key])
+        changes = {field: "wrong" for field in original}
+        changes.update({"rust_test_identifiers": [], "implementation_symbols": [], "reference_test": "fake"})
+        for field, value in changes.items():
+            if field == "rationale":
+                value = " "
+            with self.subTest(field=field):
+                self.claims["claims"][key] = {**original, field: value}
+                with self.assertRaises(SystemExit):
+                    self.validate()
+        self.claims["claims"][key] = original
+        del self.claims["claims"][key]["category"]
+        with self.assertRaisesRegex(SystemExit, "schema"):
+            self.validate()
+
+    def test_envelope_pin_and_version(self):
+        for field, value in (("baseline_revision", "wrong"), ("schema_version", True),
+                             ("schema_version", 2), ("extra", "field")):
+            with self.subTest(field=field, value=value):
+                changed = {**self.claims, field: value}
+                with self.assertRaises(SystemExit):
+                    ledger.validate_artifact_claims(changed)
+
+    def test_duplicate_json_fields_are_rejected(self):
+        self.reader.stop()
+        for path in (ledger.ARTIFACT_CLAIMS, ledger.ARTIFACT_EVIDENCE, ledger.ROOT / ledger.ARTIFACT_REVIEW):
+            with self.subTest(path=path), patch.object(Path, "open", return_value=io.StringIO(
+                    '{"claims":{"duplicate":{},"duplicate":{}}}')), self.assertRaisesRegex(SystemExit, "duplicate"):
+                ledger.read_json(path)
+
+    def test_actual_inventory_and_archived_source_are_validated(self):
+        row = next(row for row in self.inventory["records"]["files"] if row["source"] == "LICENSE")
+        original = copy.deepcopy(row)
+        for field, value in (("sha256", "0" * 64), ("bytes", 1), ("source", "test.go"),
+                             ("rust_module", "sdk_cli"), ("id", "files:NOTICE.md")):
+            with self.subTest(field=field):
+                row.update(original)
+                row[field] = value
+                with self.assertRaises(SystemExit):
+                    self.validate()
+        row.update(original)
+        source = next(row for row in self.sources["files"] if row["path"] == "LICENSE")
+        source["content"] += "changed"
+        with self.assertRaisesRegex(SystemExit, "archived LICENSE"):
+            self.validate()
+
+    def test_manifest_and_actual_immutable_bytes_are_validated(self):
+        self.manifest["artifact_sha256"]["sources.json"] = "0" * 64
+        with self.assertRaisesRegex(SystemExit, "manifest hash"):
+            self.validate()
+
+    def test_current_and_committed_bytes_and_preserved_inputs_cannot_rebaseline(self):
+        real_read = Path.read_bytes
+        real_git = ledger.artifact_git_bytes
+        for path in (*ledger.ARTIFACT_PATHS, *ledger.PRESERVED_INPUTS,
+                     "docs/migration/ledger/acceptance-contracts.json", ledger.ARTIFACT_REVIEW):
+            with self.subTest(path=path, location="working tree"):
+                def changed_read(target):
+                    data = real_read(target)
+                    return data + b"changed" if target == ledger.ROOT / path else data
+                with patch.object(Path, "read_bytes", changed_read), self.assertRaises(SystemExit):
+                    self.validate()
+            with self.subTest(path=path, location="git"):
+                def changed_git(target, revision=ledger.ARTIFACT_REVISION):
+                    data = real_git(target, revision)
+                    return data + b"changed" if target == path else data
+                with patch.object(ledger, "artifact_git_bytes", side_effect=changed_git), self.assertRaises(SystemExit):
+                    self.validate()
+
+    def test_approval_is_explicit_complete_and_scoped(self):
+        approvals = self.report["approvals"]
+        original = copy.deepcopy(approvals["sdk-license-retention-v1"])
+        for field in original:
+            with self.subTest(field=field):
+                approvals["sdk-license-retention-v1"] = {**original, field: ""}
+                with self.assertRaises(SystemExit):
+                    self.validate()
+        approvals["sdk-license-retention-v1"] = {**original, "unexpected": True}
+        with self.assertRaisesRegex(SystemExit, "schema"):
+            self.validate()
+        approvals.clear()
+        with self.assertRaisesRegex(SystemExit, "schema"):
+            self.validate()
+
+    def test_review_reference_and_paths_are_safe_and_tracked(self):
+        claim = next(iter(self.claims["claims"].values()))
+        for reference in ("https://example.test/approval", "../approval.json#/ok",
+                          ledger.ARTIFACT_REVIEW, ledger.ARTIFACT_REVIEW + "#/approvals/missing"):
+            with self.subTest(reference=reference):
+                claim["review_approval_reference"] = reference
+                with self.assertRaises(SystemExit):
+                    self.validate()
+        for path in ("../LICENSE", "/LICENSE", "https://example.test/approval", "docs/../LICENSE"):
+            with self.subTest(path=path), self.assertRaises(SystemExit):
+                ledger.artifact_path(path)
+        with patch.object(Path, "is_symlink", return_value=True), self.assertRaises(SystemExit):
+            ledger.artifact_path(ledger.ARTIFACT_REVIEW, tracked=True)
+        with patch.object(ledger.subprocess, "check_output", return_value=""), self.assertRaises(SystemExit):
+            ledger.artifact_path(ledger.ARTIFACT_REVIEW, tracked=True)
+
+    def test_evidence_requires_fixed_command_pin_profile_and_each_success(self):
+        original = copy.deepcopy(self.evidence)
+        for field, value in (("command", ["true"]), ("profile", "other"), ("exit_code", 1),
+                             ("exit_code", False), ("schema_version", True),
+                             ("baseline_revision", "wrong"), ("artifact_revision", "wrong"),
+                             ("evidence_kind", "rust_test"), ("results", {}),
+                             ("results", {key: "ignored" for key in ledger.ARTIFACT_ALLOWLIST}),
+                             ("python", ""), ("platform", ""), ("extra", True)):
+            with self.subTest(field=field, value=value):
+                self.evidence.clear()
+                self.evidence.update({**original, field: value})
+                with self.assertRaises(SystemExit):
+                    self.apply()
+
+    def test_exact_input_set_and_freshness(self):
+        original = copy.deepcopy(self.evidence["files"])
+        for path in ledger.ARTIFACT_INPUTS:
+            for change in ("missing", "stale"):
+                with self.subTest(path=path, change=change):
+                    self.evidence["files"] = original.copy()
+                    if change == "missing":
+                        del self.evidence["files"][path]
+                    else:
+                        self.evidence["files"][path] = "0" * 64
+                    with self.assertRaisesRegex(SystemExit, "stale artifact evidence"):
+                        self.apply()
+        self.evidence["files"] = {**original, "extra": "0" * 64}
+        with self.assertRaisesRegex(SystemExit, "stale artifact evidence"):
+            self.apply()
+
+    def test_overlap_excluded_and_already_verified_are_rejected(self):
+        key = next(iter(ledger.ARTIFACT_ALLOWLIST))
+        self.rust_claims["claims"][key] = {}
+        with self.assertRaisesRegex(SystemExit, "overlap"):
+            self.apply()
+        with patch.object(Path, "write_text") as write, self.assertRaisesRegex(SystemExit, "overlap"):
+            ledger.verify_artifacts()
+        write.assert_not_called()
+        del self.rust_claims["claims"][key]
+        self.entries[key]["scope"] = "out_of_scope"
+        with self.assertRaisesRegex(SystemExit, "cannot verify"):
+            self.apply()
+        self.entries[key] = {"scope": "in_scope", "disposition": "verified"}
+        with self.assertRaisesRegex(SystemExit, "cannot verify"):
+            self.apply()
+
+    def test_generator_only_writes_after_success_and_never_snapshot(self):
+        with patch.object(Path, "write_text") as write:
+            ledger.verify_artifacts()
+            generated = json.loads(write.call_args.args[0])
+            self.assertEqual(generated["results"], self.evidence["results"])
+            self.assertEqual(generated["files"], ledger.artifact_input_hashes())
+        self.claims["baseline_revision"] = "wrong"
+        with patch.object(Path, "write_text") as write, self.assertRaises(SystemExit):
+            ledger.verify_artifacts()
+        write.assert_not_called()
+        with patch.object(ledger, "ARTIFACT_EVIDENCE", ledger.SNAPSHOT / "bad.json"), \
+                patch.object(Path, "write_text") as write, self.assertRaisesRegex(SystemExit, "baseline snapshot"):
+            ledger.verify_artifacts()
+        write.assert_not_called()
+
+    def test_inputs_changed_during_verification_prevent_write(self):
+        with patch.object(ledger, "artifact_input_hashes", side_effect=[{"first": "hash"}, {"second": "hash"}]), \
+                patch.object(Path, "write_text") as write, self.assertRaisesRegex(SystemExit, "changed during"):
+            ledger.verify_artifacts()
+        write.assert_not_called()
+
+    def test_failed_rust_proof_does_not_fall_back_to_artifacts(self):
+        self.reader.stop()
+        with patch.object(ledger, "apply_rust_evidence", side_effect=SystemExit("failed Rust")), \
+                patch.object(ledger, "apply_artifact_evidence") as artifact, self.assertRaisesRegex(SystemExit, "failed Rust"):
+            ledger.overlay()
+        artifact.assert_not_called()
 
 
 if __name__ == "__main__":

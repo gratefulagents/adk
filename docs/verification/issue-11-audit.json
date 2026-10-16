@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8121,
-    "verified": 770
+    "unresolved": 8119,
+    "verified": 772
   },
   "groups": [
     {
@@ -1061,9 +1061,11 @@
     },
     {
       "counts": {
-        "artifacts:unresolved": 8,
+        "artifacts:unresolved": 7,
+        "artifacts:verified": 1,
         "evals_and_automation:unresolved": 1,
-        "files:unresolved": 8,
+        "files:unresolved": 7,
+        "files:verified": 1,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::distribution",
@@ -1080,7 +1082,6 @@
       "unresolved_ids": [
         "SDK-03447A93784AD09F",
         "SDK-04B329E4ACAEDFB5",
-        "SDK-0B2DC29E8C9CA68D",
         "SDK-28AEC79164E5CCBF",
         "SDK-31E453AB63E04C45",
         "SDK-4B2554199878923E",
@@ -1093,11 +1094,13 @@
         "SDK-9178CB1121676ED8",
         "SDK-94F6B12816DD90AD",
         "SDK-96B77A972F930691",
-        "SDK-B9810B40B3C11D74",
         "SDK-DE7C1ED65E20218D",
         "SDK-E9EA1C28C915EDC6"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-0B2DC29E8C9CA68D",
+        "SDK-B9810B40B3C11D74"
+      ]
     },
     {
       "counts": {
@@ -10934,12 +10937,17 @@
     }
   ],
   "input_hashes": {
-    "docs/migration/ledger/issue-11-overlay.json": "74fee4b3c96cb404673017d68bf0792971549dc144e07d7d0802a90f288a09eb",
+    "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
+    "docs/migration/ledger/issue-11-overlay.json": "acebd9e72b5e55cc640119d7e4a7d47b002b61988e0065f220fe45b50f9a24f9",
     "docs/migration/ledger/issue-11-rust-claims.json": "904ccbed3ae97a649b44dfac9f41a8c32cdc34129019d630064cc94702ad791f",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
   "same_declaration_review_candidates": [],
   "schema_version": 1,
-  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "verified_by_evidence_kind": {
+    "artifact_review": 2,
+    "rust_test": 770
+  }
 }

@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import os
+import platform
 import subprocess
 import sys
 from collections import Counter
@@ -20,6 +21,30 @@ OVERLAY = ROOT / "docs/migration/ledger/issue-11-overlay.json"
 REFERENCE_EVIDENCE = ROOT / "docs/verification/issue-11-pinned-reference.json"
 RUST_EVIDENCE = ROOT / "docs/verification/issue-11-rust-evidence.json"
 RUST_CLAIMS = ROOT / "docs/migration/ledger/issue-11-rust-claims.json"
+ARTIFACT_CLAIMS = ROOT / "docs/migration/ledger/issue-11-artifact-claims.json"
+ARTIFACT_EVIDENCE = ROOT / "docs/verification/issue-11-artifact-evidence.json"
+ARTIFACT_REVIEW = "docs/verification/issue-11-license-review.json"
+ARTIFACT_REVIEW_REFERENCE = ARTIFACT_REVIEW + "#/approvals/sdk-license-retention-v1"
+ARTIFACT_REVISION = "b1a1a981ead06d9c69eae4aaa713bb373a6fe2c3"
+ARTIFACT_SHA256 = "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+ARTIFACT_ALLOWLIST = {"SDK-B9810B40B3C11D74": "artifacts", "SDK-0B2DC29E8C9CA68D": "files"}
+ARTIFACT_PATHS = {"LICENSE": ARTIFACT_SHA256, "docs/migration/licenses/sdk-LICENSE": ARTIFACT_SHA256}
+PRESERVED_INPUTS = {
+    "NOTICE.md": "02e24299af6e90c0eeeb4d461a32dea8b35dbb2eb02d5c88170b102b4d830d67",
+    "docs/migration/source-lock.json": "f5ccbe03a730d24d8fe85570b1de8d0f5d7127390ec01710e2c20b88b76e5087",
+}
+ARTIFACT_COMMAND = ["python3", "scripts/issue11-ledger.py", "verify-artifacts"]
+ARTIFACT_PROFILE = "sdk-license-only-v1"
+ARTIFACT_INPUTS = [
+    "docs/migration/ledger/issue-11-artifact-claims.json", ARTIFACT_REVIEW,
+    "scripts/issue11-ledger.py", "scripts/test_issue11_ledger.py",
+    "scripts/issue11-audit.py", "scripts/test_issue11_audit.py",
+    "docs/migration/ledger/acceptance-contracts.json",
+    "docs/migration/ledger/sdk-v0.0.115/inventory.json",
+    "docs/migration/ledger/sdk-v0.0.115/sources.json",
+    "docs/migration/ledger/sdk-v0.0.115/manifest.json",
+    *ARTIFACT_PATHS, *PRESERVED_INPUTS,
+]
 SNAPSHOT = ROOT / "docs/migration/ledger/sdk-v0.0.115"
 
 BASELINE_REVISION = "1dc92b73900fac74dc357a938e4b5eee6392b418"
@@ -225,7 +250,18 @@ RUST_INPUTS = ["crates/adk-runtime/src/compaction.rs", "crates/adk-runtime/tests
 
 def read_json(path: Path) -> object:
     with path.open(encoding="utf-8") as source:
+        if path in (ARTIFACT_CLAIMS, ARTIFACT_EVIDENCE, ROOT / ARTIFACT_REVIEW):
+            return json.load(source, object_pairs_hook=artifact_json_object)
         return json.load(source)
+
+
+def artifact_json_object(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise SystemExit(f"duplicate artifact JSON field: {key}")
+        result[key] = value
+    return result
 
 
 def sha256(path: Path) -> str:
@@ -293,6 +329,182 @@ def module_reference_map() -> dict[str, dict[str, object]]:
             "test_paths": [],
         },
     }
+
+
+def artifact_object(value, fields, label):
+    if not isinstance(value, dict) or set(value) != set(fields):
+        raise SystemExit(f"invalid artifact {label} schema")
+
+
+def artifact_text(value, label):
+    if not isinstance(value, str) or not value.strip():
+        raise SystemExit(f"artifact {label} must be nonempty text")
+
+
+def artifact_path(path, tracked=False):
+    relative = Path(path)
+    if relative.is_absolute() or relative.as_posix() != path or any(
+            part in {"..", "."} for part in relative.parts):
+        raise SystemExit(f"unsafe artifact path: {path}")
+    target = ROOT / relative
+    if not target.is_file() or ROOT.resolve() not in target.resolve().parents or any(
+            item.is_symlink() for item in (target, *target.parents) if item != ROOT.parent):
+        raise SystemExit(f"artifact path must be a regular repository file: {path}")
+    if tracked:
+        listing = subprocess.check_output(["git", "ls-files", "--stage", "--", path], cwd=ROOT, text=True)
+        if not listing.startswith(("100644 ", "100755 ")) or len(listing.splitlines()) != 1:
+            raise SystemExit(f"artifact review must be tracked and regular: {path}")
+    return target
+
+
+def artifact_git_bytes(path, revision=ARTIFACT_REVISION):
+    mode = subprocess.check_output(["git", "ls-tree", revision, "--", path], cwd=ROOT, text=True)
+    if not mode.startswith(("100644 blob ", "100755 blob ")):
+        raise SystemExit(f"artifact revision must contain a regular file: {path}")
+    return subprocess.check_output(["git", "show", f"{revision}:{path}"], cwd=ROOT)
+
+
+def validate_artifact_claims(claims, records=None):
+    artifact_object(claims, {"schema_version", "baseline_revision", "claims"}, "claims envelope")
+    if type(claims["schema_version"]) is not int or claims["schema_version"] != 1 or claims["baseline_revision"] != BASELINE_REVISION:
+        raise SystemExit("artifact claims require schema 1 and authoritative baseline")
+    artifact_object(claims["claims"], ARTIFACT_ALLOWLIST, "allowlist")
+    inventory = read_json(LEDGER)
+    sources_path = SNAPSHOT / "sources.json"
+    sources = read_json(sources_path)
+    manifest = read_json(MANIFEST)
+    for document in (inventory, sources, manifest):
+        if document["commit"] != BASELINE_REVISION or document["sdk_version"] != "v0.0.115":
+            raise SystemExit("artifact source baseline mismatch")
+    for path in (LEDGER, sources_path, MANIFEST, ROOT / "docs/migration/ledger/acceptance-contracts.json"):
+        name = path.relative_to(ROOT).as_posix()
+        current = artifact_path(name).read_bytes()
+        if current != artifact_git_bytes(name):
+            raise SystemExit(f"artifact immutable input changed: {name}")
+        if path in (LEDGER, sources_path) and sha256(path) != manifest["artifact_sha256"].get(path.name):
+            raise SystemExit(f"artifact manifest hash mismatch: {name}")
+    archived = [row for row in sources["files"] if row["path"] == "LICENSE"]
+    if len(archived) != 1:
+        raise SystemExit("artifact archived LICENSE must be unique")
+    source = archived[0]["content"].encode("utf-8")
+    if len(source) != 35149 or hashlib.sha256(source).hexdigest() != ARTIFACT_SHA256 or archived[0]["sha256"] != ARTIFACT_SHA256:
+        raise SystemExit("artifact archived LICENSE bytes mismatch")
+    if records is not None and records != inventory["records"]:
+        raise SystemExit("artifact records must match actual inventory")
+    indexed = {}
+    for category, rows in inventory["records"].items():
+        for row in rows:
+            key = row["acceptance_id"]
+            if key in indexed:
+                raise SystemExit(f"duplicate artifact inventory ID: {key}")
+            indexed[key] = (category, row)
+    fields = {"evidence_kind", "category", "ledger_record_id", "source", "rust_module", "source_sha256",
+              "artifact_revision", "artifact_paths", "review_approval_reference", "rationale"}
+    for key, category in ARTIFACT_ALLOWLIST.items():
+        claim = claims["claims"][key]
+        artifact_object(claim, fields, "claim")
+        expected = {"evidence_kind": "artifact_review", "category": category,
+                    "ledger_record_id": f"{category}:LICENSE", "source": "LICENSE",
+                    "rust_module": "sdk::distribution", "source_sha256": ARTIFACT_SHA256,
+                    "artifact_revision": ARTIFACT_REVISION, "artifact_paths": ARTIFACT_PATHS,
+                    "review_approval_reference": ARTIFACT_REVIEW_REFERENCE}
+        if any(claim[field] != value for field, value in expected.items()):
+            raise SystemExit(f"artifact claim identity mismatch: {key}")
+        artifact_text(claim["rationale"], "rationale")
+        actual_category, row = indexed.get(key, (None, {}))
+        if actual_category != category or any(row.get(field) != claim[claim_field] for field, claim_field in (
+                ("id", "ledger_record_id"), ("source", "source"), ("rust_module", "rust_module"))) or excluded(row)[0]:
+            raise SystemExit(f"artifact inventory identity mismatch: {key}")
+        if category == "files" and (row.get("sha256") != ARTIFACT_SHA256 or row.get("bytes") != 35149):
+            raise SystemExit("artifact inventory LICENSE hash/length mismatch")
+    for path in ARTIFACT_PATHS:
+        if artifact_path(path).read_bytes() != source or artifact_git_bytes(path) != source:
+            raise SystemExit(f"artifact destination bytes mismatch: {path}")
+    for path, expected in PRESERVED_INPUTS.items():
+        if sha256(artifact_path(path)) != expected or hashlib.sha256(artifact_git_bytes(path)).hexdigest() != expected:
+            raise SystemExit(f"artifact preserved input changed: {path}")
+    review_path = artifact_path(ARTIFACT_REVIEW, tracked=True)
+    if review_path.read_bytes() != artifact_git_bytes(ARTIFACT_REVIEW, "HEAD"):
+        raise SystemExit("artifact review must be committed before verification")
+    report = read_json(review_path)
+    artifact_object(report, {"schema_version", "approvals"}, "review envelope")
+    if type(report["schema_version"]) is not int or report["schema_version"] != 1:
+        raise SystemExit("artifact review requires schema 1")
+    artifact_object(report["approvals"], {"sdk-license-retention-v1"}, "review approvals")
+    approval = report["approvals"]["sdk-license-retention-v1"]
+    expected = {
+        "decision": "approved_artifact_retention", "baseline_revision": BASELINE_REVISION,
+        "artifact_revision": ARTIFACT_REVISION, "source_sha256": ARTIFACT_SHA256,
+        "artifact_paths": ARTIFACT_PATHS, "preserved_inputs": PRESERVED_INPUTS,
+        "scope": "SDK LICENSE byte retention and provenance preservation only",
+        "exclusions": ["no legal-compliance conclusion", "no release-approval conclusion", "no relicensing conclusion"],
+    }
+    artifact_object(approval, {*expected, "reviewed_acceptance_ids", "responsible_agent", "complete_source_review", "justification"}, "approval")
+    if any(approval[field] != value for field, value in expected.items()):
+        raise SystemExit("artifact approval decision/provenance/scope mismatch")
+    ids = approval["reviewed_acceptance_ids"]
+    if not isinstance(ids, list) or len(ids) != 2 or any(not isinstance(key, str) for key in ids) or set(ids) != set(ARTIFACT_ALLOWLIST):
+        raise SystemExit("artifact approval must review exactly both LICENSE IDs")
+    for field in ("responsible_agent", "complete_source_review", "justification"):
+        artifact_text(approval[field], field)
+    return claims["claims"]
+
+
+def artifact_input_hashes():
+    return {path: sha256(artifact_path(path)) for path in ARTIFACT_INPUTS}
+
+
+def verify_artifacts():
+    reject_snapshot_path(ARTIFACT_EVIDENCE)
+    before = artifact_input_hashes()
+    claims = validate_artifact_claims(read_json(ARTIFACT_CLAIMS))
+    if set(claims) & set(read_json(RUST_CLAIMS)["claims"]):
+        raise SystemExit("Rust/artifact claim overlap")
+    after = artifact_input_hashes()
+    if before != after:
+        raise SystemExit("artifact inputs changed during verification")
+    evidence = {
+        "schema_version": 1, "baseline_revision": BASELINE_REVISION,
+        "artifact_revision": ARTIFACT_REVISION, "evidence_kind": "artifact_review",
+        "command": ARTIFACT_COMMAND, "profile": ARTIFACT_PROFILE,
+        "platform": platform.platform(), "python": platform.python_version(), "exit_code": 0,
+        "results": {key: "pass" for key in claims}, "files": after,
+    }
+    ARTIFACT_EVIDENCE.write_text(json.dumps(evidence, indent=2, sort_keys=True) + "\n")
+    for key in sorted(claims):
+        print(f"{key}: artifact_review pass")
+    print(f"Artifact review verified: {len(claims)} explicit SDK LICENSE IDs ({ARTIFACT_PROFILE})")
+
+
+def apply_artifact_evidence(entries, records):
+    claims = validate_artifact_claims(read_json(ARTIFACT_CLAIMS), records)
+    if set(claims) & set(read_json(RUST_CLAIMS)["claims"]):
+        raise SystemExit("Rust/artifact claim overlap")
+    evidence = read_json(ARTIFACT_EVIDENCE)
+    artifact_object(evidence, {"schema_version", "baseline_revision", "artifact_revision", "evidence_kind",
+                              "command", "profile", "platform", "python", "exit_code", "results", "files"}, "evidence")
+    expected = {"schema_version": 1, "baseline_revision": BASELINE_REVISION, "artifact_revision": ARTIFACT_REVISION,
+                "evidence_kind": "artifact_review", "command": ARTIFACT_COMMAND, "profile": ARTIFACT_PROFILE,
+                "exit_code": 0, "results": {key: "pass" for key in claims}}
+    if type(evidence["schema_version"]) is not int or type(evidence["exit_code"]) is not int or any(evidence[field] != value for field, value in expected.items()):
+        raise SystemExit("artifact evidence requires exact successful command/profile/per-ID results")
+    for field in ("platform", "python"):
+        artifact_text(evidence[field], field)
+    if evidence["files"] != artifact_input_hashes():
+        raise SystemExit("stale artifact evidence; run verify-artifacts again")
+    for key in claims:
+        if key not in entries or entries[key]["scope"] != "in_scope" or entries[key]["disposition"] != "unresolved":
+            raise SystemExit(f"cannot verify unknown/excluded/already verified artifact ID: {key}")
+    for key, claim in claims.items():
+        entries[key].update({
+            "disposition": "verified", "disposition_rationale": claim["rationale"],
+            "evidence_kind": "artifact_review", "artifact_paths": claim["artifact_paths"],
+            "review_approval_reference": claim["review_approval_reference"],
+            "implementation_symbols": [], "rust_test_identifiers": [], "target_features": [],
+            "command_log": [str(ARTIFACT_EVIDENCE.relative_to(ROOT))],
+            "verification_status": "passed", "semantic_closure": "verified",
+            "approved_divergence_reference": None,
+        })
 
 
 def verify_rust() -> None:
@@ -489,6 +701,7 @@ def apply_rust_evidence(entries, records, reference):
                 raise SystemExit(f"missing successful Rust regression: {test}")
         entries[acceptance_id].update({
             "disposition": "verified",
+            "evidence_kind": "rust_test",
             "disposition_rationale": claim["rationale"],
             "implementation_symbols": claim["implementation_symbols"],
             "rust_test_identifiers": claim["rust_test_identifiers"],
@@ -574,6 +787,7 @@ def overlay() -> dict[str, object]:
                     }
 
     apply_rust_evidence(entries, records, reference)
+    apply_artifact_evidence(entries, records)
     counts = Counter(entry["disposition"] for entry in entries.values())
     category_counts = {category: Counter() for category in records}
     for entry in entries.values():
@@ -582,7 +796,7 @@ def overlay() -> dict[str, object]:
         raise SystemExit("ledger no longer has 9,142 IDs, 251 exclusions and 8,891 retained obligations")
     return {
         "schema_version": 1,
-        "purpose": "Issue #11 current evidence overlay retaining its historical audit snapshot. Explicit Rust claims require passing command evidence and unchanged source/test hashes; the generated v0.0.115 baseline is immutable.",
+        "purpose": "Issue #11 current evidence overlay retaining its historical audit snapshot. Explicit Rust claims require passing command evidence and unchanged source/test hashes. Separately typed SDK LICENSE artifact claims require approved byte/provenance review and fresh per-ID evidence; the generated v0.0.115 baseline is immutable.",
         "baseline": {
             "sdk_version": inventory["sdk_version"],
             "sdk_revision": BASELINE_REVISION,
@@ -610,6 +824,7 @@ def overlay() -> dict[str, object]:
             "Exclude sdk_evals and sdk_evals::* records.",
             "Exclude .github/workflows/terminal-bench.yml even though its route is sdk::ci.",
             "Verify only explicit source-identified claims with passing pinned reference and Rust evidence; all other retained IDs remain unresolved.",
+            "Separately verify only the two allowlisted SDK LICENSE artifact IDs with approved byte/provenance review; no sibling or verification-group inheritance.",
         ],
         "counts": {
             "total": len(entries),
@@ -646,8 +861,11 @@ def reject_snapshot_path(path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("generate", "check", "verify-rust"))
+    parser.add_argument("command", choices=("generate", "check", "verify-rust", "verify-artifacts"))
     args = parser.parse_args()
+    if args.command == "verify-artifacts":
+        verify_artifacts()
+        return
     if args.command == "verify-rust":
         verify_rust()
         return

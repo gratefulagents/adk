@@ -53,6 +53,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Artifact retention evidence compares reviewed bytes at its pinned commit.
+          fetch-depth: 0
       - run: rustup show active-toolchain
       - run: cargo fmt --all -- --check
       - run: cargo clippy --locked --workspace --all-features --all-targets -- -D warnings

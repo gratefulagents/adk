@@ -2,6 +2,31 @@
 
 ## Current continuation evidence
 
+### Strict license-artifact evidence
+
+The acceptance contract permits explicit artifact review for nonexecutable
+obligations. The ledger now has a separate, strictly typed route restricted to
+the exact SDK LICENSE artifact/file pair. It requires both explicit claims,
+complete archived/current/reviewed-commit byte equality, immutable inventory and
+manifest checks, committed independent review, preserved NOTICE/source-lock
+hashes and fresh per-ID command evidence. It neither invents Rust tests nor
+allows executable obligations, examples, documentation or distribution groups
+to inherit closure. Failed Rust evidence still fails overall verification.
+
+The independent technical review is retained in
+`issue-11-license-review.json`; it approves only byte retention and provenance,
+not legal compliance, release or relicensing. `verify-artifacts` records the
+fixed profile and exact inputs separately from Rust evidence. Audit output
+distinguishes **770 executable-tested** from **2 artifact-reviewed** records.
+CI's quality checkout now retains history because the proof compares bytes at
+the reviewed implementation commit; a shallow clone needs that commit available.
+
+Fresh artifact verification, overlay/audit checks, **49 validator tests**, source
+locks and immutable inventory validation pass. No Rust implementation changed in
+this tooling slice; the latest full Rust result remains 1,537 passed / 0 failed / 30
+ignored. Ledger: **772 verified / 8,119 unresolved / 251 excluded**. No additional
+scope exclusions or approvals were created. Issue #11 remains incomplete.
+
 ### Failed-child findings in errors
 
 Child runner partial-error outcomes now append the pinned progress heading and

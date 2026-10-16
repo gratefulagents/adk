@@ -79,8 +79,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1079,
-        "verified": 91
+        "unresolved": 1078,
+        "verified": 92
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -96,8 +96,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8057,
-    "verified": 834
+    "unresolved": 8056,
+    "verified": 835
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -209,11 +209,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 903,
+      "pass": 904,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "f87fc208fdb15667e60286ae3c7a70e0b6298fb30cb163a292cdd845c942b8d7",
+    "evidence_sha256": "100b36e79a8b554552bb920c32f27717b09d403f2b6f1ccfc77dc022c82f4241",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -16894,7 +16894,7 @@
     "SDK-E6BD73E1DDB60BD3": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:pkg/agentsdk/tools/search/search_test.go:TestReadFileToolLineRange", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/search/TestReadFileToolLineRange"}, "proposed_rust_module": "sdk::tools::search", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/search/search_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::search", "verification_status": "not_run"},
     "SDK-E6C352DB9C8A5F8D": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.Agent.Handoffs@internal/agent/agent.go", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/agent.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
     "SDK-E6C9C76012978865": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/skills.Registry.skills@pkg/agentsdk/tools/skills/registry.go", "proposed_rust_module": "sdk::tools::skills", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/skills/registry.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::skills", "verification_status": "not_run"},
-    "SDK-E6D6FD076D045BC8": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/openai/chat_stream_test.go:TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage", "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/openai/chat_stream_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "not_run"},
+    "SDK-E6D6FD076D045BC8": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Complete original assertions: exactly thinking then tool, inspect state reasoning, exact decoded reasoning-details bytes in original member order, cache read70/write5. Actual SSE decoder consumes17-byte chunks. Five independently executed Go stream cases additionally cover repeated fragments, whitespace compaction, numeric spellings, duplicate members, escapes and HTML/Unicode separator escaping, asserting native and snapshot signatures and retaining semantic raw payloads. This does not claim interleaved reasoning-block equivalence, outbound raw detail preservation or whole stream implementation closure.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/client.rs::StreamState::event", "crates/adk-providers/src/client.rs::StreamState::finish", "crates/adk-providers/src/snapshot.rs::compact_go_json"], "ledger_record_id": "tests:internal/openai/chat_stream_test.go:TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage"}, "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": ["chat_stream_reference::original_openrouter_stream_details_and_cache_usage", "chat_stream_reference::streamed_reasoning_signatures_preserve_pinned_go_bytes"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/openai/chat_stream_test.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "passed"},
     "SDK-E6D90C06743E0446": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/agent/runner_test.go:TestRunnerErrorHandlerAbortOverridesRetryPolicy", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/runner_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
     "SDK-E6E0A5309C9BA3F1": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/openai.oauthAuthFile@internal/openai/auth_session.go", "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/openai/auth_session.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "not_run"},
     "SDK-E6E63C65FA08D335": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.RunConfig.ToolPolicy@internal/agent/run_config.go", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/run_config.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},

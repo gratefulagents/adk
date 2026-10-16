@@ -8,23 +8,23 @@ use serde_json::{Value, json};
 const DETAILS_PREFIX: &str = "openrouter-reasoning-details:";
 
 pub fn encode_reasoning_details(details: &Value) -> String {
-    format!(
-        "{DETAILS_PREFIX}{}",
-        STANDARD_NO_PAD.encode(details.to_string())
-    )
+    encode_reasoning_details_raw(&details.to_string())
+}
+pub(crate) fn encode_reasoning_details_raw(raw: &str) -> String {
+    format!("{DETAILS_PREFIX}{}", STANDARD_NO_PAD.encode(raw))
+}
+pub(crate) fn original_chat_reasoning_details<'a>(source: &'a str, part: &str) -> Option<&'a str> {
+    use serde_json::value::RawValue;
+    type Object<'a> = std::collections::BTreeMap<String, &'a RawValue>;
+    let body: Object<'_> = serde_json::from_str(source).ok()?;
+    let choices: Vec<&RawValue> = serde_json::from_str(body.get("choices")?.get()).ok()?;
+    let choice: Object<'_> = serde_json::from_str(choices.first()?.get()).ok()?;
+    let message: Object<'_> = serde_json::from_str(choice.get(part)?.get()).ok()?;
+    Some(message.get("reasoning_details")?.get())
 }
 pub(crate) fn chat_reasoning_details_signature(details: &Value, source: Option<&str>) -> String {
-    fn original_details(source: &str) -> Option<&str> {
-        use serde_json::value::RawValue;
-        type Object<'a> = std::collections::BTreeMap<String, &'a RawValue>;
-        let body: Object<'_> = serde_json::from_str(source).ok()?;
-        let choices: Vec<&RawValue> = serde_json::from_str(body.get("choices")?.get()).ok()?;
-        let choice: Object<'_> = serde_json::from_str(choices.first()?.get()).ok()?;
-        let message: Object<'_> = serde_json::from_str(choice.get("message")?.get()).ok()?;
-        Some(message.get("reasoning_details")?.get())
-    }
-    match source.and_then(original_details) {
-        Some(raw) => format!("{DETAILS_PREFIX}{}", STANDARD_NO_PAD.encode(raw)),
+    match source.and_then(|source| original_chat_reasoning_details(source, "message")) {
+        Some(raw) => encode_reasoning_details_raw(raw),
         None => encode_reasoning_details(details),
     }
 }

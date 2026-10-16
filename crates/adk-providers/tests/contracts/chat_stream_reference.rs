@@ -193,7 +193,7 @@ fn openrouter_details_semantic_round_trip() {
 }
 
 #[test]
-fn openrouter_stream_details_semantics_and_cache_usage() {
+fn original_openrouter_stream_details_and_cache_usage() {
     let (native, response) = drain(&[
         r#"{"id":"gen-1","model":"anthropic/claude-sonnet-4.6","choices":[{"index":0,"delta":{"reasoning":"inspect ","reasoning_details":[{"type":"reasoning.text","text":"inspect "}]}}]}"#,
         r#"{"choices":[{"index":0,"delta":{"reasoning":"state","reasoning_details":[{"type":"reasoning.text","text":"state"}]}}]}"#,
@@ -211,6 +211,9 @@ fn openrouter_stream_details_semantics_and_cache_usage() {
         details,
         json!([{"type":"reasoning.text","text":"inspect "},{"type":"reasoning.text","text":"state"}])
     );
+    use base64::{Engine, engine::general_purpose::STANDARD_NO_PAD};
+    let signature = response["content"][0]["signature"].as_str().unwrap();
+    assert_eq!(STANDARD_NO_PAD.decode(signature.strip_prefix("openrouter-reasoning-details:").unwrap()).unwrap(), br#"[{"type":"reasoning.text","text":"inspect "},{"type":"reasoning.text","text":"state"}]"#);
     assert_eq!(native.usage.cache_read_tokens, 70);
     assert_eq!(native.usage.cache_creation_tokens, 5);
 }
@@ -223,7 +226,7 @@ fn buffered_reasoning_signatures_preserve_pinned_go_bytes() {
     ))
     .unwrap();
     let cases = fixture["buffered_chat_details"].as_array().unwrap();
-    assert_eq!(cases.len(), 4);
+    assert_eq!(cases.len(), 5);
     for case in cases {
         let response =
             wire::response_json(case["body"].as_str().unwrap().as_bytes(), Protocol::Chat).unwrap();
@@ -243,5 +246,44 @@ fn buffered_reasoning_signatures_preserve_pinned_go_bytes() {
         let snapshot: Value =
             serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
         assert_eq!(snapshot["content"][0]["signature"], case["signature"]);
+    }
+}
+
+#[test]
+fn streamed_reasoning_signatures_preserve_pinned_go_bytes() {
+    use base64::{Engine, engine::general_purpose::STANDARD_NO_PAD};
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["streamed_chat_details"].as_array().unwrap();
+    assert_eq!(cases.len(), 5);
+    for case in cases {
+        let chunks: Vec<_> = case["chunks"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|chunk| chunk.as_str().unwrap())
+            .collect();
+        let (native, snapshot) = drain(&chunks);
+        let RunItem::Reasoning { reasoning } = &native.items[0] else {
+            panic!("missing reasoning")
+        };
+        assert_eq!(reasoning.signature, case["signature"].as_str().unwrap());
+        assert_eq!(reasoning.text, "inspect state");
+        let raw = STANDARD_NO_PAD
+            .decode(
+                reasoning
+                    .signature
+                    .strip_prefix("openrouter-reasoning-details:")
+                    .unwrap(),
+            )
+            .unwrap();
+        assert_eq!(raw, case["details"].as_str().unwrap().as_bytes());
+        assert_eq!(snapshot["content"][0]["signature"], case["signature"]);
+        assert_eq!(
+            native.raw.as_ref().unwrap()["choices"][0]["message"]["reasoning_details"],
+            serde_json::from_slice::<Value>(&raw).unwrap()
+        );
     }
 }

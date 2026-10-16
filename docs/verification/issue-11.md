@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Streamed OpenRouter reasoning detail bytes
+
+Stream assembly now retains raw reasoning-detail fragments and applies the
+existing Go-compatible JSON compactor before encoding signatures, instead of
+encoding parsed maps. The semantic native raw payload remains unchanged. Five
+independent pinned-Go stream vectors cover member order, duplicate fields, number
+spelling, whitespace, escapes and HTML/Unicode separators; the SSE decoder runs
+in17-byte chunks. Buffered vectors also cover the separator/HTML case. The new
+stream regression failed before the fix and passes afterward.
+
+The original OpenRouter stream/cache regression now checks exact decoded bytes,
+not merely equivalent JSON. This closes only that original source-test record;
+interleaved reasoning blocks, outbound detail byte preservation and full stream
+implementation equivalence remain unclaimed.
+
+Fresh full workspace: **1,579 passed /0 failed /30 ignored**,156 targets, plus
+**9 doctests**. Original pinned Go: **904 passed /5 skipped**,36 packages.
+Strict workspace Clippy/rustdoc, formatting, feature matrix, standalone consumer,
+purity, all bound oracles,51 validators and source locks pass. Evidence initially
+rejected unqualified new test identifiers; the fully qualified bindings and
+complete rerun passed. Ledger: **835 verified (833 executable-tested +2
+artifact-reviewed) /8,056 unresolved /251 excluded**. Issue11 remains incomplete.
+
 ### Deterministic cancellation reference observation
 
 Reproduced the intermittent pinned-Go subagent exporter failure and captured the

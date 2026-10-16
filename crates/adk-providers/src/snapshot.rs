@@ -502,7 +502,7 @@ fn encode(response: &Response) -> Result<JsonDocument, Error> {
     JsonDocument::new(compact_go_json(&encoded)).map_err(|_| invalid())
 }
 
-fn compact_go_json(encoded: &str) -> String {
+pub(crate) fn compact_go_json(encoded: &str) -> String {
     // Go compacts RawMessage fragments and HTML-escapes string content while
     // preserving number spellings, duplicate keys and typed member order.
     let mut compact = String::with_capacity(encoded.len());

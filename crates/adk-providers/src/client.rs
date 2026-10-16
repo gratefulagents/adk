@@ -650,6 +650,7 @@ pub struct StreamState {
     message_started: bool,
     text: String,
     reasoning: String,
+    chat_reasoning_details: Vec<String>,
     complete: bool,
     finish_reason: Option<String>,
     bytes: usize,
@@ -676,6 +677,7 @@ impl StreamState {
             message_started: false,
             text: String::new(),
             reasoning: String::new(),
+            chat_reasoning_details: Vec::new(),
             complete: false,
             finish_reason: None,
             bytes: 0,
@@ -725,7 +727,16 @@ impl StreamState {
         }
         match self.protocol {
             Protocol::Responses => self.responses(event),
-            Protocol::Chat => self.chat(event),
+            Protocol::Chat => {
+                if let Some(raw) = wire::original_chat_reasoning_details(data, "delta")
+                    && let Ok(details) =
+                        serde_json::from_str::<Vec<&serde_json::value::RawValue>>(raw)
+                {
+                    self.chat_reasoning_details
+                        .extend(details.into_iter().map(|detail| detail.get().to_owned()));
+                }
+                self.chat(event)
+            }
             Protocol::Anthropic => self.anthropic(event),
         }
     }
@@ -927,7 +938,23 @@ impl StreamState {
         }
     }
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
-        let mut response = wire::response(&self.body, self.protocol)?;
+        let mut response =
+            if self.protocol == Protocol::Chat && !self.chat_reasoning_details.is_empty() {
+                let details = crate::snapshot::compact_go_json(&format!(
+                    "[{}]",
+                    self.chat_reasoning_details.join(",")
+                ));
+                // Carry the byte-preserving signature without re-encoding parsed details.
+                let mut body = self.body.clone();
+                body["choices"][0]["message"]["reasoning_details"] = Value::Null;
+                body["choices"][0]["message"]["reasoning_opaque"] =
+                    wire::encode_reasoning_details_raw(&details).into();
+                let mut response = wire::response(&body, self.protocol)?;
+                response.raw = Some(self.body.clone());
+                response
+            } else {
+                wire::response(&self.body, self.protocol)?
+            };
         if self.protocol == Protocol::Anthropic {
             let source_calls = self
                 .tools

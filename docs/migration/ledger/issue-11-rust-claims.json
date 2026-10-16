@@ -14932,6 +14932,25 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-E6D6FD076D045BC8": {
+      "source": "internal/openai/chat_stream_test.go",
+      "source_name": "TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState::event",
+        "crates/adk-providers/src/client.rs::StreamState::finish",
+        "crates/adk-providers/src/snapshot.rs::compact_go_json"
+      ],
+      "rust_test_identifiers": [
+        "chat_stream_reference::original_openrouter_stream_details_and_cache_usage",
+        "chat_stream_reference::streamed_reasoning_signatures_preserve_pinned_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage",
+      "rationale": "Complete original assertions: exactly thinking then tool, inspect state reasoning, exact decoded reasoning-details bytes in original member order, cache read70/write5. Actual SSE decoder consumes17-byte chunks. Five independently executed Go stream cases additionally cover repeated fragments, whitespace compaction, numeric spellings, duplicate members, escapes and HTML/Unicode separator escaping, asserting native and snapshot signatures and retaining semantic raw payloads. This does not claim interleaved reasoning-block equivalence, outbound raw detail preservation or whole stream implementation closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

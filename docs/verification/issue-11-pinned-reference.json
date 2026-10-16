@@ -24,11 +24,11 @@
       "-json",
       "./internal/openai",
       "-run",
-      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamReaderMultipleToolCalls|TestChatStreamReaderNarrationToolCallsQuirk|TestChatStreamReaderReasoningAndText|TestChatStreamReaderReasoningThenTool|TestChatStreamReaderToolCalls|TestChatStreamSurfacesRefusalDeltas|TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToAnthropicResponseFromChatReasoning|TestToChatMessagesForwardsImages|TestToChatMessagesPreservesPlaintextReasoning|TestToChatMessagesRoundTripsReasoning|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseInputItems_ConvertsToolResults|TestToResponseInputItems_SkipsOrphanToolResults|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
+      "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamReaderMultipleToolCalls|TestChatStreamReaderNarrationToolCallsQuirk|TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage|TestChatStreamReaderReasoningAndText|TestChatStreamReaderReasoningThenTool|TestChatStreamReaderToolCalls|TestChatStreamSurfacesRefusalDeltas|TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToAnthropicResponseFromChatReasoning|TestToChatMessagesForwardsImages|TestToChatMessagesPreservesPlaintextReasoning|TestToChatMessagesRoundTripsReasoning|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseInputItems_ConvertsToolResults|TestToResponseInputItems_SkipsOrphanToolResults|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
     ]
   ],
   "counts": {
-    "pass": 903,
+    "pass": 904,
     "skip": 5
   },
   "exit_code": 0,
@@ -73,7 +73,7 @@
   },
   "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
-  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n",
+  "stderr": "\n\n",
   "tests": {
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static": "pass",
@@ -194,6 +194,7 @@
     "github.com/gratefulagents/sdk/internal/openai/TestChatStopReasonPrefersTruncationOverToolCalls": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderMultipleToolCalls": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderNarrationToolCallsQuirk": "pass",
+    "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningAndText": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderReasoningThenTool": "pass",
     "github.com/gratefulagents/sdk/internal/openai/TestChatStreamReaderToolCalls": "pass",

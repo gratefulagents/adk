@@ -22,11 +22,13 @@ Ten further Responses tool-pairing cases compare complete input arrays: orphans,
 matched/prior/future calls, trimmed/generated/blank IDs, repeated results,
 whitespace-only outputs and images attached to matched or orphan results.
 Orphan outputs are omitted without dropping their separate image blocks.
-Four buffered Chat cases preserve OpenRouter reasoning-details signatures byte
-for byte, including member order, whitespace, number spelling, escapes and
-duplicate fields. Native conversion and loopback HTTP compare those Go signatures
-in both reasoning items and diagnostic snapshots. Streaming signatures and
-outbound structured JSON byte preservation are not established by these cases.
+Five buffered and five streamed Chat cases compare OpenRouter reasoning-details
+signatures byte for byte, including member order, whitespace, number spelling,
+escapes, duplicate fields and HTML/Unicode separators. Buffered conversion retains
+original bytes; streaming compacts and HTML-escapes accumulated raw fragments as
+Go does. Native conversion, loopback buffered HTTP and the SSE decoder compare
+signatures in reasoning items and diagnostic snapshots. Interleaved reasoning
+blocks and outbound structured JSON byte preservation remain unverified.
 The Rust SSE differentials check every byte split. Other JSON comparisons are
 semantic; opaque continuation strings are unchanged.
 Regenerate with `bash scripts/providers/generate.sh /path/to/pinned/sdk`.

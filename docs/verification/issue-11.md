@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Original chat audit regressions
+
+Five native tests now reproduce every assertion in the original
+`audit_fixes_test.go`: nonempty complete/streamed refusal text, the three
+truncation/tool-call stop-reason combinations, multipart base64 PNG forwarding,
+and plain-string text-only messages. Production behavior passed unchanged.
+Six exact test/file claims are added; general chat codec parity is not claimed.
+
+Fresh bound native/reference evidence, strict provider all-target Clippy,
+formatting,51 validators and source locks pass. Pinned Go: **883 passed /5
+skipped**,36 packages. The full workspace/matrix results immediately below apply
+to preceding c0131fc3, before these five additional test-only regressions.
+Ledger: **819 verified (817 executable-tested +2 artifact-reviewed) /8,072
+unresolved /251 excluded**. Issue11 remains incomplete.
+
 ### Model fallback serialization and actual HTTP calls
 
 Added all four original fallback-table cases, the exact JSON omission/array

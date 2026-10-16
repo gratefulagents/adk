@@ -14541,6 +14541,118 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-BF64EC2CCEFACF4C": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": "TestChatResponseSurfacesRefusal",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_response_original_refusal_is_nonempty_text"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatResponseSurfacesRefusal",
+      "rationale": "Complete original regression assertions. Original refusal-only response succeeds and first content block contains the complete refusal. Does not claim full chat request/response/stream or provider implementation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-DF4183B7F2CBF840": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": "TestChatStopReasonPrefersTruncationOverToolCalls",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_original_stop_reason_prioritizes_truncation"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStopReasonPrefersTruncationOverToolCalls",
+      "rationale": "Complete original regression assertions. All three original stop-reason assertions: length with tools is max_tokens, tool_calls with tools is tool_use, tool_calls without tools is end_turn. Native complete response normalized snapshot exposes the same observable stop_reason. Does not claim full chat request/response/stream or provider implementation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-81FF0D057FA5967C": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": "TestChatStreamSurfacesRefusalDeltas",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_original_stream_surfaces_refusal_deltas"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatStreamSurfacesRefusalDeltas",
+      "rationale": "Complete original regression assertions. Both original refusal deltas are accumulated and complete response contains the concatenated refusal. Does not claim full chat request/response/stream or provider implementation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-55FD5D15EA39221B": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": "TestToChatMessagesForwardsImages",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_original_messages_forward_images"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesForwardsImages",
+      "rationale": "Complete original regression assertions. Original text and base64 PNG user message yields exactly one multipart message with both text and image_url, matching data URL prefix and successful JSON serialization. Does not claim full chat request/response/stream or provider implementation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-4D64CB6D86638934": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": "TestToChatMessagesTextOnlyStaysString",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_original_text_only_message_stays_string"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestToChatMessagesTextOnlyStaysString",
+      "rationale": "Complete original regression assertions. Original hello user message yields exactly one message with string content. Does not claim full chat request/response/stream or provider implementation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-96734266F0BA4C97": {
+      "source": "internal/openai/audit_fixes_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request",
+        "crates/adk-providers/src/wire.rs::response",
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "chat_response_original_refusal_is_nonempty_text",
+        "chat_original_stop_reason_prioritizes_truncation",
+        "chat_original_stream_surfaces_refusal_deltas",
+        "chat_original_messages_forward_images",
+        "chat_original_text_only_message_stays_string"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestChatResponseSurfacesRefusal",
+      "rationale": "Complete audit_fixes_test.go, containing exactly five original regressions. Individually mapped native assertions cover complete and streamed refusals, all three truncation/tool-call stop-reason cases, multipart base64 image forwarding and text-only string representation. No production API, general stream ordering or complete chat codec coverage is inferred from test-file closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

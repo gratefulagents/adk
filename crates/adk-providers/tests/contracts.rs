@@ -1012,6 +1012,148 @@ fn chat_completion_request_original_models_serialization() {
 }
 
 #[test]
+fn chat_response_original_refusal_is_nonempty_text() {
+    use adk_core::{Content, RunItem};
+    let response = wire::response(
+        &json!({
+            "id":"chatcmpl-1", "model":"gpt-test",
+            "choices":[{"message":{"role":"assistant", "refusal":"I can't help with that."}, "finish_reason":"stop"}]
+        }),
+        Protocol::Chat,
+    ).unwrap();
+    let RunItem::Message { message } = &response.items[0] else {
+        panic!("missing refusal message")
+    };
+    let Content::Text { text } = &message.content[0] else {
+        panic!("missing refusal text")
+    };
+    assert!(text.contains("I can't help with that."));
+}
+
+#[test]
+fn chat_original_stop_reason_prioritizes_truncation() {
+    for (reason, has_tools, expected) in [
+        ("length", true, "max_tokens"),
+        ("tool_calls", true, "tool_use"),
+        ("tool_calls", false, "end_turn"),
+    ] {
+        let mut message = json!({"role":"assistant", "content":"narration"});
+        if has_tools {
+            message["tool_calls"] = json!([{"id":"call_1", "type":"function", "function":{"name":"lookup", "arguments":"{}"}}]);
+        }
+        let response = wire::response(
+            &json!({"choices":[{"message":message,"finish_reason":reason}]}),
+            Protocol::Chat,
+        )
+        .unwrap();
+        let snapshot: serde_json::Value =
+            serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
+        assert_eq!(snapshot["stop_reason"], expected, "{reason}, {has_tools}");
+    }
+}
+
+#[test]
+fn chat_original_messages_forward_images() {
+    use adk_core::{Content, Message, Role, RunItem};
+    let mut input = request();
+    input.model = "gpt-test".into();
+    input.instructions.clear();
+    input.input = vec![RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![
+                Content::Text {
+                    text: "what is in this image?".into(),
+                },
+                Content::Attachment {
+                    media_type: "image/png".into(),
+                    data: "aGVsbG8=".into(),
+                    detail: String::new(),
+                },
+            ],
+        },
+    }];
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    let messages = body["messages"].as_array().unwrap();
+    assert_eq!(messages.len(), 1);
+    let parts = messages[0]["content"].as_array().unwrap();
+    let mut saw_text = false;
+    let mut saw_image = false;
+    for part in parts {
+        match part["type"].as_str() {
+            Some("text") => saw_text = true,
+            Some("image_url") => {
+                assert!(
+                    part["image_url"]["url"]
+                        .as_str()
+                        .unwrap()
+                        .starts_with("data:image/png;base64,aGVsbG8=")
+                );
+                saw_image = true;
+            }
+            _ => {}
+        }
+    }
+    assert!(saw_text && saw_image);
+    serde_json::to_string(messages).unwrap();
+}
+
+#[test]
+fn chat_original_text_only_message_stays_string() {
+    use adk_core::{Content, Message, Role, RunItem};
+    let mut input = request();
+    input.model = "gpt-test".into();
+    input.instructions.clear();
+    input.input = vec![RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![Content::Text {
+                text: "hello".into(),
+            }],
+        },
+    }];
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    let messages = body["messages"].as_array().unwrap();
+    assert_eq!(messages.len(), 1);
+    assert!(messages[0]["content"].is_string());
+}
+
+#[test]
+fn chat_original_stream_surfaces_refusal_deltas() {
+    use adk_core::{Content, ModelEvent, RunItem};
+    let mut stream = StreamState::new(Protocol::Chat);
+    stream.event(&json!({"id":"chatcmpl-1", "model":"gpt-test", "choices":[{"delta":{"refusal":"I can't "}}]}).to_string()).unwrap();
+    stream
+        .event(
+            &json!({"choices":[{"delta":{"refusal":"help with that."},"finish_reason":"stop"}]})
+                .to_string(),
+        )
+        .unwrap();
+    let events = stream.event("[DONE]").unwrap();
+    let ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("missing complete response")
+    };
+    let text: String = response
+        .items
+        .iter()
+        .filter_map(|item| match item {
+            RunItem::Message { message } => Some(
+                message
+                    .content
+                    .iter()
+                    .filter_map(|part| match part {
+                        Content::Text { text } => Some(text.as_str()),
+                        _ => None,
+                    })
+                    .collect::<String>(),
+            ),
+            _ => None,
+        })
+        .collect();
+    assert!(text.contains("I can't help with that."));
+}
+
+#[test]
 fn responses_done_only_tracking_is_per_content_part() {
     let mut stream = StreamState::new(Protocol::Responses);
     for part in 0..2 {

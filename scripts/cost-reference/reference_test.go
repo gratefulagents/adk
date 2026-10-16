@@ -3,6 +3,8 @@ package agent
 
 import (
 	"encoding/json"
+	"fmt"
+	"math"
 	"os"
 	"testing"
 )
@@ -93,7 +95,19 @@ func TestNativeResultCostReference(t *testing.T) {
 		}
 		c.CostUSD, c.CostKnown = estimateRunResultCost(result, model)
 	}
-	data, err := json.Marshal(map[string]any{"cases": cases})
+	floatCases := []map[string]string{}
+	for _, value := range []float64{0, math.Copysign(0, -1), 1, .25, -1.25, 1e-6, 1e-7, 1e20, 1e21, math.MaxFloat64, math.SmallestNonzeroFloat64} {
+		encoded, err := json.Marshal(ModelResponse{CostUSD: value})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var fields map[string]json.RawMessage
+		if err := json.Unmarshal(encoded, &fields); err != nil {
+			t.Fatal(err)
+		}
+		floatCases = append(floatCases, map[string]string{"bits": fmt.Sprintf("%016x", math.Float64bits(value)), "json": string(fields["CostUSD"])})
+	}
+	data, err := json.Marshal(map[string]any{"cases": cases, "float_cases": floatCases})
 	if err != nil {
 		t.Fatal(err)
 	}

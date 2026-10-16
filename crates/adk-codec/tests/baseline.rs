@@ -311,7 +311,34 @@ fn state_rejects_order_dependencies_and_unknown_events() {
 }
 
 #[test]
-fn go_float_cost_wire_encoding() {
+fn typed_float_spelling_matches_exact_pinned_go_bytes() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/costs/sdk-result-cost.json")).unwrap();
+    let cases = fixture["float_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 11);
+    for case in cases {
+        let bits = u64::from_str_radix(case["bits"].as_str().unwrap(), 16).unwrap();
+        let response = ModelResponse {
+            cost_usd: f64::from_bits(bits),
+            ..Default::default()
+        };
+        for encoded in [
+            serde_json::to_vec(&response).unwrap(),
+            adk_codec::snapshots::to_go_json(&response).unwrap(),
+        ] {
+            let fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>> =
+                serde_json::from_slice(&encoded).unwrap();
+            assert_eq!(
+                fields["CostUSD"].get(),
+                case["json"].as_str().unwrap(),
+                "bits={bits:x}"
+            );
+        }
+    }
+}
+
+#[test]
+fn float_cost_value_projection() {
     for (value, expected) in [
         (0.0, "0"),
         (-0.0, "0"),

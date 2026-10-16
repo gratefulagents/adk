@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Typed float negative-zero serialization
+
+The shared DTO float serializer no longer reparses its finite formatted number,
+which changed Go's `-0` to `0`. Eleven independent pinned Go ModelResponse cost
+observations store f64 bits as hexadecimal strings and exact JSON tokens as
+strings, covering signed zero, notation boundaries and finite extrema. Native
+checks compare actual Serde and Go-compatible encoded bytes through RawValue.
+The negative-zero byte regression failed before the fix and now passes.
+
+Serde's generic `to_value` projection still reparses the private Number payload
+and loses negative zero; that projection is not authoritative for exact bytes.
+The old test is renamed to describe its projection assertions, which remain
+unchanged. Nonfinite rejection and field omission rules are unchanged. This
+adds no whole-format or generic-value round-trip claim.
+
+Fresh Rust1.88 validation: **1,598 passed /0 failed /30 ignored**, **9 doctests**;
+strict workspace Clippy/rustdoc, Rust/Go formatting, facade matrix, standalone
+consumer/purity, all20 scenarios and host-session passed. Independent fixture
+reproduction, bound evidence,51 validators, artifact checks and source locks
+passed. Ledger unchanged: **848 verified /8,043 unresolved /251 excluded**.
+Latest checked7c57bf5e CI:44 passed,0 failed,2 pending; no complete-CI claim.
+Issue11 remains incomplete.
+
 ### Pruned approvals cannot authorize later calls on recovery
 
 Fixed durable approval restoration to exclude journal entries with no current

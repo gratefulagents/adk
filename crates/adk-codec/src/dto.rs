@@ -32,8 +32,8 @@ pub fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, 
     } else {
         v.to_string()
     };
-    let number: serde_json::Number = text.parse().map_err(serde::ser::Error::custom)?;
-    number.serialize(s)
+    // Re-parsing this finite-float spelling would turn "-0" into "0".
+    serde_json::Number::from_string_unchecked(text).serialize(s)
 }
 
 fn is_zero<T: Default + PartialEq>(v: &T) -> bool {

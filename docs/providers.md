@@ -274,6 +274,13 @@ JSON normalizes to `{}`. A valid raw payload that Serde cannot project has a
 Native opt-in schema validation still checks that projection. This does not change
 Anthropic argument handling or claim whole-provider Unicode/depth parity.
 
+Anthropic SSE usage follows the pinned SDK's distinct model paths. Completion
+retains initial input/cache counters and replaces output tokens on every message
+delta, including zero or omitted output. Streaming merges nonzero reported
+counters and retains prior counts when updates are zero/null/omitted. Native usage,
+context-token totals and compatibility snapshots agree for the selected path;
+ordinary JSON responses are not passed through these accumulators.
+
 Providers additionally set `snapshot_projection: Option<SnapshotProjection>` to
 explicitly identify the pinned OpenAI or Anthropic normalized-message format.
 When tagged, the compatibility codec derives items, usage and end-turn from that

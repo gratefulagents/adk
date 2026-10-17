@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Anthropic usage accumulator parity
+
+Native Anthropic SSE usage no longer overwrites known input/cache counters with
+zero updates. Streaming merges nonzero counters like `StreamAssembler`; completion
+keeps initial input/cache counts and replaces output tokens on every message delta,
+including zero/omitted output, like the SDK's separate `BetaMessage` accumulator.
+This aligns native accounting/context totals with compatibility snapshots rather
+than fixing only the trace projection.
+
+An independent HTTP oracle invokes actual pinned Go `Client.CreateMessage` and
+`CreateMessageStream`/`CollectResponse` for eleven initial, zero, null, omitted,
+nonzero and repeated-update cases. The native HTTP counterpart compares all four
+counters and snapshots through both model APIs. It first failed with input tokens
+zero instead of1200, then passed after the profile-specific update.
+
+Fresh Rust1.88: **1,634 passed /0 failed /30 ignored**, **10 doctests**; strict
+workspace Clippy/rustdoc/format, full facade matrix, standalone consumer/purity,
+all20 scenarios, host-session, script checks, refreshed source-bound evidence,
+51 validators, artifact/overlay/audit and source locks pass. All46 remote checks
+passed on preceding731dc733; newer CI is not yet claimed. Ledger unchanged:
+**859 verified /8,032 unresolved /251 excluded**. These valid nonnegative-count
+cases do not claim whole-provider or signed/overflowing count equivalence.
+
 ### Raw Anthropic output schemas on the HTTP boundary
 
 Anthropic transport now carries the original schema separately from the bounded

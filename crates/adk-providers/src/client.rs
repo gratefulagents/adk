@@ -1407,9 +1407,21 @@ impl StreamState {
                 if let Some(usage) = &mut self.snapshot_completion_usage {
                     usage["output_tokens"] = event["usage"]["output_tokens"].clone();
                 }
-                if let Some(usage) = event["usage"].as_object() {
+                // SDK completion and streaming use different usage accumulators.
+                if self.snapshot_profile == crate::snapshot::Profile::Complete {
+                    self.body["usage"]["output_tokens"] = event["usage"]["output_tokens"].clone();
+                } else if let Some(usage) = event["usage"].as_object() {
                     for (key, value) in usage {
-                        self.body["usage"][key] = value.clone();
+                        if !matches!(
+                            key.as_str(),
+                            "input_tokens"
+                                | "output_tokens"
+                                | "cache_read_input_tokens"
+                                | "cache_creation_input_tokens"
+                        ) || value.as_u64().is_some_and(|count| count != 0)
+                        {
+                            self.body["usage"][key] = value.clone();
+                        }
                     }
                 }
                 self.body["stop_reason"] = event["delta"]["stop_reason"].clone();

@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Complete MCP prompt helper review
+
+Reviewed the complete 63-line MCP prompt helper and mapped its original test
+file and three original regressions to explicit native tests: server-name
+flattening, empty contexts, and control stripping/64-rune clamping. Existing
+independent Unicode scalar and normal/stream request fixtures remain bound to
+these claims. This closes the pure formatter, not MCP transport or tool assembly.
+
+Fresh Rust 1.88 Linux verification: **1,749 workspace tests +10 doctests passed;
+0 failed, 30 ignored**. Strict all-feature lint/typecheck/rustdoc and formatting
+passed. Independently executed Go regressions reported **923 pass /5 skip across
+38 packages**; bound references, all 55 validators, artifacts/overlay/audit and
+immutable source locks passed. Ledger: **1,061 verified /7,830 unresolved /251
+excluded**. Full issue acceptance remains incomplete.
+
 ### Complete pure routing-file review
 
 Reviewed all 235 lines of `internal/agent/mode_routing.go`: five data types,

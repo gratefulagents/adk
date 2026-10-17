@@ -19254,6 +19254,97 @@
         "compat",
         "runtime"
       ]
+    },
+    "SDK-9F5C352D7C1B044B": {
+      "source": "internal/agent/mcp_prompt_test.go",
+      "source_name": "TestBuildMCPPromptContextSanitizesServerNames",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context",
+        "crates/adk-runtime/src/mcp_prompt.rs::sanitize"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::original_prompt_context_flattens_server_names"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames",
+      "rationale": "Exact native counterpart for the complete original TestBuildMCPPromptContextSanitizesServerNames regression: same inputs and assertions, including flattened newline text, empty/all-control contexts or the five exact sanitizer/truncation examples as applicable. This does not claim semantic prompt-injection resistance, arbitrary invalid-UTF8 Go strings or server transport/registration behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-90462EA2DCCE20DA": {
+      "source": "internal/agent/mcp_prompt_test.go",
+      "source_name": "TestBuildMCPPromptContextEmpty",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context",
+        "crates/adk-runtime/src/mcp_prompt.rs::sanitize"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::original_empty_prompt_context"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextEmpty",
+      "rationale": "Exact native counterpart for the complete original TestBuildMCPPromptContextEmpty regression: same inputs and assertions, including flattened newline text, empty/all-control contexts or the five exact sanitizer/truncation examples as applicable. This does not claim semantic prompt-injection resistance, arbitrary invalid-UTF8 Go strings or server transport/registration behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-921F5B26DB6AEDFA": {
+      "source": "internal/agent/mcp_prompt_test.go",
+      "source_name": "TestSanitizeMCPServerName",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context",
+        "crates/adk-runtime/src/mcp_prompt.rs::sanitize"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::original_server_name_sanitizer_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestSanitizeMCPServerName",
+      "rationale": "Exact native counterpart for the complete original TestSanitizeMCPServerName regression: same inputs and assertions, including flattened newline text, empty/all-control contexts or the five exact sanitizer/truncation examples as applicable. This does not claim semantic prompt-injection resistance, arbitrary invalid-UTF8 Go strings or server transport/registration behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-D488CFBC5D2FF6BB": {
+      "source": "internal/agent/mcp_prompt_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context",
+        "crates/adk-runtime/src/mcp_prompt.rs::sanitize"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::original_prompt_context_flattens_server_names",
+        "mcp_prompt::tests::original_empty_prompt_context",
+        "mcp_prompt::tests::original_server_name_sanitizer_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames",
+      "rationale": "Reviewed the entire original test file: exactly three pure tests, all reproduced with identical inputs and assertions in native unit tests and independently executed at the immutable SDK pin. No additional fixtures, callbacks or package behavior are hidden in this file. Closes this test file, not transport behavior or a broader prompt-injection guarantee.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-D3FD18071999D157": {
+      "source": "internal/agent/mcp_prompt.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/mcp_prompt.rs::context",
+        "crates/adk-runtime/src/mcp_prompt.rs::sanitize"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt::tests::unicode_sanitizer_matches_every_pinned_go_scalar_and_context_fixture",
+        "mcp_prompt_matches_pinned_normal_streamed_and_structured_requests",
+        "mcp_prompt::tests::original_prompt_context_flattens_server_names",
+        "mcp_prompt::tests::original_empty_prompt_context",
+        "mcp_prompt::tests::original_server_name_sanitizer_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames",
+      "rationale": "Complete63-line file review: one64-rune bound, a pure ordered-list formatter and its sanitizer, with no resources, initialization, callbacks or build constraints. The source comment says bytes, but the actual truncation counts runes; native code and multibyte-boundary observations preserve the implementation. Existing independent actual-Go evidence covers56 normal/streamed/schema request cases and all1112064 valid Unicode scalars with length-framed SHA256 classification proof pinned toUnicode15.0. Exact original regressions are also reproduced. This closes the complete UTF-8 sanitizer/formatter file under the native string boundary, not invalid-UTF8 Go strings, server registration/order outside the supplied list, transport behavior, semantic prompt-injection resistance or sandbox authority.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

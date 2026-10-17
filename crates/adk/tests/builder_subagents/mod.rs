@@ -54,6 +54,10 @@ async fn automatic_catalog_and_managed_tools_match_pinned_builder_stages() {
         .build(&context())
         .await
         .unwrap();
+        if mask & 1 != 0 {
+            let guide = case["delegation_guide"].as_str().unwrap();
+            assert!(bundle.agent().instructions.contains(guide), "{case:?}");
+        }
         let actual: Vec<_> = bundle
             .agent()
             .tools
@@ -342,4 +346,45 @@ async fn automatic_delegation_guidance_respects_parent_tool_policy() {
             .contains("Available specialist sub-agents")
     );
     bundle.close().await.unwrap();
+}
+
+#[tokio::test]
+async fn delegation_guide_contains_only_permitted_surfaces() {
+    for task in [false, true] {
+        for handoff in [false, true] {
+            let model = Script::new(vec![response(vec![message("done")])]);
+            let mut c = config();
+            c.features.as_mut().unwrap().subagents.task = true;
+            if !task {
+                c.policy.tools.denied_tools.insert("subagent".into());
+            }
+            if !handoff {
+                c.policy
+                    .tools
+                    .denied_tools
+                    .insert("transfer_to_reviewer".into());
+            }
+            let mut bundle = builder(c, &model)
+                .subagent_host(Arc::new(TestHost::default()))
+                .build(&context())
+                .await
+                .unwrap();
+            let instructions = &bundle.agent().instructions;
+            assert_eq!(
+                instructions.contains("compact, self-contained task packet"),
+                task
+            );
+            assert_eq!(
+                instructions.contains("Handoffs (transfer full control):\n- transfer_to_reviewer: Transfer the conversation to the reviewer specialist.\n\n"),
+                handoff
+            );
+            assert_eq!(
+                instructions.matches("Signal tools: finish\n").count(),
+                usize::from(task || handoff)
+            );
+            assert_eq!(bundle.agent().handoffs.len(), 1);
+            bundle.close().await.unwrap();
+            assert!(model.requests.lock().unwrap().is_empty());
+        }
+    }
 }

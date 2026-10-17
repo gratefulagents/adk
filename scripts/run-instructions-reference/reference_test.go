@@ -228,7 +228,7 @@ func observeAutomaticSubagents(t *testing.T) []map[string]any {
 				taskAgent, taskStatus = tasks[0].AgentName, string(tasks[0].Status)
 			}
 		}
-		out = append(out, map[string]any{"index": index, "mask": mask, "generic": generic, "handoffs": handoffs, "roles": roles, "tools": definitions, "agents": agents, "scheduler": state.SubAgentScheduler() != nil, "task_agent": taskAgent, "task_status": taskStatus, "requests": len(model.requests)})
+		out = append(out, map[string]any{"index": index, "mask": mask, "generic": generic, "handoffs": handoffs, "roles": roles, "tools": definitions, "agents": agents, "scheduler": state.SubAgentScheduler() != nil, "task_agent": taskAgent, "task_status": taskStatus, "requests": len(model.requests), "delegation_guide": agentsdk.BuildDelegationGuide(parent, specialists)})
 		if err := state.Close(); err != nil {
 			t.Fatal(err)
 		}

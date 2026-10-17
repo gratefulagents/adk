@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Automatic builder delegation guide
+
+The builder now injects the verified SDK guide rather than abbreviated task and
+handoff text. It retains policy filtering: denied handoffs are not advertised,
+and only the managed task tool enables catalog task guidance. Status/control-only
+configurations remain non-delegating. Catalog filtering excludes handoff-only
+fallback targets from task guidance. Twelve actual-Go builder observations now
+carry complete guides; task-enabled cases compare the entire guide within the
+assembled prompt. Four task/handoff permission combinations verify independent
+filtering, a single signal suffix, and no mutation of the underlying handoffs.
+
+Fresh Rust1.88 Linux: **1,666 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/docs/format, full matrix/consumer/purity,20 offline
+scenarios, host-session, exact Go regeneration, bound evidence,51 validators,
+artifacts/overlay/audit and source locks passed. The initial targeted run caught
+one old abbreviated-text assertion; it was updated to the SDK handoff heading
+and the final full suite passed. Ledger unchanged: **889/8,002/251**. This does not
+close the full runtime builder contract or the remaining issue11 acceptance.
+
 ### Caller-owned delegation-guide formatter
 
 Added runtime-gated `specialists::build_delegation_guide`, preserving sorted

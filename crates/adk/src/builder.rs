@@ -1885,50 +1885,30 @@ impl Builder {
                         .is_none_or(|allowed| allowed.contains(name))
             });
             policy.tools.allowed_tools = Some(graph_names);
-            if pending_children.is_some()
+            let mut guide_agent = agent.clone();
+            guide_agent.handoffs.retain(|handoff| {
+                policy.tools.decision(&handoff.definition) != adk_core::ToolDecision::Deny
+            });
+            let guide_specialists = if pending_children.is_some()
                 && agent.tools.iter().any(|tool| {
                     tool.definition().name == "subagent"
                         && policy.tools.decision(tool.definition()) != adk_core::ToolDecision::Deny
-                })
-            {
-                let available: BTreeMap<_, _> = target_roles
+                }) {
+                specialists
                     .iter()
-                    .map(|role| {
-                        (
-                            role.name.as_str(),
-                            if role.description.is_empty() {
-                                "Specialist sub-agent"
-                            } else {
-                                role.description.as_str()
-                            },
-                        )
-                    })
-                    .collect();
+                    .filter(|(name, _)| catalog_names.contains(*name))
+                    .map(|(name, target)| (name.clone(), target.clone()))
+                    .collect()
+            } else {
+                BTreeMap::new()
+            };
+            let guide =
+                crate::specialists::build_delegation_guide(&guide_agent, &guide_specialists);
+            if !guide.is_empty() {
                 if !agent.instructions.is_empty() {
                     agent.instructions.push_str("\n\n");
                 }
-                agent.instructions.push_str("Available specialist sub-agents (delegate via the subagent tool, agent_name=<name>):\n");
-                agent.instructions.push_str(
-                    &available
-                        .into_iter()
-                        .map(|(name, description)| format!("- {name}: {description}"))
-                        .collect::<Vec<_>>()
-                        .join("\n"),
-                );
-                agent.instructions.push_str("\n\nBy default, only message is sent to the child. Set share_parent_context=true only when needed; sharing can disclose unrelated context. Use mode=\"sync\" to wait or mode=\"background\" for independent work; completed results are delivered automatically. Assign parallel children disjoint file ownership.");
-            }
-            let available: Vec<_> = agent
-                .handoffs
-                .iter()
-                .filter(|h| policy.tools.decision(&h.definition) != adk_core::ToolDecision::Deny)
-                .map(|h| format!("- {}: {}", h.definition.name, h.definition.description))
-                .collect();
-            if !available.is_empty() {
-                if !agent.instructions.is_empty() {
-                    agent.instructions.push_str("\n\n");
-                }
-                agent.instructions.push_str("Delegate by transferring the conversation to an available specialist. A transfer gives that specialist ownership of the response; it does not run a nested task or return control.\n");
-                agent.instructions.push_str(&available.join("\n"));
+                agent.instructions.push_str(&guide);
             }
             let workspace = if self.config.features.is_some() {
                 workspace::selected_workspace_context(

@@ -259,7 +259,7 @@ async fn actual_transfer_run_and_stream_filter_tools_and_preserve_role_only_prom
             bundle
                 .agent()
                 .instructions
-                .contains("does not run a nested task")
+                .contains("Handoffs (transfer full control):")
         );
         let input = vec![
             message("review"),

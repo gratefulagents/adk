@@ -241,7 +241,10 @@ formats the SDK task-packet instructions and the supplied specialist/handoff
 catalog. Specialists use a `BTreeMap<String, Arc<AgentConfig>>`; map keys are
 listed in sorted order, blank keys are omitted, and handoffs retain agent order.
 It performs no model/tool execution and does not mutate or automatically inject
-instructions. Automatic builder integration is not claimed by this helper.
+instructions. The builder also uses this formatter for its automatic delegation
+guide, advertising only policy-permitted handoffs and catalog specialists when
+the managed `subagent` task tool is available. Status/control-only configurations
+do not advertise task delegation.
 
 The exact reusable text in `crates/adk/src/specialists/delegation.txt` is derived
 from GPL-3.0-only SDK `pkg/agentsdk/specialists.go` at the pinned source revision.

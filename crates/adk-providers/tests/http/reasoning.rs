@@ -1,6 +1,10 @@
 use super::*;
-use adk_core::{ModelReasoningSink, RunItem};
-use std::sync::{Mutex, mpsc};
+use adk_core::{ModelActivitySink, ModelReasoningSink, RunItem};
+use std::sync::{
+    Mutex,
+    atomic::{AtomicUsize, Ordering},
+    mpsc,
+};
 
 #[tokio::test]
 async fn completion_does_not_replay_buffered_json_reasoning_as_live_deltas() {
@@ -80,6 +84,11 @@ async fn completion_reasoning_is_live_ordered_and_forwarded() {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
         let (ack, received) = mpsc::channel();
+        let activity_count = Arc::new(AtomicUsize::new(0));
+        let activity_observed = activity_count.clone();
+        let activity: ModelActivitySink = Arc::new(move || {
+            activity_observed.fetch_add(1, Ordering::SeqCst);
+        });
         let chunks = Arc::new(Mutex::new(Vec::new()));
         let observed = chunks.clone();
         let reasoning: ModelReasoningSink = Arc::new(move |text| {
@@ -119,10 +128,11 @@ async fn completion_reasoning_is_live_ordered_and_forwarded() {
             _ => Arc::new(provider(&endpoint)),
         };
         let response = model
-            .complete_with_observers(&context(), request(), None, Some(reasoning))
+            .complete_with_observers(&context(), request(), Some(activity), Some(reasoning))
             .await
             .unwrap();
         server.join().unwrap();
+        assert!(activity_count.load(Ordering::SeqCst) > 0, "{wrapper}");
         assert_eq!(*chunks.lock().unwrap(), ["think ", "deeply"], "{wrapper}");
         assert!(response.items.iter().any(|item| matches!(item, RunItem::Reasoning { reasoning } if reasoning.text == "think deeply")), "{wrapper}: {:?}", response.items);
     }

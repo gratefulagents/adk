@@ -59,7 +59,10 @@ invalid inner counts. Malformed count forms, including leading-zero numbers,
 remain literal text as in Go rather than acquiring Rust repetition semantics.
 Perl class atoms (`\d`, `\s`, `\w` and their complements) preserve ASCII Go
 semantics inside and outside classes, including under case-insensitive flags.
-In-class word-boundary escapes remain invalid, as in Go.
+In-class word-boundary escapes remain invalid, as in Go. Go octal escapes are
+translated to Unicode hex atoms; single nonzero digits remain invalid
+backreferences. Braces belonging to hex escapes or Unicode properties are not
+interpreted as repetition delimiters.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

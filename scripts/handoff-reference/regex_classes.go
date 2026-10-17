@@ -73,6 +73,21 @@ func regexSetLiteralScenarios(inputs []string) []regexClassCase {
 	return regexMembership(patterns, inputs)
 }
 
+func regexOctalScenarios() ([]regexClassCase, []string) {
+	inputs := []string{}
+	for r := rune(0); r < 128; r++ {
+		inputs = append(inputs, string(r))
+	}
+	inputs = append(inputs, "", "\u00ff", "\u01ff", "S4", "\x008", "\x009", "\x000", `\123`, `\0`, "83", "777", "界", `\x{ff}`)
+	patterns := []string{}
+	for _, escape := range []string{`\0`, `\00`, `\000`, `\01`, `\07`, `\10`, `\12`, `\40`, `\77`, `\123`, `\177`, `\377`, `\777`} {
+		patterns = append(patterns, "^"+escape+"$", "^["+escape+"]$")
+	}
+	patterns = append(patterns, `^\1234$`, `^\08$`, `^\09$`, `^\0000$`, `^[\10-\15]$`, `^\\123$`, `^\Q\123\E$`, `\1`, `\7`, `\8`, `[\1]`)
+	patterns = append(patterns, `^\x{61}$`, `^\x{ff}$`, `^\p{Han}$`, `^\P{Han}$`, `^[\x{ff}]$`, `^[\p{Han}]$`, `^\x61$`, `^\Q\x{ff}\E$`)
+	return regexMembership(patterns, inputs), inputs
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

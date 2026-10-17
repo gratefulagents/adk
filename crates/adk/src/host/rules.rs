@@ -182,6 +182,32 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 pattern.push(c);
                 break;
             };
+            if matches!(escaped, '0'..='7')
+                && (escaped == '0' || matches!(chars.peek(), Some('0'..='7')))
+            {
+                let mut value = escaped as u32 - '0' as u32;
+                for _ in 0..2 {
+                    if let Some(digit @ '0'..='7') = chars.peek().copied() {
+                        chars.next();
+                        value = value * 8 + digit as u32 - '0' as u32;
+                    } else {
+                        break;
+                    }
+                }
+                pattern.push_str(&format!(r"\x{{{value:x}}}"));
+                continue;
+            }
+            if matches!(escaped, 'x' | 'p' | 'P') && chars.peek() == Some(&'{') {
+                pattern.push(c);
+                pattern.push(escaped);
+                for argument in chars.by_ref() {
+                    pattern.push(argument);
+                    if argument == '}' {
+                        break;
+                    }
+                }
+                continue;
+            }
             if escaped == 'Q' && !in_class {
                 let mut literal = String::new();
                 while let Some(quoted) = chars.next() {

@@ -512,3 +512,9 @@ Literal class-symbol coverage adds21 patterns ×142 inputs (2,982 actual Go matc
 decisions). Doubled ampersands, tildes and pipes are literals, not intersections,
 symmetric differences or unions. Negation, leading literal brackets, case folds,
 Perl atoms and POSIX atoms are covered without copying a Go matcher.
+
+Numeric-escape coverage adds45 patterns over141 inputs:41 accepted forms and4
+rejected backreference/escape forms. It exercises Go's one-to-three-digit octal
+rules, NUL, values above255, digit termination, class ranges, escaped backslashes
+and quoting. Braced hex/Unicode-property controls protect their delimiters from
+malformed-count translation (5,781 actual Go match decisions per native compiler).

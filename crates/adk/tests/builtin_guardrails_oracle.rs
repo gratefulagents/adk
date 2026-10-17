@@ -550,3 +550,17 @@ async fn class_set_symbols_remain_go_literals() {
     assert_eq!(inputs.len(), 142);
     assert_regex_membership(cases, inputs).await;
 }
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn octal_escapes_match_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_octal"].as_array().unwrap();
+    let inputs = fixture["regex_octal_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 45);
+    assert_eq!(inputs.len(), 141);
+    assert_regex_membership(cases, inputs).await;
+}

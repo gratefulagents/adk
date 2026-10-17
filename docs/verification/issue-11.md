@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Octal escapes and braced escape delimiters
+
+Go octal escapes now translate to Unicode hex atoms, including NUL, two-digit
+forms and values above255. Single nonzero-digit backreferences remain rejected.
+The45-pattern actual-Go oracle has41 accepted forms ×141 inputs (5,781 decisions
+per native compiler) and4 rejected forms, with ranges, digit termination,
+escaped backslashes and quoting controls.
+
+The added braced-hex/property controls caught a regression introduced by the
+malformed-count translation: `\x{ff}` was being rewritten to `\x\{ff}`.
+Hex and Unicode-property arguments are now consumed as escape arguments, not
+repetition delimiters. Both the original octal rejection and the braced-escape
+regression were reproduced before fixing.
+
+Fresh Rust1.88 Linux: **1,722 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict lint/typecheck/rustdoc, formatting, full feature matrix and
+standalone consumer/purity, Go test/vet/build, pinned evidence,53 validators,
+artifact/overlay/audit and source locks passed. Ledger remains **947 verified /
+7,944 unresolved /251 excluded**; full acceptance remains incomplete.
+
 ### Literal class-set symbols
 
 Go-valid ampersands, tildes and pipes inside classes now remain literal instead

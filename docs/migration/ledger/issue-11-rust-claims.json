@@ -18650,6 +18650,246 @@
         "compat",
         "runtime (settings interoperability regression)"
       ]
+    },
+    "SDK-ECC03B592D99BC77": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ReasoningEffort: \"none\"} in ModeReasoningSettings at source line157, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-CE4012F847B5F96F": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 1024, ReasoningEffort: \"minimal\"} in ModeReasoningSettings at source line160, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-056CE5137FC10D2D": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 2048, ReasoningEffort: \"low\"} in ModeReasoningSettings at source line162, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-8023FA70EAC2D99D": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 4096, ReasoningEffort: \"medium\"} in ModeReasoningSettings at source line164, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-E47833884F8A42FE": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 8192, ReasoningEffort: \"high\"} in ModeReasoningSettings at source line166, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-13FE21EAAF4C662C": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 16384, ReasoningEffort: \"xhigh\"} in ModeReasoningSettings at source line171, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4F0CF06368CC758E": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{ThinkingBudget: 24576, ReasoningEffort: \"max\"} in ModeReasoningSettings at source line176, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-CA8E6CF2FDE08B7A": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{} in ModeReasoningSettings at source line178, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-293610F676F7A1B5": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{TextVerbosity: \"low\"} in ModeTextVerbositySettings at source line187, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-F0A0BD8D69BA4CDB": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{TextVerbosity: \"medium\"} in ModeTextVerbositySettings at source line189, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-B0F1C95601A4209F": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{TextVerbosity: \"high\"} in ModeTextVerbositySettings at source line191, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C1E89858A66620B5": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the branch-conditioned literal ModelSettings{} in ModeTextVerbositySettings at source line193, not a global runtime default. Complete surrounding helper review includes Unicode simple lowercase and trimming, all recognized tiers, unknown/empty labels and zero-field omission. The independent pinned Go helper fixture executes12 reasoning inputs by6 verbosity inputs (72 complete settings results), including Unicode/unknown controls; Rust checks each complete settings map and its decomposition into the two helpers. All seven original effort/budget assertions also pass. Explicit none emits an effort without a budget; clearing inherited role budgets is a distinct routing step covered separately, not an invented side effect of this literal. Native arbitrary overrides, builder-global defaults, provider-specific token clamping and execution policy are not inferred from these helper values.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

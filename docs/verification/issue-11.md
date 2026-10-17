@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Branch-conditioned mode settings defaults
+
+Reviewed and verified all twelve literal-return records in the reasoning and
+verbosity helpers. The existing independent Go fixture exercises 12 reasoning
+inputs ×6 verbosity inputs, comparing complete settings maps and their separate
+helper composition. It covers all tiers, empty/unknown labels, Unicode trimming
+and simple lowercase; all seven original effort/budget assertions also pass.
+These are branch-conditioned helper values, not global runtime defaults or
+provider-specific clamps. Explicit `none` emits no budget; clearing an inherited
+role budget remains a separate, independently tested routing operation.
+
+Fresh independent reproduction, bound Rust tests, 55 ledger/audit validators,
+artifact/overlay/audit and source locks passed. No implementation changed from
+`af314db`, whose 1,739 workspace tests +10 doctests, strict lint/docs, complete
+feature matrix and standalone consumer/purity passed. Ledger:
+**1,040 verified /7,851 unresolved /251 excluded**. Full acceptance is incomplete.
+
 ### Open reasoning/verbosity labels and typed constants
 
 Added compatibility `ModeReasoningLevel` and `ModeTextVerbosity` as open string

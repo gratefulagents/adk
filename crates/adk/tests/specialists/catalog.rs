@@ -392,3 +392,86 @@ async fn original_catalog_applies_access_and_routing() {
     assert_eq!(tools[0].definition().name, "agent_researcher");
     owner.shutdown().await.unwrap();
 }
+
+#[cfg(feature = "builder")]
+#[test]
+fn mode_routing_conversion_matches_pinned_go_and_owns_its_fields() {
+    use adk::builder::{ModeSpec, ModelRouting, RoleRouting};
+    let mut fixture: Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/specialist-catalog/observations.json"
+    ))
+    .unwrap();
+    omit_null_fields(&mut fixture);
+    let cases = fixture["routing_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 6);
+    for case in cases {
+        let routing: Option<SpecialistModeRouting> =
+            serde_json::from_value(case["input"]["ModelRouting"].clone()).unwrap();
+        let mut spec = (!case["input"].is_null()).then(|| ModeSpec {
+            model_routing: routing.map(|routing| ModelRouting {
+                default_model: routing.default_model,
+                fallback_models: Some(routing.fallback_models),
+                reasoning_level: routing.reasoning_level,
+                text_verbosity: routing.text_verbosity,
+                role_overrides: routing
+                    .role_overrides
+                    .into_iter()
+                    .map(|(name, role)| {
+                        (
+                            name,
+                            RoleRouting {
+                                model: role.model,
+                                fallback_models: Some(role.fallback_models),
+                                reasoning_level: role.reasoning_level,
+                                text_verbosity: role.text_verbosity,
+                                settings: serde_json::from_value(json!({"native-only": true}))
+                                    .unwrap(),
+                            },
+                        )
+                    })
+                    .collect(),
+                settings: serde_json::from_value(json!({"native-only": true})).unwrap(),
+            }),
+            ..Default::default()
+        });
+        let actual = mode_routing_from_template_spec(spec.as_ref());
+        let expected: Option<SpecialistModeRouting> =
+            serde_json::from_value(case["output"].clone()).unwrap();
+        assert_eq!(
+            serde_json::to_value(&actual).unwrap(),
+            serde_json::to_value(&expected).unwrap()
+        );
+        if let Some(routing) = spec.as_mut().and_then(|spec| spec.model_routing.as_mut()) {
+            routing.default_model = "mutated".into();
+            routing
+                .fallback_models
+                .as_mut()
+                .unwrap()
+                .push("mutated".into());
+            for role in routing.role_overrides.values_mut() {
+                role.model = "mutated".into();
+                role.fallback_models
+                    .as_mut()
+                    .unwrap()
+                    .push("mutated".into());
+            }
+            routing.role_overrides.clear();
+        }
+        assert_eq!(
+            serde_json::to_value(actual).unwrap(),
+            serde_json::to_value(expected).unwrap()
+        );
+    }
+    assert!(mode_routing_from_template_spec(None).is_none());
+    assert!(mode_routing_from_template_spec(Some(&ModeSpec::default())).is_none());
+    let spec = ModeSpec {
+        model_routing: Some(ModelRouting {
+            role_overrides: [("empty".into(), RoleRouting::default())].into(),
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+    let routing = mode_routing_from_template_spec(Some(&spec)).unwrap();
+    assert!(routing.fallback_models.is_empty());
+    assert!(routing.role_overrides["empty"].fallback_models.is_empty());
+}

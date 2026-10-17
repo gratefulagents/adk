@@ -36,6 +36,36 @@ pub struct SpecialistModeRouting {
     pub role_overrides: BTreeMap<String, SpecialistRoleRouting>,
 }
 
+/// Copies SDK routing labels without validation, normalization, or model binding.
+/// Native arbitrary settings maps are not part of this SDK-label conversion.
+#[cfg(feature = "builder")]
+pub fn mode_routing_from_template_spec(
+    spec: Option<&crate::builder::ModeSpec>,
+) -> Option<SpecialistModeRouting> {
+    let routing = spec?.model_routing.as_ref()?;
+    Some(SpecialistModeRouting {
+        default_model: routing.default_model.clone(),
+        fallback_models: routing.fallback_models.clone().unwrap_or_default(),
+        reasoning_level: routing.reasoning_level.clone(),
+        text_verbosity: routing.text_verbosity.clone(),
+        role_overrides: routing
+            .role_overrides
+            .iter()
+            .map(|(name, role)| {
+                (
+                    name.clone(),
+                    SpecialistRoleRouting {
+                        model: role.model.clone(),
+                        fallback_models: role.fallback_models.clone().unwrap_or_default(),
+                        reasoning_level: role.reasoning_level.clone(),
+                        text_verbosity: role.text_verbosity.clone(),
+                    },
+                )
+            })
+            .collect(),
+    })
+}
+
 /// An unbound agent value: model strings are not yet executable providers.
 #[derive(Clone, Default)]
 pub struct SpecialistAgentSpec {

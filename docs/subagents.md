@@ -307,6 +307,22 @@ agent pointers. Recursive Go wrapper pointer-graph mutation is not represented.
 Native settings remain a JSON map, not a new Go `ModelSettings` codec; Go
 nil-versus-empty slice identity is not represented.
 
+### Mode-template routing bridge
+
+With the `builder` feature, `specialists::mode_routing_from_template_spec` copies
+SDK routing labels from an optional `builder::ModeSpec` into standalone
+`SpecialistModeRouting`. Missing templates or routing return `None`; present
+empty routing remains `Some`. Model, fallback, reasoning, verbosity and role-key
+strings are copied verbatim into owned containers, without normalization,
+validation, provider binding or session registration. Native arbitrary `settings`
+maps are deliberately not part of this SDK-label adapter; use the builder's
+routing-resolution path when those native extensions are needed.
+
+Six actual-Go conversion observations and native copy-isolation tests supplement
+the 54 catalog cases. The fixture retains Go nulls, but the native comparator
+projects nil containers to empty owned containers as documented above. This is
+not a mode-template wire codec or full `ModeModelRouting` serialization claim.
+
 ### Compatibility role/catalog DTOs
 
 `adk_codec::dto::{RoleSpec, RoleCatalog}` are compatibility-only data shapes,

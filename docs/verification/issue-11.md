@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Standalone mode-routing bridge
+
+Added builder-gated `specialists::mode_routing_from_template_spec`, copying raw
+SDK routing labels into owned standalone routing without validation, trimming,
+model binding or session ownership. Missing templates/routing return `None`;
+present empty routing remains `Some`. Six actual-Go conversion observations and
+source-mutation checks verify labels, role keys, fallback ordering and ownership.
+Native tests also exercise omitted fallbacks and deliberately exclude native
+arbitrary settings maps from this SDK-label adapter.
+
+This is not a mode-template/runner-routing wire codec: native nil containers
+project to empty owned containers. No full serialization or helper acceptance
+record is closed merely from this bounded adapter. Native settings users retain
+the existing builder routing-resolution path.
+
+Fresh Rust1.88 Linux: **1,725 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict lint/typecheck/rustdoc, formatting, full feature matrix and
+standalone consumer/purity, independent Go reproduction, bound evidence,
+53 validators, artifact/overlay/audit and source locks passed. Ledger remains
+**947 verified /7,944 unresolved /251 excluded**; issue acceptance is incomplete.
+
 ### Inner regex brackets retain Go literal semantics
 
 The translator no longer rejects Go-valid opening brackets within a class.

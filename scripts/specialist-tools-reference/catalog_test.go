@@ -91,7 +91,46 @@ func TestNativeSpecialistCatalogReference(t *testing.T) {
 		}
 		cases = append(cases, map[string]any{"input": in, "raw": raw, "agents": agents, "wrappers": wrappers, "adapterCalls": calls})
 	}
-	data, err := json.Marshal(map[string]any{"cases": cases})
+	routingCases := []any{}
+	for _, spec := range []*sdkmode.TemplateSpec{
+		nil, {}, {ModelRouting: &sdkmode.ModelRouting{}},
+		{ModelRouting: &sdkmode.ModelRouting{FallbackModels: []string{}, RoleOverrides: map[string]sdkmode.RoleModelRouting{}}},
+		{ModelRouting: &sdkmode.ModelRouting{DefaultModel: " raw/model ", FallbackModels: []string{" raw ", "", " raw "}, ReasoningLevel: " UNKNOWN ", TextVerbosity: " Invalid ", RoleOverrides: map[string]sdkmode.RoleModelRouting{" worker ": {Model: " child ", FallbackModels: []string{" one ", ""}, ReasoningLevel: " HIGH ", TextVerbosity: " LOW "}, "Worker": {}}}},
+		{ModelRouting: &sdkmode.ModelRouting{DefaultModel: "猫", RoleOverrides: map[string]sdkmode.RoleModelRouting{"猫": {Model: "K", FallbackModels: []string{}}}}},
+	} {
+		input, err := json.Marshal(spec)
+		if err != nil {
+			t.Fatal(err)
+		}
+		output := ModeRoutingFromTemplateSpec(spec)
+		before, err := json.Marshal(output)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if spec != nil && spec.ModelRouting != nil {
+			routing := spec.ModelRouting
+			routing.DefaultModel = "mutated"
+			if len(routing.FallbackModels) > 0 {
+				routing.FallbackModels[0] = "mutated"
+			}
+			for name, role := range routing.RoleOverrides {
+				role.Model = "mutated"
+				if len(role.FallbackModels) > 0 {
+					role.FallbackModels[0] = "mutated"
+				}
+				routing.RoleOverrides[name] = role
+			}
+		}
+		after, err := json.Marshal(output)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if string(before) != string(after) {
+			t.Fatal("mode routing copy aliases input")
+		}
+		routingCases = append(routingCases, map[string]any{"input": json.RawMessage(input), "output": output})
+	}
+	data, err := json.Marshal(map[string]any{"cases": cases, "routing_cases": routingCases})
 	if err != nil {
 		t.Fatal(err)
 	}

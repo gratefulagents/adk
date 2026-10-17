@@ -22,6 +22,8 @@ func TestNativeThinkingDeltaReference(t *testing.T) {
 		name    string
 		actions []action
 	}{
+		{"original-coalesces", []action{{Text: "first "}, {AfterNanos: 100000000, Text: "second "}, {AfterNanos: 200000000, Text: "third "}, {AfterNanos: 700000000, Text: "fourth "}, {AfterNanos: 700000000, Text: "tail"}, {AfterNanos: 700000000, Flush: true}, {AfterNanos: 700000000, Flush: true}, {AfterNanos: 700000000}}},
+		{"original-size-flush", []action{{Text: "warmup"}, {Text: strings.Repeat("x", thinkingDeltaFlushBytes)}}},
 		{"empty", []action{{}, {Flush: true}, {Flush: true}}},
 		{"empty-flush-delays-first", []action{{Flush: true}, {Text: "first"}, {AfterNanos: 500000000, Text: "next"}, {Flush: true}}},
 		{"time-boundaries", []action{{Text: "α"}, {AfterNanos: 499999999, Text: "beta"}, {AfterNanos: 500000000, Text: "γ"}, {AfterNanos: 500000001, Text: "tail"}, {Flush: true}, {Flush: true}}},

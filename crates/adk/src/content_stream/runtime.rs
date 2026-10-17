@@ -215,7 +215,9 @@ mod tests {
         ))
         .unwrap();
         let base = Instant::now();
-        for case in fixture["thinkingCases"].as_array().unwrap() {
+        let cases = fixture["thinkingCases"].as_array().unwrap();
+        assert_eq!(cases.len(), 8);
+        for case in cases {
             let mut buffer = ThinkingBuffer::default();
             for observation in case["observations"].as_array().unwrap() {
                 let action = &observation["action"];

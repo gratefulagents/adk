@@ -15,6 +15,29 @@ impl Cancellation for NeverCancelled {
 }
 
 #[test]
+fn model_activity_sink_retains_shared_capture_across_concurrent_calls() {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    let calls = Arc::new(AtomicUsize::new(0));
+    let observed = calls.clone();
+    let sink: ModelActivitySink = Arc::new(move || {
+        observed.fetch_add(1, Ordering::SeqCst);
+    });
+    std::thread::scope(|scope| {
+        for _ in 0..8 {
+            let sink = sink.clone();
+            scope.spawn(move || {
+                for _ in 0..100 {
+                    sink();
+                }
+            });
+        }
+    });
+    assert_eq!(calls.load(Ordering::SeqCst), 800);
+    sink();
+    assert_eq!(calls.load(Ordering::SeqCst), 801);
+}
+
+#[test]
 fn traits_are_object_safe_and_send_sync() {
     fn shared<T: ?Sized + Send + Sync>() {}
     fn send<T: ?Sized + Send>() {}

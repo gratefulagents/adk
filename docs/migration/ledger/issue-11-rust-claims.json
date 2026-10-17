@@ -2,6 +2,42 @@
   "schema_version": 1,
   "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "claims": {
+    "SDK-46F4E8D15C82CF43": {
+      "source": "internal/modelactivity/activity.go",
+      "source_name": "Sink",
+      "implementation_symbols": [
+        "crates/adk-core/src/contracts.rs::ModelActivitySink"
+      ],
+      "rust_test_identifiers": [
+        "model_activity_sink_retains_shared_capture_across_concurrent_calls",
+        "client::tests::body_read_activity_matches_original_sdk_test"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/modelactivity/TestWrapTransportReportsEveryResponseBodyRead",
+      "rationale": "Only the no-argument/no-result activity callback type is closed. ModelActivitySink is an owned shared callable with Send+Sync bounds, matching the source requirement for concurrent-safe, quick inline invocation. The native capture test joins eight threads and checks all800 calls plus a retained post-join invocation; the original response-read counterpart checks three inline calls without byte loss. Optional absence is carried separately by Option. This does not claim WithSink context-key semantics, transport constructor defaults or the whole package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "core",
+        "providers"
+      ]
+    },
+    "SDK-F51B42566B9EBDD4": {
+      "source": "internal/modelactivity/activity_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::read_bytes",
+        "crates/adk-providers/src/client.rs::HttpStream"
+      ],
+      "rust_test_identifiers": [
+        "client::tests::body_read_activity_matches_original_sdk_test",
+        "activity::every_body_read_reports_activity_even_without_a_model_event"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/modelactivity/TestWrapTransportReportsEveryResponseBodyRead",
+      "rationale": "Reviewed the entire58-line source file: its single test uses a function-backed transport and a three-chunk read/close fixture to require exactly three notifications while draining the body. The deterministic native response-body fixture uses those same three chunks, preserves their bytes and checks exactly three callbacks; an extra empty frame is not progress. Real HTTP JSON/SSE handshakes also verify discarded heartbeats through direct providers, Routes and Copilot. The Go helpers are test doubles, not new public behavior claims. This closes this complete test file, not activity.go, generic Close/error forwarding or the package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
     "SDK-D0F2EC9B6D5972B5": {
       "source": "internal/modelactivity/activity_test.go",
       "source_name": "TestWrapTransportReportsEveryResponseBodyRead",
@@ -6799,7 +6835,7 @@
         "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
       ],
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
-      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Eight independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "observability"
@@ -6817,7 +6853,7 @@
         "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
       ],
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
-      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Eight independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "observability"
@@ -6835,7 +6871,7 @@
         "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
       ],
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
-      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Eight independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "observability"
@@ -6853,7 +6889,7 @@
         "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items"
       ],
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterFlushesOnSize",
-      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Six independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
+      "rationale": "Only the named reasoning coalescer operation/regression is closed for valid UTF-8. Eight independent pinned Go fake-clock cases compare every action/output: empty input, explicit empty flush clock reset, first flush, 500ms boundary, 4096 UTF-8 byte boundary, oversized uncapped chunk, repeated/residual flush and clock reset. Mutex-owned per-attempt buffers release their lock before stream emission; no timer tasks. Runtime return/drop cleanup and real correlated output are tested. This is not full runner/provider/numbering or automatic child-wiring parity.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "observability"
@@ -15236,6 +15272,59 @@
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "runtime"
+      ]
+    },
+    "SDK-AAD493A85CE9FF4A": {
+      "source": "internal/agent/run_config_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy::for_model"
+      ],
+      "rust_test_identifiers": [
+        "model_threshold_names_match_pinned_sdk_simple_lowercase_and_precedence"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestCompactionDefaultsForModel",
+      "rationale": "Reviewed the complete run_config_test.go: its only test is the24-row model-name/trigger/target table. Every original input and both expected thresholds occur in the45-case independently executed fixture and native comparator. There are no live gates, environment reads or additional helpers in this file. This closes the test file only, not run_config.go, mutable Go function-variable aliases or builder-wide policy selection.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-254A6C297F107F48": {
+      "source": "pkg/agentsdk/providers/openai/compaction_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/metadata.rs::ModelMetadata::compaction_defaults"
+      ],
+      "rust_test_identifiers": [
+        "metadata_compaction::metadata_thresholds_match_pinned_sdk_signed_boundary_grid"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/openai/TestCompactionDefaultsFromModelMetadataUsesCodexLimit",
+      "rationale": "Reviewed the complete compaction_test.go: its three tests require success and exact trigger/target pairs for Codex272000, GPT5.6 372000 and auto950 clamped to900/500 at context1000. The363-case independent fixture includes all three exact inputs/results and the native comparator asserts both optional validity and values. No live or platform gates exist. This closes the test file only, not metadata transport/cache or provider-wide behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime"
+      ]
+    },
+    "SDK-1E3640AC407CD5FF": {
+      "source": "internal/agent/thinking_delta_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/content_stream/runtime.rs::ThinkingBuffer::chunk",
+        "crates/adk/src/content_stream/runtime.rs::ContentGenerationObserver"
+      ],
+      "rust_test_identifiers": [
+        "content_stream::runtime::tests::coalescing_matches_pinned_sdk_fake_clock_cases",
+        "content_stream::runtime::tests::returned_and_end_flush_each_attempt_once_and_remove_buffers",
+        "runtime::blocking_run_correlates_ordered_chunks_and_full_accepted_items",
+        "runtime::attempt_events_match_pinned_sdk_real_runner_objects",
+        "runtime::streamed_run_has_native_reasoning_but_zero_jsonl_deltas"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestThinkingDeltaEmitterCoalesces",
+      "rationale": "Reviewed the complete four-test source file and its in-memory JSONL/scripted-model helpers. Eight independent fake-clock cases include the original first/second/third/fourth/tail sequence with repeated flush and empty chunk, and the original warmup plus4096-byte single chunk. Real native runs and four pinned Go attempt records verify ordered correlated deltas, authoritative final reasoning and zero duplicate JSONL deltas in streamed runs. The native counterpart explicitly attaches host-owned content observers and enables blocking reasoning, corresponding to source PlatformHooks with an EventStream. This closes the test file for its UTF-8 cases, not default wiring, complete-only extension behavior, provider callbacks or all runner APIs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "observability"
       ]
     }
   }

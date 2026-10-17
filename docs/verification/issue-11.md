@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Reviewed callback type and complete regression files
+
+Five additional exact obligations are verified: the modelactivity Sink callable
+and four complete test files (activity, static compaction defaults, metadata
+compaction defaults and thinking deltas). Every file was reviewed in full, not
+closed by module association. The compaction comparators contain all24 original
+static cases and all3 metadata cases. Thinking fixtures now include both exact
+original coalescing/4096-byte sequences, alongside the six earlier boundary cases
+and four real runner attempt records. Runtime correlation and absence of duplicate
+streamed JSONL reasoning remain explicitly tested. No package or complete transport
+wrapper closure is inferred.
+
+A new shared-capture test joins eight threads and checks800 callbacks plus a
+retained invocation. Fresh core targets: **28 passed /0 failed**; the eight-case
+native coalescer comparator, all four original Go thinking tests, source-bound
+regressions/oracles, strict core/facade Clippy, formatting,51 validators, artifact
+review, ledger/audit and source locks passed. Production code is unchanged since
+9be85382's full **1,618-test /9-doctest** verification; all46 remote CI checks pass
+on that head. No new whole-workspace count is inferred from this test-only slice.
+Ledger: **857 verified /8,034 unresolved /251 excluded**. Issue11 remains open.
+
 ### Output-schema documents retain JSON shape, spelling and null presence
 
 Core model requests, runtime agents and the facade builder now accept the existing

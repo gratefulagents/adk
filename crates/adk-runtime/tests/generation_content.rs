@@ -1,3 +1,6 @@
+#[path = "generation_content/completion.rs"]
+mod completion;
+
 use adk_core::*;
 use adk_runtime::{tracing::*, *};
 use std::{

@@ -162,7 +162,7 @@ impl Model for Routes {
         context: &'a Context,
         mut request: ModelRequest,
         activity: Option<ModelActivitySink>,
-        reasoning: Option<ModelReasoningSink>,
+        reasoning: Option<ModelReasoningSink<'a>>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             context.check_active()?;

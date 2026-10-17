@@ -146,7 +146,7 @@ impl Model for Copilot {
         context: &'a Context,
         mut request: ModelRequest,
         activity: Option<ModelActivitySink>,
-        reasoning: Option<ModelReasoningSink>,
+        reasoning: Option<ModelReasoningSink<'a>>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         request.model = normalize(&request.model).to_owned();
         self.select(&request.model)

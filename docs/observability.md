@@ -535,8 +535,11 @@ to preserve an existing trace observer; replacing the config field outright
 would replace that observer. Existing `RunHooks` remain separate and unchanged.
 
 For a blocking run, explicitly set `RunnerConfig::blocking_reasoning = true` to
-consume native streaming bindings. The default remains the completion path.
-Complete-only models do not invent live chunks. In streamed runs, native model
+consume native streaming bindings or observe reasoning from completion-only
+models implementing `Model::complete_with_observers`. The default remains the
+ordinary completion path; models without reasoning support do not invent chunks.
+Borrowed callbacks are scoped to the model call, so generation guards cannot be
+retained by a later attempt. In streamed runs, native model
 events remain on the existing event channel and the adapter emits no duplicate
 JSONL reasoning deltas. Hidden blocking text/tool events are not published.
 Surfaced reasoning counts as visible output, preventing retry/replay after that
@@ -555,8 +558,7 @@ host requires it, including before logger/subscriber delivery. The adapter owns
 no store/exporter shutdown and does not implicitly flush the host's writer.
 
 This bounded integration does not establish complete SDK attempt/turn numbering
-under interruption, provider-specific completion-only reasoning callbacks, or
-all automatic subagent wiring. Builder-created child configuration selection is
+under interruption or all automatic subagent wiring. Builder-created child configuration selection is
 unchanged: opting the parent into blocking stream consumption does not silently
 change child execution selection. Those broader parity obligations stay open.
 

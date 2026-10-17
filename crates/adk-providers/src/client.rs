@@ -425,7 +425,7 @@ impl Model for Provider {
         context: &'a Context,
         request: ModelRequest,
         activity: Option<ModelActivitySink>,
-        reasoning: Option<ModelReasoningSink>,
+        reasoning: Option<ModelReasoningSink<'a>>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             let mode = self.session.scope().mode;

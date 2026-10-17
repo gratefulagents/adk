@@ -3322,14 +3322,33 @@ impl Engine {
             activity_sender.send_modify(|last| *last = tokio::time::Instant::now());
         });
         match binding {
-            ModelBinding::Complete { model, .. } => bounded_model(
-                &self.context,
-                timeout,
-                &mut activity_receiver,
-                model.complete_with_activity(&self.context, request, Some(activity.clone())),
-            )
-            .await
-            .map_err(|e| (e, false)),
+            ModelBinding::Complete { model, .. } => {
+                let reasoning = generation
+                    .filter(|_| !self.streaming && self.config.blocking_reasoning)
+                    .map(|generation| {
+                        let visible = visible.clone();
+                        let sink: adk_core::ModelReasoningSink<'_> = Arc::new(move |delta| {
+                            if !delta.is_empty() {
+                                visible.store(true, std::sync::atomic::Ordering::Release);
+                                generation.reasoning_delta(delta);
+                            }
+                        });
+                        sink
+                    });
+                bounded_model(
+                    &self.context,
+                    timeout,
+                    &mut activity_receiver,
+                    model.complete_with_observers(
+                        &self.context,
+                        request,
+                        Some(activity.clone()),
+                        reasoning,
+                    ),
+                )
+                .await
+                .map_err(|error| (error, visible.load(std::sync::atomic::Ordering::Acquire)))
+            }
             ModelBinding::Streaming { model, .. }
                 if !self.streaming && !self.config.blocking_reasoning =>
             {

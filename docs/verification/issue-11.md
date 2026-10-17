@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Completion-only runtime reasoning
+
+Blocking completion-only bindings now pass a call-scoped reasoning observer when
+`blocking_reasoning` is enabled and a generation observer exists. Nonempty chunks
+retain the generation identity and delivery order without becoming streamed run
+events. Visible reasoning prevents replay on retry; disabled/missing observers and
+empty chunks do not suppress retries. Streamed completion bindings do not install
+this blocking observer. Existing activity and idle-timeout bounds remain intact.
+
+The callback lifetime can borrow the generation guard without extending its
+lifecycle; a compile-fail doctest prevents promoting it to a static callback. Four
+runtime regressions cover ordering/correlation/final response, the eight-way retry
+matrix, idle timeout and streamed opt-out. The first three tests failed before the
+runner wiring and passed afterward, together with the provider HTTP regressions.
+
+Fresh Rust1.88 workspace: **1,630 passed /0 failed /30 ignored**, **10 doctests**.
+Strict workspace Clippy/rustdoc/format, full facade matrix, independent consumer
+and dependency purity, all20 offline scenarios and host-session pass. The preceding
+OpenAI correction at `f6b62b2e` passed all46 remote checks; that result is not CI
+verification of this new runtime change. Refreshed source-bound Go/native evidence,
+51 validators, artifact/overlay/audit and immutable source-lock checks pass. Ledger
+remains **858 verified /8,033 unresolved /251 excluded**. No whole context/package
+or issue closure is inferred from this integration.
+
 ### Corrected provider-specific output-schema boundaries
 
 The earlier all-provider scalar-forwarding expectation was wrong. Core/runner

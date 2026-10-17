@@ -93,8 +93,10 @@ Sinks must return quickly; callers must reconcile repeated chunks if they retry 
 call. Ordinary JSON responses do not synthesize live deltas. The existing fallback
 for SSE without its content-type buffers the body before decoding and is not live.
 Third-party models default to their activity-aware completion implementation when
-they do not implement reasoning observation. The runner continues to use its
-native streaming capability for blocking-reasoning progress.
+they do not implement reasoning observation. The runner uses native streaming
+where available and these callbacks for completion-only bindings when blocking
+reasoning is enabled. Callback lifetimes are bounded to the model call so borrowed
+generation state cannot escape into later attempts.
 
 ## Per-call transport activity
 

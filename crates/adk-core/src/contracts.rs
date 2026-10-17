@@ -92,7 +92,13 @@ pub type ModelActivitySink = Arc<dyn Fn() + Send + Sync>;
 
 /// Incremental reasoning in transport order. Called inline; return quickly.
 /// A retried call can repeat chunks; the final response remains authoritative.
-pub type ModelReasoningSink = Arc<dyn Fn(&str) + Send + Sync>;
+/// Borrowed observers cannot escape the call-scoped lifetime.
+///
+/// ```compile_fail
+/// use adk_core::ModelReasoningSink;
+/// fn retain(sink: ModelReasoningSink<'_>) -> ModelReasoningSink<'static> { sink }
+/// ```
+pub type ModelReasoningSink<'a> = Arc<dyn Fn(&str) + Send + Sync + 'a>;
 
 /// Provider-neutral completion boundary. Streaming is a separate capability;
 /// implementations must not simulate it by silently buffering a complete call.
@@ -130,7 +136,7 @@ pub trait Model: Send + Sync {
         context: &'a Context,
         request: ModelRequest,
         activity: Option<ModelActivitySink>,
-        _reasoning: Option<ModelReasoningSink>,
+        _reasoning: Option<ModelReasoningSink<'a>>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         self.complete_with_activity(context, request, activity)
     }

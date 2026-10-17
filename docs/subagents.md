@@ -323,6 +323,22 @@ the 54 catalog cases. The fixture retains Go nulls, but the native comparator
 projects nil containers to empty owned containers as documented above. This is
 not a mode-template wire codec or full `ModeModelRouting` serialization claim.
 
+### Compatibility mode DTOs and conversion
+
+With `compat`, `adk::codec::dto::{ModeTemplateSpec, ModeConstraints, ModeRouting,
+ModeRoleRouting}` preserve the pinned Go data shapes through sealed
+`from_go_json` / `to_go_json_bytes`. Unlike native builder types, optional
+containers retain nil versus allocated-empty identity. Integer constraints use
+the pinned 64-bit Go range; decoding does not enforce runtime constraints.
+
+`adk::codec::mode::mode_routing_from_template_spec` provides the exact pure
+SDK conversion, separate from the native bridge above. It copies raw labels
+and role keys, returns `None` for absent templates/routing, and converts empty
+fallback slices and role maps to nil as the Go helper does. Returned data is
+independently owned. Six actual-Go cases compare exact bytes and source-mutation
+isolation without normalizing nil/empty containers; 993 independent codec cases
+cover the data boundary. Neither API binds models or creates runtime sessions.
+
 ### Compatibility role/catalog DTOs
 
 `adk_codec::dto::{RoleSpec, RoleCatalog}` are compatibility-only data shapes,

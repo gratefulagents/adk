@@ -5,6 +5,7 @@ pub mod dto;
 pub mod events;
 mod go_decode;
 pub mod items;
+pub mod mode;
 mod payload_decode;
 pub use payload_decode::{GoJsonDecode, GoJsonEncode, from_go_json, to_go_json_bytes};
 pub mod line_writer;

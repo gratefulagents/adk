@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Exact compatibility mode-routing conversion
+
+Added `adk::codec::mode::mode_routing_from_template_spec` independently of the
+native builder adapter. It copies raw labels and role keys while reproducing
+Go's conversion of empty fallback slices and empty role maps to nil. Six
+actual-Go cases now retain exact output bytes and compare unnormalized output,
+unchanged input and source-mutation isolation. The helper closes one complete
+pure-conversion API record; it does not claim model binding or runtime behavior.
+
+Fresh Rust 1.88 Linux: **1,731 workspace tests and 10 doctests passed;
+0 failed, 30 ignored**. Strict lint/typecheck/rustdoc, formatting, the complete
+feature matrix, standalone consumer/purity, independent Go reproduction,
+bound evidence, 54 validators, artifact/overlay/audit and source locks passed.
+Ledger: **989 verified /7,902 unresolved /251 excluded**. Full retained issue
+acceptance remains incomplete.
+
+
 ### Mode template and routing compatibility codecs
 
 Added compatibility-only `ModeTemplateSpec`, `ModeConstraints`, `ModeRouting`

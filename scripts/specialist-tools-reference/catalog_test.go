@@ -128,7 +128,7 @@ func TestNativeSpecialistCatalogReference(t *testing.T) {
 		if string(before) != string(after) {
 			t.Fatal("mode routing copy aliases input")
 		}
-		routingCases = append(routingCases, map[string]any{"input": json.RawMessage(input), "output": output})
+		routingCases = append(routingCases, map[string]any{"input": json.RawMessage(input), "output": output, "output_json": string(before)})
 	}
 	data, err := json.Marshal(map[string]any{"cases": cases, "routing_cases": routingCases})
 	if err != nil {

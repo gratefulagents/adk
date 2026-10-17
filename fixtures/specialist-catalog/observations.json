@@ -6601,7 +6601,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/specialist-tools-reference/catalog_test.go": "5d6261e02a9a98c27a3289c4ebfe25b90898876f2f08d156a3e0a68abfb185e3",
+      "scripts/specialist-tools-reference/catalog_test.go": "a0ebc3072b42acb6caf3fc256bcf3a67ff4393351e107a6ba513747fc21e73cc",
       "scripts/specialist-tools-reference/delegation_test.go": "ee8aef6efc66df24d8288ca3077ec021f3d57a0aec43da747fd69c6df5b6eed2",
       "scripts/specialist-tools-reference/reference_test.go": "978308b79a145e91192e1cdb6f096538b80c79d6d23f9dfffb5ef1ca46ccf13a",
       "scripts/specialist-tools-reference/run.py": "3f030fbb927384a08fab9ce0d37079a8b72f2d2777f8a65ff32bdda8bae1659b"
@@ -6626,7 +6626,8 @@
   "routing_cases": [
     {
       "input": null,
-      "output": null
+      "output": null,
+      "output_json": "null"
     },
     {
       "input": {
@@ -6641,7 +6642,8 @@
         "ToolAccess": "",
         "Version": ""
       },
-      "output": null
+      "output": null,
+      "output_json": "null"
     },
     {
       "input": {
@@ -6668,7 +6670,8 @@
         "ReasoningLevel": "",
         "RoleOverrides": null,
         "TextVerbosity": ""
-      }
+      },
+      "output_json": "{\"DefaultModel\":\"\",\"FallbackModels\":null,\"ReasoningLevel\":\"\",\"TextVerbosity\":\"\",\"RoleOverrides\":null}"
     },
     {
       "input": {
@@ -6695,7 +6698,8 @@
         "ReasoningLevel": "",
         "RoleOverrides": null,
         "TextVerbosity": ""
-      }
+      },
+      "output_json": "{\"DefaultModel\":\"\",\"FallbackModels\":null,\"ReasoningLevel\":\"\",\"TextVerbosity\":\"\",\"RoleOverrides\":null}"
     },
     {
       "input": {
@@ -6762,7 +6766,8 @@
           }
         },
         "TextVerbosity": " Invalid "
-      }
+      },
+      "output_json": "{\"DefaultModel\":\" raw/model \",\"FallbackModels\":[\" raw \",\"\",\" raw \"],\"ReasoningLevel\":\" UNKNOWN \",\"TextVerbosity\":\" Invalid \",\"RoleOverrides\":{\" worker \":{\"Model\":\" child \",\"FallbackModels\":[\" one \",\"\"],\"ReasoningLevel\":\" HIGH \",\"TextVerbosity\":\" LOW \"},\"Worker\":{\"Model\":\"\",\"FallbackModels\":null,\"ReasoningLevel\":\"\",\"TextVerbosity\":\"\"}}}"
     },
     {
       "input": {
@@ -6803,7 +6808,8 @@
           }
         },
         "TextVerbosity": ""
-      }
+      },
+      "output_json": "{\"DefaultModel\":\"\u732b\",\"FallbackModels\":null,\"ReasoningLevel\":\"\",\"TextVerbosity\":\"\",\"RoleOverrides\":{\"\u732b\":{\"Model\":\"\u212a\",\"FallbackModels\":null,\"ReasoningLevel\":\"\",\"TextVerbosity\":\"\"}}}"
     }
   ]
 }

@@ -116,3 +116,60 @@ fn mode_nil_empty_and_zero_fields_have_exact_go_bytes() {
     assert_eq!(to_go_json_bytes(&empty).unwrap(), br#"{"DefaultModel":"","FallbackModels":[],"ReasoningLevel":"","TextVerbosity":"","RoleOverrides":{}}"#);
     assert_eq!(to_go_json_bytes(&ModeConstraints::default()).unwrap(), br#"{"MaxTurns":0,"SubAgentMaxTurns":0,"MaxConcurrentSubAgents":0,"MaxRetries":0,"MaxRuntimeMinutes":0}"#);
 }
+
+#[test]
+fn mode_routing_conversion_preserves_go_bytes_and_owns_the_result() {
+    use adk_codec::mode::mode_routing_from_template_spec;
+
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/specialist-catalog/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        fixture["provenance"]["commit"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    for (path, expected) in fixture["provenance"]["harnessSHA256"].as_object().unwrap() {
+        let digest = Sha256::digest(std::fs::read(root.join(path)).unwrap());
+        assert_eq!(format!("{digest:x}"), expected.as_str().unwrap(), "{path}");
+    }
+    let cases = fixture["routing_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 6);
+    for case in cases {
+        let mut input: Option<ModeTemplateSpec> = if case["input"].is_null() {
+            None
+        } else {
+            Some(from_go_json(&serde_json::to_vec(&case["input"]).unwrap()).unwrap())
+        };
+        let original = input.clone();
+        let output = mode_routing_from_template_spec(input.as_ref());
+        assert_eq!(input, original);
+        assert_eq!(serde_json::to_value(&output).unwrap(), case["output"]);
+        let bytes = output.as_ref().map_or_else(
+            || b"null".to_vec(),
+            |value| to_go_json_bytes(value).unwrap(),
+        );
+        assert_eq!(bytes, case["output_json"].as_str().unwrap().as_bytes());
+        if let Some(routing) = input.as_mut().and_then(|spec| spec.model_routing.as_mut()) {
+            routing.default_model.clear();
+            routing.reasoning_level.clear();
+            routing.text_verbosity.clear();
+            if let Some(models) = &mut routing.fallback_models {
+                models.clear();
+            }
+            if let Some(roles) = &mut routing.role_overrides {
+                for role in roles.values_mut() {
+                    role.model.clear();
+                    role.reasoning_level.clear();
+                    role.text_verbosity.clear();
+                    if let Some(models) = &mut role.fallback_models {
+                        models.clear();
+                    }
+                }
+                roles.clear();
+            }
+        }
+        assert_eq!(serde_json::to_value(&output).unwrap(), case["output"]);
+    }
+}

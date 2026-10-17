@@ -17824,6 +17824,25 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-CEA60C5202154B5D": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "ModeRoutingFromTemplateSpec",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::mode_routing_from_template_spec",
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec",
+        "crates/adk-codec/src/dto.rs::ModeRouting"
+      ],
+      "rust_test_identifiers": [
+        "mode_routing_conversion_preserves_go_bytes_and_owns_the_result",
+        "pinned_mode_codec_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "rationale": "Closes the complete pure template-to-runner routing conversion using compatibility DTOs, not the separate native builder adapter. Missing template/routing returns None; present routing copies all raw labels and role keys without normalization or model binding. Empty fallback slices and empty role maps become nil exactly as Go append-to-nil and conditional map allocation dictate; nonempty ordered fallback entries and role values are deeply owned. Six independently executed pinned-Go conversion cases compare unnormalized output and exact marshalled bytes, including nil, empty, raw/duplicate/unknown labels, Unicode and per-role empty slices. Both reference and Rust mutate source containers after conversion to prove ownership; Rust also checks the input is unchanged. The 993-case typed codec oracle independently verifies the data boundary. The original specialist construction regression is an upstream anchor, not the conversion oracle. No runtime specialist construction, routing resolution, arbitrary native settings transfer or lifecycle behavior is inferred."
     }
   }
 }

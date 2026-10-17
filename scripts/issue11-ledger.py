@@ -53,7 +53,7 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["scripts/mode-codec-reference/run.py", "scripts/mode-codec-reference/reference_test.go",
+RUST_INPUTS = ["crates/adk-codec/src/mode.rs", "scripts/mode-codec-reference/run.py", "scripts/mode-codec-reference/reference_test.go",
                "scripts/mode-codec-reference/README.md", "fixtures/mode-codec/observations.json",
                "crates/adk-codec/tests/modes.rs", "scripts/role-catalog-reference/run.py", "scripts/role-catalog-reference/reference_test.go",
                "scripts/role-catalog-reference/README.md", "fixtures/role-catalog/observations.json",

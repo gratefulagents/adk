@@ -608,3 +608,141 @@ mod oracle {
         }
     }
 }
+
+#[test]
+fn original_tail_respects_floor_and_current_message() {
+    let messages = [
+        (1, "user", "old task"),
+        (2, "assistant", "old summary"),
+        (3, "user", "current user message"),
+        (4, "system", "[SYSTEM] continue with shipping"),
+        (5, "assistant", "recent assistant summary"),
+    ]
+    .map(|(id, role, content)| ConversationMessage {
+        id,
+        role: role.into(),
+        content: content.into(),
+        images: vec![],
+    });
+    let batch = build_conversation_tail(
+        &messages,
+        &WorkingState {
+            history_floor_message_id: 2,
+            ..Default::default()
+        },
+        3,
+        8,
+    );
+    assert_eq!(batch.items.len(), 2);
+    assert_eq!(
+        batch.items[0],
+        message("[SYSTEM] continue with shipping", Role::Assistant)
+    );
+    assert_eq!(
+        batch.provenance,
+        [
+            ItemProvenance::Agent {
+                name: "system-summary".into()
+            },
+            ItemProvenance::Agent {
+                name: "assistant-summary".into()
+            },
+        ]
+    );
+}
+
+#[test]
+fn original_working_context_uses_recent_progress() {
+    let state = WorkingState {
+        goal: "finish github auth end to end".into(),
+        current_mode: "deep".into(),
+        last_user_message: "also wire github app callbacks".into(),
+        last_assistant_summary: "implemented oauth callback plumbing".into(),
+        recent_turn_summaries: [
+            "summary-1",
+            "summary-2",
+            "summary-3",
+            "summary-4",
+            "summary-5",
+        ]
+        .map(String::from)
+        .to_vec(),
+        ..Default::default()
+    };
+    let context = build_working_state_context(&state);
+    assert!(context.contains("Current objective: finish github auth end to end"));
+    assert!(context.contains("Mode: deep"));
+    assert!(!context.contains("summary-1"));
+    assert!(context.contains("summary-5"));
+}
+
+#[test]
+fn original_assistant_summary_captures_tools_and_issues() {
+    let batch = RunBatch {
+        items: vec![
+            message(
+                "Investigated the auth wiring and found the missing callback registration.",
+                Role::Assistant,
+            ),
+            tool("grep"),
+            tool("bash"),
+            tool("bash"),
+            RunItem::ToolResult {
+                call_id: "1".into(),
+                output: ToolOutput {
+                    content: vec![Content::Text {
+                        text: "oauth token missing".into(),
+                    }],
+                    is_error: true,
+                    should_pause: false,
+                },
+            },
+        ],
+        provenance: vec![
+            ItemProvenance::Agent {
+                name: "assistant".into(),
+            },
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed,
+            ItemProvenance::Unattributed,
+        ],
+        ..Default::default()
+    };
+    let summary = build_assistant_turn_summary(&batch);
+    for expected in [
+        "Investigated the auth wiring",
+        "bash x 2",
+        "grep x 1",
+        "Issues: oauth token missing",
+    ] {
+        assert!(summary.contains(expected), "{expected}: {summary}");
+    }
+}
+
+#[test]
+fn original_immediate_selection_preserves_earlier_queue() {
+    let messages = [
+        user(30, "queued next", USER_MESSAGE_MODE_ENQUEUE),
+        user(31, "steer now", USER_MESSAGE_MODE_IMMEDIATE),
+    ];
+    let (selected, cursor, immediate) = select_next_user_message(&messages, &BTreeSet::new());
+    assert_eq!(selected.unwrap().id, 31);
+    assert_eq!(cursor, 0);
+    assert!(immediate);
+}
+
+#[test]
+fn original_immediate_collection_preserves_order_and_cursor() {
+    let messages = [
+        user(20, "queued", USER_MESSAGE_MODE_ENQUEUE),
+        user(21, "first immediate", USER_MESSAGE_MODE_IMMEDIATE),
+        user(22, "second immediate", USER_MESSAGE_MODE_IMMEDIATE),
+    ];
+    let mut consumed = BTreeSet::new();
+    let (batch, cursor) = collect_immediate_run_items(&messages, &mut consumed);
+    assert_eq!(cursor, 0);
+    assert_eq!(batch.items.len(), 2);
+    assert_eq!(batch.items[0], message("first immediate", Role::User));
+    assert!(consumed.contains(&21));
+}

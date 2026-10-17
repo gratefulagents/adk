@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Original conversation helper regressions
+
+Ported all five original conversation tests with their literal message IDs,
+text, history floor, summary inputs and queued/immediate ordering. Native
+RunBatch provenance preserves agent labels without claiming a complete Agent
+codec. All five originals pass independently in Go; native tests pass alongside
+the eight-helper reference oracle. Closed five originals and their source test
+file, not the entire conversation implementation.
+
+Fresh Rust1.88 Linux: **1,677 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format,12 all-feature and host-only conversation
+tests, original Go tests, bound evidence,51 validators, artifacts/overlay/audit
+and source locks passed. The first overlay generation rejected bare implementation
+paths; exact symbol references were supplied and all evidence/checks regenerated.
+Production behavior is unchanged. Ledger: **903 verified /7,988 unresolved /251
+excluded**; full issue11 acceptance remains incomplete.
+
 ### Original autonomous-loop regressions
 
 Ported all five original tracker/nudge tests: no-tool threshold, warning and

@@ -16026,6 +16026,110 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-33DA21226365F238": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": "TestBuildAssistantTurnSummaryCapturesToolsAndIssues",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_assistant_turn_summary"
+      ],
+      "rust_test_identifiers": [
+        "original_assistant_summary_captures_tools_and_issues"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAssistantTurnSummaryCapturesToolsAndIssues",
+      "rationale": "Ports the original regression input values and every original assertion in the named native counterpart. Native RunBatch provenance preserves SDK Agent.Name attribution where needed. This closes only the original regression, not generic Agent/RunItem codecs or the complete helper API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-8DEA14C38252EFB5": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": "TestBuildConversationTailRespectsHistoryFloorAndCurrentMessage",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_conversation_tail"
+      ],
+      "rust_test_identifiers": [
+        "original_tail_respects_floor_and_current_message"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildConversationTailRespectsHistoryFloorAndCurrentMessage",
+      "rationale": "Ports the original regression input values and every original assertion in the named native counterpart. Native RunBatch provenance preserves SDK Agent.Name attribution where needed. This closes only the original regression, not generic Agent/RunItem codecs or the complete helper API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-90182088AFF6864B": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": "TestBuildWorkingStateContextUsesMostRecentProgress",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_working_state_context"
+      ],
+      "rust_test_identifiers": [
+        "original_working_context_uses_recent_progress"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildWorkingStateContextUsesMostRecentProgress",
+      "rationale": "Ports the original regression input values and every original assertion in the named native counterpart. Native RunBatch provenance preserves SDK Agent.Name attribution where needed. This closes only the original regression, not generic Agent/RunItem codecs or the complete helper API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-A79F5CB31DFFE59E": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": "TestCollectImmediateRunItemsPreservesOrderAndCursor",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::collect_immediate_run_items"
+      ],
+      "rust_test_identifiers": [
+        "original_immediate_collection_preserves_order_and_cursor"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestCollectImmediateRunItemsPreservesOrderAndCursor",
+      "rationale": "Ports the original regression input values and every original assertion in the named native counterpart. Native RunBatch provenance preserves SDK Agent.Name attribution where needed. This closes only the original regression, not generic Agent/RunItem codecs or the complete helper API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-FA3E657C809271D8": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": "TestSelectNextUserMessagePrioritizesImmediateOverEarlierQueued",
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::select_next_user_message"
+      ],
+      "rust_test_identifiers": [
+        "original_immediate_selection_preserves_earlier_queue"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestSelectNextUserMessagePrioritizesImmediateOverEarlierQueued",
+      "rationale": "Ports the original regression input values and every original assertion in the named native counterpart. Native RunBatch provenance preserves SDK Agent.Name attribution where needed. This closes only the original regression, not generic Agent/RunItem codecs or the complete helper API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-344094963E5B6013": {
+      "source": "pkg/agentsdk/conversation_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/host/conversation.rs::build_conversation_tail",
+        "crates/adk/src/host/conversation.rs::build_working_state_context",
+        "crates/adk/src/host/conversation.rs::build_assistant_turn_summary",
+        "crates/adk/src/host/conversation.rs::select_next_user_message",
+        "crates/adk/src/host/conversation.rs::collect_immediate_run_items"
+      ],
+      "rust_test_identifiers": [
+        "original_tail_respects_floor_and_current_message",
+        "original_working_context_uses_recent_progress",
+        "original_assistant_summary_captures_tools_and_issues",
+        "original_immediate_selection_preserves_earlier_queue",
+        "original_immediate_collection_preserves_order_and_cursor"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildConversationTailRespectsHistoryFloorAndCurrentMessage",
+      "rationale": "Ports all five original regression inputs and assertions: tail floor/current exclusion with agent labels, four-recent summary selection, assistant/tool/error summary, immediate priority and ordered consumption without skipping queued input. Native RunBatch provenance preserves SDK Agent.Name attribution, and BTreeSet models consumed IDs. This closes the complete five-test source file only, not generic Agent/RunItem codecs or the entire conversation implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

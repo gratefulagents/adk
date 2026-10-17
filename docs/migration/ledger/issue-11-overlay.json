@@ -79,8 +79,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1052,
-        "verified": 118
+        "unresolved": 1051,
+        "verified": 119
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -96,8 +96,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8013,
-    "verified": 878
+    "unresolved": 8012,
+    "verified": 879
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -209,11 +209,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 921,
+      "pass": 922,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "46ec0ca2b37b815aecdf12d72e24bcc9bb2ed07a4311be77024e798c0a0f91fe",
+    "evidence_sha256": "4311c52b81c51f3e6ec7ebfaf200d467634163026187448184ec3015e4a6ca30",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -9549,7 +9549,7 @@
     "SDK-183EC59A698B1AB9": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/runtime.Config.Routes@pkg/agentsdk/runtime/builder.go", "proposed_rust_module": "sdk::runtime", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/runtime/builder.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::runtime", "verification_status": "not_run"},
     "SDK-18411DE3F70D063F": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/openai.NewAPIKeyAuthSession@internal/openai/auth_session.go", "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/openai/auth_session.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "not_run"},
     "SDK-184A655241421699": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.GuardrailResult@pkg/agentsdk/aliases.go", "proposed_rust_module": "sdk::guardrails", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/aliases.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::guardrails", "verification_status": "not_run"},
-    "SDK-185A0A4ABF7BA882": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestStreamAssemblerHandlesCompactionEncryptedContentDelta", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/audit_fixes_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
+    "SDK-185A0A4ABF7BA882": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Closes only the original partial encrypted-compaction regression: identical block start/delta/stop with no fabricated message_start or terminal. A separate SDK-shaped incremental assembler preserves partial assembly while native transport validation remains strict.16 independently executed Go scenarios compare snapshots after each event. This does not claim all assembler API/decoder behavior or the source file; the new UTF8 Serde event boundary explicitly does not emulate Go JSON decoding.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/snapshot/assembler.rs::StreamAssembler"], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestStreamAssemblerHandlesCompactionEncryptedContentDelta", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerHandlesCompactionEncryptedContentDelta"}, "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": ["encrypted_compaction_assembles_without_a_message_start", "incremental_assembler_matches_pinned_go_at_every_event", "permissive_sdk_identity_defaults_do_not_allow_invalid_stream_order"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/anthropic/audit_fixes_test.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "passed"},
     "SDK-185A98A8C0453522": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/host/fileconfig.constraintsSpec.MaxRuntimeMinutes@pkg/agentsdk/host/fileconfig/fileconfig.go", "proposed_rust_module": "sdk::host::file_config", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/host/fileconfig/fileconfig.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::host::file_config", "verification_status": "not_run"},
     "SDK-1860C971D5FD4727": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.SubAgentSchedulerCheckpointRecord.Task@internal/agent/subagent_registry.go", "proposed_rust_module": "sdk::subagents", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/subagent_registry.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::subagents", "verification_status": "not_run"},
     "SDK-186430B6E7520D82": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.handoffTool.Name@internal/agent/handoff.go", "proposed_rust_module": "sdk::handoff", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/handoff.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::handoff", "verification_status": "not_run"},

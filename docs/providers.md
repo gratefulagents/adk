@@ -320,3 +320,25 @@ items, aggregates, usage and end-turn, through serialization and completed-run
 checkpoint recovery. Unrepresented provider cases remain unverified; these
 fixtures do not close entire provider capabilities. The fixture's
 `streaming` flag describes transport; `method` identifies the public SDK call.
+
+## Incremental Anthropic response assembly
+
+`adk_providers::anthropic::StreamAssembler` is a separate, caller-owned partial
+response assembler for SDK/shim events. `add(&str)` accepts one UTF-8 JSON event;
+`response()` returns an owned SDK-shaped JSON snapshot without closing it. Only
+stopped blocks appear, in stop order. Duplicate stops and unknown events are
+ignored; starts replace an open builder at that index. Message starts are not
+required for partial blocks. This does not relax `client::StreamState` transport
+ordering, terminal validation or error handling.
+
+The input boundary uses Serde, not the Go JSON decoder. Syntax/type errors leave
+state unchanged. Invalid accumulated tool argument JSON is reported when encoding
+a response, not silently replaced. Raw valid tool argument spelling survives
+encoding. Snapshots do not borrow mutable assembler state.
+
+`fixtures/anthropic-assembler/observations.json` contains16 independent pinned-Go
+scenarios and117 snapshots, covering all block families, replacement/duplicate
+starts and stops, missing message starts, encrypted reasoning/compaction, raw
+arguments and signed/nonzero usage updates. Regenerate or verify via
+`python3 scripts/anthropic-assembler-reference/run.py [--check]`. These are bounded
+assembly semantics, not complete provider or JSON-decoder equivalence.

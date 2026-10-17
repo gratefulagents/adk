@@ -1,5 +1,6 @@
 //! Ordered provider-neutral diagnostic documents used by compatibility traces.
 //! Native provider payloads remain separately available on `ModelResponse::raw`.
+pub(crate) mod assembler;
 mod completion;
 use crate::wire::Protocol;
 use adk_core::{Error, ErrorCategory, JsonDocument};
@@ -14,7 +15,7 @@ pub(crate) enum Profile {
     Collected,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct Response {
     #[serde(deserialize_with = "null_default")]
@@ -35,7 +36,7 @@ struct Response {
     end_turn: Option<bool>,
 }
 
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct Block {
     #[serde(rename = "type")]
@@ -92,7 +93,7 @@ struct Block {
     #[serde(skip_serializing_if = "Option::is_none")]
     cache_control: Option<CacheControl>,
 }
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct Image {
     #[serde(rename = "type")]
@@ -103,14 +104,14 @@ struct Image {
     #[serde(deserialize_with = "null_default")]
     data: String,
 }
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct CacheControl {
     #[serde(rename = "type")]
     #[serde(deserialize_with = "null_default")]
     kind: String,
 }
-#[derive(Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 #[serde(default)]
 struct Usage {
     #[serde(deserialize_with = "null_default")]

@@ -1,5 +1,6 @@
 //! Baseline Messages shaping, separate from credential lookup and HTTP retries.
 use crate::auth::AuthMode;
+pub use crate::snapshot::assembler::StreamAssembler;
 use adk_core::ModelRequest;
 use serde_json::{Value, json};
 

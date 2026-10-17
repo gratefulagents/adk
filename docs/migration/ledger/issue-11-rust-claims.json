@@ -15697,6 +15697,24 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-185A0A4ABF7BA882": {
+      "source": "internal/anthropic/audit_fixes_test.go",
+      "source_name": "TestStreamAssemblerHandlesCompactionEncryptedContentDelta",
+      "implementation_symbols": [
+        "crates/adk-providers/src/snapshot/assembler.rs::StreamAssembler"
+      ],
+      "rust_test_identifiers": [
+        "encrypted_compaction_assembles_without_a_message_start",
+        "incremental_assembler_matches_pinned_go_at_every_event",
+        "permissive_sdk_identity_defaults_do_not_allow_invalid_stream_order"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerHandlesCompactionEncryptedContentDelta",
+      "rationale": "Closes only the original partial encrypted-compaction regression: identical block start/delta/stop with no fabricated message_start or terminal. A separate SDK-shaped incremental assembler preserves partial assembly while native transport validation remains strict.16 independently executed Go scenarios compare snapshots after each event. This does not claim all assembler API/decoder behavior or the source file; the new UTF8 Serde event boundary explicitly does not emulate Go JSON decoding.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

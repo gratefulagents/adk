@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Independent partial Anthropic response assembler
+
+Added caller-owned `anthropic::StreamAssembler` separately from strict native
+transport validation. It handles partial blocks without message_start, stopped
+block order, replacement starts, duplicate stops, reasoning/compaction ciphertext,
+raw tool arguments and signed/nonzero usage updates.16 independent Go scenarios
+compare117 snapshots exactly after every event; invalid accumulated tool JSON
+fails response encoding, and malformed event input does not mutate state.
+
+The literal original encrypted-compaction regression now passes without adding
+a synthetic start or terminal. Only that test ID is newly closed; the UTF-8 Serde
+event boundary is explicitly not complete Go JSON decoding. Existing transport
+ordering tests still reject the malformed network sequence. The pinned-test
+selector now retains claimed internal/anthropic tests during report refresh
+(previous reports included them but regeneration omitted that package).
+
+Fresh Rust1.88 Linux: **1,659 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/docs/format, full matrix/consumer/purity,20 scenarios,
+host-session, bound references,51 validators, artifacts/overlay/audit/source
+locks passed. Pinned original Go report:922 passed/5 skipped across38 packages.
+Ledger: **879 verified /8,012 unresolved /251 excluded**. Full acceptance remains
+incomplete.
+
 ### Quoted host guardrail regex literals
 
 Reproduced rejection of a Go-valid quoted literal containing `(?u)`. Host rules

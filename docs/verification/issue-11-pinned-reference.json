@@ -22,6 +22,15 @@
       "test",
       "-count=1",
       "-json",
+      "./internal/anthropic",
+      "-run",
+      "^(TestStreamAssemblerAssemblesCompactionBlocks|TestStreamAssemblerHandlesCompactionEncryptedContentDelta|TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem|TestStreamAssemblerPreservesEndTurnFalse|TestToSDKParamsSendsOutputFormatForOutputSchema)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
       "./internal/modelactivity",
       "-run",
       "^(TestWrapTransportReportsEveryResponseBodyRead)$"
@@ -34,19 +43,10 @@
       "./internal/openai",
       "-run",
       "^(TestCalculateCost|TestChatCompletionRequestOmitsEmptyModels|TestChatCompletionsOmitsModelsWithoutFallbacks|TestChatCompletionsSendsModelsArrayWithFallbacks|TestChatResponseSurfacesRefusal|TestChatStopReasonPrefersTruncationOverToolCalls|TestChatStreamReaderMultipleToolCalls|TestChatStreamReaderNarrationToolCallsQuirk|TestChatStreamReaderOpenRouterReasoningDetailsAndCacheUsage|TestChatStreamReaderReasoningAndText|TestChatStreamReaderReasoningThenTool|TestChatStreamReaderToolCalls|TestChatStreamSurfacesRefusalDeltas|TestCopilotStreamDropsBudgetOnlyOpenRouterReasoning|TestDrainStreamFeedsReasoningSink|TestEstimateCost|TestFetchModelMetadataStandardOpenAIShape|TestModelMetadataEndpointAppendsCodexClientVersion|TestModelMetadataEndpointUsesCodexClientVersionOverride|TestParseModelMetadataCodexShape|TestParseModelMetadataCopilotCapabilitiesShape|TestParseModelMetadataCopilotFallsBackToMaxPromptTokens|TestPickerModelMetadataMirrorsCodexPicker|TestPickerModelMetadataPlainOpenAIShapeStaysAlphabetical|TestResponsesCacheWriteTokensNonStreaming|TestToAnthropicResponseFromChatReasoning|TestToChatMessagesForwardsImages|TestToChatMessagesPreservesPlaintextReasoning|TestToChatMessagesRoundTripsReasoning|TestToChatMessagesTextOnlyStaysString|TestToChatRequestEmitsReasoningBudget|TestToChatRequestEmitsReasoningEffort|TestToResponseInputItems_ConvertsToolResults|TestToResponseInputItems_SkipsOrphanToolResults|TestToResponseParams_EffortNoneSkipsSummary|TestValidateChatCompletionsModel|TestWithModelFallbacks)$"
-    ],
-    [
-      "go",
-      "test",
-      "-count=1",
-      "-json",
-      "./internal/anthropic",
-      "-run",
-      "^(TestStreamAssemblerAssemblesCompactionBlocks|TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem|TestStreamAssemblerPreservesEndTurnFalse|TestToSDKParamsSendsOutputFormatForOutputSchema)$"
     ]
   ],
   "counts": {
-    "pass": 921,
+    "pass": 922,
     "skip": 5
   },
   "exit_code": 0,
@@ -197,6 +197,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestTruncateMiddle": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestUsageAddAndTotal": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerAssemblesCompactionBlocks": "pass",
+    "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerHandlesCompactionEncryptedContentDelta": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerPreservesEndTurnFalse": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestToSDKParamsSendsOutputFormatForOutputSchema": "pass",

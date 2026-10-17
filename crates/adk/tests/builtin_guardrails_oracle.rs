@@ -211,3 +211,91 @@ fn public_tool_pattern_helper_matches_pinned_sdk_not_chatloop_globs() {
         );
     }
 }
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn public_rule_callbacks_match_pinned_sdk_observations() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["public_rules"].as_array().unwrap();
+    assert_eq!(cases.len(), 124);
+    let context = Context {
+        run_id: "public-rule-oracle".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    for case in cases {
+        let source = &case["rule"];
+        let rule = adk::host::GuardrailRule {
+            name: source["Name"].as_str().unwrap().into(),
+            regex: source["Regex"].as_str().unwrap().into(),
+            action: source["Action"].as_str().unwrap().into(),
+            rule_type: source["Type"].as_str().unwrap().into(),
+            tool_pattern: source["ToolPattern"].as_str().unwrap().into(),
+            message: source["Message"].as_str().unwrap().into(),
+        };
+        let regex = regex::Regex::new(case["regex"].as_str().unwrap()).unwrap();
+        let is_input = case["phase"] == "input";
+        let guard = if is_input {
+            make_tool_input_guardrail(rule, regex)
+        } else {
+            make_tool_output_guardrail(rule, regex)
+        };
+        assert_eq!(
+            guard.name(),
+            format!("crd:{}", source["Name"].as_str().unwrap())
+        );
+        let text = case["text"].as_str().unwrap();
+        let call = ToolCall {
+            id: "call".into(),
+            name: case["tool"].as_str().unwrap().into(),
+            arguments: Value::Null,
+            raw_arguments: Some(text.into()),
+        };
+        let output = ToolOutput {
+            content: vec![Content::Text { text: text.into() }],
+            is_error: false,
+            should_pause: false,
+        };
+        let input = if is_input {
+            GuardrailInput::ToolInput(&call)
+        } else {
+            GuardrailInput::ToolOutput {
+                call: &call,
+                output: &output,
+            }
+        };
+        let result = guard
+            .check(&context, "agent", input)
+            .await
+            .unwrap()
+            .unwrap();
+        assert_eq!(case["error"], "");
+        assert_eq!(result.output, case["result"]["Output"], "{case}");
+        assert_eq!(
+            result.tripwire_triggered,
+            case["result"]["TripwireTriggered"].as_bool().unwrap(),
+            "{case}"
+        );
+        assert_eq!(result.replacement_content, None);
+        assert_eq!(case["result"]["ContentReplaced"], false);
+        let wrong_phase = if is_input {
+            GuardrailInput::ToolOutput {
+                call: &call,
+                output: &output,
+            }
+        } else {
+            GuardrailInput::ToolInput(&call)
+        };
+        assert!(
+            guard
+                .check(&context, "agent", wrong_phase)
+                .await
+                .unwrap()
+                .is_none()
+        );
+        assert!(guard.durable_key().is_none());
+    }
+}

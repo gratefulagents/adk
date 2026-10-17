@@ -16621,6 +16621,51 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-93D14FBD22C23543": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestMakeToolInputGuardrailFn_UnvalidatedUnknownActionBlocks",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails/rules.rs::make_tool_input_guardrail"
+      ],
+      "rust_test_identifiers": [
+        "original_unvalidated_public_rule_action_blocks",
+        "public_rule_callbacks_match_pinned_sdk_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestMakeToolInputGuardrailFn_UnvalidatedUnknownActionBlocks",
+      "rationale": "Ports the original direct constructor rule r1/danger/deny and JSON x=danger assertion. Unknown unnormalized actions fail closed at execution rather than being rejected or silently passing. Independent actual-Go public callback observations separately cover both phases, whitespace messages, original malformed inputs and edge-star filtering. This is the original regression only, not full Go regex compiler equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-D68B73F6D2805D84": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_input_guardrails",
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk/src/guardrails/rules.rs::make_tool_input_guardrail",
+        "crates/adk/src/host/rules.rs::compile_guardrail_rules"
+      ],
+      "rust_test_identifiers": [
+        "builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_representable",
+        "destructive_guardrail_checks_original_shell_argument_text",
+        "original_added_secret_signatures_are_detected",
+        "original_destructive_command_variants_are_blocked",
+        "original_destructive_guard_ignores_non_shell_tools",
+        "original_empty_rule_action_defaults_to_block",
+        "original_rule_compilation_rejects_unknown_type_and_action",
+        "original_safe_commands_are_not_destructive",
+        "original_unvalidated_public_rule_action_blocks",
+        "public_rule_callbacks_match_pinned_sdk_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestMakeToolInputGuardrailFn_UnvalidatedUnknownActionBlocks",
+      "rationale": "All nine original hardening regressions have literal native tests: destructive/safe/non-shell/malformed inputs, invalid rule type/action, default block, unvalidated direct action and additional secret signatures. The newly separate direct public constructor preserves public semantics without changing the existing ChatLoop compiler tests. This closes only the original test file, not all public rule APIs, partial-success compilation or RE2 syntax.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

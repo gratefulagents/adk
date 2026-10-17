@@ -1,4 +1,2610 @@
 {
+  "public_rules": [
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\"",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\"",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\"",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*read*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*reader",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "reader",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "read*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "**",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "no-match",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "safe",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "input",
+      "rule": {
+        "Name": "empty",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "^$",
+      "tool": "",
+      "text": "",
+      "result": {
+        "Output": "Guardrail \"empty\" triggered on tool \"\"",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\" output",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"r1\" triggered on tool \"r1tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "r1",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "r1tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\" output",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"line\\n\\t\\\"\\\\\\x00\" triggered on tool \"line\\n\\t\\\"\\\\\\x00tool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "line\n\t\"\\\u0000",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "line\n\t\"\\\u0000tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "block",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\" output",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "warn",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "log",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": "deny",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "Guardrail \"猫\\u200b\" triggered on tool \"猫\\u200btool\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": "  "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": "  ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "猫​",
+        "Type": "ignored",
+        "Regex": "[invalid",
+        "ToolPattern": "",
+        "Action": " WARN ",
+        "Message": " custom "
+      },
+      "regex": "danger",
+      "tool": "猫​tool",
+      "text": "{\"x\":\"danger\"",
+      "result": {
+        "Output": " custom ",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*read*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*reader",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "reader",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "read*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "*",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": "Guardrail \"pattern\" triggered on tool \"reader\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "pattern",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "**",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "danger",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "no-match",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "danger",
+      "tool": "reader",
+      "text": "safe",
+      "result": {
+        "Output": null,
+        "TripwireTriggered": false,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    },
+    {
+      "phase": "output",
+      "rule": {
+        "Name": "empty",
+        "Type": "",
+        "Regex": "",
+        "ToolPattern": "",
+        "Action": "",
+        "Message": ""
+      },
+      "regex": "^$",
+      "tool": "",
+      "text": "",
+      "result": {
+        "Output": "Guardrail \"empty\" triggered on tool \"\" output",
+        "TripwireTriggered": true,
+        "ReplacementContent": "",
+        "ContentReplaced": false
+      },
+      "error": ""
+    }
+  ],
   "tool_patterns": [
     {
       "name": "",

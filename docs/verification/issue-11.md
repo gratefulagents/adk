@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Direct public rule constructors
+
+Added host-gated public input/output rule constructors, separate from ChatLoop
+compilation. They preserve supplied compiled-regex precedence, raw message
+whitespace, public edge-star matching, SDK diagnostic quoting and fail-closed
+unnormalized actions. All124 independently executed Go observations match native
+outputs/tripwires/replacement state. The literal original unknown-action test
+passes; with the other eight original regressions this closes the hardening test
+file, not the entire public compiler or RE2 syntax. Native regex compilation,
+text-only output projection, absent durable identities and feature requirements
+are explicit in docs/guardrails.md. Independent scoped review found no blockers.
+
+Following worker restart, exact source pins/tag and Rust1.88 were restored and
+verification rerun: **1,704 workspace tests passed /0 failed /30 ignored;
+10 doctests passed**. Host-only and builder-only suites, strict workspace/host
+lint/typecheck, rustdoc/format, pinned Go tests/vet/build and twice-exact fixtures
+passed. Bound evidence,51 validators, artifact review,overlay/audit and source
+locks pass. Ledger: **934 verified /7,957 unresolved /251 excluded**. Issue11 and
+PR33 remain incomplete; no current-head remote CI success is claimed here.
+
 ### Separate public tool-pattern helper
 
 Added `guardrails::match_tool_pattern` with the public SDK helper's trailing-star

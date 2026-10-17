@@ -961,3 +961,26 @@ async fn original_added_secret_signatures_are_detected() {
         assert!(result.tripwire_triggered || result.replacement_content.is_some());
     }
 }
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn original_unvalidated_public_rule_action_blocks() {
+    let rule = adk::host::GuardrailRule {
+        name: "r1".into(),
+        rule_type: "tool-input".into(),
+        regex: "danger".into(),
+        action: "deny".into(),
+        ..Default::default()
+    };
+    let guard = make_tool_input_guardrail(rule, regex::Regex::new("danger").unwrap());
+    let result = guard
+        .check(
+            &context(),
+            "agent",
+            GuardrailInput::ToolInput(&call("stub", json!({"x":"danger"}))),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(result.tripwire_triggered);
+}

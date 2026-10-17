@@ -28,7 +28,16 @@ public helper's edge-star syntax. A trailing `*` selects a literal prefix before
 a leading `*` can select a literal suffix. Internal stars are literal: `*read*`
 does not mean a substring search. `*` alone matches every name, including empty.
 This is deliberately separate from host rule compilation's multi-star glob.
-Standalone public rule factories/compiler are not yet provided by this helper.
+With `host`, `guardrails::make_tool_input_guardrail` and
+`make_tool_output_guardrail` take an owned `host::GuardrailRule` and caller-compiled
+`regex::Regex`. They use that regex rather than the configuration's regex string,
+preserve message whitespace, and block for every action except exact `warn` and
+`log`. Names use `crd:` rather than ChatLoop's `config:` prefix. Default diagnostic
+names use SDK quoting. Input checks inspect original argument text; output checks
+match newline-joined text parts, ignoring non-text parts. A guard ignores the
+opposite phase. They do not supply durable identities or claim Go RE2 syntax;
+callers explicitly own Rust regex compilation. The standalone public compiler
+that collects errors while retaining good rules is still outstanding.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

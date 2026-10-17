@@ -8,6 +8,11 @@ use adk_security::{
 use serde::Deserialize;
 use std::sync::Arc;
 
+#[cfg(feature = "host")]
+mod rules;
+#[cfg(feature = "host")]
+pub use rules::{make_tool_input_guardrail, make_tool_output_guardrail};
+
 /// Match the SDK public helper's edge-star syntax, not ChatLoop's multi-star glob.
 /// A trailing star takes precedence over a leading star; internal stars are literal.
 pub fn match_tool_pattern(name: &str, pattern: &str) -> bool {

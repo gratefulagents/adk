@@ -47,6 +47,14 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.ToolPatterns) != 120 {
 		t.Fatalf("got %d tool patterns, want 120", len(fixture.ToolPatterns))
 	}
+	if len(fixture.PublicRules) != 124 {
+		t.Fatalf("got %d public rule cases, want 124", len(fixture.PublicRules))
+	}
+	for _, c := range fixture.PublicRules {
+		if c.Result == nil || c.Error != "" {
+			t.Fatal("public rule callback failed")
+		}
+	}
 	seen := map[string]bool{}
 	for _, c := range fixture.Cases {
 		t.Run(c.Name, func(t *testing.T) {

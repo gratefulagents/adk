@@ -467,3 +467,10 @@ The same fixture includes 120 independently executed public `MatchToolPattern`
 observations from `pkg/agentsdk/guardrails/rules.go`. They cover exact and empty
 strings, edge-star precedence, literal internal/repeated stars, Unicode and
 newlines. These compare the public helper, not ChatLoop's different glob matcher.
+
+`public_rules.go` adds 124 actual calls to the pinned SDK's direct input/output
+rule constructors. The fixture records supplied-regex precedence, raw malformed
+arguments, all action branches (including unvalidated values), exact default
+quoted diagnostics, message whitespace, edge-star filters and no-match/empty
+text. Native comparison checks result output, tripwire and replacement state.
+This does not assert Go/Rust regex parser equivalence or partial-error compilation.

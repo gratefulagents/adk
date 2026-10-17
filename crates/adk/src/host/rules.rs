@@ -292,7 +292,10 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 class_has_atom = false;
                 class_can_negate = true;
             } else if in_class {
-                if matches!(c, '&' | '~' | '-' | '|') && chars.peek() == Some(&c) {
+                if matches!(c, '&' | '~' | '|') {
+                    pattern.push('\\');
+                }
+                if c == '-' && chars.peek() == Some(&c) {
                     return Err(Error::new(
                         ErrorCategory::Unsupported,
                         "Go/Rust regex character-class set syntax differs",

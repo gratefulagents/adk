@@ -62,6 +62,17 @@ func regexPerlClassScenarios(inputs []string) []regexClassCase {
 	return regexMembership(patterns, inputs)
 }
 
+func regexSetLiteralScenarios(inputs []string) []regexClassCase {
+	patterns := []string{}
+	for _, operator := range []string{"&&", "~~", "||"} {
+		for _, format := range []string{"^[a%sb]$", "^[^a%sb]$", "^[]a%s]$", "^[^]a%s]$", "(?i)^[k%ss]$", `^[\d%s\w]$`} {
+			patterns = append(patterns, fmt.Sprintf(format, operator))
+		}
+	}
+	patterns = append(patterns, `^[&~|]$`, `^[&~|&~|]$`, `^[[:alpha:]&&[:digit:]]$`)
+	return regexMembership(patterns, inputs)
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

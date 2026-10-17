@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Literal class-set symbols
+
+Go-valid ampersands, tildes and pipes inside classes now remain literal instead
+of being rejected or acquiring Rust class-set semantics. Twenty-one actual-Go
+patterns ×142 inputs verify2,982 membership decisions in each native compiler,
+including negation, literal closing brackets, case folding, Perl and POSIX atoms.
+Double-hyphen and arbitrary nested-bracket syntax remain explicitly unsupported;
+this is still not a complete RE2 parser claim.
+
+Fresh Rust1.88 Linux: **1,721 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict workspace lint/typecheck/rustdoc, formatting, full feature matrix
+and standalone consumer/purity, Go tests/vet/build, all pinned evidence,
+53 validators, artifact/overlay/audit and immutable source locks passed. Ledger
+unchanged at **947 verified /7,944 unresolved /251 excluded**. Full issue acceptance
+remains incomplete.
+
 ### ASCII Perl atoms inside regex classes
 
 Removed the blanket rejection of valid in-class `\d`, `\s`, `\w` and their

@@ -536,3 +536,17 @@ async fn perl_class_atoms_match_actual_go_membership() {
     assert_eq!(inputs.len(), 142);
     assert_regex_membership(cases, inputs).await;
 }
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn class_set_symbols_remain_go_literals() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_set_literals"].as_array().unwrap();
+    let inputs = fixture["regex_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 21);
+    assert_eq!(inputs.len(), 142);
+    assert_regex_membership(cases, inputs).await;
+}

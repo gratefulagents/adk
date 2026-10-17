@@ -63,10 +63,8 @@ fn quoting_does_not_enable_rust_only_flags_or_class_escapes() {
 }
 
 #[test]
-fn unescaped_class_set_operators_remain_explicitly_unsupported() {
-    for pattern in [
-        "[a&&b]", "[a--b]", "[a~~b]", "[a||b]", "[]a&&b]", "[^]a&&b]",
-    ] {
+fn double_hyphen_class_syntax_remains_explicitly_unsupported() {
+    for pattern in ["[a--b]", "[]a--b]", "[^]a--b]"] {
         let error = match compile_guardrail_rules(&[rule(pattern)]) {
             Ok(_) => panic!("unexpected set syntax accepted: {pattern}"),
             Err(error) => error,
@@ -141,7 +139,6 @@ fn posix_atoms_do_not_admit_nested_or_unknown_class_syntax() {
     for pattern in [
         "[[:bogus:]]",
         "[[:Alpha:]]",
-        "[[:alpha:]&&[:digit:]]",
         "[[:alpha:][a-z]]",
         "[[:alpha:]--[:digit:]]",
     ] {

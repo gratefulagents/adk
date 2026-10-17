@@ -50,6 +50,9 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.RegexClasses) != 62 || len(fixture.RegexInputs) != 142 {
 		t.Fatal("missing class observations")
 	}
+	if len(fixture.RegexSetLiterals) != 21 {
+		t.Fatal("missing literal class-symbol observations")
+	}
 	if len(fixture.RegexPerlClasses) != 40 {
 		t.Fatal("missing Perl class observations")
 	}

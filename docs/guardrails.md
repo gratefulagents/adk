@@ -50,8 +50,10 @@ sign in `blocK` lowercases to `block`). RE2-only
 syntax outside the supported subset remains explicitly unsupported, and native
 regex-parser prose is not a Go byte-parity claim. The shared subset accepts the
 14 Go POSIX ASCII class names and their negations, including unions and leading
-literal `]` cases. This does not enable arbitrary nested classes or Rust class-set
-operations. Counted repetitions enforce Go's 1,000-copy bound, including nested
+literal `]` cases. Ampersands, tildes and pipes in classes remain Go literals,
+including repeated forms that Rust otherwise interprets as class-set operations.
+Arbitrary nested classes and double-hyphen syntax remain explicitly unsupported.
+Counted repetitions enforce Go's 1,000-copy bound, including nested
 products; zero maximums shield inner products but do not permit independently
 invalid inner counts. Malformed count forms, including leading-zero numbers,
 remain literal text as in Go rather than acquiring Rust repetition semantics.

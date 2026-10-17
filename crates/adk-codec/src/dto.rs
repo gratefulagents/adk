@@ -31,6 +31,55 @@ pub struct ModelSettings {
     pub stop_sequences: Option<Vec<String>>,
 }
 
+impl ModelSettings {
+    pub fn merge(&self, overrides: &Self) -> Self {
+        let mut merged = self.clone();
+        if overrides.temperature.is_some() {
+            merged.temperature = overrides.temperature;
+        }
+        if overrides.max_tokens > 0 {
+            merged.max_tokens = overrides.max_tokens;
+        }
+        if overrides.top_p.is_some() {
+            merged.top_p = overrides.top_p;
+        }
+        if !overrides.tool_choice.is_empty() {
+            merged.tool_choice.clone_from(&overrides.tool_choice);
+        }
+        if overrides.parallel_tool_calls.is_some() {
+            merged.parallel_tool_calls = overrides.parallel_tool_calls;
+        }
+        if overrides.thinking_budget > 0 {
+            merged.thinking_budget = overrides.thinking_budget;
+        }
+        if !overrides.reasoning_effort.is_empty() {
+            merged
+                .reasoning_effort
+                .clone_from(&overrides.reasoning_effort);
+        }
+        if !overrides.text_verbosity.is_empty() {
+            merged.text_verbosity.clone_from(&overrides.text_verbosity);
+        }
+        if overrides
+            .stop_sequences
+            .as_ref()
+            .is_some_and(|values| !values.is_empty())
+        {
+            merged.stop_sequences.clone_from(&overrides.stop_sequences);
+        }
+        merged
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModelRetryAdvice {
+    pub should_retry: bool,
+    #[serde(rename = "RetryAfterMS")]
+    pub retry_after_ms: i64,
+    pub reason: String,
+}
+
 fn empty_stop_sequences(value: &Option<Vec<String>>) -> bool {
     value.as_ref().is_none_or(Vec::is_empty)
 }

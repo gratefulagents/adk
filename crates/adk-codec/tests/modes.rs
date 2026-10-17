@@ -3,7 +3,7 @@ use adk_codec::{
     GoJsonDecode, GoJsonEncode,
     dto::{
         ModeConstraints, ModeReasoningLevel, ModeRoleRouting, ModeRouting, ModeTemplateSpec,
-        ModeTextVerbosity, ModelSettings,
+        ModeTextVerbosity, ModelRetryAdvice, ModelSettings,
     },
     from_go_json, to_go_json_bytes,
 };
@@ -60,9 +60,10 @@ fn pinned_mode_codec_oracle() {
         assert_eq!(format!("{digest:x}"), expected.as_str().unwrap(), "{path}");
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1812);
+    assert_eq!(cases.len(), 1901);
     for case in cases {
         match case["type"].as_str().unwrap() {
+            "RetryAdvice" => compare::<ModelRetryAdvice>(case),
             "ModelSettings" => compare_settings(case),
             "RoutingResolution" => compare_resolution(case),
             "ReasoningLevel" => compare::<ModeReasoningLevel>(case),
@@ -345,4 +346,49 @@ fn nested_settings_null_is_noop_and_retains_backing_slots() {
         &["short", "tail", ""]
     );
     assert_eq!(to_go_json_bytes(&resolution).unwrap(), br#"{"Model":"raw","FallbackModels":null,"ReasoningLevel":"","TextVerbosity":"","ModelSettings":{"temperature":-0,"stop_sequences":["short","tail",""]}}"#);
+}
+
+#[test]
+fn settings_merge_preserves_pinned_go_state_and_bytes() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mode-codec/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["settings_merges"].as_array().unwrap();
+    assert_eq!(cases.len(), 534);
+    for case in cases {
+        let base: ModelSettings = from_go_json(case["base"].as_str().unwrap().as_bytes()).unwrap();
+        let overrides: ModelSettings =
+            from_go_json(&unhex(case["override_hex"].as_str().unwrap())).unwrap();
+        let merged = base.merge(&overrides);
+        assert_eq!(settings_state(&merged), case["state"], "{case}");
+        assert_eq!(
+            to_go_json_bytes(&merged).unwrap(),
+            unhex(case["marshal_hex"].as_str().unwrap()),
+            "{case}"
+        );
+    }
+}
+
+#[test]
+fn settings_merge_copies_override_stops_and_retains_empty_base_allocation() {
+    let base: ModelSettings = from_go_json(br#"{"stop_sequences":[]}"#).unwrap();
+    assert_eq!(
+        base.merge(&ModelSettings::default()).stop_sequences,
+        Some(vec![])
+    );
+    let mut overrides: ModelSettings = from_go_json(br#"{"stop_sequences":["override"]}"#).unwrap();
+    let merged = base.merge(&overrides);
+    overrides.stop_sequences.as_mut().unwrap()[0].clear();
+    assert_eq!(merged.stop_sequences.unwrap(), vec!["override"]);
+}
+
+#[test]
+fn retry_advice_preserves_signed_delay_and_go_field_spelling() {
+    let advice: ModelRetryAdvice = from_go_json(br#"{"ShouldRetry":true,"RetryAfterMS":-1,"Reason":" raw ","shouldretry":null,"retryafterms":null,"reason":null}"#).unwrap();
+    assert_eq!(advice.retry_after_ms, -1);
+    assert_eq!(
+        to_go_json_bytes(&advice).unwrap(),
+        br#"{"ShouldRetry":true,"RetryAfterMS":-1,"Reason":" raw "}"#
+    );
 }

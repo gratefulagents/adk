@@ -3958,15 +3958,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.Temperature",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::temperature"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::temperature",
+        "crates/adk-codec/src/dto.rs::ModelSettings::temperature"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.Temperature is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.Temperature are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -3976,15 +3979,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.MaxTokens",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::max_tokens"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::max_tokens",
+        "crates/adk-codec/src/dto.rs::ModelSettings::max_tokens"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.MaxTokens is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.MaxTokens are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -3994,15 +4000,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.TopP",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::top_p"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::top_p",
+        "crates/adk-codec/src/dto.rs::ModelSettings::top_p"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.TopP is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.TopP are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4012,15 +4021,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.ToolChoice",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::tool_choice"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::tool_choice",
+        "crates/adk-codec/src/dto.rs::ModelSettings::tool_choice"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.ToolChoice is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.ToolChoice are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4030,15 +4042,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.ParallelToolCalls",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::parallel_tool_calls"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::parallel_tool_calls",
+        "crates/adk-codec/src/dto.rs::ModelSettings::parallel_tool_calls"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.ParallelToolCalls is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.ParallelToolCalls are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4048,15 +4063,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.ThinkingBudget",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::thinking_budget"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::thinking_budget",
+        "crates/adk-codec/src/dto.rs::ModelSettings::thinking_budget"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.ThinkingBudget is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.ThinkingBudget are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4066,15 +4084,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.ReasoningEffort",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::reasoning_effort"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::reasoning_effort",
+        "crates/adk-codec/src/dto.rs::ModelSettings::reasoning_effort"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.ReasoningEffort is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.ReasoningEffort are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4084,15 +4105,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.TextVerbosity",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::text_verbosity"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::text_verbosity",
+        "crates/adk-codec/src/dto.rs::ModelSettings::text_verbosity"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.TextVerbosity is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.TextVerbosity are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4102,15 +4126,18 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.StopSequences",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::stop_sequences"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::stop_sequences",
+        "crates/adk-codec/src/dto.rs::ModelSettings::stop_sequences"
       ],
       "rust_test_identifiers": [
         "request_snapshot_field_records_match_independent_pinned_go",
         "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go"
+        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Only the analysis-record representation of ModelSettings.StopSequences is closed. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly.",
+      "rationale": "The analysis-record and lossless compatibility representations of ModelSettings.StopSequences are covered. Thirty-four independent pinned request-record decoding/encoding cases and complete/float/raw-schema fixtures verify populated values, omission/default/null behavior, type rejection, exact resulting JSON and applicable pointer-zero, signed-width or opaque-JSON distinctions. Null stop-sequence/tool elements become Go zero values. This does not close ModelSettings.Merge, executable schema validation, provider wire application, callback behavior, or automatic request assembly. The source-bound mode-codec oracle additionally checks298 full settings decode cases and534 actual Go merges, with exact nullable binary64 bits, nil/empty slice state and bytes. This adds the lossless field representation without claiming provider application.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -4120,13 +4147,16 @@
       "source": "internal/agent/model_settings.go",
       "source_name": "ModelSettings.Merge",
       "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge"
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge",
+        "crates/adk-codec/src/dto.rs::ModelSettings::merge"
       ],
       "rust_test_identifiers": [
-        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs"
+        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs",
+        "settings_merge_preserves_pinned_go_state_and_bytes",
+        "settings_merge_copies_override_stops_and_retains_empty_base_allocation"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Thirty-six independently executed pinned Merge calls compare exact resulting settings bytes across empty, populated and negative/zero bases and twelve override sets. Present optionals override even with zero/false; integers override only when positive; strings/lists only when nonempty, without whitespace normalization. Inputs remain unchanged. Native results own their data rather than reproducing Go pointer/slice aliasing, as documented in facade research; this is the value-composition helper, not builder precedence or provider validation. The executed trace-writer regression is an integration anchor; direct Merge evidence is in merged_settings_cases.",
+      "rationale": "Thirty-six independently executed pinned Merge calls compare exact resulting settings bytes across empty, populated and negative/zero bases and twelve override sets. Present optionals override even with zero/false; integers override only when positive; strings/lists only when nonempty, without whitespace normalization. Inputs remain unchanged. Native results own their data rather than reproducing Go pointer/slice aliasing, as documented in facade research; this is the value-composition helper, not builder precedence or provider validation. The executed trace-writer regression is an integration anchor; direct Merge evidence is in merged_settings_cases. The lossless DTO additionally executes534 actual Go Merge comparisons over178 accepted settings inputs and three bases, checking all fields including binary64 bits and nil/allocated-empty stop state before exact byte comparison. It preserves base empty allocation and copies nonempty override stops. This follows the same documented owned-result policy.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -19066,6 +19096,125 @@
       ],
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
       "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2EAEB42136C69657": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelRetryAdvice.ShouldRetry",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice::should_retry",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the compatibility retry-advice data declaration ModelRetryAdvice.ShouldRetry. The immutable SDK oracle directly decodes/encodes89 input cases (45 accepted,44 rejected), checking all three fields, explicit zero-field output and exact RetryAfterMS spelling, signed64-bit bounds/spelling, null scalar no-ops, repeated/casefold fields, Unicode repair/escaping, rejection and ignored-depth bounds. The original trace test is a source anchor only; actual retry-data evidence comes from the source-bound mode-codec oracle. Native Duration conversion, Model.GetRetryAdvice callbacks, provider advice and runtime retry decisions remain separate contracts. No general Serde in-place parity, identical error wording or partial error mutation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-39938CB3E2CC378A": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelRetryAdvice.Reason",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice::reason",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the compatibility retry-advice data declaration ModelRetryAdvice.Reason. The immutable SDK oracle directly decodes/encodes89 input cases (45 accepted,44 rejected), checking all three fields, explicit zero-field output and exact RetryAfterMS spelling, signed64-bit bounds/spelling, null scalar no-ops, repeated/casefold fields, Unicode repair/escaping, rejection and ignored-depth bounds. The original trace test is a source anchor only; actual retry-data evidence comes from the source-bound mode-codec oracle. Native Duration conversion, Model.GetRetryAdvice callbacks, provider advice and runtime retry decisions remain separate contracts. No general Serde in-place parity, identical error wording or partial error mutation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-94C9AE28452DA5DB": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelRetryAdvice",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the compatibility retry-advice data declaration ModelRetryAdvice. The immutable SDK oracle directly decodes/encodes89 input cases (45 accepted,44 rejected), checking all three fields, explicit zero-field output and exact RetryAfterMS spelling, signed64-bit bounds/spelling, null scalar no-ops, repeated/casefold fields, Unicode repair/escaping, rejection and ignored-depth bounds. The original trace test is a source anchor only; actual retry-data evidence comes from the source-bound mode-codec oracle. Native Duration conversion, Model.GetRetryAdvice callbacks, provider advice and runtime retry decisions remain separate contracts. No general Serde in-place parity, identical error wording or partial error mutation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A2C7AA30BD8A5E90": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModelRetryAdvice",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the compatibility retry-advice data declaration ModelRetryAdvice. The immutable SDK oracle directly decodes/encodes89 input cases (45 accepted,44 rejected), checking all three fields, explicit zero-field output and exact RetryAfterMS spelling, signed64-bit bounds/spelling, null scalar no-ops, repeated/casefold fields, Unicode repair/escaping, rejection and ignored-depth bounds. The original trace test is a source anchor only; actual retry-data evidence comes from the source-bound mode-codec oracle. Native Duration conversion, Model.GetRetryAdvice callbacks, provider advice and runtime retry decisions remain separate contracts. No general Serde in-place parity, identical error wording or partial error mutation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FD62448AA21A5FFD": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelRetryAdvice.RetryAfterMS",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice::retry_after_ms",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the compatibility retry-advice data declaration ModelRetryAdvice.RetryAfterMS. The immutable SDK oracle directly decodes/encodes89 input cases (45 accepted,44 rejected), checking all three fields, explicit zero-field output and exact RetryAfterMS spelling, signed64-bit bounds/spelling, null scalar no-ops, repeated/casefold fields, Unicode repair/escaping, rejection and ignored-depth bounds. The original trace test is a source anchor only; actual retry-data evidence comes from the source-bound mode-codec oracle. Native Duration conversion, Model.GetRetryAdvice callbacks, provider advice and runtime retry decisions remain separate contracts. No general Serde in-place parity, identical error wording or partial error mutation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3541E186F1507AA2": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelSettings",
+        "crates/adk-codec/src/dto.rs::ModelSettings::merge",
+        "crates/adk-codec/src/dto.rs::ModelRetryAdvice",
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "settings_merge_preserves_pinned_go_state_and_bytes",
+        "settings_merge_copies_override_stops_and_retains_empty_base_allocation",
+        "settings_reject_nonfinite_encoding",
+        "retry_advice_preserves_signed_delay_and_go_field_spelling",
+        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Reviewed the complete55-line source: two data structs with12 fields and one value-composition Merge method; no imports, initialization, build constraints, host resources or callback implementation. All15 API declarations in this file have explicit mappings. Source-hash-bound actual Go evidence covers298 ModelSettings and89 retry-advice inputs, six nonfinite encoding failures and534 lossless merges, plus the existing36 analysis-record merges. Successful data states and bytes match, including binary64 bits and nil/empty slices. Owned Rust merge results intentionally do not recreate Go pointer/slice aliasing, following docs/research/facade.md. This closes the complete data/merge file, not the containing agent package, model callbacks, provider validation, native Duration conversion or runtime retry policy. Ordinary Serde in-place mutation, partial mutation on errors and arbitrary invalid-UTF8 in-memory Go strings are not byte-codec contracts.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"

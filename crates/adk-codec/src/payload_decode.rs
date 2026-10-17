@@ -118,6 +118,7 @@ macro_rules! target {
     )*};
 }
 target!(
+    ModelRetryAdvice,
     ModeRoutingResolution,
     ModelSettings,
     ModeReasoningLevel,
@@ -178,6 +179,11 @@ impl sealed::Sealed for ToolApprovalData {
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
+go_object!(ModelRetryAdvice,
+    "shouldretry" => should_retry: scalar,
+    "retryafterms" => retry_after_ms: integer,
+    "reason" => reason: scalar
+);
 go_object!(ModeRoutingResolution,
     "model" => model: scalar,
     "reasoninglevel" => reasoning_level: scalar,

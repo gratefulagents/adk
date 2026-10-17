@@ -21,6 +21,7 @@ func TestNativeModeCodecReference(t *testing.T) {
 		typeOf reflect.Type
 	}{
 		{"ModelSettings", reflect.TypeOf(ModelSettings{})},
+		{"RetryAdvice", reflect.TypeOf(ModelRetryAdvice{})},
 		{"RoutingResolution", reflect.TypeOf(ModeRoutingResolution{})},
 		{"ReasoningLevel", reflect.TypeOf(ModeReasoningLevel(""))},
 		{"TextVerbosity", reflect.TypeOf(ModeTextVerbosity(""))},
@@ -97,7 +98,7 @@ func TestNativeModeCodecReference(t *testing.T) {
 			case reflect.Bool:
 				initial = "true"
 				values = []string{"null", "true", "false", "0", `"true"`, "[]", "{}"}
-			case reflect.Int:
+			case reflect.Int, reflect.Int64:
 				initial = "7"
 				values = []string{"null", "0", "-0", "-1", "9223372036854775807", "-9223372036854775808", "9223372036854775808", "-9223372036854775809", "1.0", "1e0", "01", "+1", `"3"`, "false", "[]", "{}"}
 			case reflect.Slice:
@@ -170,6 +171,36 @@ func TestNativeModeCodecReference(t *testing.T) {
 			add("pointer-casefold", `{"Conſtraints":{"MaxTurns":9},"CONSTRAINTS":{"MaxRetries":2},"ModelRouting":{"FallbacKModels":["raw"]}}`)
 		}
 	}
+	merges := []any{}
+	for _, baseJSON := range []string{
+		`{}`,
+		`{"temperature":0.75,"max_tokens":1000,"top_p":0.9,"tool_choice":"auto","parallel_tool_calls":true,"thinking_budget":500,"reasoning_effort":"high","text_verbosity":"low","stop_sequences":["base<>&"]}`,
+		`{"temperature":-0,"max_tokens":-10,"top_p":-0,"parallel_tool_calls":false,"thinking_budget":-2,"stop_sequences":[]}`,
+	} {
+		for _, prior := range cases {
+			row := prior.(map[string]any)
+			if row["type"] != "ModelSettings" || row["decode_ok"] != true {
+				continue
+			}
+			input, err := hex.DecodeString(row["input_hex"].(string))
+			if err != nil {
+				t.Fatal(err)
+			}
+			var base, override ModelSettings
+			if err := json.Unmarshal([]byte(baseJSON), &base); err != nil {
+				t.Fatal(err)
+			}
+			if err := json.Unmarshal(input, &override); err != nil {
+				t.Fatal(err)
+			}
+			merged := base.Merge(override)
+			encoded, err := json.Marshal(merged)
+			if err != nil {
+				t.Fatal(err)
+			}
+			merges = append(merges, map[string]any{"id": row["id"], "base": baseJSON, "override_hex": row["input_hex"], "state": nativeSettingsState(reflect.ValueOf(merged)), "marshal_hex": hex.EncodeToString(encoded)})
+		}
+	}
 	nonfinite := []any{}
 	for _, field := range []string{"Temperature", "TopP"} {
 		for _, value := range []float64{math.NaN(), math.Inf(1), math.Inf(-1)} {
@@ -179,7 +210,7 @@ func TestNativeModeCodecReference(t *testing.T) {
 			nonfinite = append(nonfinite, map[string]any{"field": field, "bits": fmt.Sprintf("%016x", math.Float64bits(value)), "marshal_ok": err == nil})
 		}
 	}
-	output, err := json.Marshal(map[string]any{"nonfinite": nonfinite, "schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases, "constants": map[string]any{
+	output, err := json.Marshal(map[string]any{"settings_merges": merges, "nonfinite": nonfinite, "schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases, "constants": map[string]any{
 		"ReasoningNone": ReasoningNone, "ReasoningMinimal": ReasoningMinimal, "ReasoningLow": ReasoningLow,
 		"ReasoningMedium": ReasoningMedium, "ReasoningHigh": ReasoningHigh, "ReasoningXHigh": ReasoningXHigh, "ReasoningMax": ReasoningMax,
 		"TextVerbosityLow": TextVerbosityLow, "TextVerbosityMedium": TextVerbosityMedium, "TextVerbosityHigh": TextVerbosityHigh,

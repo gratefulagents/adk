@@ -2,6 +2,33 @@
 
 ## Current continuation evidence
 
+### Settings merge and signed retry-advice data
+
+The lossless settings DTO now supports the original nonzero/non-nil merge value
+contract without passing through the analysis snapshot projection. Optional zero
+values override; integer limits override only when positive; strings and stop
+lists override only when nonempty. Base nil/allocated-empty state is retained,
+and results own their data under the existing Rust migration decision.
+
+Added `dto::ModelRetryAdvice` with signed 64-bit delay and exact `RetryAfterMS`
+wire spelling. This does not change native Duration conversion or runtime retry
+policy. The actual Go oracle adds **89 advice inputs (45 accepted, 44 rejected)**
+and **534 Merge calls**, comparing complete binary64/nil state and exact bytes.
+The combined data corpus has **1,901 inputs (1,120 accepted, 781 rejected)** plus
+six nonfinite encoding cases. Thirteen mode/settings tests and five routing
+regressions pass.
+
+Reviewed all 55 lines of `internal/agent/model_settings.go`: two structs, twelve
+fields and one merge method, with no runtime/callback implementation. Five new
+retry declarations/aliases and the complete data/merge file have bounded claims;
+existing settings-field and merge claims now include lossless state evidence.
+
+Fresh Rust 1.88 Linux: **1,746 workspace tests +10 doctests passed; 0 failed,
+30 ignored**. Strict all-feature lint/typecheck/rustdoc, formatting, facade matrix,
+external consumer/purity, independently reproduced bound references, 55 validators,
+artifact/overlay/audit and source locks pass. Ledger: **1,055 verified /7,836
+unresolved /251 excluded**. Full retained acceptance remains incomplete.
+
 ### Go hyphen/range parsing in guardrail classes
 
 Removed the blanket rejection of consecutive hyphens. The shared host/public

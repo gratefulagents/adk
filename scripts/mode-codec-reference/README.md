@@ -9,12 +9,14 @@ The runner tests an immutable SDK archive at
 Actual `encoding/json.Unmarshal` and `json.Marshal` observations cover mode
 `TemplateSpec`, `Constraints`, `ModelRouting`, `RoleModelRouting`, and the
 runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, `ModelSettings`,
-`ModeRoutingResolution`, plus the open
+`ModeRoutingResolution`, `ModelRetryAdvice`, plus the open
 `ModeReasoningLevel` and `ModeTextVerbosity` string types and ten constants. Provenance
 records archive, source and harness hashes, Go version, OS and architecture.
 The fixture records reflected field names/types/tags or scalar kinds and
-1,812 cases: 1,075 accepted and 737 rejected (993 mode structured-data cases,
-68 named-string cases, 298 ModelSettings cases and 453 routing-result cases).
+1,901 cases: 1,120 accepted and 781 rejected (993 mode structured-data cases,
+68 named-string cases, 298 ModelSettings cases, 453 routing-result cases and
+89 retry-advice cases). An additional 534 actual Go Merge calls combine each
+accepted settings input with three bases, comparing explicit state and exact bytes.
 Nested value objects retain backing slots across repeated fields, and null is
 a no-op rather than the reset used for pointer objects. Six additional native
 nonfinite-pointer encoding cases all reject. Settings compare explicit nil/empty
@@ -32,7 +34,7 @@ reset, Unicode key folding, invalid UTF-8 and surrogates, escaping, malformed
 JSON and ignored values at the Go depth boundary.
 
 Rust compatibility-only targets are
-`adk_codec::dto::{ModelSettings, ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
+`adk_codec::dto::{ModelSettings, ModelRetryAdvice, ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
 and `adk_codec::mode::ModeRoutingResolution`, through sealed `from_go_json` and
 `to_go_json_bytes`. Ordinary Serde is not a
 Go byte-decoding entrypoint. Named labels use open
@@ -40,5 +42,8 @@ Go byte-decoding entrypoint. Named labels use open
 constants; unknown strings remain valid and the empty default is not explicit
 `NONE`. This does not establish native builder settings,
 model binding, runtime constraint enforcement, or full mode-conversion parity.
-The settings DTO is distinct from the analysis-oriented snapshots type and does
-not replace native runtime settings or claim provider application or Merge semantics.
+The settings DTO is distinct from the analysis-oriented snapshots type. Its merge
+method preserves the Go value contract and nil/empty state with an owned Rust
+result, not Go pointer/slice aliases. Native runtime settings and provider
+application remain separate. Signed retry-advice delay bytes are preserved without
+converting them to native Duration or applying runtime retry policy.

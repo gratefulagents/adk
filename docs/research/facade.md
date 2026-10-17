@@ -334,6 +334,12 @@ safe standalone composition without improving the value contract. Provider range
 validation remains separate from merging. The executable settings/routing example
 passes the resulting map through actual builder mode and role routing.
 
+The lossless `codec::dto::ModelSettings` also exposes this owned composition:
+534 additional actual-Go merges compare binary64 bits and nil/allocated-empty
+stop sequences as well as exact bytes. The analysis snapshot type remains
+separate. `codec::dto::ModelRetryAdvice` preserves signed millisecond data without
+changing the native retry-advice Duration or the runner's retry policy.
+
 ## Builder structured output
 
 Forward the existing native `AgentConfig` schema/name/strict/parser fields through

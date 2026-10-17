@@ -1,6 +1,9 @@
 use adk_codec::{
     GoJsonDecode, GoJsonEncode,
-    dto::{ModeConstraints, ModeRoleRouting, ModeRouting, ModeTemplateSpec},
+    dto::{
+        ModeConstraints, ModeReasoningLevel, ModeRoleRouting, ModeRouting, ModeTemplateSpec,
+        ModeTextVerbosity,
+    },
     from_go_json, to_go_json_bytes,
 };
 use serde::Serialize;
@@ -56,9 +59,11 @@ fn pinned_mode_codec_oracle() {
         assert_eq!(format!("{digest:x}"), expected.as_str().unwrap(), "{path}");
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 993);
+    assert_eq!(cases.len(), 1061);
     for case in cases {
         match case["type"].as_str().unwrap() {
+            "ReasoningLevel" => compare::<ModeReasoningLevel>(case),
+            "TextVerbosity" => compare::<ModeTextVerbosity>(case),
             "TemplateSpec" => compare::<ModeTemplateSpec>(case),
             "Constraints" => compare::<ModeConstraints>(case),
             "TemplateRouting" | "RunnerRouting" => compare::<ModeRouting>(case),
@@ -172,4 +177,50 @@ fn mode_routing_conversion_preserves_go_bytes_and_owns_the_result() {
         }
         assert_eq!(serde_json::to_value(&output).unwrap(), case["output"]);
     }
+}
+
+#[test]
+fn named_mode_labels_preserve_constants_unknown_values_and_string_identity() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mode-codec/observations.json"
+    ))
+    .unwrap();
+    let constants = fixture["constants"].as_object().unwrap();
+    assert_eq!(constants.len(), 10);
+    for (name, value) in [
+        ("ReasoningNone", ModeReasoningLevel::NONE),
+        ("ReasoningMinimal", ModeReasoningLevel::MINIMAL),
+        ("ReasoningLow", ModeReasoningLevel::LOW),
+        ("ReasoningMedium", ModeReasoningLevel::MEDIUM),
+        ("ReasoningHigh", ModeReasoningLevel::HIGH),
+        ("ReasoningXHigh", ModeReasoningLevel::XHIGH),
+        ("ReasoningMax", ModeReasoningLevel::MAX),
+    ] {
+        assert_eq!(value.to_string(), constants[name].as_str().unwrap());
+        let decoded: ModeReasoningLevel = from_go_json(&to_go_json_bytes(&value).unwrap()).unwrap();
+        assert_eq!(decoded, value);
+        assert!(std::collections::HashSet::from([value]).contains(&decoded));
+    }
+    for (name, value) in [
+        ("TextVerbosityLow", ModeTextVerbosity::LOW),
+        ("TextVerbosityMedium", ModeTextVerbosity::MEDIUM),
+        ("TextVerbosityHigh", ModeTextVerbosity::HIGH),
+    ] {
+        assert_eq!(value.to_string(), constants[name].as_str().unwrap());
+        let decoded: ModeTextVerbosity = from_go_json(&to_go_json_bytes(&value).unwrap()).unwrap();
+        assert_eq!(decoded, value);
+        assert!(std::collections::HashSet::from([value]).contains(&decoded));
+    }
+    let unknown: ModeReasoningLevel = from_go_json(br#"" HIGH ""#).unwrap();
+    assert_eq!(&*unknown, " HIGH ");
+    assert_ne!(unknown, ModeReasoningLevel::HIGH);
+    assert_eq!(
+        from_go_json::<ModeReasoningLevel>(b"null").unwrap(),
+        ModeReasoningLevel::default()
+    );
+    assert_eq!(
+        from_go_json::<ModeTextVerbosity>(b"null").unwrap(),
+        ModeTextVerbosity::default()
+    );
+    assert_ne!(ModeReasoningLevel::NONE, ModeReasoningLevel::default());
 }

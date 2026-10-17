@@ -18146,6 +18146,510 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-97417792BF293C36": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ModeReasoningLevel. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-D754DEC3E75F79C1": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeTextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ModeTextVerbosity. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-4ED98EC02DACE8B5": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::HIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-CF3E6A2596454415": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningLow",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::LOW",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningLow. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-4A7187CD997818B1": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningMax",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MAX",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMax. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-8F8BE8678DE029E2": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningMedium",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MEDIUM",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMedium. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-B7BDE3AF1361699E": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningMinimal",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MINIMAL",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMinimal. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-60CCAF7D9417F165": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningNone",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::NONE",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningNone. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-36A08248558814BC": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ReasoningXHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::XHIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningXHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-50B0030824CF44B9": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "TextVerbosityHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::HIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-7AD06742F4593EB6": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "TextVerbosityLow",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::LOW",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityLow. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-BA329DA60CD5463B": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "TextVerbosityMedium",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::MEDIUM",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityMedium. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-AEA7D36903523D8B": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ModeReasoningLevel. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-F5A0A0451556E2FD": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeTextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ModeTextVerbosity. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-2D535E53AFBF8FA6": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::HIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-8B7B8632D7127EBE": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningLow",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::LOW",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningLow. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-BC0B02EBEF1BBED7": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningMax",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MAX",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMax. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-E988C44F1B1BE26C": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningMedium",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MEDIUM",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMedium. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-1C5ABA294750FEC2": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningMinimal",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::MINIMAL",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningMinimal. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-0A2E5991AE25CBDE": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningNone",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::NONE",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningNone. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-AD32D9BE19173EC9": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ReasoningXHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel::XHIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant ReasoningXHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-1987D027443E55DF": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "TextVerbosityHigh",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::HIGH",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityHigh. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-3C04A132B5779049": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "TextVerbosityLow",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::LOW",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityLow. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
+    },
+    "SDK-288541623914F2CD": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "TextVerbosityMedium",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity::MEDIUM",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Closes the open named-string type or typed constant TextVerbosityMedium. Rust transparent owned-or-static string wrappers retain arbitrary labels, whitespace, empty zero values, string display/comparison/hash identity and exact typed associated constants; they are not closed enums and do not normalize at construction. The immutable Go oracle adds68 scalar byte-input cases (44 accepted,24 rejected) and directly records all ten original constants, supplementing993 unchanged structured-data cases. Tests compare raw successful values and exact bytes including null-to-zero, Unicode repair and invalid scalar kinds, typed constant equality across owned/static storage, empty-default versus explicit none, and native settings interoperability through string borrowing. Sealed byte entrypoints, not arbitrary ordinary Serde byte decoding, define the Go codec boundary. Routing struct fields remain plain strings as in Go. No new provider/runtime/default enforcement or arbitrary invalid-UTF8 in-memory Go string representation is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime (settings interoperability regression)"
+      ]
     }
   }
 }

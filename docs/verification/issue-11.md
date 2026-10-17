@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Open reasoning/verbosity labels and typed constants
+
+Added compatibility `ModeReasoningLevel` and `ModeTextVerbosity` as open string
+wrappers with ten typed associated constants, not closed enums. Arbitrary labels
+remain unchanged; the empty default is distinct from explicit `NONE`. Static and
+owned strings share comparison/hash identity, display raw text and borrow as
+`str` for native settings helpers. Existing routing fields remain plain strings.
+
+The immutable Go oracle adds 68 scalar cases (44 accepted, 24 rejected) and all
+ten constant values. Current total: **1,061 codec cases, 622 accepted and 439
+rejected**, including the original 993 structured-data cases. Successful raw
+values and exact bytes, invalid kinds, null defaults, Unicode repair, constant
+identity and native interoperability all pass. This closes 24 exact type/constant
+records, not runtime enforcement or provider behavior.
+
+Fresh Rust 1.88 Linux: **1,739 workspace tests +10 doctests passed; 0 failed,
+30 ignored**. Strict lint/typecheck/rustdoc/format, full feature matrix and
+standalone consumer/purity, independent Go reproduction, bound evidence,
+55 validators, artifact/overlay/audit and source locks passed. Ledger:
+**1,028 verified /7,863 unresolved /251 excluded**; full acceptance is incomplete.
+
 ### Direct model-alias resolution
 
 Exposed `adk::codec::mode::resolve_model_for_provider`, sharing the pure resolver

@@ -45,3 +45,15 @@ fn original_mode_reasoning_settings_regression() {
         assert_eq!(settings["reasoning_effort"], level);
     }
 }
+
+#[test]
+fn named_mode_labels_flow_into_native_routing_settings() {
+    use adk_codec::dto::{ModeReasoningLevel, ModeTextVerbosity};
+    let settings = routing_settings(&ModeReasoningLevel::XHIGH, &ModeTextVerbosity::LOW);
+    assert_eq!(settings["thinking_budget"], 16384);
+    assert_eq!(settings["reasoning_effort"], "xhigh");
+    assert_eq!(settings["text_verbosity"], "low");
+    let unknown = ModeReasoningLevel(" not-a-tier ".into());
+    assert!(reasoning_settings(&unknown).is_empty());
+    assert_eq!(unknown.to_string(), " not-a-tier ");
+}

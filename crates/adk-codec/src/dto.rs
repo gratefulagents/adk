@@ -1,6 +1,57 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
+use std::borrow::Cow;
+
+#[derive(
+    Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(transparent)]
+pub struct ModeReasoningLevel(#[serde(deserialize_with = "null_default")] pub Cow<'static, str>);
+
+impl ModeReasoningLevel {
+    pub const NONE: Self = Self(Cow::Borrowed("none"));
+    pub const MINIMAL: Self = Self(Cow::Borrowed("minimal"));
+    pub const LOW: Self = Self(Cow::Borrowed("low"));
+    pub const MEDIUM: Self = Self(Cow::Borrowed("medium"));
+    pub const HIGH: Self = Self(Cow::Borrowed("high"));
+    pub const XHIGH: Self = Self(Cow::Borrowed("xhigh"));
+    pub const MAX: Self = Self(Cow::Borrowed("max"));
+}
+impl std::ops::Deref for ModeReasoningLevel {
+    type Target = str;
+    fn deref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+impl std::fmt::Display for ModeReasoningLevel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+#[derive(
+    Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(transparent)]
+pub struct ModeTextVerbosity(#[serde(deserialize_with = "null_default")] pub Cow<'static, str>);
+
+impl ModeTextVerbosity {
+    pub const LOW: Self = Self(Cow::Borrowed("low"));
+    pub const MEDIUM: Self = Self(Cow::Borrowed("medium"));
+    pub const HIGH: Self = Self(Cow::Borrowed("high"));
+}
+impl std::ops::Deref for ModeTextVerbosity {
+    type Target = str;
+    fn deref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+impl std::fmt::Display for ModeTextVerbosity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(rename_all = "PascalCase")]

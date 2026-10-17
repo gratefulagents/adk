@@ -2,6 +2,570 @@
   "cases": [
     {
       "decode_ok": true,
+      "decoded_fields": "",
+      "id": "ReasoningLevel/root-0",
+      "input_hex": "6e756c6c",
+      "marshal_hex": "2222",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-1",
+      "input_hex": "7b7d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal array into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-2",
+      "input_hex": "5b5d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal bool into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-3",
+      "input_hex": "74727565",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal number into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-4",
+      "input_hex": "3432",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "mode",
+      "id": "ReasoningLevel/root-5",
+      "input_hex": "226d6f646522",
+      "marshal_hex": "226d6f646522",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "unexpected end of JSON input",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-6",
+      "input_hex": "7b",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "invalid character 'n' after top-level value",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-7",
+      "input_hex": "7b7d206e756c6c",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "invalid character ',' looking for beginning of object key string",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-8",
+      "input_hex": "7b2c7d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-9",
+      "input_hex": "7b22756e6b6e6f776e223a5b6e756c6c2c747275652c7b7d2c5b5d5d7d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/root-10",
+      "input_hex": "7b224e616d65223a225c7564383030222c22756e6b6e6f776e223a225c7564666666227d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "",
+      "id": "ReasoningLevel/scalar-0",
+      "input_hex": "2222",
+      "marshal_hex": "2222",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "none",
+      "id": "ReasoningLevel/scalar-1",
+      "input_hex": "226e6f6e6522",
+      "marshal_hex": "226e6f6e6522",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "minimal",
+      "id": "ReasoningLevel/scalar-2",
+      "input_hex": "226d696e696d616c22",
+      "marshal_hex": "226d696e696d616c22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "low",
+      "id": "ReasoningLevel/scalar-3",
+      "input_hex": "226c6f7722",
+      "marshal_hex": "226c6f7722",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "medium",
+      "id": "ReasoningLevel/scalar-4",
+      "input_hex": "226d656469756d22",
+      "marshal_hex": "226d656469756d22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "high",
+      "id": "ReasoningLevel/scalar-5",
+      "input_hex": "226869676822",
+      "marshal_hex": "226869676822",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "xhigh",
+      "id": "ReasoningLevel/scalar-6",
+      "input_hex": "22786869676822",
+      "marshal_hex": "22786869676822",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "max",
+      "id": "ReasoningLevel/scalar-7",
+      "input_hex": "226d617822",
+      "marshal_hex": "226d617822",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": " HIGH ",
+      "id": "ReasoningLevel/scalar-8",
+      "input_hex": "2220484947482022",
+      "marshal_hex": "2220484947482022",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "UNKNOWN/\u732b",
+      "id": "ReasoningLevel/scalar-9",
+      "input_hex": "22554e4b4e4f574e2fe78cab22",
+      "marshal_hex": "22554e4b4e4f574e2fe78cab22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\u212a\u0130\u017f",
+      "id": "ReasoningLevel/scalar-10",
+      "input_hex": "22e284aac4b0c5bf22",
+      "marshal_hex": "22e284aac4b0c5bf22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "<>&\u2028\u2029",
+      "id": "ReasoningLevel/scalar-11",
+      "input_hex": "225c75303033635c75303033655c75303032365c75323032385c753230323922",
+      "marshal_hex": "225c75303033635c75303033655c75303032365c75323032385c753230323922",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\u0000\n\t",
+      "id": "ReasoningLevel/scalar-12",
+      "input_hex": "225c75303030305c6e5c7422",
+      "marshal_hex": "225c75303030305c6e5c7422",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "false",
+      "id": "ReasoningLevel/scalar-13",
+      "input_hex": "2266616c736522",
+      "marshal_hex": "2266616c736522",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "null",
+      "id": "ReasoningLevel/scalar-14",
+      "input_hex": "226e756c6c22",
+      "marshal_hex": "226e756c6c22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "42",
+      "id": "ReasoningLevel/scalar-15",
+      "input_hex": "22343222",
+      "marshal_hex": "22343222",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd",
+      "id": "ReasoningLevel/scalar-raw-0",
+      "input_hex": "225c756438303022",
+      "marshal_hex": "22efbfbd22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd",
+      "id": "ReasoningLevel/scalar-raw-1",
+      "input_hex": "225c756466666622",
+      "marshal_hex": "22efbfbd22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ud83d\ude00",
+      "id": "ReasoningLevel/scalar-raw-2",
+      "input_hex": "225c75643833645c756465303022",
+      "marshal_hex": "22f09f988022",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd\ufffd\ufffd",
+      "id": "ReasoningLevel/scalar-raw-3",
+      "input_hex": "22ffe28222",
+      "marshal_hex": "22efbfbdefbfbdefbfbd22",
+      "marshal_ok": true,
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "invalid character '\"' after top-level value",
+      "decode_ok": false,
+      "id": "ReasoningLevel/scalar-raw-4",
+      "input_hex": "2222202222",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal number into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/scalar-raw-5",
+      "input_hex": "312e30",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeReasoningLevel",
+      "decode_ok": false,
+      "id": "ReasoningLevel/scalar-raw-6",
+      "input_hex": "7b2276616c7565223a2268696768227d",
+      "type": "ReasoningLevel"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "",
+      "id": "TextVerbosity/root-0",
+      "input_hex": "6e756c6c",
+      "marshal_hex": "2222",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-1",
+      "input_hex": "7b7d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal array into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-2",
+      "input_hex": "5b5d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal bool into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-3",
+      "input_hex": "74727565",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal number into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-4",
+      "input_hex": "3432",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "mode",
+      "id": "TextVerbosity/root-5",
+      "input_hex": "226d6f646522",
+      "marshal_hex": "226d6f646522",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "unexpected end of JSON input",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-6",
+      "input_hex": "7b",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "invalid character 'n' after top-level value",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-7",
+      "input_hex": "7b7d206e756c6c",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "invalid character ',' looking for beginning of object key string",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-8",
+      "input_hex": "7b2c7d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-9",
+      "input_hex": "7b22756e6b6e6f776e223a5b6e756c6c2c747275652c7b7d2c5b5d5d7d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/root-10",
+      "input_hex": "7b224e616d65223a225c7564383030222c22756e6b6e6f776e223a225c7564666666227d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "",
+      "id": "TextVerbosity/scalar-0",
+      "input_hex": "2222",
+      "marshal_hex": "2222",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "none",
+      "id": "TextVerbosity/scalar-1",
+      "input_hex": "226e6f6e6522",
+      "marshal_hex": "226e6f6e6522",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "minimal",
+      "id": "TextVerbosity/scalar-2",
+      "input_hex": "226d696e696d616c22",
+      "marshal_hex": "226d696e696d616c22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "low",
+      "id": "TextVerbosity/scalar-3",
+      "input_hex": "226c6f7722",
+      "marshal_hex": "226c6f7722",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "medium",
+      "id": "TextVerbosity/scalar-4",
+      "input_hex": "226d656469756d22",
+      "marshal_hex": "226d656469756d22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "high",
+      "id": "TextVerbosity/scalar-5",
+      "input_hex": "226869676822",
+      "marshal_hex": "226869676822",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "xhigh",
+      "id": "TextVerbosity/scalar-6",
+      "input_hex": "22786869676822",
+      "marshal_hex": "22786869676822",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "max",
+      "id": "TextVerbosity/scalar-7",
+      "input_hex": "226d617822",
+      "marshal_hex": "226d617822",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": " HIGH ",
+      "id": "TextVerbosity/scalar-8",
+      "input_hex": "2220484947482022",
+      "marshal_hex": "2220484947482022",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "UNKNOWN/\u732b",
+      "id": "TextVerbosity/scalar-9",
+      "input_hex": "22554e4b4e4f574e2fe78cab22",
+      "marshal_hex": "22554e4b4e4f574e2fe78cab22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\u212a\u0130\u017f",
+      "id": "TextVerbosity/scalar-10",
+      "input_hex": "22e284aac4b0c5bf22",
+      "marshal_hex": "22e284aac4b0c5bf22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "<>&\u2028\u2029",
+      "id": "TextVerbosity/scalar-11",
+      "input_hex": "225c75303033635c75303033655c75303032365c75323032385c753230323922",
+      "marshal_hex": "225c75303033635c75303033655c75303032365c75323032385c753230323922",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\u0000\n\t",
+      "id": "TextVerbosity/scalar-12",
+      "input_hex": "225c75303030305c6e5c7422",
+      "marshal_hex": "225c75303030305c6e5c7422",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "false",
+      "id": "TextVerbosity/scalar-13",
+      "input_hex": "2266616c736522",
+      "marshal_hex": "2266616c736522",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "null",
+      "id": "TextVerbosity/scalar-14",
+      "input_hex": "226e756c6c22",
+      "marshal_hex": "226e756c6c22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "42",
+      "id": "TextVerbosity/scalar-15",
+      "input_hex": "22343222",
+      "marshal_hex": "22343222",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd",
+      "id": "TextVerbosity/scalar-raw-0",
+      "input_hex": "225c756438303022",
+      "marshal_hex": "22efbfbd22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd",
+      "id": "TextVerbosity/scalar-raw-1",
+      "input_hex": "225c756466666622",
+      "marshal_hex": "22efbfbd22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ud83d\ude00",
+      "id": "TextVerbosity/scalar-raw-2",
+      "input_hex": "225c75643833645c756465303022",
+      "marshal_hex": "22f09f988022",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
+      "decoded_fields": "\ufffd\ufffd\ufffd",
+      "id": "TextVerbosity/scalar-raw-3",
+      "input_hex": "22ffe28222",
+      "marshal_hex": "22efbfbdefbfbdefbfbd22",
+      "marshal_ok": true,
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "invalid character '\"' after top-level value",
+      "decode_ok": false,
+      "id": "TextVerbosity/scalar-raw-4",
+      "input_hex": "2222202222",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal number into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/scalar-raw-5",
+      "input_hex": "312e30",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_error": "json: cannot unmarshal object into Go value of type agent.ModeTextVerbosity",
+      "decode_ok": false,
+      "id": "TextVerbosity/scalar-raw-6",
+      "input_hex": "7b2276616c7565223a2268696768227d",
+      "type": "TextVerbosity"
+    },
+    {
+      "decode_ok": true,
       "decoded_fields": {
         "Autonomous": false,
         "Category": "",
@@ -13227,6 +13791,18 @@
       "type": "RunnerRoleRouting"
     }
   ],
+  "constants": {
+    "ReasoningHigh": "high",
+    "ReasoningLow": "low",
+    "ReasoningMax": "max",
+    "ReasoningMedium": "medium",
+    "ReasoningMinimal": "minimal",
+    "ReasoningNone": "none",
+    "ReasoningXHigh": "xhigh",
+    "TextVerbosityHigh": "high",
+    "TextVerbosityLow": "low",
+    "TextVerbosityMedium": "medium"
+  },
   "int_size": 64,
   "provenance": {
     "archiveSHA256": "02efd0112edea295795df8d2435f10d2f7dcbf639defcc386e5cc68fe3194741",
@@ -13235,7 +13811,7 @@
     "goOS": "linux",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/mode-codec-reference/reference_test.go": "35266c9b649d6c85038217374e7143e3bb3604f7291f39616b9c4170d764fc8d",
+      "scripts/mode-codec-reference/reference_test.go": "6256ce9746ee1c94d73ed4ab13a63f7488fb3bdfb4386d18e4755c2f047cd5a8",
       "scripts/mode-codec-reference/run.py": "97d2ac294c509651e183c5d414e53d768ce903e23f91aedc7ec9d26ec889289d"
     },
     "license": "GPL-3.0-only",
@@ -13277,6 +13853,10 @@
         "type": "int"
       }
     ],
+    "ReasoningLevel": {
+      "kind": "string",
+      "type": "agent.ModeReasoningLevel"
+    },
     "RunnerRoleRouting": [
       {
         "json_tag": "",
@@ -13426,6 +14006,10 @@
         "name": "Constraints",
         "type": "*mode.Constraints"
       }
-    ]
+    ],
+    "TextVerbosity": {
+      "kind": "string",
+      "type": "agent.ModeTextVerbosity"
+    }
   }
 }

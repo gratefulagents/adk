@@ -8,10 +8,12 @@ The runner tests an immutable SDK archive at
 
 Actual `encoding/json.Unmarshal` and `json.Marshal` observations cover mode
 `TemplateSpec`, `Constraints`, `ModelRouting`, `RoleModelRouting`, and the
-runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases. Provenance
+runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, plus the open
+`ModeReasoningLevel` and `ModeTextVerbosity` string types and ten constants. Provenance
 records archive, source and harness hashes, Go version, OS and architecture.
-The fixture records reflected field names/types/tags and 993 cases: 578
-accepted and 415 rejected. Accepted cases compare unnormalized decoded state
+The fixture records reflected field names/types/tags or scalar kinds and
+1,061 cases: 622 accepted and 439 rejected (993 structured-data cases plus
+68 named-string cases). Accepted cases compare unnormalized decoded state
 and exact output bytes. Rejected cases compare rejection, not partial mutation
 state or error wording. Integer expectations are the pinned 64-bit Go target.
 
@@ -25,5 +27,8 @@ JSON and ignored values at the Go depth boundary.
 Rust compatibility-only targets are
 `adk_codec::dto::{ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
 through sealed `from_go_json` and `to_go_json_bytes`. Ordinary Serde is not a
-Go byte-decoding entrypoint. This does not establish native builder settings,
+Go byte-decoding entrypoint. Named labels use open
+`dto::{ModeReasoningLevel, ModeTextVerbosity}` wrappers with typed associated
+constants; unknown strings remain valid and the empty default is not explicit
+`NONE`. This does not establish native builder settings,
 model binding, runtime constraint enforcement, or full mode-conversion parity.

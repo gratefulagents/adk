@@ -19,6 +19,8 @@ func TestNativeModeCodecReference(t *testing.T) {
 		name   string
 		typeOf reflect.Type
 	}{
+		{"ReasoningLevel", reflect.TypeOf(ModeReasoningLevel(""))},
+		{"TextVerbosity", reflect.TypeOf(ModeTextVerbosity(""))},
 		{"TemplateSpec", reflect.TypeOf(sdkmode.TemplateSpec{})},
 		{"Constraints", reflect.TypeOf(sdkmode.Constraints{})},
 		{"TemplateRouting", reflect.TypeOf(sdkmode.ModelRouting{})},
@@ -49,6 +51,21 @@ func TestNativeModeCodecReference(t *testing.T) {
 		}
 		for index, root := range []string{"null", "{}", "[]", "true", "42", `"mode"`, "{", "{} null", "{,}", `{"unknown":[null,true,{},[]]}`, `{"Name":"\ud800","unknown":"\udfff"}`} {
 			add(fmt.Sprintf("root-%d", index), root)
+		}
+		if target.typeOf.Kind() == reflect.String {
+			values := []string{"", "none", "minimal", "low", "medium", "high", "xhigh", "max", " HIGH ", "UNKNOWN/猫", "Kİſ", "<>&\u2028\u2029", "\x00\n\t", "false", "null", "42"}
+			for index, value := range values {
+				encoded, err := json.Marshal(value)
+				if err != nil {
+					t.Fatal(err)
+				}
+				add(fmt.Sprintf("scalar-%d", index), string(encoded))
+			}
+			for index, value := range []string{`"\ud800"`, `"\udfff"`, `"\ud83d\ude00"`, "\"\xff\xe2\x82\"", `"" ""`, "1.0", `{"value":"high"}`} {
+				add(fmt.Sprintf("scalar-raw-%d", index), value)
+			}
+			metadata[target.name] = map[string]string{"kind": target.typeOf.Kind().String(), "type": target.typeOf.String()}
+			continue
 		}
 		fields := []any{}
 		for index := 0; index < target.typeOf.NumField(); index++ {
@@ -110,7 +127,11 @@ func TestNativeModeCodecReference(t *testing.T) {
 			add("pointer-casefold", `{"Conſtraints":{"MaxTurns":9},"CONSTRAINTS":{"MaxRetries":2},"ModelRouting":{"FallbacKModels":["raw"]}}`)
 		}
 	}
-	output, err := json.Marshal(map[string]any{"schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases})
+	output, err := json.Marshal(map[string]any{"schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases, "constants": map[string]any{
+		"ReasoningNone": ReasoningNone, "ReasoningMinimal": ReasoningMinimal, "ReasoningLow": ReasoningLow,
+		"ReasoningMedium": ReasoningMedium, "ReasoningHigh": ReasoningHigh, "ReasoningXHigh": ReasoningXHigh, "ReasoningMax": ReasoningMax,
+		"TextVerbosityLow": TextVerbosityLow, "TextVerbosityMedium": TextVerbosityMedium, "TextVerbosityHigh": TextVerbosityHigh,
+	}})
 	if err != nil {
 		t.Fatal(err)
 	}

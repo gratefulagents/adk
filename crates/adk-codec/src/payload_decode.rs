@@ -117,6 +117,8 @@ macro_rules! target {
     )*};
 }
 target!(
+    ModeReasoningLevel,
+    ModeTextVerbosity,
     ModeRoleRouting,
     ModeRouting,
     ModeConstraints,

@@ -352,6 +352,13 @@ pure alias lookup directly: unknown providers retain trimmed model names;
 empty provider means OpenAI, while only Anthropic supplies an empty-model
 default. Provider request clamping and execution policy remain separate.
 
+The compatibility `dto::{ModeReasoningLevel, ModeTextVerbosity}` types are open
+string wrappers, not closed enums. Typed constants such as
+`ModeReasoningLevel::XHIGH` and `ModeTextVerbosity::LOW` borrow as `str` for the
+native settings helpers. Unknown labels retain their original text; the default
+is empty, not explicit `NONE`. The current codec oracle contains 1,061 cases:
+993 structured-data cases plus 68 named-string cases and ten constant values.
+
 ### Compatibility role/catalog DTOs
 
 `adk_codec::dto::{RoleSpec, RoleCatalog}` are compatibility-only data shapes,

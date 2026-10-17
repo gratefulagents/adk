@@ -217,8 +217,10 @@ builtin constructors as well as existing execution-layer protection.
 ## Final available turn
 
 `Features::force_final_summary_turn` opts the builder into a no-tool summary on
-the last available model attempt. Direct runner consumers use
-`RunnerConfig::force_final_summary_turn`. Both default off; builder selection is
+the last available model attempt. With `Config::features = None`, the legacy
+`Config::force_final_summary_turn` selects this behavior instead; an explicit
+feature selection overrides that legacy flag. Direct runner consumers use
+`RunnerConfig::force_final_summary_turn`. All default off; builder selection is
 authoritative over the supplied runner configuration. The request receives the
 pinned SDK `<final_turn>` directive without adding it to persisted conversation
 history. Tool and handoff descriptors are removed, declared timeout sidecars stay

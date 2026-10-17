@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Legacy final-summary selection
+
+Added the missing legacy `Config::force_final_summary_turn` input, defaulting off,
+matching the pinned Go `Config.ForceFinalSummary` projection in `legacyFeatures`.
+Explicit `Features` remain authoritative. The existing end-to-end builder test
+now checks legacy off/on and explicit opposite-value overrides, including actual
+model request tools and the final-turn directive, against a conflicting direct
+runner configuration.
+
+Fresh Rust 1.88 Linux: **1,749 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Strict all-feature Clippy/typecheck/rustdoc, formatting, full facade feature matrix,
+standalone consumer/purity, independently reproduced bound references, all 55
+validators, artifacts/overlay/audit and source locks passed. The first formatting
+check requested standard line wrapping; formatting was applied before the passing
+checks. No new whole-feature or ledger claims: **1,061 verified /7,830 unresolved
+/251 excluded**. Full acceptance remains incomplete.
+
 ### Complete MCP prompt helper review
 
 Reviewed the complete 63-line MCP prompt helper and mapped its original test

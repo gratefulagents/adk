@@ -154,6 +154,7 @@ pub struct Config {
     pub handoff_history: Option<adk_runtime::compaction::HandoffHistoryPolicy>,
     pub enable_retry: bool,
     pub enable_approval: bool,
+    pub force_final_summary_turn: bool,
     pub enable_guardrails: bool,
     pub enable_mcp: bool,
     pub enable_project_state: bool,
@@ -198,6 +199,7 @@ impl Default for Config {
             handoff_history: None,
             enable_retry: false,
             enable_approval: false,
+            force_final_summary_turn: false,
             enable_guardrails: false,
             enable_mcp: false,
             enable_project_state: false,
@@ -217,6 +219,7 @@ impl Config {
             handoff_history: self.enable_compaction,
             retry: self.enable_retry,
             approval: self.enable_approval,
+            force_final_summary_turn: self.force_final_summary_turn,
             builtin_guardrails: self.enable_guardrails,
             project_state: ProjectStateFeatures {
                 prime_context: self.enable_project_state || self.legacy_tools.enable_project_state,

@@ -204,16 +204,29 @@ impl Tool for Probe {
 
 #[tokio::test]
 async fn builder_final_summary_selection_controls_the_last_request() {
-    for enabled in [false, true] {
+    for (explicit, legacy, enabled) in [
+        (None, false, false),
+        (None, true, true),
+        (Some(false), true, false),
+        (Some(true), false, true),
+    ] {
         let model = Script::new(vec![response(vec![message("summary")])]);
         let mut c = config();
         c.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
-        c.features.as_mut().unwrap().force_final_summary_turn = enabled;
-        c.features
-            .as_mut()
-            .unwrap()
-            .tools
-            .insert("ExtraTools".into());
+        c.force_final_summary_turn = legacy;
+        c.legacy_tools.enable_tools = true;
+        c.legacy_tools.disable_default_tools = true;
+        if let Some(explicit) = explicit {
+            c.features.as_mut().unwrap().force_final_summary_turn = explicit;
+            c.features
+                .as_mut()
+                .unwrap()
+                .tools
+                .insert("ExtraTools".into());
+        } else {
+            c.features = None;
+        }
+        assert_eq!(c.resolved_features().force_final_summary_turn, enabled);
         let mut bundle = builder(c, &model)
             .runner_config(RunnerConfig {
                 force_final_summary_turn: !enabled,

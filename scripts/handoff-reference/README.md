@@ -1,5 +1,21 @@
 # Independent pinned Go handoff oracles
 
+## Prompt-cache request observations
+
+The `prompt-cache` command produces `fixtures/handoff/sdk-prompt-cache.json`:
+216 cases and 432 actual model requests across normal/stream execution, two
+caller-owned trace IDs, explicit/default/whitespace namespaces and logical keys,
+embedded NULs, and long Unicode labels. Each case invokes the original runner
+twice with the same supplied trace. The fixture records model request keys;
+it does not reimplement hashing or trimming. `check.py` reproduces it twice.
+The native comparator maps supplied Go Trace.ID to caller-owned Context.run_id;
+implicit creation/identity of Go trace objects is not emulated.
+
+```sh
+(cd scripts/handoff-reference && go run -mod=readonly . prompt-cache) \
+  > fixtures/handoff/sdk-prompt-cache.json
+```
+
 ## Unicode property compiler observations
 
 The builtin-guardrail fixture includes 568 actual SDK Unicode-name compilation

@@ -1234,6 +1234,68 @@ impl RunHooks for Observations {
     }
 }
 #[tokio::test]
+async fn prompt_cache_defaults_and_normalization_match_pinned_go_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-prompt-cache.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 216);
+    for case in fixture["cases"].as_array().unwrap() {
+        let model = TestModel::with(vec![Ok(answer("done")), Ok(answer("done"))]);
+        *model.streams.lock().unwrap() = (0..2)
+            .map(|_| {
+                vec![StreamStep::Event(ModelEvent::Complete {
+                    response: answer("done"),
+                })]
+            })
+            .collect();
+        let mut a = agent(model.clone());
+        a.name = "parent".into();
+        let key = case["logical"].as_str().unwrap();
+        let namespace = case["namespace"].as_str().unwrap();
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                prompt_cache_key: (!key.is_empty()).then(|| key.to_owned()),
+                prompt_cache_namespace: (!namespace.is_empty()).then(|| namespace.to_owned()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut ctx = context();
+        ctx.run_id = case["trace_id"].as_str().unwrap().to_owned();
+        for _ in 0..2 {
+            let req = request(2);
+            if case["streaming"] == true {
+                runner
+                    .stream(ctx.clone(), req, Arc::new(TestHost::default()))
+                    .finish()
+                    .await
+                    .unwrap();
+            } else {
+                runner
+                    .run(ctx.clone(), req, Arc::new(TestHost::default()))
+                    .await
+                    .unwrap();
+            }
+        }
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        let expected = case["keys"].as_array().unwrap();
+        assert_eq!(expected.len(), 2);
+        assert_eq!(expected[0], expected[1]);
+        for (request, expected) in requests.iter().zip(expected) {
+            assert_eq!(expected.as_str().unwrap().len(), 64);
+            assert_eq!(
+                request.settings.get("prompt_cache_key"),
+                Some(expected),
+                "{case}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
 async fn compaction_replaces_history_and_hints_cache_prefix_are_request_only() {
     let model = TestModel::with(vec![
         Ok(response(

@@ -297,10 +297,13 @@ async fn builder_settings_defaults_match_pinned_agent_builder() {
             .run(context(), vec![], Arc::new(TestHost))
             .await
             .unwrap();
-        assert_eq!(
-            model.requests.lock().unwrap()[0].settings,
-            bundle.agent().settings
+        // Go carries the wire cache key separately from builder ModelSettings.
+        let mut expected = bundle.agent().settings.clone();
+        expected.insert(
+            "prompt_cache_key".into(),
+            "3af7fb17b3587823433804fc9de1c42d411bbbfa08fdd5a99f172f3b7c44ad34".into(),
         );
+        assert_eq!(model.requests.lock().unwrap()[0].settings, expected);
         bundle.close().await.unwrap();
     }
 }

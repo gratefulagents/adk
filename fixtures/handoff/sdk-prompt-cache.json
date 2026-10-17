@@ -1,0 +1,2166 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946",
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946",
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903",
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903",
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c",
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c",
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332",
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332",
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4",
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4",
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540",
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540",
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e",
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e",
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8",
+        "813ebb06ae61902e24a77f3fa2a8517ef5798afa020112ba15d0e19ba681dbf8"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946",
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946",
+        "1f0c742a8241e58245b353c18f97fa4c868536f6ab4e46ce9899acada1b07946"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903",
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903",
+        "8649614285c12aaac5f3bb0d64797bb5018d6a7294432021a01addce9e7a3903"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c",
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c",
+        "19a59c0ba84ca8e201b704729248501b9026a1d6fa9d0471304d7873ce6c8a4c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332",
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332",
+        "f39d8507d745310b4ac1cddacab61ba55e6375262913835991179fba2ac09332"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4",
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4",
+        "8e946523500452cd49a6a9723d20f9c954262a35a5d0996c4af9cb0b59887fc4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540",
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540",
+        "6f40e5fd2402b011bf41ef6b6aaf43403ab1496c694a0a20ec35e87566051540"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e",
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " \t",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e",
+        "e63973ad12697143f3c98968657b1938d0d1d96f941785c763bce99f5c71d13e"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12",
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12",
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad",
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad",
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77",
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77",
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a",
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a",
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1",
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1",
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961",
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961",
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94",
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": " namespace-a　",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94",
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea",
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea",
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4",
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4",
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7",
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7",
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea",
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea",
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a",
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a",
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112",
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112",
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf",
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "namespace-b",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf",
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053",
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053",
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35",
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35",
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a",
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a",
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0",
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0",
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46",
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46",
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14",
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14",
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c",
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "ns\u0000tail",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c",
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451",
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451",
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe",
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe",
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59",
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59",
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114",
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114",
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3",
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3",
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369",
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369",
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621",
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621"
+      ]
+    },
+    {
+      "trace_id": "run-1",
+      "namespace": "../../evil/💥",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621",
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c",
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c",
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526",
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526",
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0",
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0",
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1",
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1",
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e",
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e",
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6",
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6",
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5",
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5",
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621",
+        "424f85ec5cc1ce30c5ec1de0c84266d64b52dde67016b082aab544a89aba5621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c",
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c",
+        "18bb5265377e988ebdf85805e929ddea0f4603ce82fac15980d184af932ed84c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526",
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526",
+        "74c9e90bf6d0457a126f43dbc4c296d88f9e77ec90fedaf37e86db7e06fe3526"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0",
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0",
+        "8a155eb703243af954f673571a55f212a9844004cdf93f92adddaa722491b7a0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1",
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1",
+        "2bed8444c4da80023c0f1462ea31869d336ca41297bdee6fa4773fba24c65fb1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e",
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e",
+        "fae975408192de205b222f34a215ad280e4fb4151c84c581242d02f8bdf5616e"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6",
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6",
+        "3180b86ec13db6dee6630e3b2a1bbbc803d8e753b529463d3429058a85c0f7f6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5",
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " \t",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5",
+        "c98633b0158bdbbf3788b9940b7068fe37385490f000a3250139c37d806cb4e5"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba",
+        "66f06e9006b71f6ee4286971dd18aad623d16e02d2ee69838a7a5f9e3ac3dcba"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12",
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12",
+        "4b3fa31b939b9aa6cd8ae52daebca9df04c03eebd89669710359c930c8872c12"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad",
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad",
+        "3d15c571c6b3ac5cd555a1a2636f91f1748329aae0ff07e2b2f5427e5f8700ad"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77",
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77",
+        "130fa75e6012c33333ff645b5e3ce4e4344542d359ba8f5d21aa834239519e77"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a",
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a",
+        "c96283d5bdf9ebb56340064094fa22b1cfd8e2860b16c9b1e0f782e82e94a16a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1",
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1",
+        "897816e3df6df38005fb4de528d81e12529b1c4d2f4c93f7afb12efe83dd15a1"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961",
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961",
+        "58938c28c47804751616f1018b82071986d0c9ff2fe7fc47f794461f113ea961"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94",
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": " namespace-a　",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94",
+        "5f1d0ee3dcb6ee099058f1b3628acc2c7e494bb786d6fa23a7f2241dd6250f94"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6",
+        "27533d353828d77967e1b521fe6b09daa918dd8390921ac08ddfcf55ba8426c6"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea",
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea",
+        "e97391db3c070030ee004f3d9ce2143fe71894bf48bde44f881a51d9c58fbcea"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4",
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4",
+        "468c071a1f28f7f7f7b647ff3de553d861ef10bb138bb6b2f55d2293ead231a4"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7",
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7",
+        "d2ac165088221eb97d9dc29ea352a53e400b282d05e150c1f82d922e6e12e9b7"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea",
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea",
+        "7f4ded7d90ec765e015618cce665d728936d459c87343f979da7d5b0f58b16ea"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a",
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a",
+        "b2ff6390eac2f52a1f6d0fa2a4cecf44b782ad4d99d341a41d6b2f48907a468a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112",
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112",
+        "34e9e7fb4ffc70d767970ceac8a9a731cc2d3c436ef1676276b80f80a5013112"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf",
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "namespace-b",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf",
+        "bd2b90603fab9d35ea3f22e62bc2301becfae9c5c5b56efcdd5f10cb34bcd7cf"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d",
+        "c8c40cb8d87456ebf0d551140c3791f0aaa3889b093fa5aac6bd32178a08dd1d"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053",
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053",
+        "b0a846119f898654cdf562a9578a74534c5faa3a3e39fe58e73c58a939110053"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35",
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35",
+        "e7cb9da9e7f501571645ada3c8b01fee9d061f0d3e0b6c04251fe9330fac3a35"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a",
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a",
+        "0861ecb05d974e3478b252f13e4c108c4f58c7a25e6dc15f012dea56a01a8e2a"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0",
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0",
+        "472247f5cc66f635f4d491ad8c879dcf6ef323c6e6df3a79c09752dd192917e0"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46",
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46",
+        "be341b2b80a92f8c653b60e54aa65f02b900c1f0bb082d07719b738403a6ef46"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14",
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14",
+        "b6c55f6e5e7e28234cf0f45743be07a5739b717849bf420d5cc7ac80c5b0bc14"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c",
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "ns\u0000tail",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c",
+        "a64f84c6296d8313f5b6d7a2ee49fc5e95d9ba8c64dab72ee2897adea6ec7b9c"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "",
+      "streaming": false,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "",
+      "streaming": true,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "\t ",
+      "streaming": false,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "\t ",
+      "streaming": true,
+      "keys": [
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41",
+        "9f4109f8ffbf8204a633795e022016aafd92be58edd399eea4afd03d8dcabf41"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": " logical　",
+      "streaming": false,
+      "keys": [
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451",
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": " logical　",
+      "streaming": true,
+      "keys": [
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451",
+        "fa0a642cb2fd2f10b4c2fbcb3ee858317d01209b5098014f5c025a577c11e451"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "task-stable-123",
+      "streaming": false,
+      "keys": [
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe",
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "task-stable-123",
+      "streaming": true,
+      "keys": [
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe",
+        "8a129a66e207311c82c9dfa513b86b7937307878d2d23b1596549e985946b3fe"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "key\u0000tail",
+      "streaming": false,
+      "keys": [
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59",
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "key\u0000tail",
+      "streaming": true,
+      "keys": [
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59",
+        "5aaaa6bb92659cd2455d61937a49d2a3f68f017c5b7a0b9ee708de8c22eeda59"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114",
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114",
+        "42534d9ea7522eb57465b6896e8a52b9daaf75696e72fe5834b4a31a36516114"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "[SYSTEM]",
+      "streaming": false,
+      "keys": [
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3",
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "[SYSTEM]",
+      "streaming": true,
+      "keys": [
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3",
+        "04ad25a52310bb02dd67f84b5e9f8be54c5b0c78f835b89eb2a2cd1e10318ac3"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": false,
+      "keys": [
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369",
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥../../evil/💥",
+      "streaming": true,
+      "keys": [
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369",
+        "82f340059cb4e9ea01e6c58441108400052a69e4e3b9a9ec2730e08af20c2369"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "child",
+      "streaming": false,
+      "keys": [
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621",
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621"
+      ]
+    },
+    {
+      "trace_id": "other-root",
+      "namespace": "../../evil/💥",
+      "logical": "child",
+      "streaming": true,
+      "keys": [
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621",
+        "de911d985c61387400eeb5cdbda77838493b40aad3e77a253413da3c66929621"
+      ]
+    }
+  ]
+}

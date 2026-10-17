@@ -10,8 +10,9 @@ one `ChildExecutor`; there is no separate unmanaged agent-as-tool execution path
 prompt-cache key, replacing any key inherited from the registered runner. An
 explicit `RunnerConfig.prompt_cache_namespace` remains shared; the model receives
 SHA-256 of namespace, a NUL separator, and task ID rather than the raw identifier.
-This child-key override does not imply parity for parent default keys, implicit
-namespace/trace identity, or namespace whitespace normalization.
+Explicit keys and namespaces are trimmed by the runner. An empty namespace uses
+the caller-owned native run ID, not a newly synthesized Go trace object. Supply
+an explicit shared namespace when parent and children should share that scope.
 
 ## Session ownership
 

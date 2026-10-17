@@ -74,10 +74,15 @@ wrappers cannot acquire approval or read-only privileges from a changed output
 wrapper. The runner rechecks the original registered definition and preserves the
 host's `ToolPolicy` in `ToolContext`, including allowlisted mutating tools.
 
-Instructions/tool definitions form a stable prefix. `prompt_cache_key` is hashed
-with `prompt_cache_namespace` (or the run ID if absent); set a stable explicit
+Instructions/tool definitions form a stable prefix. Explicit `prompt_cache_key`
+and `prompt_cache_namespace` values are trimmed; absent/blank keys default to
+`run`, and absent/blank namespaces fall back to `Context.run_id`. Each model
+request carries the lowercase SHA-256 of namespace, NUL, and logical key. Managed
+children force their stable task ID as the logical key. Set a stable explicit
 namespace to reuse cache keys across separate invocations of one conversation.
-This isolates logical keys without putting user history into the cache key.
+The native run ID is caller-owned identity, corresponding to a supplied Go trace
+ID; the runner does not create a hidden Go-style trace object to choose it.
+User history is not included in the cache key.
 Transient context belongs to the current request, not persisted history. Effective history may be replaced by
 explicit compaction while observable new items stay append-only. Hosts must
 resume from effective history, not append old input to new items. Compaction

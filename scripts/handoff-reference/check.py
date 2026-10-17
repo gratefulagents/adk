@@ -117,6 +117,16 @@ def main():
     check_sdk()
     print(f"Verified sdk-builtin-guardrails.json twice, byte-for-byte: {len(fixture['cases'])} guardrail cases")
     print(f"builtin guardrails reference verified at {PIN}")
+    expected = (ROOT / "fixtures/handoff/sdk-prompt-cache.json").read_bytes()
+    fixture = json.loads(expected)
+    if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:
+        sys.exit("Unexpected prompt-cache fixture revision/schema")
+    for attempt in range(2):
+        check_sdk()
+        if run([GO, "run", "-mod=readonly", ".", "prompt-cache"]) != expected:
+            sys.exit(f"sdk-prompt-cache.json differs from pinned Go regeneration (pass {attempt + 1})")
+    check_sdk()
+    print(f"Verified sdk-prompt-cache.json twice, byte-for-byte: {len(fixture['cases'])} cases")
     print(f"subagent selection reference verified at {PIN}")
     print(f"handoff reference verified at {PIN}")
 

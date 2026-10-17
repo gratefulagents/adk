@@ -19361,6 +19361,72 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-C59FC223DB98E3CA": {
+      "source": "internal/agent/prompt_cache_key_test.go",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests"
+      ],
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ],
+      "source_name": "TestPromptCacheKeyStableForParentRun",
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
+      "rationale": "Original parent regression counterpart: parent agent, go input and done response use a caller-owned fixed root identity. Actual Go Trace.ID maps explicitly to native Context.run_id, not automatic Go trace-object creation. The 216-case oracle compares exact keys over 432 normal/stream requests, including default run key, whitespace normalization and stable reuse of a shared identity."
+    },
+    "SDK-A88865C27012EEBA": {
+      "source": "internal/agent/prompt_cache_key_test.go",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests"
+      ],
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ],
+      "source_name": "TestPromptCacheWireKeyStableAndNamespaced",
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheWireKeyStableAndNamespaced",
+      "rationale": "Original wire-key regression counterpart at the model request boundary: the 100-copy traversal/Unicode logical label, namespace-a versus namespace-b, and child logical label are covered by exact independently observed Go keys, 64-character length and repeated-request stability. Namespace-a is also tested with surrounding whitespace removed before hashing. This does not expose or claim an arbitrary raw-string Go private helper API."
+    },
+    "SDK-76E56EDDD33937B1": {
+      "source": "internal/agent/prompt_cache_key_test.go",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests"
+      ],
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ],
+      "source_name": null,
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
+      "rationale": "Inventory classifies the line29 Runner.Run(context.Background(),...) call as a subtest. Source review confirms it is the parent runtime call, not testing.T.Run or an additional hidden test. The actual Go parent test executes it; the native counterpart executes Runner.run with the same parent/message/completion cache contract and explicit owner identity. Baseline record is retained and mapped, not deleted or silently excluded."
+    },
+    "SDK-41D1C905B966E2C2": {
+      "source": "internal/agent/prompt_cache_key_test.go",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::model_turn",
+        "crates/adk-runtime/src/runner.rs::run_child"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests",
+        "child_prompt_cache_key_uses_task_identity_not_parent_key"
+      ],
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ],
+      "source_name": null,
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
+      "rationale": "Reviewed all55 lines: exactly three regression tests, independently executed and individually mapped. Native counterparts cover parent default/shared identity, namespaced stable64-character wire keys including the original long Unicode label, and forced child task identity. The extracted Run-call occurrence is separately mapped. This closes the original test file only, not whole runner, fresh trace identity generation or arbitrary hidden Go task-context semantics."
     }
   }
 }

@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Parent cache defaults and normalization
+
+Direct runners now trim explicit logical keys/namespaces, default absent or blank
+keys to `run`, and use caller-owned `Context.run_id` when the namespace is blank.
+Every request receives the namespace/NUL/logical-key SHA-256 digest. This maps a
+supplied Go Trace.ID to explicit native identity; it does not synthesize hidden
+Go trace objects or reproduce arbitrary Go context-value storage.
+
+The new independently executed oracle records **216 cases /432 model requests**,
+normal and streamed, with repeated runs sharing identity, different namespaces,
+Unicode whitespace, embedded NULs and the original long Unicode logical label.
+All three original cache regressions are now independently executed and mapped.
+Reviewed the complete 55-line test file; the inventory's extra subtest record is
+actually its Runner.Run call and is mapped explicitly rather than excluded.
+Ledger: **1,066 verified /7,825 unresolved /251 excluded**. Full acceptance remains
+incomplete; no whole runner/cache-configuration closure is inferred.
+
+The initial full run exposed a builder test equating agent ModelSettings with
+request settings. Go carries its cache key separately; the native request map
+now has request-only cache metadata. The test preserves every original builder
+setting assertion and checks the exact independently calculated cache digest.
+
+Fresh Rust 1.88 Linux: **1,753 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Strict all-feature Clippy/typecheck/rustdoc/format, full facade matrix and external
+consumer/purity passed. Go harness test/vet/build, twice-reproduced cache oracle
+and all other bound references, **926 original Go passes /5 skips /38 packages**,
+all 55 validators, artifact/overlay/audit and immutable source locks passed.
+
 ### Stable child prompt-cache identity
 
 Reproduced a missing child cache key when the registered runner had none. Child

@@ -2416,21 +2416,28 @@ impl Engine {
             declared_tool_timeouts.clear();
         }
         let mut settings = self.agent.settings.clone();
-        if let Some(key) = &self.config.prompt_cache_key {
-            let namespace = self
-                .config
-                .prompt_cache_namespace
-                .as_deref()
-                .unwrap_or(&self.context.run_id);
-            let mut hash = Sha256::new();
-            hash.update(namespace);
-            hash.update([0]);
-            hash.update(key);
-            settings.insert(
-                "prompt_cache_key".into(),
-                Value::String(format!("{:x}", hash.finalize())),
-            );
-        }
+        let key = self
+            .config
+            .prompt_cache_key
+            .as_deref()
+            .map(str::trim)
+            .filter(|key| !key.is_empty())
+            .unwrap_or("run");
+        let namespace = self
+            .config
+            .prompt_cache_namespace
+            .as_deref()
+            .map(str::trim)
+            .filter(|namespace| !namespace.is_empty())
+            .unwrap_or(&self.context.run_id);
+        let mut hash = Sha256::new();
+        hash.update(namespace);
+        hash.update([0]);
+        hash.update(key);
+        settings.insert(
+            "prompt_cache_key".into(),
+            Value::String(format!("{:x}", hash.finalize())),
+        );
         let mut input_provenance = self.result.history_provenance.clone();
         input_provenance.resize(input.len(), ItemProvenance::Unattributed);
         let mut request = ModelRequest {

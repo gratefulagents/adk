@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"reflect"
 	"strconv"
@@ -19,6 +20,7 @@ func TestNativeModeCodecReference(t *testing.T) {
 		name   string
 		typeOf reflect.Type
 	}{
+		{"ModelSettings", reflect.TypeOf(ModelSettings{})},
 		{"ReasoningLevel", reflect.TypeOf(ModeReasoningLevel(""))},
 		{"TextVerbosity", reflect.TypeOf(ModeTextVerbosity(""))},
 		{"TemplateSpec", reflect.TypeOf(sdkmode.TemplateSpec{})},
@@ -39,6 +41,22 @@ func TestNativeModeCodecReference(t *testing.T) {
 				row["decode_error"] = err.Error()
 			} else {
 				row["decoded_fields"] = value.Elem().Interface()
+				if target.name == "ModelSettings" {
+					state := map[string]any{}
+					for i := 0; i < target.typeOf.NumField(); i++ {
+						field := value.Elem().Field(i)
+						if field.Kind() == reflect.Pointer && field.Type().Elem().Kind() == reflect.Float64 {
+							if field.IsNil() {
+								state[target.typeOf.Field(i).Name] = nil
+							} else {
+								state[target.typeOf.Field(i).Name] = fmt.Sprintf("%016x", math.Float64bits(field.Elem().Float()))
+							}
+						} else {
+							state[target.typeOf.Field(i).Name] = field.Interface()
+						}
+					}
+					row["settings_state"] = state
+				}
 				encoded, marshalErr := json.Marshal(value.Interface())
 				row["marshal_ok"] = marshalErr == nil
 				if marshalErr != nil {
@@ -71,6 +89,10 @@ func TestNativeModeCodecReference(t *testing.T) {
 		for index := 0; index < target.typeOf.NumField(); index++ {
 			field := target.typeOf.Field(index)
 			fields = append(fields, map[string]string{"name": field.Name, "type": field.Type.String(), "json_tag": field.Tag.Get("json")})
+			key := field.Name
+			if tag := field.Tag.Get("json"); tag != "" {
+				key = strings.Split(tag, ",")[0]
+			}
 			var initial string
 			var values []string
 			switch field.Type.Kind() {
@@ -90,7 +112,13 @@ func TestNativeModeCodecReference(t *testing.T) {
 				initial = `{"keep":{"Model":"keep"},"same":{"Model":"old","FallbackModels":["old","tail"]}}`
 				values = []string{"null", "{}", `{"new":null}`, `{"same":null}`, `{"same":{}}`, `{"same":{"ReasoningLevel":"high"}}`, `{"same":{"FallbackModels":[null]}}`, `{"same":{"Model":"first"},"same":{"TextVerbosity":"last"}}`, `{"x":{},"X":{},"猫":{"Model":" raw "},"<>&":null,"\ud800":{}}`, "{\"\xff\":{\"Model\":\"\xff\"}}", "[]", "true", "42", `"map"`, `{"x":[]}`, `{"x":42}`}
 			case reflect.Pointer:
-				if field.Name == "ModelRouting" {
+				if field.Type.Elem().Kind() == reflect.Float64 {
+					initial = "-0"
+					values = []string{"null", "0", "-0", "1", "1.0", "1e0", "1e-324", "-1e-324", "5e-324", "-5e-324", "2.2250738585072014e-308", "1.7976931348623157e308", "1e309", "-1e309", "9007199254740993", "1.00000000000000011102230246251565404236316680908203125", "0.000001", "1e21", `"NaN"`, "true", "[]", "{}"}
+				} else if field.Type.Elem().Kind() == reflect.Bool {
+					initial = "true"
+					values = []string{"null", "true", "false", "0", `"false"`, "[]", "{}"}
+				} else if field.Name == "ModelRouting" {
 					initial = `{"DefaultModel":"old","FallbackModels":["old","tail"],"RoleOverrides":{"keep":{"Model":"keep"}}}`
 					values = []string{"null", "{}", `{"DefaultModel":null}`, `{"ReasoningLevel":" HIGH "}`, `{"FallbackModels":[null]}`, `{"RoleOverrides":{}}`, `{"RoleOverrides":null}`, "[]", "true", "42", `"pointer"`}
 				} else {
@@ -101,14 +129,14 @@ func TestNativeModeCodecReference(t *testing.T) {
 				t.Fatalf("unhandled field %s", field.Name)
 			}
 			for index, value := range values {
-				add(fmt.Sprintf("%s/value-%d", field.Name, index), fmt.Sprintf(`{%q:%s}`, field.Name, value))
-				add(fmt.Sprintf("%s/repeated-%d", field.Name, index), fmt.Sprintf(`{%q:%s,%q:%s}`, field.Name, initial, strings.ToLower(field.Name), value))
+				add(fmt.Sprintf("%s/value-%d", field.Name, index), fmt.Sprintf(`{%q:%s}`, key, value))
+				add(fmt.Sprintf("%s/repeated-%d", field.Name, index), fmt.Sprintf(`{%q:%s,%q:%s}`, key, initial, strings.ToLower(key), value))
 			}
-			add(field.Name+"/fold", fmt.Sprintf(`{%q:%s,%q:null}`, strings.ToUpper(field.Name), initial, field.Name))
-			add(field.Name+"/null-reset", fmt.Sprintf(`{%q:%s,%q:null,%q:%s}`, field.Name, initial, field.Name, field.Name, initial))
+			add(field.Name+"/fold", fmt.Sprintf(`{%q:%s,%q:null}`, strings.ToUpper(key), initial, key))
+			add(field.Name+"/null-reset", fmt.Sprintf(`{%q:%s,%q:null,%q:%s}`, key, initial, key, key, initial))
 			if field.Type.Kind() == reflect.Slice {
 				for index, reset := range []string{`["short"]`, "[]", "null"} {
-					add(fmt.Sprintf("%s/slots-%d", field.Name, index), fmt.Sprintf(`{%q:%s,%q:%s,%q:[null,null,null]}`, field.Name, initial, field.Name, reset, field.Name))
+					add(fmt.Sprintf("%s/slots-%d", field.Name, index), fmt.Sprintf(`{%q:%s,%q:%s,%q:[null,null,null]}`, key, initial, key, reset, key))
 				}
 			}
 		}
@@ -127,7 +155,16 @@ func TestNativeModeCodecReference(t *testing.T) {
 			add("pointer-casefold", `{"Conſtraints":{"MaxTurns":9},"CONSTRAINTS":{"MaxRetries":2},"ModelRouting":{"FallbacKModels":["raw"]}}`)
 		}
 	}
-	output, err := json.Marshal(map[string]any{"schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases, "constants": map[string]any{
+	nonfinite := []any{}
+	for _, field := range []string{"Temperature", "TopP"} {
+		for _, value := range []float64{math.NaN(), math.Inf(1), math.Inf(-1)} {
+			settings := ModelSettings{}
+			reflect.ValueOf(&settings).Elem().FieldByName(field).Set(reflect.ValueOf(&value))
+			_, err := json.Marshal(settings)
+			nonfinite = append(nonfinite, map[string]any{"field": field, "bits": fmt.Sprintf("%016x", math.Float64bits(value)), "marshal_ok": err == nil})
+		}
+	}
+	output, err := json.Marshal(map[string]any{"nonfinite": nonfinite, "schema_version": 1, "int_size": strconv.IntSize, "types": metadata, "cases": cases, "constants": map[string]any{
 		"ReasoningNone": ReasoningNone, "ReasoningMinimal": ReasoningMinimal, "ReasoningLow": ReasoningLow,
 		"ReasoningMedium": ReasoningMedium, "ReasoningHigh": ReasoningHigh, "ReasoningXHigh": ReasoningXHigh, "ReasoningMax": ReasoningMax,
 		"TextVerbosityLow": TextVerbosityLow, "TextVerbosityMedium": TextVerbosityMedium, "TextVerbosityHigh": TextVerbosityHigh,

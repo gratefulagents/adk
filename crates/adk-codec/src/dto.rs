@@ -3,6 +3,48 @@ use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::borrow::Cow;
 
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
+pub struct ModelSettings {
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_optional_go_float"
+    )]
+    pub temperature: Option<f64>,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_tokens: i64,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_optional_go_float"
+    )]
+    pub top_p: Option<f64>,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub tool_choice: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parallel_tool_calls: Option<bool>,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub thinking_budget: i64,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub reasoning_effort: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub text_verbosity: String,
+    #[serde(skip_serializing_if = "empty_stop_sequences")]
+    pub stop_sequences: Option<Vec<String>>,
+}
+
+fn empty_stop_sequences(value: &Option<Vec<String>>) -> bool {
+    value.as_ref().is_none_or(Vec::is_empty)
+}
+
+fn serialize_optional_go_float<S: serde::Serializer>(
+    value: &Option<f64>,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    match value {
+        Some(value) => serialize_go_float(value, serializer),
+        None => serializer.serialize_none(),
+    }
+}
+
 #[derive(
     Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
 )]

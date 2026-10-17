@@ -8,12 +8,16 @@ The runner tests an immutable SDK archive at
 
 Actual `encoding/json.Unmarshal` and `json.Marshal` observations cover mode
 `TemplateSpec`, `Constraints`, `ModelRouting`, `RoleModelRouting`, and the
-runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, plus the open
+runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, `ModelSettings`, plus the open
 `ModeReasoningLevel` and `ModeTextVerbosity` string types and ten constants. Provenance
 records archive, source and harness hashes, Go version, OS and architecture.
 The fixture records reflected field names/types/tags or scalar kinds and
-1,061 cases: 622 accepted and 439 rejected (993 structured-data cases plus
-68 named-string cases). Accepted cases compare unnormalized decoded state
+1,359 cases: 800 accepted and 559 rejected (993 mode structured-data cases,
+68 named-string cases and 298 ModelSettings cases). Six additional native
+nonfinite-pointer encoding cases all reject. Settings compare explicit nil/empty
+slice state and binary64 bit strings independently of omitempty/JSON numeric
+normalization, including negative zero, underflow, overflow, subnormal values,
+maximum finite values and exact half-way rounding. Accepted cases compare unnormalized decoded state
 and exact output bytes. Rejected cases compare rejection, not partial mutation
 state or error wording. Integer expectations are the pinned 64-bit Go target.
 
@@ -25,10 +29,12 @@ reset, Unicode key folding, invalid UTF-8 and surrogates, escaping, malformed
 JSON and ignored values at the Go depth boundary.
 
 Rust compatibility-only targets are
-`adk_codec::dto::{ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
+`adk_codec::dto::{ModelSettings, ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
 through sealed `from_go_json` and `to_go_json_bytes`. Ordinary Serde is not a
 Go byte-decoding entrypoint. Named labels use open
 `dto::{ModeReasoningLevel, ModeTextVerbosity}` wrappers with typed associated
 constants; unknown strings remain valid and the empty default is not explicit
 `NONE`. This does not establish native builder settings,
 model binding, runtime constraint enforcement, or full mode-conversion parity.
+The settings DTO is distinct from the analysis-oriented snapshots type and does
+not replace native runtime settings or claim provider application or Merge semantics.

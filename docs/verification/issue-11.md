@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Lossless model-settings compatibility record
+
+Added a separate `dto::ModelSettings` to the sealed byte codec; the existing
+analysis-oriented snapshot and native runtime settings APIs are unchanged.
+Optional float/bool pointers retain explicit zero values, stop sequences retain
+nil versus allocated-empty state, and Go omission rules remain independent of
+that state. Integer spelling/bounds, null behavior, repeated fields and slice
+backing slots use the existing Go decoder semantics.
+
+The immutable SDK oracle adds **298 settings inputs (178 accepted, 120 rejected)**
+and six actual-Go nonfinite encoding failures. Successful cases compare all nine
+fields, with binary64 bits and explicit slice state rather than a lossy JSON
+projection, and exact output bytes. Coverage includes signed zero, underflow,
+subnormals, largest finite floats, overflow and exact half-way rounding. The
+combined mode/settings corpus now has **1,359 inputs (800 accepted, 559 rejected)**.
+Nine targeted Rust tests pass. The two new claims concern only the data type and
+public alias, not Merge, provider application or ordinary Serde in-place parity.
+
+Fresh Rust 1.88 Linux: **1,741 workspace tests +10 doctests passed; 0 failed,
+30 ignored**. Strict all-feature workspace lint/typecheck/rustdoc, formatting,
+full facade feature matrix and standalone consumer/purity, independent bound
+references, 55 validators, artifact/overlay/audit and source locks pass. Ledger:
+**1,042 verified /7,849 unresolved /251 excluded**; full acceptance remains
+incomplete. All 46 remote checks passed for preceding head `6f006ae`, not this
+subsequent settings implementation.
+
 ### Branch-conditioned mode settings defaults
 
 Reviewed and verified all twelve literal-return records in the reasoning and

@@ -31,7 +31,7 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['pkg/agentsdk/mode/types.go', 'internal/agent/mode_routing.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
+        paths = ['internal/agent/model_settings.go', 'pkg/agentsdk/mode/types.go', 'internal/agent/mode_routing.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
         harness = ['scripts/mode-codec-reference/run.py', 'scripts/mode-codec-reference/reference_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk',

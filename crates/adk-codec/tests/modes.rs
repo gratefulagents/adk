@@ -2,7 +2,7 @@ use adk_codec::{
     GoJsonDecode, GoJsonEncode,
     dto::{
         ModeConstraints, ModeReasoningLevel, ModeRoleRouting, ModeRouting, ModeTemplateSpec,
-        ModeTextVerbosity,
+        ModeTextVerbosity, ModelSettings,
     },
     from_go_json, to_go_json_bytes,
 };
@@ -59,9 +59,10 @@ fn pinned_mode_codec_oracle() {
         assert_eq!(format!("{digest:x}"), expected.as_str().unwrap(), "{path}");
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1061);
+    assert_eq!(cases.len(), 1359);
     for case in cases {
         match case["type"].as_str().unwrap() {
+            "ModelSettings" => compare_settings(case),
             "ReasoningLevel" => compare::<ModeReasoningLevel>(case),
             "TextVerbosity" => compare::<ModeTextVerbosity>(case),
             "TemplateSpec" => compare::<ModeTemplateSpec>(case),
@@ -223,4 +224,79 @@ fn named_mode_labels_preserve_constants_unknown_values_and_string_identity() {
         ModeTextVerbosity::default()
     );
     assert_ne!(ModeReasoningLevel::NONE, ModeReasoningLevel::default());
+}
+
+fn compare_settings(case: &Value) {
+    let id = case["id"].as_str().unwrap();
+    let decoded = from_go_json::<ModelSettings>(&unhex(case["input_hex"].as_str().unwrap()));
+    assert_eq!(
+        decoded.is_ok(),
+        case["decode_ok"].as_bool().unwrap(),
+        "{id}: {decoded:?}"
+    );
+    let Ok(decoded) = decoded else { return };
+    let state = serde_json::json!({
+        "Temperature": decoded.temperature.map(|v| format!("{:016x}", v.to_bits())),
+        "MaxTokens": decoded.max_tokens,
+        "TopP": decoded.top_p.map(|v| format!("{:016x}", v.to_bits())),
+        "ToolChoice": decoded.tool_choice,
+        "ParallelToolCalls": decoded.parallel_tool_calls,
+        "ThinkingBudget": decoded.thinking_budget,
+        "ReasoningEffort": decoded.reasoning_effort,
+        "TextVerbosity": decoded.text_verbosity,
+        "StopSequences": decoded.stop_sequences,
+    });
+    assert_eq!(state, case["settings_state"], "unnormalized state: {id}");
+    assert_eq!(case["marshal_ok"], true, "{id}");
+    assert_eq!(
+        to_go_json_bytes(&decoded).unwrap(),
+        unhex(case["marshal_hex"].as_str().unwrap()),
+        "exact bytes: {id}"
+    );
+}
+
+#[test]
+fn settings_preserve_pointer_zero_and_nil_slice_state() {
+    let settings: ModelSettings =
+        from_go_json(br#"{"temperature":-0,"parallel_tool_calls":false,"stop_sequences":[]}"#)
+            .unwrap();
+    assert_eq!(
+        settings.temperature.unwrap().to_bits(),
+        (-0.0_f64).to_bits()
+    );
+    assert_eq!(settings.parallel_tool_calls, Some(false));
+    assert_eq!(settings.stop_sequences, Some(vec![]));
+    assert_eq!(
+        to_go_json_bytes(&settings).unwrap(),
+        br#"{"temperature":-0,"parallel_tool_calls":false}"#
+    );
+    let settings: ModelSettings = from_go_json(
+        br#"{"temperature":-0,"temperature":null,"stop_sequences":[],"stop_sequences":null}"#,
+    )
+    .unwrap();
+    assert_eq!(settings, ModelSettings::default());
+    assert_eq!(to_go_json_bytes(&settings).unwrap(), b"{}");
+}
+
+#[test]
+fn settings_reject_nonfinite_encoding() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/mode-codec/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["nonfinite"].as_array().unwrap();
+    assert_eq!(cases.len(), 6);
+    for case in cases {
+        let value =
+            f64::from_bits(u64::from_str_radix(case["bits"].as_str().unwrap(), 16).unwrap());
+        assert!(!value.is_finite());
+        let mut settings = ModelSettings::default();
+        match case["field"].as_str().unwrap() {
+            "Temperature" => settings.temperature = Some(value),
+            "TopP" => settings.top_p = Some(value),
+            other => panic!("unknown field {other}"),
+        }
+        assert_eq!(case["marshal_ok"], false);
+        assert!(to_go_json_bytes(&settings).is_err());
+    }
 }

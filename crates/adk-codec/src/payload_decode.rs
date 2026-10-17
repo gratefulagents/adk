@@ -117,6 +117,7 @@ macro_rules! target {
     )*};
 }
 target!(
+    ModelSettings,
     ModeReasoningLevel,
     ModeTextVerbosity,
     ModeRoleRouting,
@@ -177,6 +178,17 @@ impl sealed::Sealed for ToolApprovalData {
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
+go_object!(ModelSettings,
+    "temperature" => temperature: raw,
+    "max_tokens" => max_tokens: integer,
+    "top_p" => top_p: raw,
+    "tool_choice" => tool_choice: scalar,
+    "parallel_tool_calls" => parallel_tool_calls: raw,
+    "thinking_budget" => thinking_budget: integer,
+    "reasoning_effort" => reasoning_effort: scalar,
+    "text_verbosity" => text_verbosity: scalar
+    preserve_nil { "stop_sequences" => stop_sequences }
+);
 go_object!(ModeRoleRouting,
     "model" => model: scalar,
     "reasoninglevel" => reasoning_level: scalar,

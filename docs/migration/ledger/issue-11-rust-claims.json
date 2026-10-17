@@ -18890,6 +18890,46 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-77D4C4FB8DFFBA9B": {
+      "source": "internal/agent/model_settings.go",
+      "source_name": "ModelSettings",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelSettings",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "settings_preserve_pointer_zero_and_nil_slice_state",
+        "settings_reject_nonfinite_encoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the lossless compatibility data declaration and public alias. The independent immutable Go oracle adds 298 actual ModelSettings input cases (178 accepted,120 rejected) and six nonfinite native encoding failures. All nine fields compare explicit successful state (including nullable binary64 bits and nil versus allocated empty stop slices), exact JSON bytes, omission, integer bounds/spelling, pointer null reset, scalar null no-op, repeated slice backing slots, field tags/case folding, Unicode replacement/escaping and unknown-field depth. The original trace test is a source anchor, not codec evidence. Existing analysis snapshot representation remains separate. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, general Serde in-place parity, pointer alias identity, native provider application or Merge behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-27738F46CC3C200E": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModelSettings",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModelSettings",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "settings_preserve_pointer_zero_and_nil_slice_state",
+        "settings_reject_nonfinite_encoding"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Closes only the lossless compatibility data declaration and public alias. The independent immutable Go oracle adds 298 actual ModelSettings input cases (178 accepted,120 rejected) and six nonfinite native encoding failures. All nine fields compare explicit successful state (including nullable binary64 bits and nil versus allocated empty stop slices), exact JSON bytes, omission, integer bounds/spelling, pointer null reset, scalar null no-op, repeated slice backing slots, field tags/case folding, Unicode replacement/escaping and unknown-field depth. The original trace test is a source anchor, not codec evidence. Existing analysis snapshot representation remains separate. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, general Serde in-place parity, pointer alias identity, native provider application or Merge behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

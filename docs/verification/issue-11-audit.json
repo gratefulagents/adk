@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8033,
-    "verified": 858
+    "unresolved": 8032,
+    "verified": 859
   },
   "groups": [
     {
@@ -4661,7 +4661,8 @@
         "files:unresolved": 18,
         "packages:unresolved": 2,
         "subtests:unresolved": 3,
-        "tests:unresolved": 39,
+        "tests:unresolved": 38,
+        "tests:verified": 1,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::providers::anthropic",
@@ -4755,7 +4756,6 @@
         "SDK-26E7F2445EDF0FED",
         "SDK-273C85262C2145FF",
         "SDK-27AD6A106A0612D4",
-        "SDK-27DC122669B48056",
         "SDK-27F24379CC2F9940",
         "SDK-281C8BA809A39515",
         "SDK-2838BC10B160E8D4",
@@ -5077,7 +5077,9 @@
         "SDK-FFC70366B5AA30AD",
         "SDK-FFEE10D340372391"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-27DC122669B48056"
+      ]
     },
     {
       "counts": {
@@ -10947,8 +10949,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "f3aba89b2ec96976c3c71828ebd2ce032b4ea8f5986f71351856f76b41738526",
-    "docs/migration/ledger/issue-11-rust-claims.json": "1828cceaa56d8f501f15c7a7b99c433cdf6eed3dc09d3d276c5905be6d4b8b07",
+    "docs/migration/ledger/issue-11-overlay.json": "4b27da223b685afd2aedb7047efa7a2780d866aeb9bbb78d2e48bb6a46145ab1",
+    "docs/migration/ledger/issue-11-rust-claims.json": "60321568b85ec171c122e8ac935a3d2d34c041fe47ed310f69eecd53c83db836",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10957,6 +10959,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 856
+    "rust_test": 857
   }
 }

@@ -15347,6 +15347,22 @@
         "core",
         "providers"
       ]
+    },
+    "SDK-27DC122669B48056": {
+      "source": "internal/anthropic/audit_fixes_test.go",
+      "source_name": "TestToSDKParamsSendsOutputFormatForOutputSchema",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "anthropic_output_format_matches_original_sdk_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/anthropic/TestToSDKParamsSendsOutputFormatForOutputSchema",
+      "rationale": "Closes only this original regression: the same model, token setting, user message, schema name/strict flag and nested object schema produce a serialized output_format object with type json_schema and a non-null schema. The native counterpart additionally compares the entire schema value after the wire JSON round trip. No raw-schema lexical/depth/Unicode fidelity, arbitrary schema handling, output enforcement, full request defaults or complete source-file/provider closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

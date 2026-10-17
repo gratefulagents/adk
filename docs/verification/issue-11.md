@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Exact Anthropic output-format regression
+
+The original `TestToSDKParamsSendsOutputFormatForOutputSchema` now has a literal
+native counterpart with the same model, token setting, user message and nested
+object schema. Serialized output has `output_format.type = "json_schema"` and the
+complete schema value. Only this regression ID is closed; raw lexical/depth/Unicode
+fidelity and whole provider/file equivalence remain unclaimed.
+
+The native regression and strict provider lint/format pass. The independently
+re-executed pinned Go report is **918 passed /5 skipped across38 packages**, now
+including this original test. Bound Go/native evidence,51 validators, artifact,
+overlay/audit and source-lock checks pass. Ledger: **859 verified /8,032 unresolved
+/251 excluded**. No production code changed since the full1,630-test/10-doctest
+runtime verification below; issue11 remains incomplete.
+
 ### Completion-only runtime reasoning
 
 A following HTTP integration regression exercises the actual provider through a

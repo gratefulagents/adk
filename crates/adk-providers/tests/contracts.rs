@@ -1124,6 +1124,29 @@ fn openai_output_schema_map_matches_pinned_go() {
 }
 
 #[test]
+fn anthropic_output_format_matches_original_sdk_regression() {
+    let mut input = request();
+    input.model = "claude-sonnet-5".into();
+    input.instructions.clear();
+    input.input = vec![adk_core::RunItem::Message {
+        message: adk_core::Message {
+            role: adk_core::Role::User,
+            content: vec![adk_core::Content::Text { text: "hi".into() }],
+        },
+    }];
+    input.settings.insert("max_tokens".into(), json!(100));
+    input.output_schema_name = "final".into();
+    input.output_schema_strict = true;
+    let schema = json!({"type":"object","properties":{"answer":{"type":"string"}}});
+    input.output_schema = Some(adk_core::JsonDocument::new(schema.to_string()).unwrap());
+    let encoded =
+        serde_json::to_vec(&wire::request(&input, Protocol::Anthropic, false).unwrap()).unwrap();
+    let body: serde_json::Value = serde_json::from_slice(&encoded).unwrap();
+    assert_eq!(body["output_format"]["type"], "json_schema");
+    assert_eq!(body["output_format"]["schema"], schema);
+}
+
+#[test]
 fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     let mut input = request();
     input.settings.insert(

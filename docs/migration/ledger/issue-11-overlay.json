@@ -79,8 +79,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1065,
-        "verified": 105
+        "unresolved": 1064,
+        "verified": 106
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -96,8 +96,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8033,
-    "verified": 858
+    "unresolved": 8032,
+    "verified": 859
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -209,11 +209,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 917,
+      "pass": 918,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "8389bd06c44dcae63cf1ba233d8a3814e97fc3d4e9b2d51920b22e67da8686cd",
+    "evidence_sha256": "fc1b8bdab7fbb1e396b633039facabe32a5a9ea5a034bec6d516d7a2b4c70d5f",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -10064,7 +10064,7 @@
     "SDK-27C138DCDAB29550": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.CompactionPlan.Protected@internal/agent/history_compaction.go", "proposed_rust_module": "sdk::compaction", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/history_compaction.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::compaction", "verification_status": "not_run"},
     "SDK-27C93B59C3A91A2C": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tracestore.RunFilter.Since@pkg/agentsdk/tracestore/trace_store.go", "proposed_rust_module": "sdk::trace_store", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tracestore/trace_store.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::trace_store", "verification_status": "not_run"},
     "SDK-27CAA346D6A7144B": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Closes the bounded item payload/discriminant declaration ToolApprovalData (and public alias identity where applicable), not RunItem, Agent, extraction helpers or runtime authority. Actual pinned Go payload types produce1267 byte-input observations covering every field, omission/null/root/wrongtype/duplicate/casefold semantics, image slot reuse/reset, integer constants/extrema, Unicode repair, raw lexical/invalidUTF8 preservation and depth10000/10001. Native sealed from_go_json/to_go_json_bytes compare decoded fields, raw presence/bytes and marshaled bytes without exemptions; full schema/native bridge regressions preserve strict execution admission. The associated original snapshot regression is a source anchor, not exhaustive payload evidence. Rust owned error results do not expose Go partial mutation or identical error text; Vec image nil/empty states share the same omitted wire form. Generic Serde is intentionally not the byte-normalizing API and rejects malformedUTF8raw; compatibility bytes are never silently admitted to native execution. Public facade exercises the same codec implementation.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-codec/src/dto.rs::ToolApprovalData", "crates/adk-codec/src/payload_decode.rs::from_go_json", "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"], "ledger_record_id": "apis:internal/agent.ToolApprovalData@internal/agent/items.go", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": ["pinned_payload_decode_oracle", "payload_decoder_is_available_through_standalone_facade", "public_raw_representations_share_go_marshal_depth_limit"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/agent/items.go", "target_features": ["x86_64-unknown-linux-gnu", "compat"], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "passed"},
-    "SDK-27DC122669B48056": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestToSDKParamsSendsOutputFormatForOutputSchema", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/audit_fixes_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
+    "SDK-27DC122669B48056": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Closes only this original regression: the same model, token setting, user message, schema name/strict flag and nested object schema produce a serialized output_format object with type json_schema and a non-null schema. The native counterpart additionally compares the entire schema value after the wire JSON round trip. No raw-schema lexical/depth/Unicode fidelity, arbitrary schema handling, output enforcement, full request defaults or complete source-file/provider closure is inferred.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/wire.rs::request"], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestToSDKParamsSendsOutputFormatForOutputSchema", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/anthropic/TestToSDKParamsSendsOutputFormatForOutputSchema"}, "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": ["anthropic_output_format_matches_original_sdk_regression"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/anthropic/audit_fixes_test.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "passed"},
     "SDK-27DF97CE38FD6809": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.taskRunSnapshot.maxToolOutputBytes@internal/agent/subagent_registry.go", "proposed_rust_module": "sdk::subagents", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/subagent_registry.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::subagents", "verification_status": "not_run"},
     "SDK-27F0D73B71F6982F": {"approved_divergence_reference": null, "category": "tool_parameters", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tool_parameters:pkg/agentsdk/tools/git.AttachRepositoryTool:0:branch_name", "proposed_rust_module": "sdk::tools::git", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/git/repository.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::git", "verification_status": "not_run"},
     "SDK-27F24379CC2F9940": {"approved_divergence_reference": null, "category": "configuration", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "configuration:internal/anthropic/stream.go:blockAssembler.build", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/stream.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},

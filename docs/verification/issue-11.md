@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Original CRD-shaped file configuration regression
+
+Ported the original mode YAML and planner Markdown verbatim, checking every
+original assertion for builtin/file mode listing, routing fallbacks and role
+reasoning, constraints, normalized permissions, directive warnings and role
+loading. The four-test source file is now covered; its original CRD test and
+complete test-file record are closed, not the implementation/package contract.
+
+Fresh Rust1.88 Linux: **1,667 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format,16 host-only and all-feature fileconfig
+tests, original pinned Go fileconfig tests, bound evidence,51 validators,
+artifacts/overlay/audit and source locks passed. Production behavior is unchanged.
+Ledger: **891 verified /8,000 unresolved /251 excluded**; full issue11 acceptance
+remains incomplete.
+
 ### Automatic builder delegation guide
 
 The builder now injects the verified SDK guide rather than abbreviated task and

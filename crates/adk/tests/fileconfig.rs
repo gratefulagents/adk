@@ -632,3 +632,100 @@ async fn unterminated_role_frontmatter_is_rejected() {
     let source = FileConfigSource::new(root.path());
     assert!(source.load_roles(&context()).is_err());
 }
+
+#[tokio::test]
+async fn source_loads_crd_shaped_mode_and_roles() {
+    let dir = tempfile::tempdir().unwrap();
+    write(
+        dir.path(),
+        "modes/feature-builder.yaml",
+        r#"apiVersion: platform.gratefulagents.dev/v1alpha1
+kind: ModeTemplate
+metadata:
+  name: feature-builder
+spec:
+  name: feature-builder
+  version: v1
+  displayName: Feature Builder
+  description: Build a feature.
+  category: direct
+  autonomous: false
+  toolAccess: read-only
+  modelRouting:
+    defaultModel: openai/gpt-5.5
+    fallbackModels:
+      - anthropic/claude-sonnet-4-6
+    reasoningLevel: xhigh
+    textVerbosity: low
+    roleOverrides:
+      planner:
+        model: openai/gpt-5.4
+        fallbackModels:
+          - copilot/gpt-4.1
+        reasoningLevel: high
+  constraints:
+    maxTurns: 120
+    subAgentMaxTurns: 30
+    maxConcurrentSubAgents: 3
+  instructions: |
+    Follow the feature workflow.
+"#,
+    );
+    write(
+        dir.path(),
+        "agents/planner.md",
+        r#"---
+name: planner
+description: Writes the plan.
+tool_access: analysis
+model_override: openai/gpt-5.3-codex
+---
+Plan carefully.
+"#,
+    );
+    let source = FileConfigSource::new(dir.path()).with_active_mode("feature-builder");
+    let ctx = context();
+    let modes = source.list_modes(&ctx).unwrap();
+    assert_eq!(modes.len(), 3);
+    for name in ["feature-builder", "chat", "plan"] {
+        assert!(modes.iter().any(|mode| mode.name == name));
+    }
+    let snapshot = source.mode_snapshot(&ctx).await.unwrap().unwrap();
+    let routing = snapshot.model_routing.unwrap();
+    assert_eq!(routing.role_overrides["planner"].reasoning_level, "high");
+    assert_eq!(
+        routing.fallback_models.unwrap(),
+        ["anthropic/claude-sonnet-4-6"]
+    );
+    assert_eq!(
+        routing.role_overrides["planner"]
+            .fallback_models
+            .as_ref()
+            .unwrap(),
+        &["copilot/gpt-4.1"]
+    );
+    assert_eq!(snapshot.constraints.unwrap().max_turns.unwrap().get(), 120);
+    assert_eq!(snapshot.tool_access, "read-only");
+    assert_eq!(
+        source.permission_mode(&ctx).await.unwrap(),
+        PermissionMode::ReadOnly
+    );
+    let directive = source.mode_directive(&ctx).await.unwrap();
+    for expected in [
+        "Mode: Feature Builder",
+        "Tool access: read-only",
+        "Bash is restricted to statically-authorized commands",
+        "no command substitution $(...) or backticks",
+        "Follow the feature workflow.",
+    ] {
+        assert!(
+            directive.contains(expected),
+            "missing {expected}: {directive}"
+        );
+    }
+    let catalog = source.role_catalog(&ctx).await.unwrap();
+    assert_eq!(catalog.len(), 1);
+    assert_eq!(catalog[0].name, "planner");
+    assert_eq!(catalog[0].tool_access, "read-only");
+    assert!(!catalog[0].model_override.is_empty());
+}

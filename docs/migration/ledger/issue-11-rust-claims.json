@@ -15886,6 +15886,40 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-D8EF2746E5704C2B": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig_test.go",
+      "source_name": "TestSourceLoadsCRDShapedModeAndRoles",
+      "implementation_symbols": [
+        "crates/adk/src/host/fileconfig.rs::FileConfigSource"
+      ],
+      "rust_test_identifiers": [
+        "source_loads_crd_shaped_mode_and_roles"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestSourceLoadsCRDShapedModeAndRoles",
+      "rationale": "Ports the literal original YAML and role Markdown, checking all original assertions: file mode plus builtin names, planner reasoning and default/role fallbacks, max turns, read-only permission, five directive fragments, normalized role access and nonempty model override. This closes only the original regression, not arbitrary YAML/Markdown input or the full source API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-7BA008D48728E3FA": {
+      "source": "pkg/agentsdk/host/fileconfig/fileconfig_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/host/fileconfig.rs::FileConfigSource"
+      ],
+      "rust_test_identifiers": [
+        "source_loads_crd_shaped_mode_and_roles",
+        "matches_every_unexcluded_pinned_go_query",
+        "fallback_matches_declared_and_display_names_and_builtin_overrides"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/host/fileconfig/TestSourceLoadsCRDShapedModeAndRoles",
+      "rationale": "Reviewed all four original tests in the209-line file. The literal CRD-shaped mode/role fixture covers the first; independent Go fileconfig observations and native builtin/override/traversal tests cover the other three already-verified original test records. This closes the complete test file only, not the parser implementation, package or verification group; strict native validation differences remain explicit.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

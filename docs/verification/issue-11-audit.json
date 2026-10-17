@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8002,
-    "verified": 889
+    "unresolved": 8000,
+    "verified": 891
   },
   "groups": [
     {
@@ -2535,10 +2535,10 @@
         "apis:verified": 4,
         "configuration:unresolved": 2,
         "configuration:verified": 1,
-        "files:unresolved": 2,
+        "files:unresolved": 1,
+        "files:verified": 1,
         "packages:unresolved": 1,
-        "tests:unresolved": 1,
-        "tests:verified": 3,
+        "tests:verified": 4,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::host::file_config",
@@ -2572,7 +2572,6 @@
         "SDK-68DFFBB59471306C",
         "SDK-69F682E6294B2338",
         "SDK-6B38ACCFAAC67F49",
-        "SDK-7BA008D48728E3FA",
         "SDK-7D25C6C4425503AC",
         "SDK-7D4FFEA900A0F87D",
         "SDK-8140274F6B5DDA38",
@@ -2600,7 +2599,6 @@
         "SDK-CBAD00B8B34CC7B4",
         "SDK-D14A2D7002CFE976",
         "SDK-D163A020A3DA4512",
-        "SDK-D8EF2746E5704C2B",
         "SDK-D97BDFF07F52831F",
         "SDK-E00FCEB0A4FBA728",
         "SDK-E248207DE228651F",
@@ -2618,8 +2616,10 @@
         "SDK-29BE663E324A4194",
         "SDK-2DF72F763798E69D",
         "SDK-5B616BA7F63957F2",
+        "SDK-7BA008D48728E3FA",
         "SDK-96794A9C85D4258E",
         "SDK-C283FC8051EE6B1A",
+        "SDK-D8EF2746E5704C2B",
         "SDK-F81B79D8BBB2888A",
         "SDK-FAAE73E57E2D0471"
       ]
@@ -10956,8 +10956,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "0d15da374dc8f305fe222d0e9876696a930387f9358bf49a104928551ede75c5",
-    "docs/migration/ledger/issue-11-rust-claims.json": "000ea82055a98f1bfd057ef10606013f06e7dc5453e91665609256808875f65c",
+    "docs/migration/ledger/issue-11-overlay.json": "a861428b5020244765b5127a62dd1687d883db648386c424034c212868304b78",
+    "docs/migration/ledger/issue-11-rust-claims.json": "137578e5a2c718de6533acbdff596c0e84ff7e5ceff34ae39a5182f1637a2661",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10966,6 +10966,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 887
+    "rust_test": 889
   }
 }

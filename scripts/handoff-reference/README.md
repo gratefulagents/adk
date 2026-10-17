@@ -500,3 +500,9 @@ oversized numbers followed by non-count text. Valid count forms and escaped or
 quoted literals are controls. All529 actual Go match decisions are compared by
 both native compilers, so accepting a pattern with different semantics is a
 failure even when both implementations compile it.
+
+The Perl-class oracle adds40 patterns:35 accepted forms compared over the same142
+inputs (4,970 match decisions) and5 invalid forms. It covers all six ASCII class
+escapes, negation, case-insensitive folding, mixed POSIX/literal/class unions and
+hyphens. In-class word boundaries, quoting escapes and invalid range endpoints
+remain rejected by both the actual Go compiler and native compilers.

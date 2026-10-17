@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### ASCII Perl atoms inside regex classes
+
+Removed the blanket rejection of valid in-class `\d`, `\s`, `\w` and their
+complements while retaining their ASCII Go semantics. The actual SDK oracle
+covers40 patterns:35 accepted forms ×142 inputs (4,970 match decisions per native
+compiler), plus5 rejected forms. Negation, case-insensitive flags, mixed POSIX
+unions, hyphens and leading literal brackets are covered. Word boundaries,
+quoting escapes and invalid range endpoints inside classes remain invalid.
+Arbitrary nested classes and Rust class-set syntax are still unsupported.
+
+Fresh Rust1.88 Linux: **1,720 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict workspace lint/typecheck/rustdoc, formatting, feature matrix,
+standalone consumer/purity, Go test/vet/build, all pinned evidence,53 validators,
+artifact/overlay/audit and source locks passed. No additional ledger closure is
+inferred: **947 verified /7,944 unresolved /251 excluded**, still incomplete.
+
 ### Literal malformed repetition syntax
 
 The actual Go oracle reproduced a semantic mismatch: `^a{01}$` matched `a` in

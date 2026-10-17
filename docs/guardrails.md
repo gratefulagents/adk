@@ -55,7 +55,9 @@ operations. Counted repetitions enforce Go's 1,000-copy bound, including nested
 products; zero maximums shield inner products but do not permit independently
 invalid inner counts. Malformed count forms, including leading-zero numbers,
 remain literal text as in Go rather than acquiring Rust repetition semantics.
-In-class Perl escapes remain outside the supported subset.
+Perl class atoms (`\d`, `\s`, `\w` and their complements) preserve ASCII Go
+semantics inside and outside classes, including under case-insensitive flags.
+In-class word-boundary escapes remain invalid, as in Go.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

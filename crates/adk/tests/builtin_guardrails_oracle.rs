@@ -452,7 +452,6 @@ async fn assert_regex_membership(cases: &[Value], inputs: &[Value]) {
         deadline: None,
     };
     for case in cases {
-        assert_eq!(case["error"], "");
         let pattern = case["pattern"].as_str().unwrap();
         let rule = adk::host::GuardrailRule {
             name: "class".into(),
@@ -460,8 +459,15 @@ async fn assert_regex_membership(cases: &[Value], inputs: &[Value]) {
             rule_type: "tool-input".into(),
             ..Default::default()
         };
-        let host = adk::host::compile_guardrail_rules(std::slice::from_ref(&rule)).unwrap();
+        let host = adk::host::compile_guardrail_rules(std::slice::from_ref(&rule));
         let (public, errors) = tool_guardrails_from_rules(&[rule]);
+        if case["error"] != "" {
+            assert!(host.is_err(), "host accepted {pattern}");
+            assert_eq!(errors.len(), 1, "public accepted {pattern}");
+            assert!(public.input.is_empty());
+            continue;
+        }
+        let host = host.unwrap();
         assert!(errors.is_empty(), "{pattern}: {errors:?}");
         let matches = case["matches"].as_str().unwrap();
         assert_eq!(matches.len(), inputs.len());
@@ -515,4 +521,18 @@ fn guardrail_repeat_limits_match_actual_go_compilation() {
         assert_eq!(errors.is_empty(), accepted, "public: {pattern}");
         assert_eq!(public.input.len(), usize::from(accepted));
     }
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn perl_class_atoms_match_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_perl_classes"].as_array().unwrap();
+    let inputs = fixture["regex_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 40);
+    assert_eq!(inputs.len(), 142);
+    assert_regex_membership(cases, inputs).await;
 }

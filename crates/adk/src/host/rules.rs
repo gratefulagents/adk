@@ -21,8 +21,8 @@ pub struct CompiledGuardrails {
 /// Compile before any model execution. This is the shared Go/Rust regex subset,
 /// not a claim that Rust's regex parser implements RE2. Quoted `\Q...\E`
 /// literals are translated outside classes. Named POSIX ASCII class atoms and
-/// their negations are accepted. Perl classes/boundaries inside character
-/// classes are rejected; outside classes their ASCII Go semantics are preserved.
+/// their negations are accepted. Perl class atoms retain ASCII Go semantics
+/// inside and outside character classes; in-class word boundaries are rejected.
 pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardrails, Error> {
     let mut compiled = CompiledGuardrails::default();
     for rule in rules {
@@ -195,11 +195,11 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 continue;
             }
             if "dDsSwWbB".contains(escaped) {
-                if in_class {
+                if in_class && matches!(escaped, 'b' | 'B') {
                     return Err(Error::new(
-                        ErrorCategory::Unsupported,
+                        ErrorCategory::InvalidInput,
                         format!(
-                            "guardrail {:?}: Go/Rust regex syntax gap: Perl classes inside character classes",
+                            "guardrail {:?}: Go does not permit word boundaries inside character classes",
                             rule.name
                         ),
                     ));

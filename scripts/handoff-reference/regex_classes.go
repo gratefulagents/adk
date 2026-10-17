@@ -48,6 +48,20 @@ func regexLiteralScenarios() ([]regexClassCase, []string) {
 	return regexMembership(patterns, inputs), inputs
 }
 
+func regexPerlClassScenarios(inputs []string) []regexClassCase {
+	patterns := []string{}
+	for _, atom := range []string{`\d`, `\D`, `\s`, `\S`, `\w`, `\W`} {
+		for _, negate := range []string{"", "^"} {
+			for _, flags := range []string{"", "(?i)"} {
+				patterns = append(patterns, fmt.Sprintf("%s^[%s%s]$", flags, negate, atom))
+			}
+		}
+	}
+	patterns = append(patterns, `^[\dA]$`, `^[\D-a]$`, `^[]\w]$`, `^[^]\s]$`, `^[[:alpha:]\d]$`, `^[\s\W]$`)
+	patterns = append(patterns, `^[\d-\w]$`, `^[\D-]$`, `^[\d[:alpha:]]$`, `^[\w\s]$`, `^[\W\S]$`, `[a-\d]`, `[\b]`, `[\B]`, `[\Q]`, `[\E]`)
+	return regexMembership(patterns, inputs)
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

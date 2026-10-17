@@ -295,6 +295,54 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
             pattern.push(c);
         }
     }
+    use regex_syntax::ast::{Ast, RepetitionKind, RepetitionRange};
+    let ast = regex_syntax::ast::parse::Parser::new()
+        .parse(&pattern)
+        .map_err(|error| {
+            Error::new(
+                ErrorCategory::InvalidInput,
+                format!(
+                    "invalid or unsupported Go/Rust regex in guardrail {:?}: {error}",
+                    rule.name
+                ),
+            )
+        })?;
+    let mut pending = vec![(&ast, 1000)];
+    while let Some((node, mut limit)) = pending.pop() {
+        match node {
+            Ast::Repetition(repetition) => {
+                if let RepetitionKind::Range(range) = &repetition.op.kind {
+                    let count = match *range {
+                        RepetitionRange::Exactly(count) | RepetitionRange::AtLeast(count) => count,
+                        RepetitionRange::Bounded(_, max) => max,
+                    };
+                    if count > limit {
+                        return Err(Error::new(
+                            ErrorCategory::InvalidInput,
+                            format!("invalid Go repeat count in guardrail {:?}", rule.name),
+                        ));
+                    }
+                    if matches!(
+                        range,
+                        RepetitionRange::Exactly(0) | RepetitionRange::Bounded(_, 0)
+                    ) {
+                        // A zero maximum shields its subtree from outer products,
+                        // but inner repetitions must still be independently valid.
+                        limit = 1000;
+                    } else if count > 0 {
+                        limit /= count;
+                    }
+                }
+                pending.push((&repetition.ast, limit));
+            }
+            Ast::Group(group) => pending.push((&group.ast, limit)),
+            Ast::Alternation(alternation) => {
+                pending.extend(alternation.asts.iter().map(|node| (node, limit)));
+            }
+            Ast::Concat(concat) => pending.extend(concat.asts.iter().map(|node| (node, limit))),
+            _ => {}
+        }
+    }
     Regex::new(&pattern).map_err(|error| {
         Error::new(
             ErrorCategory::InvalidInput,

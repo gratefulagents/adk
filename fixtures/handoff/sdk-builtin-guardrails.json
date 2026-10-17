@@ -1,4 +1,206 @@
 {
+  "regex_repeats": [
+    {
+      "pattern": "a{999}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1000}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1001}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{1001}`",
+      "matches": ""
+    },
+    {
+      "pattern": "a{0,1000}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "a{0,1001}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{0,1001}`",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1000,}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1001,}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{1001,}`",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1001,1002}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{1001,1002}`",
+      "matches": ""
+    },
+    {
+      "pattern": "a{2,1}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2,1}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{10}){100}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{10}){101}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{101}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{100}){10}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{101}){10}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{10}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{10,}){100}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{10,}){101}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{101}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{0,10}){100}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{0,10}){101}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{101}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1000})*",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1000})+",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1000})?",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1000}){0}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1000}){0}){1000}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1001}){0}){1000}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{1001}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1000}|b){2}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(ab{1000}){2}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2}`",
+      "matches": ""
+    },
+    {
+      "pattern": "a{1000}b{1000}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(?:a{10}){100}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "(?i:a{10}){101}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{101}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{10}){101}?",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{101}?`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\Qa{1001}\\E",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "a\\{1001\\}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[{1001}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1000}){0,0}){1000}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1000}){0,}){1000}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{1000}`",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1000}){1,}){2}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2}`",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{1000})?){2}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2}`",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{10}){10}){10}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "((a{10}){10}){11}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{11}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{1,1000}){2}",
+      "error": "invalid regex in guardrail rule \"repeat\": error parsing regexp: invalid repeat count: `{2}`",
+      "matches": ""
+    },
+    {
+      "pattern": "(a{0,1000}){0}",
+      "error": "",
+      "matches": ""
+    }
+  ],
   "regex_classes": [
     {
       "pattern": "^[[:alnum:]]$",

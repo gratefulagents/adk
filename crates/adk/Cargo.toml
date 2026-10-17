@@ -11,7 +11,7 @@ default = []
 compat = ["dep:adk-codec"]
 runtime = ["dep:adk-runtime", "dep:serde", "dep:serde_json", "dep:tokio"]
 builder = ["providers-runtime", "tools", "dep:adk-codec", "dep:schemars", "dep:serde_yaml", "dep:adk-sandbox", "dep:adk-security"]
-host = ["builder", "observability"]
+host = ["builder", "observability", "dep:regex-syntax"]
 providers = ["dep:adk-providers"]
 providers-runtime = ["providers", "runtime", "adk-providers/runtime"]
 execution = ["dep:adk-security", "dep:adk-sandbox"]
@@ -30,6 +30,7 @@ serde_yaml = { package = "serde_yaml_bw", version = "=2.5.8", optional = true }
 tokio = { workspace = true, optional = true }
 sha2 = { version = "0.10", optional = true }
 regex = { version = "1", optional = true }
+regex-syntax = { version = "0.8", optional = true }
 uuid = { version = "1", features = ["v4"], optional = true }
 chrono = { version = "0.4", default-features = false, features = ["std", "serde"], optional = true }
 opentelemetry = { version = "0.31", default-features = false, features = ["trace"], optional = true }

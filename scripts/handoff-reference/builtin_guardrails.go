@@ -40,6 +40,7 @@ type toolPatternCase struct {
 }
 
 type builtinFixture struct {
+	RegexRepeats     []regexClassCase   `json:"regex_repeats"`
 	RegexClasses     []regexClassCase   `json:"regex_classes"`
 	RegexInputs      []string           `json:"regex_inputs"`
 	CompiledRules    []compiledRuleCase `json:"compiled_rules"`
@@ -162,7 +163,7 @@ func builtinScenarios() []builtinCase {
 func generateBuiltinGuardrails() ([]byte, error) {
 	inputs, outputs := guardrails.BuiltinToolInputGuardrails(), guardrails.BuiltinToolOutputGuardrails()
 	regexCases, regexInputs := regexClassScenarios()
-	fixture := builtinFixture{RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
+	fixture := builtinFixture{RegexRepeats: regexRepeatScenarios(), RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
 	for _, name := range []string{"", "write", "read_file", "mcp_sql_db_write", "*write", "foo*bar", "猫-read", "file\nwrite"} {
 		for _, pattern := range []string{"", "*", "write", "wr*", "*ite", "*write", "*sql*_write", "*sql*", "wr*te", "**", "foo*", "foo**", "猫*", "*read", "\n*"} {
 			fixture.ToolPatterns = append(fixture.ToolPatterns, toolPatternCase{Name: name, Pattern: pattern, Matches: guardrails.MatchToolPattern(name, pattern)})

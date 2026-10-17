@@ -14,6 +14,34 @@ type regexClassCase struct {
 	Matches string `json:"matches"`
 }
 
+func regexRepeatScenarios() []regexClassCase {
+	patterns := []string{
+		`a{999}`, `a{1000}`, `a{1001}`, `a{0,1000}`, `a{0,1001}`,
+		`a{1000,}`, `a{1001,}`, `a{1001,1002}`, `a{2,1}`,
+		`(a{10}){100}`, `(a{10}){101}`, `(a{100}){10}`, `(a{101}){10}`,
+		`(a{10,}){100}`, `(a{10,}){101}`, `(a{0,10}){100}`, `(a{0,10}){101}`,
+		`(a{1000})*`, `(a{1000})+`, `(a{1000})?`, `(a{1000}){0}`,
+		`((a{1000}){0}){1000}`, `((a{1001}){0}){1000}`,
+		`(a{1000}|b){2}`, `(ab{1000}){2}`, `a{1000}b{1000}`,
+		`(?:a{10}){100}`, `(?i:a{10}){101}`, `(a{10}){101}?`,
+		`\Qa{1001}\E`, `a\{1001\}`, `[{1001}]`,
+		`((a{1000}){0,0}){1000}`, `((a{1000}){0,}){1000}`,
+		`((a{1000}){1,}){2}`, `((a{1000})?){2}`,
+		`((a{10}){10}){10}`, `((a{10}){10}){11}`,
+		`(a{1,1000}){2}`, `(a{0,1000}){0}`,
+	}
+	cases := []regexClassCase{}
+	for _, pattern := range patterns {
+		observed := regexClassCase{Pattern: pattern}
+		_, _, errors := guardrails.ToolGuardrailsFromRules([]sdk.GuardrailRule{{Name: "repeat", Type: "tool-input", Regex: pattern}})
+		if len(errors) != 0 {
+			observed.Error = errors[0].Error()
+		}
+		cases = append(cases, observed)
+	}
+	return cases
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

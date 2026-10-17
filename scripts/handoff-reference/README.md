@@ -487,3 +487,9 @@ negations and case-insensitive forms are compiled by the actual public SDK rule
 compiler. Ordered `0`/`1` match strings record8804 Go membership decisions; native
 host and public compilers each compare every decision. The Go generator contains
 no copied class matcher. Other nested/set syntax remains explicitly unsupported.
+
+The repeat oracle records40 actual SDK compilation decisions at and beyond Go's
+1,000-count boundary: bounded/unbounded counts, nested products, alternatives,
+concatenations, noncapturing/flag groups, lazy repetitions, zero maxima, and
+quoted/escaped/class literals. Both native compilers compare acceptance, not Go
+parser error wording. This does not broaden the claim to complete RE2 syntax.

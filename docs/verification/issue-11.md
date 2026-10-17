@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Counted regex repetition boundary
+
+A fresh regression reproduced native acceptance of `a{1001}`, rejected by the
+actual SDK. Both public and host compilation now validate Go's 1,000-copy bound
+for counted repetitions and nested products before compiling the executable
+regex. Zero maxima shield outer products without masking independently invalid
+inner repetitions. Forty independently executed Go compilation cases cover the
+boundary, groups/alternation/concatenation, unbounded and lazy counts, and literal
+quoted/escaped/class text. No complete RE2 syntax or error-text parity is claimed.
+The host-only `regex-syntax` dependency reuses the existing locked package;
+no new dependency version was introduced.
+
+Fresh Rust1.88 Linux: **1,718 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict workspace lint/typecheck and rustdoc, formatting, feature matrix,
+standalone consumer/purity, Go tests/vet/build, all pinned evidence regeneration,
+53 validators, artifact/overlay/audit and immutable source locks passed. Ledger
+unchanged at **947 verified /7,944 unresolved /251 excluded**; full acceptance is
+not complete.
+
 ### Role/catalog wire codecs and POSIX guardrail classes
 
 Compatibility-only `adk_codec::dto::{RoleSpec, RoleCatalog}` now expose sealed

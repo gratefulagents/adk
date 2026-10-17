@@ -471,3 +471,29 @@ async fn posix_guardrail_classes_match_actual_go_membership() {
         }
     }
 }
+
+#[cfg(feature = "host")]
+#[test]
+fn guardrail_repeat_limits_match_actual_go_compilation() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_repeats"].as_array().unwrap();
+    assert_eq!(cases.len(), 40);
+    for case in cases {
+        let pattern = case["pattern"].as_str().unwrap();
+        let rule = adk::host::GuardrailRule {
+            name: "repeat".into(),
+            regex: pattern.into(),
+            rule_type: "tool-input".into(),
+            ..Default::default()
+        };
+        let accepted = case["error"] == "";
+        let host = adk::host::compile_guardrail_rules(std::slice::from_ref(&rule));
+        assert_eq!(host.is_ok(), accepted, "host: {pattern}");
+        let (public, errors) = tool_guardrails_from_rules(&[rule]);
+        assert_eq!(errors.is_empty(), accepted, "public: {pattern}");
+        assert_eq!(public.input.len(), usize::from(accepted));
+    }
+}

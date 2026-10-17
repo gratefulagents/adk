@@ -1,3 +1,6 @@
+#[path = "http/activity.rs"]
+mod activity;
+
 use adk_core::{BoxFuture, Context, Error, Model, ModelEvent, ModelRequest, StreamingModel};
 use adk_providers::{auth::*, client::Provider, wire::Protocol};
 use adk_runtime::CancellationToken;

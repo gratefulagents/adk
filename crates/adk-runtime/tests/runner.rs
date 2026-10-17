@@ -1,3 +1,6 @@
+#[path = "runner/activity.rs"]
+mod activity;
+
 use adk_core::*;
 use adk_runtime::*;
 use serde_json::{Value, json};

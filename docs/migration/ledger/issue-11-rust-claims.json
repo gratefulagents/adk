@@ -2,6 +2,22 @@
   "schema_version": 1,
   "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "claims": {
+    "SDK-D0F2EC9B6D5972B5": {
+      "source": "internal/modelactivity/activity_test.go",
+      "source_name": "TestWrapTransportReportsEveryResponseBodyRead",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::read_bytes"
+      ],
+      "rust_test_identifiers": [
+        "client::tests::body_read_activity_matches_original_sdk_test"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/modelactivity/TestWrapTransportReportsEveryResponseBodyRead",
+      "rationale": "Only the original three-positive-body-read regression is closed. The native test uses deterministic response body frames containing the same start, ping and input-delta text, asserts all bytes are preserved and exactly three activity callbacks fire; an extra empty frame produces no notification. This does not claim Go context helpers, transport defaults, package/file closure or generic reader-error behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
     "SDK-6866B794E8FC3833": {
       "source": "pkg/agentsdk/runtime/features.go",
       "source_name": "AsyncSubAgentFeatures.any",

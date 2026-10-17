@@ -79,8 +79,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1066,
-        "verified": 104
+        "unresolved": 1065,
+        "verified": 105
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -96,8 +96,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8040,
-    "verified": 851
+    "unresolved": 8039,
+    "verified": 852
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -209,11 +209,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 915,
+      "pass": 916,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "ec7cf4aca15ce1757b53c5fa98011037582a97c973a7b3917bbf65471b910135",
+    "evidence_sha256": "49c11ca9d94c9ca1011cc756e3d436563e168730c99000f78d16b6e9d6a2bebc",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -16134,7 +16134,7 @@
     "SDK-D0DA337C387C25E2": {"approved_divergence_reference": null, "category": "tool_parameters", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tool_parameters:pkg/agentsdk/tools/projectstate.memoryRememberTool:0:scope", "proposed_rust_module": "sdk::tools::project_state", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/projectstate/tools.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::project_state", "verification_status": "not_run"},
     "SDK-D0E3B9F4BBEFFE29": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.DurableCheckpointSchemaVersion@pkg/agentsdk/aliases.go", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/aliases.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
     "SDK-D0EF8946B55169B3": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.LLMOutputSchema@pkg/agentsdk/aliases.go", "proposed_rust_module": "sdk::model", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/aliases.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::model", "verification_status": "not_run"},
-    "SDK-D0F2EC9B6D5972B5": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/modelactivity/activity_test.go:TestWrapTransportReportsEveryResponseBodyRead", "proposed_rust_module": "sdk::events::activity", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/modelactivity/activity_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::events::activity", "verification_status": "not_run"},
+    "SDK-D0F2EC9B6D5972B5": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Only the original three-positive-body-read regression is closed. The native test uses deterministic response body frames containing the same start, ping and input-delta text, asserts all bytes are preserved and exactly three activity callbacks fire; an extra empty frame produces no notification. This does not claim Go context helpers, transport defaults, package/file closure or generic reader-error behavior.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/client.rs::read_bytes"], "ledger_record_id": "tests:internal/modelactivity/activity_test.go:TestWrapTransportReportsEveryResponseBodyRead", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/modelactivity/TestWrapTransportReportsEveryResponseBodyRead"}, "proposed_rust_module": "sdk::events::activity", "rust_test_identifiers": ["client::tests::body_read_activity_matches_original_sdk_test"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/modelactivity/activity_test.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::events::activity", "verification_status": "passed"},
     "SDK-D0F55CBE2F5C31F4": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/projectstate.taskClosedPayload.Task@pkg/agentsdk/projectstate/engine.go", "proposed_rust_module": "sdk::project_state", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/projectstate/engine.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::project_state", "verification_status": "not_run"},
     "SDK-D0F891800BF34105": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/agent/audit_fixes_test.go:TestHandoffInputFilterSeesCurrentTurnItems", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/agent/TestHandoffInputFilterSeesCurrentTurnItems"}, "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/audit_fixes_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
     "SDK-D0FB957827924E25": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.subagentProgressSummary@pkg/agentsdk/subagent_tools.go", "proposed_rust_module": "sdk::subagents", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/subagent_tools.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::subagents", "verification_status": "not_run"},

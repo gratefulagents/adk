@@ -148,6 +148,8 @@ dependencies = [
  "adk-core",
  "adk-runtime",
  "base64",
+ "futures-util",
+ "http",
  "httpdate",
  "reqwest",
  "serde",

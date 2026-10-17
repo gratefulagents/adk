@@ -52,8 +52,14 @@ process crash**. Durable recovery/idempotency protocols remain separate issues.
 
 Awaited event delivery provides backpressure. Cancellation and total deadlines
 must race pending I/O; checking a flag only before dispatch is insufficient.
-Provider idle timeouts reset per received event rather than acting as total
-stream deadlines. Limits stop at reported usage boundaries, not mid-generation;
+Model idle timeouts reset on per-call transport activity as well as received
+model events, rather than acting as total stream deadlines. Body bytes that a
+provider discards (for example SSE heartbeat comments) still count as progress.
+Activity uses an attempt-local clock, never a synthetic host/model event: it does
+not commit visible output, disable a safe retry, extend an absolute deadline or
+let an old attempt keep its replacement alive. Awaited host backpressure is still
+excluded from the idle interval. Fixed compaction/summary deadlines are unchanged.
+Limits stop at reported usage boundaries, not mid-generation;
 provider compaction reports usage and cost too, and is charged before another
 model call. A cost-limited run requires a cost estimator. Fallback selection and success counts are per agent identity, live inside the
 continuation, and reset to primary after three successful fallback calls. A new

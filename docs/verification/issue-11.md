@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Transport progress resets model inactivity without exposing output
+
+Added optional per-call activity callbacks to native model contracts and forwarded
+positive response-body reads through direct providers, Routes and Copilot. The
+runner resets attempt-local idle timers even when SSE heartbeat bytes produce no
+model events. It retains the pending operation, absolute deadlines, cancellation,
+retry visibility and host-backpressure semantics; stale callbacks cannot keep a
+later attempt alive. Existing third-party models retain delegation defaults.
+
+Five paused-clock regressions cover call modes, stopped activity, absolute limits,
+retry eligibility and attempt isolation. Real HTTP chunk/callback handshakes cover
+buffered JSON and SSE through all three provider entry points. The deterministic
+three-read counterpart closes only the original modelactivity body-read test, not
+the whole transport/context API.
+
+Fresh Rust1.88: **1,614 passed /0 failed /30 ignored**, **9 doctests**; strict
+Clippy/rustdoc/format, facade matrix, locked consumer/purity, all20 scenarios and
+host-session passed. Pinned Go: **916 pass /5 skip**,37 packages. Bound evidence,
+51 validators, artifact checks and source locks passed. The first evidence run
+rejected an unqualified unit-test name; the corrected fully qualified identifier
+passed. Ledger: **852 verified /8,039 unresolved /251 excluded**. Issue11 remains
+incomplete; these results do not claim live-provider or whole-SDK parity.
+
 ### Explicit default ports retain backend and credential-scope distinctions
 
 Scope canonicalization now retains explicit default/empty ports before reqwest

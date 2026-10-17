@@ -6,8 +6,8 @@ use crate::{
     wire::{self, Protocol},
 };
 use adk_core::{
-    BoxFuture, Context, Error, ErrorCategory, Model, ModelEvent, ModelRequest, ModelResponse,
-    ModelStream, StreamingModel,
+    BoxFuture, Context, Error, ErrorCategory, Model, ModelActivitySink, ModelEvent, ModelRequest,
+    ModelResponse, ModelStream, StreamingModel,
 };
 use base64::{Engine, engine::general_purpose::STANDARD};
 use reqwest::Client;
@@ -116,7 +116,9 @@ impl Provider {
             client: self.client.clone(),
             thinking_overrides: Mutex::default(),
         };
-        let response = transport.send_body(context, "/responses", body).await?;
+        let response = transport
+            .send_body(context, "/responses", body, None)
+            .await?;
         let mut state = StreamState::new(Protocol::Responses);
         state.snapshot_profile = if codex {
             crate::snapshot::Profile::Collected
@@ -125,6 +127,7 @@ impl Provider {
         };
         let mut stream = HttpStream {
             context: context.clone(),
+            activity: None,
             response: Some(response),
             decoder: Decoder::default(),
             state,
@@ -222,7 +225,9 @@ impl Provider {
                 body["text"] = json!({"verbosity":verbosity});
             }
         }
-        let response = self.send_body(context, "/responses/compact", body).await?;
+        let response = self
+            .send_body(context, "/responses/compact", body, None)
+            .await?;
         let result = wire::response(&read_json(context, response).await?, self.protocol)?;
         if !result.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if !compaction.encrypted_content.trim().is_empty())) {
             return Err(protocol_error("native compaction response has no encrypted continuation"));
@@ -234,6 +239,7 @@ impl Provider {
         context: &Context,
         request: &ModelRequest,
         stream: bool,
+        activity: Option<&ModelActivitySink>,
     ) -> Result<reqwest::Response, Error> {
         let mut body = wire::request(request, self.protocol, stream)?;
         let scope = self.session.scope();
@@ -246,13 +252,15 @@ impl Provider {
         if self.protocol == Protocol::Anthropic {
             crate::anthropic::shape(&mut body, request, scope.mode);
         }
-        self.send_body(context, self.protocol.path(), body).await
+        self.send_body(context, self.protocol.path(), body, activity)
+            .await
     }
     async fn send_body(
         &self,
         context: &Context,
         path: &str,
         body: Value,
+        activity: Option<&ModelActivitySink>,
     ) -> Result<reqwest::Response, Error> {
         let scope = self.session.scope();
         let mut body = body;
@@ -312,7 +320,7 @@ impl Provider {
                 let status = response.status().as_u16();
                 let failure = RequestFailure::http(status, response.headers(), SystemTime::now());
                 if status == 400 {
-                    let bytes = read_bytes(context, response).await?;
+                    let bytes = read_bytes(context, response, activity).await?;
                     if !repaired_anthropic
                         && repair(
                             &mut body,
@@ -402,6 +410,14 @@ impl Model for Provider {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, None)
+    }
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             let mode = self.session.scope().mode;
             let streaming = match mode {
@@ -409,7 +425,9 @@ impl Model for Provider {
                 AuthMode::OpenAiOAuth => true,
                 _ => self.protocol != Protocol::Chat,
             };
-            let response = self.send(context, &request, streaming).await?;
+            let response = self
+                .send(context, &request, streaming, activity.as_ref())
+                .await?;
             let event_stream = response
                 .headers()
                 .get(reqwest::header::CONTENT_TYPE)
@@ -425,6 +443,7 @@ impl Model for Provider {
                 state.snapshot_profile = profile;
                 let mut stream = HttpStream {
                     context: context.clone(),
+                    activity,
                     response: Some(response),
                     decoder: Decoder::default(),
                     state,
@@ -438,7 +457,7 @@ impl Model for Provider {
                 }
                 return Err(protocol_error("stream ended without completion"));
             }
-            let bytes = read_bytes(context, response).await?;
+            let bytes = read_bytes(context, response, activity.as_ref()).await?;
             // Some compatible gateways return a JSON document even when streaming
             // was requested. Keep that existing native transport extension.
             let json_document = bytes
@@ -470,10 +489,21 @@ impl StreamingModel for Provider {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream_with_activity(context, request, None)
+    }
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         Box::pin(async move {
-            let response = self.send(context, &request, true).await?;
+            let response = self
+                .send(context, &request, true, activity.as_ref())
+                .await?;
             Ok(Box::new(HttpStream {
                 context: context.clone(),
+                activity,
                 response: Some(response),
                 decoder: Decoder::default(),
                 state: StreamState::new(self.protocol),
@@ -484,15 +514,24 @@ impl StreamingModel for Provider {
     }
 }
 async fn read_json(context: &Context, response: reqwest::Response) -> Result<Value, Error> {
-    serde_json::from_slice(&read_bytes(context, response).await?)
+    serde_json::from_slice(&read_bytes(context, response, None).await?)
         .map_err(|_| protocol_error("invalid provider response JSON"))
 }
-async fn read_bytes(context: &Context, mut response: reqwest::Response) -> Result<Vec<u8>, Error> {
+async fn read_bytes(
+    context: &Context,
+    mut response: reqwest::Response,
+    activity: Option<&ModelActivitySink>,
+) -> Result<Vec<u8>, Error> {
     let mut bytes = Vec::new();
     while let Some(chunk) = crate::active(context, response.chunk())
         .await?
         .map_err(|e| RequestFailure::transport(&e).into_error())?
     {
+        if !chunk.is_empty()
+            && let Some(activity) = activity
+        {
+            activity();
+        }
         if bytes.len().saturating_add(chunk.len()) > 16 * 1024 * 1024 {
             return Err(protocol_error("provider response exceeds limit"));
         }
@@ -584,6 +623,7 @@ fn protocol_error(message: &'static str) -> Error {
 
 struct HttpStream {
     context: Context,
+    activity: Option<ModelActivitySink>,
     response: Option<reqwest::Response>,
     decoder: Decoder,
     state: StreamState,
@@ -611,6 +651,11 @@ impl HttpStream {
                     "provider stream ended without terminal event",
                 ));
             };
+            if !chunk.is_empty()
+                && let Some(activity) = &self.activity
+            {
+                activity();
+            }
             for event in self.decoder.feed(&chunk)? {
                 self.queue.extend(self.state.event(&event.data)?);
             }
@@ -1332,6 +1377,37 @@ fn required(value: &Value, key: &str) -> Result<String, Error> {
 mod tests {
     use super::*;
     use crate::auth::{CredentialStore, Material, Refresh, Scope, Secret, cache_scope};
+
+    #[tokio::test]
+    async fn body_read_activity_matches_original_sdk_test() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let chunks = [
+            "event: message_start\ndata: {}\n\n",
+            "",
+            "event: ping\ndata: {}\n\n",
+            "event: input_json_delta\ndata: {}\n\n",
+        ];
+        let frames = futures_util::stream::iter(chunks.map(Ok::<_, std::io::Error>));
+        let response =
+            reqwest::Response::from(http::Response::new(reqwest::Body::wrap_stream(frames)));
+        let count = Arc::new(AtomicUsize::new(0));
+        let observed = count.clone();
+        let activity: ModelActivitySink = Arc::new(move || {
+            observed.fetch_add(1, Ordering::SeqCst);
+        });
+        let context = Context {
+            run_id: "activity".into(),
+            cancellation: Arc::new(adk_runtime::CancellationToken::new()),
+            deadline: None,
+        };
+        assert_eq!(
+            read_bytes(&context, response, Some(&activity))
+                .await
+                .unwrap(),
+            chunks.concat().as_bytes()
+        );
+        assert_eq!(count.load(Ordering::SeqCst), 3);
+    }
 
     struct Credentials(Mutex<Material>);
     impl CredentialStore for Credentials {

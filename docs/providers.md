@@ -84,6 +84,20 @@ scoped prompt-cache affinity, not a learned prompt-cache capability registry.
 Neither unused predicates nor a hypothetical registry are counted as missing
 baseline features.
 
+## Per-call transport activity
+
+`Model::complete_with_activity` and `StreamingModel::stream_with_activity` accept
+an optional `ModelActivitySink` (`Arc<dyn Fn() + Send + Sync>`). Native providers
+notify once per nonempty response-body chunk, including discarded SSE heartbeat
+comments and body reads during bounded shape-repair handling. Routes and Copilot
+forward the same per-call sink. Callbacks run inline and must return quickly;
+notifications are not model events or proof that output was exposed to the host.
+The runner uses them to reset idle timeouts without extending cancellation or
+absolute deadlines. Existing model implementations inherit methods that delegate
+to their ordinary complete/stream calls; they must override the activity-aware
+method to report otherwise-hidden progress. No context-global callback or
+process-global observer is installed.
+
 ## Ownership/security contract
 
 The host supplies a `CredentialStore`, preserves secrets and revisions, and

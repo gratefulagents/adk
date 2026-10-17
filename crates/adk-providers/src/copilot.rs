@@ -2,7 +2,8 @@
 //! No environment flags or discovery requests are performed implicitly.
 use crate::{auth::Session, client::Provider, wire::Protocol};
 use adk_core::{
-    BoxFuture, Context, Error, Model, ModelRequest, ModelResponse, ModelStream, StreamingModel,
+    BoxFuture, Context, Error, Model, ModelActivitySink, ModelRequest, ModelResponse, ModelStream,
+    StreamingModel,
 };
 use std::sync::Arc;
 
@@ -128,20 +129,38 @@ impl Model for Copilot {
     fn complete<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, None)
+    }
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         request.model = normalize(&request.model).to_owned();
-        self.select(&request.model).complete(context, request)
+        self.select(&request.model)
+            .complete_with_activity(context, request, activity)
     }
 }
 impl StreamingModel for Copilot {
     fn stream<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream_with_activity(context, request, None)
+    }
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         request.model = normalize(&request.model).to_owned();
-        self.select(&request.model).stream(context, request)
+        self.select(&request.model)
+            .stream_with_activity(context, request, activity)
     }
 }
 

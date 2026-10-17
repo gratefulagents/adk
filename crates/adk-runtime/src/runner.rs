@@ -1273,6 +1273,51 @@ pub(crate) async fn bounded<T>(
     }
 }
 
+async fn bounded_model<T>(
+    context: &Context,
+    timeout: Option<Duration>,
+    activity: &mut tokio::sync::watch::Receiver<tokio::time::Instant>,
+    future: impl Future<Output = Result<T, Error>>,
+) -> Result<T, Error> {
+    let Some(timeout) = timeout else {
+        return bounded(context, None, future).await;
+    };
+    activity.borrow_and_update();
+    let inactivity = async {
+        let timer = tokio::time::sleep(timeout);
+        tokio::pin!(timer);
+        loop {
+            tokio::select! {
+                biased;
+                _ = &mut timer => {
+                    let latest = *activity.borrow_and_update();
+                    let expires = latest.checked_add(timeout).unwrap_or(timer.deadline());
+                    if expires > timer.deadline() {
+                        timer.as_mut().reset(expires);
+                    } else {
+                        return Error::new(ErrorCategory::DeadlineExceeded, "operation inactivity/timeout limit exceeded").with_source(OperationTimeout);
+                    }
+                }
+                Ok(()) = activity.changed() => {
+                    let latest = *activity.borrow_and_update();
+                    let expires = latest.checked_add(timeout).unwrap_or(timer.deadline());
+                    if expires > timer.deadline() {
+                        timer.as_mut().reset(expires);
+                    }
+                }
+            }
+        }
+    };
+    bounded(context, None, async {
+        tokio::select! {
+            biased;
+            error = inactivity => Err(error),
+            result = future => result,
+        }
+    })
+    .await
+}
+
 fn go_duration(duration: Duration) -> String {
     let ns = duration.as_nanos();
     if ns == 0 {
@@ -3271,36 +3316,50 @@ impl Engine {
         completed_usage: Option<Arc<std::sync::Mutex<Option<Usage>>>>,
     ) -> Result<ModelResponse, (Error, bool)> {
         let timeout = self.config.model_idle_timeout;
+        let (activity_sender, mut activity_receiver) =
+            tokio::sync::watch::channel(tokio::time::Instant::now());
+        let activity: adk_core::ModelActivitySink = Arc::new(move || {
+            activity_sender.send_modify(|last| *last = tokio::time::Instant::now());
+        });
         match binding {
-            ModelBinding::Complete { model, .. } => bounded(
+            ModelBinding::Complete { model, .. } => bounded_model(
                 &self.context,
                 timeout,
-                model.complete(&self.context, request),
+                &mut activity_receiver,
+                model.complete_with_activity(&self.context, request, Some(activity.clone())),
             )
             .await
             .map_err(|e| (e, false)),
             ModelBinding::Streaming { model, .. }
                 if !self.streaming && !self.config.blocking_reasoning =>
             {
-                bounded(
+                bounded_model(
                     &self.context,
                     timeout,
-                    model.complete(&self.context, request),
+                    &mut activity_receiver,
+                    model.complete_with_activity(&self.context, request, Some(activity.clone())),
                 )
                 .await
                 .map_err(|e| (e, false))
             }
             ModelBinding::Streaming { model, .. } => {
                 let context = self.context.clone();
-                let mut stream = bounded(&context, timeout, model.stream(&context, request))
-                    .await
-                    .map_err(|e| (e, false))?;
+                let mut stream = bounded_model(
+                    &context,
+                    timeout,
+                    &mut activity_receiver,
+                    model.stream_with_activity(&context, request, Some(activity.clone())),
+                )
+                .await
+                .map_err(|e| (e, false))?;
                 let mut complete = None;
                 let mut items = vec![];
                 let mut delta_text = String::new();
                 let mut committed = false;
                 let result = loop {
-                    match bounded(&context, timeout, stream.next()).await {
+                    match bounded_model(&context, timeout, &mut activity_receiver, stream.next())
+                        .await
+                    {
                         Ok(Some(event)) => {
                             if complete.is_some() {
                                 break Err(Error::new(

@@ -4,7 +4,8 @@ use crate::{
     factory::{Kind, RouteSpec},
 };
 use adk_core::{
-    BoxFuture, Context, Error, Model, ModelRequest, ModelResponse, ModelStream, StreamingModel,
+    BoxFuture, Context, Error, Model, ModelActivitySink, ModelRequest, ModelResponse, ModelStream,
+    StreamingModel,
 };
 use std::{collections::BTreeMap, sync::Arc};
 
@@ -144,13 +145,23 @@ impl Model for Routes {
     fn complete<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, None)
+    }
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             context.check_active()?;
             let (route, name) = self.resolve(&request.model)?;
             request.model = name;
-            route.complete(context, request).await
+            route
+                .complete_with_activity(context, request, activity)
+                .await
         })
     }
 }
@@ -160,13 +171,24 @@ impl StreamingModel for Routes {
     fn stream<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream_with_activity(context, request, None)
+    }
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         Box::pin(async move {
             context.check_active()?;
             let (route, model) = self.select(&request.model)?;
             request.model = model;
-            route.model.stream(context, request).await
+            route
+                .model
+                .stream_with_activity(context, request, activity)
+                .await
         })
     }
 }

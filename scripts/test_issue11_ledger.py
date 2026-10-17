@@ -24,12 +24,14 @@ class ReferenceSelectionTests(unittest.TestCase):
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
+            "github.com/gratefulagents/sdk/internal/modelactivity/TestReadActivity",
             "github.com/gratefulagents/sdk/pkg/agentsdk/TestPublic",
             "github.com/gratefulagents/sdk/internal/unrelated/TestNotSelected",
         ])}}
         self.reference.add_claimed_internal_tests(claims, selected)
         self.assertEqual(selected, {"internal/agent": {"TestHistorical", "TestRunner"},
-                                    "internal/openai": {"TestMetadata"}})
+                                    "internal/openai": {"TestMetadata"},
+                                    "internal/modelactivity": {"TestReadActivity"}})
 
     def test_internal_reference_patterns_and_subtests_cannot_expand_execution(self):
         for name in ("TestAny|TestOther", "TestAny/subtest", "TestAny$", "../TestOther", ""):

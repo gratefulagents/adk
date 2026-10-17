@@ -204,6 +204,28 @@ fn default_run_policy_preserves_baseline_hundred_turn_budget() {
 }
 
 #[test]
+fn output_schema_documents_preserve_all_json_shapes_and_null_presence() {
+    for schema in [
+        None,
+        Some("null"),
+        Some("\"schema\""),
+        Some("7"),
+        Some("[]"),
+        Some("true"),
+        Some("{\"type\":27}"),
+    ] {
+        let input = json!({
+            "model": "test", "instructions": "", "input": [], "tools": [],
+            "output_schema": schema, "output_schema_name": "output", "output_schema_strict": true,
+            "settings": {}
+        });
+        let request: ModelRequest = serde_json::from_value(input.clone()).unwrap();
+        assert_eq!(request.output_schema.is_some(), schema.is_some());
+        assert_eq!(serde_json::to_value(&request).unwrap(), input);
+    }
+}
+
+#[test]
 fn provenance_fields_preserve_legacy_json_and_explicit_attribution() {
     let items = json!([{
         "type": "message",

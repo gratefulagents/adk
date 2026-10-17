@@ -250,7 +250,7 @@ pub struct AgentConfig {
     pub tool_access_ceiling: Option<AccessMode>,
     pub handoffs: Vec<Handoff>,
     pub handoff_description: String,
-    pub output_schema: Option<schemars::Schema>,
+    pub output_schema: Option<adk_core::JsonDocument>,
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn OutputParser>>,
@@ -2887,7 +2887,7 @@ impl Engine {
             } else {
                 ""
             };
-            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_str()));
         }
         let mcp_context = crate::mcp_prompt::context(&self.agent.mcp_servers);
         if !mcp_context.is_empty() {

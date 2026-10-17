@@ -2,6 +2,33 @@
 
 ## Current continuation evidence
 
+### Output-schema documents retain JSON shape, spelling and null presence
+
+Core model requests, runtime agents and the facade builder now accept the existing
+syntax-validated `JsonDocument` for output schemas instead of restricting them to
+Schemars objects/booleans. Native Serde stores the document as a string, preserving
+explicit JSON null versus no schema and binding that distinction into durable
+configuration identity. Snapshot conversion retains raw schema text; tool/handoff
+input-schema validation is unchanged. Updated examples and the external consumer
+use the explicit document constructor.
+
+The pinned Go matrix expanded from80 to240 cases across object, invalid-schema
+object, null, string, number and array schemas. Native comparisons check exact
+request schema text/instructions, parsed outputs and warnings in both run modes.
+New regressions cover document round trips, all three provider protocol shapes,
+raw snapshots and rejecting durable recovery after absent/null schema changes.
+The core regression failed before the change with `expected object or boolean`.
+Malformed raw schema bytes remain unsupported; provider Value projection still
+limits Unicode/depth and exact wire-token parity. This is not whole-schema closure.
+
+Fresh Rust1.88: **1,618 passed /0 failed /30 ignored**, **9 doctests**; strict
+Clippy/rustdoc/format, facade matrix, locked consumer/purity, all20 scenarios and
+host-session passed. Independent Go reproduction, bound evidence,51 validators,
+artifact checks and source locks passed. Ledger remains **852 verified /8,039
+unresolved /251 excluded**. Previous8135dbb8 CI had44 passing checks and two
+quality failures from the stale audit report; correctioncfaf3d18 regenerates it.
+The latest change's remote CI is not yet claimed. Issue11 is still incomplete.
+
 ### Transport progress resets model inactivity without exposing output
 
 Added optional per-call activity callbacks to native model contracts and forwarded

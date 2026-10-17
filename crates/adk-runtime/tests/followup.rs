@@ -1378,7 +1378,7 @@ async fn final_verifier_matches_pinned_sdk_once_after_gate_normal_and_streamed()
                 .push(TestTool::new("read", true, false, false, false));
         }
         if matches!(name, "object" | "number" | "null" | "string") {
-            agent.output_schema = Some(schemars::json_schema!(true));
+            agent.output_schema = Some(adk_core::JsonDocument::new("true".into()).unwrap());
         }
         let verifier = Arc::new(VerifierProbe {
             inputs: Mutex::new(vec![]),
@@ -1594,7 +1594,7 @@ async fn critic_matches_pinned_sdk_verdicts_prompts_and_read_only_turn_limits() 
         agent.instructions = case["instructions"].as_str().unwrap().into();
         agent.tools = vec![read.clone(), write.clone()];
         if case["structured"] == true {
-            agent.output_schema = Some(schemars::json_schema!(true));
+            agent.output_schema = Some(adk_core::JsonDocument::new("true".into()).unwrap());
             agent.output_schema_strict = false;
         }
         let critic =
@@ -2034,7 +2034,8 @@ async fn per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_gua
             agent.tool_final_output = Some(ToolFinalOutput::FirstTool);
         }
         if name == "schema" {
-            agent.output_schema = Some(schemars::json_schema!({"type":"object"}));
+            agent.output_schema =
+                Some(adk_core::JsonDocument::new(r#"{"type":"object"}"#.into()).unwrap());
         }
         if matches!(name, "object" | "string" | "null" | "false") {
             agent.tool_final_output = Some(ToolFinalOutput::Json(case["output"].clone()));

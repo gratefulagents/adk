@@ -16,7 +16,7 @@ fn main() {
     };
     assert_eq!(request.input.len(), 1);
     let config = adk::builder::Config {
-        output_schema: Some(true.into()),
+        output_schema: Some(adk::core::JsonDocument::new("true".into()).unwrap()),
         ..Default::default()
     };
     assert!(config.output_schema.is_some());

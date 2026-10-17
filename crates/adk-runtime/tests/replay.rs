@@ -374,7 +374,8 @@ async fn replay(script: &Value) -> Value {
             .collect();
     }
     if !script["schema"].is_null() {
-        agent.output_schema = Some(script["schema"].clone().try_into().unwrap());
+        agent.output_schema =
+            Some(adk_core::JsonDocument::new(script["schema"].to_string()).unwrap());
         if let Some(name) = script["schema_name"].as_str() {
             agent.output_schema_name = name.into();
         }

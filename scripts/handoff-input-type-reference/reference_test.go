@@ -94,7 +94,7 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 		}
 	}
 	outputCases := []map[string]any{}
-	for _, schema := range []json.RawMessage{json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`), json.RawMessage(`{"type":27}`)} {
+	for _, schema := range []json.RawMessage{json.RawMessage(`{"type":"object","required":["n"],"properties":{"n":{"type":"integer","minimum":0}},"additionalProperties":false}`), json.RawMessage(`{"type":27}`), json.RawMessage(`null`), json.RawMessage(`"schema"`), json.RawMessage(`7`), json.RawMessage(`[]`)} {
 		for _, streamed := range []bool{false, true} {
 			for _, raw := range []string{`{"n":1}`, `{"n":-1}`, `"text"`, `null`, `[]`, `true`, `not json`, ``, `"\ud800"`, `{"\ud800":"\udc00"}`, `"\ud83d\ude00"`, `"\\ud800"`, `"\ud800\uD800\udc00"`, `9007199254740993`, `1e400`, `{"n":1e400,"n":1}`, `{"$serde_json::private::Number":"1"}`, `{"$serde_json::private::RawValue":"[1]"}`, `-0`, `[0.1,1.0,1e-7,1e21]`} {
 				var logs bytes.Buffer
@@ -119,7 +119,7 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				outputCases = append(outputCases, map[string]any{"raw": raw, "streamed": streamed, "schema": schema, "output_json": string(encoded), "warning": strings.Contains(logs.String(), "output schema validation failed")})
+				outputCases = append(outputCases, map[string]any{"raw": raw, "streamed": streamed, "schema": schema, "schema_json": string(model.requests[0].OutputSchema.Schema), "instructions": model.requests[0].Instructions, "output_json": string(encoded), "warning": strings.Contains(logs.String(), "output schema validation failed")})
 			}
 		}
 	}

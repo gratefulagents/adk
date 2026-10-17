@@ -193,7 +193,10 @@ impl RequestSnapshot {
             settings,
             output_schema: request.output_schema.as_ref().map(|schema| OutputSchema {
                 name: request.output_schema_name.clone(),
-                schema: RawJson::Present(schema.as_value().clone()),
+                schema: RawJson::Encoded(
+                    serde_json::value::RawValue::from_string(schema.as_str().to_owned())
+                        .expect("JsonDocument is syntax validated"),
+                ),
                 strict: request.output_schema_strict,
             }),
             input_token_estimate,

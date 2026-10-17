@@ -694,7 +694,8 @@ async fn agent_as_tool_completed_output_matches_pinned_sdk() {
         let mut child_agent =
             AgentConfig::new("worker", ModelBinding::complete("fake", child.clone()));
         if case["structured"].as_bool().unwrap() {
-            child_agent.output_schema = Some(json!(true).try_into().unwrap());
+            child_agent.output_schema =
+                Some(adk_core::JsonDocument::new((json!(true)).to_string()).unwrap());
         }
         let child_runner = Runner::new(child_agent, RunnerConfig::default()).unwrap();
         let mut executor = RunnerChildExecutor::new(

@@ -174,7 +174,9 @@ mod tests {
             instructions: "host instructions".into(),
             input: vec![],
             tools: vec![],
-            output_schema: Some(json!({"type":"object"}).try_into().unwrap()),
+            output_schema: Some(
+                adk_core::JsonDocument::new((json!({"type":"object"})).to_string()).unwrap(),
+            ),
             output_schema_name: "result".into(),
             output_schema_strict: true,
             settings: [("reasoning_effort".into(), json!(effort))]

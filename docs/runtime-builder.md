@@ -555,7 +555,13 @@ attribution because their historical agent names were not reliable.
 
 ## Structured output
 
-`Config::output_schema` accepts a typed `schemars::Schema` (object or boolean).
+`Config::output_schema` accepts an `adk::core::JsonDocument`, for example
+`JsonDocument::new(r#"{"type":"object"}"#.into())?`. It preserves JSON text
+without requiring an object/boolean schema or compiling JSON Schema. Scalars,
+arrays and explicit JSON `null` are supported. `None` disables structured output;
+`Some(JsonDocument::new("null".into())?)` still enables it. Native request Serde
+stores the document as a string, preserving that distinction and raw spelling
+through checkpoints; provider wire requests embed the JSON value instead.
 `output_schema_name` defaults to `final_output`; `output_schema_strict` defaults
 to `true`. Set `output_parser` to an `Arc<dyn runtime::OutputParser>` for custom
 parsing. These fields forward the existing runtime contracts to the **parent**
@@ -566,8 +572,11 @@ Normal and streamed runs carry the schema/name/strict flag in `ModelRequest` and
 return parsed `RunResult::final_output`. The `structured_output` offline feature
 example demonstrates builder configuration, observational validation and explicit
 bundle closure. Output schemas are forwarded without local JSON Schema compilation,
-matching the SDK; providers may reject unsupported schemas. Native schemas must be
-JSON objects or booleans. Tool-only construction does not inspect output schemas.
+matching the SDK; providers may reject unsupported schemas. Tool schemas retain
+their existing typed validation. Tool-only construction does not inspect output
+schemas. `JsonDocument` requires valid JSON syntax; malformed raw schema bytes are
+not accepted. Provider request shaping still projects schemas through `Value`,
+so arbitrary raw Unicode/depth and exact wire-token fidelity are not claimed.
 
 Validation remains observational, not fail-closed: invalid JSON or parser failure
 retains the original text and emits `OutputValidationFailed`. Without a custom

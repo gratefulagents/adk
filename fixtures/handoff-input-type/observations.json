@@ -757,6 +757,7 @@
   ],
   "output_cases": [
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
@@ -772,10 +773,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
@@ -791,10 +794,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
@@ -810,10 +815,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "null",
       "raw": "null",
       "schema": {
@@ -829,10 +836,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "[]",
       "raw": "[]",
       "schema": {
@@ -848,10 +857,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "true",
       "raw": "true",
       "schema": {
@@ -867,10 +878,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
@@ -886,10 +899,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\"",
       "raw": "",
       "schema": {
@@ -905,10 +920,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
@@ -924,10 +941,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
@@ -943,10 +962,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
@@ -962,10 +983,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
@@ -981,10 +1004,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
@@ -1000,10 +1025,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "9007199254740992",
       "raw": "9007199254740993",
       "schema": {
@@ -1019,10 +1046,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"1e400\"",
       "raw": "1e400",
       "schema": {
@@ -1038,10 +1067,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
       "raw": "{\"n\":1e400,\"n\":1}",
       "schema": {
@@ -1057,10 +1088,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"$serde_json::private::Number\":\"1\"}",
       "raw": "{\"$serde_json::private::Number\":\"1\"}",
       "schema": {
@@ -1076,10 +1109,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "schema": {
@@ -1095,10 +1130,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "-0",
       "raw": "-0",
       "schema": {
@@ -1114,10 +1151,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "[0.1,1,1e-7,1e+21]",
       "raw": "[0.1,1.0,1e-7,1e21]",
       "schema": {
@@ -1133,10 +1172,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
@@ -1152,10 +1193,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
@@ -1171,10 +1214,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
@@ -1190,10 +1235,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "null",
       "raw": "null",
       "schema": {
@@ -1209,10 +1256,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "[]",
       "raw": "[]",
       "schema": {
@@ -1228,10 +1277,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "true",
       "raw": "true",
       "schema": {
@@ -1247,10 +1298,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
@@ -1266,10 +1319,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\"",
       "raw": "",
       "schema": {
@@ -1285,10 +1340,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
@@ -1304,10 +1361,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
@@ -1323,10 +1382,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
@@ -1342,10 +1403,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
@@ -1361,10 +1424,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
@@ -1380,10 +1445,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "9007199254740992",
       "raw": "9007199254740993",
       "schema": {
@@ -1399,10 +1466,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"1e400\"",
       "raw": "1e400",
       "schema": {
@@ -1418,10 +1487,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
       "raw": "{\"n\":1e400,\"n\":1}",
       "schema": {
@@ -1437,10 +1508,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"$serde_json::private::Number\":\"1\"}",
       "raw": "{\"$serde_json::private::Number\":\"1\"}",
       "schema": {
@@ -1456,10 +1529,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "schema": {
@@ -1475,10 +1550,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "-0",
       "raw": "-0",
       "schema": {
@@ -1494,10 +1571,12 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}\n</structured_output>",
       "output_json": "[0.1,1,1e-7,1e+21]",
       "raw": "[0.1,1.0,1e-7,1e21]",
       "schema": {
@@ -1513,366 +1592,1887 @@
         ],
         "type": "object"
       },
+      "schema_json": "{\"type\":\"object\",\"required\":[\"n\"],\"properties\":{\"n\":{\"type\":\"integer\",\"minimum\":0}},\"additionalProperties\":false}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "null",
       "raw": "null",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "[]",
       "raw": "[]",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "true",
       "raw": "true",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\"",
       "raw": "",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "9007199254740992",
       "raw": "9007199254740993",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"1e400\"",
       "raw": "1e400",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
       "raw": "{\"n\":1e400,\"n\":1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"$serde_json::private::Number\":\"1\"}",
       "raw": "{\"$serde_json::private::Number\":\"1\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "-0",
       "raw": "-0",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "[0.1,1,1e-7,1e+21]",
       "raw": "[0.1,1.0,1e-7,1e21]",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": false,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"n\":1}",
       "raw": "{\"n\":1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"n\":-1}",
       "raw": "{\"n\":-1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"text\"",
       "raw": "\"text\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "null",
       "raw": "null",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "[]",
       "raw": "[]",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "true",
       "raw": "true",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"not json\"",
       "raw": "not json",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\"",
       "raw": "",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ufffd\"",
       "raw": "\"\\ud800\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"\ufffd\":\"\ufffd\"}",
       "raw": "{\"\\ud800\":\"\\udc00\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ud83d\ude00\"",
       "raw": "\"\\ud83d\\ude00\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\\\\ud800\"",
       "raw": "\"\\\\ud800\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"\ufffd\ud800\udc00\"",
       "raw": "\"\\ud800\\uD800\\udc00\"",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "9007199254740992",
       "raw": "9007199254740993",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"1e400\"",
       "raw": "1e400",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
       "raw": "{\"n\":1e400,\"n\":1}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": true
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"$serde_json::private::Number\":\"1\"}",
       "raw": "{\"$serde_json::private::Number\":\"1\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "-0",
       "raw": "-0",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
       "streamed": true,
       "warning": false
     },
     {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":27}\n</structured_output>",
       "output_json": "[0.1,1,1e-7,1e+21]",
       "raw": "[0.1,1.0,1e-7,1e21]",
       "schema": {
         "type": 27
       },
+      "schema_json": "{\"type\":27}",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\nnull\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": null,
+      "schema_json": "null",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n\"schema\"\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": "schema",
+      "schema_json": "\"schema\"",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n7\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": 7,
+      "schema_json": "7",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": false,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"n\":1}",
+      "raw": "{\"n\":1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"n\":-1}",
+      "raw": "{\"n\":-1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"text\"",
+      "raw": "\"text\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "null",
+      "raw": "null",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "[]",
+      "raw": "[]",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "true",
+      "raw": "true",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"not json\"",
+      "raw": "not json",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\"",
+      "raw": "",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ufffd\"",
+      "raw": "\"\\ud800\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"\ufffd\":\"\ufffd\"}",
+      "raw": "{\"\\ud800\":\"\\udc00\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ud83d\ude00\"",
+      "raw": "\"\\ud83d\\ude00\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\\\\ud800\"",
+      "raw": "\"\\\\ud800\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"\ufffd\ud800\udc00\"",
+      "raw": "\"\\ud800\\uD800\\udc00\"",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "9007199254740992",
+      "raw": "9007199254740993",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"1e400\"",
+      "raw": "1e400",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "\"{\\\"n\\\":1e400,\\\"n\\\":1}\"",
+      "raw": "{\"n\":1e400,\"n\":1}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"$serde_json::private::Number\":\"1\"}",
+      "raw": "{\"$serde_json::private::Number\":\"1\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "raw": "{\"$serde_json::private::RawValue\":\"[1]\"}",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "-0",
+      "raw": "-0",
+      "schema": [],
+      "schema_json": "[]",
+      "streamed": true,
+      "warning": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n[]\n</structured_output>",
+      "output_json": "[0.1,1,1e-7,1e+21]",
+      "raw": "[0.1,1.0,1e-7,1e21]",
+      "schema": [],
+      "schema_json": "[]",
       "streamed": true,
       "warning": false
     }
@@ -1881,7 +3481,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "a9b65dfcf88fe48c07b26f241b79b7fb644d3ab4e56d7e9601cfddb13be555b9",
+      "scripts/handoff-input-type-reference/reference_test.go": "d7fd7130d14ab3ec9948cf5c642a4e7fbc58d1b716bb53e399a2b311fdd37e06",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

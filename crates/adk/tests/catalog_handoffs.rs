@@ -1428,7 +1428,7 @@ async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
         c.output_schema = if schema.is_empty() {
             None
         } else {
-            Some(serde_json::from_str(schema).unwrap())
+            Some(adk_core::JsonDocument::new(schema.into()).unwrap())
         };
         c.output_schema_name = case["name"].as_str().unwrap().into();
         c.output_schema_strict = case["strict"].as_bool().unwrap();
@@ -1473,8 +1473,11 @@ async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
             assert_eq!(requests.len(), 1);
             let request = &requests[0];
             assert_eq!(
-                request.output_schema.as_ref().map(|s| s.as_value()),
-                (!case["request_schema"].is_null()).then_some(&case["request_schema"])
+                request
+                    .output_schema
+                    .as_ref()
+                    .map(|s| serde_json::from_str::<serde_json::Value>(s.as_str()).unwrap()),
+                (!schema.is_empty()).then_some(case["request_schema"].clone())
             );
             if request.output_schema.is_some() {
                 assert_eq!(
@@ -1502,7 +1505,8 @@ async fn builder_output_schema_requests_and_results_match_pinned_sdk() {
 async fn output_schema_name_and_strict_default_match_original_sdk_test() {
     let model = Script::new(vec![]);
     let mut c = config();
-    c.output_schema = Some(json!({"type":"object"}).try_into().unwrap());
+    c.output_schema =
+        Some(adk_core::JsonDocument::new((json!({"type":"object"})).to_string()).unwrap());
     c.output_schema_name = "test".into();
     let mut bundle = builder(c, &model).build(&context()).await.unwrap();
     assert_eq!(bundle.agent().output_schema_name, "test");
@@ -1516,7 +1520,7 @@ async fn builder_forwards_output_schema_without_local_compilation() {
     let owner = SessionState::new();
     let handle = owner.handle();
     let mut c = config();
-    c.output_schema = Some(json!({"type":27}).try_into().unwrap());
+    c.output_schema = Some(adk_core::JsonDocument::new((json!({"type":27})).to_string()).unwrap());
     let mut bundle = builder(c.clone(), &model)
         .owned_session(owner)
         .build(&context())

@@ -1114,7 +1114,7 @@ async fn structured_output_validation_preserves_baseline_result() {
     ))
     .unwrap();
     let cases = fixture["output_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 80);
+    assert_eq!(cases.len(), 240);
     for case in cases {
         let output = case["raw"].as_str().unwrap();
         let model = TestModel::with(vec![Ok(answer(output))]);
@@ -1122,8 +1122,11 @@ async fn structured_output_validation_preserves_baseline_result() {
             response: answer(output),
         })]]
         .into();
-        let mut a = agent(model);
-        a.output_schema = Some(serde_json::from_value(case["schema"].clone()).unwrap());
+        let mut a = agent(model.clone());
+        a.output_schema = Some(
+            adk_core::JsonDocument::new(case["schema_json"].as_str().unwrap().into()).unwrap(),
+        );
+        a.output_schema_name = "final".into();
         let hooks = Arc::new(Observations::default());
         let result = Runner::new(
             a,
@@ -1153,6 +1156,15 @@ async fn structured_output_validation_preserves_baseline_result() {
             .unwrap(),
             case["output_json"].as_str().unwrap(),
             "{case}"
+        );
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(
+            requests[0].output_schema.as_ref().unwrap().as_str(),
+            case["schema_json"].as_str().unwrap()
+        );
+        assert_eq!(
+            requests[0].instructions,
+            case["instructions"].as_str().unwrap()
         );
         assert_eq!(
             hooks
@@ -4598,7 +4610,8 @@ async fn mcp_prompt_matches_pinned_normal_streamed_and_structured_requests() {
         a.instructions = "base".into();
         a.mcp_servers = serde_json::from_value(case["names"].clone()).unwrap();
         if case["schema"].as_bool().unwrap() {
-            a.output_schema = Some(json!({"type":"object"}).try_into().unwrap());
+            a.output_schema =
+                Some(adk_core::JsonDocument::new((json!({"type":"object"})).to_string()).unwrap());
         }
         let r = Runner::new(
             a,

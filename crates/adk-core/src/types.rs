@@ -257,7 +257,7 @@ pub struct ModelRequest {
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub input_provenance: Vec<ItemProvenance>,
     pub tools: Vec<ToolDefinition>,
-    pub output_schema: Option<schemars::Schema>,
+    pub output_schema: Option<JsonDocument>,
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub settings: serde_json::Map<String, Value>,

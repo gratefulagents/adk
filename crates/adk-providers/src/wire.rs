@@ -448,6 +448,7 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         body["tools"] = tools.into();
     }
     if let Some(schema) = &request.output_schema {
+        let schema: Value = serde_json::from_str(schema.as_str()).map_err(|_| unsupported())?;
         let format = json!({"type":"json_schema","name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema});
         match protocol {
             Protocol::Responses => body["text"] = json!({"format":format}),

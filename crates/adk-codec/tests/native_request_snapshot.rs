@@ -38,7 +38,7 @@ fn full() -> ModelRequest {
         input_provenance: vec![ItemProvenance::Unattributed, attributed(), attributed(), attributed(), attributed()],
         tools: vec![ToolDefinition { name: "tool".into(), description: "description".into(), input_schema: serde_json::from_value(json!({"properties":{"x":{"type":"string"}},"type":"object"})).unwrap(), read_only: true, requires_approval: true }],
         settings: json!({"temperature":0.5,"max_tokens":100,"parallel_tool_calls":false,"thinking_budget":200,"stop_sequences":["stop"],"prompt_cache_key":"private-cache-key"}).as_object().unwrap().clone(),
-        output_schema: Some(serde_json::from_value(json!({"type":"object"})).unwrap()), output_schema_name: "answer".into(), output_schema_strict: true,
+        output_schema: Some(adk_core::JsonDocument::new(r#"{"type":"object"}"#.into()).unwrap()), output_schema_name: "answer".into(), output_schema_strict: true,
         ..empty()
     }
 }
@@ -222,6 +222,34 @@ fn approval_markers_keep_order_authorship_and_estimates() {
     };
     assert!(
         RequestSnapshot::from_native_with_approvals("B", &request, &[None], &[outside]).is_err()
+    );
+}
+
+#[test]
+fn output_schema_snapshot_preserves_raw_documents() {
+    for raw in [
+        "null",
+        "\"schema\"",
+        "7",
+        "[]",
+        "true",
+        "{ \"n\": 1e+09, \"n\": -0 }",
+        r#""\ud800""#,
+    ] {
+        let mut request = empty();
+        request.output_schema = Some(JsonDocument::new(raw.into()).unwrap());
+        let snapshot = RequestSnapshot::from_native("A", &request, &[]).unwrap();
+        assert_eq!(
+            snapshot.output_schema.as_ref().unwrap().schema.bytes(),
+            raw.as_bytes()
+        );
+        assert!(to_go_json(&snapshot).is_ok());
+    }
+    assert!(
+        RequestSnapshot::from_native("A", &empty(), &[])
+            .unwrap()
+            .output_schema
+            .is_none()
     );
 }
 

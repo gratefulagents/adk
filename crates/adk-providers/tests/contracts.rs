@@ -1051,6 +1051,24 @@ fn anthropic_ignores_sdk_verbosity_without_losing_reasoning_budget() {
 }
 
 #[test]
+fn output_schema_documents_are_forwarded_without_shape_validation() {
+    for raw in ["null", "\"schema\"", "7", "[]", "true", "{\"type\":27}"] {
+        let mut input = request();
+        input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+        let expected: serde_json::Value = serde_json::from_str(raw).unwrap();
+        for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
+            let body = wire::request(&input, protocol, false).unwrap();
+            let format = match protocol {
+                Protocol::Chat => &body["response_format"]["json_schema"],
+                Protocol::Responses => &body["text"]["format"],
+                Protocol::Anthropic => &body["output_format"],
+            };
+            assert_eq!(format.get("schema"), Some(&expected));
+        }
+    }
+}
+
+#[test]
 fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     let mut input = request();
     input.settings.insert(
@@ -1063,7 +1081,10 @@ fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     input
         .settings
         .insert("compaction_threshold".into(), json!(20000));
-    input.output_schema = Some(json!({"type":"object","properties":{}}).try_into().unwrap());
+    input.output_schema = Some(
+        adk_core::JsonDocument::new((json!({"type":"object","properties":{}})).to_string())
+            .unwrap(),
+    );
     let chat = wire::request(&input, Protocol::Chat, false).unwrap();
     assert_eq!(
         chat["models"],

@@ -135,7 +135,7 @@ pub struct Config {
     pub reasoning: String,
     pub verbosity: String,
     pub settings: Map<String, Value>,
-    pub output_schema: Option<schemars::Schema>,
+    pub output_schema: Option<adk_core::JsonDocument>,
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn adk_runtime::OutputParser>>,

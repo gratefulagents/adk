@@ -934,7 +934,7 @@ async fn structured_output() {
         let hooks = Arc::new(Hooks::default());
         let mut bundle = adk::builder::Builder::new(adk::builder::Config {
             model: "mock/base".into(),
-            output_schema: Some(json!({"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"],"additionalProperties":false}).try_into().unwrap()),
+            output_schema: Some(adk_core::JsonDocument::new((json!({"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"],"additionalProperties":false})).to_string()).unwrap()),
             output_schema_name: "answer".into(),
             ..Default::default()
         })

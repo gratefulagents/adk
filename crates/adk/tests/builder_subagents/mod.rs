@@ -182,7 +182,7 @@ async fn automatic_children_run_in_both_modes_with_role_security_and_limits() {
                 }),
                 ..Default::default()
             });
-            c.output_schema = Some(true.into());
+            c.output_schema = Some(adk_core::JsonDocument::new("true".into()).unwrap());
             let host = Arc::new(TestHost::default());
             let mut bundle = builder(c, &parent)
                 .model("worker", Kind::Local, child.clone())

@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Inner regex brackets retain Go literal semantics
+
+The translator no longer rejects Go-valid opening brackets within a class.
+Recognized complete POSIX atoms retain their special meaning; other opening
+brackets are literal, rather than acquiring Rust nested-class semantics.
+Unknown complete POSIX names and unclosed classes remain rejected. Twenty-one
+actual-Go patterns include17 accepted forms ×140 inputs (2,380 comparisons per
+native compiler) and4 rejected forms. Multi-character input cases distinguish
+literal closing brackets after a class from nested-class interpretations.
+The prior Go-valid `[a[b]]` rejection was reproduced before the fix.
+
+Fresh Rust1.88 Linux: **1,724 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict lint/typecheck/rustdoc, formatting, full feature matrix,
+standalone consumer/purity, Go test/vet/build, bound references,53 validators,
+artifacts/overlay/audit and immutable source locks passed. Double-hyphen syntax
+and other parser gaps remain unclaimed. Ledger remains **947 verified /
+7,944 unresolved /251 excluded**; issue acceptance is incomplete.
+
 ### Named regex groups
 
 Rule compilation validates Go's capture-name grammar and compiles validated

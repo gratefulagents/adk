@@ -52,7 +52,9 @@ regex-parser prose is not a Go byte-parity claim. The shared subset accepts the
 14 Go POSIX ASCII class names and their negations, including unions and leading
 literal `]` cases. Ampersands, tildes and pipes in classes remain Go literals,
 including repeated forms that Rust otherwise interprets as class-set operations.
-Arbitrary nested classes and double-hyphen syntax remain explicitly unsupported.
+An inner opening bracket that does not begin a complete POSIX atom is a literal,
+as in Go, not Rust nested-class syntax. Unknown complete POSIX names are rejected.
+Double-hyphen syntax remains explicitly unsupported.
 Counted repetitions enforce Go's 1,000-copy bound, including nested
 products; zero maximums shield inner products but do not permit independently
 invalid inner counts. Malformed count forms, including leading-zero numbers,

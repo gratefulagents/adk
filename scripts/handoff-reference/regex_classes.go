@@ -94,6 +94,16 @@ func regexCaptureScenarios() ([]regexClassCase, []string) {
 	return regexMembership(patterns, inputs), inputs
 }
 
+func regexBracketScenarios() ([]regexClassCase, []string) {
+	inputs := []string{}
+	for r := rune(0); r < 128; r++ {
+		inputs = append(inputs, string(r))
+	}
+	inputs = append(inputs, "", "a]", "[]", "b]", "x]", "&]", "ab]", "[b]", "a]]", "[]]", "猫", "猫]")
+	patterns := []string{`^[a[b]]$`, `^[[a-z]$`, `^[[a]b]$`, `^[a-z&&[b]]$`, `^[[:alpha:][a-z]]$`, `^[[:alpha]]$`, `^[[:alpha:xyz]]$`, `^[[.a.]]$`, `^[[]$`, `^[[[]$`, `^[[^]$`, `^[^[a]]$`, `^[[]]$`, `(?i)^[k[s]]$`, `^[\d[a]]$`, `^[[:alpha:][[]]$`, `[[:bogus:]]`, `[[:Alpha:]]`, `[[:alpha:]`, `[[`, `[[:]]`}
+	return regexMembership(patterns, inputs), inputs
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

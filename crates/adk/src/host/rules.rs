@@ -346,10 +346,18 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                         class_can_negate = false;
                         continue;
                     }
-                    return Err(Error::new(
-                        ErrorCategory::Unsupported,
-                        "Go/Rust nested character-class syntax differs outside recognized POSIX atoms",
-                    ));
+                    if chars.peek() == Some(&':')
+                        && chars.clone().skip(1).collect::<String>().contains(":]")
+                    {
+                        return Err(Error::new(
+                            ErrorCategory::InvalidInput,
+                            "invalid Go POSIX character-class name",
+                        ));
+                    }
+                    pattern.push_str(r"\[");
+                    class_has_atom = true;
+                    class_can_negate = false;
+                    continue;
                 }
                 in_class = true;
                 class_has_atom = false;

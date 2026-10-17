@@ -486,8 +486,8 @@ Unicode, control and multi-character cases). All14 Go POSIX ASCII class names,
 negations and case-insensitive forms are compiled by the actual public SDK rule
 compiler. Ordered `0`/`1` match strings record8804 Go membership decisions; native
 host and public compilers each compare every decision. The Go generator contains
-no copied class matcher. Arbitrary nested and double-hyphen syntax remain
-explicitly unsupported; ampersands, tildes and pipes retain Go literal semantics.
+no copied class matcher. Double-hyphen syntax remains explicitly unsupported;
+inner brackets, ampersands, tildes and pipes retain Go literal semantics.
 
 The repeat oracle records40 actual SDK compilation decisions at and beyond Go's
 1,000-count boundary: bounded/unbounded counts, nested products, alternatives,
@@ -524,3 +524,9 @@ Both named-group spellings, digit-leading names, duplicate names, nested groups,
 repetition, flags and quoted literals are compared through actual SDK matching.
 Empty/non-ASCII/punctuated names, malformed delimiters, lookahead and backreferences
 remain rejected. These are membership-only guards, not a capture-extraction API.
+
+Inner-bracket coverage adds21 patterns over140 inputs, including multi-character
+strings that distinguish Go literal brackets from Rust nested classes. Complete
+POSIX names, incomplete POSIX-like text, ordinary brackets, ranges, Perl atoms,
+case folding and malformed/unclosed classes are checked against actual SDK
+compilation and membership rather than normalized class sets.

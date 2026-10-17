@@ -396,7 +396,7 @@ async fn public_rule_compiler_retains_valid_rules_and_ordered_errors() {
 #[cfg(feature = "host")]
 #[test]
 fn public_rule_compiler_preserves_explicit_regex_support_limits() {
-    let rules: Vec<_> = ["(?x)danger", "[a[b]]", "danger"]
+    let rules: Vec<_> = ["(?x)danger", "[a--b]", "danger"]
         .into_iter()
         .map(|pattern| adk::host::GuardrailRule {
             name: pattern.into(),
@@ -576,5 +576,19 @@ async fn capture_groups_match_actual_go_membership() {
     let inputs = fixture["regex_capture_inputs"].as_array().unwrap();
     assert_eq!(cases.len(), 22);
     assert_eq!(inputs.len(), 12);
+    assert_regex_membership(cases, inputs).await;
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn inner_brackets_match_actual_go_literal_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_brackets"].as_array().unwrap();
+    let inputs = fixture["regex_bracket_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 21);
+    assert_eq!(inputs.len(), 140);
     assert_regex_membership(cases, inputs).await;
 }

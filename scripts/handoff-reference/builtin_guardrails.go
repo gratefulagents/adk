@@ -40,6 +40,8 @@ type toolPatternCase struct {
 }
 
 type builtinFixture struct {
+	RegexBrackets      []regexClassCase   `json:"regex_brackets"`
+	RegexBracketInputs []string           `json:"regex_bracket_inputs"`
 	RegexCaptures      []regexClassCase   `json:"regex_captures"`
 	RegexCaptureInputs []string           `json:"regex_capture_inputs"`
 	RegexOctal         []regexClassCase   `json:"regex_octal"`
@@ -174,7 +176,8 @@ func generateBuiltinGuardrails() ([]byte, error) {
 	literalCases, literalInputs := regexLiteralScenarios()
 	octalCases, octalInputs := regexOctalScenarios()
 	captureCases, captureInputs := regexCaptureScenarios()
-	fixture := builtinFixture{RegexCaptures: captureCases, RegexCaptureInputs: captureInputs, RegexOctal: octalCases, RegexOctalInputs: octalInputs, RegexSetLiterals: regexSetLiteralScenarios(regexInputs), RegexPerlClasses: regexPerlClassScenarios(regexInputs), RegexLiterals: literalCases, RegexLiteralInputs: literalInputs, RegexRepeats: regexRepeatScenarios(), RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
+	bracketCases, bracketInputs := regexBracketScenarios()
+	fixture := builtinFixture{RegexBrackets: bracketCases, RegexBracketInputs: bracketInputs, RegexCaptures: captureCases, RegexCaptureInputs: captureInputs, RegexOctal: octalCases, RegexOctalInputs: octalInputs, RegexSetLiterals: regexSetLiteralScenarios(regexInputs), RegexPerlClasses: regexPerlClassScenarios(regexInputs), RegexLiterals: literalCases, RegexLiteralInputs: literalInputs, RegexRepeats: regexRepeatScenarios(), RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
 	for _, name := range []string{"", "write", "read_file", "mcp_sql_db_write", "*write", "foo*bar", "猫-read", "file\nwrite"} {
 		for _, pattern := range []string{"", "*", "write", "wr*", "*ite", "*write", "*sql*_write", "*sql*", "wr*te", "**", "foo*", "foo**", "猫*", "*read", "\n*"} {
 			fixture.ToolPatterns = append(fixture.ToolPatterns, toolPatternCase{Name: name, Pattern: pattern, Matches: guardrails.MatchToolPattern(name, pattern)})

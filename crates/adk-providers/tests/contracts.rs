@@ -1,5 +1,7 @@
 #[path = "contracts/chat_stream_reference.rs"]
 mod chat_stream_reference;
+#[path = "contracts/compaction_origin.rs"]
+mod compaction_origin;
 
 use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest};
 use adk_providers::{

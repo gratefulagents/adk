@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Original Anthropic compaction-origin regression file
+
+Ported both original compaction-origin tests with identical native/legacy/foreign
+inputs: only native and unstamped ciphertext survives, while a foreign plaintext
+summary becomes one marked text block and opaque-only foreign state is dropped.
+Both original tests and the fully covered two-test source file are now claimed;
+no entire conversion helper/provider parity is inferred. Production code did not
+change. An initial test compilation missed the existing stream argument; corrected
+before final checks.
+
+Fresh Rust1.88 Linux: **1,661 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/typecheck/format, bound references,51 validators, artifact/
+overlay/audit and immutable source locks passed. Matrix/consumer/purity,20
+scenarios and host-session passed on the unchanged implementation in the preceding
+assembler checkpoint. Ledger: **882 verified /8,009 unresolved /251 excluded**.
+Full issue11 acceptance remains incomplete.
+
 ### Independent partial Anthropic response assembler
 
 Added caller-owned `anthropic::StreamAssembler` separately from strict native

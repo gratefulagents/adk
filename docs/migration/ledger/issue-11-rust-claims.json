@@ -15715,6 +15715,55 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-64ECB28EDF4193E5": {
+      "source": "pkg/agentsdk/providers/anthropic/compaction_origin_test.go",
+      "source_name": "TestItemsToAnthropicMessagesDownConvertsForeignBlobSummary",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "compaction_origin::anthropic_downconverts_foreign_summary_without_forwarding_ciphertext"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/anthropic/TestItemsToAnthropicMessagesDownConvertsForeignBlobSummary",
+      "rationale": "Original compaction-origin regression counterpart using identical native, legacy-unstamped and foreign ciphertext inputs, including a foreign plaintext summary and an opaque-only foreign block. Tests check only native/legacy compaction survives and foreign summary becomes one marked text block without forwarding ciphertext. The file claim covers both original test entry points; it does not claim all conversion helpers or the provider package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-F64A6D73D7EEDBCA": {
+      "source": "pkg/agentsdk/providers/anthropic/compaction_origin_test.go",
+      "source_name": "TestItemsToAnthropicMessagesSkipsForeignCompactionBlobs",
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "compaction_origin::anthropic_skips_foreign_compaction_and_keeps_native_and_legacy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/anthropic/TestItemsToAnthropicMessagesSkipsForeignCompactionBlobs",
+      "rationale": "Original compaction-origin regression counterpart using identical native, legacy-unstamped and foreign ciphertext inputs, including a foreign plaintext summary and an opaque-only foreign block. Tests check only native/legacy compaction survives and foreign summary becomes one marked text block without forwarding ciphertext. The file claim covers both original test entry points; it does not claim all conversion helpers or the provider package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-0259AC4D3AA22DC1": {
+      "source": "pkg/agentsdk/providers/anthropic/compaction_origin_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-providers/src/wire.rs::request"
+      ],
+      "rust_test_identifiers": [
+        "compaction_origin::anthropic_downconverts_foreign_summary_without_forwarding_ciphertext",
+        "compaction_origin::anthropic_skips_foreign_compaction_and_keeps_native_and_legacy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/anthropic/TestItemsToAnthropicMessagesSkipsForeignCompactionBlobs",
+      "rationale": "Original compaction-origin regression counterpart using identical native, legacy-unstamped and foreign ciphertext inputs, including a foreign plaintext summary and an opaque-only foreign block. Tests check only native/legacy compaction survives and foreign summary becomes one marked text block without forwarding ciphertext. The file claim covers both original test entry points; it does not claim all conversion helpers or the provider package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }
